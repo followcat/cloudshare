@@ -7,6 +7,7 @@ share，edit your doc，pdf，md and so on...
     pypandoc
     emaildata
     dulwich
+    python-magic
 
     libreoffice
     pdftohtml

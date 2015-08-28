@@ -4,6 +4,7 @@ import os.path
 import mimetypes
 import subprocess
 
+import magic
 import pypandoc
 import emaildata.text
 
@@ -64,6 +65,7 @@ def get_md_version(filename):
 
 
 def storage(file, repo):
+    mimetype = magic.Magic()
     stream = file.read()
     path = repo.repo.path + '/'
 
@@ -72,15 +74,15 @@ def storage(file, repo):
 
     htmlname = basename + '.html'
     mdname = basename + '.md'
-    mimetype = file.mimetype
+    mimetype = mimetype.from_buffer(stream)
     save_stream(path, localname, stream)
-    if mimetype == 'application/pdf':
+    if mimetype.startswith('PDF'):
         file_pdf_to_html(path, localname)
-    elif mimetype == 'application/msword':
-        returncode = file_doc_to_html(path, localname)
-        if 'Document is empty' in returncode[0]:
-            html_src = file_mht_to_html(path, localname)
-            save_stream(path, htmlname, html_src)
+    elif mimetype.startswith('news or mail'):
+        html_src = file_mht_to_html(path, localname)
+        save_stream(path, htmlname, html_src)
+    else:
+       returncode = file_doc_to_html(path, localname)
     md = file_html_to_md(path, htmlname).encode('utf-8')
     save_stream(path, mdname, md)
     repo.add_file(path, mdname, md)

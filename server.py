@@ -17,11 +17,12 @@ def index():
             return render_template('index.html', error='Please enter filename.')
         mdname = converterutils.get_md_version(network_file.filename)
         local_file = repo.repo.get_named_file('../' + mdname)
-        if isinstance(local_file, file):
+        if local_file is not None:
             md = local_file.read()
             local_file.close()
         else:
-            md = converterutils.storage(network_file, repo)
+            md = converterutils.storage(network_file.filename,
+                                        network_file, repo)
         format_md = md.decode('utf-8').replace('\\\n', '\n\n')
         return render_template('index.html', markdown=format_md)
     return render_template('index.html')

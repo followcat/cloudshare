@@ -64,13 +64,35 @@ def get_md_version(filename):
     return basename + '.md'
 
 
-def storage(file, repo):
+def storage(filename, fileobj, repo):
+    """
+        >>> import shutil
+        >>> import gitinterface
+        >>> import converterutils
+        >>> repo_name = 'test_repo'
+        >>> interface = gitinterface.GitInterface(repo_name)
+        >>> cv1_name = 'cv_1.doc'
+        >>> cv2_name = 'cv_2.doc'
+        >>> cv1_file = open('test/' + cv1_name, 'r')
+        >>> cv2_file = open('test/' + cv2_name, 'r')
+        >>> md1_str = converterutils.storage(cv1_name, cv1_file, interface)
+        >>> md2_str = converterutils.storage(cv2_name, cv2_file, interface)
+        >>> with open('test_repo/cv_1.md') as file:
+        ...     md1_file = file.read()
+        >>> with open('test_repo/cv_2.md') as file:
+        ...     md2_file = file.read()
+        >>> md1_str == md1_file
+        True
+        >>> md2_str == md2_file
+        True
+        >>> shutil.rmtree(repo_name)
+    """
     mimetype = magic.Magic()
-    stream = file.read()
+    stream = fileobj.read()
     path = repo.repo.path + '/'
 
-    basename, _ = os.path.splitext(file.filename)
-    localname = file.filename
+    basename, _ = os.path.splitext(filename)
+    localname = filename
 
     htmlname = basename + '.html'
     mdname = basename + '.md'

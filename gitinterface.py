@@ -55,7 +55,8 @@ class GitInterface(object):
             >>> import gitinterface
             >>> repo_name = 'test_repo'
             >>> interface = gitinterface.GitInterface(repo_name)
-            >>> commit_id = interface.add_file('test_file', b'test',
+            >>> path = interface.repo.path + '/'
+            >>> commit_id = interface.add_file(path, 'test_file', b'test',
             ... b'Test commit', b'test<test@test.com>')
             >>> interface.modify_file('test_file', b'Modify test')
             >>> with open('test_repo/test_file') as file:

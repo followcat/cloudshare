@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import os.path
-import mimetypes
-
 from flask import Flask, request, render_template
 
 import gitinterface
@@ -16,24 +12,17 @@ repo = gitinterface.GitInterface("repo")
 @app.route("/demo", methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        file = request.files['file']
-        stream = file.read()
-        localname = '/tmp/' + file.filename
-        converterutils.save_stream(stream, localname)
-        format, _ = mimetypes.guess_type(localname)
-        basename, _ = os.path.splitext(localname)
-        htmlname = basename + '.html'
-        if format == 'application/pdf':
-            converterutils.pdf_to_html(localname)
-        elif format in ['application/msword',
-                        'application/vnd.openxmlformats-officedocument.\
-                        wordprocessingml.document']:
-            returncode = converterutils.doc_to_html(localname, '/tmp')
-            if 'error' in returncode[0]:
-                html_src = converterutils.file_mht_to_html(localname)
-                converterutils.save_stream(html_src, htmlname)
-        md = converterutils.file_html_to_md(htmlname)
-        format_md = md.replace('\\\n', '\n\n')
+        network_file = request.files['file']
+        if network_file.mimetype == 'application/octet-stream':
+            return render_template('index.html', error='Please enter filename.')
+        mdname = converterutils.get_md_version(network_file.filename)
+        local_file = repo.repo.get_named_file('../' + mdname)
+        if isinstance(local_file, file):
+            md = local_file.read()
+            local_file.close()
+        else:
+            md = converterutils.storage(network_file, repo)
+        format_md = md.decode('utf-8').replace('\\\n', '\n\n')
         return render_template('index.html', markdown=format_md)
     return render_template('index.html')
 

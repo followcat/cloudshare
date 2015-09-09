@@ -1,27 +1,12 @@
 # -*- coding: utf-8 -*-
+import os
 import email
 import os.path
-import mimetypes
 import subprocess
 
 import magic
 import pypandoc
 import emaildata.text
-
-
-"""
-def doc_to_docx(file_uri, output_dir):
-    p = subprocess.Popen(['soffice', '--headless', '-convert-to',
-                          'docx:MS Word 2007 XML', file_uri,
-                          '--outdir', output_dir],
-                         stdout=subprocess.PIPE)
-    p.communicate()
-
-
-def file_docx_to_md(file_uri):
-    result = pypandoc.convert(file_uri, 'md', format='docx')
-    return result
-"""
 
 
 def file_pdf_to_html(path, filename):
@@ -109,3 +94,47 @@ def storage(filename, fileobj, repo):
     save_stream(path, mdname, md)
     repo.add_file(path, mdname, md)
     return md
+
+
+def file_doc_to_docbook(path, filename, output):
+    p = subprocess.Popen(['libreoffice', '--headless', '--convert-to',
+                          'xml:DocBook File', os.path.join(path, filename),
+                          '--outdir', output],
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    returncode = p.communicate()
+    return returncode
+
+
+def file_docbook_to_markdown(path, filename, output):
+    input_file = os.path.join(path, filename)
+    output_file = os.path.join(output, filename + '.md')
+    try:
+        pypandoc.convert(input_file, 'markdown', format='docbook', outputfile=output_file)
+    except RuntimeError as e:
+        pass
+
+
+def convert_folder(path):
+    docbook_path = 'docbook_output'
+    markdown_path = 'md_output'
+    if not os.path.exists(docbook_path):
+        os.mkdir(docbook_path)
+    if not os.path.exists(markdown_path):
+        os.mkdir(markdown_path)
+    mimetype = magic.Magic()
+    for root, dirs, files in os.walk(path):
+        for name in files:
+            abs_path = os.path.join(root, name)
+            with open(abs_path, 'r') as f:
+                stream = f.read()
+            filetype = mimetype.from_buffer(stream)
+            if filetype.startswith('PDF'):
+                pass
+            elif filetype.startswith('news or mail'):
+                pass
+            else:
+                returncode = file_doc_to_docbook(root, name, docbook_path)
+                basename, _ = os.path.splitext(name)
+                file_docbook_to_markdown(docbook_path,
+                                         basename + '.xml',
+                                         markdown_path)

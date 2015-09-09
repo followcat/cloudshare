@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request, render_template
 
+import codecs
+
+import pypandoc
+import markdown
+
 import gitinterface
 import converterutils
 
@@ -27,6 +32,13 @@ def index():
         return render_template('index.html', markdown=format_md)
     return render_template('index.html')
 
+
+@app.route("/showtest/<filename>")
+def showtest(filename):
+    with codecs.open('md_output/%s.xml.md' % filename, 'r', encoding='utf-8') as file:
+        data = file.read()
+    output = pypandoc.convert(data, 'html', format='markdown')
+    return render_template('cv.html', markdown=output)
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=4888)

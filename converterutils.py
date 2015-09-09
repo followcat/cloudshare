@@ -115,6 +115,23 @@ def file_docbook_to_markdown(path, filename, output):
 
 
 def convert_folder(path):
+    """
+        >>> import os
+        >>> import converterutils
+        >>> import xml.etree.ElementTree
+        >>> converterutils.convert_folder('./test')
+        >>> e = xml.etree.ElementTree.parse('docbook_output/cv_1.xml').getroot()
+        >>> e.findall('para')[0].text
+        'http://jianli.yjbys.com/'
+        >>> with open('md_output/cv_1.xml.md') as file:
+        ...     data = file.read()
+        >>> 'http://jianli.yjbys.com/' in data
+        True
+        >>> os.remove('docbook_output/cv_1.xml')
+        >>> os.remove('docbook_output/cv_2.xml')
+        >>> os.remove('md_output/cv_1.xml.md')
+        >>> os.remove('md_output/cv_2.xml.md')
+    """
     docbook_path = 'docbook_output'
     markdown_path = 'md_output'
     if not os.path.exists(docbook_path):

@@ -2,6 +2,7 @@
 import os
 import email
 import os.path
+import mimetypes
 import subprocess
 
 import magic
@@ -138,20 +139,18 @@ def convert_folder(path):
         os.mkdir(docbook_path)
     if not os.path.exists(markdown_path):
         os.mkdir(markdown_path)
-    mimetype = magic.Magic()
     for root, dirs, files in os.walk(path):
         for name in files:
-            abs_path = os.path.join(root, name)
-            with open(abs_path, 'r') as f:
-                stream = f.read()
-            filetype = mimetype.from_buffer(stream)
-            if filetype.startswith('PDF'):
-                pass
-            elif filetype.startswith('news or mail'):
-                pass
-            else:
+            mimetype = mimetypes.guess_type(os.path.join(root, name))[0]
+            if mimetype in ['application/msword',
+                            "application/vnd.openxmlformats-officedocument"
+                            ".wordprocessingml.document"]:
                 returncode = file_doc_to_docbook(root, name, docbook_path)
+                if "Error" in returncode[0]:
+                    continue
                 basename, _ = os.path.splitext(name)
                 file_docbook_to_markdown(docbook_path,
                                          basename + '.xml',
                                          markdown_path)
+            else:
+                pass

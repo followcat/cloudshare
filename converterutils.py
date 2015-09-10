@@ -4,6 +4,7 @@ import email
 import os.path
 import mimetypes
 import subprocess
+import xml.etree.ElementTree
 
 import magic
 import pypandoc
@@ -115,6 +116,15 @@ def file_docbook_to_markdown(path, filename, output):
         pass
 
 
+def remove_note(path, filename):
+    e = xml.etree.ElementTree.parse(os.path.join(path, filename))
+    note_parent = e.findall('.//note/..')
+    for parent in note_parent:
+        while(parent.find('note') is not None):
+            parent.remove(parent.find('note'))
+    e.write(os.path.join(path, filename), encoding='utf-8')
+
+
 def convert_folder(path):
     """
         >>> import os
@@ -149,6 +159,7 @@ def convert_folder(path):
                 if "Error" in returncode[0]:
                     continue
                 basename, _ = os.path.splitext(name)
+                remove_note(docbook_path, basename + '.xml')
                 file_docbook_to_markdown(docbook_path,
                                          basename + '.xml',
                                          markdown_path)

@@ -125,6 +125,15 @@ def remove_note(path, filename):
     e.write(os.path.join(path, filename), encoding='utf-8')
 
 
+def process_mht(path, filename):
+    with open(os.path.join(path, filename), 'r') as f:
+        stream = f.read()
+    if 'Content-Type:multipart/related' in stream:
+        return False
+    else:
+        return True
+
+
 def convert_folder(path):
     """
         >>> import os
@@ -155,13 +164,18 @@ def convert_folder(path):
             if mimetype in ['application/msword',
                             "application/vnd.openxmlformats-officedocument"
                             ".wordprocessingml.document"]:
+                if not process_mht(root, name):
+                    continue
                 returncode = file_doc_to_docbook(root, name, docbook_path)
                 if "Error" in returncode[0]:
                     continue
                 basename, _ = os.path.splitext(name)
-                remove_note(docbook_path, basename + '.xml')
+                docbookname = basename + '.xml'
+                if not os.path.exists(os.path.join(docbook_path, docbookname)):
+                    continue
+                remove_note(docbook_path, docbookname)
                 file_docbook_to_markdown(docbook_path,
-                                         basename + '.xml',
+                                         docbookname,
                                          markdown_path)
             else:
                 pass

@@ -113,13 +113,13 @@ def remove_note(path, filename):
     e.write(os.path.join(path, filename), encoding='utf-8')
 
 
-def process_mht(path, filename):
-    with open(os.path.join(path, filename), 'r') as f:
-        stream = f.read()
-    if 'multipart/related' in stream:
-        return False
-    else:
-        return True
+def process_mht(stream, mht_path, filename):
+    message = email.message_from_string(stream)
+    for part in message.walk():
+        if part.get_content_charset() is not None:
+            part.set_param('charset', 'utf-8')
+    html_src = emaildata.text.Text.html(message)
+    save_stream(mht_path, filename, html_src)
 
 
 def convert_folder(path):
@@ -140,22 +140,30 @@ def convert_folder(path):
         >>> os.remove('md_output/cv_1.xml.md')
         >>> os.remove('md_output/cv_2.xml.md')
     """
-    docbook_path = 'docbook_output'
+    mht_path = "mht_output"
     markdown_path = 'md_output'
-    if not os.path.exists(docbook_path):
-        os.mkdir(docbook_path)
+    docbook_path = 'docbook_output'
+    if not os.path.exists(mht_path):
+        os.mkdir(mht_path)
     if not os.path.exists(markdown_path):
         os.mkdir(markdown_path)
+    if not os.path.exists(docbook_path):
+        os.mkdir(docbook_path)
     for root, dirs, files in os.walk(path):
         for name in files:
             mimetype = mimetypes.guess_type(os.path.join(root, name))[0]
             if mimetype in ['application/msword',
                             "application/vnd.openxmlformats-officedocument"
                             ".wordprocessingml.document"]:
-                if not process_mht(root, name):
-                    continue
-                returncode = convert_docfile(root, name, docbook_path,
-                                             'xml:DocBook File')
+                with open(os.path.join(root, name), 'r') as f:
+                    stream = f.read()
+                if 'multipart/related' in stream:
+                    process_mht(stream, mht_path, name)
+                    returncode = convert_docfile(mht_path, name, docbook_path,
+                                                 'xml:DocBook File')
+                else:
+                    returncode = convert_docfile(root, name, docbook_path,
+                                                 'xml:DocBook File')
                 if "Error" in returncode[0]:
                     continue
                 basename, _ = os.path.splitext(name)

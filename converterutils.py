@@ -17,14 +17,6 @@ def file_pdf_to_html(path, filename):
     p.communicate()
 
 
-def file_doc_to_html(path, filename):
-    p = subprocess.Popen(['soffice', '--headless', '--convert-to',
-                          'html', path + filename, '--outdir', path],
-                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    returncode = p.communicate()
-    return returncode
-
-
 def file_html_to_md(path, filename):
     result = pypandoc.convert(path + filename, 'md', format='html')
     return result
@@ -91,16 +83,17 @@ def storage(filename, fileobj, repo):
         html_src = file_mht_to_html(path, localname)
         save_stream(path, htmlname, html_src)
     else:
-       returncode = file_doc_to_html(path, localname)
+       returncode = convert_docfile(repo.repo.path, localname,
+                                    repo.repo.path, 'html')
     md = file_html_to_md(path, htmlname).encode('utf-8')
     save_stream(path, mdname, md)
     repo.add_file(path, mdname, md)
     return md
 
 
-def file_doc_to_docbook(path, filename, output):
+def convert_docfile(path, filename, output, format):
     p = subprocess.Popen(['libreoffice', '--headless', '--convert-to',
-                          'xml:DocBook File', os.path.join(path, filename),
+                          format, os.path.join(path, filename),
                           '--outdir', output],
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     returncode = p.communicate()
@@ -166,7 +159,8 @@ def convert_folder(path):
                             ".wordprocessingml.document"]:
                 if not process_mht(root, name):
                     continue
-                returncode = file_doc_to_docbook(root, name, docbook_path)
+                returncode = convert_docfile(root, name, docbook_path,
+                                             'xml:DocBook File')
                 if "Error" in returncode[0]:
                     continue
                 basename, _ = os.path.splitext(name)

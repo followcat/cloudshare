@@ -78,8 +78,8 @@ def storage(filename, fileobj, repo):
         html_src = file_mht_to_html(path, localname)
         save_stream(path, htmlname, html_src)
     else:
-       returncode = convert_docfile(repo.repo.path, localname,
-                                    repo.repo.path, 'html')
+        returncode = convert_docfile(repo.repo.path, localname,
+                                     repo.repo.path, 'html')
     md = file_html_to_md(path, htmlname).encode('utf-8')
     save_stream(path, mdname, md)
     repo.add_file(path, mdname, md)
@@ -120,6 +120,9 @@ def process_mht(stream, mht_path, filename):
             part.set_param('charset', 'utf-8')
     html_src = emaildata.text.Text.html(message)
     save_stream(mht_path, filename, html_src)
+    returncode = convert_docfile(mht_path, filename,
+                                 mht_path, 'docx:Office Open XML Text')
+    return returncode
 
 
 def convert_folder(path):
@@ -159,7 +162,7 @@ def convert_folder(path):
                     stream = f.read()
                 if 'multipart/related' in stream:
                     process_mht(stream, mht_path, name)
-                    returncode = convert_docfile(mht_path, name, docbook_path,
+                    returncode = convert_docfile(mht_path, name+'x', docbook_path,
                                                  'xml:DocBook File')
                 else:
                     returncode = convert_docfile(root, name, docbook_path,

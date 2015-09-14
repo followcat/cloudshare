@@ -128,7 +128,7 @@ def remove_note(path, filename):
 def process_mht(path, filename):
     with open(os.path.join(path, filename), 'r') as f:
         stream = f.read()
-    if 'Content-Type:multipart/related' in stream:
+    if 'multipart/related' in stream:
         return False
     else:
         return True

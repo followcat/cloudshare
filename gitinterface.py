@@ -1,5 +1,6 @@
 import time
 import logging
+import os.path
 
 import dulwich.repo
 import dulwich.index
@@ -31,7 +32,7 @@ class GitInterface(object):
             >>> import gitinterface
             >>> repo_name = 'test_repo'
             >>> interface = gitinterface.GitInterface(repo_name)
-            >>> path = interface.repo.path + '/'
+            >>> path = interface.repo.path
             >>> commit_id = interface.add_file(path, 'test_file', b'test',
             ... b'Test commit', b'test<test@test.com>')
             >>> commit_id == interface.repo.head()
@@ -39,7 +40,7 @@ class GitInterface(object):
             >>> shutil.rmtree(repo_name)
         """
         filename = filename.encode('utf-8')
-        with open(path + filename, 'wb') as file:
+        with open(os.path.join(path, filename), 'wb') as file:
             file.write(dumps)
         self.repo.stage([filename])
         if committer is None:
@@ -55,7 +56,7 @@ class GitInterface(object):
             >>> import gitinterface
             >>> repo_name = 'test_repo'
             >>> interface = gitinterface.GitInterface(repo_name)
-            >>> path = interface.repo.path + '/'
+            >>> path = interface.repo.path
             >>> commit_id = interface.add_file(path, 'test_file', b'test',
             ... b'Test commit', b'test<test@test.com>')
             >>> interface.modify_file('test_file', b'Modify test')

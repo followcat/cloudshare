@@ -12,28 +12,23 @@ import emaildata.text
 
 
 def file_pdf_to_html(path, filename):
-    p = subprocess.Popen(['pdftohtml', '-noframes', path + filename],
+    p = subprocess.Popen(['pdftohtml', '-noframes', os.path.join(path, filename)],
                          stdout=subprocess.PIPE)
     p.communicate()
 
 
 def file_html_to_md(path, filename):
-    result = pypandoc.convert(path + filename, 'md', format='html')
-    return result
-
-
-def str_md_to_html(md_code):
-    result = pypandoc.convert(md_code, 'html', format='md')
+    result = pypandoc.convert(os.path.join(path, filename), 'md', format='html')
     return result
 
 
 def save_stream(path, filename, stream):
-    with open(path + filename, 'wb') as localfile:
+    with open(os.path.join(path, filename), 'wb') as localfile:
         localfile.write(stream)
 
 
 def file_mht_to_html(path, filename):
-    message = email.message_from_file(open(path + filename))
+    message = email.message_from_file(open(os.path.join(path, filename)))
     html = emaildata.text.Text.html(message)
     return html
 
@@ -68,7 +63,7 @@ def storage(filename, fileobj, repo):
     """
     mimetype = magic.Magic()
     stream = fileobj.read()
-    path = repo.repo.path + '/'
+    path = repo.repo.path
 
     basename, _ = os.path.splitext(filename)
     localname = filename

@@ -100,13 +100,16 @@ def file_docbook_to_markdown(path, filename, output):
     output_file = os.path.join(output, filename + '.md')
     try:
         pypandoc.convert(input_file, 'markdown', format='docbook', outputfile=output_file)
-        reformat = []
         with open(output_file, 'r') as f:
+            reformat = []
             for each in f.readlines():
-                reformat.append(each.lstrip(' '))
-        with open(output_file, 'w') as f:
-            for line in reformat:
-                f.write(line)
+                reformat.append(each)
+                if each[0] == '-':
+                    break
+            else:
+                with open(output_file, 'w') as f:
+                    for line in reformat:
+                        f.write(line.lstrip(' '))
     except RuntimeError as e:
         pass
 
@@ -120,15 +123,15 @@ def remove_note(path, filename):
     e.write(os.path.join(path, filename), encoding='utf-8')
 
 
-def process_mht(stream, mht_path, filename):
+def process_mht(stream, docx_path, filename):
     message = email.message_from_string(stream)
     for part in message.walk():
         if part.get_content_charset() is not None:
             part.set_param('charset', 'utf-8')
     html_src = emaildata.text.Text.html(message)
-    save_stream(mht_path, filename, html_src)
-    returncode = convert_docfile(mht_path, filename,
-                                 mht_path, 'docx:Office Open XML Text')
+    save_stream(docx_path, filename, html_src)
+    returncode = convert_docfile(docx_path, filename,
+                                 docx_path, 'docx:Office Open XML Text')
     return returncode
 
 
@@ -150,11 +153,11 @@ def convert_folder(path):
         >>> os.remove('md_output/cv_1.xml.md')
         >>> os.remove('md_output/cv_2.xml.md')
     """
-    mht_path = "mht_output"
+    docx_path = 'docx_output'
     markdown_path = 'md_output'
     docbook_path = 'docbook_output'
-    if not os.path.exists(mht_path):
-        os.mkdir(mht_path)
+    if not os.path.exists(docx_path):
+        os.mkdir(docx_path)
     if not os.path.exists(markdown_path):
         os.mkdir(markdown_path)
     if not os.path.exists(docbook_path):
@@ -168,15 +171,19 @@ def convert_folder(path):
                 with open(os.path.join(root, name), 'r') as f:
                     stream = f.read()
                 if 'multipart/related' in stream:
-                    process_mht(stream, mht_path, name)
-                    returncode = convert_docfile(mht_path, name+'x',
+                    process_mht(stream, docx_path, name)
+                    returncode = convert_docfile(docx_path, name+'x',
                                                  docbook_path,
                                                  'xml:DocBook File')
                 else:
                     returncode = convert_docfile(root, name, docbook_path,
                                                  'xml:DocBook File')
                 if "Error" in returncode[0]:
-                    continue
+                    returncode = convert_docfile(root, name, docx_path,
+                                                 'docx:Office Open XML Text')
+                    returncode = convert_docfile(docx_path, name+'x',
+                                                 docbook_path,
+                                                 'xml:DocBook File')
                 basename, _ = os.path.splitext(name)
                 docbookname = basename + '.xml'
                 if not os.path.exists(os.path.join(docbook_path, docbookname)):

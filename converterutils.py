@@ -100,6 +100,13 @@ def file_docbook_to_markdown(path, filename, output):
     output_file = os.path.join(output, filename + '.md')
     try:
         pypandoc.convert(input_file, 'markdown', format='docbook', outputfile=output_file)
+        reformat = []
+        with open(output_file, 'r') as f:
+            for each in f.readlines():
+                reformat.append(each.lstrip(' '))
+        with open(output_file, 'w') as f:
+            for line in reformat:
+                f.write(line)
     except RuntimeError as e:
         pass
 
@@ -162,7 +169,8 @@ def convert_folder(path):
                     stream = f.read()
                 if 'multipart/related' in stream:
                     process_mht(stream, mht_path, name)
-                    returncode = convert_docfile(mht_path, name+'x', docbook_path,
+                    returncode = convert_docfile(mht_path, name+'x',
+                                                 docbook_path,
                                                  'xml:DocBook File')
                 else:
                     returncode = convert_docfile(root, name, docbook_path,

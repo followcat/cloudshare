@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="/static/listdata.css">
         <title>ListData Templates</title>
     </head>
     <body>
-        {% for data in datas %}
-        <div><p><b><a href="/showtest/{{ data }}">{{ data }}</a></b></p></div>
-        {% endfor %}
+        <div>
+            <img alt="Test Image" src="https://pypi.python.org/static/images/python-logo.png" />
+        </div>
+        <div id="list8">
+            <ul>
+                {% for data in datas %}
+                <li><a href="/showtest/{{ data }}.xml.md">{{ data }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
     </body>
 </html>

@@ -45,7 +45,7 @@ def showtest(filename):
 @app.route("/listdata")
 def listdata():
     files = list(os.walk('./md_output'))[0][2]
-    datas = [f.decode('utf-8') for f in files]
+    datas = [f.decode('utf-8').split('.')[0] for f in files]
     return render_template('listdata.html', datas=datas)
 
 

@@ -26,22 +26,21 @@ class GitInterface(object):
         except OSError:
             self.repo = dulwich.repo.Repo(path)
 
-    def add_file(self, path, filename, dumps, message=None, committer=None):
+    def add_file(self, path, filename, message=None, committer=None):
         """
             >>> import shutil
             >>> import gitinterface
             >>> repo_name = 'test_repo'
             >>> interface = gitinterface.GitInterface(repo_name)
             >>> path = interface.repo.path
-            >>> commit_id = interface.add_file(path, 'test_file', b'test',
+            >>> with open('test_repo/test_file', 'w') as file:
+            ...     file.write('test')
+            >>> commit_id = interface.add_file(path, 'test_file',
             ... b'Test commit', b'test<test@test.com>')
             >>> commit_id == interface.repo.head()
             True
             >>> shutil.rmtree(repo_name)
         """
-        filename = filename.encode('utf-8')
-        with open(os.path.join(path, filename), 'wb') as file:
-            file.write(dumps)
         self.repo.stage([filename])
         if committer is None:
             committer = self.author
@@ -57,7 +56,9 @@ class GitInterface(object):
             >>> repo_name = 'test_repo'
             >>> interface = gitinterface.GitInterface(repo_name)
             >>> path = interface.repo.path
-            >>> commit_id = interface.add_file(path, 'test_file', b'test',
+            >>> with open('test_repo/test_file', 'w') as file:
+            ...     file.write('test')
+            >>> commit_id = interface.add_file(path, 'test_file',
             ... b'Test commit', b'test<test@test.com>')
             >>> interface.modify_file('test_file', b'Modify test')
             >>> with open('test_repo/test_file') as file:

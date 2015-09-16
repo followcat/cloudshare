@@ -99,42 +99,6 @@ def save_stream(path, filename, stream):
         localfile.write(stream)
 
 
-def storage(filename, fileobj, repo):
-    """
-        >>> import shutil
-        >>> import gitinterface
-        >>> import converterutils
-        >>> repo_name = 'test_repo'
-        >>> interface = gitinterface.GitInterface(repo_name)
-        >>> cv1_name = 'cv_1.doc'
-        >>> cv2_name = 'cv_2.doc'
-        >>> cv1_file = open('test/' + cv1_name, 'r')
-        >>> cv2_file = open('test/' + cv2_name, 'r')
-        >>> md1_str = converterutils.storage(cv1_name, cv1_file, interface)
-        >>> md2_str = converterutils.storage(cv2_name, cv2_file, interface)
-        >>> with open('test_repo/cv_1.md') as file:
-        ...     md1_file = file.read()
-        >>> with open('test_repo/cv_2.md') as file:
-        ...     md2_file = file.read()
-        >>> md1_str == md1_file
-        True
-        >>> md2_str == md2_file
-        True
-        >>> shutil.rmtree(repo_name)
-    """
-    path = repo.repo.path
-    conname = ConverName(filename)
-    save_stream(path, conname, fileobj.read())
-    convert_file(path, conname)
-    output = OutputPath()
-    shutil.copy(os.path.join(output.markdown, conname.md),
-                os.path.join(path, conname.md))
-    with open(os.path.join(path, conname.md), 'r') as f:
-        md = f.read()
-    repo.add_file(path, conname.md, md)
-    return md
-
-
 def convert_docfile(path, filename, output, format):
     p = subprocess.Popen(['libreoffice', '--headless', '--convert-to',
                           format, os.path.join(path, filename),
@@ -246,3 +210,39 @@ def convert_folder(path):
             logger.info('Convert: %s' % os.path.join(root, conname))
             convert_file(root, conname)
             logger.info('Finish')
+
+
+def storage(filename, fileobj, repo):
+    """
+        >>> import shutil
+        >>> import gitinterface
+        >>> import converterutils
+        >>> repo_name = 'test_repo'
+        >>> interface = gitinterface.GitInterface(repo_name)
+        >>> cv1_name = 'cv_1.doc'
+        >>> cv2_name = 'cv_2.doc'
+        >>> cv1_file = open('test/' + cv1_name, 'r')
+        >>> cv2_file = open('test/' + cv2_name, 'r')
+        >>> md1_str = converterutils.storage(cv1_name, cv1_file, interface)
+        >>> md2_str = converterutils.storage(cv2_name, cv2_file, interface)
+        >>> with open('test_repo/cv_1.md') as file:
+        ...     md1_file = file.read()
+        >>> with open('test_repo/cv_2.md') as file:
+        ...     md2_file = file.read()
+        >>> md1_str == md1_file
+        True
+        >>> md2_str == md2_file
+        True
+        >>> shutil.rmtree(repo_name)
+    """
+    path = repo.repo.path
+    conname = ConverName(filename)
+    save_stream(path, conname, fileobj.read())
+    convert_file(path, conname)
+    output = OutputPath()
+    shutil.copy(os.path.join(output.markdown, conname.md),
+                os.path.join(path, conname.md))
+    repo.add_file(path, conname.md)
+    with open(os.path.join(path, conname.md), 'r') as f:
+        md = f.read()
+    return md

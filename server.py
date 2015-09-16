@@ -36,13 +36,14 @@ def index():
         network_file = request.files['file']
         if network_file.mimetype == 'application/octet-stream':
             return render_template('index.html', error='Please enter filename.')
-        convertname = converterutils.ConverName(network_file.filename)
+        convertname = converterutils.ConverName(
+            network_file.filename.encode('utf-8'))
         local_file = repo.repo.get_named_file('../' + convertname.md)
         if local_file is not None:
             md = local_file.read()
             local_file.close()
         else:
-            md = converterutils.storage(network_file.filename,
+            md = converterutils.storage(convertname,
                                         network_file, repo)
         format_md = md.decode('utf-8').replace('\\\n', '\n\n')
         return render_template('upload.html', markdown=format_md)

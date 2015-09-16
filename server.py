@@ -14,8 +14,22 @@ app = Flask(__name__)
 repo = gitinterface.GitInterface("repo")
 
 
-@app.route("/", methods=['GET', 'POST'])
-@app.route("/demo", methods=['GET', 'POST'])
+@app.route("/")
+def listdata():
+    files = list(os.walk('./md_output'))[0][2]
+    datas = [f.decode('utf-8').split('.')[0] for f in files]
+    return render_template('listdata.html', datas=datas)
+
+
+@app.route("/showtest/<filename>")
+def showtest(filename):
+    with codecs.open('md_output/%s' % filename, 'r', encoding='utf-8') as file:
+        data = file.read()
+    output = pypandoc.convert(data, 'html', format='markdown')
+    return render_template('cv.html', markdown=output)
+
+
+@app.route("/upload", methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         network_file = request.files['file']
@@ -30,23 +44,8 @@ def index():
             md = converterutils.storage(network_file.filename,
                                         network_file, repo)
         format_md = md.decode('utf-8').replace('\\\n', '\n\n')
-        return render_template('index.html', markdown=format_md)
-    return render_template('index.html')
-
-
-@app.route("/showtest/<filename>")
-def showtest(filename):
-    with codecs.open('md_output/%s' % filename, 'r', encoding='utf-8') as file:
-        data = file.read()
-    output = pypandoc.convert(data, 'html', format='markdown')
-    return render_template('cv.html', markdown=output)
-
-
-@app.route("/listdata")
-def listdata():
-    files = list(os.walk('./md_output'))[0][2]
-    datas = [f.decode('utf-8').split('.')[0] for f in files]
-    return render_template('listdata.html', datas=datas)
+        return render_template('upload.html', markdown=format_md)
+    return render_template('upload.html')
 
 
 if __name__ == "__main__":

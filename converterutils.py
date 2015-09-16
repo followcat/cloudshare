@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
 import os
 import email
+import logging
 import os.path
 import mimetypes
 import subprocess
+import logging.config
 import xml.etree.ElementTree
 
 import magic
 import pypandoc
 import emaildata.text
+
+
+logging.config.fileConfig("logger.conf")
+logger = logging.getLogger("converterinfo")
 
 
 def file_pdf_to_html(path, filename):
@@ -92,6 +98,7 @@ def convert_docfile(path, filename, output, format):
                           '--outdir', output],
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     returncode = p.communicate()
+    logger.info(returncode[0])
     return returncode
 
 
@@ -164,7 +171,9 @@ def convert_folder(path):
         os.mkdir(docbook_path)
     for root, dirs, files in os.walk(path):
         for name in files:
+            logger.info('Convert: %s' % os.path.join(root, name))
             mimetype = mimetypes.guess_type(os.path.join(root, name))[0]
+            logger.info('Mimetype: %s' % mimetype)
             if mimetype in ['application/msword',
                             "application/vnd.openxmlformats-officedocument"
                             ".wordprocessingml.document"]:
@@ -187,10 +196,13 @@ def convert_folder(path):
                 basename, _ = os.path.splitext(name)
                 docbookname = basename + '.xml'
                 if not os.path.exists(os.path.join(docbook_path, docbookname)):
+                    logger.info('Not exists')
                     continue
                 remove_note(docbook_path, docbookname)
                 file_docbook_to_markdown(docbook_path,
                                          docbookname,
                                          markdown_path)
+                logger.info('Success')
             else:
-                pass
+                logger.info('Skip')
+            logger.info('Finish')

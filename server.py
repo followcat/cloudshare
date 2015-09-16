@@ -23,7 +23,8 @@ def listdata():
 
 @app.route("/showtest/<filename>")
 def showtest(filename):
-    with codecs.open('md_output/%s' % filename, 'r', encoding='utf-8') as file:
+    with codecs.open('output/markdown/%s' % filename,
+                     'r', encoding='utf-8') as file:
         data = file.read()
     output = pypandoc.convert(data, 'html', format='markdown')
     return render_template('cv.html', markdown=output)

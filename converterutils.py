@@ -74,6 +74,26 @@ class ConverName(str):
         return self._md
 
 
+class OutputPath(object):
+    def __init__(self):
+        self.output = 'output'
+        self.docx = os.path.join(self.output, 'docx')
+        self.markdown = os.path.join(self.output, 'markdown')
+        self.docbook = os.path.join(self.output, 'docbook')
+        self.yaml = os.path.join(self.output, 'yaml')
+
+        if not os.path.exists(self.output):
+            os.mkdir(self.output)
+        if not os.path.exists(self.docx):
+            os.mkdir(self.docx)
+        if not os.path.exists(self.markdown):
+            os.mkdir(self.markdown)
+        if not os.path.exists(self.docbook):
+            os.mkdir(self.docbook)
+        if not os.path.exists(self.yaml):
+            os.mkdir(self.yaml)
+
+
 def file_pdf_to_html(path, filename):
     p = subprocess.Popen(['pdftohtml', '-noframes', os.path.join(path, filename)],
                          stdout=subprocess.PIPE)
@@ -200,30 +220,19 @@ def convert_folder(path):
         >>> import converterutils
         >>> import xml.etree.ElementTree
         >>> converterutils.convert_folder('./test')
-        >>> e = xml.etree.ElementTree.parse('docbook_output/cv_1.xml').getroot()
+        >>> e = xml.etree.ElementTree.parse('output/docbook/cv_1.xml').getroot()
         >>> e.findall('para')[0].text
         'http://jianli.yjbys.com/'
-        >>> with open('md_output/cv_1.md') as file:
+        >>> with open('output/markdown/cv_1.md') as file:
         ...     data = file.read()
         >>> 'http://jianli.yjbys.com/' in data
         True
-        >>> os.remove('docbook_output/cv_1.xml')
-        >>> os.remove('docbook_output/cv_2.xml')
-        >>> os.remove('md_output/cv_1.md')
-        >>> os.remove('md_output/cv_2.md')
+        >>> os.remove('output/docbook/cv_1.xml')
+        >>> os.remove('output/docbook/cv_2.xml')
+        >>> os.remove('output/markdown/cv_1.md')
+        >>> os.remove('output/markdown/cv_2.md')
     """
-    docx_path = 'docx_output'
-    markdown_path = 'md_output'
-    docbook_path = 'docbook_output'
-    yaml_path = 'yaml_output'
-    if not os.path.exists(docx_path):
-        os.mkdir(docx_path)
-    if not os.path.exists(markdown_path):
-        os.mkdir(markdown_path)
-    if not os.path.exists(docbook_path):
-        os.mkdir(docbook_path)
-    if not os.path.exists(yaml_path):
-        os.mkdir(yaml_path)
+    output = OutputPath()
     for root, dirs, files in os.walk(path):
         for name in files:
             conname = ConverName(name)
@@ -236,28 +245,28 @@ def convert_folder(path):
                 with open(os.path.join(root, conname), 'r') as f:
                     stream = f.read()
                 if 'multipart/related' in stream:
-                    process_mht(stream, docx_path, conname)
-                    returncode = convert_docfile(docx_path, conname.docx,
-                                                 docbook_path,
+                    process_mht(stream, output.docx, conname)
+                    returncode = convert_docfile(output.docx, conname.docx,
+                                                 output.docbook,
                                                  'xml:DocBook File')
                 else:
-                    returncode = convert_docfile(root, conname, docbook_path,
+                    returncode = convert_docfile(root, conname, output.docbook,
                                                  'xml:DocBook File')
                 if "Error" in returncode[0]:
-                    returncode = convert_docfile(root, conname, docx_path,
+                    returncode = convert_docfile(root, conname, output.docx,
                                                  'docx:Office Open XML Text')
-                    returncode = convert_docfile(docx_path, conname.docx,
-                                                 docbook_path,
+                    returncode = convert_docfile(output.docx, conname.docx,
+                                                 output.docbook,
                                                  'xml:DocBook File')
                 if not os.path.exists(os.path.join(
-                                      docbook_path, conname.xml)):
+                                      output.docbook, conname.xml)):
                     logger.info('Not exists')
                     continue
-                remove_note(docbook_path, conname.xml)
-                file_docbook_to_markdown(docbook_path, conname,
-                                         markdown_path)
-                information_explorer.catch(markdown_path, conname,
-                                           yaml_path)
+                remove_note(output.docbook, conname.xml)
+                file_docbook_to_markdown(output.docbook, conname,
+                                         output.markdown)
+                information_explorer.catch(output.markdown, conname,
+                                           output.yaml)
                 logger.info('Success')
             else:
                 logger.info('Skip')

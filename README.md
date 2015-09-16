@@ -8,7 +8,6 @@ share，edit your doc，pdf，md and so on...
     dulwich
     pypandoc
     emaildata
-    python-magic
 
     pandoc
     pdftohtml

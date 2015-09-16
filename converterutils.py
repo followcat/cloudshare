@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import email
+import shutil
 import logging
 import os.path
 import mimetypes
@@ -8,7 +9,6 @@ import subprocess
 import logging.config
 import xml.etree.ElementTree
 
-import magic
 import pypandoc
 import emaildata.text
 
@@ -139,28 +139,16 @@ def storage(filename, fileobj, repo):
         True
         >>> shutil.rmtree(repo_name)
     """
-    mimetype = magic.Magic()
-    stream = fileobj.read()
     path = repo.repo.path
-
-    basename, _ = os.path.splitext(filename)
-    localname = filename
-
-    htmlname = basename + '.html'
-    mdname = basename + '.md'
-    mimetype = mimetype.from_buffer(stream)
-    save_stream(path, localname, stream)
-    if mimetype.startswith('PDF'):
-        file_pdf_to_html(path, localname)
-    elif mimetype.startswith('news or mail'):
-        html_src = file_mht_to_html(path, localname)
-        save_stream(path, htmlname, html_src)
-    else:
-        returncode = convert_docfile(repo.repo.path, localname,
-                                     repo.repo.path, 'html')
-    md = file_html_to_md(path, htmlname).encode('utf-8')
-    save_stream(path, mdname, md)
-    repo.add_file(path, mdname, md)
+    conname = ConverName(filename)
+    save_stream(path, conname, fileobj.read())
+    convert_file(path, conname)
+    output = OutputPath()
+    shutil.copy(os.path.join(output.markdown, conname.md),
+                os.path.join(path, conname.md))
+    with open(os.path.join(path, conname.md), 'r') as f:
+        md = f.read()
+    repo.add_file(path, conname.md, md)
     return md
 
 
@@ -214,6 +202,43 @@ def process_mht(stream, docx_path, convertname):
     return returncode
 
 
+def convert_file(root, conname):
+    output = OutputPath()
+    mimetype = mimetypes.guess_type(os.path.join(root, conname))[0]
+    logger.info('Mimetype: %s' % mimetype)
+    if mimetype in ['application/msword',
+                    "application/vnd.openxmlformats-officedocument"
+                    ".wordprocessingml.document"]:
+        with open(os.path.join(root, conname), 'r') as f:
+            stream = f.read()
+        if 'multipart/related' in stream:
+            process_mht(stream, output.docx, conname)
+            returncode = convert_docfile(output.docx, conname.docx,
+                                         output.docbook,
+                                         'xml:DocBook File')
+        else:
+            returncode = convert_docfile(root, conname, output.docbook,
+                                         'xml:DocBook File')
+        if "Error" in returncode[0]:
+            returncode = convert_docfile(root, conname, output.docx,
+                                         'docx:Office Open XML Text')
+            returncode = convert_docfile(output.docx, conname.docx,
+                                         output.docbook,
+                                         'xml:DocBook File')
+        if not os.path.exists(os.path.join(
+                              output.docbook, conname.xml)):
+            logger.info('Not exists')
+            return
+        remove_note(output.docbook, conname.xml)
+        file_docbook_to_markdown(output.docbook, conname,
+                                 output.markdown)
+        information_explorer.catch(output.markdown, conname,
+                                   output.yaml)
+        logger.info('Success')
+    else:
+        logger.info('Skip')
+
+
 def convert_folder(path):
     """
         >>> import os
@@ -232,42 +257,9 @@ def convert_folder(path):
         >>> os.remove('output/markdown/cv_1.md')
         >>> os.remove('output/markdown/cv_2.md')
     """
-    output = OutputPath()
     for root, dirs, files in os.walk(path):
         for name in files:
             conname = ConverName(name)
             logger.info('Convert: %s' % os.path.join(root, conname))
-            mimetype = mimetypes.guess_type(os.path.join(root, conname))[0]
-            logger.info('Mimetype: %s' % mimetype)
-            if mimetype in ['application/msword',
-                            "application/vnd.openxmlformats-officedocument"
-                            ".wordprocessingml.document"]:
-                with open(os.path.join(root, conname), 'r') as f:
-                    stream = f.read()
-                if 'multipart/related' in stream:
-                    process_mht(stream, output.docx, conname)
-                    returncode = convert_docfile(output.docx, conname.docx,
-                                                 output.docbook,
-                                                 'xml:DocBook File')
-                else:
-                    returncode = convert_docfile(root, conname, output.docbook,
-                                                 'xml:DocBook File')
-                if "Error" in returncode[0]:
-                    returncode = convert_docfile(root, conname, output.docx,
-                                                 'docx:Office Open XML Text')
-                    returncode = convert_docfile(output.docx, conname.docx,
-                                                 output.docbook,
-                                                 'xml:DocBook File')
-                if not os.path.exists(os.path.join(
-                                      output.docbook, conname.xml)):
-                    logger.info('Not exists')
-                    continue
-                remove_note(output.docbook, conname.xml)
-                file_docbook_to_markdown(output.docbook, conname,
-                                         output.markdown)
-                information_explorer.catch(output.markdown, conname,
-                                           output.yaml)
-                logger.info('Success')
-            else:
-                logger.info('Skip')
+            convert_file(root, conname)
             logger.info('Finish')

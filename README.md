@@ -3,15 +3,16 @@ share，edit your doc，pdf，md and so on...
 
 ## Dependencies
 
+    yaml
     flask
+    dulwich
     pypandoc
     emaildata
-    dulwich
     python-magic
 
     pandoc
-    libreoffice
     pdftohtml
+    libreoffice
 
 ## How to
 

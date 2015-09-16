@@ -12,6 +12,8 @@ import magic
 import pypandoc
 import emaildata.text
 
+import information_explorer
+
 
 logging.config.fileConfig("logger.conf")
 logger = logging.getLogger("converterinfo")
@@ -163,12 +165,15 @@ def convert_folder(path):
     docx_path = 'docx_output'
     markdown_path = 'md_output'
     docbook_path = 'docbook_output'
+    yaml_path = 'yaml_output'
     if not os.path.exists(docx_path):
         os.mkdir(docx_path)
     if not os.path.exists(markdown_path):
         os.mkdir(markdown_path)
     if not os.path.exists(docbook_path):
         os.mkdir(docbook_path)
+    if not os.path.exists(yaml_path):
+        os.mkdir(yaml_path)
     for root, dirs, files in os.walk(path):
         for name in files:
             logger.info('Convert: %s' % os.path.join(root, name))
@@ -202,6 +207,9 @@ def convert_folder(path):
                 file_docbook_to_markdown(docbook_path,
                                          docbookname,
                                          markdown_path)
+                information_explorer.catch(markdown_path,
+                                           docbookname + '.md',
+                                           yaml_path)
                 logger.info('Success')
             else:
                 logger.info('Skip')

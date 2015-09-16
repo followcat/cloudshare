@@ -21,8 +21,8 @@ def index():
         network_file = request.files['file']
         if network_file.mimetype == 'application/octet-stream':
             return render_template('index.html', error='Please enter filename.')
-        mdname = converterutils.get_md_version(network_file.filename)
-        local_file = repo.repo.get_named_file('../' + mdname)
+        convertname = converterutils.ConverName(network_file.filename)
+        local_file = repo.repo.get_named_file('../' + convertname.md)
         if local_file is not None:
             md = local_file.read()
             local_file.close()

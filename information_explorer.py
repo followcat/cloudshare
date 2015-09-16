@@ -23,11 +23,11 @@ def save_yaml(infodict, path, filename):
         f.write(yaml.dump(infodict))
 
 
-def catch(path, filename, output):
-    with open(os.path.join(path, filename), 'r') as f:
+def catch(path, convertname, output):
+    with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
         info_dict = {
             "mail": getMailAddFromString(stream),
             "phone": getPhoneNumFromString(stream)
             }
-        save_yaml(info_dict, output, filename)
+        save_yaml(info_dict, output, convertname.yaml)

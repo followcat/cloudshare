@@ -16,14 +16,14 @@ repo = gitinterface.GitInterface("repo")
 
 @app.route("/")
 def listdata():
-    files = list(os.walk('./md_output'))[0][2]
+    files = list(os.walk('./output/markdown'))[0][2]
     datas = [f.decode('utf-8').split('.')[0] for f in files]
     return render_template('listdata.html', datas=datas)
 
 
 @app.route("/showtest/<filename>")
 def showtest(filename):
-    with codecs.open('output/markdown/%s' % filename,
+    with codecs.open('./output/markdown/%s' % filename,
                      'r', encoding='utf-8') as file:
         data = file.read()
     output = pypandoc.convert(data, 'html', format='markdown')

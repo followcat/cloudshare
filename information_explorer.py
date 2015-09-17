@@ -11,7 +11,7 @@ def getPhoneNumFromString(stream):
 
 
 def getMailAddFromString(stream):
-    regex = re.compile(r"\b[a-zA-Z0-9._%+-]+"
+    regex = re.compile(r"\b[a-zA-Z0-9._\\%+-]+"
                        r"@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b",
                        re.IGNORECASE)
     mails = re.findall(regex, stream)

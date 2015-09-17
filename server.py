@@ -4,6 +4,7 @@ from flask import Flask, request, render_template
 import os
 import codecs
 
+import yaml
 import pypandoc
 import markdown
 
@@ -17,7 +18,13 @@ repo = gitinterface.GitInterface("repo")
 @app.route("/")
 def listdata():
     files = list(os.walk('./output/markdown'))[0][2]
-    datas = [f.decode('utf-8').split('.')[0] for f in files]
+    datas = []
+    for f in files:
+        conname = converterutils.ConverName(f)
+        with open(os.path.join('output', 'yaml', conname.yaml), 'r') as yf:
+            stream = yf.read()
+        yaml_data = yaml.load(stream)
+        datas.append([f.decode('utf-8').split('.')[0], yaml_data])
     return render_template('listdata.html', datas=datas)
 
 

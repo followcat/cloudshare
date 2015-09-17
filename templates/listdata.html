@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="/static/table.css">
         <link rel="stylesheet" href="/static/listdata.css">
         <title>ListData Templates</title>
     </head>
@@ -11,7 +12,15 @@
         <div id="list8">
             <ul>
                 {% for data in datas %}
-                <li><a href="/showtest/{{ data }}.md">{{ data }}</a></li>
+                <li><a href="/showtest/{{ data[0] }}.md">{{ data[0] }}</a></li>
+                <table>
+                        {% for info in data[1] %}
+                        <tr>
+                        <td>{{ info }}</td>
+                        <td>{{ data[1][info][0] }}</td>
+                        </tr>
+                        {% endfor %}
+                </table>
                 {% endfor %}
             </ul>
         </div>

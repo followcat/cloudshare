@@ -6,7 +6,6 @@ import codecs
 
 import yaml
 import pypandoc
-import markdown
 
 import gitinterface
 import converterutils

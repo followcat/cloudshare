@@ -74,24 +74,67 @@ class ConverName(str):
         return self._md
 
 
-class OutputPath(object):
-    def __init__(self):
-        self.output = 'output'
-        self.docx = os.path.join(self.output, 'docx')
-        self.markdown = os.path.join(self.output, 'markdown')
-        self.docbook = os.path.join(self.output, 'docbook')
-        self.yaml = os.path.join(self.output, 'yaml')
+class ClassProperty(property):
+    def __get__(self, instance, cls):
+        return classmethod(self.fget).__get__(instance, cls)()
 
-        if not os.path.exists(self.output):
-            os.mkdir(self.output)
-        if not os.path.exists(self.docx):
-            os.mkdir(self.docx)
-        if not os.path.exists(self.markdown):
-            os.mkdir(self.markdown)
-        if not os.path.exists(self.docbook):
-            os.mkdir(self.docbook)
-        if not os.path.exists(self.yaml):
-            os.mkdir(self.yaml)
+
+class OutputPath(object):
+    """
+        >>> import os
+        >>> import shutil
+        >>> import converterutils
+        >>> output_backup = converterutils.OutputPath._output
+        >>> converterutils.OutputPath._output = 'test_output'
+        >>> os.path.exists('test_output')
+        False
+        >>> converterutils.OutputPath.output
+        'test_output'
+        >>> os.path.exists('test_output')
+        True
+        >>> os.path.exists('test_output/markdown')
+        False
+        >>> converterutils.OutputPath.markdown
+        'test_output/markdown'
+        >>> os.path.exists('test_output')
+        True
+        >>> shutil.rmtree('test_output')
+        >>> converterutils.OutputPath._output = output_backup
+    """
+    _output = 'output'
+    _yaml = 'yaml'
+    _docx = 'docx'
+    _docbook = 'docbook'
+    _markdown = 'markdown'
+
+    @classmethod
+    def getpath(cls, name):
+        path = os.path.join(cls.output, name)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path
+
+    @ClassProperty
+    def output(self):
+        if not os.path.exists(self._output):
+            os.mkdir(self._output)
+        return self._output
+
+    @ClassProperty
+    def yaml(self):
+        return self.getpath(self._yaml)
+
+    @ClassProperty
+    def docx(self):
+        return self.getpath(self._docx)
+
+    @ClassProperty
+    def docbook(self):
+        return self.getpath(self._docbook)
+
+    @ClassProperty
+    def markdown(self):
+        return self.getpath(self._markdown)
 
 
 def save_stream(path, filename, stream):
@@ -150,7 +193,6 @@ def process_mht(stream, docx_path, convertname):
 
 
 def convert_file(root, conname):
-    output = OutputPath()
     mimetype = mimetypes.guess_type(os.path.join(root, conname))[0]
     logger.info('Mimetype: %s' % mimetype)
     if mimetype in ['application/msword',
@@ -159,28 +201,28 @@ def convert_file(root, conname):
         with open(os.path.join(root, conname), 'r') as f:
             stream = f.read()
         if 'multipart/related' in stream:
-            process_mht(stream, output.docx, conname)
-            returncode = convert_docfile(output.docx, conname.docx,
-                                         output.docbook,
+            process_mht(stream, OutputPath.docx, conname)
+            returncode = convert_docfile(OutputPath.docx, conname.docx,
+                                         OutputPath.docbook,
                                          'xml:DocBook File')
         else:
-            returncode = convert_docfile(root, conname, output.docbook,
+            returncode = convert_docfile(root, conname, OutputPath.docbook,
                                          'xml:DocBook File')
         if "Error" in returncode[0]:
-            returncode = convert_docfile(root, conname, output.docx,
+            returncode = convert_docfile(root, conname, OutputPath.docx,
                                          'docx:Office Open XML Text')
-            returncode = convert_docfile(output.docx, conname.docx,
-                                         output.docbook,
+            returncode = convert_docfile(OutputPath.docx, conname.docx,
+                                         OutputPath.docbook,
                                          'xml:DocBook File')
         if not os.path.exists(os.path.join(
-                              output.docbook, conname.xml)):
+                              OutputPath.docbook, conname.xml)):
             logger.info('Not exists')
             return
-        remove_note(output.docbook, conname.xml)
-        file_docbook_to_markdown(output.docbook, conname,
-                                 output.markdown)
-        information_explorer.catch(output.markdown, conname,
-                                   output.yaml)
+        remove_note(OutputPath.docbook, conname.xml)
+        file_docbook_to_markdown(OutputPath.docbook, conname,
+                                 OutputPath.markdown)
+        information_explorer.catch(OutputPath.markdown, conname,
+                                   OutputPath.yaml)
         logger.info('Success')
     else:
         logger.info('Skip')
@@ -239,8 +281,7 @@ def storage(filename, fileobj, repo):
     conname = ConverName(filename)
     save_stream(path, conname, fileobj.read())
     convert_file(path, conname)
-    output = OutputPath()
-    shutil.copy(os.path.join(output.markdown, conname.md),
+    shutil.copy(os.path.join(OutputPath.markdown, conname.md),
                 os.path.join(path, conname.md))
     repo.add_file(path, conname.md)
     with open(os.path.join(path, conname.md), 'r') as f:

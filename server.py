@@ -3,6 +3,7 @@ from flask import Flask, request, render_template
 
 import os
 import codecs
+import os.path
 
 import yaml
 import pypandoc
@@ -23,7 +24,7 @@ def listdata():
         with open(os.path.join('output', 'yaml', conname.yaml), 'r') as yf:
             stream = yf.read()
         yaml_data = yaml.load(stream)
-        datas.append([f.decode('utf-8').split('.')[0], yaml_data])
+        datas.append([os.path.splitext(f.decode('utf-8'))[0], yaml_data])
     return render_template('listdata.html', datas=datas)
 
 

@@ -12,6 +12,7 @@ import xml.etree.ElementTree
 import pypandoc
 import emaildata.text
 
+import outputstorage
 import information_explorer
 
 
@@ -74,79 +75,6 @@ class ConverName(str):
         return self._md
 
 
-class ClassProperty(property):
-    def __get__(self, instance, cls):
-        return classmethod(self.fget).__get__(instance, cls)()
-
-
-class OutputPath(object):
-    """
-        >>> import os
-        >>> import shutil
-        >>> import converterutils
-        >>> output_backup = converterutils.OutputPath._output
-        >>> converterutils.OutputPath._output = 'test_output'
-        >>> os.path.exists('test_output')
-        False
-        >>> converterutils.OutputPath.output
-        'test_output'
-        >>> os.path.exists('test_output')
-        True
-        >>> os.path.exists('test_output/markdown')
-        False
-        >>> converterutils.OutputPath.markdown
-        'test_output/markdown'
-        >>> os.path.exists('test_output')
-        True
-        >>> shutil.rmtree('test_output')
-        >>> converterutils.OutputPath._output = output_backup
-    """
-    _output = 'output'
-    _yaml = 'yaml'
-    _html = 'html'
-    _docx = 'docx'
-    _docbook = 'docbook'
-    _markdown = 'markdown'
-
-    @classmethod
-    def getpath(cls, name):
-        path = os.path.join(cls.output, name)
-        if not os.path.exists(path):
-            os.mkdir(path)
-        return path
-
-    @ClassProperty
-    def output(self):
-        if not os.path.exists(self._output):
-            os.mkdir(self._output)
-        return self._output
-
-    @ClassProperty
-    def yaml(self):
-        return self.getpath(self._yaml)
-
-    @ClassProperty
-    def html(self):
-        return self.getpath(self._html)
-
-    @ClassProperty
-    def docx(self):
-        return self.getpath(self._docx)
-
-    @ClassProperty
-    def docbook(self):
-        return self.getpath(self._docbook)
-
-    @ClassProperty
-    def markdown(self):
-        return self.getpath(self._markdown)
-
-
-def save_stream(path, filename, stream):
-    with open(os.path.join(path, filename), 'wb') as localfile:
-        localfile.write(stream)
-
-
 def convert_docfile(path, filename, output, format):
     p = subprocess.Popen(['libreoffice', '--headless', '--convert-to',
                           format, os.path.join(path, filename),
@@ -163,11 +91,11 @@ class FileProcesser():
         self.name = ConverName(name)
         self.mimetype = self.mimetype()
         self.stream = self.load()
-        self.docx_path = OutputPath.docx
-        self.html_path = OutputPath.html
-        self.yaml_path = OutputPath.yaml
-        self.docbook_path = OutputPath.docbook
-        self.markdown_path = OutputPath.markdown
+        self.docx_path = outputstorage.OutputPath.docx
+        self.html_path = outputstorage.OutputPath.html
+        self.yaml_path = outputstorage.OutputPath.yaml
+        self.docbook_path = outputstorage.OutputPath.docbook
+        self.markdown_path = outputstorage.OutputPath.markdown
         logger.info('Mimetype: %s' % self.mimetype)
 
     def mimetype(self):
@@ -187,7 +115,7 @@ class FileProcesser():
             if part.get_content_charset() is not None:
                 part.set_param('charset', 'utf-8')
         html_src = emaildata.text.Text.html(message)
-        save_stream(self.html_path, self.name.html, html_src)
+        outputstorage.save_stream(self.html_path, self.name.html, html_src)
         returncode = convert_docfile(self.html_path, self.name.html,
                                      self.docx_path, 'docx:Office Open XML Text')
         return returncode
@@ -255,10 +183,11 @@ class FileProcesser():
 def convert_folder(path):
     """
         >>> import os
+        >>> import outputstorage
         >>> import converterutils
         >>> import xml.etree.ElementTree
-        >>> output_backup = converterutils.OutputPath._output
-        >>> converterutils.OutputPath._output = 'test_output'
+        >>> output_backup = outputstorage.OutputPath._output
+        >>> outputstorage.OutputPath._output = 'test_output'
         >>> converterutils.convert_folder('./test')
         >>> e = xml.etree.ElementTree.parse('test_output/docbook/cv_1.xml').getroot()
         >>> e.findall('para')[0].text
@@ -268,7 +197,7 @@ def convert_folder(path):
         >>> 'http://jianli.yjbys.com/' in data
         True
         >>> shutil.rmtree('test_output')
-        >>> converterutils.OutputPath._output = output_backup
+        >>> outputstorage.OutputPath._output = output_backup
     """
     for root, dirs, files in os.walk(path):
         for name in files:
@@ -283,8 +212,8 @@ def storage(filename, fileobj, repo):
         >>> import shutil
         >>> import gitinterface
         >>> import converterutils
-        >>> output_backup = converterutils.OutputPath._output
-        >>> converterutils.OutputPath._output = 'test_output'
+        >>> output_backup = outputstorage.OutputPath._output
+        >>> outputstorage.OutputPath._output = 'test_output'
         >>> repo_name = 'test_repo'
         >>> interface = gitinterface.GitInterface(repo_name)
         >>> cv1_name = 'cv_1.doc'
@@ -303,14 +232,14 @@ def storage(filename, fileobj, repo):
         True
         >>> shutil.rmtree(repo_name)
         >>> shutil.rmtree('test_output')
-        >>> converterutils.OutputPath._output = output_backup
+        >>> outputstorage.OutputPath._output = output_backup
     """
     path = repo.repo.path
     conname = ConverName(filename)
-    save_stream(path, conname, fileobj.read())
+    outputstorage.save_stream(path, conname, fileobj.read())
     processfile = FileProcesser(path, filename)
     processfile.convert()
-    shutil.copy(os.path.join(OutputPath.markdown, conname.md),
+    shutil.copy(os.path.join(outputstorage.OutputPath.markdown, conname.md),
                 os.path.join(path, conname.md))
     repo.add_file(path, conname.md)
     with open(os.path.join(path, conname.md), 'r') as f:

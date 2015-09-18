@@ -9,6 +9,7 @@ import yaml
 import pypandoc
 
 import gitinterface
+import outputstorage
 import converterutils
 
 app = Flask(__name__)
@@ -17,12 +18,12 @@ repo = gitinterface.GitInterface("repo")
 
 @app.route("/")
 def listdata():
-    files = list(os.walk(converterutils.OutputPath.markdown))[0][2]
+    files = list(os.walk(outputstorage.OutputPath.markdown))[0][2]
     datas = []
     for f in files:
         conname = converterutils.ConverName(f)
         with open(os.path.join(
-                  converterutils.OutputPath.yaml, conname.yaml), 'r') as yf:
+                  outputstorage.OutputPath.yaml, conname.yaml), 'r') as yf:
             stream = yf.read()
         yaml_data = yaml.load(stream)
         datas.append([os.path.splitext(f.decode('utf-8'))[0], yaml_data])
@@ -32,7 +33,7 @@ def listdata():
 @app.route("/showtest/<filename>")
 def showtest(filename):
     with codecs.open(os.path.join(
-                     converterutils.OutputPath.markdown, filename),
+                     outputstorage.OutputPath.markdown, filename),
                      'r', encoding='utf-8') as file:
         data = file.read()
     output = pypandoc.convert(data, 'html', format='markdown')

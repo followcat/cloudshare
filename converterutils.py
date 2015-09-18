@@ -103,6 +103,7 @@ class OutputPath(object):
     """
     _output = 'output'
     _yaml = 'yaml'
+    _html = 'html'
     _docx = 'docx'
     _docbook = 'docbook'
     _markdown = 'markdown'
@@ -123,6 +124,10 @@ class OutputPath(object):
     @ClassProperty
     def yaml(self):
         return self.getpath(self._yaml)
+
+    @ClassProperty
+    def html(self):
+        return self.getpath(self._html)
 
     @ClassProperty
     def docx(self):
@@ -152,80 +157,99 @@ def convert_docfile(path, filename, output, format):
     return returncode
 
 
-def file_docbook_to_markdown(path, convertname, output):
-    input_file = os.path.join(path, convertname.xml)
-    output_file = os.path.join(output, convertname.md)
-    try:
-        pypandoc.convert(input_file, 'markdown', format='docbook', outputfile=output_file)
-        with open(output_file, 'r') as f:
-            reformat = []
-            for each in f.readlines():
-                reformat.append(each)
-                if each[0] == '-':
-                    break
+class FileProcesser():
+    def __init__(self, root, name):
+        self.root = root
+        self.name = ConverName(name)
+        self.mimetype = self.mimetype()
+        self.stream = self.load()
+        self.docx_path = OutputPath.docx
+        self.html_path = OutputPath.html
+        self.yaml_path = OutputPath.yaml
+        self.docbook_path = OutputPath.docbook
+        self.markdown_path = OutputPath.markdown
+        logger.info('Mimetype: %s' % self.mimetype)
+
+    def mimetype(self):
+        mimetype = mimetypes.guess_type(os.path.join(
+                                        self.root, self.name))[0]
+        return mimetype
+
+    def load(self):
+        data = ""
+        with open(os.path.join(self.root, self.name), 'r') as f:
+            data = f.read()
+        return data
+
+    def process_mht(self):
+        message = email.message_from_string(self.stream)
+        for part in message.walk():
+            if part.get_content_charset() is not None:
+                part.set_param('charset', 'utf-8')
+        html_src = emaildata.text.Text.html(message)
+        save_stream(self.html_path, self.name.html, html_src)
+        returncode = convert_docfile(self.html_path, self.name.html,
+                                     self.docx_path, 'docx:Office Open XML Text')
+        return returncode
+
+    def remove_note(self):
+        position = os.path.join(self.docbook_path, self.name.xml)
+        e = xml.etree.ElementTree.parse(position)
+        note_parent = e.findall('.//note/..')
+        for parent in note_parent:
+            while(parent.find('note') is not None):
+                parent.remove(parent.find('note'))
+        e.write(position, encoding='utf-8')
+
+    def file_docbook_to_markdown(self):
+        input_file = os.path.join(self.docbook_path, self.name.xml)
+        output_file = os.path.join(self.markdown_path, self.name.md)
+        try:
+            pypandoc.convert(input_file, 'markdown', format='docbook', outputfile=output_file)
+            with open(output_file, 'r') as f:
+                reformat = []
+                for each in f.readlines():
+                    reformat.append(each)
+                    if each[0] == '-':
+                        break
+                else:
+                    with open(output_file, 'w') as f:
+                        for line in reformat:
+                            f.write(line.lstrip(' '))
+        except RuntimeError as e:
+            pass
+
+    def convert(self):
+        if self.mimetype in ['application/msword',
+                             "application/vnd.openxmlformats-officedocument"
+                             ".wordprocessingml.document"]:
+            if 'multipart/related' in self.stream:
+                self.process_mht()
+                returncode = convert_docfile(self.docx_path, self.name.docx,
+                                             self.docbook_path,
+                                             'xml:DocBook File')
             else:
-                with open(output_file, 'w') as f:
-                    for line in reformat:
-                        f.write(line.lstrip(' '))
-    except RuntimeError as e:
-        pass
-
-
-def remove_note(path, convertname):
-    e = xml.etree.ElementTree.parse(os.path.join(path, convertname))
-    note_parent = e.findall('.//note/..')
-    for parent in note_parent:
-        while(parent.find('note') is not None):
-            parent.remove(parent.find('note'))
-    e.write(os.path.join(path, convertname), encoding='utf-8')
-
-
-def process_mht(stream, docx_path, convertname):
-    message = email.message_from_string(stream)
-    for part in message.walk():
-        if part.get_content_charset() is not None:
-            part.set_param('charset', 'utf-8')
-    html_src = emaildata.text.Text.html(message)
-    save_stream(docx_path, convertname.html, html_src)
-    returncode = convert_docfile(docx_path, convertname.html,
-                                 docx_path, 'docx:Office Open XML Text')
-    return returncode
-
-
-def convert_file(root, conname):
-    mimetype = mimetypes.guess_type(os.path.join(root, conname))[0]
-    logger.info('Mimetype: %s' % mimetype)
-    if mimetype in ['application/msword',
-                    "application/vnd.openxmlformats-officedocument"
-                    ".wordprocessingml.document"]:
-        with open(os.path.join(root, conname), 'r') as f:
-            stream = f.read()
-        if 'multipart/related' in stream:
-            process_mht(stream, OutputPath.docx, conname)
-            returncode = convert_docfile(OutputPath.docx, conname.docx,
-                                         OutputPath.docbook,
-                                         'xml:DocBook File')
+                returncode = convert_docfile(self.root, self.name,
+                                             self.docbook_path,
+                                             'xml:DocBook File')
+            if "Error" in returncode[0]:
+                returncode = convert_docfile(self.root, self.name,
+                                             self.docx_path,
+                                             'docx:Office Open XML Text')
+                returncode = convert_docfile(self.docx_path, self.name.docx,
+                                             self.docbook_path,
+                                             'xml:DocBook File')
+            if not os.path.exists(os.path.join(
+                                  self.docbook_path, self.name.xml)):
+                logger.info('Not exists')
+                return
+            self.remove_note()
+            self.file_docbook_to_markdown()
+            information_explorer.catch(self.markdown_path, self.name,
+                                       self.yaml_path)
+            logger.info('Success')
         else:
-            returncode = convert_docfile(root, conname, OutputPath.docbook,
-                                         'xml:DocBook File')
-        if "Error" in returncode[0]:
-            returncode = convert_docfile(root, conname, OutputPath.docx,
-                                         'docx:Office Open XML Text')
-            returncode = convert_docfile(OutputPath.docx, conname.docx,
-                                         OutputPath.docbook,
-                                         'xml:DocBook File')
-        if not os.path.exists(os.path.join(
-                              OutputPath.docbook, conname.xml)):
-            logger.info('Not exists')
-            return
-        remove_note(OutputPath.docbook, conname.xml)
-        file_docbook_to_markdown(OutputPath.docbook, conname,
-                                 OutputPath.markdown)
-        information_explorer.catch(OutputPath.markdown, conname,
-                                   OutputPath.yaml)
-        logger.info('Success')
-    else:
-        logger.info('Skip')
+            logger.info('Skip')
 
 
 def convert_folder(path):
@@ -233,24 +257,24 @@ def convert_folder(path):
         >>> import os
         >>> import converterutils
         >>> import xml.etree.ElementTree
+        >>> output_backup = converterutils.OutputPath._output
+        >>> converterutils.OutputPath._output = 'test_output'
         >>> converterutils.convert_folder('./test')
-        >>> e = xml.etree.ElementTree.parse('output/docbook/cv_1.xml').getroot()
+        >>> e = xml.etree.ElementTree.parse('test_output/docbook/cv_1.xml').getroot()
         >>> e.findall('para')[0].text
         'http://jianli.yjbys.com/'
-        >>> with open('output/markdown/cv_1.md') as file:
+        >>> with open('test_output/markdown/cv_1.md') as file:
         ...     data = file.read()
         >>> 'http://jianli.yjbys.com/' in data
         True
-        >>> os.remove('output/docbook/cv_1.xml')
-        >>> os.remove('output/docbook/cv_2.xml')
-        >>> os.remove('output/markdown/cv_1.md')
-        >>> os.remove('output/markdown/cv_2.md')
+        >>> shutil.rmtree('test_output')
+        >>> converterutils.OutputPath._output = output_backup
     """
     for root, dirs, files in os.walk(path):
         for name in files:
-            conname = ConverName(name)
-            logger.info('Convert: %s' % os.path.join(root, conname))
-            convert_file(root, conname)
+            processfile = FileProcesser(root, name)
+            logger.info('Convert: %s' % os.path.join(root, name))
+            processfile.convert()
             logger.info('Finish')
 
 
@@ -259,6 +283,8 @@ def storage(filename, fileobj, repo):
         >>> import shutil
         >>> import gitinterface
         >>> import converterutils
+        >>> output_backup = converterutils.OutputPath._output
+        >>> converterutils.OutputPath._output = 'test_output'
         >>> repo_name = 'test_repo'
         >>> interface = gitinterface.GitInterface(repo_name)
         >>> cv1_name = 'cv_1.doc'
@@ -276,11 +302,14 @@ def storage(filename, fileobj, repo):
         >>> md2_str == md2_file
         True
         >>> shutil.rmtree(repo_name)
+        >>> shutil.rmtree('test_output')
+        >>> converterutils.OutputPath._output = output_backup
     """
     path = repo.repo.path
     conname = ConverName(filename)
     save_stream(path, conname, fileobj.read())
-    convert_file(path, conname)
+    processfile = FileProcesser(path, filename)
+    processfile.convert()
     shutil.copy(os.path.join(OutputPath.markdown, conname.md),
                 os.path.join(path, conname.md))
     repo.add_file(path, conname.md)

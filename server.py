@@ -21,7 +21,7 @@ def listdata():
     files = list(os.walk(outputstorage.OutputPath.markdown))[0][2]
     datas = []
     for f in files:
-        conname = converterutils.ConverName(f)
+        conname = converterutils.ConvertName(f)
         with open(os.path.join(
                   outputstorage.OutputPath.yaml, conname.yaml), 'r') as yf:
             stream = yf.read()
@@ -46,7 +46,7 @@ def index():
         network_file = request.files['file']
         if network_file.mimetype == 'application/octet-stream':
             return render_template('index.html', error='Please enter filename.')
-        convertname = converterutils.ConverName(
+        convertname = converterutils.ConvertName(
             network_file.filename.encode('utf-8'))
         local_file = repo.repo.get_named_file('../' + convertname.md)
         if local_file is not None:

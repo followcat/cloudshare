@@ -20,21 +20,21 @@ logging.config.fileConfig("logger.conf")
 logger = logging.getLogger("converterinfo")
 
 
-class ConverName(str):
+class ConvertName(str):
     def __new__(cls, value):
         """
             >>> import converterutils
             >>> name = 'base.cvs.doc'
-            >>> convername = converterutils.ConverName(name)
-            >>> convername.xml
+            >>> convertname = converterutils.ConvertName(name)
+            >>> convertname.xml
             'base.cvs.xml'
-            >>> convername.yaml
+            >>> convertname.yaml
             'base.cvs.yaml'
-            >>> convername.doc
+            >>> convertname.doc
             'base.cvs.doc'
-            >>> convername.docx
+            >>> convertname.docx
             'base.cvs.docx'
-            >>> convername.md
+            >>> convertname.md
             'base.cvs.md'
         """
         obj = str.__new__(cls, value)
@@ -88,7 +88,7 @@ def convert_docfile(path, filename, output, format):
 class FileProcesser():
     def __init__(self, root, name):
         self.root = root
-        self.name = ConverName(name)
+        self.name = ConvertName(name)
         self.mimetype = self.mimetype()
         self.stream = self.load()
         self.docx_path = outputstorage.OutputPath.docx
@@ -235,7 +235,7 @@ def storage(filename, fileobj, repo):
         >>> outputstorage.OutputPath._output = output_backup
     """
     path = repo.repo.path
-    conname = ConverName(filename)
+    conname = ConvertName(filename)
     outputstorage.save_stream(path, conname, fileobj.read())
     processfile = FileProcesser(path, filename)
     processfile.convert()

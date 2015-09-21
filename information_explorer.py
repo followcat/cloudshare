@@ -56,10 +56,11 @@ def save_yaml(infodict, path, filename):
         f.write(yaml.dump(infodict))
 
 
-def catch(path, convertname, output):
+def catch(path, convertname, basename, output):
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
         info_dict = {
+            "filename": basename.decode('utf-8'),
             "name": getNameFromString(stream),
             "mail": getMailAddFromString(stream),
             "phone": getPhoneNumFromString(stream)

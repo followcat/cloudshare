@@ -1,4 +1,6 @@
 import os
+import random
+import string
 import os.path
 
 
@@ -10,9 +12,11 @@ def save_stream(path, filename, stream):
 class ConvertName(str):
     def __new__(cls, value):
         """
-            >>> import converterutils
+            >>> import outputstorage
             >>> name = 'base.cvs.doc'
-            >>> convertname = ConvertName(name)
+            >>> convertname = outputstorage.ConvertName(name)
+            >>> convertname.origin
+            'base.cvs.doc'
             >>> convertname.xml
             'base.cvs.xml'
             >>> convertname.yaml
@@ -26,16 +30,24 @@ class ConvertName(str):
         """
         obj = str.__new__(cls, value)
         obj.base, obj.suffix = os.path.splitext(value)
+        obj._origin = value
         obj._xml = obj._add_suffix('xml')
         obj._html = obj._add_suffix('html')
         obj._yaml = obj._add_suffix('yaml')
         obj._doc = obj._add_suffix('doc')
         obj._docx = obj._add_suffix('docx')
         obj._md = obj._add_suffix('md')
+        obj._random = ''.join(random.choice(
+                              string.ascii_lowercase + string.digits)
+                              for _ in range(8))
         return obj
 
     def _add_suffix(self, suffix):
         return self.base + '.' + suffix
+
+    @property
+    def origin(self):
+        return self._origin
 
     @property
     def xml(self):
@@ -60,6 +72,15 @@ class ConvertName(str):
     @property
     def md(self):
         return self._md
+
+    @property
+    def random(self):
+        return ConvertName(self._random + self.suffix)
+
+    def reset_random(self):
+        self._random = ''.join(random.choice(
+                               string.ascii_lowercase + string.digits)
+                               for _ in range(8))
 
 
 class ClassProperty(property):
@@ -95,6 +116,7 @@ class OutputPath(object):
     _docx = 'docx'
     _docbook = 'docbook'
     _markdown = 'markdown'
+    _source = 'source'
 
     @classmethod
     def getpath(cls, name):
@@ -108,6 +130,10 @@ class OutputPath(object):
         if not os.path.exists(self._output):
             os.mkdir(self._output)
         return self._output
+
+    @ClassProperty
+    def source(self):
+        return self.getpath(self._source)
 
     @ClassProperty
     def yaml(self):

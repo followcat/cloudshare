@@ -26,7 +26,8 @@ def listdata():
                   outputstorage.OutputPath.yaml, conname.yaml), 'r') as yf:
             stream = yf.read()
         yaml_data = yaml.load(stream)
-        datas.append([os.path.splitext(f.decode('utf-8'))[0], yaml_data])
+        datas.append([os.path.splitext(f)[0],
+                      yaml_data])
     return render_template('listdata.html', datas=datas)
 
 

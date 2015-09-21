@@ -60,11 +60,9 @@ class FileProcesser():
 
     def copy(self, des=None, name=None):
         """
-            >>> import os
             >>> import shutil
             >>> import outputstorage
             >>> import converterutils
-            >>> import xml.etree.ElementTree
             >>> output_backup = outputstorage.OutputPath._output
             >>> outputstorage.OutputPath._output = 'test_output'
             >>> cv1 = converterutils.FileProcesser('./test', 'cv_1.doc')

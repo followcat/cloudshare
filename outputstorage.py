@@ -7,6 +7,61 @@ def save_stream(path, filename, stream):
         localfile.write(stream)
 
 
+class ConvertName(str):
+    def __new__(cls, value):
+        """
+            >>> import converterutils
+            >>> name = 'base.cvs.doc'
+            >>> convertname = ConvertName(name)
+            >>> convertname.xml
+            'base.cvs.xml'
+            >>> convertname.yaml
+            'base.cvs.yaml'
+            >>> convertname.doc
+            'base.cvs.doc'
+            >>> convertname.docx
+            'base.cvs.docx'
+            >>> convertname.md
+            'base.cvs.md'
+        """
+        obj = str.__new__(cls, value)
+        obj.base, obj.suffix = os.path.splitext(value)
+        obj._xml = obj._add_suffix('xml')
+        obj._html = obj._add_suffix('html')
+        obj._yaml = obj._add_suffix('yaml')
+        obj._doc = obj._add_suffix('doc')
+        obj._docx = obj._add_suffix('docx')
+        obj._md = obj._add_suffix('md')
+        return obj
+
+    def _add_suffix(self, suffix):
+        return self.base + '.' + suffix
+
+    @property
+    def xml(self):
+        return self._xml
+
+    @property
+    def html(self):
+        return self._html
+
+    @property
+    def yaml(self):
+        return self._yaml
+
+    @property
+    def doc(self):
+        return self._doc
+
+    @property
+    def docx(self):
+        return self._docx
+
+    @property
+    def md(self):
+        return self._md
+
+
 class ClassProperty(property):
     def __get__(self, instance, cls):
         return classmethod(self.fget).__get__(instance, cls)()

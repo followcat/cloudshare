@@ -20,61 +20,6 @@ logging.config.fileConfig("logger.conf")
 logger = logging.getLogger("converterinfo")
 
 
-class ConvertName(str):
-    def __new__(cls, value):
-        """
-            >>> import converterutils
-            >>> name = 'base.cvs.doc'
-            >>> convertname = converterutils.ConvertName(name)
-            >>> convertname.xml
-            'base.cvs.xml'
-            >>> convertname.yaml
-            'base.cvs.yaml'
-            >>> convertname.doc
-            'base.cvs.doc'
-            >>> convertname.docx
-            'base.cvs.docx'
-            >>> convertname.md
-            'base.cvs.md'
-        """
-        obj = str.__new__(cls, value)
-        obj.base, obj.suffix = os.path.splitext(value)
-        obj._xml = obj._add_suffix('xml')
-        obj._html = obj._add_suffix('html')
-        obj._yaml = obj._add_suffix('yaml')
-        obj._doc = obj._add_suffix('doc')
-        obj._docx = obj._add_suffix('docx')
-        obj._md = obj._add_suffix('md')
-        return obj
-
-    def _add_suffix(self, suffix):
-        return self.base + '.' + suffix
-
-    @property
-    def xml(self):
-        return self._xml
-
-    @property
-    def html(self):
-        return self._html
-
-    @property
-    def yaml(self):
-        return self._yaml
-
-    @property
-    def doc(self):
-        return self._doc
-
-    @property
-    def docx(self):
-        return self._docx
-
-    @property
-    def md(self):
-        return self._md
-
-
 def convert_docfile(path, filename, output, format):
     p = subprocess.Popen(['libreoffice', '--headless', '--convert-to',
                           format, os.path.join(path, filename),
@@ -88,7 +33,7 @@ def convert_docfile(path, filename, output, format):
 class FileProcesser():
     def __init__(self, root, name):
         self.root = root
-        self.name = ConvertName(name)
+        self.name = outputstorage.ConvertName(name)
         self.mimetype = self.mimetype()
         self.stream = self.load()
         self.docx_path = outputstorage.OutputPath.docx
@@ -235,7 +180,7 @@ def storage(filename, fileobj, repo):
         >>> outputstorage.OutputPath._output = output_backup
     """
     path = repo.repo.path
-    conname = ConvertName(filename)
+    conname = outputstorage.ConvertName(filename)
     outputstorage.save_stream(path, conname, fileobj.read())
     processfile = FileProcesser(path, filename)
     processfile.convert()

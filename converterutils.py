@@ -59,11 +59,33 @@ class FileProcesser():
         return data
 
     def copy(self, des=None, name=None):
+        """
+            >>> import os
+            >>> import shutil
+            >>> import outputstorage
+            >>> import converterutils
+            >>> import xml.etree.ElementTree
+            >>> output_backup = outputstorage.OutputPath._output
+            >>> outputstorage.OutputPath._output = 'test_output'
+            >>> cv1 = converterutils.FileProcesser('./test', 'cv_1.doc')
+            >>> cv1.convert()
+            >>> ori = cv1.name
+            >>> des = cv1.copy()
+            >>> cv1.name == ori
+            False
+            >>> shutil.rmtree('test_output')
+            >>> outputstorage.OutputPath._output = output_backup
+        """
         if des is None:
             des = self.source_path
         if name is None:
             name = self.name
         location = os.path.join(des, name)
+        while os.path.isfile(location) is True:
+            self.base.reset_random()
+            self.name = self.base.random
+            name = self.name
+            location = os.path.join(des, name)
         with open(location, 'wb') as f:
             f.write(self.stream)
         return location

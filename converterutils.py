@@ -200,11 +200,15 @@ class FileProcesser():
             >>> cv2 = converterutils.FileProcesser('./test', 'cv_2.doc')
             >>> cv1.storage(interface)
             >>> cv2.storage(interface)
-            >>> data_list = []
+            >>> md_list = []
             >>> for position in glob.glob(os.path.join(repo_name, '*.md')):
             ...     with open(position) as f:
-            ...         data_list.append(f.read())
-            >>> len(data_list)
+            ...         md_list.append(f.read())
+            >>> yaml_list = []
+            >>> for position in glob.glob(os.path.join(repo_name, '*.yaml')):
+            ...     with open(position) as f:
+            ...         yaml_list.append(f.read())
+            >>> len(yaml_list)
             2
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree('test_output')
@@ -214,7 +218,9 @@ class FileProcesser():
         self.convert()
         shutil.copy(os.path.join(self.markdown_path, self.name.md),
                     os.path.join(path, self.name.md))
-        repo.add_file(self.name.md)
+        shutil.copy(os.path.join(self.yaml_path, self.name.yaml),
+                    os.path.join(path, self.name.yaml))
+        repo.add_files([self.name.md, self.name.yaml])
 
 
 def convert_folder(path):

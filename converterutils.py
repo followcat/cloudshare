@@ -184,6 +184,38 @@ class FileProcesser():
         else:
             logger.info('Skip')
 
+    def storage(self, repo):
+        """
+            >>> import glob
+            >>> import shutil
+            >>> import os.path
+            >>> import gitinterface
+            >>> import outputstorage
+            >>> import converterutils
+            >>> output_backup = outputstorage.OutputPath._output
+            >>> outputstorage.OutputPath._output = 'test_output'
+            >>> repo_name = 'test_repo'
+            >>> interface = gitinterface.GitInterface(repo_name)
+            >>> cv1 = converterutils.FileProcesser('./test', 'cv_1.doc')
+            >>> cv2 = converterutils.FileProcesser('./test', 'cv_2.doc')
+            >>> cv1.storage(interface)
+            >>> cv2.storage(interface)
+            >>> data_list = []
+            >>> for position in glob.glob(os.path.join(repo_name, '*.md')):
+            ...     with open(position) as f:
+            ...         data_list.append(f.read())
+            >>> len(data_list)
+            2
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree('test_output')
+            >>> outputstorage.OutputPath._output = output_backup
+        """
+        path = repo.repo.path
+        self.convert()
+        shutil.copy(os.path.join(self.markdown_path, self.name.md),
+                    os.path.join(path, self.name.md))
+        repo.add_file(self.name.md)
+
 
 def convert_folder(path):
     for root, dirs, files in os.walk(path):
@@ -192,45 +224,3 @@ def convert_folder(path):
             logger.info('Convert: %s' % os.path.join(root, name))
             processfile.convert()
             logger.info('Finish')
-
-
-def storage(filename, fileobj, repo):
-    """
-        >>> import glob
-        >>> import shutil
-        >>> import os.path
-        >>> import gitinterface
-        >>> import outputstorage
-        >>> import converterutils
-        >>> output_backup = outputstorage.OutputPath._output
-        >>> outputstorage.OutputPath._output = 'test_output'
-        >>> repo_name = 'test_repo'
-        >>> interface = gitinterface.GitInterface(repo_name)
-        >>> cv1_name = 'cv_1.doc'
-        >>> cv2_name = 'cv_2.doc'
-        >>> cv1_file = open('test/' + cv1_name, 'r')
-        >>> cv2_file = open('test/' + cv2_name, 'r')
-        >>> md1_str = converterutils.storage(cv1_name, cv1_file, interface)
-        >>> md2_str = converterutils.storage(cv2_name, cv2_file, interface)
-        >>> data_list = []
-        >>> for position in glob.glob(os.path.join(repo_name, '*.md')):
-        ...     with open(position) as f:
-        ...         data_list.append(f.read())
-        >>> md1_str in data_list
-        True
-        >>> md2_str in data_list
-        True
-        >>> shutil.rmtree(repo_name)
-        >>> shutil.rmtree('test_output')
-        >>> outputstorage.OutputPath._output = output_backup
-    """
-    path = repo.repo.path
-    outputstorage.save_stream(path, filename, fileobj.read())
-    processfile = FileProcesser(path, filename)
-    processfile.convert()
-    shutil.copy(os.path.join(outputstorage.OutputPath.markdown, processfile.name.md),
-                os.path.join(path, processfile.name.md))
-    repo.add_file(path, processfile.name.md)
-    with open(os.path.join(path, processfile.name.md), 'r') as f:
-        md = f.read()
-    return md

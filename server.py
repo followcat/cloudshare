@@ -54,8 +54,13 @@ def index():
             md = local_file.read()
             local_file.close()
         else:
-            md = converterutils.storage(convertname,
-                                        network_file, repo)
+            path = '/tmp'
+            outputstorage.save_stream(path, convertname, network_file.read())
+            storage_file = converterutils.FileProcesser(path, convertname)
+            storage_file.storage(repo)
+            with open(os.path.join(repo.repo.path,
+                                   storage_file.name.md), 'r') as f:
+                md = f.read()
         format_md = md.decode('utf-8').replace('\\\n', '\n\n')
         return render_template('upload.html', markdown=format_md)
     return render_template('upload.html')

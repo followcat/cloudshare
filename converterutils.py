@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-import os
 import email
 import shutil
 import logging

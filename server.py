@@ -2,6 +2,7 @@
 from flask import Flask, request, render_template
 
 import os
+import glob
 import codecs
 import os.path
 
@@ -18,24 +19,19 @@ repo = gitinterface.GitInterface("repo")
 
 @app.route("/")
 def listdata():
-    files = list(os.walk(outputstorage.OutputPath.markdown))[0][2]
     datas = []
-    for f in files:
-        conname = outputstorage.ConvertName(f)
-        with open(os.path.join(
-                  outputstorage.OutputPath.yaml, conname.yaml), 'r') as yf:
+    for position in glob.glob(os.path.join(repo.repo.path, '*.yaml')):
+        with open(position, 'r') as yf:
             stream = yf.read()
         yaml_data = yaml.load(stream)
-        datas.append([os.path.splitext(f)[0],
+        datas.append([os.path.splitext(position)[0],
                       yaml_data])
     return render_template('listdata.html', datas=datas)
 
 
-@app.route("/showtest/<filename>")
+@app.route("/showtest/<path:filename>")
 def showtest(filename):
-    with codecs.open(os.path.join(
-                     outputstorage.OutputPath.markdown, filename),
-                     'r', encoding='utf-8') as file:
+    with codecs.open(filename, 'r', encoding='utf-8') as file:
         data = file.read()
     output = pypandoc.convert(data, 'html', format='markdown')
     return render_template('cv.html', markdown=output)

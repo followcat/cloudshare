@@ -69,6 +69,7 @@ class FileProcesser():
             >>> outputstorage.OutputPath._output = 'test_output'
             >>> cv1 = converterutils.FileProcesser('./test', 'cv_1.doc')
             >>> cv1.convert()
+            True
             >>> ori = cv1.name
             >>> des = cv1.copy()
             >>> cv1.name == ori
@@ -139,6 +140,7 @@ class FileProcesser():
             >>> outputstorage.OutputPath._output = 'test_output'
             >>> cv1 = converterutils.FileProcesser('./test', 'cv_1.doc')
             >>> cv1.convert()
+            True
             >>> e = xml.etree.ElementTree.parse(os.path.join(
             ... cv1.docbook_path, cv1.name.xml)).getroot()
             >>> e.findall('para')[0].text
@@ -175,14 +177,16 @@ class FileProcesser():
             if not os.path.exists(os.path.join(
                                   self.docbook_path, self.name.xml)):
                 logger.info('Not exists')
-                return
+                return False
             self.remove_note()
             self.file_docbook_to_markdown()
             information_explorer.catch(self.markdown_path, self.name,
                                        self.base.base, self.yaml_path)
             logger.info('Success')
+            return True
         else:
             logger.info('Skip')
+            return False
 
     def storage(self, repo):
         """
@@ -199,7 +203,9 @@ class FileProcesser():
             >>> cv1 = converterutils.FileProcesser('./test', 'cv_1.doc')
             >>> cv2 = converterutils.FileProcesser('./test', 'cv_2.doc')
             >>> cv1.storage(interface)
+            True
             >>> cv2.storage(interface)
+            True
             >>> md_list = []
             >>> for position in glob.glob(os.path.join(repo_name, '*.md')):
             ...     with open(position) as f:
@@ -215,18 +221,24 @@ class FileProcesser():
             >>> outputstorage.OutputPath._output = output_backup
         """
         path = repo.repo.path
-        self.convert()
+        if self.convert() is False:
+            return False
         shutil.copy(os.path.join(self.markdown_path, self.name.md),
                     os.path.join(path, self.name.md))
         shutil.copy(os.path.join(self.yaml_path, self.name.yaml),
                     os.path.join(path, self.name.yaml))
         repo.add_files([self.name.md, self.name.yaml])
+        return True
 
 
-def convert_folder(path):
+def convert_folder(path, repo):
     for root, dirs, files in os.walk(path):
         for name in files:
             processfile = FileProcesser(root, name)
             logger.info('Convert: %s' % os.path.join(root, name))
-            processfile.convert()
+            try:
+                processfile.storage(repo)
+            except Exception as error:
+                logger.info(error)
+                continue
             logger.info('Finish')

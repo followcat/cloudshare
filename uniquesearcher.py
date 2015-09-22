@@ -21,6 +21,7 @@ class UniqueSearcher(object):
         >>> us.unique_name('cv_1')
         True
         >>> cv1.convert()
+        True
         >>> us.unique_name('cv_1')
         True
         >>> us.reload()

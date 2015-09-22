@@ -11,6 +11,7 @@ import pypandoc
 import emaildata.text
 
 import outputstorage
+import uniquesearcher
 import information_explorer
 
 
@@ -29,6 +30,8 @@ def convert_docfile(path, filename, output, format):
 
 
 class FileProcesser():
+    unique_checker = uniquesearcher.UniqueSearcher()
+
     def __init__(self, root, name):
         self.root = root
         self.base = outputstorage.ConvertName(name)
@@ -44,6 +47,7 @@ class FileProcesser():
         logger.info('Mimetype: %s' % self.mimetype)
         location = self.copy()
         logger.info('Backup to: %s' % location)
+        self.unique_checker.reload()
 
     def mimetype(self):
         mimetype = mimetypes.guess_type(os.path.join(
@@ -147,6 +151,8 @@ class FileProcesser():
             >>> shutil.rmtree('test_output')
             >>> outputstorage.OutputPath._output = output_backup
         """
+        if self.unique_checker.unique_name(self.base.base) is False:
+            raise Exception('Duplicate files: %s' % self.base.base)
         if self.mimetype in ['application/msword',
                              "application/vnd.openxmlformats-officedocument"
                              ".wordprocessingml.document"]:

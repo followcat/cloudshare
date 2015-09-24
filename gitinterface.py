@@ -101,18 +101,19 @@ class GitInterface(object):
                                             self.repo.object_store, tree)
 
     def grep(self, restrings):
-        keywords = restrings.split()
-        command = ['git', 'grep', '-l', '--all-match']
-        for each in keywords:
-            command.append('-e')
-            command.append(each)
-        p = subprocess.Popen(command,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT,
-                             cwd='repo')
-        returncode = p.communicate()[0]
         grep_list = []
-        for each in returncode.split('\n'):
-            if each:
-                grep_list.append(each)
+        keywords = restrings.split()
+        if keywords:
+            command = ['git', 'grep', '-l', '--all-match']
+            for each in keywords:
+                command.append('-e')
+                command.append(each)
+            p = subprocess.Popen(command,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT,
+                                 cwd='repo')
+            returncode = p.communicate()[0]
+            for each in returncode.split('\n'):
+                if each:
+                    grep_list.append(each)
         return grep_list

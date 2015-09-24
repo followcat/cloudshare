@@ -17,27 +17,7 @@ app = Flask(__name__)
 repo = gitinterface.GitInterface("repo")
 
 
-@app.route("/")
-def listdata():
-    datas = []
-    for position in glob.glob(os.path.join(repo.repo.path, '*.yaml')):
-        with open(position, 'r') as yf:
-            stream = yf.read()
-        yaml_data = yaml.load(stream)
-        datas.append([os.path.splitext(position)[0],
-                      yaml_data])
-    return render_template('listdata.html', datas=datas)
-
-
-@app.route("/showtest/<path:filename>")
-def showtest(filename):
-    with codecs.open(filename, 'r', encoding='utf-8') as file:
-        data = file.read()
-    output = pypandoc.convert(data, 'html', format='markdown')
-    return render_template('cv.html', markdown=output)
-
-
-@app.route("/search", methods=['GET', 'POST'])
+@app.route("/", methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
         search_text = request.form['search_text']
@@ -57,8 +37,28 @@ def search():
         return render_template('search.html')
 
 
+@app.route("/listdata")
+def listdata():
+    datas = []
+    for position in glob.glob(os.path.join(repo.repo.path, '*.yaml')):
+        with open(position, 'r') as yf:
+            stream = yf.read()
+        yaml_data = yaml.load(stream)
+        datas.append([os.path.splitext(position)[0],
+                      yaml_data])
+    return render_template('listdata.html', datas=datas)
+
+
+@app.route("/showtest/<path:filename>")
+def showtest(filename):
+    with codecs.open(filename, 'r', encoding='utf-8') as file:
+        data = file.read()
+    output = pypandoc.convert(data, 'html', format='markdown')
+    return render_template('cv.html', markdown=output)
+
+
 @app.route("/upload", methods=['GET', 'POST'])
-def index():
+def upload():
     if request.method == 'POST':
         network_file = request.files['file']
         if network_file.mimetype == 'application/octet-stream':

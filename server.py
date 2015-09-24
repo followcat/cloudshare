@@ -37,6 +37,26 @@ def showtest(filename):
     return render_template('cv.html', markdown=output)
 
 
+@app.route("/search", methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST':
+        search_text = request.form['search_text']
+        result = repo.grep(search_text)
+        datas = []
+        for each in result:
+            base, suffix = os.path.splitext(each)
+            name = outputstorage.ConvertName(base)
+            with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
+                stream = yf.read()
+            yaml_data = yaml.load(stream)
+            datas.append([os.path.join(repo.repo.path, name), yaml_data])
+        return render_template('search_result.html',
+                               search_key=search_text,
+                               result=datas)
+    else:
+        return render_template('search.html')
+
+
 @app.route("/upload", methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':

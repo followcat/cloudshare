@@ -1,0 +1,72 @@
+<!--A Design by W3layouts
+Author: W3layout
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>CLOUDSHARE Searcher</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="Photo-Hub Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template, 
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<link href="{{ url_for('static', filename='bootstrap.css') }}" rel='stylesheet' type='text/css' />
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<!-- Custom Theme files -->
+<link href="{{ url_for('static', filename='search.css') }}" rel='stylesheet' type='text/css' />
+<link rel="stylesheet" href="{{ url_for('static', filename='table.css') }}">
+<!-- Custom Theme files -->
+<!--webfont-->
+<link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800' rel='stylesheet' type='text/css'>
+<script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
+<script src="/static/js/menu_jquery.js"></script>
+</head>
+<body style="padding: 0;">
+    <div class="header">    
+      <div class="container"> 
+         <div class="logo">
+            <h1><a href="search">Doc Hub</a></h1>
+         </div>
+         <div class="clearfix">
+                <div class="search">
+                  <ul class="nav1">
+                    <li id="search">
+                        <form action="search" name="searchform" method="post">
+                            <input type="text" name="search_text" id="search_text" placeholder="Search" value="{{ search_key }}"/>
+                            <input type="button" name="search_button" id="search_button" onclick="document.searchform.submit();">
+                        </form>
+                    </li>
+                    <li id="options">
+                        <a href="#">Markdown</a>
+                        <ul class="subnav">
+                            <li><a href="#">Option1</a></li>
+                            <li><a href="#">Option2</a></li>
+                            <li><a href="#">Option3</a></li>
+                        </ul>
+                    </li>
+                  </ul>
+                </div>
+         </div>
+        </div>
+    </div>
+    <div style="position:absolute; height:80%; overflow:auto; width:100%;">
+      <div>
+        {% for data in result %}
+        <h3><a href="/showtest/{{ data[0] }}.md" target="view_window">{{ data[0] }}</a></h3>
+        <table>
+                {% for info in data[1] %}
+                <tr>
+                <td>{{ info }}</td>
+                <td>{{ data[1][info] }}</td>
+                </tr>
+                {% endfor %}
+        </table>
+        {% endfor %}
+      </div>
+    </div>
+</body>
+</html>     

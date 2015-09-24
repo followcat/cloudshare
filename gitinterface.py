@@ -100,13 +100,19 @@ class GitInterface(object):
         dulwich.index.build_index_from_tree(self.repo.path, indexfile,
                                             self.repo.object_store, tree)
 
-    def grep(self, restring):
-        p = subprocess.Popen(['git', 'grep', '-l', restring],
+    def grep(self, restrings):
+        keywords = restrings.split()
+        command = ['git', 'grep', '-l', '--all-match']
+        for each in keywords:
+            command.append('-e')
+            command.append(each)
+        p = subprocess.Popen(command,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,
                              cwd='repo')
-        returncode = p.communicate()[0][:-1]
+        returncode = p.communicate()[0]
         grep_list = []
         for each in returncode.split('\n'):
-            grep_list.append(each)
+            if each:
+                grep_list.append(each)
         return grep_list

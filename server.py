@@ -57,31 +57,6 @@ def showtest(filename):
     return render_template('cv.html', markdown=output)
 
 
-@app.route("/edit", methods=['GET', 'POST'])
-def edit():
-    if request.method == 'POST':
-        network_file = request.files['file']
-        if network_file.mimetype == 'application/octet-stream':
-            return render_template('index.html', error='Please enter filename.')
-        convertname = outputstorage.ConvertName(
-            network_file.filename.encode('utf-8'))
-        local_file = repo.repo.get_named_file('../' + convertname.md)
-        if local_file is not None:
-            md = local_file.read()
-            local_file.close()
-        else:
-            path = '/tmp'
-            outputstorage.save_stream(path, convertname, network_file.read())
-            storage_file = converterutils.FileProcesser(path, convertname)
-            storage_file.storage(repo)
-            with open(os.path.join(repo.repo.path,
-                                   storage_file.name.md), 'r') as f:
-                md = f.read()
-        format_md = md.decode('utf-8').replace('\\\n', '\n\n')
-        return render_template('edit.html', markdown=format_md)
-    return render_template('edit.html')
-
-
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':

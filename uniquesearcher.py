@@ -46,6 +46,7 @@ class UniqueSearcher(object):
             return True
 
     def reload(self):
+        self.yaml_datas = []
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
             base, suffix = os.path.splitext(f)
             if base not in self.yaml_datas:

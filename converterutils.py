@@ -189,6 +189,26 @@ class FileProcesser():
             return False
 
     def deleteconvert(self):
+        """
+            >>> import shutil
+            >>> import os.path
+            >>> import outputstorage
+            >>> import converterutils
+            >>> output_backup = outputstorage.OutputPath._output
+            >>> outputstorage.OutputPath._output = 'test_output'
+            >>> cv1 = converterutils.FileProcesser('./test', 'cv_1.doc')
+            >>> cv1.convert()
+            True
+            >>> os.path.isfile(os.path.join(outputstorage.OutputPath.markdown,
+            ... cv1.name.md))
+            True
+            >>> cv1.deleteconvert()
+            >>> os.path.isfile(os.path.join(outputstorage.OutputPath.markdown,
+            ... cv1.name.md))
+            False
+            >>> shutil.rmtree('test_output')
+            >>> outputstorage.OutputPath._output = output_backup
+        """
         filename = os.path.join(self.docx_path, self.name.docx)
         if os.path.isfile(filename):
             os.remove(filename)

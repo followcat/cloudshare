@@ -57,8 +57,8 @@ def showtest(filename):
     return render_template('cv.html', markdown=output)
 
 
-@app.route("/upload", methods=['GET', 'POST'])
-def upload():
+@app.route("/edit", methods=['GET', 'POST'])
+def edit():
     if request.method == 'POST':
         network_file = request.files['file']
         if network_file.mimetype == 'application/octet-stream':
@@ -78,8 +78,31 @@ def upload():
                                    storage_file.name.md), 'r') as f:
                 md = f.read()
         format_md = md.decode('utf-8').replace('\\\n', '\n\n')
-        return render_template('upload.html', markdown=format_md)
-    return render_template('upload.html')
+        return render_template('edit.html', markdown=format_md)
+    return render_template('edit.html')
+
+
+@app.route("/upload", methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        network_file = request.files['file']
+        convertname = outputstorage.ConvertName(
+            network_file.filename.encode('utf-8'))
+        path = '/tmp'
+        outputstorage.save_stream(path, convertname, network_file.read())
+        storage_file = converterutils.FileProcesser(path, convertname)
+        try:
+            result = storage_file.convert()
+            if result is False:
+                return render_template('upload.html', result='Can not Convert')
+        except:
+            return render_template('upload.html', result='Exist File')
+        md_html = showtest(os.path.join(outputstorage.OutputPath.markdown,
+                                        storage_file.name.md))
+        storage_file.deleteconvert()
+        return md_html
+    else:
+        return render_template('upload.html')
 
 
 if __name__ == "__main__":

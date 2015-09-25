@@ -188,6 +188,23 @@ class FileProcesser():
             logger.info('Skip')
             return False
 
+    def deleteconvert(self):
+        filename = os.path.join(self.docx_path, self.name.docx)
+        if os.path.isfile(filename):
+            os.remove(filename)
+        filename = os.path.join(self.html_path, self.name.html)
+        if os.path.isfile(filename):
+            os.remove(filename)
+        filename = os.path.join(self.yaml_path, self.name.yaml)
+        if os.path.isfile(filename):
+            os.remove(filename)
+        filename = os.path.join(self.docbook_path, self.name.xml)
+        if os.path.isfile(filename):
+            os.remove(filename)
+        filename = os.path.join(self.markdown_path, self.name.md)
+        if os.path.isfile(filename):
+            os.remove(filename)
+
     def storage(self, repo):
         """
             >>> import glob

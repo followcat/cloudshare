@@ -1,63 +1,26 @@
 <!DOCTYPE html>
-
 <html>
-
     <head>
-        <title>PageDown Demo Page</title>
-        
-        <link rel="stylesheet" type="text/css" href="static/pagedown/demo/browser/demo.css" />
-        <link rel="stylesheet" href="static/Skeleton-2.0.4/css/normalize.css">
-        <link rel="stylesheet" href="static/Skeleton-2.0.4/css/skeleton.css">
-        
-        <script type="text/javascript" src="static/js/jquery-1.11.3.min.js"></script>
-        <script type="text/javascript" src="static/pagedown/Markdown.Converter.js"></script>
-        <script type="text/javascript" src="static/pagedown/Markdown.Sanitizer.js"></script>
-        <script type="text/javascript" src="static/pagedown/Markdown.Editor.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='upload.css') }}">
+        <title>CV Upload</title>
     </head>
-    
     <body>
-        <div class="section hero">
-            <div class="container">
-              <div class="row">
-                <div class="one-half column">
-                    <div class="wmd-panel">
-                        <div id="wmd-button-bar"></div>
-                        <textarea class="wmd-input" id="wmd-input">
-{{ markdown }}
-                        </textarea>
-                    </div>
-                </div>
-                <div class="one-half column">
-                    <div id="wmd-preview" class="wmd-panel wmd-preview"></div>
-                </div>
-              </div>
-              <div class="row">
-                <form action="upload" method="post" enctype="multipart/form-data">
-                <input type="file" name="file" /><br />
-                <input type="submit" value="Upload" />
-              </div>
-
-        <script type="text/javascript">
-            (function () {
-                var converter1 = Markdown.getSanitizingConverter();
-                
-                converter1.hooks.chain("preBlockGamut", function (text, rbg) {
-                    return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
-                        return "<blockquote>" + rbg(inner) + "</blockquote>\n";
-                    });
-                });
-                
-                var editor1 = new Markdown.Editor(converter1);
-                
-                editor1.run();
-                
-                
-                var help = function () { alert("Do you need help?"); }
-                var options = {
-                    helpButton: { handler: help },
-                    strings: { quoteexample: "whatever you're quoting, put it right here" }
-                };
-            })();
-        </script>
+        <h1>CV File Upload <span>With jQuery and CSS</span></h1>
+        <h3>{{ result }}</h3>
+        <form id="upload_form" action="upload" method="post" enctype="multipart/form-data">
+            <div class="custom-file-upload">
+                <input type="file" id="file" name="file" multiple />
+            </div>
+            <div>
+                <p>
+                    <input type="submit" value="PREVIEW"></input>
+                </p>
+            </div>
+        </form>
     </body>
+    <script language=javascript>
+
+    </script>
+    <script type="text/javascript" src="static/js/upload.js"></script>
 </html>

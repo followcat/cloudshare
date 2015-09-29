@@ -5,23 +5,27 @@ import os.path
 import yaml
 
 
-def getNameFromString(stream):
+def getTagFromString(tag, stream):
     """
         >>> import information_explorer
-        >>> information_explorer.getNameFromString('姓名:followcat ')
+        >>> information_explorer.getTagFromString('姓名', '姓名:followcat ')
         u'followcat'
-        >>> information_explorer.getNameFromString('姓    名:followcat ')
+        >>> information_explorer.getTagFromString('姓名', '姓    名:followcat ')
         u'followcat'
-        >>> information_explorer.getNameFromString('姓名:    followcat ')
+        >>> information_explorer.getTagFromString('姓名', '姓名:    followcat ')
         u'followcat'
-        >>> information_explorer.getNameFromString('姓    名:    followcat ')
+        >>> information_explorer.getTagFromString('姓名', '姓    名:    followcat ')
         u'followcat'
-        >>> information_explorer.getNameFromString('  姓    名:    followcat ')
+        >>> information_explorer.getTagFromString('姓名', '  姓    名:    followcat ')
         u'followcat'
     """
     name = ""
-    re_words = re.search(ur"\u59d3[\xa0 ]*\u540d[\xa0 :\uff1a]*"
-                         "(?P<name>[\S]*)\W", stream.decode('utf8'))
+    re_string = ""
+    for each in tag.decode('utf-8'):
+        re_string += each
+        re_string += ur"[\xa0 ]*"
+    re_string += ur"[\xa0 :\uff1a]*(?P<name>[\S]*)\W"
+    re_words = re.search(re_string, stream.decode('utf8'))
     if re_words is not None:
         name = re_words.group('name')
     return name
@@ -61,7 +65,7 @@ def catch(path, convertname, basename, output):
         stream = f.read()
         info_dict = {
             "filename": basename.decode('utf-8'),
-            "name": getNameFromString(stream),
+            "name": getTagFromString('姓名', stream),
             "mail": getMailAddFromString(stream),
             "phone": getPhoneNumFromString(stream)
             }

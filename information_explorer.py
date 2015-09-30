@@ -60,13 +60,13 @@ def save_yaml(infodict, path, filename):
 
 def catch(path, convertname, basename, output):
     organization = (u'有限公司', u'集团', u'院')
-    organization_restr = u'[ \u3000:\uff1a]*([\S]*)('
+    organization_restr = u'[ \u3000:\uff1a]*([a-zA-Z0-9\u4E00-\u9FA5]+)('
     for each in organization:
         organization_restr += each + '|'
     organization_restr = organization_restr[:-1] + ')'
 
     school = (u'大学', u'学院')
-    school_restr = u'[ \u3000]*([\S]*)('
+    school_restr = u'[ \u3000]*([a-zA-Z0-9\u4E00-\u9FA5]+)('
     for each in school:
         school_restr += each + '|'
     school_restr = school_restr[:-1] + ')'

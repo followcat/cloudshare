@@ -10,6 +10,7 @@ import xml.etree.ElementTree
 import pypandoc
 import emaildata.text
 
+import exception
 import outputstorage
 import uniquesearcher
 import information_explorer
@@ -154,7 +155,8 @@ class FileProcesser():
             >>> outputstorage.OutputPath._output = output_backup
         """
         if self.unique_checker.unique_name(self.base.base) is False:
-            raise Exception('Duplicate files: %s' % self.base.base)
+            raise exception.DuplicateException(
+                'Duplicate files: %s' % self.base.base)
         if self.mimetype in ['application/msword',
                              "application/vnd.openxmlformats-officedocument"
                              ".wordprocessingml.document"]:
@@ -275,7 +277,7 @@ def convert_folder(path, repo):
             logger.info('Convert: %s' % os.path.join(root, name))
             try:
                 processfile.storage(repo)
-            except Exception as error:
+            except exception.DuplicateException as error:
                 logger.info(error)
                 continue
             logger.info('Finish')

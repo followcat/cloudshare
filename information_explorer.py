@@ -65,7 +65,7 @@ def catch(path, convertname, basename, output):
         organization_restr += each + '|'
     organization_restr = organization_restr[:-1] + ')'
 
-    school = (u'大学', u'学院')
+    school = (u'大学', u'学院', u'学校')
     school_restr = u'[ \u3000]*([a-zA-Z0-9\u4E00-\u9FA5]+)('
     for each in school:
         school_restr += each + '|'

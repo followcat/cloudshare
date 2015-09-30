@@ -21,7 +21,7 @@ def getTagFromString(tag, stream):
     """
     name = ""
     re_string = ""
-    for each in tag.decode('utf-8'):
+    for each in tag.decode('utf-8').replace(u'\xa0', ' '):
         re_string += each
         re_string += ur"[ \u3000]*"
     re_string += ur"[ \u3000:\uff1a]+(?P<tag>[\S]+)\W"
@@ -48,7 +48,8 @@ def getInfoFromRestr(stream, restring):
         [u'cat\u6709\u9650\u516c\u53f8']
     """
     regex = re.compile(restring, re.IGNORECASE)
-    result = re.findall(regex, stream.decode('utf8'))
+    search_string = stream.decode('utf8').replace(u'\xa0', ' ')
+    result = re.findall(regex, search_string)
     return result
 
 
@@ -58,15 +59,28 @@ def save_yaml(infodict, path, filename):
 
 
 def catch(path, convertname, basename, output):
-    company_restr = ur'[ \u3000:\uff1a]*([\S]*\u6709\u9650\u516c\u53f8)'
+    organization = (u'有限公司', u'集团', u'院')
+    organization_restr = u'[ \u3000:\uff1a]*([\S]*)('
+    for each in organization:
+        organization_restr += each + '|'
+    organization_restr = organization_restr[:-1] + ')'
+
+    school = (u'大学', u'学院')
+    school_restr = u'[ \u3000]*([\S]*)('
+    for each in school:
+        school_restr += each + '|'
+    school_restr = school_restr[:-1] + ')'
+    age_restr = u'[ \u3000]*(\d{2}\u5c81' + u'岁)'
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
         info_dict = {
             "filename":     basename.decode('utf-8'),
             "name":         getTagFromString('姓名', stream),
             "education":    getTagFromString('学历', stream),
-            "age":          getTagFromString('年龄', stream),
+            "age":          getTagFromString('年龄', stream) or
+            getInfoFromRestr(stream, age_restr)[0],
             "position":     getTagFromString('职位', stream),
-            "company":      getInfoFromRestr(stream, company_restr)[0],
+            "company":      ''.join(getInfoFromRestr(stream, organization_restr)[0]),
+            "school":       ''.join(getInfoFromRestr(stream, school_restr)[0]),
             }
         save_yaml(info_dict, output, convertname.yaml)

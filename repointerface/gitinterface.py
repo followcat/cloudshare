@@ -15,9 +15,9 @@ class GitInterface(object):
     def __init__(self, path):
         """
             >>> import shutil
-            >>> import gitinterface
-            >>> repo_name = 'test_repo'
-            >>> interface = gitinterface.GitInterface(repo_name)
+            >>> import repointerface.gitinterface
+            >>> repo_name = 'repointerface/test_repo'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
             >>> interface.repo # doctest: +ELLIPSIS
             <Repo at ...
             >>> shutil.rmtree(repo_name)
@@ -30,11 +30,11 @@ class GitInterface(object):
     def add_files(self, filenames, message=None, committer=None):
         """
             >>> import shutil
-            >>> import gitinterface
-            >>> repo_name = 'test_repo'
-            >>> interface = gitinterface.GitInterface(repo_name)
+            >>> import repointerface.gitinterface
+            >>> repo_name = 'repointerface/test_repo'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
             >>> path = interface.repo.path
-            >>> with open('test_repo/test_file', 'w') as file:
+            >>> with open('repointerface/test_repo/test_file', 'w') as file:
             ...     file.write('test')
             >>> commit_id = interface.add_files(['test_file'],
             ... b'Test commit', b'test<test@test.com>')
@@ -55,16 +55,16 @@ class GitInterface(object):
     def modify_file(self, filename, stream):
         """
             >>> import shutil
-            >>> import gitinterface
-            >>> repo_name = 'test_repo'
-            >>> interface = gitinterface.GitInterface(repo_name)
+            >>> import repointerface.gitinterface
+            >>> repo_name = 'repointerface/test_repo'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
             >>> path = interface.repo.path
-            >>> with open('test_repo/test_file', 'w') as file:
+            >>> with open('repointerface/test_repo/test_file', 'w') as file:
             ...     file.write('test')
             >>> commit_id = interface.add_files(['test_file'],
             ... b'Test commit', b'test<test@test.com>')
             >>> interface.modify_file('test_file', b'Modify test')
-            >>> with open('test_repo/test_file') as file:
+            >>> with open('repointerface/test_repo/test_file') as file:
             ...     data = file.read()
             >>> data
             'Modify test'

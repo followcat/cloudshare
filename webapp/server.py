@@ -9,12 +9,12 @@ import os.path
 import yaml
 import pypandoc
 
-import gitinterface
-import outputstorage
-import converterutils
+import core.outputstorage
+import core.converterutils
+import repointerface.gitinterface
 
 app = Flask(__name__)
-repo = gitinterface.GitInterface("repo")
+repo = repointerface.gitinterface.GitInterface("repo")
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -25,7 +25,7 @@ def search():
         datas = []
         for each in result:
             base, suffix = os.path.splitext(each)
-            name = outputstorage.ConvertName(base)
+            name = core.outputstorage.ConvertName(base)
             with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
                 stream = yf.read()
             yaml_data = yaml.load(stream)
@@ -61,18 +61,18 @@ def showtest(filename):
 def upload():
     if request.method == 'POST':
         network_file = request.files['file']
-        convertname = outputstorage.ConvertName(
+        convertname = core.outputstorage.ConvertName(
             network_file.filename.encode('utf-8'))
         path = '/tmp'
-        outputstorage.save_stream(path, convertname, network_file.read())
-        storage_file = converterutils.FileProcesser(path, convertname)
+        core.outputstorage.save_stream(path, convertname, network_file.read())
+        storage_file = core.converterutils.FileProcesser(path, convertname)
         try:
             result = storage_file.convert()
             if result is False:
                 return render_template('upload.html', result='Can not Convert')
         except:
             return render_template('upload.html', result='Exist File')
-        md_html = showtest(os.path.join(outputstorage.OutputPath.markdown,
+        md_html = showtest(os.path.join(core.outputstorage.OutputPath.markdown,
                                         storage_file.name.md))
         storage_file.deleteconvert()
         return md_html

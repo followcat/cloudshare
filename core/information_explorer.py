@@ -7,16 +7,16 @@ import yaml
 
 def getTagFromString(tag, stream):
     """
-        >>> import information_explorer
-        >>> information_explorer.getTagFromString('姓名', '姓名:followcat ')
+        >>> import core.information_explorer
+        >>> core.information_explorer.getTagFromString('姓名', '姓名:followcat ')
         u'followcat'
-        >>> information_explorer.getTagFromString('姓名', '姓    名:followcat ')
+        >>> core.information_explorer.getTagFromString('姓名', '姓    名:followcat ')
         u'followcat'
-        >>> information_explorer.getTagFromString('姓名', '姓名:    followcat ')
+        >>> core.information_explorer.getTagFromString('姓名', '姓名:    followcat ')
         u'followcat'
-        >>> information_explorer.getTagFromString('姓名', '姓    名:    followcat ')
+        >>> core.information_explorer.getTagFromString('姓名', '姓    名:    followcat ')
         u'followcat'
-        >>> information_explorer.getTagFromString('姓名', '  姓    名:    followcat ')
+        >>> core.information_explorer.getTagFromString('姓名', '  姓    名:    followcat ')
         u'followcat'
     """
     name = ""
@@ -33,17 +33,17 @@ def getTagFromString(tag, stream):
 
 def getInfoFromRestr(stream, restring):
     """
-        >>> import information_explorer
+        >>> import core.information_explorer
         >>> email_restr = ur"[a-zA-Z0-9._\\%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}"
-        >>> information_explorer.getInfoFromRestr(
+        >>> core.information_explorer.getInfoFromRestr(
         ... 'Mail followcat@gmail.com', email_restr)
         [u'followcat@gmail.com']
         >>> phone_restr = r'1\d{10}'
-        >>> information_explorer.getInfoFromRestr(
+        >>> core.information_explorer.getInfoFromRestr(
         ... 'phone: 13123456789', phone_restr)
         [u'13123456789']
         >>> company_restr = ur'[ \u3000:\uff1a]*([\S]*\u6709\u9650\u516c\u53f8)'
-        >>> information_explorer.getInfoFromRestr(
+        >>> core.information_explorer.getInfoFromRestr(
         ... 'company: cat有限公司', company_restr)
         [u'cat\u6709\u9650\u516c\u53f8']
     """

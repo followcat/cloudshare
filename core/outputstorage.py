@@ -12,9 +12,9 @@ def save_stream(path, filename, stream):
 class ConvertName(str):
     def __new__(cls, value):
         """
-            >>> import outputstorage
+            >>> import core.outputstorage
             >>> name = 'base.cvs.doc'
-            >>> convertname = outputstorage.ConvertName(name)
+            >>> convertname = core.outputstorage.ConvertName(name)
             >>> convertname.origin
             'base.cvs.doc'
             >>> convertname.xml
@@ -92,23 +92,23 @@ class OutputPath(object):
     """
         >>> import shutil
         >>> import os.path
-        >>> import outputstorage
-        >>> output_backup = outputstorage.OutputPath._output
-        >>> outputstorage.OutputPath._output = 'test_output'
-        >>> os.path.exists('test_output')
+        >>> import core.outputstorage
+        >>> output_backup = core.outputstorage.OutputPath._output
+        >>> core.outputstorage.OutputPath._output = 'core/test_output'
+        >>> os.path.exists('core/test_output')
         False
-        >>> outputstorage.OutputPath.output
-        'test_output'
-        >>> os.path.exists('test_output')
+        >>> core.outputstorage.OutputPath.output
+        'core/test_output'
+        >>> os.path.exists('core/test_output')
         True
-        >>> os.path.exists('test_output/markdown')
+        >>> os.path.exists('core/test_output/markdown')
         False
-        >>> outputstorage.OutputPath.markdown
-        'test_output/markdown'
-        >>> os.path.exists('test_output')
+        >>> core.outputstorage.OutputPath.markdown
+        'core/test_output/markdown'
+        >>> os.path.exists('core/test_output')
         True
-        >>> shutil.rmtree('test_output')
-        >>> outputstorage.OutputPath._output = output_backup
+        >>> shutil.rmtree('core/test_output')
+        >>> core.outputstorage.OutputPath._output = output_backup
     """
     _output = 'output'
     _yaml = 'yaml'

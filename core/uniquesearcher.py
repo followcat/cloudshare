@@ -3,7 +3,7 @@ import os.path
 
 import yaml
 
-import outputstorage
+import core.outputstorage
 
 
 class UniqueSearcher(object):
@@ -11,13 +11,13 @@ class UniqueSearcher(object):
         """
         >>> import shutil
         >>> import os.path
-        >>> import outputstorage
-        >>> import converterutils
-        >>> import uniquesearcher
-        >>> output_backup = outputstorage.OutputPath._output
-        >>> outputstorage.OutputPath._output = 'test_output'
-        >>> cv1 = converterutils.FileProcesser('./test', 'cv_1.doc')
-        >>> us = uniquesearcher.UniqueSearcher()
+        >>> import core.outputstorage
+        >>> import core.converterutils
+        >>> import core.uniquesearcher
+        >>> output_backup = core.outputstorage.OutputPath._output
+        >>> core.outputstorage.OutputPath._output = 'core/test_output'
+        >>> cv1 = core.converterutils.FileProcesser('core/test', 'cv_1.doc')
+        >>> us = core.uniquesearcher.UniqueSearcher()
         >>> us.unique_name('cv_1')
         True
         >>> cv1.convert()
@@ -27,10 +27,10 @@ class UniqueSearcher(object):
         >>> us.reload()
         >>> us.unique_name('cv_1')
         False
-        >>> shutil.rmtree('test_output')
-        >>> outputstorage.OutputPath._output = output_backup
+        >>> shutil.rmtree('core/test_output')
+        >>> core.outputstorage.OutputPath._output = output_backup
         """
-        self.yaml_path = outputstorage.OutputPath.yaml
+        self.yaml_path = core.outputstorage.OutputPath.yaml
         self.yaml_datas = {}
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
             with open(f) as fp:

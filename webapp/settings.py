@@ -1,0 +1,1 @@
+UPLOAD_TEMP = '/tmp'

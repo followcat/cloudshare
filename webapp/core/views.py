@@ -49,6 +49,12 @@ class Listdata(flask.views.MethodView):
 
 
 class Upload(flask.views.MethodView):
+    upload_tmp_path = '/tmp'
+
+    @classmethod
+    def setup_upload_tmp(cls, path):
+        cls.upload_tmp_path = path
+
     def get(self):
         return flask.render_template('upload.html')
 
@@ -56,7 +62,7 @@ class Upload(flask.views.MethodView):
         network_file = flask.request.files['file']
         convertname = core.outputstorage.ConvertName(
             network_file.filename.encode('utf-8'))
-        path = '/tmp'
+        path = self.upload_tmp_path
         core.outputstorage.save_stream(path, convertname, network_file.read())
         storage_file = core.converterutils.FileProcesser(path, convertname)
         try:

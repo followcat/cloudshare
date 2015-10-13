@@ -12,6 +12,7 @@ def configure(app):
         view_func=webapp.core.views.Listdata.as_view('listdata'),
         )
 
+    webapp.core.views.Upload.setup_upload_tmp(app.config['UPLOAD_TEMP'])
     app.add_url_rule(
         '/upload',
         view_func=webapp.core.views.Upload.as_view('upload'),

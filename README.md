@@ -18,10 +18,10 @@ share，edit your doc，pdf，md and so on...
 1) Use method convert_folder in converterutils.py to convert your doc/docx/pdf.
 
 ``` python
->>> import gitinterface
->>> import converterutils
->>> repo = gitinterface.GitInterface("repo")
->>> converterutils.convert_folder(YOUR_DIR, repo)
+>>> import core.converterutils
+>>> import repointerface.gitinterface
+>>> repo = repointerface.gitinterface.GitInterface("repo")
+>>> core.converterutils.convert_folder(YOUR_DIR, repo)
 ```
 
     The generated docbook will save in folder docbook_output
@@ -30,6 +30,6 @@ share，edit your doc，pdf，md and so on...
 2) Run flask server and visit page http://localhost:4888/.
 
 ```
-python server.py
+python run.py
 ```
 

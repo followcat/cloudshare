@@ -13,6 +13,11 @@ share，edit your doc，pdf，md and so on...
     pdftohtml 0.18.4
     LibreOffice 4.3
 
+    node.js 4.1.2
+    npm 2.14.4
+    gulp CLI 3.9.0
+
+
 ## How to
 
 1) Use method convert_folder in converterutils.py to convert your doc/docx/pdf.

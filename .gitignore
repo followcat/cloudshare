@@ -1,0 +1,2 @@
+#ignore node_modules
+webapp/static/js/node_modules/

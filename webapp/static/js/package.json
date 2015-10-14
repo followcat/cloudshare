@@ -1,0 +1,29 @@
+{
+  "name": "gulp_demo",
+  "version": "1.0.0",
+  "description": "'gulp test'",
+  "main": "gulpfile.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "gulp-karma": "^0.0.5",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.10",
+    "karma-jasmine": "^0.3.6"
+  },
+  "devDependencies": {
+    "karma-phantomjs-launcher": "^0.2.1",
+    "phantomjs": "^1.9.18"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gulp",
+    "karma"
+  ],
+  "author": "kabess",
+  "license": "ISC"
+}

@@ -3,15 +3,15 @@ share，edit your doc，pdf，md and so on...
 
 ## Dependencies
 
-    yaml
-    flask
-    dulwich
-    pypandoc
-    emaildata
+    PyYAML==3.11
+    Flask==0.10.1
+    dulwich==0.10.2
+    pypandoc==1.0.1
+    emaildata==0.3.2
 
-    pandoc
-    pdftohtml
-    libreoffice
+    pandoc 1.13.2.1
+    pdftohtml 0.18.4
+    LibreOffice 4.3
 
 ## How to
 

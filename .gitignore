@@ -1,2 +1,5 @@
 #ignore node_modules
 webapp/static/js/node_modules/
+
+#ignore test results files
+webapp/static/js/PhantomJS*/

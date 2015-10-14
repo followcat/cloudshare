@@ -8,6 +8,12 @@ module.exports = function (config) {
 
         exclude: ['karma.conf.js','gulpfile.js'],
 
+        reporters: ['junit'],
+
+        junitReporter: {
+            outputFile: 'test_results.xml'
+        },
+
         port: 9876,
 
         colors: true,

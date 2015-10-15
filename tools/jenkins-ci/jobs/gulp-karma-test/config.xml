@@ -16,6 +16,7 @@
     </hudson.triggers.SCMTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
+  <customWorkspace>$CLOUDSHARE_CI_HOME/webapp/static/js</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
       <command>git fetch
@@ -32,6 +33,11 @@
         <completeBuild>true</completeBuild>
       </threshold>
     </hudson.tasks.BuildTrigger>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>PhantomJS*/test-results.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
   </publishers>
   <buildWrappers/>
 </project>

@@ -17,11 +17,13 @@ import webapp.core.account
 
 
 class Search(flask.views.MethodView):
+    repo = webapp.core.repo
+
     def get(self):
         return flask.render_template('search.html')
 
     def post(self):
-        repo = webapp.core.repo
+        repo = self.repo
         search_text = flask.request.form['search_text']
         result = repo.grep(search_text)
         datas = []
@@ -38,9 +40,11 @@ class Search(flask.views.MethodView):
 
 
 class Listdata(flask.views.MethodView):
+    repo = webapp.core.repo
+
     def get(self):
         datas = []
-        repo = webapp.core.repo
+        repo = self.repo
         for position in glob.glob(os.path.join(repo.repo.path, '*.yaml')):
             with open(position, 'r') as yf:
                 stream = yf.read()

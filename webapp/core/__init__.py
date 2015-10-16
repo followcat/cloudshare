@@ -1,3 +1,3 @@
 import repointerface.gitinterface
 
-repo = repointerface.gitinterface.GitInterface("repo")
+repo = repointerface.gitinterface.GitInterface("default_repo")

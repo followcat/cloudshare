@@ -3,11 +3,13 @@ import webapp.core.account
 
 
 def configure(app):
+    webapp.core.views.Search.repo = app.config['REPO_DB']
     app.add_url_rule(
         '/',
         view_func=webapp.core.views.Search.as_view('search'),
         )
 
+    webapp.core.views.Listdata.repo = app.config['REPO_DB']
     app.add_url_rule(
         '/listdata',
         view_func=webapp.core.views.Listdata.as_view('listdata'),
@@ -24,6 +26,7 @@ def configure(app):
         view_func=webapp.core.views.Showtest.as_view('showtest'),
         )
 
+    webapp.core.account.RepoAccount.repo = app.config['REPO_DB']
     app.add_url_rule(
         '/index',
         view_func=webapp.core.views.Index.as_view('index'),

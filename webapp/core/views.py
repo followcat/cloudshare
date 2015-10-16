@@ -8,9 +8,11 @@ import yaml
 import flask
 import pypandoc
 import flask.views
+import flask.ext.login
 
 import core.outputstorage
 import core.converterutils
+import webapp.core.account
 import repointerface.gitinterface
 
 repo = repointerface.gitinterface.GitInterface("repo")
@@ -83,3 +85,56 @@ class Showtest(flask.views.MethodView):
             data = file.read()
         output = pypandoc.convert(data, 'html', format='markdown')
         return flask.render_template('cv.html', markdown=output)
+
+
+class Index(flask.views.MethodView):
+
+    def get(self):
+        return (
+            '''
+                <h1>Hello {1}</h1>
+                <p style="color: #f00;">{0}</p>
+                <p>{2}</p>
+            '''.format(
+                # flash message
+                ', '.join([str(m) for m in flask.get_flashed_messages()]),
+                flask.ext.login.current_user.get_id() or 'Guest',
+                ('<a href="/logout">Logout</a>' if flask.ext.login.current_user.is_authenticated
+                    else '<a href="/login">Login</a>')
+            )
+        )
+
+
+class Login(flask.views.MethodView):
+
+    def get(self):
+        return '''
+            <form action="/login/check" method="post">
+                <p>Username: <input name="username" type="text"></p>
+                <p>Password: <input name="password" type="password"></p>
+                <input type="submit">
+            </form>
+        '''
+
+
+class LoginCheck(flask.views.MethodView):
+
+    def post(self):
+        user = webapp.core.account.User.get(flask.request.form['username'])
+        password = flask.request.form['password']
+        m = hashlib.md5()
+        m.update(password)
+        upassword = unicode(m.hexdigest())
+        if (user and user.password == upassword):
+            flask.ext.login.login_user(user)
+        else:
+            flask.flash('Username or password incorrect.')
+
+        return flask.redirect(flask.url_for('index'))
+
+
+class Logout(flask.views.MethodView):
+
+    def get(self):
+        flask.ext.login.logout_user()
+        return flask.redirect(flask.url_for('index'))

@@ -2,10 +2,10 @@
 import flask
 
 import ext.views
-import core.account
+import webapp.core.account
 
 
 app = flask.Flask(__name__)
 app.config.from_object('webapp.settings')
 ext.views.configure(app)
-core.account.init_login(app)
+webapp.core.account.init_login(app)

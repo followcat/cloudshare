@@ -3,6 +3,8 @@ import random
 import string
 import os.path
 
+import utils.classproperty
+
 
 def save_stream(path, filename, stream):
     with open(os.path.join(path, filename), 'wb') as localfile:
@@ -83,11 +85,6 @@ class ConvertName(str):
                                for _ in range(8))
 
 
-class ClassProperty(property):
-    def __get__(self, instance, cls):
-        return classmethod(self.fget).__get__(instance, cls)()
-
-
 class OutputPath(object):
     """
         >>> import shutil
@@ -125,32 +122,32 @@ class OutputPath(object):
             os.mkdir(path)
         return path
 
-    @ClassProperty
+    @utils.classproperty.ClassProperty
     def output(self):
         if not os.path.exists(self._output):
             os.mkdir(self._output)
         return self._output
 
-    @ClassProperty
+    @utils.classproperty.ClassProperty
     def source(self):
         return self.getpath(self._source)
 
-    @ClassProperty
+    @utils.classproperty.ClassProperty
     def yaml(self):
         return self.getpath(self._yaml)
 
-    @ClassProperty
+    @utils.classproperty.ClassProperty
     def html(self):
         return self.getpath(self._html)
 
-    @ClassProperty
+    @utils.classproperty.ClassProperty
     def docx(self):
         return self.getpath(self._docx)
 
-    @ClassProperty
+    @utils.classproperty.ClassProperty
     def docbook(self):
         return self.getpath(self._docbook)
 
-    @ClassProperty
+    @utils.classproperty.ClassProperty
     def markdown(self):
         return self.getpath(self._markdown)

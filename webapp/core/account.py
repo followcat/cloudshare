@@ -6,88 +6,87 @@ import flask
 import flask.views
 import flask.ext.login
 
+import webapp.core.views
+import utils.classproperty
 import webapp.core.exception
-import repointerface.gitinterface
 
 
 class RepoAccount(object):
     """
         >>> import shutil
-        >>> import repointerface.gitinterface
         >>> import webapp.core.account
+        >>> import utils.classproperty
+        >>> import repointerface.gitinterface
         >>> repo_name = 'webapp/core/test_repo'
         >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-        >>> account = webapp.core.account.RepoAccount(interface)
-        >>> account.get_account_date()
+        >>> RepoAccount = webapp.core.account.RepoAccount
+        >>> save_repo = RepoAccount.repo
+        >>> RepoAccount.repo = interface
+        >>> RepoAccount.USERS
         {u'root': u'63a9f0ea7bb98050796b649e85481845'}
-        >>> account.USERS
-        {u'root': u'63a9f0ea7bb98050796b649e85481845'}
-        >>> account.add('admin', 'password')
-        >>> account.USERS['admin']
+        >>> RepoAccount.add('admin', 'password')
+        >>> RepoAccount.USERS['admin']
         u'5f4dcc3b5aa765d61d8327deb882cf99'
-        >>> account.add('admin', 'password') # doctest: +ELLIPSIS
+        >>> RepoAccount.add('admin', 'password') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ExistsUser: admin
-        >>> account.delete('admin')
-        >>> account.USERS
+        >>> RepoAccount.delete('admin')
+        >>> RepoAccount.USERS
         {u'root': u'63a9f0ea7bb98050796b649e85481845'}
+        >>> RepoAccount.repo = save_repo
         >>> shutil.rmtree(repo_name)
     """
     default_root_name = u'root'
     default_root_password = 'root'
     account_filename = 'account.yaml'
 
-    def __init__(self, repo):
-        self.repo = repo
-        account_file = repo.repo.get_named_file(
-            os.path.join('..', self.account_filename))
-        if account_file is None:
-            self.create()
+    repo = webapp.core.views.repo
 
-    def create(self):
+    @classmethod
+    def create(cls):
         m = hashlib.md5()
-        m.update(self.default_root_password)
-        empty_dict = {self.default_root_name: unicode(m.hexdigest())}
-        with open(os.path.join(self.repo.repo.path, self.account_filename),
+        m.update(cls.default_root_password)
+        empty_dict = {cls.default_root_name: unicode(m.hexdigest())}
+        with open(os.path.join(cls.repo.repo.path, cls.account_filename),
                   'w') as f:
             f.write(yaml.dump(empty_dict))
-        self.repo.add_files(self.account_filename, "Add account file.")
+        cls.repo.add_files(cls.account_filename, "Add account file.")
 
-    def get_account_date(self):
-        account_file = self.repo.repo.get_named_file(
-            os.path.join('..', self.account_filename))
-        data = yaml.load(account_file.read())
-        account_file.close()
-        return data
-
-    def add(self, id, password):
+    @classmethod
+    def add(cls, id, password):
         m = hashlib.md5()
-        data = self.get_account_date()
+        data = cls.USERS
         uid = unicode(id)
         if uid in data:
             raise webapp.core.exception.ExistsUser(uid)
         m.update(password)
         data[uid] = unicode(m.hexdigest())
         dump_data = yaml.dump(data)
-        self.repo.modify_file(self.account_filename, dump_data)
+        cls.repo.modify_file(cls.account_filename, dump_data)
 
-    def delete(self, id):
-        data = self.get_account_date()
+    @classmethod
+    def delete(cls, id):
+        data = cls.USERS
         data.pop(unicode(id))
         dump_data = yaml.dump(data)
-        self.repo.modify_file(self.account_filename, dump_data)
+        cls.repo.modify_file(cls.account_filename, dump_data)
 
-    @property
-    def USERS(self):
-        return self.get_account_date()
-
-repo = repointerface.gitinterface.GitInterface("repo")
-accounts = RepoAccount(repo)
+    @utils.classproperty.ClassProperty
+    def USERS(cls):
+        account_file = cls.repo.repo.get_named_file(
+            os.path.join('..', cls.account_filename))
+        if account_file is None:
+            cls.create()
+            account_file = cls.repo.repo.get_named_file(
+                os.path.join('..', cls.account_filename))
+        data = yaml.load(account_file.read())
+        account_file.close()
+        return data
 
 
 class User(flask.ext.login.UserMixin):
-    USERS = accounts.USERS
+    USERS = RepoAccount.USERS
 
     def __init__(self, id):
         self.id = unicode(id)
@@ -103,8 +102,10 @@ class User(flask.ext.login.UserMixin):
             >>> import repointerface.gitinterface
             >>> repo_name = 'webapp/core/test_repo'
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> account = webapp.core.account.RepoAccount(interface)
-            >>> webapp.core.account.User.USERS = account.USERS
+            >>> RepoAccount = webapp.core.account.RepoAccount
+            >>> save_repo = RepoAccount.repo
+            >>> RepoAccount.repo = interface
+            >>> webapp.core.account.User.USERS = RepoAccount.USERS
             >>> user = webapp.core.account.User('root')
             >>> user.id
             u'root'
@@ -112,7 +113,7 @@ class User(flask.ext.login.UserMixin):
             u'63a9f0ea7bb98050796b649e85481845'
             >>> type(webapp.core.account.User.get('None'))
             <type 'NoneType'>
-            >>> webapp.core.account.User.USERS = webapp.core.account.accounts
+            >>> RepoAccount.repo = save_repo
             >>> shutil.rmtree(repo_name)
         """
         try:

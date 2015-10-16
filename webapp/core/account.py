@@ -7,6 +7,7 @@ import flask.views
 import flask.ext.login
 
 import webapp.core.exception
+import repointerface.gitinterface
 
 
 class RepoAccount(object):
@@ -14,20 +15,22 @@ class RepoAccount(object):
         >>> import shutil
         >>> import repointerface.gitinterface
         >>> import webapp.core.account
-        >>> repo_name = 'repointerface/test_repo'
+        >>> repo_name = 'webapp/core/test_repo'
         >>> interface = repointerface.gitinterface.GitInterface(repo_name)
         >>> account = webapp.core.account.RepoAccount(interface)
         >>> account.get_account_date()
         {u'root': u'63a9f0ea7bb98050796b649e85481845'}
+        >>> account.USERS
+        {u'root': u'63a9f0ea7bb98050796b649e85481845'}
         >>> account.add('admin', 'password')
-        >>> account.get_account_date()['admin']
+        >>> account.USERS['admin']
         u'5f4dcc3b5aa765d61d8327deb882cf99'
         >>> account.add('admin', 'password') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ExistsUser: admin
         >>> account.delete('admin')
-        >>> account.get_account_date()
+        >>> account.USERS
         {u'root': u'63a9f0ea7bb98050796b649e85481845'}
         >>> shutil.rmtree(repo_name)
     """
@@ -75,24 +78,43 @@ class RepoAccount(object):
         dump_data = yaml.dump(data)
         self.repo.modify_file(self.account_filename, dump_data)
 
+    @property
+    def USERS(self):
+        return self.get_account_date()
+
+repo = repointerface.gitinterface.GitInterface("repo")
+accounts = RepoAccount(repo)
+
 
 class User(flask.ext.login.UserMixin):
-    '''Simple User class'''
-    USERS = {
-        # username: password
-        'john': 'love mary',
-        'mary': 'love peter'
-    }
+    USERS = accounts.USERS
 
     def __init__(self, id):
+        self.id = unicode(id)
         if id not in self.USERS:
             raise webapp.core.exception.UserNotFoundError()
-        self.id = id
-        self.password = self.USERS[id]
+        self.password = self.USERS[self.id]
 
     @classmethod
     def get(self_class, id):
-        '''Return user instance of id, return None if not exist'''
+        """
+            >>> import shutil
+            >>> import webapp.core.account
+            >>> import repointerface.gitinterface
+            >>> repo_name = 'webapp/core/test_repo'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> account = webapp.core.account.RepoAccount(interface)
+            >>> webapp.core.account.User.USERS = account.USERS
+            >>> user = webapp.core.account.User('root')
+            >>> user.id
+            u'root'
+            >>> user.password
+            u'63a9f0ea7bb98050796b649e85481845'
+            >>> type(webapp.core.account.User.get('None'))
+            <type 'NoneType'>
+            >>> webapp.core.account.User.USERS = webapp.core.account.accounts
+            >>> shutil.rmtree(repo_name)
+        """
         try:
             return self_class(id)
         except webapp.core.exception.UserNotFoundError:
@@ -141,12 +163,15 @@ class Login(flask.views.MethodView):
 class LoginCheck(flask.views.MethodView):
 
     def post(self):
-        # validate username and password
         user = User.get(flask.request.form['username'])
-        if (user and user.password == flask.request.form['password']):
+        password = flask.request.form['password']
+        m = hashlib.md5()
+        m.update(password)
+        upassword = unicode(m.hexdigest())
+        if (user and user.password == upassword):
             flask.ext.login.login_user(user)
         else:
-            flask.flash('Username or password incorrect')
+            flask.flash('Username or password incorrect.')
 
         return flask.redirect(flask.url_for('index'))
 

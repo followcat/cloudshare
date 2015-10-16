@@ -26,20 +26,20 @@ def configure(app):
 
     app.add_url_rule(
         '/index',
-        view_func=webapp.core.account.Index.as_view('index'),
+        view_func=webapp.core.views.Index.as_view('index'),
         )
 
     app.add_url_rule(
         '/login',
-        view_func=webapp.core.account.Login.as_view('login'),
+        view_func=webapp.core.views.Login.as_view('login'),
         )
 
     app.add_url_rule(
         '/login/check',
-        view_func=webapp.core.account.LoginCheck.as_view('logincheck'),
+        view_func=webapp.core.views.LoginCheck.as_view('logincheck'),
         )
 
     app.add_url_rule(
         '/logout',
-        view_func=webapp.core.account.Logout.as_view('logout'),
+        view_func=webapp.core.views.Logout.as_view('logout'),
         )

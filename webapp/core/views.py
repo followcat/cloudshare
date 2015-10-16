@@ -1,7 +1,7 @@
-
 import os
 import glob
 import codecs
+import hashlib
 import os.path
 
 import yaml
@@ -10,12 +10,10 @@ import pypandoc
 import flask.views
 import flask.ext.login
 
+import webapp.core
 import core.outputstorage
 import core.converterutils
 import webapp.core.account
-import repointerface.gitinterface
-
-repo = repointerface.gitinterface.GitInterface("repo")
 
 
 class Search(flask.views.MethodView):
@@ -23,6 +21,7 @@ class Search(flask.views.MethodView):
         return flask.render_template('search.html')
 
     def post(self):
+        repo = webapp.core.repo
         search_text = flask.request.form['search_text']
         result = repo.grep(search_text)
         datas = []
@@ -41,6 +40,7 @@ class Search(flask.views.MethodView):
 class Listdata(flask.views.MethodView):
     def get(self):
         datas = []
+        repo = webapp.core.repo
         for position in glob.glob(os.path.join(repo.repo.path, '*.yaml')):
             with open(position, 'r') as yf:
                 stream = yf.read()

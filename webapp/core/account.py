@@ -2,7 +2,9 @@ import os.path
 import hashlib
 
 import yaml
+import flask.ext.login
 
+import webapp.core
 import webapp.core.views
 import utils.classproperty
 import webapp.core.exception
@@ -38,7 +40,7 @@ class RepoAccount(object):
     default_root_password = 'root'
     account_filename = 'account.yaml'
 
-    repo = webapp.core.views.repo
+    repo = webapp.core.repo
 
     @classmethod
     def create(cls):

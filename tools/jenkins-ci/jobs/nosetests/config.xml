@@ -26,6 +26,6 @@
         <completeBuild>true</completeBuild>
       </threshold>
     </hudson.tasks.BuildTrigger>
-  <publishers/>
+  </publishers>
   <buildWrappers/>
 </project>

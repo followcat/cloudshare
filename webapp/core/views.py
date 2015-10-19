@@ -89,20 +89,22 @@ class Showtest(flask.views.MethodView):
 
 class Index(flask.views.MethodView):
 
-    def get(self):
-        return (
-            '''
-                <h1>Hello {1}</h1>
-                <p style="color: #f00;">{0}</p>
-                <p>{2}</p>
-            '''.format(
-                # flash message
-                ', '.join([str(m) for m in flask.get_flashed_messages()]),
-                flask.ext.login.current_user.get_id() or 'Guest',
-                ('<a href="/logout">Logout</a>' if flask.ext.login.current_user.is_authenticated
-                    else '<a href="/login">Login</a>')
-            )
-        )
+    # def get(self):
+    #     return (
+    #         '''
+    #             <h1>Hello {1}</h1>
+    #             <p style="color: #f00;">{0}</p>
+    #             <p>{2}</p>
+    #         '''.format(
+    #             # flash message
+    #             ', '.join([str(m) for m in flask.get_flashed_messages()]),
+    #             flask.ext.login.current_user.get_id() or 'Guest',
+    #             ('<a href="/logout">Logout</a>' if flask.ext.login.current_user.is_authenticated
+    #                 else '<a href="/login">Login</a>')
+    #         )
+    #     )
+      def get(self):
+          return flask.render_template('index.html')
 
 
 class Login(flask.views.MethodView):
@@ -124,13 +126,15 @@ class LoginCheck(flask.views.MethodView):
         password = flask.request.form['password']
         m = hashlib.md5()
         m.update(password)
+        error = None
         upassword = unicode(m.hexdigest())
         if (user and user.password == upassword):
             flask.ext.login.login_user(user)
         else:
-            flask.flash('Username or password incorrect.')
-
-        return flask.redirect(flask.url_for('index'))
+            # flask.flash('Username or Password Incorrect.')
+            error = 'Username or Password Incorrect.'
+        return flask.render_template('index.html', error=error)
+        # return flask.redirect(flask.url_for('index'),error=error)
 
 
 class Logout(flask.views.MethodView):

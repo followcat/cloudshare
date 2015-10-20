@@ -11,3 +11,6 @@ export GIT_DIR=${ReleaseCode}/.git
 cd $ReleaseCode
 git fetch origin
 git reset --hard origin/master
+
+export PYTHONPATH=`pwd`
+python tools/repobackup.py

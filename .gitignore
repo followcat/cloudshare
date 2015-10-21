@@ -3,4 +3,7 @@ webapp/static/js/node_modules/
 webapp/static/js/PhantomJS*/
 *.log
 *.pyc
+output/
+repo/
+default_repo/
 

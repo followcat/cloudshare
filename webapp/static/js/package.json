@@ -1,23 +1,8 @@
 {
   "name": "gulp_demo",
   "version": "1.0.0",
-  "description": "'gulp test'",
-  "main": "gulpfile.js",
-  "directories": {
-    "test": "test"
-  },
-  "dependencies": {
-    "gulp": "^3.9.0",
-    "gulp-karma": "^0.0.5",
-    "jasmine-core": "^2.3.4",
-    "karma": "^0.13.10",
-    "karma-jasmine": "^0.3.6"
-  },
-  "devDependencies": {
-    "karma-junit-reporter": "^0.3.7",
-    "karma-phantomjs-launcher": "^0.2.1",
-    "phantomjs": "^1.9.18"
-  },
+  "description": "'this is gulp_demo'",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,5 +11,17 @@
     "karma"
   ],
   "author": "kabess",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-jshint": "^1.11.2",
+    "jasmine-core": "^2.3.4",
+    "jshint-stylish": "^2.0.1",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-jasmine": "^0.3.6",
+    "karma-junit-reporter": "^0.3.8",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "karma-requirejs": "^0.2.2",
+    "requirejs": "^2.1.20"
+  }
 }

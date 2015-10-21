@@ -1,31 +1,74 @@
-module.exports = function (config) {
-    config.set({
-        basePath: '',
+// Karma configuration
+// Generated on Sun Oct 20 2013 07:28:56 GMT+0200 (CEST)
 
-        frameworks: ['jasmine'],
+module.exports = function(config) {
+  config.set({
 
-        files: ['test/**/*.js'],
+    // base path, that will be used to resolve files and exclude
+    basePath: '',
 
-        exclude: ['karma.conf.js','gulpfile.js'],
 
-        reporters: ['junit'],
+    // frameworks to use
+    frameworks: ['jasmine', 'requirejs'],
 
-        junitReporter: {
-            outputFile: 'test-results.xml'
-        },
 
-        port: 9876,
+    // list of files / patterns to load in the browser
+    files: [
+        {pattern: 'lib/**/*.js', included: false},
+        {pattern: 'src/**/*.js', included: false},
+        {pattern: 'test/**/*Spec.js', included: false},
 
-        colors: true,
+        'test/test-main.js',
+    ],
 
-        logLevel: config.LOG_INFO,
 
-        autoWatch: true,
+    // list of files to exclude
+    exclude: [
+        'src/main.js'
+    ],
 
-        browsers: ['PhantomJS'],
 
-        captureTimeout: 60000,
+    // test results reporter to use
+    // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
+    reporters: ['progress', 'junit'],
 
-        singleRun: true
-    });
+    junitReporter: {
+        outputFile: 'test-results.xml'
+    },
+    // web server port
+    port: 9876,
+
+
+    // enable / disable colors in the output (reporters and logs)
+    colors: true,
+
+
+    // level of logging
+    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+    logLevel: config.LOG_INFO,
+
+
+    // enable / disable watching file and executing tests whenever any file changes
+    autoWatch: true,
+
+
+    // Start these browsers, currently available:
+    // - Chrome
+    // - ChromeCanary
+    // - Firefox
+    // - Opera
+    // - Safari (only Mac)
+    // - PhantomJS
+    // - IE (only Windows)
+    browsers: ['PhantomJS'],
+
+
+    // If browser does not capture in given timeout [ms], kill it
+    captureTimeout: 60000,
+
+
+    // Continuous Integration mode
+    // if true, it capture browsers, run tests and exit
+    singleRun: false
+  });
 };

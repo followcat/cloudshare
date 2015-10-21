@@ -85,16 +85,15 @@ class RepoAccount(object):
 
 
 class User(flask.ext.login.UserMixin):
-    USERS = RepoAccount.USERS
 
-    def __init__(self, id):
+    def __init__(self, id, account_dict):
         self.id = unicode(id)
-        if id not in self.USERS:
+        if id not in account_dict:
             raise webapp.core.exception.UserNotFoundError()
-        self.password = self.USERS[self.id]
+        self.password = account_dict[self.id]
 
     @classmethod
-    def get(self_class, id):
+    def get(self_class, id, account_dict=None):
         """
             >>> import shutil
             >>> import webapp.core.account
@@ -104,8 +103,7 @@ class User(flask.ext.login.UserMixin):
             >>> RepoAccount = webapp.core.account.RepoAccount
             >>> save_repo = RepoAccount.repo
             >>> RepoAccount.repo = interface
-            >>> webapp.core.account.User.USERS = RepoAccount.USERS
-            >>> user = webapp.core.account.User('root')
+            >>> user = webapp.core.account.User.get('root')
             >>> user.id
             u'root'
             >>> user.password
@@ -115,8 +113,10 @@ class User(flask.ext.login.UserMixin):
             >>> RepoAccount.repo = save_repo
             >>> shutil.rmtree(repo_name)
         """
+        if account_dict is None:
+            account_dict = RepoAccount.USERS
         try:
-            return self_class(id)
+            return self_class(id, account_dict)
         except webapp.core.exception.UserNotFoundError:
             return None
 

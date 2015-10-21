@@ -31,7 +31,6 @@ def convert_docfile(path, filename, output, format):
 
 
 class FileProcesser():
-    unique_checker = core.uniquesearcher.UniqueSearcher()
 
     def __init__(self, root, name):
         self.root = root
@@ -48,7 +47,7 @@ class FileProcesser():
         logger.info('Mimetype: %s' % self.mimetype)
         location = self.copy()
         logger.info('Backup to: %s' % location)
-        self.unique_checker.reload()
+        self.unique_checker = core.uniquesearcher.UniqueSearcher(self.yaml_path)
 
     def mimetype(self):
         mimetype = mimetypes.guess_type(os.path.join(
@@ -183,7 +182,7 @@ class FileProcesser():
             self.remove_note()
             self.file_docbook_to_markdown()
             core.information_explorer.catch(self.markdown_path, self.name,
-                                       self.base.base, self.yaml_path)
+                                            self.base.base, self.yaml_path)
             logger.info('Success')
             return True
         else:

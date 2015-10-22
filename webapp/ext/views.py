@@ -46,3 +46,7 @@ def configure(app):
         '/logout',
         view_func=webapp.core.views.Logout.as_view('logout'),
         )
+    app.add_url_rule(
+        '/urm',
+        view_func=webapp.core.views.Urm.as_view('urm'),
+        )

@@ -30,7 +30,5 @@ define(['jquery'], function($){
 
 	}
 
-
-
 	return header;
 })

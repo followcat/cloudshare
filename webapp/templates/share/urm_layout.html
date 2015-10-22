@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>User Management</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
+</head>
+<body>
+	<div class="wrap">
+	<!-- Wrap Left Module-->
+	  <div class="wrap-left">
+	  	<div class="wrap-left-header">
+	  	  <img src="{{ url_for('static', filename='images/logo.png') }}" class="center">
+	  	</div>
+	  	<div class="account-info">
+	  		<p>Welcome back! {{ current_user.id }}</p>
+	  	</div>
+	    <ul class="list-unstyled">
+	  	  <li class="active">HOME</li>
+	  	  <li>SETTING</li>
+	  	  <li>Quit</li>
+	    </ul>
+	  </div>
+	<!-- Wrap Left Module End-->
+	<!-- Wrap Right Module -->
+	  <div class="wrap-right">
+	  	<div class="wrap-right-header">
+		  <div class="container-fluid">
+	  	    <nav class="nav nav-default">
+	  	      <h2 class="navbar-text navbar-title">Management System</h2>
+	  	    </nav>
+	  	  </div>	
+		</div>
+		<!-- load the content-->
+		{% block content %}{% endblock %}
+		<!-- load the content end-->
+	  </div>
+	<!-- Wrap Right Module End-->
+	</div>
+</body>
+</html>

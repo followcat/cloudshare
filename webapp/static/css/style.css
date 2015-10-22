@@ -1,11 +1,7 @@
-/*body{
-  background-image: url(../bg.jpg);
-}*/
+
 .header-box{
   width: 100%;
   height: 50px;
-  position: fixed;
-  top: 0;
   background-color: #337ab7;
 }
 .login-box{
@@ -16,9 +12,6 @@
 .title-font{
   font-weight: bold;
 }
-.error-msg{
-  color: #EA0000;
-}
 .login-msg{
   font-weight: bold;
   color: #EA0000;
@@ -27,6 +20,7 @@
 /******UserManagement*******/
 a{
   text-decoration: none;
+
 }
 .center{
   position: absolute;
@@ -37,22 +31,15 @@ a{
   -moz-transform: translate(-50%,-50%);
   transform: translate(-50%,-50%);
 }
-.header-style,.wrap{
-  width: 100%; 
-  overflow: hidden;
-}
-.header-left{
-  width: 18%;
-  float: left;
-}
-.header-right,.wrap-right{
-  width: 82%;
-  float: left;
-}
-.header-top{
+.wrap-left-header{
+  position: relative;
   height: 50px;
 }
-.header-right{
+.wrap-left-header img{
+  width: 82%;
+}
+.wrap-right-header{
+  height: 50px;
   background-color: #8E8E8E;
 }
 .wrap-left{
@@ -78,17 +65,21 @@ a{
 }
 .wrap-right{
   width: 82%;
+  float: left;
   margin-left: 18%;
 }
 .add-user-frame{
-  position: absolute;
-  width: 30%;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%,-50%);
-  -ms-transform: translate(-50%,-50%);
-  -moz-transform: translate(-50%,-50%);
-  transform: translate(-50%,-50%);
+  width: 50%;
+}
+@media (max-width: 768px){
+  .add-user-frame{
+    width: 70%;
+  }
+}
+@media (min-width: 960px){
+  .add-user-frame{
+    width: 30%;
+  }
 }
 .add-user-top{
   width: 100%;
@@ -112,6 +103,24 @@ a{
   width: 100%;
   padding: 6px 8px 20px 8px;
 }
-
-
+.navbar-title{
+  font-size: 1.5em;
+  font-weight: bold;
+}
+.account-info{
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+}
+@media (max-width: 768px){
+  .account-info{
+    height: 100px;
+  }
+}
+.account-info a{
+  color: #fff;
+}
 

@@ -147,3 +147,9 @@ class Logout(flask.views.MethodView):
     def get(self):
         flask.ext.login.logout_user()
         return flask.redirect(flask.url_for('index'))
+
+
+class Urm(flask.views.MethodView):
+
+    def get(self):
+        return flask.render_template('urm.html')

@@ -22,7 +22,7 @@ class RepoAccount(object):
         >>> save_repo = RepoAccount.repo
         >>> RepoAccount.repo = interface
         >>> RepoAccount.USERS
-        {u'root': u'63a9f0ea7bb98050796b649e85481845'}
+        {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> RepoAccount.add('admin', 'password')
         >>> RepoAccount.USERS['admin']
         u'5f4dcc3b5aa765d61d8327deb882cf99'
@@ -32,12 +32,12 @@ class RepoAccount(object):
         ExistsUser: admin
         >>> RepoAccount.delete('admin')
         >>> RepoAccount.USERS
-        {u'root': u'63a9f0ea7bb98050796b649e85481845'}
+        {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> RepoAccount.repo = save_repo
         >>> shutil.rmtree(repo_name)
     """
     default_root_name = u'root'
-    default_root_password = 'root'
+    default_root_password = 'password'
     account_filename = 'account.yaml'
 
     repo = webapp.core.repo
@@ -107,7 +107,7 @@ class User(flask.ext.login.UserMixin):
             >>> user.id
             u'root'
             >>> user.password
-            u'63a9f0ea7bb98050796b649e85481845'
+            u'5f4dcc3b5aa765d61d8327deb882cf99'
             >>> type(webapp.core.account.User.get('None'))
             <type 'NoneType'>
             >>> RepoAccount.repo = save_repo

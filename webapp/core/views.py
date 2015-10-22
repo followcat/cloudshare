@@ -133,7 +133,8 @@ class LoginCheck(flask.views.MethodView):
         error = None
         upassword = unicode(m.hexdigest())
         if (user and user.password == upassword):
-            flask.ext.login.login_user(user)
+            flask.ext.login.login_user(user) 
+            return flask.redirect(flask.url_for("search"))
         else:
             # flask.flash('Username or Password Incorrect.')
             error = 'Username or Password Incorrect.'

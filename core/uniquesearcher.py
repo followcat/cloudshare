@@ -12,9 +12,10 @@ class UniqueSearcher(object):
         >>> import core.outputstorage
         >>> import core.converterutils
         >>> import core.uniquesearcher
-        >>> output_backup = core.outputstorage.OutputPath._output
-        >>> core.outputstorage.OutputPath._output = 'core/test_output'
-        >>> cv1 = core.converterutils.FileProcesser('core/test', 'cv_1.doc')
+        >>> basepath = 'core/test_output'
+        >>> outputpath = core.outputstorage.OutputPath(basepath)
+        >>> cv1 = core.converterutils.FileProcesser('core/test', 'cv_1.doc',
+        ... basepath)
         >>> us = core.uniquesearcher.UniqueSearcher(cv1.yaml_path)
         >>> us.unique_name('cv_1')
         True
@@ -25,8 +26,7 @@ class UniqueSearcher(object):
         >>> us.reload()
         >>> us.unique_name('cv_1')
         False
-        >>> shutil.rmtree('core/test_output')
-        >>> core.outputstorage.OutputPath._output = output_backup
+        >>> shutil.rmtree(basepath)
         """
         self.yaml_path = path
         self.yaml_datas = {}

@@ -15,10 +15,16 @@ def configure(app):
         view_func=webapp.core.views.Listdata.as_view('listdata'),
         )
 
-    webapp.core.views.Upload.setup_upload_tmp(app.config['UPLOAD_TEMP'])
+    webapp.core.views.Upload.setup_upload_tmp(app.config['UPLOAD_TEMP'],
+                                              app.config['REPO_DB'])
     app.add_url_rule(
         '/upload',
         view_func=webapp.core.views.Upload.as_view('upload'),
+        )
+
+    app.add_url_rule(
+        '/uppreview',
+        view_func=webapp.core.views.UploadPreview.as_view('uppreview'),
         )
 
     app.add_url_rule(

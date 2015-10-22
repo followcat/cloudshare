@@ -2,6 +2,7 @@
 webapp/static/js/node_modules/
 webapp/static/js/PhantomJS*/
 *.log
+*.dot
 *.pyc
 output/
 repo/

@@ -5,6 +5,8 @@ import os.path
 
 
 def save_stream(path, filename, stream):
+    if not os.path.exists(path):
+        os.makedirs(path)
     with open(os.path.join(path, filename), 'wb') as localfile:
         localfile.write(stream)
 

@@ -25,11 +25,6 @@ class UploadObject(object):
             >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
             >>> up.result
             True
-            >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
-            >>> up.result
-            False
-            >>> up.information
-            'Exists File'
             >>> up.remove()
             >>> shutil.rmtree(test_path)
         """
@@ -42,14 +37,11 @@ class UploadObject(object):
         self.storage = core.converterutils.FileProcesser(self.tmp_path,
                                                          self.convertname,
                                                          self.tmp_path)
-        try:
-            self.result = self.storage.convert()
-            if self.result is False:
-                self.information = 'Can not Convert'
-            else:
-                self.information = 'Sucess'
-        except core.exception.DuplicateException:
-            self.information = 'Exists File'
+        self.result = self.storage.convert()
+        if self.result is False:
+            self.information = 'Can not Convert'
+        else:
+            self.information = 'Sucess'
 
     def preview_yaml(self):
         """
@@ -82,6 +74,38 @@ class UploadObject(object):
             data = file.read()
         output = pypandoc.convert(data, 'html', format='markdown')
         return output
+
+    def confirm(self, repo):
+        """
+            >>> import glob
+            >>> import shutil
+            >>> import os.path
+            >>> import webapp.core.upload
+            >>> import repointerface.gitinterface
+            >>> root = "core/test"
+            >>> name = "cv_1.doc"
+            >>> repo_name = 'webapp/core/test_repo'
+            >>> test_path = "webapp/core/test_output"
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> obj = open(os.path.join(root, name))
+            >>> os.makedirs(test_path)
+            >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
+            >>> up.confirm(interface)
+            True
+            >>> up.confirm(interface)
+            False
+            >>> up.information
+            'Exists File'
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(test_path)
+        """
+        result = False
+        try:
+            self.storage.storage(repo)
+            result = True
+        except core.exception.DuplicateException:
+            self.information = 'Exists File'
+        return result
 
     def remove(self):
         """

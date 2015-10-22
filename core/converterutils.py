@@ -48,7 +48,6 @@ class FileProcesser():
         logger.info('Mimetype: %s' % self.mimetype)
         location = self.copy()
         logger.info('Backup to: %s' % location)
-        self.unique_checker = core.uniquesearcher.UniqueSearcher(self.yaml_path)
 
     def mimetype(self):
         mimetype = mimetypes.guess_type(os.path.join(
@@ -152,9 +151,6 @@ class FileProcesser():
             True
             >>> shutil.rmtree(basepath)
         """
-        if self.unique_checker.unique_name(self.base.base) is False:
-            raise core.exception.DuplicateException(
-                'Duplicate files: %s' % self.base.base)
         if self.mimetype in ['application/msword',
                              "application/vnd.openxmlformats-officedocument"
                              ".wordprocessingml.document"]:
@@ -257,6 +253,10 @@ class FileProcesser():
             >>> shutil.rmtree(basepath)
         """
         path = repo.repo.path
+        unique_checker = core.uniquesearcher.UniqueSearcher(repo)
+        if unique_checker.unique_name(self.base.base) is False:
+            raise core.exception.DuplicateException(
+                'Duplicate files: %s' % self.base.base)
         if self.convert() is False:
             return False
         shutil.copy(os.path.join(self.markdown_path, self.name.md),

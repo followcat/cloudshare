@@ -22,7 +22,7 @@ class RepoAccount(object):
         >>> save_repo = RepoAccount.repo
         >>> RepoAccount.repo = interface
         >>> RepoAccount.USERS
-        {u'root': u'63a9f0ea7bb98050796b649e85481845'}
+        {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> RepoAccount.add('admin', 'password')
         >>> RepoAccount.USERS['admin']
         u'5f4dcc3b5aa765d61d8327deb882cf99'
@@ -32,12 +32,12 @@ class RepoAccount(object):
         ExistsUser: admin
         >>> RepoAccount.delete('admin')
         >>> RepoAccount.USERS
-        {u'root': u'63a9f0ea7bb98050796b649e85481845'}
+        {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> RepoAccount.repo = save_repo
         >>> shutil.rmtree(repo_name)
     """
     default_root_name = u'root'
-    default_root_password = 'root'
+    default_root_password = 'password'
     account_filename = 'account.yaml'
 
     repo = webapp.core.repo
@@ -53,14 +53,28 @@ class RepoAccount(object):
         cls.repo.add_files(cls.account_filename, "Add account file.")
 
     @classmethod
-    def add(cls, id, password):
+    def unicodemd5(cls, password):
         m = hashlib.md5()
+        m.update(password)
+        return unicode(m.hexdigest())
+
+    @classmethod
+    def add(cls, id, password):
         data = cls.USERS
         uid = unicode(id)
+        upw = cls.unicodemd5(password)
         if uid in data:
             raise webapp.core.exception.ExistsUser(uid)
-        m.update(password)
-        data[uid] = unicode(m.hexdigest())
+        data[uid] = upw
+        dump_data = yaml.dump(data)
+        cls.repo.modify_file(cls.account_filename, dump_data)
+
+    @classmethod
+    def modify(cls, id, password):
+        data = cls.USERS
+        uid = unicode(id)
+        upw = cls.unicodemd5(password)
+        data[uid] = upw
         dump_data = yaml.dump(data)
         cls.repo.modify_file(cls.account_filename, dump_data)
 
@@ -87,10 +101,13 @@ class RepoAccount(object):
 class User(flask.ext.login.UserMixin):
 
     def __init__(self, id, account_dict):
-        self.id = unicode(id)
+        self.id = id
         if id not in account_dict:
             raise webapp.core.exception.UserNotFoundError()
-        self.password = account_dict[self.id]
+        self.password = account_dict[unicode(id)]
+
+    def changepassword(self, password):
+        RepoAccount.modify(self.id, password)
 
     @classmethod
     def get(self_class, id, account_dict=None):
@@ -105,9 +122,9 @@ class User(flask.ext.login.UserMixin):
             >>> RepoAccount.repo = interface
             >>> user = webapp.core.account.User.get('root')
             >>> user.id
-            u'root'
+            'root'
             >>> user.password
-            u'63a9f0ea7bb98050796b649e85481845'
+            u'5f4dcc3b5aa765d61d8327deb882cf99'
             >>> type(webapp.core.account.User.get('None'))
             <type 'NoneType'>
             >>> RepoAccount.repo = save_repo

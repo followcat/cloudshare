@@ -1,0 +1,28 @@
+{% extends "share/urm_layout.html" %}
+{% block content %}
+<ol class="breadcrumb">
+  <li class="active">SETTING</li>
+</ol>
+<div class="container_fluid">
+  <div class="col-md-4 col-md-offset-2 clearfix">
+    <form>
+  	  <div class="form-group">
+        <label for="oldpassword">Old Password</label>
+        <input type="password" class="form-control" name="oldpassword" id="oldpassword" placeholder="Old Password">
+      </div>
+      <div class="form-group">
+        <label for="newpassword">New Password</label>
+        <input type="password" class="form-control" name="newpassword" id="newpassword" placeholder="New Password">
+      </div>
+      <div class="form-group">
+        <label for="confirmpassword">Confirm New Password</label>
+        <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" placeholder="Confirm New Password">
+      </div>
+      <button type="submit" class="btn btn-primary center-block">Submit</button>
+    </form>
+  </div>
+</div>
+{% endblock%}
+{% block script %}
+<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/urm_setting') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+{% endblock %}

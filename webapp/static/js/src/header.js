@@ -14,6 +14,7 @@ define(['jquery'], function($){
 	header.LogOut = function(obj){
 		//obj is a element object
 		obj.on("click", function(event){
+
 			$.ajax({
 				url: '/logout',
 				type: 'GET',
@@ -21,8 +22,10 @@ define(['jquery'], function($){
 					window.location.href = "/index";
 				},
 				error: function(msg){
-					alert(msg);
+					alert("Operate Error!");
+					console.log(msg);
 				}
+
 			})
 
 			event.preventDefault();    //prevent event default.

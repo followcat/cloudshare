@@ -15,11 +15,7 @@ require.config({
 
 require(['jquery', 'bootstrap', 'urmmain'],function($, bootstrap, urmmain){
 	// body...
-	$("#save-btn").on('click', function(event){
-		var aForm = $("#add-user-form");
-		urmmain.FormAjax(aForm);
-		event.preventDefault();
-	})
+	
 	
 
 })

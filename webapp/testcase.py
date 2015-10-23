@@ -31,10 +31,10 @@ class Test(flask.ext.testing.TestCase):
         return self.client.get('/logout', follow_redirects=True)
 
 
-class LoginoutTest(Test):
+class LoginoutSuperAdminTest(Test):
 
-    def test_login_logout(self):
+    def test_superadmin_login_logout(self):
         rv = self.login('root', 'password')
-        assert 'Hello root' in rv.data
+        assert 'Management System' in rv.data
         rv = self.logout()
-        assert 'Hello Guest' in rv.data
+        assert 'Login In' in rv.data

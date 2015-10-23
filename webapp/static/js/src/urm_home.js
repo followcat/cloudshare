@@ -21,9 +21,23 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 	//set up the button of save to open or close
 	var saveBtn = $("#save-btn");
 
-	$("#save-btn").on('click', function(event){
+	//
+	saveBtn.on('click', function(event){
+		//get the form
 		var aForm = $("#add-user-form");
-		urmmain.FormAjax(aForm);
+		
+		//call the ajax request
+		var result = urmmain.FormAjax(aForm);
+
+		if(result)
+		{
+			alert("success!");
+		}
+		else
+		{
+			alert("failure!")
+		}
+
 		event.preventDefault();
 	})
 

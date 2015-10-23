@@ -53,7 +53,11 @@ define(['jquery'], function(){
 			dataType: 'html',
 			data: formObj.serialize(),
 			success: function(result){
-				console.log('!!!')
+				return true;
+			},
+			error: function(msg){
+				console.log(msg);
+				return false;
 			}
 
 		})

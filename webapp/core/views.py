@@ -140,13 +140,15 @@ class Logout(flask.views.MethodView):
 class AddUser(flask.views.MethodView):
 
     def post(self):
+        result = False
         id = flask.request.form['username']
         password = flask.request.form['password']
         try:
             webapp.core.account.RepoAccount.add(id, password)
+            result = True
         except webapp.core.exception.ExistsUser:
-            return False
-        return True
+            pass
+        return flask.jsonify(result=result)
 
 
 class ChangePassword(flask.views.MethodView):

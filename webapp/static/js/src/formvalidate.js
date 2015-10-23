@@ -22,5 +22,16 @@ define(function(){
 	    return true;
  	}
 
+ 	validation.ComparePassword = function(pwd, cofpwd){
+
+ 		if(pwd === cofpwd)
+ 		{
+ 			return true;
+
+ 		}else{
+ 			return false;
+ 		}
+ 	}
+
  	return validation;
 })

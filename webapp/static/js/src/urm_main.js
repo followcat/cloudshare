@@ -58,5 +58,15 @@ define(['jquery'], function(){
 
 		})
 	}
+
+	//set up the button of save to open or close
+	urmmain.ButtonDisable = function(obj){
+		obj.attr("disabled",true);
+	}
+
+	urmmain.ButtonAble = function(obj){
+		obj.attr("disabled",false);
+	}
+
 	return urmmain;
 })

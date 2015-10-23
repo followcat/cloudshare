@@ -8,17 +8,18 @@
     <form>
   	  <div class="form-group">
         <label for="oldpassword">Old Password</label>
-        <input type="password" class="form-control" name="oldpassword" id="oldpassword" placeholder="Old Password">
+        <input type="password" class="form-control" name="oldpassword" id="oldpassword" placeholder="Old Password" required="required">
       </div>
       <div class="form-group">
         <label for="newpassword">New Password</label>
-        <input type="password" class="form-control" name="newpassword" id="newpassword" placeholder="New Password">
+        <input type="password" class="form-control" name="newpassword" id="newpassword" placeholder="New Password" required="required">
       </div>
       <div class="form-group">
         <label for="confirmpassword">Confirm New Password</label>
-        <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" placeholder="Confirm New Password">
+        <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" data-compare="#newpassword"placeholder="Confirm New Password" required="required">
       </div>
-      <button type="submit" class="btn btn-primary center-block">Submit</button>
+      <strong class="error-msg"></strong>
+      <button type="submit" class="btn btn-primary center-block" id="submit-btn">Submit</button>
     </form>
   </div>
 </div>

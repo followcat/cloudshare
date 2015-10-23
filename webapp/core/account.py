@@ -53,14 +53,28 @@ class RepoAccount(object):
         cls.repo.add_files(cls.account_filename, "Add account file.")
 
     @classmethod
-    def add(cls, id, password):
+    def unicodemd5(cls, password):
         m = hashlib.md5()
+        m.update(password)
+        return unicode(m.hexdigest())
+
+    @classmethod
+    def add(cls, id, password):
         data = cls.USERS
         uid = unicode(id)
+        upw = cls.unicodemd5(password)
         if uid in data:
             raise webapp.core.exception.ExistsUser(uid)
-        m.update(password)
-        data[uid] = unicode(m.hexdigest())
+        data[uid] = upw
+        dump_data = yaml.dump(data)
+        cls.repo.modify_file(cls.account_filename, dump_data)
+
+    @classmethod
+    def modify(cls, id, password):
+        data = cls.USERS
+        uid = unicode(id)
+        upw = cls.unicodemd5(password)
+        data[uid] = upw
         dump_data = yaml.dump(data)
         cls.repo.modify_file(cls.account_filename, dump_data)
 
@@ -87,10 +101,13 @@ class RepoAccount(object):
 class User(flask.ext.login.UserMixin):
 
     def __init__(self, id, account_dict):
-        self.id = unicode(id)
+        self.id = id
         if id not in account_dict:
             raise webapp.core.exception.UserNotFoundError()
-        self.password = account_dict[self.id]
+        self.password = account_dict[unicode(id)]
+
+    def changepassword(self, password):
+        RepoAccount.modify(self.id, password)
 
     @classmethod
     def get(self_class, id, account_dict=None):

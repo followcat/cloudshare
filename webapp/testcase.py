@@ -21,9 +21,6 @@ class Test(flask.ext.testing.TestCase):
         ext.views.configure(app)
         return app
 
-
-class LoginoutTest(Test):
-
     def login(self, username, password):
         return self.client.post('/login/check', data=dict(
             username=username,
@@ -33,8 +30,11 @@ class LoginoutTest(Test):
     def logout(self):
         return self.client.get('/logout', follow_redirects=True)
 
+
+class LoginoutTest(Test):
+
     def test_login_logout(self):
-        rv = self.login('root', 'root')
+        rv = self.login('root', 'password')
         assert 'Hello root' in rv.data
         rv = self.logout()
         assert 'Hello Guest' in rv.data

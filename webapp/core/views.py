@@ -14,6 +14,7 @@ import webapp.core
 import core.outputstorage
 import core.converterutils
 import webapp.core.account
+import webapp.core.exception
 
 
 class Search(flask.views.MethodView):
@@ -93,22 +94,8 @@ class Showtest(flask.views.MethodView):
 
 class Index(flask.views.MethodView):
 
-    # def get(self):
-    #     return (
-    #         '''
-    #             <h1>Hello {1}</h1>
-    #             <p style="color: #f00;">{0}</p>
-    #             <p>{2}</p>
-    #         '''.format(
-    #             # flash message
-    #             ', '.join([str(m) for m in flask.get_flashed_messages()]),
-    #             flask.ext.login.current_user.get_id() or 'Guest',
-    #             ('<a href="/logout">Logout</a>' if flask.ext.login.current_user.is_authenticated
-    #                 else '<a href="/login">Login</a>')
-    #         )
-    #     )
-      def get(self):
-          return flask.render_template('index.html')
+    def get(self):
+        return flask.render_template('index.html')
 
 
 class Login(flask.views.MethodView):
@@ -128,10 +115,8 @@ class LoginCheck(flask.views.MethodView):
     def post(self):
         user = webapp.core.account.User.get(flask.request.form['username'])
         password = flask.request.form['password']
-        m = hashlib.md5()
-        m.update(password)
+        upassword = webapp.core.account.RepoAccount.unicodemd5(password)
         error = None
-        upassword = unicode(m.hexdigest())
         if (user and user.password == upassword):
             flask.ext.login.login_user(user)
         else:
@@ -146,3 +131,23 @@ class Logout(flask.views.MethodView):
     def get(self):
         flask.ext.login.logout_user()
         return flask.redirect(flask.url_for('index'))
+
+
+class AddUser(flask.views.MethodView):
+
+    def post(self):
+        id = flask.request.form['username']
+        password = flask.request.form['password']
+        try:
+            webapp.core.account.RepoAccount.add(id, password)
+        except webapp.core.exception.ExistsUser:
+            return False
+        return True
+
+
+class ChangePassword(flask.views.MethodView):
+
+    def post(self):
+        password = flask.request.form['newpassword']
+        user = flask.ext.login.current_user
+        user.changepassword(password)

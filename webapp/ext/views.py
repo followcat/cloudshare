@@ -46,3 +46,13 @@ def configure(app):
         '/logout',
         view_func=webapp.core.views.Logout.as_view('logout'),
         )
+
+    app.add_url_rule(
+        '/adduser',
+        view_func=webapp.core.views.AddUser.as_view('adduser'),
+        )
+
+    app.add_url_rule(
+        '/changepassword',
+        view_func=webapp.core.views.ChangePassword.as_view('changepassword'),
+        )

@@ -27,16 +27,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 		var aForm = $("#add-user-form");
 		
 		//call the ajax request
-		var result = urmmain.FormAjax(aForm);
-
-		if(result)
-		{
-			alert("success!");
-		}
-		else
-		{
-			alert("failure!")
-		}
+		urmmain.FormAjax(aForm);
 
 		event.preventDefault();
 	})

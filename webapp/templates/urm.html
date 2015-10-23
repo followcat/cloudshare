@@ -52,26 +52,33 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">Add User</h4>
       </div>
-      <div class="modal-body">
-	    <div class="form-group">
-	      <label for="addUserName" class="control-label">Name</label>
-	      <input type="text" class="form-control" id="addUserName" placeholder="Name" required="required">
+      <form id="add-user-form" method="POST" action="/asd">
+	    <div class="modal-body">
+	      	
+		  <div class="form-group">
+		    <label for="addUserName" class="control-label">Name</label>
+		    <input type="text" class="form-control" id="addUserName" name="username" placeholder="Name" required="required">
+		  </div>
+		  <div class="form-group">
+		    <label for="password" class="control-label">Password</label>
+		    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required="required">
+		  </div>
+		  <div class="form-group">
+		    <label for="confirmPassword" class="control-label">Confirm Password</label>
+		    <input type="password" class="form-control" id="confirmPassword" name="confirmpassword" placeholder="Confirm Password" required="required">
+		  </div>
 	    </div>
-	    <div class="form-group">
-	      <label for="password" class="control-label">Password</label>
-	      <input type="password" class="form-control" id="password" placeholder="Password" required="required">
+	    <div class="modal-footer">
+	      <button type="reset" class="btn btn-default" id="reset-btn">Reset</button>
+	      <button type="button" class="btn btn-primary" id="save-btn">Save</button>
 	    </div>
-	    <div class="form-group">
-	      <label for="confirmPassword" class="control-label">Confirm Password</label>
-	      <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required="required">
-	    </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" id="reset-btn">Reset</button>
-        <button type="button" class="btn btn-primary" id="save-btn">Save</button>
-      </div>
+      </form>
     </div>
   </div>
 </div>
 <!-- Add user modal end-->
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/urm_home') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
 {% endblock %}

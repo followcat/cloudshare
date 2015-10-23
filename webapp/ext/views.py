@@ -5,7 +5,7 @@ import webapp.core.account
 def configure(app):
     webapp.core.views.Search.repo = app.config['REPO_DB']
     app.add_url_rule(
-        '/',
+        '/search',
         view_func=webapp.core.views.Search.as_view('search'),
         )
 
@@ -55,4 +55,14 @@ def configure(app):
     app.add_url_rule(
         '/changepassword',
         view_func=webapp.core.views.ChangePassword.as_view('changepassword'),
+        )
+    
+    app.add_url_rule(
+        '/urm',
+        view_func=webapp.core.views.Urm.as_view('urm'),
+        )
+
+    app.add_url_rule(
+        '/urmsetting',
+        view_func=webapp.core.views.UrmSetting.as_view('urmsetting'),
         )

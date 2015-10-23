@@ -1,0 +1,85 @@
+{% extends "share/urm_layout.html" %}
+{% block content %}
+<ol class="breadcrumb">
+  <li class="active">HOME</li>
+</ol>
+<div class="container_fluid">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title"><h4>User Management</h4></div>
+	    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserModal">
+	  	  <span class="glyphicon glyphicon-plus"></span> Add User
+	    </button>
+	</div>
+	<!--   User Info Table begin   -->
+	<table class="table table-striped table-hover">
+	  <thead>
+	    <tr>
+		  <th>Number</th>
+		  <th>Name</th>
+		  <th>Phone</th>
+		  <th>Operate</th>
+	    </tr>  
+	  </thead>  
+	  <tbody>
+	    <tr>
+	      <td>1</td>
+	      <td>Tom</td>
+	      <td>123456789</td>
+	      <td>
+		    <button type="button" class="btn btn-default btn-xs">
+			  <span class="glyphicon glyphicon-trash" title="delete" id="delete"></span> Delete
+			</button>
+		  </td>
+		</tr>
+	  </tbody>
+	</table>
+	<!--   User Info Table end  -->
+	<div class="penel-footer">
+	  <ul class="pager">
+	    <li class="disabled"><a href="#">Previous</a></li>
+	    <li><a href="#">Next</a></li>
+	  </ul>
+	</div>
+  </div>
+</div>
+<!-- Add user modal begin-->
+<!-- Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add User</h4>
+      </div>
+      <form id="add-user-form" method="POST" >
+	    <div class="modal-body">
+	      	
+		  <div class="form-group">
+		    <label for="addUserName" class="control-label">Name</label>
+		    <input type="text" class="form-control" id="addUserName" name="username" placeholder="Name" required="required">
+		  </div>
+		  <div class="form-group">
+		    <label for="password" class="control-label">Password</label>
+		    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required="required">
+		  </div>
+		  <div class="form-group">
+		    <label for="confirmPassword" class="control-label">Confirm Password</label>
+		    <input type="password" class="form-control" id="confirmPassword" data-compare="#password" name="confirmpassword" placeholder="Confirm Password" required="required">
+		  </div>
+		  <strong class="error-msg"></strong>
+	    </div>
+	    <div class="modal-footer">
+	      <button type="reset" class="btn btn-default" id="reset-btn">Reset</button>
+	      <button type="button" class="btn btn-primary" id="save-btn">Save</button>
+	    </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Add user modal end-->
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/urm_home') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+{% endblock %}

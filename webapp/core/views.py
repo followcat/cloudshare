@@ -119,6 +119,10 @@ class LoginCheck(flask.views.MethodView):
         error = None
         if (user and user.password == upassword):
             flask.ext.login.login_user(user)
+            if(user.id == "root"):
+                return flask.redirect(flask.url_for("urm"))
+            else:
+                return flask.redirect(flask.url_for("search"))
         else:
             # flask.flash('Username or Password Incorrect.')
             error = 'Username or Password Incorrect.'
@@ -151,3 +155,15 @@ class ChangePassword(flask.views.MethodView):
         password = flask.request.form['newpassword']
         user = flask.ext.login.current_user
         user.changepassword(password)
+
+
+class Urm(flask.views.MethodView):
+
+    def get(self):
+        return flask.render_template('urm.html')
+
+
+class UrmSetting(flask.views.MethodView):
+
+    def get(self):
+        return flask.render_template('urmsetting.html')

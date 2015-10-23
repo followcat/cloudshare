@@ -18,7 +18,7 @@
   <customWorkspace>$CLOUDSHARE_CI_HOME/webapp/static/js</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
-      <command>git fetch
+      <command>git pull
 (cd $CLOUDSHARE_CI_HOME/webapp/static/js; gulp test)</command>
     </hudson.tasks.Shell>
   </builders>

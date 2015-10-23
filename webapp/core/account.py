@@ -122,7 +122,7 @@ class User(flask.ext.login.UserMixin):
             >>> RepoAccount.repo = interface
             >>> user = webapp.core.account.User.get('root')
             >>> user.id
-            u'root'
+            'root'
             >>> user.password
             u'5f4dcc3b5aa765d61d8327deb882cf99'
             >>> type(webapp.core.account.User.get('None'))

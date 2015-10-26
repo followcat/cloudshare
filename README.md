@@ -24,6 +24,13 @@ share，edit your doc，pdf，md and so on...
     npm 2.14.4
     gulp CLI 3.9.0
 
+### draw && view router graph
+
+    xdot 0.4
+    networkx==1.10
+    pygraphviz==1.4.dev
+
+
 You can do the automatic test by using Jenkins with karma, nose and so on.
 Here is a demo bash script to run Jenkins test:
 

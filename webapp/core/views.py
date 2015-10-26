@@ -16,6 +16,7 @@ import webapp.core.upload
 import core.outputstorage
 import core.converterutils
 import webapp.core.account
+import webapp.core.exception
 
 
 class Search(flask.views.MethodView):
@@ -102,19 +103,7 @@ class Showtest(flask.views.MethodView):
 class Index(flask.views.MethodView):
 
     def get(self):
-        return (
-            '''
-                <h1>Hello {1}</h1>
-                <p style="color: #f00;">{0}</p>
-                <p>{2}</p>
-            '''.format(
-                # flash message
-                ', '.join([str(m) for m in flask.get_flashed_messages()]),
-                flask.ext.login.current_user.get_id() or 'Guest',
-                ('<a href="/logout">Logout</a>' if flask.ext.login.current_user.is_authenticated
-                    else '<a href="/login">Login</a>')
-            )
-        )
+        return flask.render_template('index.html')
 
 
 class Login(flask.views.MethodView):
@@ -134,15 +123,19 @@ class LoginCheck(flask.views.MethodView):
     def post(self):
         user = webapp.core.account.User.get(flask.request.form['username'])
         password = flask.request.form['password']
-        m = hashlib.md5()
-        m.update(password)
-        upassword = unicode(m.hexdigest())
+        upassword = webapp.core.account.RepoAccount.unicodemd5(password)
+        error = None
         if (user and user.password == upassword):
             flask.ext.login.login_user(user)
+            if(user.id == "root"):
+                return flask.redirect(flask.url_for("urm"))
+            else:
+                return flask.redirect(flask.url_for("search"))
         else:
-            flask.flash('Username or password incorrect.')
-
-        return flask.redirect(flask.url_for('index'))
+            # flask.flash('Username or Password Incorrect.')
+            error = 'Username or Password Incorrect.'
+        return flask.render_template('index.html', error=error)
+        # return flask.redirect(flask.url_for('index'),error=error)
 
 
 class Logout(flask.views.MethodView):
@@ -150,3 +143,58 @@ class Logout(flask.views.MethodView):
     def get(self):
         flask.ext.login.logout_user()
         return flask.redirect(flask.url_for('index'))
+
+
+class AddUser(flask.views.MethodView):
+
+    def post(self):
+        result = False
+        id = flask.request.form['username']
+        password = flask.request.form['password']
+        try:
+            webapp.core.account.RepoAccount.add(id, password)
+            result = True
+        except webapp.core.exception.ExistsUser:
+            pass
+        return flask.jsonify(result=result)
+
+
+class ChangePassword(flask.views.MethodView):
+
+    def post(self): 
+        result = False
+        oldpassword = flask.request.form['oldpassword']
+        newpassword = flask.request.form['newpassword']
+        md5newpwd = webapp.core.account.RepoAccount.unicodemd5(oldpassword)
+        user = flask.ext.login.current_user
+        # user.id
+        # user.password
+        try:
+            if( user.password == md5newpwd ):
+                user.changepassword(newpassword)
+                result = True
+            else:
+                result = False
+        except webapp.core.exception.ExistsUser:
+            pass
+        return flask.jsonify(result=result)
+
+
+class Urm(flask.views.MethodView):
+
+    def get(self):
+        userlist = webapp.core.account.RepoAccount.get_user_list()
+        return flask.render_template('urm.html', userlist=userlist)
+
+
+class UrmSetting(flask.views.MethodView):
+
+    def get(self):
+        return flask.render_template('urmsetting.html')
+
+
+class DeleteUser(flask.views.MethodView):
+    def post(self):
+        name = flask.request.form['name']
+        webapp.core.account.RepoAccount.delete(name)
+        return flask.jsonify(result=True)

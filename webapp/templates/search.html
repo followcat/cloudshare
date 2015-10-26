@@ -1,68 +1,80 @@
-<!--A Design by W3layouts
-Author: W3layout
-Author URL: http://w3layouts.com
-License: Creative Commons Attribution 3.0 Unported
-License URL: http://creativecommons.org/licenses/by/3.0/
--->
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>CLOUDSHARE Searcher</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="keywords" content="Photo-Hub Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template, 
-Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel='stylesheet' type='text/css' />
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<!-- Custom Theme files -->
-<link href="{{ url_for('static', filename='css/search.css') }}" rel='stylesheet' type='text/css' />
-<!-- Custom Theme files -->
-<!--webfont-->
-<link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800' rel='stylesheet' type='text/css'>
-<script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
-<script src="/static/js/menu_jquery.js"></script>
+	<meta charset="UTF-8">
+	<title>Seach-Willendare</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/search.css') }}">
 </head>
 <body>
-	<div class="header">	
-      <div class="container"> 
-  	     <div class="logo">
-			<h1><a href="/">Doc Hub</a></h1>
-		 </div>
-		 <div class="top_right">
-		   <ul>
-			<li><a href="/listdata">Listdata</a></li>|
-			<li><a href="/upload">Upload</a></li>
-		   </ul>
-	     </div>
-		 <div class="clearfix"></div>
-		</div>
+	<header class="header-box">
+	  
+      <img src="{{ url_for('static',filename='images/logo.png') }}" height="36" width="174" class="logo">
+
+	  <div class="col-xs-offset-8 col-sm-offset-8 col-md-offset-9 profile">
+	    <span id="name"><span class="glyphicon glyphicon-user"></span> {{ current_user.id }} </span>
+	    <ul class="profile-menu list-unstyled">
+<!-- 	      <li><a href="#">Center</a></li> -->
+	      <li><a href="#" data-toggle="modal" data-target=".quit-modal">Quit</a></li>
+	    </ul>
+	  </div>
+
+	  <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 upload" id="upload" data-toggle="modal" data-target=".upload-modal">
+	  	<span class="glyphicon glyphicon-upload"></span> Upload
+	  </div>
+
+	</header>
+	<!-- upload modal begin-->
+	<div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Upload File</h4>
+          </div>
+            <div class="modal-body">
+              <button type="button" class="btn btn-primary upload-btn">
+            	  Choose file
+			    <input type="file" id="choose-file-btn"/>
+              </button>
+            <input type="text" class="form-control file-text" id="file-text" value="" readonly="true" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Upload</button>
+          </div>
+        </div>
+      </div>
+    </div>
+      <!-- upload modal end-->
+	<!--quit modal begin-->
+	<div class="modal fade quit-modal" tabindex="-1" role="dialog" aria-labelledby="myQuitModalLabel">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Confirm</h4>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure to quit?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+            <button type="button" class="btn btn-primary" id="quit-btn">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--quit modal end-->
+
+	<div class="search-box">
+	  <form >
+	  	<input type="text" placeholder="Search for ..." class="search-text"/>
+	  	<button type="submit" class="search-btn">Search</button>
+	  </form>
 	</div>
-	<div class="banner">
-		<div class="container">
-			<div class="span_1_of_1">
-			    <h2>Docs, illustrations by<br> Creatives all over the world.</h2>
-			    <div class="search">
-			      <ul class="nav1">
-		            <li id="search">
-						<form action="/" name="searchform" method="post">
-							<input type="text" name="search_text" id="search_text" placeholder="Search"/>
-							<input type="button" name="search_button" id="search_button" onclick="document.searchform.submit();">
-						</form>
-					</li>
-					<li id="options">
-						<a href="#">from MD</a>
-						<ul class="subnav">
-							<li><a href="#">Option1</a></li>
-							<li><a href="#">Option2</a></li>
-							<li><a href="#">Option3</a></li>
-						</ul>
-					</li>
-	              </ul>
-	            </div>
-			</div>
-		</div>
-	</div>
+
+<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/search') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+	
 </body>
-</html>		
+</html>

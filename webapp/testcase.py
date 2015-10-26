@@ -71,5 +71,6 @@ class LoginoutUser(Test):
         login_name = 'addname'
         rv = self.login(login_name, 'addpassword')
         assert(login_name in rv.data)
+        self.adduser('addname2', 'addpassword2')
         rv = self.logout()
         assert('Login In' in rv.data)

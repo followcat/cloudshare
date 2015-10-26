@@ -143,9 +143,9 @@ class AddUser(flask.views.MethodView):
         result = False
         id = flask.request.form['username']
         password = flask.request.form['password']
+        user = flask.ext.login.current_user
         try:
-            webapp.core.account.RepoAccount.add(id, password)
-            result = True
+            result = webapp.core.account.RepoAccount.add(user.id, id, password)
         except webapp.core.exception.ExistsUser:
             pass
         return flask.jsonify(result=result)
@@ -186,7 +186,9 @@ class UrmSetting(flask.views.MethodView):
 
 
 class DeleteUser(flask.views.MethodView):
+
     def post(self):
         name = flask.request.form['name']
-        webapp.core.account.RepoAccount.delete(name)
-        return flask.jsonify(result=True)
+        user = flask.ext.login.current_user
+        result = webapp.core.account.RepoAccount.delete(user.id, name)
+        return flask.jsonify(result=result)

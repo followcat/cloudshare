@@ -23,16 +23,18 @@ class RepoAccount(object):
         >>> RepoAccount.repo = interface
         >>> RepoAccount.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
-        >>> RepoAccount.add('admin', 'password')
+        >>> RepoAccount.add('root', 'admin', 'password')
+        True
         >>> RepoAccount.USERS['admin']
         u'5f4dcc3b5aa765d61d8327deb882cf99'
         >>> RepoAccount.get_user_list()
         [u'admin']
-        >>> RepoAccount.add('admin', 'password') # doctest: +ELLIPSIS
+        >>> RepoAccount.add('root', 'admin', 'password') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ExistsUser: admin
-        >>> RepoAccount.delete('admin')
+        >>> RepoAccount.delete('root', 'admin')
+        True
         >>> RepoAccount.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> RepoAccount.repo = save_repo
@@ -61,7 +63,9 @@ class RepoAccount(object):
         return unicode(m.hexdigest())
 
     @classmethod
-    def add(cls, id, password):
+    def add(cls, mender, id, password):
+        if mender != u'root':
+            return False
         data = cls.USERS
         uid = unicode(id)
         upw = cls.unicodemd5(password)
@@ -70,6 +74,7 @@ class RepoAccount(object):
         data[uid] = upw
         dump_data = yaml.dump(data)
         cls.repo.modify_file(cls.account_filename, dump_data)
+        return True
 
     @classmethod
     def modify(cls, id, password):
@@ -81,11 +86,14 @@ class RepoAccount(object):
         cls.repo.modify_file(cls.account_filename, dump_data)
 
     @classmethod
-    def delete(cls, id):
+    def delete(cls, mender, id):
+        if mender != u'root':
+            return False
         data = cls.USERS
         data.pop(unicode(id))
         dump_data = yaml.dump(data)
         cls.repo.modify_file(cls.account_filename, dump_data)
+        return True
 
     @utils.classproperty.ClassProperty
     def USERS(cls):

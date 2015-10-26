@@ -24,7 +24,15 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 	submitBtn.on('click', function(event){
 		var aForm = $("#settin-form");
 
-		urmmain.FormAjax(aForm);
+		urmmain.FormAjax(aForm, function(){
+			alert("The password is changed, please login again.");
+			window.location.href = "/index";
+
+		}, function(){
+
+			alert("Operation Failed!");
+
+		});
 		
 		event.preventDefault();
 	})

@@ -45,7 +45,8 @@ define(['jquery'], function(){
 	urmmain.Quit();
 
 	//form ajax submit function
-	urmmain.FormAjax = function(formObj){
+	urmmain.FormAjax = function(formObj,success_func,fail_func){
+
 		$.ajax({
 			url: formObj.attr('action'),
 			type: formObj.attr('method'),
@@ -53,21 +54,23 @@ define(['jquery'], function(){
 			data: formObj.serialize(),
 			success: function(result){
 				var resultJson = $.parseJSON(result);
+				console.log(resultJson.result);
 				if(resultJson.result)
 				{
-					alert("Success!");
+					success_func();
 				}
 				else
 				{
-					alert("Failure!");
+					fail_func();
 				}
 			},
 			error: function(msg){
 				console.log(msg);
-				return false;
+				alert("Error!")
 			}
+		});
 
-		})
+
 	}
 
 	//set up the button of save to open or close

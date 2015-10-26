@@ -21,15 +21,17 @@
 	    </tr>  
 	  </thead>  
 	  <tbody>
+	  	{% for useritem in userlist %}
 	    <tr>
 	      <td>1</td>
-	      <td>Tom</td>
+	      <td class="name">{{ useritem }}</td>
 	      <td>
 		    <button type="button" class="btn btn-default btn-xs">
-			  <span class="glyphicon glyphicon-trash" title="delete" id="delete"></span> Delete
+			  <span class="glyphicon glyphicon-trash" title="delete" class="delete"></span> Delete
 			</button>
 		  </td>
 		</tr>
+		{% endfor %}
 	  </tbody>
 	</table>
 	<!--   User Info Table end  -->

@@ -175,10 +175,18 @@ class ChangePassword(flask.views.MethodView):
 class Urm(flask.views.MethodView):
 
     def get(self):
-        return flask.render_template('urm.html')
+        userlist = webapp.core.account.RepoAccount.get_user_list()
+        return flask.render_template('urm.html', userlist=userlist)
 
 
 class UrmSetting(flask.views.MethodView):
 
     def get(self):
         return flask.render_template('urmsetting.html')
+
+
+class DeleteUser(flask.views.MethodView):
+    def post(self):
+        name = flask.request.form['name']
+        webapp.core.account.RepoAccount.delete(name)
+        return flask.jsonify(result=True)

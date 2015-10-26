@@ -21,13 +21,22 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 	//set up the button of save to open or close
 	var saveBtn = $("#save-btn");
 
-	//
+	//Add User button event
 	saveBtn.on('click', function(event){
 		//get the form
 		var aForm = $("#add-user-form");
 		
 		//call the ajax request
-		urmmain.FormAjax(aForm);
+		urmmain.FormAjax(aForm, function(){
+
+			alert("Successful Add!");
+			window.location.reload();
+
+		}, function(){
+
+			alert("Operation Failed!");
+			
+		});
 
 		event.preventDefault();
 	})
@@ -90,6 +99,34 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 				msgBox.text("");
 			}
 		}	
+	})
+
+
+	//Delete Button
+	$("table tbody button").on('click', function(){
+		var trParent = $(this).parent().parent();
+		var deletename = trParent.find(".name").text();
+		
+		console.log(deletename);
+
+		if(confirm("Are you sure to delete " + deletename + "?"))
+		{
+			$.ajax({
+				url: '/deleteuser',
+				type: 'POST',
+				data: "name="+deletename,
+				dataType: 'text',
+				success: function(result){
+					console.log($.parseJSON(result).result);
+					alert("Successful Delete!");
+					window.location.reload();
+				}
+
+			})
+		}
+
+
+
 	})
 
 })

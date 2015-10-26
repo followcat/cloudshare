@@ -66,3 +66,8 @@ def configure(app):
         '/urmsetting',
         view_func=webapp.core.views.UrmSetting.as_view('urmsetting'),
         )
+
+    app.add_url_rule(
+        '/deleteuser',
+        view_func=webapp.core.views.DeleteUser.as_view('deleteuser'),
+        )

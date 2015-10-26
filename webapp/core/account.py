@@ -26,6 +26,8 @@ class RepoAccount(object):
         >>> RepoAccount.add('admin', 'password')
         >>> RepoAccount.USERS['admin']
         u'5f4dcc3b5aa765d61d8327deb882cf99'
+        >>> RepoAccount.get_user_list()
+        [u'admin']
         >>> RepoAccount.add('admin', 'password') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
@@ -96,6 +98,13 @@ class RepoAccount(object):
         data = yaml.load(account_file.read())
         account_file.close()
         return data
+
+    @classmethod
+    def get_user_list(cls):
+        account_list = cls.USERS.keys()
+        account_list.remove(cls.default_root_name)
+        user_list = account_list
+        return user_list
 
 
 class User(flask.ext.login.UserMixin):

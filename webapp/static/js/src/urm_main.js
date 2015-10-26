@@ -53,7 +53,19 @@ define(['jquery'], function(){
 			dataType: 'html',
 			data: formObj.serialize(),
 			success: function(result){
-				console.log('!!!')
+				var resultJson = $.parseJSON(result);
+				if(resultJson.result)
+				{
+					alert("Success!");
+				}
+				else
+				{
+					alert("Failure!");
+				}
+			},
+			error: function(msg){
+				console.log(msg);
+				return false;
 			}
 
 		})

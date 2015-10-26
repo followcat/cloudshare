@@ -43,6 +43,11 @@ class Test(flask.ext.testing.TestCase):
             password=password
         ), follow_redirects=True)
 
+    def deleteuser(self, username):
+        return self.client.post('/deleteuser', data=dict(
+            name=username
+        ), follow_redirects=True)
+
 
 class LoginoutSuperAdminTest(Test):
 
@@ -52,10 +57,12 @@ class LoginoutSuperAdminTest(Test):
         rv = self.logout()
         assert('Login In' in rv.data)
 
-    def test_superadmin_add_user(self):
+    def test_superadmin_add_delete_user(self):
         self.login('root', 'password')
         self.adduser('addname', 'addpassword')
         assert('addname' in webapp.core.account.RepoAccount.USERS)
+        self.deleteuser('addname')
+        assert('addname' not in webapp.core.account.RepoAccount.USERS)
         self.logout()
 
 

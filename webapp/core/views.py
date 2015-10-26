@@ -92,6 +92,14 @@ class UploadPreview(flask.views.MethodView):
         return flask.redirect(os.path.join('showtest', preview_path))
 
 
+class Confirm(flask.views.MethodView):
+    def get(self):
+        user = flask.ext.login.current_user
+        upobj = pickle.loads(flask.session['upload'])
+        result = upobj.confirm(Upload.upload_repo, user.id)
+        return str(result)
+
+
 class Showtest(flask.views.MethodView):
     def get(self, filename):
         with codecs.open(filename, 'r', encoding='utf-8') as file:

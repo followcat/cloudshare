@@ -57,6 +57,9 @@ class Test(flask.ext.testing.TestCase):
     def uppreview(self):
         return self.client.get('/uppreview', follow_redirects=True)
 
+    def confirm(self):
+        return self.client.get('/confirm', follow_redirects=True)
+
 
 class LoginoutSuperAdminTest(Test):
 
@@ -104,3 +107,8 @@ class UploadFile(User):
         assert(rv.data == 'True')
         rv = self.uppreview()
         assert('CV Templates' in rv.data)
+        rv = self.confirm()
+        assert(rv.data == 'True')
+        commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
+        assert('Add file' in commit.message)
+        assert('addname' == commit.author)

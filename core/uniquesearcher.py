@@ -42,7 +42,8 @@ class UniqueSearcher(object):
 
     def unique_name(self, name):
         for each in self.yaml_datas.values():
-            if name == each['filename'].encode('utf-8'):
+            if ('filename' in each and
+                    name == each['filename'].encode('utf-8')):
                 return False
         else:
             return True

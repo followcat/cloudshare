@@ -65,11 +65,16 @@ class Upload(flask.views.MethodView):
         cls.upload_repo = repo
         cls.upload_tmp_path = path
 
+    def judge(self, filename):
+        return len(filename.split('-')) is 3
+
     def get(self):
         return flask.render_template('upload.html')
 
     def post(self):
         network_file = flask.request.files['file']
+        if self.judge(network_file.filename):
+            return str('Not support file name format.')
         upobj = webapp.core.upload.UploadObject(network_file.filename,
                                                 network_file,
                                                 self.upload_tmp_path)

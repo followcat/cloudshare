@@ -75,7 +75,7 @@ class UploadObject(object):
         output = pypandoc.convert(data, 'html', format='markdown')
         return output
 
-    def confirm(self, repo):
+    def confirm(self, repo, committer=None):
         """
             >>> import glob
             >>> import shutil
@@ -101,7 +101,7 @@ class UploadObject(object):
         """
         result = False
         try:
-            self.storage.storage(repo)
+            self.storage.storage(repo, committer=committer)
             result = True
         except core.exception.DuplicateException:
             self.information = 'Exists File'

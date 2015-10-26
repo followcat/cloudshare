@@ -220,7 +220,7 @@ class FileProcesser():
         if os.path.isfile(filename):
             os.remove(filename)
 
-    def storage(self, repo):
+    def storage(self, repo, committer=None):
         """
             >>> import glob
             >>> import shutil
@@ -263,7 +263,8 @@ class FileProcesser():
                     os.path.join(path, self.name.md))
         shutil.copy(os.path.join(self.yaml_path, self.name.yaml),
                     os.path.join(path, self.name.yaml))
-        repo.add_files([self.name.md, self.name.yaml])
+        repo.add_files([self.name.md, self.name.yaml],
+                       committer=committer)
         return True
 
 

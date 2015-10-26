@@ -5,7 +5,7 @@
 </ol>
 <div class="container_fluid">
   <div class="col-md-4 col-md-offset-2 clearfix">
-    <form>
+    <form id="settin-form" method="POST" action="/changepassword">
   	  <div class="form-group">
         <label for="oldpassword">Old Password</label>
         <input type="password" class="form-control" name="oldpassword" id="oldpassword" placeholder="Old Password" required="required">
@@ -19,7 +19,7 @@
         <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" data-compare="#newpassword"placeholder="Confirm New Password" required="required">
       </div>
       <strong class="error-msg"></strong>
-      <button type="submit" class="btn btn-primary center-block" id="submit-btn">Submit</button>
+      <button type="button" class="btn btn-primary center-block" id="submit-btn">Submit</button>
     </form>
   </div>
 </div>

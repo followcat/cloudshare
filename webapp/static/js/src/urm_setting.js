@@ -20,6 +20,15 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 	var msgBox = $(".error-msg");
 	var submitBtn = $("#submit-btn");
 
+	//change password click event
+	submitBtn.on('click', function(event){
+		var aForm = $("#settin-form");
+
+		urmmain.FormAjax(aForm);
+		
+		event.preventDefault();
+	})
+
 	//validate the password form
 	function PasswordValidate(objVal){
 		if(!formvalidate.ValidatePassword(objVal))

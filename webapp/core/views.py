@@ -153,10 +153,23 @@ class AddUser(flask.views.MethodView):
 
 class ChangePassword(flask.views.MethodView):
 
-    def post(self):
-        password = flask.request.form['newpassword']
+    def post(self): 
+        result = False
+        oldpassword = flask.request.form['oldpassword']
+        newpassword = flask.request.form['newpassword']
+        md5newpwd = webapp.core.account.RepoAccount.unicodemd5(oldpassword)
         user = flask.ext.login.current_user
-        user.changepassword(password)
+        # user.id
+        # user.password
+        try:
+            if( user.password == md5newpwd ):
+                user.changepassword(newpassword)
+                result = True
+            else:
+                result = False
+        except webapp.core.exception.ExistsUser:
+            pass
+        return flask.jsonify(result=result)
 
 
 class Urm(flask.views.MethodView):

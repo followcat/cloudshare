@@ -46,11 +46,10 @@ define(['jquery'], function(){
 
 	//form ajax submit function
 	urmmain.FormAjax = function(formObj){
-
 		$.ajax({
 			url: formObj.attr('action'),
 			type: formObj.attr('method'),
-			dataType: 'html',
+			dataType: 'text',
 			data: formObj.serialize(),
 			success: function(result){
 				var resultJson = $.parseJSON(result);

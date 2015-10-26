@@ -48,6 +48,15 @@ class Test(flask.ext.testing.TestCase):
             name=username
         ), follow_redirects=True)
 
+    def upload(self, filepath):
+        fileobj = open(filepath, 'r')
+        return self.client.post('/upload', data=dict(
+            file=fileobj
+        ), follow_redirects=True)
+
+    def uppreview(self):
+        return self.client.get('/uppreview', follow_redirects=True)
+
 
 class LoginoutSuperAdminTest(Test):
 
@@ -66,12 +75,15 @@ class LoginoutSuperAdminTest(Test):
         self.logout()
 
 
-class LoginoutUser(Test):
+class User(Test):
 
     def init_user(self):
         self.login('root', 'password')
         self.adduser('addname', 'addpassword')
         self.logout()
+
+
+class LoginoutUser(User):
 
     def test_login_user(self):
         self.init_user()
@@ -81,3 +93,14 @@ class LoginoutUser(Test):
         self.adduser('addname2', 'addpassword2')
         rv = self.logout()
         assert('Login In' in rv.data)
+
+
+class UploadFile(User):
+
+    def test_upload(self):
+        self.init_user()
+        rv = self.login('addname', 'addpassword')
+        rv = self.upload(u'/tmp/x-y-z.doc')
+        assert(rv.data == 'True')
+        rv = self.uppreview()
+        assert('CV Templates' in rv.data)

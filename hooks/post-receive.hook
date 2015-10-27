@@ -13,6 +13,6 @@ git fetch origin
 git reset --hard origin/master
 
 export PYTHONPATH=`pwd`
-export CLOUDSHARE_VIRTUALENV_PATH=/home/followcat/Virtualenv/charelation
+export CLOUDSHARE_VIRTUALENV_PATH=/home/$USER/Virtualenv/cloudshare
 source $CLOUDSHARE_VIRTUALENV_PATH/bin/activate
 python tools/repobackup.py

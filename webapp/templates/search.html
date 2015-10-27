@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Seach-Willendare</title>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='js/plugin/uploadify/uploadify.css')}}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/search.css') }}">
 </head>
 <body>
@@ -19,7 +20,7 @@
 	    </ul>
 	  </div>
 
-	  <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 upload" id="upload" data-toggle="modal" data-target=".upload-modal">
+	  <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 upload" data-toggle="modal" data-target=".upload-modal">
 	  	<span class="glyphicon glyphicon-upload"></span> Upload
 	  </div>
 
@@ -32,17 +33,18 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="myModalLabel">Upload File</h4>
           </div>
-            <div class="modal-body">
-              <button type="button" class="btn btn-primary upload-btn">
-            	  Choose file
-			    <input type="file" id="choose-file-btn"/>
+          <div class="modal-body">
+<!--               <button type="button" class="btn btn-primary upload-btn">
+            	    Choose file
+			          <input type="file" id="choose-file-btn" name="file"  />
               </button>
-            <input type="text" class="form-control file-text" id="file-text" value="" readonly="true" />
+              <input type="text" class="form-control file-text" id="file-text" value="" readonly="true" /> -->
+            <input type="file" name="uploadify" id="uploadify" />
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Upload</button>
-          </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
+            </div>
         </div>
       </div>
     </div>

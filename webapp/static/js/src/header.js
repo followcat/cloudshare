@@ -2,12 +2,18 @@ define(['jquery'], function($){
 
 	var header = {};
 
+
 	//upload modal, button of choose file config
 	header.UploadChooseFile = function(btnObj, fileTextObj){
 		
 		btnObj.on("change", function(){
+			console.log(this.value);
 			fileTextObj.val(this.value);
 		})
+
+
+
+
 	};
 
 	// Login out in header
@@ -31,7 +37,8 @@ define(['jquery'], function($){
 			event.preventDefault();    //prevent event default.
 		})
 
-	}
+	};
+
 
 	return header;
 })

@@ -43,6 +43,23 @@ class Test(flask.ext.testing.TestCase):
             password=password
         ), follow_redirects=True)
 
+    def deleteuser(self, username):
+        return self.client.post('/deleteuser', data=dict(
+            name=username
+        ), follow_redirects=True)
+
+    def upload(self, filepath):
+        fileobj = open(filepath, 'r')
+        return self.client.post('/upload', data=dict(
+            file=fileobj
+        ), follow_redirects=True)
+
+    def uppreview(self):
+        return self.client.get('/uppreview', follow_redirects=True)
+
+    def confirm(self):
+        return self.client.get('/confirm', follow_redirects=True)
+
 
 class LoginoutSuperAdminTest(Test):
 
@@ -52,24 +69,46 @@ class LoginoutSuperAdminTest(Test):
         rv = self.logout()
         assert('Login In' in rv.data)
 
-    def test_superadmin_add_user(self):
+    def test_superadmin_add_delete_user(self):
         self.login('root', 'password')
         self.adduser('addname', 'addpassword')
         assert('addname' in webapp.core.account.RepoAccount.USERS)
+        self.deleteuser('addname')
+        assert('addname' not in webapp.core.account.RepoAccount.USERS)
         self.logout()
 
 
-class LoginoutUser(Test):
+class User(Test):
 
     def init_user(self):
         self.login('root', 'password')
         self.adduser('addname', 'addpassword')
         self.logout()
 
+
+class LoginoutUser(User):
+
     def test_login_user(self):
         self.init_user()
         login_name = 'addname'
         rv = self.login(login_name, 'addpassword')
         assert(login_name in rv.data)
+        self.adduser('addname2', 'addpassword2')
         rv = self.logout()
         assert('Login In' in rv.data)
+
+
+class UploadFile(User):
+
+    def test_upload(self):
+        self.init_user()
+        rv = self.login('addname', 'addpassword')
+        rv = self.upload(u'/tmp/x-y-z.doc')
+        assert(rv.data == 'True')
+        rv = self.uppreview()
+        assert('CV Templates' in rv.data)
+        rv = self.confirm()
+        assert(rv.data == 'True')
+        commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
+        assert('Add file' in commit.message)
+        assert('addname' == commit.author)

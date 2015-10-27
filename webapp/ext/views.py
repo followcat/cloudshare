@@ -28,6 +28,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/confirm',
+        view_func=webapp.core.views.Confirm.as_view('confirm'),
+        )
+
+    app.add_url_rule(
         '/showtest/<path:filename>',
         view_func=webapp.core.views.Showtest.as_view('showtest'),
         )

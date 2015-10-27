@@ -74,7 +74,7 @@ class Upload(flask.views.MethodView):
 
     def post(self):
         network_file = flask.request.files['file']
-        if self.judge(network_file.filename):
+        if self.judge(network_file.filename) is False:
             return str('Not support file name format.')
         upobj = webapp.core.upload.UploadObject(network_file.filename,
                                                 network_file,
@@ -90,6 +90,14 @@ class UploadPreview(flask.views.MethodView):
         preview_path = os.path.join(upobj.storage.markdown_path,
                                     upobj.storage.name.md)
         return flask.redirect(os.path.join('showtest', preview_path))
+
+
+class Confirm(flask.views.MethodView):
+    def get(self):
+        user = flask.ext.login.current_user
+        upobj = pickle.loads(flask.session['upload'])
+        result = upobj.confirm(Upload.upload_repo, user.id)
+        return str(result)
 
 
 class Showtest(flask.views.MethodView):
@@ -151,9 +159,9 @@ class AddUser(flask.views.MethodView):
         result = False
         id = flask.request.form['username']
         password = flask.request.form['password']
+        user = flask.ext.login.current_user
         try:
-            webapp.core.account.RepoAccount.add(id, password)
-            result = True
+            result = webapp.core.account.RepoAccount.add(user.id, id, password)
         except webapp.core.exception.ExistsUser:
             pass
         return flask.jsonify(result=result)
@@ -194,7 +202,9 @@ class UrmSetting(flask.views.MethodView):
 
 
 class DeleteUser(flask.views.MethodView):
+
     def post(self):
         name = flask.request.form['name']
-        webapp.core.account.RepoAccount.delete(name)
-        return flask.jsonify(result=True)
+        user = flask.ext.login.current_user
+        result = webapp.core.account.RepoAccount.delete(user.id, name)
+        return flask.jsonify(result=result)

@@ -73,7 +73,7 @@ class Upload(flask.views.MethodView):
         return flask.render_template('upload.html')
 
     def post(self):
-        network_file = flask.request.files['file']
+        network_file = flask.request.files['Filedata']
         if self.judge(network_file.filename) is False:
             return str('Not support file name format.')
         upobj = webapp.core.upload.UploadObject(network_file.filename,

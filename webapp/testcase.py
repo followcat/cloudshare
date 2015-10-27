@@ -1,4 +1,5 @@
 import shutil
+import tempfile
 
 import flask
 import flask.ext.testing
@@ -49,9 +50,13 @@ class Test(flask.ext.testing.TestCase):
         ), follow_redirects=True)
 
     def upload(self, filepath):
-        fileobj = open(filepath, 'r')
+        with open(filepath) as f:
+            stream = f.read()
+        temp = tempfile.NamedTemporaryFile()
+        temp.name = 'x-y-z.doc'
+        temp.write(stream)
         return self.client.post('/upload', data=dict(
-            file=fileobj
+            file=temp
         ), follow_redirects=True)
 
     def uppreview(self):
@@ -80,9 +85,12 @@ class LoginoutSuperAdminTest(Test):
 
 class User(Test):
 
+    user_name = 'username'
+    user_password = 'userpassword'
+
     def init_user(self):
         self.login('root', 'password')
-        self.adduser('addname', 'addpassword')
+        self.adduser(self.user_name, self.user_password)
         self.logout()
 
 
@@ -90,20 +98,27 @@ class LoginoutUser(User):
 
     def test_login_user(self):
         self.init_user()
-        login_name = 'addname'
-        rv = self.login(login_name, 'addpassword')
-        assert(login_name in rv.data)
-        self.adduser('addname2', 'addpassword2')
+        rv = self.login(self.user_name, self.user_password)
+        assert(self.user_name in rv.data)
         rv = self.logout()
         assert('Login In' in rv.data)
+
+    def test_user_add_delete_user(self):
+        self.init_user()
+        self.login(self.user_name, self.user_password)
+        self.adduser('addname', 'addpassword')
+        assert('addname' not in webapp.core.account.RepoAccount.USERS)
+        self.deleteuser(self.user_name)
+        assert(self.user_name in webapp.core.account.RepoAccount.USERS)
+        self.logout()
 
 
 class UploadFile(User):
 
     def test_upload(self):
         self.init_user()
-        rv = self.login('addname', 'addpassword')
-        rv = self.upload(u'/tmp/x-y-z.doc')
+        self.login(self.user_name, self.user_password)
+        rv = self.upload('core/test/cv_1.doc')
         assert(rv.data == 'True')
         rv = self.uppreview()
         assert('CV Templates' in rv.data)
@@ -111,4 +126,4 @@ class UploadFile(User):
         assert(rv.data == 'True')
         commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
         assert('Add file' in commit.message)
-        assert('addname' == commit.author)
+        assert('username' == commit.author)

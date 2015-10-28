@@ -7,14 +7,14 @@ import dulwich.porcelain
 
 
 backup_folder = webapp.settings.BACKUP_DIR
-ISOTIMEFORMAT = '%Y-%m-%d %X'
+ISOTIMEFORMAT = '%Y-%m-%d-%X'
 source_repo = webapp.settings.REPO_DB.repo
 
 
 def assure_path_exists(path):
-        dir = os.path.dirname(path)
-        if not os.path.exists(dir):
-                os.makedirs(dir)
+    dir = os.path.dirname(path)
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 if __name__ == '__main__':
     backup_name = time.strftime(ISOTIMEFORMAT, time.localtime())

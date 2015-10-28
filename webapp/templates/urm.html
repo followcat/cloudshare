@@ -23,7 +23,7 @@
 	  <tbody>
 	  	{% for useritem in userlist %}
 	    <tr>
-	      <td>1</td>
+	      <td>{{ loop.index }}</td>
 	      <td class="name">{{ useritem }}</td>
 	      <td>
 		    <button type="button" class="btn btn-default btn-xs">
@@ -34,13 +34,6 @@
 		{% endfor %}
 	  </tbody>
 	</table>
-	<!--   User Info Table end  -->
-<!-- 	<div class="penel-footer">
-	  <ul class="pager">
-	    <li class="disabled"><a href="#">Previous</a></li>
-	    <li><a href="#">Next</a></li>
-	  </ul>
-	</div> -->
   </div>
 </div>
 <!-- Add user modal begin-->

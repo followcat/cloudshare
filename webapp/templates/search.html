@@ -1,82 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Seach-Willendare</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='js/plugin/uploadify/uploadify.css')}}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/search.css') }}">
-</head>
-<body>
-	<header class="header-box">
-	  
-      <img src="{{ url_for('static',filename='images/logo.png') }}" height="36" width="174" class="logo">
-
-	  <div class="col-xs-offset-8 col-sm-offset-8 col-md-offset-9 profile">
-	    <span id="name"><span class="glyphicon glyphicon-user"></span> {{ current_user.id }} </span>
-	    <ul class="profile-menu list-unstyled">
-<!-- 	      <li><a href="#">Center</a></li> -->
-	      <li><a href="#" data-toggle="modal" data-target=".quit-modal">Quit</a></li>
-	    </ul>
-	  </div>
-
-	  <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 upload" data-toggle="modal" data-target=".upload-modal">
-	  	<span class="glyphicon glyphicon-upload"></span> Upload
-	  </div>
-
-	</header>
-	<!-- upload modal begin-->
-	<div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Upload File</h4>
-          </div>
-          <div class="modal-body">
-<!--               <button type="button" class="btn btn-primary upload-btn">
-            	    Choose file
-			          <input type="file" id="choose-file-btn" name="file"  />
-              </button>
-              <input type="text" class="form-control file-text" id="file-text" value="" readonly="true" /> -->
-            <input type="file" name="uploadify" id="uploadify" />
-          </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
-            </div>
-        </div>
-      </div>
-    </div>
-      <!-- upload modal end-->
-	<!--quit modal begin-->
-	<div class="modal fade quit-modal" tabindex="-1" role="dialog" aria-labelledby="myQuitModalLabel">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Confirm</h4>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure to quit?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-            <button type="button" class="btn btn-primary" id="quit-btn">Yes</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--quit modal end-->
-
+{% extends "share/layout.html" %}
+{% block content %}
 	<div class="search-box">
-	  <form >
-	  	<input type="text" placeholder="Search for ..." class="search-text"/>
-	  	<button type="submit" class="search-btn">Search</button>
+	  <form action="/search" method="POST">
+	  	<input type="text" placeholder="Search for ..." class="search-text" id="search-text" name="search_text" />
+	  	<button type="submit" class="search-btn" id="search-btn">Search</button>
 	  </form>
 	</div>
-
+{% endblock %}
+{% block script %}
 <script type="text/javascript" data-main="{{ url_for('static', filename='js/src/search') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
-	
-</body>
-</html>
+{% endblock %}

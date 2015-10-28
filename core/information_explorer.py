@@ -84,12 +84,16 @@ def catch(path, convertname, basename, output):
             school = ''.join(school_iter.next())
         except StopIteration:
             school = ''
+        age_iter = iter(getInfoFromRestr(stream, age_restr))
+        try:
+            age = ''.join(age_iter.next())
+        except StopIteration:
+            age = ''
         info_dict = {
             "filename":     basename.decode('utf-8'),
             "name":         getTagFromString('姓名', stream),
             "education":    getTagFromString('学历', stream),
-            "age":          getTagFromString('年龄', stream) or
-            getInfoFromRestr(stream, age_restr)[:1],
+            "age":          getTagFromString('年龄', stream) or age,
             "position":     getTagFromString('职位', stream),
             "company":      company,
             "school":       school,

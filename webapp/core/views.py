@@ -37,8 +37,6 @@ class Search(flask.views.MethodView):
                 stream = yf.read()
             yaml_data = yaml.load(stream)
             datas.append([os.path.join(repo.repo.path, name), yaml_data])
-            print(search_text)
-            print(flask.jsonify(datas))
         return flask.render_template('search_result.html',
                                      search_key=search_text,
                                      result=datas)

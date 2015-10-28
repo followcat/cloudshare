@@ -227,3 +227,25 @@ body{
   text-indent: 158px;
   color: #ccc;
 }
+
+.info li{
+  float: left;
+}
+.info .name{
+  width: 10%;
+}
+.info .age{
+  width: 10%;
+}
+.info .education{
+  width: 10%;
+}
+.info .school{
+  width: 20%;
+}
+.info .position{
+  width: 20%;
+}
+.info .company{
+  width: 20%;
+}

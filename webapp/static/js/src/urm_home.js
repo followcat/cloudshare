@@ -12,7 +12,7 @@ require.config({
 			exports: 'bootstrap'
 		}
 	}
-})
+});
 
 require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap, urmmain,formvalidate){
 	// body...
@@ -39,7 +39,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 		});
 
 		event.preventDefault();
-	})
+	});
 
 	//validate user name form	
 	$("#addUserName").on('blur', function(){
@@ -54,7 +54,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 			urmmain.ButtonAble(saveBtn);
 			msgBox.text("");
 		}
-	})
+	});
 
 	//validate password form
 	$("#password").on('blur', function(){
@@ -70,7 +70,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 			msgBox.text("");
 		}
 
-	})
+	});
 
 	//validate confirm password form
 	$("#confirmPassword").on('blur', function(){
@@ -99,7 +99,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 				msgBox.text("");
 			}
 		}	
-	})
+	});
 
 
 	//Delete Button
@@ -122,11 +122,11 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 					window.location.reload();
 				}
 
-			})
+			});
 		}
 
 
 
-	})
+	});
 
-})
+});

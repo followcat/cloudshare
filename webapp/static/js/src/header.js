@@ -20,8 +20,6 @@ define(['jquery', 'uploadify'], function($, uploadify){
 	            alert('The file ' + file.name + ' could not be uploaded: ' + errorString);
 	        },
 	        'onUploadSuccess' : function(file, data, response) {                //upload success event 
-	            console.log("response: " + response);
-	            console.log("data: " + data);
 	            if(response)
 	            {
 	            	alert('The file ' + file.name + ' was successfully uploaded ');
@@ -33,14 +31,14 @@ define(['jquery', 'uploadify'], function($, uploadify){
 	            }
 	        }
 		});
-	}
+	};
 	header.upload();
 
 	header.UploadHandle = function(btnObj){	
 		$(btnObj).on('click', function(){
 			$("#uploadify").uploadify('upload');
-		})
-	}
+		});
+	};
 
 	header.UploadHandle("#upload-btn");
 
@@ -57,17 +55,16 @@ define(['jquery', 'uploadify'], function($, uploadify){
 				},
 				error: function(msg){
 					alert("Operate Error!");
-					console.log(msg);
 				}
 
-			})
+			});
 
 			event.preventDefault();    //prevent event default.
-		})
+		});
 
 	};
 
 	header.LogOut($("#quit-btn"));
 
 	return header;
-})
+});

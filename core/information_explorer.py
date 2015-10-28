@@ -70,7 +70,8 @@ def catch(path, convertname, basename, output):
     for each in school:
         school_restr += each + '|'
     school_restr = school_restr[:-1] + ')'
-    age_restr = u'[ \u3000]*(\d{2}\u5c81' + u'岁)'
+    age_chinese = u'岁'
+    age_restr = u'[ \u3000]*(\d{2})' + age_chinese
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
         company_iter = iter(getInfoFromRestr(stream, organization_restr))

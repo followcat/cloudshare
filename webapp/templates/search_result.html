@@ -1,72 +1,79 @@
-<!--A Design by W3layouts
-Author: W3layout
-Author URL: http://w3layouts.com
-License: Creative Commons Attribution 3.0 Unported
-License URL: http://creativecommons.org/licenses/by/3.0/
--->
-<!DOCTYPE HTML>
-<html>
-<head>
-<title>CLOUDSHARE Searcher</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="keywords" content="Photo-Hub Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template, 
-Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel='stylesheet' type='text/css' />
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<!-- Custom Theme files -->
-<link href="{{ url_for('static', filename='css/search.css') }}" rel='stylesheet' type='text/css' />
-<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
-<!-- Custom Theme files -->
-<!--webfont-->
-<link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800' rel='stylesheet' type='text/css'>
-<script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
-<script src="/static/js/menu_jquery.js"></script>
-</head>
-<body style="padding: 0;">
-    <div class="header">    
-      <div class="container"> 
-         <div class="logo">
-            <h1><a href="/">Doc Hub</a></h1>
-         </div>
-         <div class="clearfix">
-                <div class="search">
-                  <ul class="nav1">
-                    <li id="search">
-                        <form action="/" name="searchform" method="post">
-                            <input type="text" name="search_text" id="search_text" placeholder="Search" value="{{ search_key }}"/>
-                            <input type="button" name="search_button" id="search_button" onclick="document.searchform.submit();">
-                        </form>
-                    </li>
-                    <li id="options">
-                        <a href="#">from MD</a>
-                        <ul class="subnav">
-                            <li><a href="#">Option1</a></li>
-                            <li><a href="#">Option2</a></li>
-                            <li><a href="#">Option3</a></li>
-                        </ul>
-                    </li>
-                  </ul>
-                </div>
-         </div>
-        </div>
+{% extends "share/layout.html" %}
+
+{% block search %}
+<form action="/search" method="POST">
+  <div class="input-group search-item">
+    <input type="text" class="form-control" name="search_text" placeholder="Search for ..." value="{{ search_key }}" required="required">
+    <div class="input-group-btn">
+      <button type="submit" class="btn btn-default" >Search</button>
     </div>
-    <div style="position:absolute; height:80%; overflow:auto; width:100%;">
-      <div>
-        {% for data in result %}
-        <h3><a href="/showtest/{{ data[0] }}.md" target="view_window">{{ data[0] }}</a></h3>
-        <table>
-                {% for info in data[1] %}
-                <tr>
-                <td>{{ info }}</td>
-                <td>{{ data[1][info] }}</td>
-                </tr>
-                {% endfor %}
-        </table>
-        {% endfor %}
+  </div>
+</form>
+{% endblock%}
+
+{% block content %}
+  <div class="col-md-10 col-md-offset-1 result-list">
+
+    {% for item in result %}
+    <div class="result-list-item">
+      <div class="item-link">
+        <a href="/showtest/{{ item[0] }}.md" class="item-title">{{ item[1].filename }}</a>
+<!--         <span class="item-operate">
+          by
+          <a href="#">戴艳玲</a>,
+        <span>2015年9月25日</span>
+        </span> -->
       </div>
+      <div class="container-fluid">
+        <ul class="list-unstyled row">
+          <li class="col-md-2 name"><strong>姓名: </strong><span>{{ item[1].name }}</span></li>
+          <li class="col-md-1 age"><strong>年龄: </strong><span>{{ item[1].age }}</span></li>
+          <li class="col-md-3"><strong>院校: </strong><span>{{ item[1].school }}</span></li>
+          <li class="col-md-3"><strong>职位: </strong><span>{{ item[1].position }}</span></li>
+          <li class="col-md-3"><strong>公司: </strong><span>{{ item[1].company }}</span></li>
+        </ul>
+      </div>
+<!--       <div class="item-label">
+        <a href="javascript:;" class="label-alink"><span>+</span>标签</a>
+        <div class="item-label-content">
+          <div class="triangle-up"></div>
+          <span class="triangle-up-border"></span>
+          <span class="label label-info" title="戴艳玲">New</span></h3>
+          <span class="label label-info" title="Tom">New</span></h3>
+          <span class="label label-info" title="Tom">New</span></h3>
+          <span class="label label-info" title="Tom">New</span></h3>
+          <span class="label label-info" title="Tom">New</span></h3>
+          <a href="javascript:;">查看更多</a>
+        </div>
+      </div> -->
+<!--       <div class="item-comment">
+        <a href="javascript:;" class="comment-alink"><span>+</span>评论</a>
+        <div class="item-comment-content">
+          <div class="triangle-up"></div>
+          <span class="triangle-up-border"></span>
+          <ul class="list-unstyled clearfix">
+            <li class="comment-items">
+              <p>Pretty sure this is just because you're placing an inline-block element within an inline element. I think the only logical and practical solution for this is to add something to the docs and encourage folks to change the style as they need. Moving back to inline-block doesn't feasible without affecting computer height of elements.</p>
+              <div class="comment-info">by <a href="#">Tom</a> <span>2015年10月10日 20:06</span></div>
+            </li>
+            <li class="comment-items">
+              <p>Pretty sure this is just because you're placing an inline-block element within an inline element. I think the only logical and practical solution for this is to add something to the docs and encourage folks to change the style as they need. Moving back to inline-block doesn't feasible without affecting computer height of elements.</p>
+              <div class="comment-info">by <a href="#">Tom</a> <span>2015年10月10日 20:06</span></div>
+            </li>
+            <li class="comment-items">
+              <p>Pretty sure this is just because you're placing an inline-block element within an inline element. I think the only logical and practical solution for this is to add something to the docs and encourage folks to change the style as they need. Moving back to inline-block doesn't feasible without affecting computer height of elements.</p>
+              <div class="comment-info">by <a href="#">Tom</a> <span>2015年10月10日 20:06</span></div>
+            </li>
+          </ul>
+          <div class="item-comment-bottom">Not anymore.</div>
+        </div>
+      </div> -->
     </div>
-</body>
-</html>     
+    {% endfor %}
+
+  </div>
+{% endblock %}
+
+{% block script%}
+<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/search_result') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+{% endblock%}

@@ -9,9 +9,9 @@
 </head>
 <body>
 	<header class="header-box">
-	  
-      <img src="{{ url_for('static',filename='images/logo.png') }}" height="36" width="174" class="logo">
-
+	   
+    <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
+    {% block search %}{% endblock %}
 	  <div class="col-xs-offset-8 col-sm-offset-8 col-md-offset-9 profile">
 	    <span id="name"><span class="glyphicon glyphicon-user"></span> {{ current_user.id }} </span>
 	    <ul class="profile-menu list-unstyled">

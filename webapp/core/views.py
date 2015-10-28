@@ -192,7 +192,6 @@ class Urm(flask.views.MethodView):
 
     def get(self):
         userlist = webapp.core.account.RepoAccount.get_user_list()
-        print(userlist)
         return flask.render_template('urm.html', userlist=userlist)
 
 

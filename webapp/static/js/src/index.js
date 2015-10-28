@@ -5,7 +5,7 @@ require.config({
 		jquery: 'lib/jquery',
 		formvalidate: 'src/formvalidate'
 	}
-})
+});
 
 require(['jquery','formvalidate'], function($,formvalidate){
 
@@ -22,7 +22,7 @@ require(['jquery','formvalidate'], function($,formvalidate){
 		{
 			msg_box.text("");
 		}
-	})
+	});
 
 	$("#passwordInput").on("blur", function(){
 		var value = this.value;
@@ -34,5 +34,5 @@ require(['jquery','formvalidate'], function($,formvalidate){
 		{
 			msg_box.text("");
 		}
-	})
-})
+	});
+});

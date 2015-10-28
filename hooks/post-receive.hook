@@ -11,6 +11,7 @@ export GIT_DIR=${ReleaseCode}/.git
 cd $ReleaseCode
 git fetch origin
 git reset --hard origin/master
+chmod +x hooks/post-receive.hook
 
 export PYTHONPATH=`pwd`
 export CLOUDSHARE_VIRTUALENV_PATH=/home/$USER/Virtualenv/cloudshare

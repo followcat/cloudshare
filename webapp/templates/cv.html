@@ -7,8 +7,34 @@
     <body>
         <div>
             <img alt="Test Image" src="https://pypi.python.org/static/images/python-logo.png" />
+            <button id="cv-confirm" style="float:right;margin-right:100px;margin-top:20px;">Confirm</button>
         </div>
+
         <hr />
         {{ markdown|safe }}
+
+
+        <script type="text/javascript" src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
+        <script type="text/javascript">
+            (function(){
+                $("#cv-confirm").on('click', function(){
+
+                    if(confirm("Are you sure to submit?"))
+                    {
+                        $.get('/confirm',function(result){
+                            if(result == 'True')
+                            {
+                                window.location.href = '/search';
+                            }
+                            else
+                            {
+                                alert(' Exists File ');
+                            }
+                        });
+                    }  
+                })
+
+            }());
+        </script>
     </body>
 </html>

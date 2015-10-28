@@ -1,5 +1,6 @@
 import os
 import glob
+import pickle
 import codecs
 import hashlib
 import os.path
@@ -11,6 +12,7 @@ import flask.views
 import flask.ext.login
 
 import webapp.core
+import webapp.core.upload
 import core.outputstorage
 import core.converterutils
 import webapp.core.account
@@ -56,32 +58,46 @@ class Listdata(flask.views.MethodView):
 
 
 class Upload(flask.views.MethodView):
-    upload_tmp_path = '/tmp'
+    upload_tmp_path = 'output'
+    upload_repo = webapp.core.repo
 
     @classmethod
-    def setup_upload_tmp(cls, path):
+    def setup_upload_tmp(cls, path, repo):
+        cls.upload_repo = repo
         cls.upload_tmp_path = path
+
+    def judge(self, filename):
+        return len(filename.split('-')) is 3
 
     def get(self):
         return flask.render_template('upload.html')
 
     def post(self):
-        network_file = flask.request.files['file']
-        convertname = core.outputstorage.ConvertName(
-            network_file.filename.encode('utf-8'))
-        path = self.upload_tmp_path
-        core.outputstorage.save_stream(path, convertname, network_file.read())
-        storage_file = core.converterutils.FileProcesser(path, convertname)
-        try:
-            result = storage_file.convert()
-            if result is False:
-                return flask.render_template('upload.html', result='Can not Convert')
-        except:
-            return flask.render_template('upload.html', result='Exist File')
-        md_html = showtest(os.path.join(core.outputstorage.OutputPath.markdown,
-                                        storage_file.name.md))
-        storage_file.deleteconvert()
-        return md_html
+        network_file = flask.request.files['Filedata']
+        if self.judge(network_file.filename) is False:
+            return str('Not support file name format.')
+        upobj = webapp.core.upload.UploadObject(network_file.filename,
+                                                network_file,
+                                                self.upload_tmp_path)
+        flask.session['upload'] = pickle.dumps(upobj)
+        flask.session.modified = True
+        return str(upobj.result)
+
+
+class UploadPreview(flask.views.MethodView):
+    def get(self):
+        upobj = pickle.loads(flask.session['upload'])
+        preview_path = os.path.join(upobj.storage.markdown_path,
+                                    upobj.storage.name.md)
+        return flask.redirect(os.path.join('showtest', preview_path))
+
+
+class Confirm(flask.views.MethodView):
+    def get(self):
+        user = flask.ext.login.current_user
+        upobj = pickle.loads(flask.session['upload'])
+        result = upobj.confirm(Upload.upload_repo, user.id)
+        return str(result)
 
 
 class Showtest(flask.views.MethodView):
@@ -176,6 +192,7 @@ class Urm(flask.views.MethodView):
 
     def get(self):
         userlist = webapp.core.account.RepoAccount.get_user_list()
+        print(userlist)
         return flask.render_template('urm.html', userlist=userlist)
 
 

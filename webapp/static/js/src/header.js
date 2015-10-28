@@ -1,14 +1,48 @@
-define(['jquery'], function($){
+define(['jquery', 'uploadify'], function($, uploadify){
 
 	var header = {};
 
+
 	//upload modal, button of choose file config
-	header.UploadChooseFile = function(btnObj, fileTextObj){
-		
-		btnObj.on("change", function(){
-			fileTextObj.val(this.value);
+	header.upload = function(){
+		$("#uploadify").uploadify({
+			'swf': 'static/js/plugin/uploadify/uploadify.swf',
+			'uploader': '/upload',
+			'buttonText': 'Choose File',
+			'progressData': 'percentage',
+			'queueID': false,
+			'auto': false,         //automatically upload
+			'multi': false,        //multiple files
+			'onUploadProgress' : function(file, bytesUploaded, bytesTotal, totalBytesUploaded, totalBytesTotal) {
+	            $('#progress').html(totalBytesUploaded + ' bytes uploaded of ' + totalBytesTotal + ' bytes.');
+	        },
+			'onUploadError' : function(file, errorCode, errorMsg, errorString) {   //upload fail ,catch the error info
+	            alert('The file ' + file.name + ' could not be uploaded: ' + errorString);
+	        },
+	        'onUploadSuccess' : function(file, data, response) {                //upload success event 
+	            console.log("response: " + response);
+	            console.log("data: " + data);
+	            if(response)
+	            {
+	            	alert('The file ' + file.name + ' was successfully uploaded ');
+	            	window.location.href = '/uppreview';
+	            }
+	            else
+	            {
+	            	alert('The file ' + file.name + ' was failed uploaded ');
+	            }
+	        }
+		});
+	}
+	header.upload();
+
+	header.UploadHandle = function(btnObj){	
+		$(btnObj).on('click', function(){
+			$("#uploadify").uploadify('upload');
 		})
-	};
+	}
+
+	header.UploadHandle("#upload-btn");
 
 	// Login out in header
 	header.LogOut = function(obj){
@@ -31,7 +65,9 @@ define(['jquery'], function($){
 			event.preventDefault();    //prevent event default.
 		})
 
-	}
+	};
+
+	header.LogOut($("#quit-btn"));
 
 	return header;
 })

@@ -3,34 +3,36 @@ import os.path
 
 import yaml
 
-import core.outputstorage
-
 
 class UniqueSearcher(object):
-    def __init__(self):
+    def __init__(self, repo):
         """
-        >>> import shutil
-        >>> import os.path
-        >>> import core.outputstorage
-        >>> import core.converterutils
-        >>> import core.uniquesearcher
-        >>> output_backup = core.outputstorage.OutputPath._output
-        >>> core.outputstorage.OutputPath._output = 'core/test_output'
-        >>> cv1 = core.converterutils.FileProcesser('core/test', 'cv_1.doc')
-        >>> us = core.uniquesearcher.UniqueSearcher()
-        >>> us.unique_name('cv_1')
-        True
-        >>> cv1.convert()
-        True
-        >>> us.unique_name('cv_1')
-        True
-        >>> us.reload()
-        >>> us.unique_name('cv_1')
-        False
-        >>> shutil.rmtree('core/test_output')
-        >>> core.outputstorage.OutputPath._output = output_backup
+            >>> import shutil
+            >>> import core.converterutils
+            >>> import repointerface.gitinterface
+            >>> repo_name = 'core/test_repo'
+            >>> basepath = 'core/test_output'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> cv1 = core.converterutils.FileProcesser('core/test',
+            ... 'cv_1.doc', basepath)
+            >>> us = core.uniquesearcher.UniqueSearcher(interface)
+            >>> us.unique_name('cv_1')
+            True
+            >>> cv1.storage(interface)
+            True
+            >>> us.unique_name('cv_1')
+            True
+            >>> us.reload()
+            >>> us.unique_name('cv_1')
+            False
+            >>> cv1.storage(interface)  # doctest: +ELLIPSIS
+            Traceback (most recent call last):
+            ...
+            DuplicateException: Duplicate files: cv_1
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(basepath)
         """
-        self.yaml_path = core.outputstorage.OutputPath.yaml
+        self.yaml_path = repo.repo.path
         self.yaml_datas = {}
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
             with open(f) as fp:
@@ -40,7 +42,8 @@ class UniqueSearcher(object):
 
     def unique_name(self, name):
         for each in self.yaml_datas.values():
-            if name == each['filename'].encode('utf-8'):
+            if ('filename' in each and
+                    name == each['filename'].encode('utf-8')):
                 return False
         else:
             return True

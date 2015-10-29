@@ -54,9 +54,6 @@ class Upload(flask.views.MethodView):
     def judge(self, filename):
         return len(filename.split('-')) is 3
 
-    def get(self):
-        return flask.render_template('upload.html')
-
     def post(self):
         network_file = flask.request.files['Filedata']
         if self.judge(network_file.filename) is False:

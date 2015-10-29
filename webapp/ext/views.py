@@ -9,12 +9,6 @@ def configure(app):
         view_func=webapp.core.views.Search.as_view('search'),
         )
 
-    webapp.core.views.Listdata.repo = app.config['REPO_DB']
-    app.add_url_rule(
-        '/listdata',
-        view_func=webapp.core.views.Listdata.as_view('listdata'),
-        )
-
     webapp.core.views.Upload.setup_upload_tmp(app.config['UPLOAD_TEMP'],
                                               app.config['REPO_DB'])
     app.add_url_rule(

@@ -42,21 +42,6 @@ class Search(flask.views.MethodView):
                                      result=datas)
 
 
-class Listdata(flask.views.MethodView):
-    repo = webapp.core.repo
-
-    def get(self):
-        datas = []
-        repo = self.repo
-        for position in glob.glob(os.path.join(repo.repo.path, '*.yaml')):
-            with open(position, 'r') as yf:
-                stream = yf.read()
-            yaml_data = yaml.load(stream)
-            datas.append([os.path.splitext(position)[0],
-                          yaml_data])
-        return flask.render_template('listdata.html', datas=datas)
-
-
 class Upload(flask.views.MethodView):
     upload_tmp_path = 'output'
     upload_repo = webapp.core.repo

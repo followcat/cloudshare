@@ -19,6 +19,12 @@ import webapp.core.account
 import webapp.core.exception
 
 
+class LoginRedirect(flask.views.MethodView):
+
+    def get(self):
+        return flask.render_template('gotologin.html')
+
+
 class Search(flask.views.MethodView):
     repo = webapp.core.repo
 

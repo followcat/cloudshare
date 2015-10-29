@@ -3,6 +3,12 @@ import webapp.core.account
 
 
 def configure(app):
+
+    app.add_url_rule(
+        '/gotologin',
+        view_func=webapp.core.views.LoginRedirect.as_view('gotologin'),
+        )
+
     webapp.core.views.Search.repo = app.config['REPO_DB']
     app.add_url_rule(
         '/search',

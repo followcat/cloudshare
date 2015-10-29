@@ -29,7 +29,7 @@ define(['jquery'], function(){
 				url: '/logout',
 				type: 'GET',
 				success: function(){
-					window.location.href = "/index";
+					window.location.href = "/";
 				},
 				error: function(msg){
 					alert("Operate Error!");

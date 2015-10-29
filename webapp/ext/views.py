@@ -33,7 +33,7 @@ def configure(app):
 
     webapp.core.account.RepoAccount.repo = app.config['REPO_DB']
     app.add_url_rule(
-        '/index',
+        '/',
         view_func=webapp.core.views.Index.as_view('index'),
         )
 

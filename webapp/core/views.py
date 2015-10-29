@@ -28,6 +28,7 @@ class LoginRedirect(flask.views.MethodView):
 class Search(flask.views.MethodView):
     repo = webapp.core.repo
 
+    @flask.ext.login.login_required
     def get(self):
         return flask.render_template('search.html')
 
@@ -73,6 +74,7 @@ class Upload(flask.views.MethodView):
 
 
 class UploadPreview(flask.views.MethodView):
+
     def get(self):
         upobj = pickle.loads(flask.session['upload'])
         preview_path = os.path.join(upobj.storage.markdown_path,
@@ -81,6 +83,7 @@ class UploadPreview(flask.views.MethodView):
 
 
 class Confirm(flask.views.MethodView):
+
     def get(self):
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session['upload'])
@@ -89,6 +92,8 @@ class Confirm(flask.views.MethodView):
 
 
 class Showtest(flask.views.MethodView):
+
+    @flask.ext.login.login_required
     def get(self, filename):
         with codecs.open(filename, 'r', encoding='utf-8') as file:
             data = file.read()
@@ -178,6 +183,7 @@ class ChangePassword(flask.views.MethodView):
 
 class Urm(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def get(self):
         userlist = webapp.core.account.RepoAccount.get_user_list()
         return flask.render_template('urm.html', userlist=userlist)
@@ -185,6 +191,7 @@ class Urm(flask.views.MethodView):
 
 class UrmSetting(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def get(self):
         return flask.render_template('urmsetting.html')
 

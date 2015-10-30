@@ -33,7 +33,6 @@ define(['jquery'], function(){
 				},
 				error: function(msg){
 					alert("Operate Error!");
-					console.log(msg);
 				}
 
 			});
@@ -54,7 +53,6 @@ define(['jquery'], function(){
 			data: formObj.serialize(),
 			success: function(result){
 				var resultJson = $.parseJSON(result);
-				console.log(resultJson.result);
 				if(resultJson.result)
 				{
 					success_func();
@@ -65,7 +63,6 @@ define(['jquery'], function(){
 				}
 			},
 			error: function(msg){
-				console.log(msg);
 				alert("Error!");
 			}
 		});

@@ -107,8 +107,6 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 		var trParent = $(this).parent().parent();
 		var deletename = trParent.find(".name").text();
 		
-		console.log(deletename);
-
 		if(confirm("Are you sure to delete " + deletename + "?"))
 		{
 			$.ajax({
@@ -117,7 +115,6 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 				data: "name="+deletename,
 				dataType: 'text',
 				success: function(result){
-					console.log($.parseJSON(result).result);
 					alert("Successful Delete!");
 					window.location.reload();
 				}

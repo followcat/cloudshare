@@ -2,10 +2,14 @@
 {% block content %}
 	<div class="search-box">
 	  <form action="/search" method="POST">
-	  	<input type="text" placeholder="Search for ..." class="search-text" id="search-text" name="search_text" />
-	  	<button type="submit" class="search-btn" id="search-btn">Search</button>
-	  </form>
-	</div>
+        <div class="input-group">
+          <input type="text" name="search_text" class="form-control" placeholder="Search for...">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </span>
+        </div><!-- /input-group -->
+      </form>
+	</div><!-- /search-->
 {% endblock %}
 {% block script %}
 <script type="text/javascript" data-main="{{ url_for('static', filename='js/src/search') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>

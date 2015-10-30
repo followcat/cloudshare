@@ -117,3 +117,31 @@ class GitInterface(object):
                 if each:
                     grep_list.append(each)
         return grep_list
+
+    def get_file_create_info(self, filename):
+        """
+            >>> import shutil
+            >>> import repointerface.gitinterface
+            >>> repo_name = 'repointerface/test_repo'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> path = interface.repo.path
+            >>> with open('repointerface/test_repo/test_file', 'w') as file:
+            ...     file.write('test')
+            >>> commit_id = interface.add_files(['test_file'],
+            ... b'Test commit', b'test<test@test.com>')
+            >>> info = interface.get_file_create_info('test_file')
+            >>> info['author']
+            'test<test@test.com>'
+            >>> shutil.rmtree(repo_name)
+        """
+        info = {}
+        w = self.repo.get_walker(paths=[filename], reverse=True)
+        try:
+            commit = next(iter(w)).commit
+        except StopIteration:
+            pass
+        else:
+            info['author'] = commit.author
+            info['time'] = time.strftime('%Y-%m-%d %H:%M:%S',
+                                         time.localtime(commit.author_time))
+        return info

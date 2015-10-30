@@ -36,25 +36,11 @@ class Search(flask.views.MethodView):
             with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
                 stream = yf.read()
             yaml_data = yaml.load(stream)
-            datas.append([os.path.join(repo.repo.path, name), yaml_data])
+            info = repo.get_file_create_info(name.md)
+            datas.append([os.path.join(repo.repo.path, name), yaml_data, info])
         return flask.render_template('search_result.html',
                                      search_key=search_text,
                                      result=datas)
-
-
-class Listdata(flask.views.MethodView):
-    repo = webapp.core.repo
-
-    def get(self):
-        datas = []
-        repo = self.repo
-        for position in glob.glob(os.path.join(repo.repo.path, '*.yaml')):
-            with open(position, 'r') as yf:
-                stream = yf.read()
-            yaml_data = yaml.load(stream)
-            datas.append([os.path.splitext(position)[0],
-                          yaml_data])
-        return flask.render_template('listdata.html', datas=datas)
 
 
 class Upload(flask.views.MethodView):
@@ -68,9 +54,6 @@ class Upload(flask.views.MethodView):
 
     def judge(self, filename):
         return len(filename.split('-')) is 3
-
-    def get(self):
-        return flask.render_template('upload.html')
 
     def post(self):
         network_file = flask.request.files['Filedata']

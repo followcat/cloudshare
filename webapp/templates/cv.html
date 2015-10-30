@@ -13,28 +13,7 @@
         <hr />
         {{ markdown|safe }}
 
-
         <script type="text/javascript" src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
-        <script type="text/javascript">
-            (function(){
-                $("#cv-confirm").on('click', function(){
-
-                    if(confirm("Are you sure to submit?"))
-                    {
-                        $.get('/confirm',function(result){
-                            if(result == 'True')
-                            {
-                                window.location.href = '/search';
-                            }
-                            else
-                            {
-                                alert(' Exists File ');
-                            }
-                        });
-                    }  
-                })
-
-            }());
-        </script>
+        <script type="text/javascript" src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
     </body>
 </html>

@@ -3,11 +3,18 @@ require.config({
 
 	paths: {
 		jquery: 'lib/jquery',
-		formvalidate: 'src/formvalidate'
+		formvalidate: 'src/formvalidate',
+		marked: 'lib/marked'
+	},
+
+	shim: {
+		marked: {
+			exports: 'marked'
+		}
 	}
 })
 
-require(['jquery','formvalidate'], function($,formvalidate){
+require(['jquery', 'formvalidate', 'marked'], function($, formvalidate, marked){
 
 	var msg_box = $(".login-msg");
 
@@ -22,7 +29,7 @@ require(['jquery','formvalidate'], function($,formvalidate){
 		{
 			msg_box.text("");
 		}
-	})
+	});
 
 	$("#passwordInput").on("blur", function(){
 		var value = this.value;
@@ -34,5 +41,9 @@ require(['jquery','formvalidate'], function($,formvalidate){
 		{
 			msg_box.text("");
 		}
+	});
+
+	$("#textarea-input").on('change', function(){
+		$("#preview").html(marked(this.value));
 	})
 })

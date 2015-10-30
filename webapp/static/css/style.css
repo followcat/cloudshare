@@ -31,7 +31,18 @@ body{
 .error-msg{
   color: #EA0000;
 }
+.feature-info{
+  width: 200px;
+  height: auto;
+  float: right;
+  margin-right: 50px;
+  margin-top: 20px;
+}
 
+#preview{
+  width: 100%;
+  height: auto;
+}
 
 
 /******UserManagement*******/

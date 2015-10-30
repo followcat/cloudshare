@@ -58,10 +58,11 @@ window.onload = function(){
 
 	//delete --------- breaket  Function
 	cvdeal.DeleleLine = function(){
-		var pattern = /-{3,}/g;
-		var patternTd = /-{2,}/g;
+		var pattern = /-{3,}/g;   
+		
 
-		var patternPbr = /\d(\.|：|:|、).*(；|;|\.|。)/g;
+
+		// var patternPbr = /\d(\.|：|:|、).*(；|;|\.|。)/g;
 
 		var allElementP = $("p");
 		var allElementTh = $("th");
@@ -76,10 +77,9 @@ window.onload = function(){
 				text = text.replace(pattern," ");
 				$(this).text(text);
 			}
-			if(patternPbr.exec(text))
-			{
-				
-			}
+
+			//p br
+			cvdeal.ParagraphBr(text,$(this));
 		});
 
 		allElementTh.each(function(){
@@ -99,7 +99,8 @@ window.onload = function(){
 				var retext = text.replace(pattern," ");
 				$(this).text(retext);
 			}
-
+			//td paragraph br
+			cvdeal.ParagraphBr(text,$(this));
 
 			// if(text !== "" && $(this).next("td").text() === "")
 			// {
@@ -109,6 +110,20 @@ window.onload = function(){
 			// }
 		});
 	};
+
+	cvdeal.ParagraphBr = function(text, obj){
+
+		var patternChinese = /[\u4e00-\u9fa5]{15,}/;
+		var patternPbr1 = /；/g;
+		var patternPbr2 = /。/g;
+
+		if(patternChinese.test(text))
+		{
+			text = text.replace(patternPbr1, "；<br />");
+			text = text.replace(patternPbr2, "。<br />");
+			obj.html(text);
+		}
+	}
 
 	// cvdeal.CheckBlank = function(obj){
 	// 	var nextBro = obj.next();
@@ -122,6 +137,8 @@ window.onload = function(){
 		
 	// }
 
+
+
 	// delete hr
 	cvdeal.DeleteHr();
 	//delete id named "section *"
@@ -130,4 +147,9 @@ window.onload = function(){
 	cvdeal.DeleteLink();
 
 	cvdeal.DeleleLine();
+
+	
+	$("#loding-img").remove();
+	$("#cv-box").show();
+
 };

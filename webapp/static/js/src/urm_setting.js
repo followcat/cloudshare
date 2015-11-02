@@ -12,7 +12,7 @@ require.config({
 			exports: 'bootstrap'
 		}
 	}
-})
+});
 
 require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap, urmmain, formvalidate){
 	// body...
@@ -35,7 +35,7 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 		});
 		
 		event.preventDefault();
-	})
+	});
 
 	//validate the password form
 	function PasswordValidate(objVal){
@@ -52,11 +52,11 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 
 	$("#oldpassword").on('blur', function(){
 		PasswordValidate(this.value);
-	})
+	});
 
 	$("#newpassword").on('blur', function(){
 		PasswordValidate(this.value);
-	})
+	});
 
 
 	$("#confirmpassword").on('blur', function(){
@@ -83,6 +83,6 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 				msgBox.text("");
 			}
 		}	
-	})
+	});
 
-})
+});

@@ -13,6 +13,7 @@
   "author": "kabess",
   "license": "ISC",
   "devDependencies": {
+    "browser-sync": "^2.9.11",
     "gulp": "^3.9.0",
     "gulp-jshint": "^1.11.2",
     "jasmine-core": "^2.3.4",

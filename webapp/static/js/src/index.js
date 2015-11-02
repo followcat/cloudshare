@@ -12,7 +12,7 @@ require.config({
 			exports: 'marked'
 		}
 	}
-})
+});
 
 require(['jquery', 'formvalidate', 'marked'], function($, formvalidate, marked){
 
@@ -43,7 +43,9 @@ require(['jquery', 'formvalidate', 'marked'], function($, formvalidate, marked){
 		}
 	});
 
+
 	$("#textarea-input").on('change', function(){
 		$("#preview").html(marked(this.value));
-	})
-})
+	});
+});
+

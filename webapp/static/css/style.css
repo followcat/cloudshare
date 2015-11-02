@@ -38,7 +38,9 @@ body{
   margin-right: 50px;
   margin-top: 20px;
 }
-
+#textarea-input{
+  display: none;
+}
 #preview{
   width: 100%;
   height: auto;

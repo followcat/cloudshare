@@ -70,7 +70,8 @@ def catch(path, convertname, basename, output):
     for each in school:
         school_restr += each + '|'
     school_restr = school_restr[:-1] + ')'
-    age_restr = u'[ \u3000]*(\d{2}\u5c81' + u'岁)'
+    age_chinese = u'岁'
+    age_restr = u'[ \u3000]*(\d{2})' + age_chinese
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
         company_iter = iter(getInfoFromRestr(stream, organization_restr))
@@ -83,14 +84,21 @@ def catch(path, convertname, basename, output):
             school = ''.join(school_iter.next())
         except StopIteration:
             school = ''
+        age_iter = iter(getInfoFromRestr(stream, age_restr))
+        try:
+            age = ''.join(age_iter.next())
+        except StopIteration:
+            age = ''
         info_dict = {
             "filename":     basename.decode('utf-8'),
             "name":         getTagFromString('姓名', stream),
             "education":    getTagFromString('学历', stream),
-            "age":          getTagFromString('年龄', stream) or
-            getInfoFromRestr(stream, age_restr)[:1],
+            "age":          getTagFromString('年龄', stream) or age,
             "position":     getTagFromString('职位', stream),
             "company":      company,
             "school":       school,
+            "comment":      [],
+            "tag":          [],
+            "tracking":     [],
             }
         save_yaml(info_dict, output, convertname.yaml)

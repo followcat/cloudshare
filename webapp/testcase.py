@@ -58,8 +58,10 @@ class Test(flask.ext.testing.TestCase):
         with open(filepath) as f:
             stream = f.read()
         temp = tempfile.NamedTemporaryFile()
-        temp.name = 'x-y-z.doc'
         temp.write(stream)
+        temp.flush()
+        temp.seek(0)
+        temp.name = 'x-y-z.doc'
         return self.client.post('/upload', data=dict(
             Filedata=temp
         ), follow_redirects=True)
@@ -69,6 +71,11 @@ class Test(flask.ext.testing.TestCase):
 
     def confirm(self):
         return self.client.get('/confirm', follow_redirects=True)
+
+    def search(self, keyword):
+        return self.client.post('/search', data=dict(
+            search_text=keyword
+        ), follow_redirects=True)
 
 
 class LoginoutSuperAdminTest(Test):
@@ -132,3 +139,22 @@ class UploadFile(User):
         commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
         assert('Add file' in commit.message)
         assert('username' == commit.author)
+
+
+class Search(User):
+
+    def init_search(self):
+        self.init_user()
+        self.login(self.user_name, self.user_password)
+        rv = self.upload('core/test/cv_1.doc')
+        assert(rv.data == 'True')
+        rv = self.uppreview()
+        assert('CV Templates' in rv.data)
+        rv = self.confirm()
+        assert(rv.data == 'True')
+
+    def test_searchresult(self):
+        self.init_search()
+        keyword = '2005.9'
+        rv = self.search(keyword)
+        assert('position' in rv.data)

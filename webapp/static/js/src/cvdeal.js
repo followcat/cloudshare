@@ -1,33 +1,35 @@
 window.onload = function(){
-	$("#cv-confirm").on('click', function(){
+	$("#confirm-btn").on('click', function(){
 
-	    if(confirm("Are you sure to submit?"))
-	    {
-	        $.get('/confirm',function(result){
-	            if(result == 'True')
-	            {
-	                window.location.href = '/search';
-	            }
-	            else
-	            {
-	                alert(' Exists File ');
-	            }
-	        });
-	    }  
+        $.get('/confirm',function(result){
+            if(result == 'True')
+            {
+                window.location.href = '/search';
+            }
+            else
+            {
+                alert(' Exists File ');
+            }
+        });
+        
 	});
 
 	
-	var cvdeal = {};
+	//Object CVDeal
+	function CVDeal(cv){
+		this.cv = cv;
+	}
 
-	// delete hr  Function
-	cvdeal.DeleteHr = function(){
-		$("hr").remove();
+	//Delete hr element
+	CVDeal.prototype.DeleteHr = function(){
+		var oHr = this.cv.find("hr");
+		oHr.remove();
 	};
 
-	//delete id named "section *"  Function
-	cvdeal.DeleteSection = function(){
+	//Delete section element which text is a string likes "----"
+	CVDeal.prototype.DeleteSection = function(){
 		var reg = /section-\d+|section/;
-		var aH2 = $("h2");
+		var aH2 = this.cv.find("h2");
 
 		aH2.each(function(){
 			if(reg.test(this.id))
@@ -37,85 +39,63 @@ window.onload = function(){
 		});
 	};
 
-	//delete link of chinese  Function
-	cvdeal.DeleteLink = function(){
+	//Delete pragraph's link
+	CVDeal.prototype.DeleteLink = function(){
 		var reg = /[\u4e00-\u9fa5]+/;
 
-		//get body children p
-		var childP = $("body").children("p");
+		var childP = this.cv.children("p");
 
 		childP.each(function(){
 			var a = $(this).children("a");
 			var a_text = a.text();
-			if(reg.test(a_text) && a_text !== "")
+
+			if( reg.test(a_text) && a_text !== "" )
 			{
 				a.remove();
 			}
 		});
-
 	};
 
 
-	//delete --------- breaket  Function
-	cvdeal.DeleleLine = function(){
-		var pattern = /-{3,}/g;   
-		
+	CVDeal.prototype.DeleleLine = function(){
+		var pattern = /-{3,}/g;
 
-
-		// var patternPbr = /\d(\.|：|:|、).*(；|;|\.|。)/g;
-
-		var allElementP = $("p");
-		var allElementTh = $("th");
-		var allElementTd = $("td");
-
-		allElementP.each(function(){
-
-			var text = $(this).text();
-
-			if(pattern.test(text))
-			{
-				text = text.replace(pattern," ");
-				$(this).text(text);
-			}
-
-			//p br
-			cvdeal.ParagraphBr(text,$(this));
-		});
+		var allElementP = this.cv.find("p");
+		var allElementTh = this.cv.find("th");
+		var allElementTd = this.cv.find("td");
 
 		allElementTh.each(function(){
 			var text = $(this).text();
+
 			if(pattern.test(text))
 			{
 				$(this).parent().remove();
 			}
 		});
 
+		allElementP.each(function(){
+
+			CVDeal.prototype.ParagraphBr($(this), pattern);
+		});
+
 		allElementTd.each(function(){
-			
-			var text = $(this).text();
 
-			if(pattern.test(text))
-			{
-				var retext = text.replace(pattern," ");
-				$(this).text(retext);
-			}
-			//td paragraph br
-			cvdeal.ParagraphBr(text,$(this));
-
-			// if(text !== "" && $(this).next("td").text() === "")
-			// {
-			// 	console.log($(this).next());
-			// 	$(this).attr("colspan","1");
-			// 	cvdeal.CheckBlank($(this));
-			// }
+			CVDeal.prototype.ParagraphBr($(this), pattern);
 		});
 	};
 
-	cvdeal.ParagraphBr = function(text, obj){
+	CVDeal.prototype.ParagraphBr = function(obj, pattern){
+		var text = obj.text();
 
 		var patternChinese = /[\u4e00-\u9fa5]{15,}/;
 		var patternPbr1 = /；/g;
 		var patternPbr2 = /。/g;
+
+		if(pattern.test(text))
+		{
+			text = text.replace(pattern," ");
+			obj.text(text);
+		}
 
 		if(patternChinese.test(text))
 		{
@@ -123,32 +103,18 @@ window.onload = function(){
 			text = text.replace(patternPbr2, "。<br />");
 			obj.html(text);
 		}
-	}
-
-	// cvdeal.CheckBlank = function(obj){
-	// 	var nextBro = obj.next();
-	// 	if(nextBro.text() === "")
-	// 	{
-	// 		nextBro.remove();
-	// 		var colspan = parseInt(obj.attr("colspan"));
-	// 		colspan++;
-	// 		obj.attr("colspan",colspan);
-	// 	}
-		
-	// }
+	};
 
 
+	var objCV = new CVDeal($("#cv-box"));
 
-	// delete hr
-	cvdeal.DeleteHr();
-	//delete id named "section *"
-	cvdeal.DeleteSection();
-	//delete link of chinese
-	cvdeal.DeleteLink();
+	objCV.DeleteHr();
+	objCV.DeleteSection();
+	objCV.DeleteLink();
+    objCV.DeleleLine();
 
-	cvdeal.DeleleLine();
+    objCV = null;
 
-	
 	$("#loding-img").remove();
 	$("#cv-box").show();
 

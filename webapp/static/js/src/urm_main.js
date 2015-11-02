@@ -11,14 +11,14 @@ define(['jquery'], function(){
 				$(this).addClass("active");		
 			}
 			
-		})
+		});
 
 		aLink.on('click', function(){
 			
 			$("#nav-list li a").removeClass();
 			$(this).addClass("active");
-		})
-	}
+		});
+	};
 	urmmain.NavLinkClass();
 
 	urmmain.Quit = function(){
@@ -33,15 +33,14 @@ define(['jquery'], function(){
 				},
 				error: function(msg){
 					alert("Operate Error!");
-					console.log(msg);
 				}
 
-			})
+			});
 
 			event.preventDefault();
-		})
+		});
 
-	}
+	};
 	urmmain.Quit();
 
 	//form ajax submit function
@@ -64,22 +63,21 @@ define(['jquery'], function(){
 				}
 			},
 			error: function(msg){
-				console.log(msg);
-				alert("Error!")
+				alert("Error!");
 			}
 		});
 
 
-	}
+	};
 
 	//set up the button of save to open or close
 	urmmain.ButtonDisable = function(obj){
 		obj.attr("disabled",true);
-	}
+	};
 
 	urmmain.ButtonAble = function(obj){
 		obj.attr("disabled",false);
-	}
+	};
 
 	return urmmain;
-})
+});

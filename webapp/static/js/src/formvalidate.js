@@ -10,7 +10,7 @@ define(function(){
 		}
 			
 		return true;
- 	}
+ 	};
 
  	validation.ValidatePassword = function(str){
  		var reg = /^\w{6,15}$/;
@@ -20,7 +20,7 @@ define(function(){
 	    	return false;
 	    }
 	    return true;
- 	}
+ 	};
 
  	validation.ComparePassword = function(pwd, cofpwd){
 
@@ -31,7 +31,7 @@ define(function(){
  		}else{
  			return false;
  		}
- 	}
+ 	};
 
  	validation.ValidateBlank = function(obj){
 
@@ -50,4 +50,4 @@ define(function(){
  	}
 
  	return validation;
-})
+});

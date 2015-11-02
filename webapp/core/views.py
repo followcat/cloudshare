@@ -38,7 +38,8 @@ class Search(flask.views.MethodView):
             with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
                 stream = yf.read()
             yaml_data = yaml.load(stream)
-            datas.append([os.path.join(repo.repo.path, name), yaml_data])
+            info = repo.get_file_create_info(name.md)
+            datas.append([os.path.join(repo.repo.path, name), yaml_data, info])
         return flask.render_template('search_result.html',
                                      search_key=search_text,
                                      result=datas)

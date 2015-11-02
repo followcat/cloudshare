@@ -5,6 +5,7 @@ import yaml
 import flask.ext.login
 
 import webapp.core
+import utils.builtin
 import utils.classproperty
 import webapp.core.exception
 
@@ -56,18 +57,12 @@ class RepoAccount(object):
         cls.repo.add_files(cls.account_filename, "Add account file.")
 
     @classmethod
-    def unicodemd5(cls, password):
-        m = hashlib.md5()
-        m.update(password)
-        return unicode(m.hexdigest())
-
-    @classmethod
     def add(cls, mender, id, password):
         if mender != u'root':
             return False
         data = cls.USERS
         uid = unicode(id)
-        upw = cls.unicodemd5(password)
+        upw = utils.builtin.md5(password)
         if uid in data:
             raise webapp.core.exception.ExistsUser(uid)
         data[uid] = upw
@@ -79,7 +74,7 @@ class RepoAccount(object):
     def modify(cls, id, password):
         data = cls.USERS
         uid = unicode(id)
-        upw = cls.unicodemd5(password)
+        upw = utils.builtin.md5(password)
         data[uid] = upw
         dump_data = yaml.dump(data)
         cls.repo.modify_file(cls.account_filename, dump_data)

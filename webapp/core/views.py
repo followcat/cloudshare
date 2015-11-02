@@ -8,6 +8,7 @@ import pypandoc
 import flask.views
 import flask.ext.login
 
+import utils.builtin
 import webapp.core.upload
 import core.outputstorage
 import webapp.core.account
@@ -102,7 +103,7 @@ class LoginCheck(flask.views.MethodView):
     def post(self):
         user = webapp.core.account.User.get(flask.request.form['username'])
         password = flask.request.form['password']
-        upassword = webapp.core.account.RepoAccount.unicodemd5(password)
+        upassword = utils.builtin.md5(password)
         error = None
         if (user and user.password == upassword):
             flask.ext.login.login_user(user)
@@ -144,7 +145,7 @@ class ChangePassword(flask.views.MethodView):
         result = False
         oldpassword = flask.request.form['oldpassword']
         newpassword = flask.request.form['newpassword']
-        md5newpwd = webapp.core.account.RepoAccount.unicodemd5(oldpassword)
+        md5newpwd = utils.builtin.md5(oldpassword)
         user = flask.ext.login.current_user
         # user.id
         # user.password

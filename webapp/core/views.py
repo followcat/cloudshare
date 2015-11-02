@@ -20,13 +20,12 @@ import webapp.core.exception
 
 
 class Search(flask.views.MethodView):
-    repo = webapp.core.repo
 
     def get(self):
         return flask.render_template('search.html')
 
     def post(self):
-        repo = self.repo
+        repo = flask.current_app.config['REPO_DB']
         search_text = flask.request.form['search_text']
         result = repo.grep(search_text)
         datas = []
@@ -43,13 +42,6 @@ class Search(flask.views.MethodView):
 
 
 class Upload(flask.views.MethodView):
-    upload_tmp_path = 'output'
-    upload_repo = webapp.core.repo
-
-    @classmethod
-    def setup_upload_tmp(cls, path, repo):
-        cls.upload_repo = repo
-        cls.upload_tmp_path = path
 
     def judge(self, filename):
         return len(filename.split('-')) is 3
@@ -60,13 +52,14 @@ class Upload(flask.views.MethodView):
             return str('Not support file name format.')
         upobj = webapp.core.upload.UploadObject(network_file.filename,
                                                 network_file,
-                                                self.upload_tmp_path)
+                                                flask.current_app.config['UPLOAD_TEMP'])
         flask.session['upload'] = pickle.dumps(upobj)
         flask.session.modified = True
         return str(upobj.result)
 
 
 class UploadPreview(flask.views.MethodView):
+
     def get(self):
         upobj = pickle.loads(flask.session['upload'])
         preview_path = os.path.join(upobj.storage.markdown_path,
@@ -75,10 +68,11 @@ class UploadPreview(flask.views.MethodView):
 
 
 class Confirm(flask.views.MethodView):
+
     def get(self):
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session['upload'])
-        result = upobj.confirm(Upload.upload_repo, user.id)
+        result = upobj.confirm(flask.current_app.config['REPO_DB'], user.id)
         return str(result)
 
 

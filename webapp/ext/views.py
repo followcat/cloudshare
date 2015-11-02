@@ -3,14 +3,11 @@ import webapp.core.account
 
 
 def configure(app):
-    webapp.core.views.Search.repo = app.config['REPO_DB']
     app.add_url_rule(
         '/search',
         view_func=webapp.core.views.Search.as_view('search'),
         )
 
-    webapp.core.views.Upload.setup_upload_tmp(app.config['UPLOAD_TEMP'],
-                                              app.config['REPO_DB'])
     app.add_url_rule(
         '/upload',
         view_func=webapp.core.views.Upload.as_view('upload'),
@@ -61,7 +58,7 @@ def configure(app):
         '/changepassword',
         view_func=webapp.core.views.ChangePassword.as_view('changepassword'),
         )
-    
+
     app.add_url_rule(
         '/urm',
         view_func=webapp.core.views.Urm.as_view('urm'),

@@ -101,8 +101,10 @@ class Login(flask.views.MethodView):
 class LoginCheck(flask.views.MethodView):
 
     def post(self):
-        user = webapp.core.account.User.get(flask.request.form['username'])
+        username = flask.request.form['username']
         password = flask.request.form['password']
+        repoaccount = flask.current_app.config['REPO_ACCOUNT']
+        user = webapp.core.account.User.get(username, repoaccount)
         upassword = utils.builtin.md5(password)
         error = None
         if (user and user.password == upassword):
@@ -133,7 +135,8 @@ class AddUser(flask.views.MethodView):
         password = flask.request.form['password']
         user = flask.ext.login.current_user
         try:
-            result = webapp.core.account.RepoAccount.add(user.id, id, password)
+            repoaccount = flask.current_app.config['REPO_ACCOUNT']
+            result = repoaccount.add(user.id, id, password)
         except webapp.core.exception.ExistsUser:
             pass
         return flask.jsonify(result=result)
@@ -163,7 +166,8 @@ class ChangePassword(flask.views.MethodView):
 class Urm(flask.views.MethodView):
 
     def get(self):
-        userlist = webapp.core.account.RepoAccount.get_user_list()
+        repoaccount = flask.current_app.config['REPO_ACCOUNT']
+        userlist = repoaccount.get_user_list()
         return flask.render_template('urm.html', userlist=userlist)
 
 
@@ -178,5 +182,6 @@ class DeleteUser(flask.views.MethodView):
     def post(self):
         name = flask.request.form['name']
         user = flask.ext.login.current_user
-        result = webapp.core.account.RepoAccount.delete(user.id, name)
+        repoaccount = flask.current_app.config['REPO_ACCOUNT']
+        result = repoaccount.delete(user.id, name)
         return flask.jsonify(result=result)

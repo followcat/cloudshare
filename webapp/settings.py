@@ -1,5 +1,6 @@
 import os.path
 
+import webapp.core.account
 import repointerface.gitinterface
 
 
@@ -12,3 +13,4 @@ BACKUP_FOLDER = 'repodb_backup'
 BACKUP_DIR = os.path.join(USER_HOME, BACKUP_FOLDER)
 
 REPO_DB = repointerface.gitinterface.GitInterface(REPO_DB_NAME)
+REPO_ACCOUNT = webapp.core.account.RepoAccount(REPO_DB)

@@ -53,8 +53,10 @@ class Test(flask.ext.testing.TestCase):
         with open(filepath) as f:
             stream = f.read()
         temp = tempfile.NamedTemporaryFile()
-        temp.name = 'x-y-z.doc'
         temp.write(stream)
+        temp.flush()
+        temp.seek(0)
+        temp.name = 'x-y-z.doc'
         return self.client.post('/upload', data=dict(
             Filedata=temp
         ), follow_redirects=True)

@@ -26,17 +26,24 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 		//get the form
 		var aForm = $("#add-user-form");
 		
-		//call the ajax request
-		urmmain.FormAjax(aForm, function(){
+		var aText = aForm.find(":text");
+		var aPwd = aForm.find(":password");
+		
+		if(formvalidate.ValidateBlank(aText) && formvalidate.ValidateBlank(aPwd))
+		{
+			//call the ajax request
+			urmmain.FormAjax(aForm, function(){
 
-			alert("Successful Add!");
-			window.location.reload();
+				alert("Successful Add!");
+				window.location.reload();
 
-		}, function(){
+			}, function(){
 
-			alert("Operation Failed!");
-			
-		});
+				alert("Operation Failed!");
+				
+			});
+		}
+		
 
 		event.preventDefault();
 	});

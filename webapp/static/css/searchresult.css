@@ -1,0 +1,101 @@
+/* Search result page */
+.result-list{
+  margin-top: 26px;
+}
+.result-list-item{
+  margin-bottom: 20px;
+  padding-bottom: 8px;
+  border-bottom: 1px dotted #c2c2c2;
+}
+.item-link .item-title{
+  font-size: 1.25em;
+}
+.item-link .item-operate{
+  margin-left: 50px;
+}
+.item-content{
+  padding: 6px 8px 0 12px;
+}
+.item-content ul li{
+  float: left;
+  margin-left: 8px;
+}
+.item-label,.item-comment{
+  margin-left: 4px;
+}
+.item-label-content{
+  display: none;
+  position: relative;
+  width: 204px;
+  padding: 2px 4px;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: 1px solid #c2c2c2;
+  background-color: #fff;
+}
+.triangle-up{
+  position: absolute;
+  width:0;
+  height:0;
+  top: -6px;
+  left: 12px;
+  border-width:0 6px 6px;
+  border-style:solid;
+  border-color:transparent transparent #c2c2c2;/*透明 透明  灰*/
+}
+.triangle-up-border
+{
+  position: absolute;
+  width:0;
+  height:0;
+  top: -5px;
+  left: 12px;
+  border-width:0 6px 6px;
+  border-style:solid;
+  border-color:transparent transparent #fff;/*透明 透明  灰*/
+}
+.item-comment-content{
+  display: none;
+  position: relative;
+  width: 400px;
+  padding: 2px 4px;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: 1px solid #c2c2c2;
+  background-color: #fff;
+}
+.comment-info{
+  float: right;
+}
+.comment-items{
+  padding: 4px 10px 10px 6px;
+  border-bottom: 1px solid #ccc;
+  overflow: hidden;
+}
+.item-comment-bottom{
+  margin-bottom: 6px;
+  text-indent: 158px;
+  color: #ccc;
+}
+
+.info li{
+  float: left;
+}
+.info .name{
+  width: 10%;
+}
+.info .age{
+  width: 10%;
+}
+.info .education{
+  width: 10%;
+}
+.info .school{
+  width: 20%;
+}
+.info .position{
+  width: 20%;
+}
+.info .company{
+  width: 20%;
+}

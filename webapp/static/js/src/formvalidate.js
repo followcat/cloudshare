@@ -33,5 +33,21 @@ define(function(){
  		}
  	};
 
+ 	validation.ValidateBlank = function(obj){
+
+ 		var len = obj.length;
+
+ 		for(var i = 0; i < len; i++)
+ 		{
+ 			if(obj[i].value === "")
+ 			{
+ 				return false;
+ 			}else{
+ 				return true;
+ 			}
+ 		}
+	
+ 	}
+
  	return validation;
 });

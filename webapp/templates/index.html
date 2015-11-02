@@ -18,9 +18,13 @@
 </head>
 <body>
 	<header class="header-box">
-	  <div class="col-md-2 col-md-offset-5">
+	  <div class="logo-box">
 	  	<img src="../static/images/logo.png">
 	  </div>
+	  <div class="feature-info" data-toggle="modal" data-target="#featureModal" id="feature-btn">
+	  	<span>Feature</span>
+		</div> <!-- /.feature-info -->
+		<textarea id="textarea">{{ features }}</textarea> 
 	</header>
 
 	<div class="col-xs-10 col-sm-8 col-md-4 center">
@@ -43,12 +47,20 @@
 	      </div>
       </div>	
 	</div>
-	
-	<div class="feature-info">
-		<textarea id="textarea-input" rows="1" cols="10"></textarea> 
-		<div id="preview"></div>
-	</div>
-	
+
+	<div class="modal fade" id="featureModal">
+  	<div class="modal-dialog">
+    	<div class="modal-content">
+      	<div class="modal-header">
+        	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        	<h4 class="modal-title">Feature Informations</h4>
+      	</div>
+      	<div class="modal-body" id="preview">
+      	</div>
+      </div><!-- /.modal-content -->
+  	</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
 	<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/index') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
 </body>
 </html>

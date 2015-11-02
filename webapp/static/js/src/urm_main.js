@@ -54,7 +54,6 @@ define(['jquery'], function(){
 			data: formObj.serialize(),
 			success: function(result){
 				var resultJson = $.parseJSON(result);
-				console.log(resultJson.result);
 				if(resultJson.result)
 				{
 					success_func();

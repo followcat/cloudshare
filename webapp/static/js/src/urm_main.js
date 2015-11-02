@@ -29,7 +29,7 @@ define(['jquery'], function(){
 				url: '/logout',
 				type: 'GET',
 				success: function(){
-					window.location.href = "/index";
+					window.location.href = "/";
 				},
 				error: function(msg){
 					alert("Operate Error!");
@@ -54,7 +54,6 @@ define(['jquery'], function(){
 			data: formObj.serialize(),
 			success: function(result){
 				var resultJson = $.parseJSON(result);
-				console.log(resultJson.result);
 				if(resultJson.result)
 				{
 					success_func();

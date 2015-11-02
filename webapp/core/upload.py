@@ -1,5 +1,5 @@
-import os
 import codecs
+import os.path
 
 import yaml
 import pypandoc

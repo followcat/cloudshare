@@ -26,7 +26,7 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 
 		urmmain.FormAjax(aForm, function(){
 			alert("The password is changed, please login again.");
-			window.location.href = "/index";
+			window.location.href = "/";
 
 		}, function(){
 

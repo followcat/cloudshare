@@ -5,7 +5,6 @@ import yaml
 import flask.ext.login
 
 import webapp.core
-import webapp.core.views
 import utils.classproperty
 import webapp.core.exception
 

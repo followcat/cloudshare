@@ -31,7 +31,6 @@ class Test(flask.ext.testing.TestCase):
         self.app.config['REPO_ACCOUNT'] = webapp.core.account.RepoAccount(self.repo_db)
         self.app.config['UPLOAD_TEMP'] = self.upload_tmp
 
-        webapp.core.account.init_login(self.app)
         ext.views.configure(self.app)
         return self.app
 
@@ -83,9 +82,9 @@ class LoginoutSuperAdminTest(Test):
     def test_superadmin_add_delete_user(self):
         self.login('root', 'password')
         self.adduser('addname', 'addpassword')
-        assert('addname' in flask.current_app.config['REPO_ACCOUNT'].USERS)
+        assert('addname' in self.app.config['REPO_ACCOUNT'].USERS)
         self.deleteuser('addname')
-        assert('addname' not in flask.current_app.config['REPO_ACCOUNT'].USERS)
+        assert('addname' not in self.app.config['REPO_ACCOUNT'].USERS)
         self.logout()
 
 
@@ -113,9 +112,9 @@ class LoginoutUser(User):
         self.init_user()
         self.login(self.user_name, self.user_password)
         self.adduser('addname', 'addpassword')
-        assert('addname' not in flask.current_app.config['REPO_ACCOUNT'].USERS)
+        assert('addname' not in self.app.config['REPO_ACCOUNT'].USERS)
         self.deleteuser(self.user_name)
-        assert(self.user_name in flask.current_app.config['REPO_ACCOUNT'].USERS)
+        assert(self.user_name in self.app.config['REPO_ACCOUNT'].USERS)
         self.logout()
 
 

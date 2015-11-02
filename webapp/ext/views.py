@@ -1,7 +1,22 @@
+import flask.ext.login
+
 import webapp.core.views
+import webapp.core.account
+
+
+def init_login(app):
+    login_manager = flask.ext.login.LoginManager()
+    login_manager.setup_app(app)
+
+    @login_manager.user_loader
+    def load_user(id):
+        return webapp.core.account.User.get(id, app.config['REPO_ACCOUNT'])
 
 
 def configure(app):
+
+    init_login(app)
+
     app.add_url_rule(
         '/search',
         view_func=webapp.core.views.Search.as_view('search'),

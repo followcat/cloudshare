@@ -131,12 +131,3 @@ class User(flask.ext.login.UserMixin):
             return self_class(id, repoaccount)
         except webapp.core.exception.UserNotFoundError:
             return None
-
-
-def init_login(app):
-    login_manager = flask.ext.login.LoginManager()
-    login_manager.setup_app(app)
-
-    @login_manager.user_loader
-    def load_user(id):
-        return User.get(id, app.config['REPO_ACCOUNT'])

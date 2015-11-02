@@ -111,7 +111,7 @@ class GitInterface(object):
             p = subprocess.Popen(command,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,
-                                 cwd='repo')
+                                 cwd=self.repo.path)
             returncode = p.communicate()[0]
             for each in returncode.split('\n'):
                 if each:

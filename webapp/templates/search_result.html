@@ -22,11 +22,8 @@
     <div class="result-list-item">
       <div class="item-link">
         <a href="/showtest/{{ item[0] }}.md" class="item-title">{{ item[1].filename }}</a>
-<!--         <span class="item-operate">
-          by
-          <a href="#">戴艳玲</a>,
-        <span>2015年9月25日</span>
-        </span> -->
+        <em class="item-operate">Uploader: {{ item[2].author }}, {{ item[2].time }}
+        </em>
       </div>
       <div class="container-fluid">
         <ul class="list-unstyled info">

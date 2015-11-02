@@ -8,10 +8,12 @@
   border-bottom: 1px dotted #c2c2c2;
 }
 .item-link .item-title{
+  display: inline-block;
+  width: 300px;
   font-size: 1.25em;
 }
 .item-link .item-operate{
-  margin-left: 50px;
+  border-bottom: 1px solid #ccc;
 }
 .item-content{
   padding: 6px 8px 0 12px;

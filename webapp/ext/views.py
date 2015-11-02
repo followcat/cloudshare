@@ -1,22 +1,33 @@
+import flask.ext.login
+
 import webapp.core.views
 import webapp.core.account
 
 
+def init_login(app):
+    login_manager = flask.ext.login.LoginManager()
+    login_manager.login_view = "/gotologin"
+    login_manager.setup_app(app)
+
+    @login_manager.user_loader
+    def load_user(id):
+        return webapp.core.account.User.get(id, app.config['REPO_ACCOUNT'])
+
+
 def configure(app):
+
+    init_login(app)
 
     app.add_url_rule(
         '/gotologin',
         view_func=webapp.core.views.LoginRedirect.as_view('gotologin'),
         )
 
-    webapp.core.views.Search.repo = app.config['REPO_DB']
     app.add_url_rule(
         '/search',
         view_func=webapp.core.views.Search.as_view('search'),
         )
 
-    webapp.core.views.Upload.setup_upload_tmp(app.config['UPLOAD_TEMP'],
-                                              app.config['REPO_DB'])
     app.add_url_rule(
         '/upload',
         view_func=webapp.core.views.Upload.as_view('upload'),
@@ -37,7 +48,6 @@ def configure(app):
         view_func=webapp.core.views.Showtest.as_view('showtest'),
         )
 
-    webapp.core.account.RepoAccount.repo = app.config['REPO_DB']
     app.add_url_rule(
         '/',
         view_func=webapp.core.views.Index.as_view('index'),
@@ -67,7 +77,7 @@ def configure(app):
         '/changepassword',
         view_func=webapp.core.views.ChangePassword.as_view('changepassword'),
         )
-    
+
     app.add_url_rule(
         '/urm',
         view_func=webapp.core.views.Urm.as_view('urm'),

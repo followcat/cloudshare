@@ -1,3 +1,4 @@
+import os
 import shutil
 import tempfile
 
@@ -5,7 +6,6 @@ import flask
 import flask.ext.testing
 
 import ext.views
-import webapp.core
 import webapp.core.account
 import repointerface.gitinterface
 
@@ -14,18 +14,23 @@ class Test(flask.ext.testing.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.repo_db.repo.path)
+        shutil.rmtree(self.upload_tmp)
 
     def create_app(self):
 
         self.app = flask.Flask(__name__)
         self.app.config.from_object('webapp.settings')
 
-        self.app.config['SECRET_KEY'] = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
         self.repo_db = repointerface.gitinterface.GitInterface('testcase_repo')
-        self.app.config['REPO_DB'] = self.repo_db
-        self.app.config['TESTING'] = True
+        self.upload_tmp = 'testcase_output'
+        os.mkdir(self.upload_tmp)
 
-        webapp.core.account.init_login(self.app)
+        self.app.config['SECRET_KEY'] = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
+        self.app.config['TESTING'] = True
+        self.app.config['REPO_DB'] = self.repo_db
+        self.app.config['REPO_ACCOUNT'] = webapp.core.account.RepoAccount(self.repo_db)
+        self.app.config['UPLOAD_TEMP'] = self.upload_tmp
+
         ext.views.configure(self.app)
         return self.app
 
@@ -77,9 +82,9 @@ class LoginoutSuperAdminTest(Test):
     def test_superadmin_add_delete_user(self):
         self.login('root', 'password')
         self.adduser('addname', 'addpassword')
-        assert('addname' in webapp.core.account.RepoAccount.USERS)
+        assert('addname' in self.app.config['REPO_ACCOUNT'].USERS)
         self.deleteuser('addname')
-        assert('addname' not in webapp.core.account.RepoAccount.USERS)
+        assert('addname' not in self.app.config['REPO_ACCOUNT'].USERS)
         self.logout()
 
 
@@ -107,9 +112,9 @@ class LoginoutUser(User):
         self.init_user()
         self.login(self.user_name, self.user_password)
         self.adduser('addname', 'addpassword')
-        assert('addname' not in webapp.core.account.RepoAccount.USERS)
+        assert('addname' not in self.app.config['REPO_ACCOUNT'].USERS)
         self.deleteuser(self.user_name)
-        assert(self.user_name in webapp.core.account.RepoAccount.USERS)
+        assert(self.user_name in self.app.config['REPO_ACCOUNT'].USERS)
         self.logout()
 
 

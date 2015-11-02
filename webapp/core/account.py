@@ -1,12 +1,9 @@
 import os.path
-import hashlib
 
 import yaml
 import flask.ext.login
 
-import webapp.core
-import webapp.core.views
-import utils.classproperty
+import utils.builtin
 import webapp.core.exception
 
 
@@ -14,151 +11,123 @@ class RepoAccount(object):
     """
         >>> import shutil
         >>> import webapp.core.account
-        >>> import utils.classproperty
         >>> import repointerface.gitinterface
         >>> repo_name = 'webapp/core/test_repo'
         >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-        >>> RepoAccount = webapp.core.account.RepoAccount
-        >>> save_repo = RepoAccount.repo
-        >>> RepoAccount.repo = interface
-        >>> RepoAccount.USERS
+        >>> repoaccount = webapp.core.account.RepoAccount(interface)
+        >>> repoaccount.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
-        >>> RepoAccount.add('root', 'admin', 'password')
+        >>> repoaccount.add('root', 'admin', 'password')
         True
-        >>> RepoAccount.USERS['admin']
+        >>> repoaccount.USERS['admin']
         u'5f4dcc3b5aa765d61d8327deb882cf99'
-        >>> RepoAccount.get_user_list()
+        >>> repoaccount.get_user_list()
         [u'admin']
-        >>> RepoAccount.add('root', 'admin', 'password') # doctest: +ELLIPSIS
+        >>> repoaccount.add('root', 'admin', 'password') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ExistsUser: admin
-        >>> RepoAccount.delete('root', 'admin')
+        >>> repoaccount.delete('root', 'admin')
         True
-        >>> RepoAccount.USERS
+        >>> repoaccount.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
-        >>> RepoAccount.repo = save_repo
         >>> shutil.rmtree(repo_name)
     """
     default_root_name = u'root'
     default_root_password = 'password'
     account_filename = 'account.yaml'
 
-    repo = webapp.core.repo
+    def __init__(self, repo):
+        self.repo = repo
 
-    @classmethod
-    def create(cls):
-        m = hashlib.md5()
-        m.update(cls.default_root_password)
-        empty_dict = {cls.default_root_name: unicode(m.hexdigest())}
-        with open(os.path.join(cls.repo.repo.path, cls.account_filename),
+    def create(self):
+        upassword = utils.builtin.md5(self.default_root_password)
+        empty_dict = {self.default_root_name: upassword}
+        with open(os.path.join(self.repo.repo.path, self.account_filename),
                   'w') as f:
             f.write(yaml.dump(empty_dict))
-        cls.repo.add_files(cls.account_filename, "Add account file.")
+        self.repo.add_files(self.account_filename, "Add account file.")
 
-    @classmethod
-    def unicodemd5(cls, password):
-        m = hashlib.md5()
-        m.update(password)
-        return unicode(m.hexdigest())
-
-    @classmethod
-    def add(cls, mender, id, password):
+    def add(self, mender, id, password):
         if mender != u'root':
             return False
-        data = cls.USERS
+        data = self.USERS
         uid = unicode(id)
-        upw = cls.unicodemd5(password)
+        upw = utils.builtin.md5(password)
         if uid in data:
             raise webapp.core.exception.ExistsUser(uid)
         data[uid] = upw
         dump_data = yaml.dump(data)
-        cls.repo.modify_file(cls.account_filename, dump_data)
+        self.repo.modify_file(self.account_filename, dump_data)
         return True
 
-    @classmethod
-    def modify(cls, id, password):
-        data = cls.USERS
+    def modify(self, id, password):
+        data = self.USERS
         uid = unicode(id)
-        upw = cls.unicodemd5(password)
+        upw = utils.builtin.md5(password)
         data[uid] = upw
         dump_data = yaml.dump(data)
-        cls.repo.modify_file(cls.account_filename, dump_data)
+        self.repo.modify_file(self.account_filename, dump_data)
 
-    @classmethod
-    def delete(cls, mender, id):
+    def delete(self, mender, id):
         if mender != u'root':
             return False
-        data = cls.USERS
+        data = self.USERS
         data.pop(unicode(id))
         dump_data = yaml.dump(data)
-        cls.repo.modify_file(cls.account_filename, dump_data)
+        self.repo.modify_file(self.account_filename, dump_data)
         return True
 
-    @utils.classproperty.ClassProperty
-    def USERS(cls):
-        account_file = cls.repo.repo.get_named_file(
-            os.path.join('..', cls.account_filename))
+    @property
+    def USERS(self):
+        account_file = self.repo.repo.get_named_file(
+            os.path.join('..', self.account_filename))
         if account_file is None:
-            cls.create()
-            account_file = cls.repo.repo.get_named_file(
-                os.path.join('..', cls.account_filename))
+            self.create()
+            account_file = self.repo.repo.get_named_file(
+                os.path.join('..', self.account_filename))
         data = yaml.load(account_file.read())
         account_file.close()
         return data
 
-    @classmethod
-    def get_user_list(cls):
-        account_list = cls.USERS.keys()
-        account_list.remove(cls.default_root_name)
+    def get_user_list(self):
+        account_list = self.USERS.keys()
+        account_list.remove(self.default_root_name)
         user_list = account_list
         return user_list
 
 
 class User(flask.ext.login.UserMixin):
 
-    def __init__(self, id, account_dict):
+    def __init__(self, id, repoaccount):
         self.id = id
-        if id not in account_dict:
+        self.repoaccount = repoaccount
+        if id not in repoaccount.USERS:
             raise webapp.core.exception.UserNotFoundError()
-        self.password = account_dict[unicode(id)]
+        self.password = repoaccount.USERS[unicode(id)]
 
     def changepassword(self, password):
-        RepoAccount.modify(self.id, password)
+        self.repoaccount.modify(self.id, password)
 
     @classmethod
-    def get(self_class, id, account_dict=None):
+    def get(self_class, id, repoaccount):
         """
             >>> import shutil
             >>> import webapp.core.account
             >>> import repointerface.gitinterface
             >>> repo_name = 'webapp/core/test_repo'
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> RepoAccount = webapp.core.account.RepoAccount
-            >>> save_repo = RepoAccount.repo
-            >>> RepoAccount.repo = interface
-            >>> user = webapp.core.account.User.get('root')
+            >>> repoaccount = webapp.core.account.RepoAccount(interface)
+            >>> user = webapp.core.account.User.get('root', repoaccount)
             >>> user.id
             'root'
             >>> user.password
             u'5f4dcc3b5aa765d61d8327deb882cf99'
-            >>> type(webapp.core.account.User.get('None'))
+            >>> type(webapp.core.account.User.get('None', repoaccount))
             <type 'NoneType'>
-            >>> RepoAccount.repo = save_repo
             >>> shutil.rmtree(repo_name)
         """
-        if account_dict is None:
-            account_dict = RepoAccount.USERS
         try:
-            return self_class(id, account_dict)
+            return self_class(id, repoaccount)
         except webapp.core.exception.UserNotFoundError:
             return None
-
-
-def init_login(app):
-    login_manager = flask.ext.login.LoginManager()
-    login_manager.setup_app(app)
-
-    @login_manager.user_loader
-    def load_user(id):
-        return User.get(id)

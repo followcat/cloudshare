@@ -4,17 +4,22 @@ require.config({
 	paths: {
 		jquery: 'lib/jquery',
 		formvalidate: 'src/formvalidate',
+		bootstrap: 'lib/bootstrap',
 		marked: 'lib/marked'
 	},
 
 	shim: {
+		bootstrap: {
+			deps: ['jquery'],
+			exports: 'bootstrap'
+		},
 		marked: {
 			exports: 'marked'
 		}
 	}
 })
 
-require(['jquery', 'formvalidate', 'marked'], function($, formvalidate, marked){
+require(['jquery', 'formvalidate', 'marked', 'bootstrap'], function($, formvalidate, marked, bootstrap){
 
 	var msg_box = $(".login-msg");
 
@@ -43,7 +48,9 @@ require(['jquery', 'formvalidate', 'marked'], function($, formvalidate, marked){
 		}
 	});
 
-	$("#textarea-input").on('change', function(){
-		$("#preview").html(marked(this.value));
-	})
+	$("#feature-btn").on('click', function(){
+		var text = $("#textarea").val();
+		$("#preview").html(marked(text));
+	});
+
 })

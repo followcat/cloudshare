@@ -97,5 +97,8 @@ def catch(path, convertname, basename, output):
             "position":     getTagFromString('职位', stream),
             "company":      company,
             "school":       school,
+            "comment":      [],
+            "tag":          [],
+            "tracking":     [],
             }
         save_yaml(info_dict, output, convertname.yaml)

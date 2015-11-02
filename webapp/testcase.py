@@ -1,3 +1,4 @@
+import os
 import shutil
 import tempfile
 
@@ -5,7 +6,6 @@ import flask
 import flask.ext.testing
 
 import ext.views
-import webapp.core
 import webapp.core.account
 import repointerface.gitinterface
 
@@ -14,16 +14,21 @@ class Test(flask.ext.testing.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.repo_db.repo.path)
+        shutil.rmtree(self.upload_tmp)
 
     def create_app(self):
 
         self.app = flask.Flask(__name__)
         self.app.config.from_object('webapp.settings')
 
-        self.app.config['SECRET_KEY'] = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
         self.repo_db = repointerface.gitinterface.GitInterface('testcase_repo')
-        self.app.config['REPO_DB'] = self.repo_db
+        self.upload_tmp = 'testcase_output'
+        os.mkdir(self.upload_tmp)
+
+        self.app.config['SECRET_KEY'] = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
         self.app.config['TESTING'] = True
+        self.app.config['REPO_DB'] = self.repo_db
+        self.app.config['UPLOAD_TEMP'] = self.upload_tmp
 
         webapp.core.account.init_login(self.app)
         ext.views.configure(self.app)

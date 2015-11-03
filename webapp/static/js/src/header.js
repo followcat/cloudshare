@@ -13,23 +13,37 @@ define(['jquery', 'uploadify'], function($, uploadify){
 			'queueID': false,
 			'auto': false,         //automatically upload
 			'multi': false,        //multiple files
-			'onUploadProgress' : function(file, bytesUploaded, bytesTotal, totalBytesUploaded, totalBytesTotal) {
-	            $('#progress').html(totalBytesUploaded + ' bytes uploaded of ' + totalBytesTotal + ' bytes.');
-	        },
-			'onUploadError' : function(file, errorCode, errorMsg, errorString) {   //upload fail ,catch the error info
-	            alert('The file ' + file.name + ' could not be uploaded: ' + errorString);
-	        },
-	        'onUploadSuccess' : function(file, data, response) {                //upload success event 
-	            if(response)
-	            {
-	            	alert('The file ' + file.name + ' was successfully uploaded ');
-	            	window.location.href = '/uppreview';
-	            }
-	            else
-	            {
-	            	alert('The file ' + file.name + ' was failed uploaded ');
-	            }
-	        }
+			'onUploadStart': function(file){
+					$("#uploading").show();
+			},
+			'onSelect': function(file){
+					$("#uploading").hide();
+					$("#upload-success").hide();
+					$("#upload-fail").hide();
+			},
+			'onUploadProgress' : function(file, fileBytesLoaded, fileTotalBytes) {
+	            $('#progress').html(fileBytesLoaded + ' bytes uploaded of ' + fileTotalBytes + ' bytes.');
+	    },
+			'onUploadError' : function(file, errorCode, errorMsg) {   //upload fail ,catch the error info
+	            alert('The file ' + file.name + ' could not be uploaded: ' + errorMsg);
+	    },
+	    'onUploadSuccess' : function(file, data, response) {                //upload success event 
+	    	console.log();
+	      if(response)
+	      {
+	      	$("#uploading").hide();
+	      	$("#upload-success").show();
+
+	        setTimeout(function(){
+	        	window.location.href = '/uppreview';
+	        },2000);
+	      }
+	      else
+	      {
+	      	$("#uploading").hide();
+	      	$("#upload-fail").show();
+	      }
+	    }
 		});
 	};
 	header.upload();
@@ -65,6 +79,16 @@ define(['jquery', 'uploadify'], function($, uploadify){
 	};
 
 	header.LogOut($("#quit-btn"));
+
+	header.UploadDiv = function(obj){
+		obj.on('click', function(){
+			$("#uploading").hide();
+			$("#upload-success").hide();
+			$("#upload-fail").hide();
+		});
+	};
+
+	header.UploadDiv($(".upload"));
 
 	return header;
 });

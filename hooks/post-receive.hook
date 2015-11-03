@@ -15,5 +15,5 @@ chmod +x hooks/post-receive.hook
 
 export PYTHONPATH=`pwd`
 export CLOUDSHARE_VIRTUALENV_PATH=/home/$USER/Virtualenv/cloudshare
-source $CLOUDSHARE_VIRTUALENV_PATH/bin/activate
+. $CLOUDSHARE_VIRTUALENV_PATH/bin/activate
 python tools/repobackup.py

@@ -58,6 +58,15 @@ def save_yaml(infodict, path, filename):
         f.write(yaml.dump(infodict))
 
 
+def info_by_re_iter(stream, restr):
+    result_iter = iter(getInfoFromRestr(stream, restr))
+    try:
+        result = ''.join(result_iter.next())
+    except StopIteration:
+        result = ''
+    return result
+
+
 def catch(path, convertname, basename, output):
     organization = (u'有限公司', U'公司', u'集团', u'院')
     organization_restr = u'[ \u3000:\uff1a]*([()a-zA-Z0-9\u4E00-\u9FA5]+)('
@@ -80,18 +89,16 @@ def catch(path, convertname, basename, output):
 
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
-        company_iter = iter(getInfoFromRestr(stream, organization_restr))
 
         name = getTagFromString('姓名', stream)
         namelist = getInfoFromRestr(name.encode('utf-8'), u'^[\u4E00-\u9FA5\w]*$')
         if not namelist:
             name = ''
 
-        try:
-            company = ''.join(company_iter.next())
-        except StopIteration:
-            company = ''
-
+        age = info_by_re_iter(stream, age_restr)
+        phone = info_by_re_iter(stream, phone_restr)
+        email = info_by_re_iter(stream, email_restr)
+        company = info_by_re_iter(stream, organization_restr)
         school_iter = iter(getInfoFromRestr(stream, school_restr))
         try:
             school = ''.join(school_iter.next())
@@ -99,24 +106,6 @@ def catch(path, convertname, basename, output):
                 school = ''.join(school_iter.next())
         except StopIteration:
             school = ''
-
-        age_iter = iter(getInfoFromRestr(stream, age_restr))
-        try:
-            age = ''.join(age_iter.next())
-        except StopIteration:
-            age = ''
-
-        phone_iter = iter(getInfoFromRestr(stream, phone_restr))
-        try:
-            phone = ''.join(phone_iter.next())
-        except StopIteration:
-            phone = ''
-
-        email_iter = iter(getInfoFromRestr(stream, email_restr))
-        try:
-            email = ''.join(email_iter.next())
-        except StopIteration:
-            email = ''
 
         info_dict = {
             "filename":     basename.decode('utf-8'),

@@ -256,9 +256,9 @@ class FileProcesser():
         path = repo.repo.path
         unique_checker = core.uniquesearcher.UniqueSearcher(repo)
         if unique_checker.unique_name(self.base.base) is False:
+            error = 'Duplicate files: %s' % self.base.base
             logger.info(error)
-            raise core.exception.DuplicateException(
-                'Duplicate files: %s' % self.base.base)
+            raise core.exception.DuplicateException(error)
         if self.convert() is False:
             return False
         shutil.copy(os.path.join(self.markdown_path, self.name.md),

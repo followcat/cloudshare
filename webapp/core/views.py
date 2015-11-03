@@ -68,8 +68,8 @@ class UploadPreview(flask.views.MethodView):
         upobj = pickle.loads(flask.session['upload'])
         preview_path = os.path.join(upobj.storage.markdown_path,
                                     upobj.storage.name.md)
-        confirm = True
-        return flask.redirect(os.path.join('showtest', preview_path), confirm=confirm)
+        flask.flash('Successlly Upload.')
+        return flask.redirect(os.path.join('showtest', preview_path))
 
 
 class Confirm(flask.views.MethodView):

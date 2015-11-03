@@ -74,8 +74,14 @@ window.onload = function(){
 		});
 
 		allElementP.each(function(){
+			var oP = $(this);
+			var reg = /&nbsp;/;
+			if(reg.test(oP.html()))
+			{
+				oP.remove();
+			}
 
-			CVDeal.prototype.ParagraphBr($(this), pattern);
+			CVDeal.prototype.ParagraphBr(oP, pattern);
 		});
 
 		allElementTd.each(function(){
@@ -93,7 +99,7 @@ window.onload = function(){
 
 		if(pattern.test(text))
 		{
-			text = text.replace(pattern," ");
+			text = text.replace(pattern,"");
 			obj.text(text);
 		}
 

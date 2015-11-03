@@ -94,7 +94,7 @@ window.onload = function(){
 		var text = obj.text();
 
 		var patternChinese = /[\u4e00-\u9fa5]{15,}/;
-		var patternPbr1 = /；/g;
+		var patternPbr1 = /；|;/g;
 		var patternPbr2 = /。/g;
 
 		if(pattern.test(text))

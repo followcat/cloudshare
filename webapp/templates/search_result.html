@@ -21,7 +21,7 @@
     {% for item in result %}
     <div class="result-list-item">
       <div class="item-link">
-        <a href="/showtest/{{ item[0] }}.md" class="item-title">{{ item[1].filename }}</a>
+        <a href="/showtest/{{ item[0] }}.md" class="item-title" target="_blank">{{ item[1].filename }}</a>
         <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
         </em>
       </div>

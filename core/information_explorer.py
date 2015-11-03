@@ -75,23 +75,34 @@ def catch(path, convertname, basename, output):
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
         company_iter = iter(getInfoFromRestr(stream, organization_restr))
+
+        name = getTagFromString('姓名', stream)
+        namelist = getInfoFromRestr(name.encode('utf-8'), u'^[\u4E00-\u9FA5\w]*$')
+        if not namelist:
+            name = ''
+
         try:
             company = ''.join(company_iter.next())
         except StopIteration:
             company = ''
+
         school_iter = iter(getInfoFromRestr(stream, school_restr))
         try:
             school = ''.join(school_iter.next())
+            while len(school) > 10:
+                school = ''.join(school_iter.next())
         except StopIteration:
             school = ''
+
         age_iter = iter(getInfoFromRestr(stream, age_restr))
         try:
             age = ''.join(age_iter.next())
         except StopIteration:
             age = ''
+
         info_dict = {
             "filename":     basename.decode('utf-8'),
-            "name":         getTagFromString('姓名', stream),
+            "name":         name,
             "education":    getTagFromString('学历', stream),
             "age":          getTagFromString('年龄', stream) or age,
             "position":     getTagFromString('职位', stream),

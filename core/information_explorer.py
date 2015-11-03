@@ -70,8 +70,14 @@ def catch(path, convertname, basename, output):
     for each in school:
         school_restr += each + '|'
     school_restr = school_restr[:-1] + ')'
+
     age_chinese = u'岁'
     age_restr = u'[ \u3000]*(\d{2})' + age_chinese
+
+    phone_restr = u'\b1\d{10}\b'
+
+    email_restr = u'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b'
+
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
         company_iter = iter(getInfoFromRestr(stream, organization_restr))
@@ -100,6 +106,18 @@ def catch(path, convertname, basename, output):
         except StopIteration:
             age = ''
 
+        phone_iter = iter(getInfoFromRestr(stream, phone_restr))
+        try:
+            phone = ''.join(phone_iter.next())
+        except StopIteration:
+            phone = ''
+
+        email_iter = iter(getInfoFromRestr(stream, email_restr))
+        try:
+            email = ''.join(email_iter.next())
+        except StopIteration:
+            email = ''
+
         info_dict = {
             "filename":     basename.decode('utf-8'),
             "name":         name,
@@ -108,6 +126,8 @@ def catch(path, convertname, basename, output):
             "position":     getTagFromString('职位', stream),
             "company":      company,
             "school":       school,
+            "phone":        getTagFromString('电话', stream) or phone,
+            "email":        getTagFromString('邮件', stream) or email,
             "comment":      [],
             "tag":          [],
             "tracking":     [],

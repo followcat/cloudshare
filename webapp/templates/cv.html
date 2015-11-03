@@ -61,12 +61,13 @@
       </div>
       <!--quit modal end-->
       <div class="wrap">
-        {% if confirm %}
-        <div class="wrap-top">
-          <button type="button" class="btn btn-primary" id="confirm-btn">Confirm</button>
-        </div>
-        {% endif %}
-      
+        {% with confirm = get_flashed_messages() %}
+          {% if confirm %}
+            <div class="wrap-top">
+              <button type="button" class="btn btn-primary" id="confirm-btn">Confirm</button>
+            </div>
+          {% endif %}
+        {% endwith%}
         <div id="cv-box">
           <div class="cv-box-top">
             <span>简历情况：</span>

@@ -15,8 +15,15 @@ import webapp.core.account
 import webapp.core.exception
 
 
+class LoginRedirect(flask.views.MethodView):
+
+    def get(self):
+        return flask.render_template('gotologin.html')
+
+
 class Search(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def get(self):
         return flask.render_template('search.html')
 
@@ -74,6 +81,8 @@ class Confirm(flask.views.MethodView):
 
 
 class Showtest(flask.views.MethodView):
+
+    @flask.ext.login.login_required
     def get(self, filename):
         with codecs.open(filename, 'r', encoding='utf-8') as file:
             data = file.read()
@@ -84,7 +93,9 @@ class Showtest(flask.views.MethodView):
 class Index(flask.views.MethodView):
 
     def get(self):
-        return flask.render_template('index.html')
+        with codecs.open('webapp/features.md', 'r', encoding='utf-8') as fp:
+            data = fp.read()
+        return flask.render_template('index.html', features=data)
 
 
 class Login(flask.views.MethodView):
@@ -166,6 +177,7 @@ class ChangePassword(flask.views.MethodView):
 
 class Urm(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def get(self):
         repoaccount = flask.current_app.config['REPO_ACCOUNT']
         userlist = repoaccount.get_user_list()
@@ -174,6 +186,7 @@ class Urm(flask.views.MethodView):
 
 class UrmSetting(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def get(self):
         return flask.render_template('urmsetting.html')
 

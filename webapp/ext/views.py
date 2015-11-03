@@ -6,6 +6,7 @@ import webapp.core.account
 
 def init_login(app):
     login_manager = flask.ext.login.LoginManager()
+    login_manager.login_view = "/gotologin"
     login_manager.setup_app(app)
 
     @login_manager.user_loader
@@ -16,6 +17,11 @@ def init_login(app):
 def configure(app):
 
     init_login(app)
+
+    app.add_url_rule(
+        '/gotologin',
+        view_func=webapp.core.views.LoginRedirect.as_view('gotologin'),
+        )
 
     app.add_url_rule(
         '/search',

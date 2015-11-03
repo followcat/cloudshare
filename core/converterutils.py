@@ -151,6 +151,7 @@ class FileProcesser():
             True
             >>> shutil.rmtree(basepath)
         """
+        logger.info('Convert: %s' % os.path.join(self.root, self.base))
         if self.mimetype in ['application/msword',
                              "application/vnd.openxmlformats-officedocument"
                              ".wordprocessingml.document"]:
@@ -255,8 +256,9 @@ class FileProcesser():
         path = repo.repo.path
         unique_checker = core.uniquesearcher.UniqueSearcher(repo)
         if unique_checker.unique_name(self.base.base) is False:
-            raise core.exception.DuplicateException(
-                'Duplicate files: %s' % self.base.base)
+            error = 'Duplicate files: %s' % self.base.base
+            logger.info(error)
+            raise core.exception.DuplicateException(error)
         if self.convert() is False:
             return False
         shutil.copy(os.path.join(self.markdown_path, self.name.md),
@@ -265,17 +267,5 @@ class FileProcesser():
                     os.path.join(path, self.name.yaml))
         repo.add_files([self.name.md, self.name.yaml],
                        committer=committer)
+        logger.info('Finish')
         return True
-
-
-def convert_folder(path, repo):
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            processfile = FileProcesser(root, name)
-            logger.info('Convert: %s' % os.path.join(root, name))
-            try:
-                processfile.storage(repo)
-            except core.exception.DuplicateException as error:
-                logger.info(error)
-                continue
-            logger.info('Finish')

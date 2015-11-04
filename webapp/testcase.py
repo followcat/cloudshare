@@ -75,8 +75,12 @@ class Test(flask.ext.testing.TestCase):
     def uppreview(self):
         return self.client.get('/uppreview', follow_redirects=True)
 
-    def confirm(self):
-        return self.client.get('/confirm', follow_redirects=True)
+    def confirm(self, name, origin, id):
+        return self.client.post('/confirm', data=dict(
+            name=name,
+            origin=origin,
+            id=id,
+        ), follow_redirects=True)
 
     def search(self, keyword):
         return self.client.post('/search', data=dict(
@@ -148,7 +152,7 @@ class UploadFile(User):
         assert(rv.data == 'True')
         rv = self.uppreview()
         assert('CV Templates' in rv.data)
-        rv = self.confirm()
+        rv = self.confirm('name', 'origin', 'id')
         assert(rv.data == 'True')
         commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
         assert('Add file' in commit.message)
@@ -164,7 +168,7 @@ class Search(User):
         assert(rv.data == 'True')
         rv = self.uppreview()
         assert('CV Templates' in rv.data)
-        rv = self.confirm()
+        rv = self.confirm('name', 'origin', 'id')
         assert(rv.data == 'True')
 
     def test_searchresult(self):

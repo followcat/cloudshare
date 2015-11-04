@@ -69,7 +69,15 @@ class UploadPreview(flask.views.MethodView):
         preview_path = os.path.join(upobj.storage.markdown_path,
                                     upobj.storage.name.md)
         flask.flash('Successlly Upload.')
-        return flask.redirect(os.path.join('showtest', preview_path))
+        with codecs.open(preview_path, 'r', encoding='utf-8') as file:
+            data = file.read()
+        output = pypandoc.convert(data, 'html', format='markdown')
+        info = {
+            "name": upobj.storage.yamlinfo['name'],
+            "origin": upobj.storage.yamlinfo['origin'],
+            "id": upobj.storage.yamlinfo['id']
+        }
+        return flask.render_template('cv.html', markdown=output, info=info)
 
 
 class Confirm(flask.views.MethodView):

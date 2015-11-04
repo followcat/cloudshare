@@ -2,8 +2,6 @@
 import re
 import os.path
 
-import yaml
-
 
 def getTagFromString(tag, stream):
     """
@@ -53,11 +51,6 @@ def getInfoFromRestr(stream, restring):
     return result
 
 
-def save_yaml(infodict, path, filename):
-    with open(os.path.join(path, filename), 'w') as f:
-        f.write(yaml.dump(infodict))
-
-
 def info_by_re_iter(stream, restr):
     result_iter = iter(getInfoFromRestr(stream, restr))
     try:
@@ -67,7 +60,7 @@ def info_by_re_iter(stream, restr):
     return result
 
 
-def catch(path, convertname, basename, output):
+def catch(path, convertname, basename):
     info_dict = {
         "filename":     '',
         "name":         '',
@@ -133,6 +126,4 @@ def catch(path, convertname, basename, output):
         info_dict["age"] = getTagFromString('年龄', stream) or age
         info_dict["phone"] = getTagFromString('电话', stream) or phone
         info_dict["email"] = getTagFromString('邮件', stream) or email
-
-        save_yaml(info_dict, output, convertname.yaml)
     return info_dict

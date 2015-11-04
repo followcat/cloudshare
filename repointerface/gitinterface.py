@@ -52,7 +52,7 @@ class GitInterface(object):
         commit_id = self.repo.do_commit(message, committer=committer)
         return commit_id
 
-    def modify_file(self, filename, stream):
+    def modify_file(self, filename, stream, message=None):
         """
             >>> import shutil
             >>> import repointerface.gitinterface
@@ -70,11 +70,13 @@ class GitInterface(object):
             'Modify test'
             >>> shutil.rmtree(repo_name)
         """
+        if message is None:
+            message = "Change %s." % filename
         blob = dulwich.objects.Blob.from_string(stream)
         head_commit = self.repo.get_object(self.repo.refs['HEAD'])
         head_tree = dulwich.objects.Tree()
         head_tree[filename] = (0o100644, blob.id)
-        self.commit(head_tree, blob, "Change %s" % filename)
+        self.commit(head_tree, blob, message)
         self.checkout(head_tree)
 
     def commit(self, tree, blob, message):

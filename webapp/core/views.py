@@ -67,12 +67,7 @@ class UploadPreview(flask.views.MethodView):
 
     def get(self):
         upobj = pickle.loads(flask.session['upload'])
-        preview_path = os.path.join(upobj.storage.markdown_path,
-                                    upobj.storage.name.md)
-        flask.flash('Successlly Upload.')
-        with codecs.open(preview_path, 'r', encoding='utf-8') as file:
-            data = file.read()
-        output = pypandoc.convert(data, 'html', format='markdown')
+        output = upobj.preview_markdown()
         info = {
             "name": upobj.storage.yamlinfo['name'],
             "origin": upobj.storage.yamlinfo['origin'],

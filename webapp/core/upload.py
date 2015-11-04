@@ -1,7 +1,6 @@
 import codecs
 import os.path
 
-import yaml
 import pypandoc
 
 import core.exception
@@ -42,30 +41,6 @@ class UploadObject(object):
             self.information = 'Can not Convert'
         else:
             self.information = 'Sucess'
-
-    def preview_yaml(self):
-        """
-            >>> import os
-            >>> import shutil
-            >>> import os.path
-            >>> import webapp.core.upload
-            >>> root = "core/test"
-            >>> name = "cv_1.doc"
-            >>> obj = open(os.path.join(root, name))
-            >>> test_path = "webapp/core/test_output"
-            >>> os.makedirs(test_path)
-            >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
-            >>> yaml_data = up.preview_yaml()
-            >>> yaml_data['filename']
-            u'cv_1'
-            >>> up.remove()
-            >>> shutil.rmtree(test_path)
-        """
-        filename = os.path.join(self.storage.yaml_path, self.storage.name.yaml)
-        with open(filename, 'r') as yf:
-            stream = yf.read()
-        yaml_data = yaml.load(stream)
-        return yaml_data
 
     def preview_markdown(self):
         filename = os.path.join(self.storage.markdown_path,

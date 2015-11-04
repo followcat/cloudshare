@@ -50,6 +50,7 @@ class FileProcesser():
         logger.info('Mimetype: %s' % self.mimetype)
         location = self.copy()
         logger.info('Backup to: %s' % location)
+        self.result = self.convert()
 
     def mimetype(self):
         mimetype = mimetypes.guess_type(os.path.join(
@@ -70,7 +71,7 @@ class FileProcesser():
             >>> basepath = 'core/test_output'
             >>> cv1 = core.converterutils.FileProcesser('core/test',
             ... 'cv_1.doc', basepath)
-            >>> cv1.convert()
+            >>> cv1.result
             True
             >>> ori = cv1.name
             >>> des = cv1.copy()
@@ -140,7 +141,7 @@ class FileProcesser():
             >>> basepath = 'core/test_output'
             >>> cv1 = core.converterutils.FileProcesser('core/test',
             ... 'cv_1.doc', basepath)
-            >>> cv1.convert()
+            >>> cv1.result
             True
             >>> e = xml.etree.ElementTree.parse(os.path.join(
             ... cv1.docbook_path, cv1.name.xml)).getroot()
@@ -197,7 +198,7 @@ class FileProcesser():
             >>> basepath = 'core/test_output'
             >>> cv1 = core.converterutils.FileProcesser('core/test',
             ... 'cv_1.doc', basepath)
-            >>> cv1.convert()
+            >>> cv1.result
             True
             >>> os.path.isfile(os.path.join(cv1.markdown_path,
             ... cv1.name.md))
@@ -256,10 +257,10 @@ class FileProcesser():
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(basepath)
         """
+        if self.result is False:
+            return False
         path = repo.repo.path
         unique_checker = core.uniquesearcher.UniqueSearcher(repo)
-        if self.convert() is False:
-            return False
         if unique_checker.unique(self.yamlinfo) is False:
             error = 'Duplicate files: %s' % self.base.base
             logger.info(error)

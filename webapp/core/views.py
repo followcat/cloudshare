@@ -8,6 +8,7 @@ import pypandoc
 import flask.views
 import flask.ext.login
 
+import utils._yaml
 import utils.builtin
 import webapp.core.upload
 import core.outputstorage
@@ -37,7 +38,7 @@ class Search(flask.views.MethodView):
             name = core.outputstorage.ConvertName(base)
             with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
                 stream = yf.read()
-            yaml_data = yaml.load(stream)
+            yaml_data = yaml.load(stream, Loader=utils._yaml.Loader)
             info = repo.get_file_create_info(name.md)
             datas.append([os.path.join(repo.repo.path, name), yaml_data, info])
         return flask.render_template('search_result.html',

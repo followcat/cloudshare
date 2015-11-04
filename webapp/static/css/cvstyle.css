@@ -8,9 +8,10 @@
   height: 80px;
   overflow: hidden;
 }
-.wrap-top button{
+.wrap-top .confirm-box{
+  width: 400px;
   float: right;
-  margin-top:20px;
+  margin-top: 20px; 
 }
 #cv-box{
   display: none;

@@ -68,6 +68,20 @@ def info_by_re_iter(stream, restr):
 
 
 def catch(path, convertname, basename, output):
+    info_dict = {
+        "filename":     '',
+        "name":         '',
+        "education":    '',
+        "age":          '',
+        "position":     '',
+        "company":      '',
+        "school":       '',
+        "phone":        '',
+        "email":        '',
+        "comment":      [],
+        "tag":          [],
+        "tracking":     [],
+        }
     organization = (u'有限公司', U'公司', u'集团', u'院')
     organization_restr = u'[ \u3000:\uff1a]*([()a-zA-Z0-9\u4E00-\u9FA5]+)('
     for each in organization:
@@ -94,6 +108,7 @@ def catch(path, convertname, basename, output):
         namelist = getInfoFromRestr(name.encode('utf-8'), u'^[\u4E00-\u9FA5\w]*$')
         if not namelist:
             name = ''
+        info_dict["name"] = name
 
         age = info_by_re_iter(stream, age_restr)
         phone = info_by_re_iter(stream, phone_restr)
@@ -107,18 +122,14 @@ def catch(path, convertname, basename, output):
         except StopIteration:
             school = ''
 
-        info_dict = {
-            "filename":     basename.decode('utf-8'),
-            "name":         name,
-            "education":    getTagFromString('学历', stream),
-            "age":          getTagFromString('年龄', stream) or age,
-            "position":     getTagFromString('职位', stream),
-            "company":      company,
-            "school":       school,
-            "phone":        getTagFromString('电话', stream) or phone,
-            "email":        getTagFromString('邮件', stream) or email,
-            "comment":      [],
-            "tag":          [],
-            "tracking":     [],
-            }
+        info_dict["school"] = school
+        info_dict["company"] = company
+        info_dict["filename"] = basename.decode('utf-8')
+        info_dict["position"] = getTagFromString('职位', stream)
+        info_dict["education"] = getTagFromString('学历', stream)
+        info_dict["age"] = getTagFromString('年龄', stream) or age
+        info_dict["phone"] = getTagFromString('电话', stream) or phone
+        info_dict["email"] = getTagFromString('邮件', stream) or email
+
         save_yaml(info_dict, output, convertname.yaml)
+    return info_dict

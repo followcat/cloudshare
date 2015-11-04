@@ -45,6 +45,7 @@ class FileProcesser():
         self.docbook_path = self.output_path.docbook
         self.markdown_path = self.output_path.markdown
         self.mimetype = self.mimetype()
+        self.yamlinfo = {}
         logger.info('Mimetype: %s' % self.mimetype)
         location = self.copy()
         logger.info('Backup to: %s' % location)
@@ -177,8 +178,9 @@ class FileProcesser():
                 return False
             self.remove_note()
             self.file_docbook_to_markdown()
-            core.information_explorer.catch(self.markdown_path, self.name,
-                                            self.base.base, self.yaml_path)
+            self.yamlinfo = core.information_explorer.catch(
+                self.markdown_path, self.name,
+                self.base.base, self.yaml_path)
             logger.info('Success')
             return True
         else:
@@ -255,12 +257,12 @@ class FileProcesser():
         """
         path = repo.repo.path
         unique_checker = core.uniquesearcher.UniqueSearcher(repo)
-        if unique_checker.unique_name(self.base.base) is False:
+        if self.convert() is False:
+            return False
+        if unique_checker.unique(self.yamlinfo) is False:
             error = 'Duplicate files: %s' % self.base.base
             logger.info(error)
             raise core.exception.DuplicateException(error)
-        if self.convert() is False:
-            return False
         shutil.copy(os.path.join(self.markdown_path, self.name.md),
                     os.path.join(path, self.name.md))
         shutil.copy(os.path.join(self.yaml_path, self.name.yaml),

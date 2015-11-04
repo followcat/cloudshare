@@ -88,7 +88,9 @@ body{
   -o-transform: translate(-50%,-50%);
   transform: translate(-50%,-50%);
 }
-
+#error-msg{
+  color: #EA0000;
+}
 /*  search page css. search input css*/
 .search-box{
   position: absolute;

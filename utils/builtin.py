@@ -1,6 +1,8 @@
 import os
 import hashlib
 
+import yaml
+
 import core.exception
 import core.converterutils
 
@@ -21,3 +23,8 @@ def convert_folder(path, repo, temp_output):
                 processfile.storage(repo)
             except core.exception.DuplicateException as error:
                 continue
+
+
+def save_yaml(infodict, path, filename):
+    with open(os.path.join(path, filename), 'w') as f:
+        f.write(yaml.dump(infodict))

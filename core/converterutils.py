@@ -10,6 +10,7 @@ import xml.etree.ElementTree
 import pypandoc
 import emaildata.text
 
+import utils.builtin
 import core.exception
 import core.outputstorage
 import core.uniquesearcher
@@ -179,8 +180,8 @@ class FileProcesser():
             self.remove_note()
             self.file_docbook_to_markdown()
             self.yamlinfo = core.information_explorer.catch(
-                self.markdown_path, self.name,
-                self.base.base, self.yaml_path)
+                self.markdown_path, self.name, self.base.base)
+            utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)
             logger.info('Success')
             return True
         else:

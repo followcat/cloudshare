@@ -266,8 +266,7 @@ class FileProcesser():
             raise core.exception.DuplicateException(error)
         shutil.copy(os.path.join(self.markdown_path, self.name.md),
                     os.path.join(path, self.name.md))
-        shutil.copy(os.path.join(self.yaml_path, self.name.yaml),
-                    os.path.join(path, self.name.yaml))
+        utils.builtin.save_yaml(self.yamlinfo, path, self.name.yaml)
         repo.add_files([self.name.md, self.name.yaml],
                        committer=committer)
         logger.info('Finish')

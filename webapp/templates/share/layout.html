@@ -26,6 +26,7 @@
 	  <div class="col-xs-offset-8 col-sm-offset-8 col-md-offset-9 profile">
 	    <span id="name"><span class="glyphicon glyphicon-user"></span> {{ current_user.id }} </span>
 	    <div class="profile-menu">
+        <a href="#" data-toggle="modal" data-target=".setting-modal">Setting</a>
 	      <a href="#" data-toggle="modal" data-target=".quit-modal">Quit</a>
 	    </div>
 	  </div>
@@ -37,36 +38,36 @@
 	</header>
 	<!-- upload modal begin-->
 	<div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Upload File</h4>
-          </div>
-          <div class="modal-body">
-            <p>文件格式：名字-来源-ID.doc<br />例：张三-猎聘-123456.doc</p>
-            <input type="file" name="uploadify" id="uploadify" />
-            <div class="upload-info-box">
-              <div id="uploading">
-                <p><img src="{{ url_for('static', filename='images/uploading.gif') }}" alt="uploading">Uploading...</p>
-              </div>
-              <div id="upload-success">
-                <p><img src="{{ url_for('static', filename='images/yes.png') }}">Upload Success! Skipping page.</p>
-              </div>
-              <div id="upload-fail">
-                <p><img src="{{ url_for('static', filename='images/no.png') }}">Upload Fail! Please try it again.</p>
-              </div>
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Upload File</h4>
+        </div>
+        <div class="modal-body">
+          <p>文件格式：名字-来源-ID.doc<br />例：张三-猎聘-123456.doc</p>
+          <input type="file" name="uploadify" id="uploadify" />
+          <div class="upload-info-box">
+            <div id="uploading">
+              <p><img src="{{ url_for('static', filename='images/uploading.gif') }}" alt="uploading">Uploading...</p>
             </div>
+            <div id="upload-success">
+              <p><img src="{{ url_for('static', filename='images/yes.png') }}">Upload Success! Skipping page.</p>
+            </div>
+            <div id="upload-fail">
+              <p><img src="{{ url_for('static', filename='images/no.png') }}">Upload Fail! Please try it again.</p>
+            </div>
+          </div>
             
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
-          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
         </div>
       </div>
     </div>
-      <!-- upload modal end-->
+  </div>
+  <!-- upload modal end-->
 	<!--quit modal begin-->
 	<div class="modal fade quit-modal" tabindex="-1" role="dialog" aria-labelledby="myQuitModalLabel">
       <div class="modal-dialog modal-sm">
@@ -87,6 +88,39 @@
     </div>
     <!--quit modal end-->
 
+    <!--setting modal begin-->
+  <div class="modal fade setting-modal" tabindex="-1" role="dialog" aria-labelledby="mySettingModalLabel">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Change password</h4>
+          </div>
+          <form id="cpwd-form" action="/changepassword" method="POST">          
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="oldpassword">Old Password</label>
+              <input type="password" class="form-control" name="oldpassword" id="oldpassword" placeholder="Old Password" required="required">
+            </div>
+            <div class="form-group">
+              <label for="newpassword">New Password</label>
+              <input type="password" class="form-control" name="newpassword" id="newpassword" placeholder="New Password" required="required">
+            </div>
+            <div class="form-group">
+              <label for="confirmpassword">Confirm New Password</label>
+              <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" data-compare="#newpassword"placeholder="Confirm New Password" required="required">
+            </div>
+            <strong id="error-msg"></strong>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="cpwd-btn">Submit</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!--setting modal end-->
     {% block content %}{% endblock %}
     {% block script %}{% endblock %}
 </body>

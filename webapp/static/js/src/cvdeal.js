@@ -19,7 +19,7 @@ window.onload = function(){
 					}
 					else
 					{
-						alert(' Exists File ');
+						alert('文件已存在或者该简历不存在联系方式');
 					}
 				}
 			});

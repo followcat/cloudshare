@@ -1,23 +1,29 @@
 window.onload = function(){
 	$("#confirm-btn").on('click', function(){
 		var aForm = $("#cv-confirm-form");
-		console.log(aForm.serialize());
-		$.ajax({
-			url: '/confirm',
-			type: 'GET',
-			data: aForm.serialize(),
-			dataType: 'text',
-			success: function(result){
-				if( result == 'True')
-				{
-					window.location.href = '/search';
+		var aText = aForm.find(":text");
+
+
+		if(aText[0].value !== "" && aText[1].value !== "" && aText[2].value !== "")
+		{
+			$.ajax({
+				url: '/confirm',
+				type: 'POST',
+				data: aForm.serialize(),
+				dataType: 'text',
+				success: function(result){
+					console.log(result);
+					if( result == 'True')
+					{
+						window.location.href = '/search';
+					}
+					else
+					{
+						alert(' Exists File ');
+					}
 				}
-				else
-				{
-					alert(' Exists File ');
-				}
-			}
-		});
+			});
+		}	
         
 	});
 

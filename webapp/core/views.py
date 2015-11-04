@@ -77,7 +77,7 @@ class UploadPreview(flask.views.MethodView):
 
 class Confirm(flask.views.MethodView):
 
-    def get(self):
+    def post(self):
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session['upload'])
         result = upobj.confirm(flask.current_app.config['REPO_DB'], user.id)

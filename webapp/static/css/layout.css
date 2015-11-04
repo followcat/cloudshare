@@ -104,3 +104,8 @@ body{
   -o-transform:translateX(-50%);
   transform: translateX(-50%);
 }
+
+#uploading, #upload-success, #upload-fail{
+  display: none;
+  font-weight: bold;
+}

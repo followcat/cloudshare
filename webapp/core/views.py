@@ -68,6 +68,7 @@ class UploadPreview(flask.views.MethodView):
         upobj = pickle.loads(flask.session['upload'])
         preview_path = os.path.join(upobj.storage.markdown_path,
                                     upobj.storage.name.md)
+        flask.flash('Successlly Upload.')
         return flask.redirect(os.path.join('showtest', preview_path))
 
 
@@ -156,16 +157,14 @@ class AddUser(flask.views.MethodView):
 
 class ChangePassword(flask.views.MethodView):
 
-    def post(self): 
+    def post(self):
         result = False
         oldpassword = flask.request.form['oldpassword']
         newpassword = flask.request.form['newpassword']
         md5newpwd = utils.builtin.md5(oldpassword)
         user = flask.ext.login.current_user
-        # user.id
-        # user.password
         try:
-            if( user.password == md5newpwd ):
+            if(user.password == md5newpwd):
                 user.changepassword(newpassword)
                 result = True
             else:

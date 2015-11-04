@@ -45,12 +45,25 @@
           <h4 class="modal-title" id="myModalLabel">Upload File</h4>
         </div>
         <div class="modal-body">
-            <input type="file" name="uploadify" id="uploadify" />
-        </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
+          <p>文件格式：名字-来源-ID.doc<br />例：张三-猎聘-123456.doc</p>
+          <input type="file" name="uploadify" id="uploadify" />
+          <div class="upload-info-box">
+            <div id="uploading">
+              <p><img src="{{ url_for('static', filename='images/uploading.gif') }}" alt="uploading">Uploading...</p>
+            </div>
+            <div id="upload-success">
+              <p><img src="{{ url_for('static', filename='images/yes.png') }}">Upload Success! Skipping page.</p>
+            </div>
+            <div id="upload-fail">
+              <p><img src="{{ url_for('static', filename='images/no.png') }}">Upload Fail! Please try it again.</p>
+            </div>
           </div>
+            
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
+        </div>
       </div>
     </div>
   </div>

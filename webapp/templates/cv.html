@@ -10,62 +10,15 @@
     <body>
       <header class="header-box">
         <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
-    {% block search %}{% endblock %}
-        <div class="col-xs-offset-8 col-sm-offset-8 col-md-offset-9 profile">
-          <span id="name"><span class="glyphicon glyphicon-user"></span> {{ current_user.id }} </span>
-          <div class="profile-menu">
-            <a href="#" data-toggle="modal" data-target=".quit-modal">Quit</a>
-          </div>
-        </div>
-
-        <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 upload" data-toggle="modal" data-target=".upload-modal">
-          <span class="glyphicon glyphicon-upload"></span> Upload
-        </div>
-      </header>
-    <!-- upload modal begin-->
-      <div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
-        <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Upload File</h4>
-            </div>
-            <div class="modal-body">
-              <input type="file" name="uploadify" id="uploadify" />
-            </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
-              </div>
-          </div>
-        </div>
-      </div>
-      <!-- upload modal end-->
-      <!--quit modal begin-->
-      <div class="modal fade quit-modal" tabindex="-1" role="dialog" aria-labelledby="myQuitModalLabel">
-        <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Confirm</h4>
-            </div>
-            <div class="modal-body">
-              <p>Are you sure to quit?</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-              <button type="button" class="btn btn-primary" id="quit-btn">Yes</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!--quit modal end-->
+      </header> 
       <div class="wrap">
-        <div class="wrap-top">
-          <button type="button" class="btn btn-primary" id="confirm-btn">Confirm</button>
-        </div>
-        
-      
+        {% with confirm = get_flashed_messages() %}
+          {% if confirm %}
+            <div class="wrap-top">
+              <button type="button" class="btn btn-primary" id="confirm-btn">Confirm</button>
+            </div>
+          {% endif %}
+        {% endwith%}
         <div id="cv-box">
           <div class="cv-box-top">
             <span>简历情况：</span>

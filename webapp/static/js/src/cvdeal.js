@@ -74,8 +74,14 @@ window.onload = function(){
 		});
 
 		allElementP.each(function(){
+			var oP = $(this);
+			var reg = /&nbsp;/;
+			if(reg.test(oP.html()))
+			{
+				oP.remove();
+			}
 
-			CVDeal.prototype.ParagraphBr($(this), pattern);
+			CVDeal.prototype.ParagraphBr(oP, pattern);
 		});
 
 		allElementTd.each(function(){
@@ -88,12 +94,12 @@ window.onload = function(){
 		var text = obj.text();
 
 		var patternChinese = /[\u4e00-\u9fa5]{15,}/;
-		var patternPbr1 = /；/g;
+		var patternPbr1 = /；|;/g;
 		var patternPbr2 = /。/g;
 
 		if(pattern.test(text))
 		{
-			text = text.replace(pattern," ");
+			text = text.replace(pattern,"");
 			obj.text(text);
 		}
 

@@ -9,8 +9,8 @@ import dulwich.objects
 
 
 class GitInterface(object):
-    author = b'user<user@git.com>'
-    encoding = b"UTF-8"
+    author = b'developer'
+    encoding = b'UTF-8'
 
     def __init__(self, path):
         """

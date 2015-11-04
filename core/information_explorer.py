@@ -58,7 +58,30 @@ def save_yaml(infodict, path, filename):
         f.write(yaml.dump(infodict))
 
 
+def info_by_re_iter(stream, restr):
+    result_iter = iter(getInfoFromRestr(stream, restr))
+    try:
+        result = ''.join(result_iter.next())
+    except StopIteration:
+        result = ''
+    return result
+
+
 def catch(path, convertname, basename, output):
+    info_dict = {
+        "filename":     '',
+        "name":         '',
+        "education":    '',
+        "age":          '',
+        "position":     '',
+        "company":      '',
+        "school":       '',
+        "phone":        '',
+        "email":        '',
+        "comment":      [],
+        "tag":          [],
+        "tracking":     [],
+        }
     organization = (u'有限公司', U'公司', u'集团', u'院')
     organization_restr = u'[ \u3000:\uff1a]*([()a-zA-Z0-9\u4E00-\u9FA5]+)('
     for each in organization:
@@ -70,35 +93,43 @@ def catch(path, convertname, basename, output):
     for each in school:
         school_restr += each + '|'
     school_restr = school_restr[:-1] + ')'
+
     age_chinese = u'岁'
     age_restr = u'[ \u3000]*(\d{2})' + age_chinese
+
+    phone_restr = u'\b1\d{10}\b'
+
+    email_restr = u'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b'
+
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()
-        company_iter = iter(getInfoFromRestr(stream, organization_restr))
-        try:
-            company = ''.join(company_iter.next())
-        except StopIteration:
-            company = ''
+
+        name = getTagFromString('姓名', stream)
+        namelist = getInfoFromRestr(name.encode('utf-8'), u'^[\u4E00-\u9FA5\w]*$')
+        if not namelist:
+            name = ''
+        info_dict["name"] = name
+
+        age = info_by_re_iter(stream, age_restr)
+        phone = info_by_re_iter(stream, phone_restr)
+        email = info_by_re_iter(stream, email_restr)
+        company = info_by_re_iter(stream, organization_restr)
         school_iter = iter(getInfoFromRestr(stream, school_restr))
         try:
             school = ''.join(school_iter.next())
+            while len(school) > 10:
+                school = ''.join(school_iter.next())
         except StopIteration:
             school = ''
-        age_iter = iter(getInfoFromRestr(stream, age_restr))
-        try:
-            age = ''.join(age_iter.next())
-        except StopIteration:
-            age = ''
-        info_dict = {
-            "filename":     basename.decode('utf-8'),
-            "name":         getTagFromString('姓名', stream),
-            "education":    getTagFromString('学历', stream),
-            "age":          getTagFromString('年龄', stream) or age,
-            "position":     getTagFromString('职位', stream),
-            "company":      company,
-            "school":       school,
-            "comment":      [],
-            "tag":          [],
-            "tracking":     [],
-            }
+
+        info_dict["school"] = school
+        info_dict["company"] = company
+        info_dict["filename"] = basename.decode('utf-8')
+        info_dict["position"] = getTagFromString('职位', stream)
+        info_dict["education"] = getTagFromString('学历', stream)
+        info_dict["age"] = getTagFromString('年龄', stream) or age
+        info_dict["phone"] = getTagFromString('电话', stream) or phone
+        info_dict["email"] = getTagFromString('邮件', stream) or email
+
         save_yaml(info_dict, output, convertname.yaml)
+    return info_dict

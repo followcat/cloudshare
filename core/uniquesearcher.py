@@ -15,15 +15,17 @@ class UniqueSearcher(object):
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
             >>> cv1 = core.converterutils.FileProcesser('core/test',
             ... 'cv_1.doc', basepath)
+            >>> cv1.convert()
+            True
             >>> us = core.uniquesearcher.UniqueSearcher(interface)
-            >>> us.unique_name('cv_1')
+            >>> us.unique(cv1.yamlinfo)
             True
             >>> cv1.storage(interface)
             True
-            >>> us.unique_name('cv_1')
+            >>> us.unique(cv1.yamlinfo)
             True
             >>> us.reload()
-            >>> us.unique_name('cv_1')
+            >>> us.unique(cv1.yamlinfo)
             False
             >>> cv1.storage(interface)  # doctest: +ELLIPSIS
             Traceback (most recent call last):
@@ -40,10 +42,15 @@ class UniqueSearcher(object):
             base, suffix = os.path.splitext(f)
             self.yaml_datas[base] = data
 
-    def unique_name(self, name):
+    def unique(self, yamldict):
+        phone = yamldict['phone']
+        email = yamldict['email']
         for each in self.yaml_datas.values():
-            if ('filename' in each and
-                    name == each['filename'].encode('utf-8')):
+            if (('phone' in each and
+                     phone == each['phone'].encode('utf-8')) or
+                    ('email' in each and
+                     email == each['email'].encode('utf-8'))
+                    ):
                 return False
         else:
             return True

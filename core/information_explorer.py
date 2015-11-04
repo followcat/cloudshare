@@ -78,6 +78,8 @@ def catch(path, convertname, basename, output):
         "school":       '',
         "phone":        '',
         "email":        '',
+        "origin":       '',
+        "id":           '',
         "comment":      [],
         "tag":          [],
         "tracking":     [],
@@ -127,6 +129,7 @@ def catch(path, convertname, basename, output):
         info_dict["filename"] = basename.decode('utf-8')
         info_dict["position"] = getTagFromString('职位', stream)
         info_dict["education"] = getTagFromString('学历', stream)
+        info_dict["id"] = getTagFromString('ID', stream)
         info_dict["age"] = getTagFromString('年龄', stream) or age
         info_dict["phone"] = getTagFromString('电话', stream) or phone
         info_dict["email"] = getTagFromString('邮件', stream) or email

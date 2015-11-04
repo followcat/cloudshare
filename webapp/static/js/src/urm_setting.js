@@ -24,16 +24,20 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 	submitBtn.on('click', function(event){
 		var aForm = $("#settin-form");
 
-		urmmain.FormAjax(aForm, function(){
-			alert("The password is changed, please login again.");
-			window.location.href = "/";
+		var aPwd = aForm.find(":password");
 
-		}, function(){
+		if(formvalidate.ValidateBlank(aPwd))
+		{
+			urmmain.FormAjax(aForm, function(){
+				alert("The password is changed, please login again.");
+				window.location.href = "/";
 
-			alert("Operation Failed!");
+			}, function(){
 
-		});
-		
+				alert("Operation Failed!");
+
+			});
+		}
 		event.preventDefault();
 	});
 

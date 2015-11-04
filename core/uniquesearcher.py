@@ -47,11 +47,10 @@ class UniqueSearcher(object):
         phone = yamldict['phone']
         email = yamldict['email']
         for each in self.yaml_datas.values():
-            if (('phone' in each and
-                     phone == each['phone'].encode('utf-8')) or
-                    ('email' in each and
-                     email == each['email'].encode('utf-8'))
-                    ):
+            if ((phone and 'phone' in each and
+                 phone == each['phone'].encode('utf-8')) or
+                (email and 'email' in each and
+                 email == each['email'].encode('utf-8'))):
                 return False
         else:
             return True

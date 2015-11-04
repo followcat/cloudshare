@@ -92,9 +92,9 @@ def catch(path, convertname, basename):
     age_chinese = u'岁'
     age_restr = u'[ \u3000]*(\d{2})' + age_chinese
 
-    phone_restr = u'\b1\d{10}\b'
+    phone_restr = u'1\d{10}'
 
-    email_restr = u'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b'
+    email_restr = u'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'
 
     with open(os.path.join(path, convertname.md), 'r') as f:
         stream = f.read()

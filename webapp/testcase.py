@@ -54,6 +54,12 @@ class Test(flask.ext.testing.TestCase):
             name=username
         ), follow_redirects=True)
 
+    def changepassword(self, oldpassword, newpassword):
+        return self.client.post('/changepassword', data=dict(
+            oldpassword=oldpassword,
+            newpassword=newpassword
+        ), follow_redirects=True)
+
     def upload(self, filepath):
         with open(filepath) as f:
             stream = f.read()
@@ -69,8 +75,12 @@ class Test(flask.ext.testing.TestCase):
     def uppreview(self):
         return self.client.get('/uppreview', follow_redirects=True)
 
-    def confirm(self):
-        return self.client.get('/confirm', follow_redirects=True)
+    def confirm(self, name, origin, id):
+        return self.client.post('/confirm', data=dict(
+            name=name,
+            origin=origin,
+            id=id,
+        ), follow_redirects=True)
 
     def search(self, keyword):
         return self.client.post('/search', data=dict(
@@ -124,6 +134,14 @@ class LoginoutUser(User):
         assert(self.user_name in self.app.config['REPO_ACCOUNT'].USERS)
         self.logout()
 
+    def test_user_modify_password(self):
+        self.init_user()
+        self.login(self.user_name, self.user_password)
+        rv = self.changepassword(self.user_password, 'newpassword')
+        assert('true' in rv.data)
+        rv = self.login(self.user_name, 'newpassword')
+        assert(self.user_name in rv.data)
+
 
 class UploadFile(User):
 
@@ -134,7 +152,7 @@ class UploadFile(User):
         assert(rv.data == 'True')
         rv = self.uppreview()
         assert('CV Templates' in rv.data)
-        rv = self.confirm()
+        rv = self.confirm('name', 'origin', 'id')
         assert(rv.data == 'True')
         commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
         assert('Add file' in commit.message)
@@ -150,7 +168,7 @@ class Search(User):
         assert(rv.data == 'True')
         rv = self.uppreview()
         assert('CV Templates' in rv.data)
-        rv = self.confirm()
+        rv = self.confirm('name', 'origin', 'id')
         assert(rv.data == 'True')
 
     def test_searchresult(self):

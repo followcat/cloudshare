@@ -2,6 +2,7 @@ import glob
 import os.path
 
 import yaml
+import utils._yaml
 
 
 class UniqueSearcher(object):
@@ -38,7 +39,7 @@ class UniqueSearcher(object):
         self.yaml_datas = {}
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
             with open(f) as fp:
-                data = yaml.load(fp.read())
+                data = yaml.load(fp.read(), Loader=utils._yaml.Loader)
             base, suffix = os.path.splitext(f)
             self.yaml_datas[base] = data
 

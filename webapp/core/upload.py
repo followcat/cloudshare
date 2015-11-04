@@ -36,7 +36,7 @@ class UploadObject(object):
         self.storage = core.converterutils.FileProcesser(self.tmp_path,
                                                          self.convertname,
                                                          self.tmp_path)
-        self.result = self.storage.convert()
+        self.result = self.storage.result
         if self.result is False:
             self.information = 'Can not Convert'
         else:

@@ -67,7 +67,8 @@ class RepoAccount(object):
         upw = utils.builtin.md5(password)
         data[uid] = upw
         dump_data = yaml.dump(data)
-        self.repo.modify_file(self.account_filename, dump_data)
+        self.repo.modify_file(self.account_filename, dump_data,
+                              "Modify %s password." % id)
 
     def delete(self, mender, id):
         if mender != u'root':

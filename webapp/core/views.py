@@ -8,6 +8,7 @@ import pypandoc
 import flask.views
 import flask.ext.login
 
+import utils._yaml
 import utils.builtin
 import webapp.core.upload
 import core.outputstorage
@@ -37,7 +38,7 @@ class Search(flask.views.MethodView):
             name = core.outputstorage.ConvertName(base)
             with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
                 stream = yf.read()
-            yaml_data = yaml.load(stream)
+            yaml_data = yaml.load(stream, Loader=utils._yaml.Loader)
             info = repo.get_file_create_info(name.md)
             datas.append([os.path.join(repo.repo.path, name), yaml_data, info])
         return flask.render_template('search_result.html',
@@ -47,13 +48,8 @@ class Search(flask.views.MethodView):
 
 class Upload(flask.views.MethodView):
 
-    def judge(self, filename):
-        return len(filename.split('-')) is 3
-
     def post(self):
         network_file = flask.request.files['Filedata']
-        if self.judge(network_file.filename) is False:
-            return str('Not support file name format.')
         upobj = webapp.core.upload.UploadObject(network_file.filename,
                                                 network_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
@@ -78,8 +74,14 @@ class UploadPreview(flask.views.MethodView):
 class Confirm(flask.views.MethodView):
 
     def post(self):
+        info = {
+            'name': flask.request.form['name'],
+            'origin': flask.request.form['origin'],
+            'id': flask.request.form['id']
+        }
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session['upload'])
+        upobj.storage.yamlinfo.update(info)
         result = upobj.confirm(flask.current_app.config['REPO_DB'], user.id)
         return str(result)
 
@@ -160,16 +162,14 @@ class AddUser(flask.views.MethodView):
 
 class ChangePassword(flask.views.MethodView):
 
-    def post(self): 
+    def post(self):
         result = False
         oldpassword = flask.request.form['oldpassword']
         newpassword = flask.request.form['newpassword']
         md5newpwd = utils.builtin.md5(oldpassword)
         user = flask.ext.login.current_user
-        # user.id
-        # user.password
         try:
-            if( user.password == md5newpwd ):
+            if(user.password == md5newpwd):
                 user.changepassword(newpassword)
                 result = True
             else:

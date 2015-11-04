@@ -158,16 +158,14 @@ class AddUser(flask.views.MethodView):
 
 class ChangePassword(flask.views.MethodView):
 
-    def post(self): 
+    def post(self):
         result = False
         oldpassword = flask.request.form['oldpassword']
         newpassword = flask.request.form['newpassword']
         md5newpwd = utils.builtin.md5(oldpassword)
         user = flask.ext.login.current_user
-        # user.id
-        # user.password
         try:
-            if( user.password == md5newpwd ):
+            if(user.password == md5newpwd):
                 user.changepassword(newpassword)
                 result = True
             else:

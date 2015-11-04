@@ -8,8 +8,7 @@
   height: 80px;
   overflow: hidden;
 }
-.wrap-top .confirm-box{
-  width: 400px;
+.wrap-top .confirm-box{;
   float: right;
   margin-top: 20px; 
 }

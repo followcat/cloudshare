@@ -1,16 +1,23 @@
 window.onload = function(){
 	$("#confirm-btn").on('click', function(){
-
-        $.get('/confirm',function(result){
-            if(result == 'True')
-            {
-                window.location.href = '/search';
-            }
-            else
-            {
-                alert(' Exists File ');
-            }
-        });
+		var aForm = $("#cv-confirm-form");
+		console.log(aForm.serialize());
+		$.ajax({
+			url: '/confirm',
+			type: 'GET',
+			data: aForm.serialize(),
+			dataType: 'text',
+			success: function(result){
+				if( result == 'True')
+				{
+					window.location.href = '/search';
+				}
+				else
+				{
+					alert(' Exists File ');
+				}
+			}
+		});
         
 	});
 
@@ -117,9 +124,9 @@ window.onload = function(){
 	objCV.DeleteHr();
 	objCV.DeleteSection();
 	objCV.DeleteLink();
-    objCV.DeleleLine();
+  objCV.DeleleLine();
 
-    objCV = null;
+  objCV = null;
 
 	$("#loding-img").remove();
 	$("#cv-box").show();

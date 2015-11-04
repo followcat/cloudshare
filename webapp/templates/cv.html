@@ -16,10 +16,18 @@
           {% if confirm %}
           <div class="wrap-top">
             <div class="confirm-box">
-              <form class="form-inline">
+              <form class="form-inline" id="cv-confirm-form">
                 <div class="form-group">
-                  <label for="filename">File Name:</label>
-                  <input type="text" name="filename" placeholder="Please Input File Name" class="form-control" />
+                  <label for="filename">Name:</label>
+                  <input type="text" name="name" placeholder="Please Input Name" class="form-control" value="{{ name }}" />
+                </div>
+                <div class="form-group">
+                  <label for="filename">Origin:</label>
+                  <input type="text" name="origin" placeholder="Please Input Origin" class="form-control" value="{{ origin }}" />
+                </div>
+                <div class="form-group">
+                  <label for="filename">Id:</label>
+                  <input type="text" name="id" placeholder="Please Input Id" class="form-control" value="{{ id }}" />
                 </div>     
                 <button type="button" class="btn btn-primary" id="confirm-btn">Confirm</button>
               </form>

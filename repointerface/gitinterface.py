@@ -52,7 +52,7 @@ class GitInterface(object):
         commit_id = self.repo.do_commit(message, committer=committer)
         return commit_id
 
-    def modify_file(self, filename, stream, message=None):
+    def modify_file(self, filename, stream, message=None, committer=None):
         """
             >>> import shutil
             >>> import repointerface.gitinterface
@@ -72,19 +72,20 @@ class GitInterface(object):
         """
         if message is None:
             message = "Change %s." % filename
+        if committer is None:
+            committer = self.author
         blob = dulwich.objects.Blob.from_string(stream)
         head_commit = self.repo.get_object(self.repo.refs['HEAD'])
         head_tree = dulwich.objects.Tree()
         head_tree[filename] = (0o100644, blob.id)
-        self.commit(head_tree, blob, message)
+        self.commit(head_tree, blob, message, committer)
         self.checkout(head_tree)
 
-    def commit(self, tree, blob, message):
+    def commit(self, tree, blob, message, committer):
         commit = dulwich.objects.Commit()
         commit.tree = tree.id
-        author = self.author
         commit.parents = [self.repo.refs['HEAD']]
-        commit.author = commit.committer = author
+        commit.author = commit.committer = committer
         commit.commit_time = commit.author_time = int(time.time())
         tz = dulwich.objects.parse_timezone(b'-0200')[0]
         commit.commit_timezone = commit.author_timezone = tz

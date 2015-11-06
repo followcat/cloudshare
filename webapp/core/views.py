@@ -2,6 +2,7 @@ import pickle
 import codecs
 import os.path
 
+import yaml
 import flask
 import pypandoc
 import flask.views
@@ -92,7 +93,6 @@ class Show(flask.views.MethodView):
                          'r', encoding='utf-8') as file:
             md_data = file.read()
         md = pypandoc.convert(md_data, 'html', format='markdown')
-
         yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
@@ -102,8 +102,19 @@ class UpdateInfo(flask.views.MethodView):
     @flask.ext.login.login_required
     def post(self):
         result = True
+        user = flask.ext.login.current_user
+        repo = flask.current_app.config['REPO_DB']
         filename = flask.request.form['filename']
-        yamlinfo = flask.request.form['yamlinfo']
+        updateinfo = flask.request.form['yamlinfo']
+        key, value = updateinfo.popitem()
+        name = core.outputstorage.ConvertName(filename)
+        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+        if key in yaml_info:
+            yaml_info[key].add(value)
+            repo.modify_file(name.yaml, yaml.dump(yaml_info),
+                             "Add %s in %s." % (key, name.yaml), user.id)
+        else:
+            result = False
         return flask.jsonify(result=result)
 
 

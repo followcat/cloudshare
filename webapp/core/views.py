@@ -2,13 +2,11 @@ import pickle
 import codecs
 import os.path
 
-import yaml
 import flask
 import pypandoc
 import flask.views
 import flask.ext.login
 
-import utils._yaml
 import utils.builtin
 import webapp.core.upload
 import core.outputstorage
@@ -36,9 +34,7 @@ class Search(flask.views.MethodView):
         for each in result:
             base, suffix = os.path.splitext(each)
             name = core.outputstorage.ConvertName(base)
-            with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
-                stream = yf.read()
-            yaml_data = yaml.load(stream, Loader=utils._yaml.Loader)
+            yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
             info = repo.get_file_create_info(name.md)
             datas.append([name, yaml_data, info])
         return flask.render_template('search_result.html',
@@ -96,9 +92,8 @@ class Show(flask.views.MethodView):
                          'r', encoding='utf-8') as file:
             md_data = file.read()
         md = pypandoc.convert(md_data, 'html', format='markdown')
-        with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
-            yaml_data = yf.read()
-        yaml_info = yaml.load(yaml_data, Loader=utils._yaml.Loader)
+
+        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
 

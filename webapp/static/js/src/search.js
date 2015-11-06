@@ -6,22 +6,18 @@ require.config({
 		bootstrap: 'lib/bootstrap',
 		header: 'src/header',
 		formvalidate: 'src/formvalidate',
-		uploadify: 'plugin/uploadify/uploadify'
+		Upload: 'src/upload'
 	},
 	shim: {
 		bootstrap: {
 			deps: ['jquery'],
 			exports: 'bootstrap'
-		},
-		uploadify: {
-			deps: ['jquery'],
-			exports: 'uploadify'
 		}
 	}
 });
 
 
-require(['jquery', 'bootstrap', 'uploadify', 'header', 'formvalidate'], function($, bootstrap, uploadify, header, formvalidate){
+require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload'], function($, bootstrap, header, formvalidate, Upload){
 
 
 });

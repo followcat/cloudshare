@@ -49,7 +49,7 @@ class Search(flask.views.MethodView):
 class Upload(flask.views.MethodView):
 
     def post(self):
-        network_file = flask.request.files['Filedata']
+        network_file = flask.request.files['file']
         upobj = webapp.core.upload.UploadObject(network_file.filename,
                                                 network_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])

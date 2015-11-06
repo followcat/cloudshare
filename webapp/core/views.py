@@ -40,7 +40,7 @@ class Search(flask.views.MethodView):
                 stream = yf.read()
             yaml_data = yaml.load(stream, Loader=utils._yaml.Loader)
             info = repo.get_file_create_info(name.md)
-            datas.append([os.path.join(repo.repo.path, name), yaml_data, info])
+            datas.append([name, yaml_data, info])
         return flask.render_template('search_result.html',
                                      search_key=search_text,
                                      result=datas)
@@ -90,11 +90,13 @@ class Show(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self, filename):
+        repo = flask.current_app.config['REPO_DB']
         name = core.outputstorage.ConvertName(filename)
-        with codecs.open(name.md, 'r', encoding='utf-8') as file:
+        with codecs.open(os.path.join(repo.repo.path, name.md),
+                         'r', encoding='utf-8') as file:
             md_data = file.read()
         md = pypandoc.convert(md_data, 'html', format='markdown')
-        with open(name.yaml, 'r') as yf:
+        with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
             yaml_data = yf.read()
         yaml_info = yaml.load(yaml_data, Loader=utils._yaml.Loader)
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)

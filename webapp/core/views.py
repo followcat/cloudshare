@@ -100,6 +100,16 @@ class Show(flask.views.MethodView):
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
 
+class UpdateInfo(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def post(self):
+        result = True
+        filename = flask.request.form['filename']
+        yamlinfo = flask.request.form['yamlinfo']
+        return flask.jsonify(result=result)
+
+
 class Index(flask.views.MethodView):
 
     def get(self):

@@ -49,6 +49,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/updateinfo',
+        view_func=webapp.core.views.UpdateInfo.as_view('updateinfo'),
+        )
+
+    app.add_url_rule(
         '/',
         view_func=webapp.core.views.Index.as_view('index'),
         )

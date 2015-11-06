@@ -86,7 +86,7 @@ class Confirm(flask.views.MethodView):
         return str(result)
 
 
-class Showtest(flask.views.MethodView):
+class Show(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self, filename):

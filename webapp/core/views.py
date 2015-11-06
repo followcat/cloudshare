@@ -90,10 +90,14 @@ class Showtest(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self, filename):
-        with codecs.open(filename, 'r', encoding='utf-8') as file:
-            data = file.read()
-        output = pypandoc.convert(data, 'html', format='markdown')
-        return flask.render_template('cv.html', markdown=output)
+        name = core.outputstorage.ConvertName(filename)
+        with codecs.open(name.md, 'r', encoding='utf-8') as file:
+            md_data = file.read()
+        md = pypandoc.convert(md_data, 'html', format='markdown')
+        with open(name.yaml, 'r') as yf:
+            yaml_data = yf.read()
+        yaml_info = yaml.load(yaml_data, Loader=utils._yaml.Loader)
+        return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
 
 class Index(flask.views.MethodView):

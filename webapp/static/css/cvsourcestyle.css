@@ -76,3 +76,8 @@
 .comment-content{
 	max-height: 160px;
 }
+.add-label-box{
+	display: none;
+	margin-top: 2px;
+	width: 50%;
+}

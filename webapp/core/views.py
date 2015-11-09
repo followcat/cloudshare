@@ -104,14 +104,14 @@ class UpdateInfo(flask.views.MethodView):
         result = True
         user = flask.ext.login.current_user
         repo = flask.current_app.config['REPO_DB']
-        filename = flask.request.form['filename']
-        updateinfo = flask.request.form['yamlinfo']
+        filename = flask.request.json['filename']
+        updateinfo = flask.request.json['yamlinfo']
         key, value = updateinfo.popitem()
         name = core.outputstorage.ConvertName(filename)
         yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
         if key in yaml_info:
-            yaml_info[key].add(value)
-            repo.modify_file(name.yaml, yaml.dump(yaml_info),
+            yaml_info[key].append(value)
+            repo.modify_file(bytes(name.yaml), yaml.dump(yaml_info),
                              "Add %s in %s." % (key, name.yaml), user.id)
         else:
             result = False

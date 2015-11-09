@@ -58,10 +58,10 @@ Here is a demo bash script to run Jenkins test:
 1) Use method convert_folder in converterutils.py to convert your doc/docx/pdf.
 
 ``` python
->>> import utils.builtin
+>>> import tools.batching
 >>> import repointerface.gitinterface
 >>> repo = repointerface.gitinterface.GitInterface("repo")
->>> utils.builtin.convert_folder(YOUR_DIR, repo, TEMP_DIR)
+>>> tools.batching.convert_folder(YOUR_DIR, repo, TEMP_DIR)
 ```
 
     The generated docbook will save in folder docbook_output

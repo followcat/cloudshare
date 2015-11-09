@@ -4,13 +4,8 @@
     	<meta http-equiv="X-UA-Compatible" content="IE=edge">
   		<meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='js/plugin/uploadify/uploadify.css')}}">
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/layout.css') }}">
-<!--       <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvstyle.css') }}"> -->
-			{% block previewstyle %}{% endblock %}
-			{% block sourcestyle %}{% endblock %}
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvlayout.css') }}">
       <title>CV Templates</title>
-
       <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 		  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 		  <!--[if lt IE 9]>
@@ -24,9 +19,5 @@
     </header> 
 		{% block content %}
 		{% endblock %}
-    <script type="text/javascript" src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
-    {% block previewscript %}{% endblock %}
-    {% block sourcescript %}{% endblock %}
   </body>
 </html>

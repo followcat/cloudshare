@@ -122,7 +122,8 @@ def catch(path, convertname, basename):
         info_dict["school"] = school
         info_dict["company"] = company
         info_dict["filename"] = basename.decode('utf-8')
-        info_dict["position"] = getTagFromString('职位', stream)
+        info_dict["position"] = getTagFromString('所任职位', stream)[:25] or\
+            getTagFromString('职位', stream)[:25]
         info_dict["education"] = getTagFromString('学历', stream)
         info_dict["id"] = getTagFromString('ID', stream, rule='a-zA-Z0-9')
         info_dict["age"] = getTagFromString('年龄', stream) or age

@@ -72,7 +72,4 @@ def classify(path, temp_output):
     for root, dirs, files in os.walk(path):
         for name in files:
             processfile = core.converterutils.FileProcesser(root, name, temp_output)
-            try:
-                filter(processfile, root, name)
-            except core.exception.DuplicateException as error:
-                continue
+            filter(processfile, root, name)

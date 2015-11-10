@@ -83,7 +83,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		}
 
 	}
-	
+
 	//Add tag
 	$("#add-label-btn").on('click', function(){
 		var filename = GetFileName();
@@ -115,9 +115,6 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 					{
 						alert("操作失败");
 					}
-				},
-				error: function(msg){
-					console.log(msg);
 				}
 			});
 		}
@@ -157,9 +154,6 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 						$("#tracking-content").prepend("<div class='tracking-item'><p class='content'>"+ tracking_text +"</p><em class='commit-info'>" + current_user + " "+ date + "</em></div>");
 						$("#tracking-text").val("");
 					}
-				},
-				error: function(msg){
-					console.log(msg);
 				}
 			});
 		}
@@ -190,9 +184,6 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 				success: function(result){
 					$("#comment-content").prepend("<div class='comment-item'><p class='content'>" + comment_text + "</p><em class='commit-info'>" + current_user + "</em></div>");
 					$("#comment-text").val("");
-				},
-				error: function(msg){
-					console.log(msg);
 				}
 			});
 		}

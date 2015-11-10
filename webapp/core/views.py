@@ -87,7 +87,7 @@ class Show(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self, filename):
-        repo = flask.current_app.config['REPO_DB']
+        repo = flask.current_app.config['DATA_DB']
         name = core.outputstorage.ConvertName(filename)
         with codecs.open(os.path.join(repo.repo.path, name.md),
                          'r', encoding='utf-8') as file:
@@ -103,7 +103,7 @@ class UpdateInfo(flask.views.MethodView):
     def post(self):
         result = True
         user = flask.ext.login.current_user
-        repo = flask.current_app.config['REPO_DB']
+        repo = flask.current_app.config['DATA_DB']
         filename = flask.request.json['filename']
         updateinfo = flask.request.json['yamlinfo']
         key, value = updateinfo.popitem()

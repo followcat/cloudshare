@@ -35,8 +35,7 @@
           {{ markdown|safe }}
         </div>
       </div>
-      <script src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
-      <script src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
+      <script data-main="{{ url_for('static', filename='js/src/preview') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
       {% else %}
       {% block sourcestyle %}
       <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-datetimepicker.min.css') }}">
@@ -56,7 +55,7 @@
                 <a href="javascript:;" id="add-label">添加</a>
               </div>
               <div class="input-group add-label-box">
-                <input type="text" class="form-control" id="label-text" />
+                <input type="text" class="form-control" id="label-text" required="required" />
                 <div class="input-group-btn">
                   <button type="button" class="btn btn-primary" id="add-label-btn">完成</button>
                 </div>               
@@ -68,7 +67,7 @@
                 <span>跟进情况</span>
               </div>
               <div class="form-input">
-                <input type="text" class="form-control" placeholder="写下你的跟进情况..." id="tracking-text" />
+                <input type="text" class="form-control" placeholder="写下你的跟进情况..." id="tracking-text" required="required" />
                 <div class="btn-box">
                   <div class="form-group">
                     <label for="date" class="col-md-2 control-label" style="padding:4px;">日期</label>
@@ -102,7 +101,7 @@
                 <span>评论</span>
               </div>
               <div class="form-input">
-                <input type="text" class="form-control" placeholder="写下你的评论..." id="comment-text" />
+                <input type="text" class="form-control" placeholder="写下你的评论..." id="comment-text" required="required" />
                 <div class="btn-box">
                   <button type="button" class="btn btn-primary" id="comment-btn">提交</button>
                 </div>

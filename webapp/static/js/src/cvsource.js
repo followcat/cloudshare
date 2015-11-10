@@ -73,36 +73,55 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		return filename;
 	};
 
+	function CheckBlank(val){
+		var reg = /^\s*$/g;
+		if(val == "" || reg.test(val)){
+			return true;
+		}
+		else{
+			return false;
+		}
+
+	}
+	
 	//Add tag
 	$("#add-label-btn").on('click', function(){
 		var filename = GetFileName();
 		var label_text = $("#label-text").val();
 		var current_user = $("#current-id").text();
 
-		$.ajax({
-			type: 'POST',
-			url: '/updateinfo',
-			dataType: 'json',
-			contentType: 'application/json',
-			data: JSON.stringify({
-				"filename" : filename,
-				"yamlinfo" : {"tag" : label_text}
-			}),
-			success: function(result){
-				if(result.result)
-				{
-					$(".label-item").prepend("<span class='label label-primary' title="+ current_user +">"+ label_text +"</span>");
-					$("#label-text").val("");
+		if( CheckBlank(label_text) ){
+			$(this).attr("disable",false);
+			$("#label-text").focus();
+		}
+		else{
+			$(this).attr("disable",true);
+			$.ajax({
+				type: 'POST',
+				url: '/updateinfo',
+				dataType: 'json',
+				contentType: 'application/json',
+				data: JSON.stringify({
+					"filename" : filename,
+					"yamlinfo" : {"tag" : label_text}
+				}),
+				success: function(result){
+					if(result.result)
+					{
+						$(".label-item").prepend("<span class='label label-primary' title="+ current_user +">"+ label_text +"</span>");
+						$("#label-text").val("");
+					}
+					else
+					{
+						alert("操作失败");
+					}
+				},
+				error: function(msg){
+					console.log(msg);
 				}
-				else
-				{
-					alert("操作失败");
-				}
-			},
-			error: function(msg){
-				console.log(msg);
-			}
-		});
+			});
+		}
+
 	});
 
 	//Add tracking massage 
@@ -112,31 +131,39 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		var date = $("#date").val();
 		var current_user = $("#current-id").text();
 
-		$.ajax({
-			type: 'POST',
-			url: '/updateinfo',
-			dataType: 'json',
-			contentType: 'application/json',
-			data: JSON.stringify({
-				"filename" : filename,
-				"yamlinfo" : {
-					"tracking" :{
-						"date" : date,
-						"text" : tracking_text
+		if( CheckBlank(tracking_text) || date == "" ){
+			$(this).attr("disable", false);
+			$("#tracking-text").focus();
+		}
+		else{
+			$(this).attr("disable", true);
+			$.ajax({
+				type: 'POST',
+				url: '/updateinfo',
+				dataType: 'json',
+				contentType: 'application/json',
+				data: JSON.stringify({
+					"filename" : filename,
+					"yamlinfo" : {
+						"tracking" :{
+							"date" : date,
+							"text" : tracking_text
+						}
 					}
+				}),
+				success: function(result){
+					if(result.result)
+					{
+						$("#tracking-content").prepend("<div class='tracking-item'><p class='content'>"+ tracking_text +"</p><em class='commit-info'>" + current_user + " "+ date + "</em></div>");
+						$("#tracking-text").val("");
+					}
+				},
+				error: function(msg){
+					console.log(msg);
 				}
-			}),
-			success: function(result){
-				if(result.result)
-				{
-					$("#tracking-content").prepend("<div class='tracking-item'><p class='content'>"+ tracking_text +"</p><em class='commit-info'>" + current_user + " "+ date + "</em></div>");
-					$("#tracking-text").val("");
-				}
-			},
-			error: function(msg){
-				console.log(msg);
-			}
-		});
+			});
+		}
+		
 	});
 
 	//Add comment
@@ -145,23 +172,31 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		var comment_text = $("#comment-text").val();
 		var current_user = $("#current-id").text();
 
-		$.ajax({
-			type: 'POST',
-			url: '/updateinfo',
-			dataType: 'json',
-			contentType: 'application/json',
-			data: JSON.stringify({
-				"filename" : filename,
-				"yamlinfo" : { "comment" : comment_text }
-			}),
-			success: function(result){
-				$("#comment-content").prepend("<div class='comment-item'><p class='content'>" + comment_text + "</p><em class='commit-info'>" + current_user + "</em></div>");
-				$("#comment-text").val("");
-			},
-			error: function(msg){
-				console.log(msg);
-			}
-		});
+		if( CheckBlank(comment_text) ){
+			$(this).attr("disable", false);
+			$("#comment-text").focus();
+		}
+		else{
+			$(this).attr("disable", true);
+			$.ajax({
+				type: 'POST',
+				url: '/updateinfo',
+				dataType: 'json',
+				contentType: 'application/json',
+				data: JSON.stringify({
+					"filename" : filename,
+					"yamlinfo" : { "comment" : comment_text }
+				}),
+				success: function(result){
+					$("#comment-content").prepend("<div class='comment-item'><p class='content'>" + comment_text + "</p><em class='commit-info'>" + current_user + "</em></div>");
+					$("#comment-text").val("");
+				},
+				error: function(msg){
+					console.log(msg);
+				}
+			});
+		}
+		
 	});
 
 

@@ -43,11 +43,11 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
     forceParse: 0
   });
 
-	$("#follow-up-text").on('click', function(){
+	$("#tracking-text").on('focus', function(){
 		$(this).next().show();
 	});
 
-	$("#comment-text").on('click', function(){
+	$("#comment-text").on('focus', function(){
 		$(this).next().show();
 	});
 
@@ -96,17 +96,18 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		});
 	});
 
-	//Add follow-up massage 
-	$("#follow-up-btn").on('click', function(){
+	//Add tracking massage 
+	$("#tracking-btn").on('click', function(){
 		var filename = GetFileName();
-		var follow_up_text = $("#follow-up-text").val();
+		var follow_up_text = $("#tracking-text").val();
 		var date = $("#date").val();
 
 		$.ajax({
 			type: 'POST',
 			url: '/updateinfo',
 			dataType: 'json',
-			data: {
+			contentType: 'application/json',
+			data: JSON.stringify({
 				"filename" : filename,
 				"yamlinfo" : {
 					"tracking" :{
@@ -114,7 +115,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 						"text" : follow_up_text
 					}
 				}
-			},
+			}),
 			success: function(result){
 				console.log(result);
 			},
@@ -129,14 +130,14 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		var filename = GetFileName();
 		var comment_text = $("#comment-text").val();
 
-		var commentJson = JSON.stringify({ "comment" : comment_text });
 		$.ajax({
 			type: 'POST',
 			url: '/updateinfo',
 			dataType: 'json',
+			contentType: 'application/json',
 			data: JSON.stringify({
 				"filename" : filename,
-				"yamlinfo" : commentJson
+				"yamlinfo" : { "comment" : comment_text }
 			}),
 			success: function(result){
 				console.log(result);

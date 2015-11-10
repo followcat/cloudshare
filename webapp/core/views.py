@@ -110,7 +110,7 @@ class UpdateInfo(flask.views.MethodView):
         name = core.outputstorage.ConvertName(filename)
         yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
         if key in yaml_info:
-            yaml_info[key].append(value)
+            yaml_info[key].append({'author': user.id, 'content': value})
             repo.modify_file(bytes(name.yaml), yaml.dump(yaml_info),
                              "Add %s in %s." % (key, name.yaml), user.id)
         else:

@@ -46,7 +46,14 @@
           <div class="wrap-right">
             <div class="label-box">
               <div class="label-item">
-<!--                 <span class="label label-primary">本科</span>
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='tag' %}
+                    {% for item in value %}
+                      <span class="label label-primary" title="{{ item.author }}">{{ item.content }}</span>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+<!--            <span class="label label-primary">本科</span>
                 <span class="label label-primary">医疗设备</span> -->
                 <a href="javascript:;" id="add-label">添加</a>
               </div>
@@ -58,12 +65,12 @@
               </div>
               
             </div>
-            <div class="follow-up-box">
+            <div class="tracking-box">
               <div class="title">
                 <span>跟进情况</span>
               </div>
               <div class="form-input">
-                <input type="text" class="form-control" placeholder="写下你的跟进情况..." id="follow-up-text" />
+                <input type="text" class="form-control" placeholder="写下你的跟进情况..." id="tracking-text" />
                 <div class="btn-box">
                   <div class="form-group">
                     <label for="date" class="col-md-2 control-label" style="padding:4px;">日期</label>
@@ -73,11 +80,17 @@
                     </div>
                     <input type="hidden" id="date" value="" />
                   </div>
-                  <button type="button" class="btn btn-primary" id="follow-up-btn">提交</button>
+                  <button type="button" class="btn btn-primary" id="tracking-btn">提交</button>
                 </div>
               </div>
-              <div class="follow-up-content">
-                <div class="follow-up-item"> </div>
+              <div class="tracking-content" id="tracking-content">
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='tracking' %}
+                    {% for item in value %}
+                      <div class="comment-item"><span class="author">{{ item.author }}</span>{{ item.content.text }}<p>{{ item.content.date }}</p></div>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
               </div>        
             </div>
             <div class="comment-box">
@@ -90,12 +103,16 @@
                   <button type="button" class="btn btn-primary" id="comment-btn">提交</button>
                 </div>
               </div>
-              <div class="comment-content">
-                <div class="comment-item"></div>
+              <div class="comment-content" id="comment-content">
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='comment' %}
+                    {% for item in value %}
+                      <div class="comment-item"><span class="author">{{ item.author }}</span>{{ item.content }}</div>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
               </div>
-              
             </div>
-
           </div>
           <div class="wrap-left">
             <div id="cv-box">

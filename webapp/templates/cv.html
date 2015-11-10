@@ -87,7 +87,13 @@
                 {% for key, value in yaml.iteritems() %}
                   {% if key=='tracking' %}
                     {% for item in value %}
-                      <div class="comment-item"><span class="author">{{ item.author }}</span>{{ item.content.text }}<p>{{ item.content.date }}</p></div>
+                      <div class="tracking-item">
+                        <p class="content">{{ item.content.text }}</p>
+                        <em class="commit-info">
+                          {{ item.author }}
+                          {{ item.content.date }}
+                        </em>
+                      </div>
                     {% endfor %}
                   {% endif %}
                 {% endfor %}
@@ -107,7 +113,12 @@
                 {% for key, value in yaml.iteritems() %}
                   {% if key=='comment' %}
                     {% for item in value %}
-                      <div class="comment-item"><span class="author">{{ item.author }}</span>{{ item.content }}</div>
+                      <div class="comment-item">
+                        <p class="content">{{ item.content }}</p>
+                        <em class="commit-info">
+                          {{ item.author }}
+                        </em>
+                      </div>
                     {% endfor %}
                   {% endif %}
                 {% endfor %}

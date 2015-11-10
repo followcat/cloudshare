@@ -34,10 +34,14 @@ def convert_docfile(path, filename, output, format):
 class FileProcesser():
 
     def __init__(self, root, name, output_base):
+        self.yamlinfo = {}
+        self.markdown_stream = ''
+
         self.root = root
         self.base = core.outputstorage.ConvertName(name)
         self.name = self.base.random
         self.stream = self.load()
+
         self.output_path = core.outputstorage.OutputPath(output_base)
         self.source_path = self.output_path.source
         self.docx_path = self.output_path.docx
@@ -45,11 +49,13 @@ class FileProcesser():
         self.yaml_path = self.output_path.yaml
         self.docbook_path = self.output_path.docbook
         self.markdown_path = self.output_path.markdown
+
         self.mimetype = self.mimetype()
-        self.yamlinfo = {}
         logger.info('Mimetype: %s' % self.mimetype)
+
         location = self.copy()
         logger.info('Backup to: %s' % location)
+
         self.result = self.convert()
 
     def mimetype(self):
@@ -127,7 +133,9 @@ class FileProcesser():
                 else:
                     with open(output_file, 'w') as f:
                         for line in reformat:
-                            f.write(line.lstrip(' '))
+                            data = line.lstrip(' ')
+                            f.write(data)
+                            self.markdown_stream += data
         except RuntimeError as e:
             pass
 

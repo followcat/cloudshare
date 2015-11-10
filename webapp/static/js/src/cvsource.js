@@ -77,6 +77,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 	$("#add-label-btn").on('click', function(){
 		var filename = GetFileName();
 		var label_text = $("#label-text").val();
+		var current_user = $("#current-id").text();
 
 		$.ajax({
 			type: 'POST',
@@ -88,7 +89,15 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 				"yamlinfo" : {"tag" : label_text}
 			}),
 			success: function(result){
-				console.log(result);
+				if(result.result)
+				{
+					$(".label-item").prepend("<span class='label label-primary' title="+ current_user +">"+ label_text +"</span>");
+					$("#label-text").val("");
+				}
+				else
+				{
+					alert("操作失败");
+				}
 			},
 			error: function(msg){
 				console.log(msg);
@@ -99,8 +108,9 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 	//Add tracking massage 
 	$("#tracking-btn").on('click', function(){
 		var filename = GetFileName();
-		var follow_up_text = $("#tracking-text").val();
+		var tracking_text = $("#tracking-text").val();
 		var date = $("#date").val();
+		var current_user = $("#current-id").text();
 
 		$.ajax({
 			type: 'POST',
@@ -112,12 +122,16 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 				"yamlinfo" : {
 					"tracking" :{
 						"date" : date,
-						"text" : follow_up_text
+						"text" : tracking_text
 					}
 				}
 			}),
 			success: function(result){
-				console.log(result);
+				if(result.result)
+				{
+					$("#tracking-content").prepend("<div class='tracking-item'><p class='content'>"+ tracking_text +"</p><em class='commit-info'>" + current_user + " "+ date + "</em></div>");
+					$("#tracking-text").val("");
+				}
 			},
 			error: function(msg){
 				console.log(msg);
@@ -129,6 +143,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 	$("#comment-btn").on('click', function(){
 		var filename = GetFileName();
 		var comment_text = $("#comment-text").val();
+		var current_user = $("#current-id").text();
 
 		$.ajax({
 			type: 'POST',
@@ -140,7 +155,8 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 				"yamlinfo" : { "comment" : comment_text }
 			}),
 			success: function(result){
-				console.log(result);
+				$("#comment-content").prepend("<div class='comment-item'><p class='content'>" + comment_text + "</p><em class='commit-info'>" + current_user + "</em></div>");
+				$("#comment-text").val("");
 			},
 			error: function(msg){
 				console.log(msg);

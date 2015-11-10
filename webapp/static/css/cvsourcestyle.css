@@ -74,10 +74,10 @@
 	overflow-y: auto; 
 }
 .tracking-content{
-	max-height: 120px;
+	max-height: 100px;
 }
 .comment-content{
-	max-height: 160px;
+	max-height: 140px;
 }
 .add-label-box{
 	display: none;
@@ -86,7 +86,7 @@
 }
 .tracking-item, .comment-item{
 	padding: 6px 8px;
-	border-bottom: 1px dotted #eee; 
+	border-bottom: 1px dotted #e1e1e1; 
 }
 .tracking-item p, .comment-item p{
 	margin: 0;

@@ -7,6 +7,9 @@ body{
   height: 50px;
   background-color: #337ab7;
 }
+.header-box #current-id{
+  display: none;
+}
 .logo{
   position: absolute;
   width: 174px;

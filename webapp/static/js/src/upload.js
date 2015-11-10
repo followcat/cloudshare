@@ -15,7 +15,6 @@ define('Upload', function(){
 		if( aForm["file"].files.length > 0 )
 		{
 			var file = aForm["file"].files[0];
-			console.log(file);
 			//build formdata object
 			var formData = new FormData();
 			formData.append('file', file);
@@ -30,35 +29,68 @@ define('Upload', function(){
 			// upload.progressbar = progressbar;
 			xhr.open("POST", aForm.action);
 			//add upload file evnet function
+			var progressmsg = document.getElementById("progressmsg");
+			xhr.addEventListener('loadstart', function(event){
+				var img = document.createElement("img");
+				img.src = "/static/images/uploading.gif";
+				img.alt = "loading";
+				var span = document.createElement("span");
+				span.innerHTML = "Uploading";
+				progressmsg.appendChild(img);
+				progressmsg.appendChild(span);
+
+				var a = document.createElement("a");
+				a.href = "javascript:;";
+				a.innerHTML = "cancel";
+				progressmsg.appendChild(a);
+				a.onclick = function(){
+					xhr.abort();
+					xhr = null;
+				};
+			}, false);
+
+			xhr.addEventListener('abort', function(){
+				progressmsg.innerHTML = "";
+			}, false);
 
 			xhr.addEventListener("progress", function(event){
-				console.log("profress" + this);
-				var progressbar = document.getElementById("progressbar");
+
 				if(event.lengthComputable)
 				{
-					progressbar.innerHTML = "Received " + event.position + " of " + event.totalSize + "bytes";
+					progressmsg.innerHTML = "Received " + event.loaded + " of " + event.total + " bytes" + "<br>";
 				}
 			}, false);
 
 			xhr.addEventListener("load", function(){
 				if( (xhr.status >= 200 && xhr.status < 300) || xhr.status == 304 )
 				{
-					var successMsg = document.createElement('p');
+					var img = document.createElement("img");
+					img.src = "/static/images/yes.png";
+					img.alt = "yes";
+					var successMsg = document.createElement('span');
 					var text = document.createTextNode("Upload Success! Skipping page.");
 					successMsg.appendChild(text);
-					aForm.appendChild(successMsg);
+					progressmsg.appendChild(img);
+					progressmsg.appendChild(successMsg);
 					func();
 				}
 				else
 				{
-					var failMsg = document.createElement('p');
+					var img = document.createElement("img");
+					img.src = "/static/images/no.png";
+					img.alt = "no";
+					var failMsg = document.createElement('span');
 					var text = document.createTextNode("Upload Fail! Please Try it again.");
-					successMsg.appendChild(text);
-					aForm.appendChild(successMsg);
+					failMsg.appendChild(text);
+					progressmsg.appendChild(img);
+					progressmsg.appendChild(failMsg);
 				}
 			}, false);
 
-			xhr.addEventListener("error", Upload.Error, false);
+			xhr.addEventListener("error", function(event){
+				console.log(event);
+				progressmsg.innerHTML = "Error." + Upload.Error;
+			}, false);
 
 			//upload file
 			
@@ -72,7 +104,6 @@ define('Upload', function(){
 			aForm.appendChild(p);
 		}
 	};
-
 
 	return Upload;
 });

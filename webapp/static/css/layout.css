@@ -122,6 +122,8 @@ body{
   -o-border-radius: 6px;
   border-radius: 6px;
 }
-#progressbar{
+#progressmsg{
+  padding: 10px 0 0;
+  font-size: 1.075em;
   font-weight: bold;
 }

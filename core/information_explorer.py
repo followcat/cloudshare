@@ -91,6 +91,12 @@ def catch(path, convertname, basename):
         school_restr += each + '|'
     school_restr = school_restr[:-1] + ')'
 
+    education = (u'博士', u'硕士', u'本科', u'大专')
+    education_restr = u'('
+    for each in education:
+        education_restr += each + '|'
+    education_restr = education_restr[:-1] + ')'
+
     age_chinese = u'岁'
     age_restr = u'[ \u3000]*(\d{2})' + age_chinese
 
@@ -124,7 +130,8 @@ def catch(path, convertname, basename):
         info_dict["filename"] = basename.decode('utf-8')
         info_dict["position"] = getTagFromString('所任职位', stream)[:25] or\
             getTagFromString('职位', stream)[:25]
-        info_dict["education"] = getTagFromString('学历', stream)
+        info_dict["education"] = getTagFromString('学历', stream) or\
+            info_by_re_iter(stream, education_restr)
         info_dict["id"] = getTagFromString('ID', stream, rule='a-zA-Z0-9')
         info_dict["age"] = getTagFromString('年龄', stream) or age
         info_dict["phone"] = getTagFromString('电话', stream) or phone

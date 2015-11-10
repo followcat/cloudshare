@@ -81,7 +81,6 @@ def convert_folder(path, repo, temp_output):
             if not processfile.yamlinfo['name']:
                 name = name_from_51job(processfile.markdown_stream)
                 processfile.yamlinfo['name'] = name
-                processfile.yamlinfo['origin'] = u'51job'
                 if not processfile.yamlinfo['name']:
                     processfile.yamlinfo['name'] = name_from_filename(filename)
             try:

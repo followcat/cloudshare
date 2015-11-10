@@ -18,8 +18,16 @@ def move_file(path, origin_path, filename):
 
 def name_from_51job(stream):
     name = core.information_explorer.getInfoFromRestr(stream,
-                                                      u'Script([\u4E00-\u9FA5]+)\W')
-    return name
+                u'Script简历关键字：[\u4E00-\u9FA5|\w|\S ]+[\n]+([\u4E00-\u9FA5]+)')
+    if name:
+        return name[0]
+    else:
+        name = core.information_explorer.getInfoFromRestr(stream,
+                    u'Script([\u4E00-\u9FA5]+)\W')
+        if name and len(name) < 4:
+            return name[0]
+        else:
+            return ''
 
 
 def name_from_filename(filename):
@@ -68,8 +76,13 @@ def convert_folder(path, repo, temp_output):
     if not os.path.exists(temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
-        for name in files:
-            processfile = core.converterutils.FileProcesser(root, name, temp_output)
+        for filename in files:
+            processfile = core.converterutils.FileProcesser(root, filename, temp_output)
+            if not processfile.yamlinfo['name']:
+                name = name_from_51job(processfile.markdown_stream)
+                processfile.yamlinfo['name'] = name
+                if not processfile.yamlinfo['name']:
+                    processfile.yamlinfo['name'] = name_from_filename(filename)
             try:
                 processfile.storage(repo)
             except core.exception.DuplicateException as error:

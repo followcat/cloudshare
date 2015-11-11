@@ -2,15 +2,15 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
 
 	var header = {};
 
+	//upload event
 	header.UploadHandle = function(objBtn){
 		objBtn.on('click', function(){
 
 			var uploader = new Upload("file-form");
 			uploader.Uploadfile(function(){
-				setTimeout(function(){
-					window.location.href = "/uppreview";
-				}, 1000);
-				
+					setTimeout(function(){
+						window.location.href = "/uppreview";
+					}, 1000);
 			});
 		});
 	};
@@ -153,9 +153,8 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
 
 	header.UploadDiv = function(obj){
 		obj.on('click', function(){
-			$("#uploading").hide();
-			$("#upload-success").hide();
-			$("#upload-fail").hide();
+			$("#file").val("");
+			$("#progressmsg").html("");
 		});
 	};
 

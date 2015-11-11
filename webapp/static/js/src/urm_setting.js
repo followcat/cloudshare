@@ -26,7 +26,7 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 
 		var aPwd = aForm.find(":password");
 
-		if(formvalidate.ValidateBlank(aPwd))
+		if(!formvalidate.ValidateBlank(aPwd))
 		{
 			urmmain.FormAjax(aForm, function(){
 				alert("The password is changed, please login again.");

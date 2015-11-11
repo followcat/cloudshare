@@ -29,7 +29,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 		var aText = aForm.find(":text");
 		var aPwd = aForm.find(":password");
 		
-		if(formvalidate.ValidateBlank(aText) && formvalidate.ValidateBlank(aPwd))
+		if( !formvalidate.ValidateBlank(aText) && !formvalidate.ValidateBlank(aPwd))
 		{
 			//call the ajax request
 			urmmain.FormAjax(aForm, function(){

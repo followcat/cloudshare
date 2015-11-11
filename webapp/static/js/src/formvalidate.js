@@ -41,9 +41,9 @@ define(function(){
  		{
  			if(obj[i].value === "")
  			{
- 				return false;
- 			}else{
  				return true;
+ 			}else{
+ 				return false;
  			}
  		}
 	

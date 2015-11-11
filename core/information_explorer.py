@@ -3,7 +3,7 @@ import re
 import os.path
 
 
-def getTagFromString(tag, stream):
+def getTagFromString(tag, stream, rule=None):
     """
         >>> import core.information_explorer
         >>> core.information_explorer.getTagFromString('姓名', '姓名:followcat ')
@@ -17,12 +17,14 @@ def getTagFromString(tag, stream):
         >>> core.information_explorer.getTagFromString('姓名', '  姓    名:    followcat ')
         u'followcat'
     """
+    if rule is None:
+        rule = '\S'
     name = ""
     re_string = ""
     for each in tag.decode('utf-8').replace(u'\xa0', ' '):
         re_string += each
         re_string += ur"[ \u3000]*"
-    re_string += ur"[ \u3000:\uff1a]+(?P<tag>[\S]+)\W"
+    re_string += ur"[ \u3000:\uff1a]+(?P<tag>[%s]+)\W" % rule
     re_words = re.search(re_string, stream.decode('utf8'))
     if re_words is not None:
         name = re_words.group('tag')
@@ -78,7 +80,7 @@ def catch(path, convertname, basename):
         "tracking":     [],
         }
     organization = (u'有限公司', U'公司', u'集团', u'院')
-    organization_restr = u'[ \u3000:\uff1a]*([()a-zA-Z0-9\u4E00-\u9FA5]+)('
+    organization_restr = u'[ \u3000:\uff1a]*([（）()a-zA-Z0-9\u4E00-\u9FA5]+)('
     for each in organization:
         organization_restr += each + '|'
     organization_restr = organization_restr[:-1] + ')'
@@ -88,6 +90,12 @@ def catch(path, convertname, basename):
     for each in school:
         school_restr += each + '|'
     school_restr = school_restr[:-1] + ')'
+
+    education = (u'博士', u'硕士', u'本科', u'大专')
+    education_restr = u'('
+    for each in education:
+        education_restr += each + '|'
+    education_restr = education_restr[:-1] + ')'
 
     age_chinese = u'岁'
     age_restr = u'[ \u3000]*(\d{2})' + age_chinese
@@ -120,9 +128,11 @@ def catch(path, convertname, basename):
         info_dict["school"] = school
         info_dict["company"] = company
         info_dict["filename"] = basename.decode('utf-8')
-        info_dict["position"] = getTagFromString('职位', stream)
-        info_dict["education"] = getTagFromString('学历', stream)
-        info_dict["id"] = getTagFromString('ID', stream)
+        info_dict["position"] = getTagFromString('所任职位', stream)[:25] or\
+            getTagFromString('职位', stream)[:25]
+        info_dict["education"] = getTagFromString('学历', stream) or\
+            info_by_re_iter(stream, education_restr)
+        info_dict["id"] = getTagFromString('ID', stream, rule='a-zA-Z0-9')
         info_dict["age"] = getTagFromString('年龄', stream) or age
         info_dict["phone"] = getTagFromString('电话', stream) or phone
         info_dict["email"] = getTagFromString('邮件', stream) or email

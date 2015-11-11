@@ -1,6 +1,4 @@
-
-import os
-import glob
+import pickle
 import codecs
 import os.path
 
@@ -8,19 +6,30 @@ import yaml
 import flask
 import pypandoc
 import flask.views
+import flask.ext.login
 
+import utils._yaml
+import utils.builtin
+import webapp.core.upload
 import core.outputstorage
-import core.converterutils
-import repointerface.gitinterface
+import webapp.core.account
+import webapp.core.exception
 
-repo = repointerface.gitinterface.GitInterface("repo")
+
+class LoginRedirect(flask.views.MethodView):
+
+    def get(self):
+        return flask.render_template('gotologin.html')
 
 
 class Search(flask.views.MethodView):
+
+    @flask.ext.login.login_required
     def get(self):
         return flask.render_template('search.html')
 
     def post(self):
+        repo = flask.current_app.config['REPO_DB']
         search_text = flask.request.form['search_text']
         result = repo.grep(search_text)
         datas = []
@@ -29,57 +38,168 @@ class Search(flask.views.MethodView):
             name = core.outputstorage.ConvertName(base)
             with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
                 stream = yf.read()
-            yaml_data = yaml.load(stream)
-            datas.append([os.path.join(repo.repo.path, name), yaml_data])
+            yaml_data = yaml.load(stream, Loader=utils._yaml.Loader)
+            info = repo.get_file_create_info(name.md)
+            datas.append([os.path.join(repo.repo.path, name), yaml_data, info])
         return flask.render_template('search_result.html',
                                      search_key=search_text,
                                      result=datas)
 
 
-class Listdata(flask.views.MethodView):
-    def get(self):
-        datas = []
-        for position in glob.glob(os.path.join(repo.repo.path, '*.yaml')):
-            with open(position, 'r') as yf:
-                stream = yf.read()
-            yaml_data = yaml.load(stream)
-            datas.append([os.path.splitext(position)[0],
-                          yaml_data])
-        return flask.render_template('listdata.html', datas=datas)
-
-
 class Upload(flask.views.MethodView):
-    upload_tmp_path = '/tmp'
-
-    @classmethod
-    def setup_upload_tmp(cls, path):
-        cls.upload_tmp_path = path
-
-    def get(self):
-        return flask.render_template('upload.html')
 
     def post(self):
-        network_file = flask.request.files['file']
-        convertname = core.outputstorage.ConvertName(
-            network_file.filename.encode('utf-8'))
-        path = self.upload_tmp_path
-        core.outputstorage.save_stream(path, convertname, network_file.read())
-        storage_file = core.converterutils.FileProcesser(path, convertname)
-        try:
-            result = storage_file.convert()
-            if result is False:
-                return flask.render_template('upload.html', result='Can not Convert')
-        except:
-            return flask.render_template('upload.html', result='Exist File')
-        md_html = showtest(os.path.join(core.outputstorage.OutputPath.markdown,
-                                        storage_file.name.md))
-        storage_file.deleteconvert()
-        return md_html
+        network_file = flask.request.files['Filedata']
+        upobj = webapp.core.upload.UploadObject(network_file.filename,
+                                                network_file,
+                                                flask.current_app.config['UPLOAD_TEMP'])
+        flask.session['upload'] = pickle.dumps(upobj)
+        flask.session.modified = True
+        return str(upobj.result)
+
+
+class UploadPreview(flask.views.MethodView):
+
+    def get(self):
+        upobj = pickle.loads(flask.session['upload'])
+        output = upobj.preview_markdown()
+        info = {
+            "name": upobj.storage.yamlinfo['name'],
+            "origin": upobj.storage.yamlinfo['origin'],
+            "id": upobj.storage.yamlinfo['id']
+        }
+        return flask.render_template('cv.html', markdown=output, info=info)
+
+
+class Confirm(flask.views.MethodView):
+
+    def post(self):
+        info = {
+            'name': flask.request.form['name'],
+            'origin': flask.request.form['origin'],
+            'id': flask.request.form['id']
+        }
+        user = flask.ext.login.current_user
+        upobj = pickle.loads(flask.session['upload'])
+        upobj.storage.yamlinfo.update(info)
+        result = upobj.confirm(flask.current_app.config['REPO_DB'], user.id)
+        return str(result)
 
 
 class Showtest(flask.views.MethodView):
+
+    @flask.ext.login.login_required
     def get(self, filename):
         with codecs.open(filename, 'r', encoding='utf-8') as file:
             data = file.read()
         output = pypandoc.convert(data, 'html', format='markdown')
         return flask.render_template('cv.html', markdown=output)
+
+
+class Index(flask.views.MethodView):
+
+    def get(self):
+        with codecs.open('webapp/features.md', 'r', encoding='utf-8') as fp:
+            data = fp.read()
+        return flask.render_template('index.html', features=data)
+
+
+class Login(flask.views.MethodView):
+
+    def get(self):
+        return '''
+            <form action="/login/check" method="post">
+                <p>Username: <input name="username" type="text"></p>
+                <p>Password: <input name="password" type="password"></p>
+                <input type="submit">
+            </form>
+        '''
+
+
+class LoginCheck(flask.views.MethodView):
+
+    def post(self):
+        username = flask.request.form['username']
+        password = flask.request.form['password']
+        repoaccount = flask.current_app.config['REPO_ACCOUNT']
+        user = webapp.core.account.User.get(username, repoaccount)
+        upassword = utils.builtin.md5(password)
+        error = None
+        if (user and user.password == upassword):
+            flask.ext.login.login_user(user)
+            if(user.id == "root"):
+                return flask.redirect(flask.url_for("urm"))
+            else:
+                return flask.redirect(flask.url_for("search"))
+        else:
+            # flask.flash('Username or Password Incorrect.')
+            error = 'Username or Password Incorrect.'
+        return flask.render_template('index.html', error=error)
+        # return flask.redirect(flask.url_for('index'),error=error)
+
+
+class Logout(flask.views.MethodView):
+
+    def get(self):
+        flask.ext.login.logout_user()
+        return flask.redirect(flask.url_for('index'))
+
+
+class AddUser(flask.views.MethodView):
+
+    def post(self):
+        result = False
+        id = flask.request.form['username']
+        password = flask.request.form['password']
+        user = flask.ext.login.current_user
+        try:
+            repoaccount = flask.current_app.config['REPO_ACCOUNT']
+            result = repoaccount.add(user.id, id, password)
+        except webapp.core.exception.ExistsUser:
+            pass
+        return flask.jsonify(result=result)
+
+
+class ChangePassword(flask.views.MethodView):
+
+    def post(self):
+        result = False
+        oldpassword = flask.request.form['oldpassword']
+        newpassword = flask.request.form['newpassword']
+        md5newpwd = utils.builtin.md5(oldpassword)
+        user = flask.ext.login.current_user
+        try:
+            if(user.password == md5newpwd):
+                user.changepassword(newpassword)
+                result = True
+            else:
+                result = False
+        except webapp.core.exception.ExistsUser:
+            pass
+        return flask.jsonify(result=result)
+
+
+class Urm(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        repoaccount = flask.current_app.config['REPO_ACCOUNT']
+        userlist = repoaccount.get_user_list()
+        return flask.render_template('urm.html', userlist=userlist)
+
+
+class UrmSetting(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('urmsetting.html')
+
+
+class DeleteUser(flask.views.MethodView):
+
+    def post(self):
+        name = flask.request.form['name']
+        user = flask.ext.login.current_user
+        repoaccount = flask.current_app.config['REPO_ACCOUNT']
+        result = repoaccount.delete(user.id, name)
+        return flask.jsonify(result=result)

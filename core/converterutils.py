@@ -10,6 +10,7 @@ import xml.etree.ElementTree
 import pypandoc
 import emaildata.text
 
+import utils.builtin
 import core.exception
 import core.outputstorage
 import core.uniquesearcher
@@ -31,24 +32,25 @@ def convert_docfile(path, filename, output, format):
 
 
 class FileProcesser():
-    unique_checker = core.uniquesearcher.UniqueSearcher()
 
-    def __init__(self, root, name):
+    def __init__(self, root, name, output_base):
         self.root = root
         self.base = core.outputstorage.ConvertName(name)
         self.name = self.base.random
         self.stream = self.load()
-        self.source_path = core.outputstorage.OutputPath.source
-        self.docx_path = core.outputstorage.OutputPath.docx
-        self.html_path = core.outputstorage.OutputPath.html
-        self.yaml_path = core.outputstorage.OutputPath.yaml
-        self.docbook_path = core.outputstorage.OutputPath.docbook
-        self.markdown_path = core.outputstorage.OutputPath.markdown
+        self.output_path = core.outputstorage.OutputPath(output_base)
+        self.source_path = self.output_path.source
+        self.docx_path = self.output_path.docx
+        self.html_path = self.output_path.html
+        self.yaml_path = self.output_path.yaml
+        self.docbook_path = self.output_path.docbook
+        self.markdown_path = self.output_path.markdown
         self.mimetype = self.mimetype()
+        self.yamlinfo = {}
         logger.info('Mimetype: %s' % self.mimetype)
         location = self.copy()
         logger.info('Backup to: %s' % location)
-        self.unique_checker.reload()
+        self.result = self.convert()
 
     def mimetype(self):
         mimetype = mimetypes.guess_type(os.path.join(
@@ -66,17 +68,16 @@ class FileProcesser():
             >>> import shutil
             >>> import core.outputstorage
             >>> import core.converterutils
-            >>> output_backup = core.outputstorage.OutputPath._output
-            >>> core.outputstorage.OutputPath._output = 'core/test_output'
-            >>> cv1 = core.converterutils.FileProcesser('core/test', 'cv_1.doc')
-            >>> cv1.convert()
+            >>> basepath = 'core/test_output'
+            >>> cv1 = core.converterutils.FileProcesser('core/test',
+            ... 'cv_1.doc', basepath)
+            >>> cv1.result
             True
             >>> ori = cv1.name
             >>> des = cv1.copy()
             >>> cv1.name == ori
             False
-            >>> shutil.rmtree('core/test_output')
-            >>> core.outputstorage.OutputPath._output = output_backup
+            >>> shutil.rmtree(basepath)
         """
         if des is None:
             des = self.source_path
@@ -137,10 +138,10 @@ class FileProcesser():
             >>> import core.outputstorage
             >>> import core.converterutils
             >>> import xml.etree.ElementTree
-            >>> output_backup = core.outputstorage.OutputPath._output
-            >>> core.outputstorage.OutputPath._output = 'core/test_output'
-            >>> cv1 = core.converterutils.FileProcesser('core/test', 'cv_1.doc')
-            >>> cv1.convert()
+            >>> basepath = 'core/test_output'
+            >>> cv1 = core.converterutils.FileProcesser('core/test',
+            ... 'cv_1.doc', basepath)
+            >>> cv1.result
             True
             >>> e = xml.etree.ElementTree.parse(os.path.join(
             ... cv1.docbook_path, cv1.name.xml)).getroot()
@@ -151,12 +152,9 @@ class FileProcesser():
             ...     data = file.read()
             >>> 'http://jianli.yjbys.com/' in data
             True
-            >>> shutil.rmtree('core/test_output')
-            >>> core.outputstorage.OutputPath._output = output_backup
+            >>> shutil.rmtree(basepath)
         """
-        if self.unique_checker.unique_name(self.base.base) is False:
-            raise core.exception.DuplicateException(
-                'Duplicate files: %s' % self.base.base)
+        logger.info('Convert: %s' % os.path.join(self.root, self.base))
         if self.mimetype in ['application/msword',
                              "application/vnd.openxmlformats-officedocument"
                              ".wordprocessingml.document"]:
@@ -182,8 +180,9 @@ class FileProcesser():
                 return False
             self.remove_note()
             self.file_docbook_to_markdown()
-            core.information_explorer.catch(self.markdown_path, self.name,
-                                       self.base.base, self.yaml_path)
+            self.yamlinfo = core.information_explorer.catch(
+                self.markdown_path, self.name, self.base.base)
+            utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)
             logger.info('Success')
             return True
         else:
@@ -196,20 +195,19 @@ class FileProcesser():
             >>> import os.path
             >>> import core.outputstorage
             >>> import core.converterutils
-            >>> output_backup = core.outputstorage.OutputPath._output
-            >>> core.outputstorage.OutputPath._output = 'core/test_output'
-            >>> cv1 = core.converterutils.FileProcesser('core/test', 'cv_1.doc')
-            >>> cv1.convert()
+            >>> basepath = 'core/test_output'
+            >>> cv1 = core.converterutils.FileProcesser('core/test',
+            ... 'cv_1.doc', basepath)
+            >>> cv1.result
             True
-            >>> os.path.isfile(os.path.join(core.outputstorage.OutputPath.markdown,
+            >>> os.path.isfile(os.path.join(cv1.markdown_path,
             ... cv1.name.md))
             True
             >>> cv1.deleteconvert()
-            >>> os.path.isfile(os.path.join(core.outputstorage.OutputPath.markdown,
+            >>> os.path.isfile(os.path.join(cv1.markdown_path,
             ... cv1.name.md))
             False
-            >>> shutil.rmtree('core/test_output')
-            >>> core.outputstorage.OutputPath._output = output_backup
+            >>> shutil.rmtree(basepath)
         """
         filename = os.path.join(self.docx_path, self.name.docx)
         if os.path.isfile(filename):
@@ -227,7 +225,7 @@ class FileProcesser():
         if os.path.isfile(filename):
             os.remove(filename)
 
-    def storage(self, repo):
+    def storage(self, repo, committer=None):
         """
             >>> import glob
             >>> import shutil
@@ -235,12 +233,13 @@ class FileProcesser():
             >>> import core.outputstorage
             >>> import core.converterutils
             >>> import repointerface.gitinterface
-            >>> output_backup = core.outputstorage.OutputPath._output
-            >>> core.outputstorage.OutputPath._output = 'core/test_output'
+            >>> basepath = 'core/test_output'
             >>> repo_name = 'core/test_repo'
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> cv1 = core.converterutils.FileProcesser('core/test', 'cv_1.doc')
-            >>> cv2 = core.converterutils.FileProcesser('core/test', 'cv_2.doc')
+            >>> cv1 = core.converterutils.FileProcesser('core/test',
+            ... 'cv_1.doc', basepath)
+            >>> cv2 = core.converterutils.FileProcesser('core/test',
+            ... 'cv_2.doc', basepath)
             >>> cv1.storage(interface)
             True
             >>> cv2.storage(interface)
@@ -256,28 +255,20 @@ class FileProcesser():
             >>> len(yaml_list)
             2
             >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree('core/test_output')
-            >>> core.outputstorage.OutputPath._output = output_backup
+            >>> shutil.rmtree(basepath)
         """
-        path = repo.repo.path
-        if self.convert() is False:
+        if self.result is False:
             return False
+        path = repo.repo.path
+        unique_checker = core.uniquesearcher.UniqueSearcher(repo)
+        if unique_checker.unique(self.yamlinfo) is False:
+            error = 'Duplicate files: %s' % self.base.base
+            logger.info(error)
+            raise core.exception.DuplicateException(error)
         shutil.copy(os.path.join(self.markdown_path, self.name.md),
                     os.path.join(path, self.name.md))
-        shutil.copy(os.path.join(self.yaml_path, self.name.yaml),
-                    os.path.join(path, self.name.yaml))
-        repo.add_files([self.name.md, self.name.yaml])
+        utils.builtin.save_yaml(self.yamlinfo, path, self.name.yaml)
+        repo.add_files([self.name.md, self.name.yaml],
+                       committer=committer)
+        logger.info('Finish')
         return True
-
-
-def convert_folder(path, repo):
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            processfile = FileProcesser(root, name)
-            logger.info('Convert: %s' % os.path.join(root, name))
-            try:
-                processfile.storage(repo)
-            except core.exception.DuplicateException as error:
-                logger.info(error)
-                continue
-            logger.info('Finish')

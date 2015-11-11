@@ -1,5 +1,10 @@
 #ignore node_modules
 webapp/static/js/node_modules/
-
-#ignore test results files
 webapp/static/js/PhantomJS*/
+flask_session/
+*.log
+*.dot
+*.pyc
+output/
+repo/
+default_repo/

@@ -10,15 +10,15 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
-    <hudson.triggers.SCMTrigger>
+    <hudson.triggers.TimerTrigger>
       <spec>H/5 * * * *</spec>
-      <ignorePostCommitHooks>false</ignorePostCommitHooks>
-    </hudson.triggers.SCMTrigger>
+    </hudson.triggers.TimerTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
+  <customWorkspace>$CLOUDSHARE_CI_HOME/webapp/static/js</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
-      <command>git fetch
+      <command>git pull
 (cd $CLOUDSHARE_CI_HOME/webapp/static/js; gulp test)</command>
     </hudson.tasks.Shell>
   </builders>
@@ -32,6 +32,11 @@
         <completeBuild>true</completeBuild>
       </threshold>
     </hudson.tasks.BuildTrigger>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>PhantomJS*/test-results.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
   </publishers>
   <buildWrappers/>
 </project>

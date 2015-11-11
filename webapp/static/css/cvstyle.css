@@ -1,0 +1,50 @@
+.wrap{
+  width: 90%;
+  margin: 0 auto;
+}
+.wrap-top{
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.wrap-top .confirm-box{;
+  margin-top: 20px; 
+  overflow: hidden;
+}
+#cv-confirm-form .form-group{
+  float: left;
+  width: 30%;
+}
+#cv-confirm-form .form-group .form-control{
+  display: inline-block;
+  width: 80%;
+}
+#cv-confirm-form .form-btn{
+  display: inline-block;
+  width: 10%;
+}
+@media (max-width: 970px){
+  #cv-confirm-form .form-group label{
+    display: block;
+  }
+  #cv-confirm-form .form-group .form-control{
+    width: 96%;
+
+  }
+  #cv-confirm-form .form-group{
+    float: left;
+    width: 33.33333%;
+  }
+  #cv-confirm-form .form-btn{
+    display: block;
+  }
+}
+@media (max-width: 750px){
+  #cv-confirm-form .form-group{
+    float: left;
+    width: 100%;
+  }
+  #cv-confirm-form .form-group .form-control{
+    width: 100%;
+  }
+}

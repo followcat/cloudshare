@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>User Management</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+      <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
+    <![endif]-->
+</head>
+<body>
+	<div class="wrap">
+	<!-- Wrap Left Module-->
+	  <div class="wrap-left">
+	  	<div class="wrap-left-header">
+	  	  <img src="{{ url_for('static', filename='images/logo.png') }}" class="center">
+	  	</div>
+	  	<div class="account-info">
+	  		<p>Welcome back! {{ current_user.id }}</p>
+	  	</div>
+	    <ul class="list-unstyled" id="nav-list">
+	  	  <li><a href="{{ url_for('urm') }}">HOME</a></li>
+	  	  <li><a href="{{ url_for('urmsetting') }}">SETTING</a></li>
+	  	  <li><a href="#" data-toggle="modal" data-target=".quit-modal">Quit</a></li>
+	    </ul>
+	  </div>
+	<!-- Wrap Left Module End-->
+	<!-- Wrap Right Module -->
+	  <div class="wrap-right">
+	  	<div class="wrap-right-header">
+		  <div class="container-fluid">
+	  	    <nav class="nav nav-default">
+	  	      <h2 class="navbar-text navbar-title">Management System</h2>
+	  	    </nav>
+	  	  </div>	
+		</div>
+		<!-- load the content-->
+		{% block content %}{% endblock %}
+		<!-- load the content end-->
+	  </div>
+	<!-- Wrap Right Module End-->
+	</div>
+	<!--quit modal begin-->
+	<div class="modal fade quit-modal" tabindex="-1" role="dialog" aria-labelledby="myQuitModalLabel">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Confirm</h4>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure to quit?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+            <button type="button" class="btn btn-primary" id="quit-btn">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--quit modal end-->
+	{% block script %}{% endblock %}
+</body>
+</html>

@@ -5,6 +5,8 @@ share，edit your doc，pdf，md and so on...
 
     PyYAML==3.11
     Flask==0.10.1
+    Flask-Login==0.3.2
+    Flask-Session==0.2.2
     dulwich==0.10.2
     pypandoc==1.0.1
     emaildata==0.3.2
@@ -16,10 +18,18 @@ share，edit your doc，pdf，md and so on...
 ### for test
 
     nose==1.3.7
+    Flask-Testing==0.4.2
 
     node.js 4.1.2
     npm 2.14.4
     gulp CLI 3.9.0
+
+### draw && view router graph
+
+    xdot 0.4
+    networkx==1.10
+    pygraphviz==1.4.dev
+
 
 You can do the automatic test by using Jenkins with karma, nose and so on.
 Here is a demo bash script to run Jenkins test:
@@ -48,10 +58,10 @@ Here is a demo bash script to run Jenkins test:
 1) Use method convert_folder in converterutils.py to convert your doc/docx/pdf.
 
 ``` python
->>> import core.converterutils
+>>> import utils.builtin
 >>> import repointerface.gitinterface
 >>> repo = repointerface.gitinterface.GitInterface("repo")
->>> core.converterutils.convert_folder(YOUR_DIR, repo)
+>>> utils.builtin.convert_folder(YOUR_DIR, repo, TEMP_DIR)
 ```
 
     The generated docbook will save in folder docbook_output

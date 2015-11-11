@@ -1,0 +1,111 @@
+body{
+  background-color: #F8F8FF;
+}
+.header-box{
+  position: relative;
+  width: 100%;
+  height: 50px;
+  background-color: #337ab7;
+}
+.logo{
+  position: absolute;
+  width: 174px;
+  height: 36px;
+  top: 50%;
+  margin-top: -18px;
+}
+@media (max-width: 768px){
+  .logo{
+    width: 20%;
+  }
+}
+.profile{
+  position: absolute;
+  width: 100px;
+  line-height: 50px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 2;
+}
+@media (max-width: 768px){
+  .search-item{
+    width: 240px;
+  }
+  .profile{
+    margin-left: 80%;
+  }
+}
+.profile:hover{
+  background-color: #004B97;
+}
+.profile:hover .profile-menu{
+  display: block;
+}
+.profile #name{
+  font-size: 1.25em;
+  color: #fcfcfc;
+}
+.profile-menu{
+  display: none;
+  background-color: #004B97;
+}
+.profile-menu a{
+  display: block;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  color: #fcfcfc;
+}
+.profile-menu a:hover{
+  text-decoration: none;
+  background-color: #003D79;
+}
+.upload{
+  width: 100px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+@media (max-width: 768px){
+  .upload{
+    display: none;
+  }
+}
+.upload:hover{
+  background-color: #003D79;
+}
+.search-item{
+  position: absolute;
+  width: 24%;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  -o-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+}
+#error-msg{
+  color: #EA0000;
+}
+/*  search page css. search input css*/
+.search-box{
+  position: absolute;
+  width: 60%;
+  height: 40px;
+  margin-top: 140px;
+  left: 50%;
+  -webkit-transform:translateX(-50%);
+  -moz-transform:translateX(-50%);
+  -ms-transform:translateX(-50%);
+  -o-transform:translateX(-50%);
+  transform: translateX(-50%);
+}
+
+#uploading, #upload-success, #upload-fail{
+  display: none;
+  font-weight: bold;
+}

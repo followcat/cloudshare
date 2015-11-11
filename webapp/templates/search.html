@@ -1,68 +1,16 @@
-<!--A Design by W3layouts
-Author: W3layout
-Author URL: http://w3layouts.com
-License: Creative Commons Attribution 3.0 Unported
-License URL: http://creativecommons.org/licenses/by/3.0/
--->
-<!DOCTYPE HTML>
-<html>
-<head>
-<title>CLOUDSHARE Searcher</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="keywords" content="Photo-Hub Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template, 
-Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel='stylesheet' type='text/css' />
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<!-- Custom Theme files -->
-<link href="{{ url_for('static', filename='css/search.css') }}" rel='stylesheet' type='text/css' />
-<!-- Custom Theme files -->
-<!--webfont-->
-<link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800' rel='stylesheet' type='text/css'>
-<script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
-<script src="/static/js/menu_jquery.js"></script>
-</head>
-<body>
-	<div class="header">	
-      <div class="container"> 
-  	     <div class="logo">
-			<h1><a href="/">Doc Hub</a></h1>
-		 </div>
-		 <div class="top_right">
-		   <ul>
-			<li><a href="/listdata">Listdata</a></li>|
-			<li><a href="/upload">Upload</a></li>
-		   </ul>
-	     </div>
-		 <div class="clearfix"></div>
-		</div>
-	</div>
-	<div class="banner">
-		<div class="container">
-			<div class="span_1_of_1">
-			    <h2>Docs, illustrations by<br> Creatives all over the world.</h2>
-			    <div class="search">
-			      <ul class="nav1">
-		            <li id="search">
-						<form action="/" name="searchform" method="post">
-							<input type="text" name="search_text" id="search_text" placeholder="Search"/>
-							<input type="button" name="search_button" id="search_button" onclick="document.searchform.submit();">
-						</form>
-					</li>
-					<li id="options">
-						<a href="#">from MD</a>
-						<ul class="subnav">
-							<li><a href="#">Option1</a></li>
-							<li><a href="#">Option2</a></li>
-							<li><a href="#">Option3</a></li>
-						</ul>
-					</li>
-	              </ul>
-	            </div>
-			</div>
-		</div>
-	</div>
-</body>
-</html>		
+{% extends "share/layout.html" %}
+{% block content %}
+	<div class="search-box">
+	  <form action="/search" method="POST">
+        <div class="input-group">
+          <input type="text" name="search_text" class="form-control" placeholder="Search for...">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </span>
+        </div><!-- /input-group -->
+      </form>
+	</div><!-- /search-->
+{% endblock %}
+{% block script %}
+<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/search') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+{% endblock %}

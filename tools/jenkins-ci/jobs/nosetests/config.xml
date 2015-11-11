@@ -13,9 +13,19 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>(cd $CLOUDSHARE_CI_HOME; nosetests --with-doctest core/*.py repointerface/*.py)</command>
+      <command>(cd $CLOUDSHARE_CI_HOME; nosetests --with-doctest webapp/core/*.py core/*.py repointerface/*.py)</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>webapp_testcase</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+        <completeBuild>true</completeBuild>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+  </publishers>
   <buildWrappers/>
 </project>

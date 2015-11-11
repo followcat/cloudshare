@@ -5,6 +5,8 @@ import os.path
 
 
 def save_stream(path, filename, stream):
+    if not os.path.exists(path):
+        os.makedirs(path)
     with open(os.path.join(path, filename), 'wb') as localfile:
         localfile.write(stream)
 
@@ -83,34 +85,23 @@ class ConvertName(str):
                                for _ in range(8))
 
 
-class ClassProperty(property):
-    def __get__(self, instance, cls):
-        return classmethod(self.fget).__get__(instance, cls)()
-
-
 class OutputPath(object):
     """
         >>> import shutil
         >>> import os.path
         >>> import core.outputstorage
-        >>> output_backup = core.outputstorage.OutputPath._output
-        >>> core.outputstorage.OutputPath._output = 'core/test_output'
-        >>> os.path.exists('core/test_output')
+        >>> basepath = 'core/test_output'
+        >>> outputpath = core.outputstorage.OutputPath(basepath)
+        >>> os.path.exists(outputpath.basepath)
         False
-        >>> core.outputstorage.OutputPath.output
-        'core/test_output'
-        >>> os.path.exists('core/test_output')
+        >>> outputpath.markdown
+        'core/test_output/markdown'
+        >>> os.path.exists(outputpath.basepath)
         True
         >>> os.path.exists('core/test_output/markdown')
-        False
-        >>> core.outputstorage.OutputPath.markdown
-        'core/test_output/markdown'
-        >>> os.path.exists('core/test_output')
         True
-        >>> shutil.rmtree('core/test_output')
-        >>> core.outputstorage.OutputPath._output = output_backup
+        >>> shutil.rmtree(basepath)
     """
-    _output = 'output'
     _yaml = 'yaml'
     _html = 'html'
     _docx = 'docx'
@@ -118,39 +109,35 @@ class OutputPath(object):
     _markdown = 'markdown'
     _source = 'source'
 
-    @classmethod
-    def getpath(cls, name):
-        path = os.path.join(cls.output, name)
+    def __init__(self, basepath):
+        self.basepath = basepath
+
+    def getpath(self, name):
+        path = os.path.join(self.basepath, name)
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path)
         return path
 
-    @ClassProperty
-    def output(self):
-        if not os.path.exists(self._output):
-            os.mkdir(self._output)
-        return self._output
-
-    @ClassProperty
+    @property
     def source(self):
         return self.getpath(self._source)
 
-    @ClassProperty
+    @property
     def yaml(self):
         return self.getpath(self._yaml)
 
-    @ClassProperty
+    @property
     def html(self):
         return self.getpath(self._html)
 
-    @ClassProperty
+    @property
     def docx(self):
         return self.getpath(self._docx)
 
-    @ClassProperty
+    @property
     def docbook(self):
         return self.getpath(self._docbook)
 
-    @ClassProperty
+    @property
     def markdown(self):
         return self.getpath(self._markdown)

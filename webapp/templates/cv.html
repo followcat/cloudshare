@@ -52,10 +52,10 @@
                     {% endfor %}
                   {% endif %}
                 {% endfor %}
-                <a href="javascript:;" id="add-label">添加</a>
+                <a href="javascript:;" id="add-label">添加标签</a>
               </div>
               <div class="input-group add-label-box">
-                <input type="text" class="form-control" id="label-text" required="required" />
+                <input type="text" class="form-control" id="label-text" required="required" placeholder="添加标签" />
                 <div class="input-group-btn">
                   <button type="button" class="btn btn-primary" id="add-label-btn">完成</button>
                 </div>               
@@ -77,6 +77,7 @@
                     </div>
                     <input type="hidden" id="date" value="" />
                   </div>
+                  <a href="javascript:;" class="collapse">收起</a>
                   <button type="button" class="btn btn-primary" id="tracking-btn">提交</button>
                 </div>
               </div>
@@ -103,6 +104,7 @@
               <div class="form-input">
                 <input type="text" class="form-control" placeholder="写下你的评论..." id="comment-text" required="required" />
                 <div class="btn-box">
+                  <a href="javascript:;" class="collapse">收起</a>
                   <button type="button" class="btn btn-primary" id="comment-btn">提交</button>
                 </div>
               </div>
@@ -111,10 +113,10 @@
                   {% if key=='comment' %}
                     {% for item in value %}
                       <div class="comment-item">
-                        <p class="content">{{ item.content }}</p>
                         <em class="commit-info">
                           {{ item.author }}
                         </em>
+                        <p class="content">{{ item.content }}</p>
                       </div>
                     {% endfor %}
                   {% endif %}

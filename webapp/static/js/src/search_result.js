@@ -81,4 +81,24 @@ require(['jquery', 'bootstrap', 'uploadify', 'header', 'formvalidate'], function
 	var aCommentToggle = $(".comment-alink");
 	Toggle(aCommentToggle);
 
+	function AddedInfoHandler(obj){
+		var nextBro = obj.next();
+		if(nextBro.css("display") === "none"){
+			obj.children("span").text("-");
+			nextBro.show();
+		}else{
+			obj.children("span").text("+");
+			nextBro.hide();
+		}
+	}
+
+	//tracking-link click event
+	$("#tracking-link").on('click', function(){
+		AddedInfoHandler($(this));
+	});
+
+	//comment-link click event
+	$("#comment-link").on('click', function(){
+		AddedInfoHandler($(this));
+	});
 });

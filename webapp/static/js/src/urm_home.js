@@ -28,7 +28,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 		
 		var aText = aForm.find(":text");
 		var aPwd = aForm.find(":password");
-		
+
 		if( !formvalidate.ValidateBlank(aText) && !formvalidate.ValidateBlank(aPwd))
 		{
 			//call the ajax request
@@ -38,8 +38,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 				window.location.reload();
 
 			}, function(){
-
-				alert("Operation Failed!");
+				$("#addUserName").focus();
 				
 			});
 		}

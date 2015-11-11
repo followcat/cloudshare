@@ -126,8 +126,10 @@ define(['jquery','formvalidate'], function($,validation) {
 		var text, result;
 
 		it("The text is null", function(){
-			text = "     ";
+			text = "";
 			result = validation.ValidateBlank(text);
+			expect(result).toEqual(true);
+			text = { value : "     "};
 			expect(result).toEqual(true);
 		});
 

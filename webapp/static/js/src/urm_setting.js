@@ -33,9 +33,7 @@ require(['jquery', 'bootstrap', 'urmmain', 'formvalidate'],function($, bootstrap
 				window.location.href = "/";
 
 			}, function(){
-
-				alert("Operation Failed!");
-
+				$("#oldpassword").focus();
 			});
 		}
 		event.preventDefault();

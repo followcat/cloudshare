@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html>
-    <head>
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='js/plugin/uploadify/uploadify.css')}}">
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/layout.css') }}">
+{% extends "share/cv_layout.html" %}
+{% block content%}
+      {% if info %}
+      {% block previewstyle %}
       <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvstyle.css') }}">
-      <title>CV Templates</title>
-    </head>
-    <body>
-      <header class="header-box">
-        <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
-      </header> 
+      {% endblock %}
       <div class="wrap">
-          {% if info %}
           <div class="wrap-top">
             <div class="confirm-box">
               <form id="cv-confirm-form">
@@ -34,7 +26,7 @@
               </form>
             </div> 
           </div>   
-          {% endif %}
+
         <div id="cv-box">
           <div class="cv-box-top">
             <span>简历情况：</span>
@@ -43,8 +35,87 @@
           {{ markdown|safe }}
         </div>
       </div>
-  
-      <script type="text/javascript" src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
-      <script type="text/javascript" src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
-    </body>
-</html>
+      <script src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
+      <script src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
+      {% else %}
+      {% block sourcestyle %}
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-datetimepicker.min.css') }}">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvsourcestyle.css') }}">
+      {% endblock %}
+      <div class="container-fluid clearfix">
+          <div class="wrap-right">
+            <div class="label-box">
+              <div class="label-item">
+                <span class="label label-primary">本科</span>
+                <span class="label label-primary">医疗设备</span>
+                <a href="javascript:;" id="add-label">添加</a>
+              </div>
+            </div>
+            <div class="follow-up-box">
+              <div class="title">
+                <span>跟进情况</span>
+              </div>
+              <div class="form-input">
+                <input type="text" class="form-control" placeholder="写下你的跟进情况..." />
+                <div class="btn-box">
+                <div class="form-group">
+                  <label for="date" class="col-md-2 control-label" style="padding:4px;">日期</label>
+                  <div class="input-group date form_date col-md-9" data-date="" data-date-format="dd MM yyyy" data-link-field="date" data-link-format="yyyy-mm-dd">
+                      <input class="form-control" size="16" type="text" value="" readonly>
+                      <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                  </div>
+                  <input type="hidden" id="date" value="" />
+                </div>
+                <button type="button" class="btn btn-primary" id="follow-up-btn">提交</button>
+                </div>
+              </div>
+              <div class="follow-up-content">
+                <div class="follow-up-item"> </div>
+              </div>        
+            </div>
+            <div class="comment-box">
+              <div class="title">
+                <span>评论</span>
+              </div>
+              <div class="form-input">
+                <input type="text" class="form-control" placeholder="写下你的评论..." />
+                <div class="btn-box">
+                  <button type="button" class="btn btn-primary" id="comment-btn">提交</button>
+                </div>
+              </div>
+              <div class="comment-content">
+                <div class="comment-item"></div>
+              </div>
+              
+            </div>
+
+          </div>
+          <div class="wrap-left">
+            <div id="cv-box">
+              <div class="cv-box-top">
+                <span>简历情况：</span>
+              </div>
+              <img id="loding-img" src="{{  url_for('static', filename='images/loding.gif') }}">
+              {{ markdown|safe }}
+            </div>
+          </div>
+      </div>
+      <script src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
+      <script src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
+      <script src="{{ url_for('static',filename='js/lib/bootstrap.js')}}"></script>
+      <script src="{{ url_for('static',filename='js/lib/bootstrap-datetimepicker.min.js')}}"></script>
+      <script src="{{ url_for('static',filename='js/lib/bootstrap-datetimepicker.zh-CN.js')}}"></script>
+      <script type="text/javascript">
+        $('.form_date').datetimepicker({
+          language:  'zh-CN',
+          weekStart: 1,
+          todayBtn:  1,
+          autoclose: 1,
+          todayHighlight: 1,
+          startView: 2,
+          minView: 2,
+          forceParse: 0
+        });
+      </script>
+      {% endif %}
+{% endblock %}

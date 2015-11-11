@@ -108,3 +108,6 @@
 	bottom: 6px;
 	font-size: 0.85em;
 }
+.label-primary{
+  cursor: pointer;
+}

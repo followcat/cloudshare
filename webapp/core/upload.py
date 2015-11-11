@@ -43,11 +43,8 @@ class UploadObject(object):
             self.information = 'Sucess'
 
     def preview_markdown(self):
-        filename = os.path.join(self.storage.markdown_path,
-                                self.storage.name.md)
-        with codecs.open(filename, 'r', encoding='utf-8') as file:
-            data = file.read()
-        output = pypandoc.convert(data, 'html', format='markdown')
+        output = pypandoc.convert(self.storage.markdown_stream,
+                                  'html', format='markdown')
         return output
 
     def confirm(self, repo, committer=None):

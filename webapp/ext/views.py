@@ -44,8 +44,13 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/showtest/<path:filename>',
-        view_func=webapp.core.views.Showtest.as_view('showtest'),
+        '/show/<path:filename>',
+        view_func=webapp.core.views.Show.as_view('show'),
+        )
+
+    app.add_url_rule(
+        '/updateinfo',
+        view_func=webapp.core.views.UpdateInfo.as_view('updateinfo'),
         )
 
     app.add_url_rule(

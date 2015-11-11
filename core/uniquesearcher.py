@@ -1,8 +1,7 @@
 import glob
 import os.path
 
-import yaml
-import utils._yaml
+import utils.builtin
 
 
 class UniqueSearcher(object):
@@ -38,8 +37,7 @@ class UniqueSearcher(object):
         self.yaml_path = repo.repo.path
         self.yaml_datas = {}
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
-            with open(f) as fp:
-                data = yaml.load(fp.read(), Loader=utils._yaml.Loader)
+            data = utils.builtin.load_yaml("", f)
             base, suffix = os.path.splitext(f)
             self.yaml_datas[base] = data
 
@@ -49,10 +47,8 @@ class UniqueSearcher(object):
         if len(phone) == 0 and len(email) == 0:
             return False
         for each in self.yaml_datas.values():
-            if ((phone and 'phone' in each and
-                 phone == each['phone'].encode('utf-8')) or
-                (email and 'email' in each and
-                 email == each['email'].encode('utf-8'))):
+            if (phone and phone == each['phone'].encode('utf-8') or
+                    email and email == each['email'].encode('utf-8')):
                 return False
         else:
             return True
@@ -62,6 +58,5 @@ class UniqueSearcher(object):
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
             base, suffix = os.path.splitext(f)
             if base not in self.yaml_datas:
-                with open(f) as fp:
-                    data = yaml.load(fp.read())
+                data = utils.builtin.load_yaml("", f)
                 self.yaml_datas[base] = data

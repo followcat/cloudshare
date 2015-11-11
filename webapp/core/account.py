@@ -58,7 +58,8 @@ class RepoAccount(object):
             raise webapp.core.exception.ExistsUser(uid)
         data[uid] = upw
         dump_data = yaml.dump(data)
-        self.repo.modify_file(self.account_filename, dump_data)
+        self.repo.modify_file(self.account_filename, dump_data,
+                              self.default_root_name)
         return True
 
     def modify(self, id, password):
@@ -68,7 +69,7 @@ class RepoAccount(object):
         data[uid] = upw
         dump_data = yaml.dump(data)
         self.repo.modify_file(self.account_filename, dump_data,
-                              "Modify %s password." % id)
+                              "Modify %s password." % id, self.default_root_name)
 
     def delete(self, mender, id):
         if mender != u'root':
@@ -76,7 +77,8 @@ class RepoAccount(object):
         data = self.USERS
         data.pop(unicode(id))
         dump_data = yaml.dump(data)
-        self.repo.modify_file(self.account_filename, dump_data)
+        self.repo.modify_file(self.account_filename, dump_data,
+                              self.default_root_name)
         return True
 
     @property

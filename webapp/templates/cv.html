@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html>
-    <head>
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='js/plugin/uploadify/uploadify.css')}}">
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/layout.css') }}">
+{% extends "share/cv_layout.html" %}
+{% block content%}
+      {% if info %}
+      {% block previewstyle %}
       <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvstyle.css') }}">
-      <title>CV Templates</title>
-    </head>
-    <body>
-      <header class="header-box">
-        <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
-      </header> 
+      {% endblock %}
       <div class="wrap">
-          {% if info %}
           <div class="wrap-top">
             <div class="confirm-box">
               <form id="cv-confirm-form">
@@ -34,7 +26,7 @@
               </form>
             </div> 
           </div>   
-          {% endif %}
+
         <div id="cv-box">
           <div class="cv-box-top">
             <span>简历情况：</span>
@@ -43,8 +35,102 @@
           {{ markdown|safe }}
         </div>
       </div>
-  
-      <script type="text/javascript" src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
-      <script type="text/javascript" src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
-    </body>
-</html>
+      <script data-main="{{ url_for('static', filename='js/src/preview') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+      {% else %}
+      {% block sourcestyle %}
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-datetimepicker.min.css') }}">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvsourcestyle.css') }}">
+      {% endblock %}
+      <div class="container-fluid clearfix">
+          <div class="wrap-right">
+            <div class="label-box">
+              <div class="label-item">
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='tag' %}
+                    {% for item in value %}
+                      <span class="label label-primary" title="{{ item.author }}">{{ item.content }}</span>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+                <a href="javascript:;" id="add-label">添加</a>
+              </div>
+              <div class="input-group add-label-box">
+                <input type="text" class="form-control" id="label-text" required="required" />
+                <div class="input-group-btn">
+                  <button type="button" class="btn btn-primary" id="add-label-btn">完成</button>
+                </div>               
+              </div>
+              
+            </div>
+            <div class="tracking-box">
+              <div class="title">
+                <span>跟进情况</span>
+              </div>
+              <div class="form-input">
+                <input type="text" class="form-control" placeholder="写下你的跟进情况..." id="tracking-text" required="required" />
+                <div class="btn-box">
+                  <div class="form-group">
+                    <label for="date" class="col-md-2 control-label" style="padding:4px;">日期</label>
+                    <div class="input-group date form_date col-md-9" data-date="" data-date-format="dd MM yyyy" data-link-field="date" data-link-format="yyyy-mm-dd">
+                        <input class="form-control" size="16" type="text" value="" readonly>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    </div>
+                    <input type="hidden" id="date" value="" />
+                  </div>
+                  <button type="button" class="btn btn-primary" id="tracking-btn">提交</button>
+                </div>
+              </div>
+              <div class="tracking-content" id="tracking-content">
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='tracking' %}
+                    {% for item in value %}
+                      <div class="tracking-item">
+                        <p class="content">{{ item.content.text }}</p>
+                        <em class="commit-info">
+                          {{ item.author }}
+                          {{ item.content.date }}
+                        </em>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+              </div>        
+            </div>
+            <div class="comment-box">
+              <div class="title">
+                <span>评论</span>
+              </div>
+              <div class="form-input">
+                <input type="text" class="form-control" placeholder="写下你的评论..." id="comment-text" required="required" />
+                <div class="btn-box">
+                  <button type="button" class="btn btn-primary" id="comment-btn">提交</button>
+                </div>
+              </div>
+              <div class="comment-content" id="comment-content">
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='comment' %}
+                    {% for item in value %}
+                      <div class="comment-item">
+                        <p class="content">{{ item.content }}</p>
+                        <em class="commit-info">
+                          {{ item.author }}
+                        </em>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <div class="wrap-left">
+            <div id="cv-box">
+              <div class="cv-box-top">
+                <span>简历情况：</span>
+              </div>
+              {{ markdown|safe }}
+            </div>
+          </div>
+      </div>
+      <script data-main="{{ url_for('static', filename='js/src/cvsource') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+      {% endif %}
+{% endblock %}

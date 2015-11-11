@@ -1,33 +1,7 @@
-window.onload = function(){
-	$("#confirm-btn").on('click', function(){
-		var aForm = $("#cv-confirm-form");
-		var aText = aForm.find(":text");
+define(['jquery'], function(){
 
 
-		if(aText[0].value !== "" && aText[1].value !== "" && aText[2].value !== "")
-		{
-			$.ajax({
-				url: '/confirm',
-				type: 'POST',
-				data: aForm.serialize(),
-				dataType: 'text',
-				success: function(result){
-					console.log(result);
-					if( result == 'True')
-					{
-						window.location.href = '/search';
-					}
-					else
-					{
-						alert('文件已存在或者该简历不存在联系方式');
-					}
-				}
-			});
-		}	
-        
-	});
 
-	
 	//Object CVDeal
 	function CVDeal(cv){
 		this.cv = cv;
@@ -124,17 +98,19 @@ window.onload = function(){
 		}
 	};
 
+	return {
+		CVdeal: function(){
+			var objCV = new CVDeal($("#cv-box"));
 
-	var objCV = new CVDeal($("#cv-box"));
+			objCV.DeleteHr();
+			objCV.DeleteSection();
+			objCV.DeleteLink();
+		  objCV.DeleleLine();
 
-	objCV.DeleteHr();
-	objCV.DeleteSection();
-	objCV.DeleteLink();
-  objCV.DeleleLine();
+		  objCV = null;
 
-  objCV = null;
-
-	$("#loding-img").remove();
-	$("#cv-box").show();
-
-};
+			$("#loding-img").remove();
+			$("#cv-box").show();
+		}
+	};
+});

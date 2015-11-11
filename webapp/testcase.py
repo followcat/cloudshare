@@ -13,7 +13,8 @@ import repointerface.gitinterface
 class Test(flask.ext.testing.TestCase):
 
     def tearDown(self):
-        shutil.rmtree(self.repo_db.repo.path)
+        shutil.rmtree(self.data_db.repo.path)
+        shutil.rmtree(self.account_db.repo.path)
         shutil.rmtree(self.upload_tmp)
 
     def create_app(self):
@@ -21,14 +22,15 @@ class Test(flask.ext.testing.TestCase):
         self.app = flask.Flask(__name__)
         self.app.config.from_object('webapp.settings')
 
-        self.repo_db = repointerface.gitinterface.GitInterface('testcase_repo')
+        self.data_db = repointerface.gitinterface.GitInterface('testcase_data')
+        self.account_db = repointerface.gitinterface.GitInterface('testcase_account')
         self.upload_tmp = 'testcase_output'
         os.mkdir(self.upload_tmp)
 
         self.app.config['SECRET_KEY'] = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
         self.app.config['TESTING'] = True
-        self.app.config['REPO_DB'] = self.repo_db
-        self.app.config['REPO_ACCOUNT'] = webapp.core.account.RepoAccount(self.repo_db)
+        self.app.config['DATA_DB'] = self.data_db
+        self.app.config['REPO_ACCOUNT'] = webapp.core.account.RepoAccount(self.account_db)
         self.app.config['UPLOAD_TEMP'] = self.upload_tmp
 
         ext.views.configure(self.app)
@@ -154,7 +156,7 @@ class UploadFile(User):
         assert('CV Templates' in rv.data)
         rv = self.confirm('name', 'origin', 'id')
         assert(rv.data == 'True')
-        commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
+        commit = self.data_db.repo.get_object(self.data_db.repo.head())
         assert('Add file' in commit.message)
         assert('username' == commit.author)
 

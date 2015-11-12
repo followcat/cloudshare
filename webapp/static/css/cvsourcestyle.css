@@ -63,6 +63,7 @@
 }
 .btn-box{
 	display: none;
+	position: relative;
 }
 .tracking-content, .comment-content{
 	width: 100%;
@@ -95,6 +96,18 @@
 .commit-info{
 	display: block;
 	padding-top:2px; 
-	padding-left: 6px;
 	font-size: 1.075em;
+}
+.comment-item .content{
+	text-indent: 12px;
+}
+.collapse{
+	position: absolute;
+	display: block;
+	left: 8px;
+	bottom: 6px;
+	font-size: 0.85em;
+}
+.label-primary{
+  cursor: pointer;
 }

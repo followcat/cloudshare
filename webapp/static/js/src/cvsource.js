@@ -51,6 +51,10 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		$(this).next().show();
 	});
 
+	$(".collapse").on('click', function(){
+		$(this).parent().hide();
+	});
+
 	//add label function
 	$("#add-label").on('click', function(){
 		var display = $(".add-label-box").css("display");
@@ -59,7 +63,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 			$(this).text("收起");
 			$(".add-label-box").css("display", "table");
 		}else{
-			$(this).text("添加");
+			$(this).text("添加标签");
 			$(".add-label-box").css("display", "none");
 		}
 		
@@ -182,7 +186,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 					"yamlinfo" : { "comment" : comment_text }
 				}),
 				success: function(result){
-					$("#comment-content").prepend("<div class='comment-item'><p class='content'>" + comment_text + "</p><em class='commit-info'>" + current_user + "</em></div>");
+					$("#comment-content").prepend("<div class='comment-item'><em class='commit-info'>" + current_user + "</em><p class='content'>"+ comment_text +"</p></div>");
 					$("#comment-text").val("");
 				}
 			});

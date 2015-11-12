@@ -36,7 +36,10 @@ class Search(flask.views.MethodView):
             base, suffix = os.path.splitext(each)
             name = core.outputstorage.ConvertName(base)
             yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
-            info = repo.get_file_create_info(name.md)
+            info = {
+                'author': yaml_data['committer'],
+                'time': utils.builtin.strftime(yaml_data['date']),
+            }
             datas.append([name, yaml_data, info])
         return flask.render_template('search_result.html',
                                      search_key=search_text,

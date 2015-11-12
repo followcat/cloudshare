@@ -1,4 +1,5 @@
 import os
+import time
 import hashlib
 
 import yaml
@@ -21,3 +22,7 @@ def load_yaml(path, filename):
         yaml_data = yf.read()
     yaml_info = yaml.load(yaml_data, Loader=utils._yaml.Loader)
     return yaml_info
+
+
+def strftime(t):
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t))

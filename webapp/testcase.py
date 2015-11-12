@@ -73,7 +73,7 @@ class Test(flask.ext.testing.TestCase):
         temp.seek(0)
         temp.name = 'x-y-z.doc'
         return self.client.post('/upload', data=dict(
-            Filedata=temp
+            file=temp,
         ), follow_redirects=True)
 
     def uppreview(self):

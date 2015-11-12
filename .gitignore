@@ -7,5 +7,5 @@ flask_session/
 *.pyc
 output/
 repo/
+default_repo/
 account/
-

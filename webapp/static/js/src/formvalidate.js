@@ -33,21 +33,26 @@ define(function(){
  		}
  	};
 
- 	validation.ValidateBlank = function(obj){
+ 	validation.ValidateBlank = function(arg){
+ 		
+ 		var reg = /^\s*$/g;
 
- 		var len = obj.length;
-
- 		for(var i = 0; i < len; i++)
- 		{
- 			if(obj[i].value === "")
- 			{
- 				return false;
- 			}else{
- 				return true;
+ 		if(typeof arg == "object"){
+ 			for(var i = 0, len = arg.len; i < len; i++){
+ 				if( arg[i].value == "" || reg.test(arg[i].value)){
+ 					return true;
+ 				}else{
+ 					return false
+ 				}
  			}
- 		}
-	
- 	}
+ 		}else{
+ 			if( arg === "" || reg.test(arg)){
+	 			return true;
+	 		}else{
+	 			return false;
+	 		}
+ 		}	
+ 	};
 
  	return validation;
 });

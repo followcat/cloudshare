@@ -109,3 +109,21 @@ body{
   display: none;
   font-weight: bold;
 }
+#file{
+  border: 1px solid #eee;
+  -webkit-box-shadow: 0 0 6px #c2c2c2;
+  -moz-box-shadow: 0 0 6px #c2c2c2;
+  -ms-box-shadow: 0 0 6px #c2c2c2;
+  -o-box-shadow: 0 0 6px #c2c2c2;
+  box-shadow: 0 0 6px #c2c2c2;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
+  -o-border-radius: 6px;
+  border-radius: 6px;
+}
+#progressmsg{
+  padding: 10px 0 0;
+  font-size: 1.075em;
+  font-weight: bold;
+}

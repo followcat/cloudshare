@@ -3,6 +3,7 @@ import shutil
 import tempfile
 
 import flask
+import jinja2.ext
 import flask.ext.testing
 
 import ext.views
@@ -21,6 +22,7 @@ class Test(flask.ext.testing.TestCase):
 
         self.app = flask.Flask(__name__)
         self.app.config.from_object('webapp.settings')
+        self.app.jinja_env.add_extension(jinja2.ext.loopcontrols)
 
         self.data_db = repointerface.gitinterface.GitInterface('testcase_data')
         self.account_db = repointerface.gitinterface.GitInterface('testcase_account')

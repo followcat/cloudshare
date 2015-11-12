@@ -31,12 +31,11 @@
           <div class="cv-box-top">
             <span>简历情况：</span>
           </div>
-          <img id="loding-img" src="{{  url_for('static', filename='images/loding.gif') }}">
+          <img id="loding-img" src="{{  url_for('static', filename='images/loading.gif') }}">
           {{ markdown|safe }}
         </div>
       </div>
-      <script src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
-      <script src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
+      <script data-main="{{ url_for('static', filename='js/src/preview') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
       {% else %}
       {% block sourcestyle %}
       <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-datetimepicker.min.css') }}">
@@ -46,31 +45,55 @@
           <div class="wrap-right">
             <div class="label-box">
               <div class="label-item">
-                <span class="label label-primary">本科</span>
-                <span class="label label-primary">医疗设备</span>
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='tag' %}
+                    {% for item in value %}
+                      <span class="label label-primary" title="{{ item.author }}">{{ item.content }}</span>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
                 <a href="javascript:;" id="add-label">添加</a>
               </div>
+              <div class="input-group add-label-box">
+                <input type="text" class="form-control" id="label-text" required="required" />
+                <div class="input-group-btn">
+                  <button type="button" class="btn btn-primary" id="add-label-btn">完成</button>
+                </div>               
+              </div>
+              
             </div>
-            <div class="follow-up-box">
+            <div class="tracking-box">
               <div class="title">
                 <span>跟进情况</span>
               </div>
               <div class="form-input">
-                <input type="text" class="form-control" placeholder="写下你的跟进情况..." />
+                <input type="text" class="form-control" placeholder="写下你的跟进情况..." id="tracking-text" required="required" />
                 <div class="btn-box">
-                <div class="form-group">
-                  <label for="date" class="col-md-2 control-label" style="padding:4px;">日期</label>
-                  <div class="input-group date form_date col-md-9" data-date="" data-date-format="dd MM yyyy" data-link-field="date" data-link-format="yyyy-mm-dd">
-                      <input class="form-control" size="16" type="text" value="" readonly>
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                  <div class="form-group">
+                    <label for="date" class="col-md-2 control-label" style="padding:4px;">日期</label>
+                    <div class="input-group date form_date col-md-9" data-date="" data-date-format="dd MM yyyy" data-link-field="date" data-link-format="yyyy-mm-dd">
+                        <input class="form-control" size="16" type="text" value="" readonly>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    </div>
+                    <input type="hidden" id="date" value="" />
                   </div>
-                  <input type="hidden" id="date" value="" />
-                </div>
-                <button type="button" class="btn btn-primary" id="follow-up-btn">提交</button>
+                  <button type="button" class="btn btn-primary" id="tracking-btn">提交</button>
                 </div>
               </div>
-              <div class="follow-up-content">
-                <div class="follow-up-item"> </div>
+              <div class="tracking-content" id="tracking-content">
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='tracking' %}
+                    {% for item in value %}
+                      <div class="tracking-item">
+                        <p class="content">{{ item.content.text }}</p>
+                        <em class="commit-info">
+                          {{ item.author }}
+                          {{ item.content.date }}
+                        </em>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
               </div>        
             </div>
             <div class="comment-box">
@@ -78,44 +101,36 @@
                 <span>评论</span>
               </div>
               <div class="form-input">
-                <input type="text" class="form-control" placeholder="写下你的评论..." />
+                <input type="text" class="form-control" placeholder="写下你的评论..." id="comment-text" required="required" />
                 <div class="btn-box">
                   <button type="button" class="btn btn-primary" id="comment-btn">提交</button>
                 </div>
               </div>
-              <div class="comment-content">
-                <div class="comment-item"></div>
+              <div class="comment-content" id="comment-content">
+                {% for key, value in yaml.iteritems() %}
+                  {% if key=='comment' %}
+                    {% for item in value %}
+                      <div class="comment-item">
+                        <p class="content">{{ item.content }}</p>
+                        <em class="commit-info">
+                          {{ item.author }}
+                        </em>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
               </div>
-              
             </div>
-
           </div>
           <div class="wrap-left">
             <div id="cv-box">
               <div class="cv-box-top">
                 <span>简历情况：</span>
               </div>
-              <img id="loding-img" src="{{  url_for('static', filename='images/loding.gif') }}">
               {{ markdown|safe }}
             </div>
           </div>
       </div>
-      <script src="{{ url_for('static',filename='js/lib/jquery.js')}}"></script>
-      <script src="{{ url_for('static',filename='js/src/cvdeal.js')}}"></script>
-      <script src="{{ url_for('static',filename='js/lib/bootstrap.js')}}"></script>
-      <script src="{{ url_for('static',filename='js/lib/bootstrap-datetimepicker.min.js')}}"></script>
-      <script src="{{ url_for('static',filename='js/lib/bootstrap-datetimepicker.zh-CN.js')}}"></script>
-      <script type="text/javascript">
-        $('.form_date').datetimepicker({
-          language:  'zh-CN',
-          weekStart: 1,
-          todayBtn:  1,
-          autoclose: 1,
-          todayHighlight: 1,
-          startView: 2,
-          minView: 2,
-          forceParse: 0
-        });
-      </script>
+      <script data-main="{{ url_for('static', filename='js/src/cvsource') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
       {% endif %}
 {% endblock %}

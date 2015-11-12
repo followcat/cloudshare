@@ -8,7 +8,6 @@ import pypandoc
 import flask.views
 import flask.ext.login
 
-import utils._yaml
 import utils.builtin
 import webapp.core.upload
 import core.outputstorage
@@ -36,11 +35,9 @@ class Search(flask.views.MethodView):
         for each in result:
             base, suffix = os.path.splitext(each)
             name = core.outputstorage.ConvertName(base)
-            with open(os.path.join(repo.repo.path, name.yaml), 'r') as yf:
-                stream = yf.read()
-            yaml_data = yaml.load(stream, Loader=utils._yaml.Loader)
+            yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
             info = repo.get_file_create_info(name.md)
-            datas.append([os.path.join(repo.repo.path, name), yaml_data, info])
+            datas.append([name, yaml_data, info])
         return flask.render_template('search_result.html',
                                      search_key=search_text,
                                      result=datas)
@@ -49,7 +46,7 @@ class Search(flask.views.MethodView):
 class Upload(flask.views.MethodView):
 
     def post(self):
-        network_file = flask.request.files['Filedata']
+        network_file = flask.request.files['file']
         upobj = webapp.core.upload.UploadObject(network_file.filename,
                                                 network_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
@@ -86,14 +83,39 @@ class Confirm(flask.views.MethodView):
         return str(result)
 
 
-class Showtest(flask.views.MethodView):
+class Show(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self, filename):
-        with codecs.open(filename, 'r', encoding='utf-8') as file:
-            data = file.read()
-        output = pypandoc.convert(data, 'html', format='markdown')
-        return flask.render_template('cv.html', markdown=output)
+        repo = flask.current_app.config['DATA_DB']
+        name = core.outputstorage.ConvertName(filename)
+        with codecs.open(os.path.join(repo.repo.path, name.md),
+                         'r', encoding='utf-8') as file:
+            md_data = file.read()
+        md = pypandoc.convert(md_data, 'html', format='markdown')
+        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+        return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
+
+
+class UpdateInfo(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def post(self):
+        result = True
+        user = flask.ext.login.current_user
+        repo = flask.current_app.config['DATA_DB']
+        filename = flask.request.json['filename']
+        updateinfo = flask.request.json['yamlinfo']
+        key, value = updateinfo.popitem()
+        name = core.outputstorage.ConvertName(filename)
+        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+        if key in yaml_info:
+            yaml_info[key].insert(0, {'author': user.id, 'content': value})
+            repo.modify_file(bytes(name.yaml), yaml.dump(yaml_info),
+                             "Add %s in %s." % (key, name.yaml), user.id)
+        else:
+            result = False
+        return flask.jsonify(result=result)
 
 
 class Index(flask.views.MethodView):

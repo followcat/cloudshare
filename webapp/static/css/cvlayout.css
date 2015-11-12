@@ -7,6 +7,9 @@ body{
   height: 50px;
   background-color: #337ab7;
 }
+.header-box #current-id{
+  display: none;
+}
 .logo{
   position: absolute;
   width: 174px;
@@ -24,7 +27,7 @@ body{
   display: block;
   position: relative;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 4px;
   padding: 8px 10px;
   border: 1px solid #D9D9D9;
   background-color: #fff;

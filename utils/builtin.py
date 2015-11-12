@@ -2,6 +2,7 @@ import os
 import hashlib
 
 import yaml
+import utils._yaml
 
 
 def md5(text):
@@ -13,3 +14,10 @@ def md5(text):
 def save_yaml(infodict, path, filename):
     with open(os.path.join(path, filename), 'w') as f:
         f.write(yaml.dump(infodict))
+
+
+def load_yaml(path, filename):
+    with open(os.path.join(path, filename), 'r') as yf:
+        yaml_data = yf.read()
+    yaml_info = yaml.load(yaml_data, Loader=utils._yaml.Loader)
+    return yaml_info

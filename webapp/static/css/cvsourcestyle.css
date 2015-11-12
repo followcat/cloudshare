@@ -9,7 +9,7 @@
 .wrap-left{
 	width: 68%;
 }
-.follow-up-box, .comment-box{
+.tracking-box, .comment-box{
 	width: 100%;
 	height: auto;
 	padding: 0 4px;
@@ -47,11 +47,12 @@
 }
 .form-input{
 	margin-top: 2px; 
+	background-color: #fbfbfb;
 }
 .form-input .form-group{
 	margin: 2px;
 }
-#follow-up-btn, #comment-btn{
+#tracking-btn, #comment-btn{
 	display: block;
 	width: 60%;
 	margin: 0 auto;
@@ -63,16 +64,37 @@
 .btn-box{
 	display: none;
 }
-.follow-up-content, .comment-content{
+.tracking-content, .comment-content{
 	width: 100%;
 	margin-bottom: 4px; 
+	margin-top: 2px; 
 	border-top: 1px solid #eee;
 	border-bottom: 1px solid #eee;
+	border-top: 1px solid #eee;
 	overflow-y: auto; 
 }
-.follow-up-content{
+.tracking-content{
 	max-height: 100px;
 }
 .comment-content{
-	max-height: 160px;
+	max-height: 140px;
+}
+.add-label-box{
+	display: none;
+	margin-top: 2px;
+	width: 50%;
+}
+.tracking-item, .comment-item{
+	padding: 6px 8px;
+	border-bottom: 1px dotted #e1e1e1; 
+}
+.tracking-item p, .comment-item p{
+	margin: 0;
+	padding: 0;
+}
+.commit-info{
+	display: block;
+	padding-top:2px; 
+	padding-left: 6px;
+	font-size: 1.075em;
 }

@@ -89,12 +89,12 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload'], function($,
 	}
 
 	//tracking-link click event
-	$("#tracking-link").on('click', function(){
+	$(".tracking-link").on('click', function(){
 		AddedInfoHandler($(this));
 	});
 
 	//comment-link click event
-	$("#comment-link").on('click', function(){
+	$(".comment-link").on('click', function(){
 		AddedInfoHandler($(this));
 	});
 });

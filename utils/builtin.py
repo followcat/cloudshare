@@ -35,7 +35,6 @@ except ImportError:
         process = Popen(stdout=PIPE, *popenargs, **kwargs)
         output, _ = process.communicate()
         retcode = process.poll()
-        print(process, output, retcode)
         if retcode:
             cmd = kwargs.get("args")
             if cmd is None:

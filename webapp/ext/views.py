@@ -29,11 +29,6 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/searchresult',
-        view_func=webapp.core.views.SearchResult.as_view('searchresult'),
-        )
-
-    app.add_url_rule(
         '/upload',
         view_func=webapp.core.views.Upload.as_view('upload'),
         )

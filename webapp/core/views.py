@@ -25,28 +25,25 @@ class Search(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        return flask.render_template('search.html')
-
-
-class SearchResult(flask.views.MethodView):
-
-    def get(self):
-        repo = flask.current_app.config['DATA_DB']
-        search_text = flask.request.args['search_text']
-        result = repo.grep(search_text)
-        datas = []
-        for each in result:
-            base, suffix = os.path.splitext(each)
-            name = core.outputstorage.ConvertName(base)
-            yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
-            info = {
-                'author': yaml_data['committer'],
-                'time': utils.builtin.strftime(yaml_data['date']),
-            }
-            datas.append([name, yaml_data, info])
-        return flask.render_template('search_result.html',
-                                     search_key=search_text,
-                                     result=datas)
+        if 'search_text' in flask.request.args:
+            repo = flask.current_app.config['DATA_DB']
+            search_text = flask.request.args['search_text']
+            result = repo.grep(search_text)
+            datas = []
+            for each in result:
+                base, suffix = os.path.splitext(each)
+                name = core.outputstorage.ConvertName(base)
+                yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+                info = {
+                    'author': yaml_data['committer'],
+                    'time': utils.builtin.strftime(yaml_data['date']),
+                }
+                datas.append([name, yaml_data, info])
+            return flask.render_template('search_result.html',
+                                         search_key=search_text,
+                                         result=datas)
+        else:
+            return flask.render_template('search.html')
 
 
 class Upload(flask.views.MethodView):

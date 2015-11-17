@@ -5,11 +5,10 @@
 .wrap-top{
   position: relative;
   width: 100%;
-  overflow: hidden;
 }
 .wrap-top .confirm-box{;
   margin-top: 20px; 
-  overflow: hidden;
+  margin-bottom: 20px;
 }
 #cv-confirm-form .form-group{
   float: left;
@@ -22,6 +21,15 @@
 #cv-confirm-form .form-btn{
   display: inline-block;
   width: 10%;
+}
+.form-group .btn-group{
+  width: 80%;
+}
+.form-group .btn-group .origin{
+  width: 82%;
+}
+.form-group .btn-group .dropdown-menu{
+  width: 82%;
 }
 @media (max-width: 970px){
   #cv-confirm-form .form-group label{

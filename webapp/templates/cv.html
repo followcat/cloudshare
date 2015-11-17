@@ -14,7 +14,17 @@
                 </div>
                 <div class="form-group">
                   <label for="origin">Origin:</label>
-                  <input type="text" name="origin" placeholder="Please Input Origin" class="form-control" value="{{ info.origin }}" required="required" />
+                  <!-- <input type="text" name="origin" placeholder="Please Input Origin" class="form-control" value="{{ info.origin }}" required="required" /> -->
+                  <!-- Split button -->
+                  <div class="btn-group">
+                    <button type="button" name="origin" class="btn btn-default origin"></button>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="caret"></span>
+                      <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" id="origin-menu">
+                    </ul>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label for="id">Id:</label>

@@ -27,9 +27,12 @@ class Search(flask.views.MethodView):
     def get(self):
         return flask.render_template('search.html')
 
-    def post(self):
+
+class SearchResult(flask.views.MethodView):
+
+    def get(self):
         repo = flask.current_app.config['DATA_DB']
-        search_text = flask.request.form['search_text']
+        search_text = flask.request.args['search_text']
         result = repo.grep(search_text)
         datas = []
         for each in result:
@@ -83,7 +86,7 @@ class Confirm(flask.views.MethodView):
         upobj = pickle.loads(flask.session['upload'])
         upobj.storage.yamlinfo.update(info)
         result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
-        return str(result)
+        return flask.jsonify(result=result)
 
 
 class Show(flask.views.MethodView):

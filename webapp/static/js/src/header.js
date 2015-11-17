@@ -47,7 +47,7 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
 		objBtn.on('click', function(){
 			var aPwd = objForm.find(":password");
 
-			if(formvalidate.ValidateBlank(aPwd))
+			if(!formvalidate.ValidateBlank(aPwd))
 			{
 				//change password, send request
 				$.ajax({

@@ -4,7 +4,6 @@ import shutil
 import logging
 import os.path
 import mimetypes
-import subprocess
 import logging.config
 import xml.etree.ElementTree
 
@@ -12,23 +11,25 @@ import pypandoc
 import emaildata.text
 
 import utils.builtin
+import utils.unoconverter
 import core.exception
 import core.outputstorage
 import core.uniquesearcher
 import core.information_explorer
 
 
+converter = utils.unoconverter.DocumentConverter()
 logging.config.fileConfig("core/logger.conf")
 logger = logging.getLogger("converterinfo")
 
 
-def convert_docfile(path, filename, output, format):
-    p = subprocess.Popen(['libreoffice', '--headless', '--convert-to',
-                          format, os.path.join(path, filename),
-                          '--outdir', output],
-                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    returncode = p.communicate()
-    logger.info(returncode[0])
+def convert_docfile(input, filename, output, outputname):
+    returncode = True
+    try:
+        converter.convert(os.path.join(input, filename), os.path.join(output, outputname))
+    except Exception as e:
+        logger.info(e)
+        returncode = False
     return returncode
 
 
@@ -108,7 +109,7 @@ class FileProcesser():
         html_src = emaildata.text.Text.html(message)
         core.outputstorage.save_stream(self.html_path, self.name.html, html_src)
         returncode = convert_docfile(self.html_path, self.name.html,
-                                     self.docx_path, 'docx:Office Open XML Text')
+                                     self.docx_path, self.name.docx)
         return returncode
 
     def remove_note(self):
@@ -170,19 +171,15 @@ class FileProcesser():
             if 'multipart/related' in self.stream:
                 self.process_mht()
                 returncode = convert_docfile(self.docx_path, self.name.docx,
-                                             self.docbook_path,
-                                             'xml:DocBook File')
+                                             self.docbook_path, self.name.xml)
             else:
                 returncode = convert_docfile(self.source_path, self.name,
-                                             self.docbook_path,
-                                             'xml:DocBook File')
-            if "Error" in returncode[0]:
+                                             self.docbook_path, self.name.xml)
+            if returncode is False:
                 returncode = convert_docfile(self.source_path, self.name,
-                                             self.docx_path,
-                                             'docx:Office Open XML Text')
+                                             self.docx_path, self.name.docx)
                 returncode = convert_docfile(self.docx_path, self.name.docx,
-                                             self.docbook_path,
-                                             'xml:DocBook File')
+                                             self.docbook_path, self.name.xml)
             if not os.path.exists(os.path.join(
                                   self.docbook_path, self.name.xml)):
                 logger.info('Not exists')

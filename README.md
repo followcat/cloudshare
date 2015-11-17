@@ -55,6 +55,12 @@ Here is a demo bash script to run Jenkins test:
 
 ## How to
 
+0) Install libreoffice/Openoffice, and start service.
+
+```
+libreoffice --invisible "--accept=socket,host=localhost,port=8100;urp;"
+```
+
 1) Use method convert_folder in converterutils.py to convert your doc/docx/pdf.
 
 ``` python

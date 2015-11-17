@@ -167,6 +167,15 @@ class Logout(flask.views.MethodView):
         return flask.redirect(flask.url_for('index'))
 
 
+class UserInfo(flask.views.MethodView):
+
+    def get(self):
+        repo = flask.current_app.config['DATA_DB']
+        user = flask.ext.login.current_user
+        info_list = repo.history(user.id, max_commits=10)
+        return flask.jsonify({'commits': info_list})
+
+
 class AddUser(flask.views.MethodView):
 
     def post(self):

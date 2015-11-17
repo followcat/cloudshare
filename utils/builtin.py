@@ -21,3 +21,22 @@ def load_yaml(path, filename):
         yaml_data = yf.read()
     yaml_info = yaml.load(yaml_data, Loader=utils._yaml.Loader)
     return yaml_info
+
+try:
+    from subprocess import check_output
+except ImportError:
+    # Python < 2.7 fallback, stolen from the 2.7 stdlib
+    def check_output(*popenargs, **kwargs):
+        from subprocess import Popen, PIPE, CalledProcessError
+        if 'stdout' in kwargs:
+            raise ValueError('stdout argument not allowed, it will be overridden.')
+        process = Popen(stdout=PIPE, *popenargs, **kwargs)
+        output, _ = process.communicate()
+        retcode = process.poll()
+        print(process, output, retcode)
+        if retcode:
+            cmd = kwargs.get("args")
+            if cmd is None:
+                cmd = popenargs[0]
+            raise CalledProcessError(retcode, cmd, output=output)
+        return output

@@ -74,6 +74,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/userinfo',
+        view_func=webapp.core.views.UserInfo.as_view('userinfo'),
+        )
+
+    app.add_url_rule(
         '/adduser',
         view_func=webapp.core.views.AddUser.as_view('adduser'),
         )

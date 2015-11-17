@@ -27,9 +27,12 @@ class Search(flask.views.MethodView):
     def get(self):
         return flask.render_template('search.html')
 
-    def post(self):
+
+class SearchResult(flask.views.MethodView):
+
+    def get(self):
         repo = flask.current_app.config['DATA_DB']
-        search_text = flask.request.form['search_text']
+        search_text = flask.request.args['search_text']
         result = repo.grep(search_text)
         datas = []
         for each in result:

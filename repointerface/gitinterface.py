@@ -1,11 +1,12 @@
 import time
-import logging
 import os.path
 import subprocess
 
 import dulwich.repo
 import dulwich.index
 import dulwich.objects
+
+import utils.builtin
 
 
 class GitInterface(object):
@@ -145,6 +146,27 @@ class GitInterface(object):
             pass
         else:
             info['author'] = commit.author
-            info['time'] = time.strftime('%Y-%m-%d %H:%M:%S',
-                                         time.localtime(commit.author_time))
+            info['time'] = utils.builtin.strftime(commit.author_time)
         return info
+
+    def history(self, author, max_commits=None, skip=0):
+        cmd = ['git', 'log', '--format=%H']
+        cmd.append('--author=%s' % author)
+        if skip:
+            cmd.append('--skip=%d' % skip)
+        if max_commits:
+            cmd.append('--max-count=%d' % max_commits)
+        try:
+            output = utils.builtin.check_output(cmd, cwd=os.path.abspath(self.repo.path))
+        except subprocess.CalledProcessError:
+            return []
+        sha1_sums = output.strip().split(b'\n')
+        return [self.commit_info(self.repo[sha1]) for sha1 in sha1_sums]
+
+    def commit_info(self, commit):
+        info_dict = {}
+        info_dict['author'] = commit.author
+        info_dict['message'] = commit.message
+        info_dict['time'] = utils.builtin.strftime(commit.author_time)
+        info_dict['id'] = commit.id
+        return info_dict

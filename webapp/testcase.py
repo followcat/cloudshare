@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 import tempfile
 
@@ -87,9 +88,8 @@ class Test(flask.ext.testing.TestCase):
         ), follow_redirects=True)
 
     def search(self, keyword):
-        return self.client.post('/search', data=dict(
-            search_text=keyword
-        ), follow_redirects=True)
+        return self.client.get('/search?search_text=%s' % keyword,
+                               follow_redirects=True)
 
 
 class LoginoutSuperAdminTest(Test):
@@ -157,7 +157,7 @@ class UploadFile(User):
         rv = self.uppreview()
         assert('CV Templates' in rv.data)
         rv = self.confirm('name', 'origin', 'id')
-        assert(rv.data == 'True')
+        assert(json.loads(rv.data)['result'] is True)
         commit = self.data_db.repo.get_object(self.data_db.repo.head())
         assert('Add file' in commit.message)
         assert('username' == commit.author)
@@ -173,7 +173,7 @@ class Search(User):
         rv = self.uppreview()
         assert('CV Templates' in rv.data)
         rv = self.confirm('name', 'origin', 'id')
-        assert(rv.data == 'True')
+        assert(json.loads(rv.data)['result'] is True)
 
     def test_searchresult(self):
         self.init_search()

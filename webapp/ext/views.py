@@ -29,11 +29,6 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/searchresult',
-        view_func=webapp.core.views.SearchResult.as_view('searchresult'),
-        )
-
-    app.add_url_rule(
         '/upload',
         view_func=webapp.core.views.Upload.as_view('upload'),
         )
@@ -76,6 +71,11 @@ def configure(app):
     app.add_url_rule(
         '/logout',
         view_func=webapp.core.views.Logout.as_view('logout'),
+        )
+
+    app.add_url_rule(
+        '/userinfo',
+        view_func=webapp.core.views.UserInfo.as_view('userinfo'),
         )
 
     app.add_url_rule(

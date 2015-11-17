@@ -83,7 +83,7 @@ class Confirm(flask.views.MethodView):
         upobj = pickle.loads(flask.session['upload'])
         upobj.storage.yamlinfo.update(info)
         result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
-        return str(result)
+        return flask.jsonify(result=result)
 
 
 class Show(flask.views.MethodView):

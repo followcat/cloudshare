@@ -27,11 +27,12 @@ require(['jquery', 'cvdeal'], function($, cvdeal){
 				url: '/confirm',
 				type: 'POST',
 				data: aForm.serialize(),
-				dataType: 'text',
 				success: function(result){
-					if( result == 'True')
+					if(result.result)
 					{
-						window.location.href = '/search';
+						setTimeout(function(){
+							window.location.href = "/search";
+						},500);
 					}
 					else
 					{

@@ -1,4 +1,5 @@
 import os
+import time
 import hashlib
 
 import yaml
@@ -22,6 +23,7 @@ def load_yaml(path, filename):
     yaml_info = yaml.load(yaml_data, Loader=utils._yaml.Loader)
     return yaml_info
 
+
 try:
     from subprocess import check_output
 except ImportError:
@@ -40,3 +42,7 @@ except ImportError:
                 cmd = popenargs[0]
             raise CalledProcessError(retcode, cmd, output=output)
         return output
+
+
+def strftime(t):
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t))

@@ -1,3 +1,4 @@
+import time
 import email
 import shutil
 import logging
@@ -275,6 +276,8 @@ class FileProcesser():
             raise core.exception.DuplicateException(error)
         shutil.copy(os.path.join(self.markdown_path, self.name.md),
                     os.path.join(path, self.name.md))
+        self.yamlinfo['committer'] = committer
+        self.yamlinfo['date'] = time.time()
         utils.builtin.save_yaml(self.yamlinfo, path, self.name.yaml)
         repo.add_files([self.name.md, self.name.yaml],
                        committer=committer)

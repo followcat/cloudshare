@@ -146,8 +146,7 @@ class GitInterface(object):
             pass
         else:
             info['author'] = commit.author
-            info['time'] = time.strftime('%Y-%m-%d %H:%M:%S',
-                                         time.localtime(commit.author_time))
+            info['time'] = utils.builtin.strftime(commit.author_time)
         return info
 
     def history(self, author, max_commits=None, skip=0):
@@ -168,7 +167,6 @@ class GitInterface(object):
         info_dict = {}
         info_dict['author'] = commit.author
         info_dict['message'] = commit.message
-        info_dict['time'] = time.strftime('%Y-%m-%d %H:%M:%S',
-                                          time.localtime(commit.author_time))
+        info_dict['time'] = utils.builtin.strftime(commit.author_time)
         info_dict['id'] = commit.id
         return info_dict

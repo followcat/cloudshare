@@ -176,7 +176,7 @@ class UserInfo(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         user = flask.ext.login.current_user
         info_list = repo.history(user.id, max_commits=10)
-        return flask.jsonify({'commits': info_list})
+        return flask.render_template('userinfo.html', info=info_list)
 
 
 class AddUser(flask.views.MethodView):

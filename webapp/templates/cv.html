@@ -32,7 +32,9 @@
                 </div> -->
                 <div class="form-btn">  
                   <button type="button" class="btn btn-primary" id="confirm-btn">Confirm</button>
+                  <button type="button" class="btn btn-default" id="goback-btn">Go back</button>
                 </div>
+                
               </form>
             </div> 
           </div>   
@@ -46,8 +48,8 @@
         </div>
       </div>
       <script data-main="{{ url_for('static', filename='js/src/preview') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
-      {% else %}
-      {% block sourcestyle %}
+      {% else %}<!-- cv preview end  -->
+      {% block sourcestyle %}    <!-- cv page start -->
       <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-datetimepicker.min.css') }}">
       <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvsourcestyle.css') }}">
       {% endblock %}
@@ -136,8 +138,9 @@
           </div>
           <div class="wrap-left">
             <div id="cv-box">
-              <div class="cv-box-top">
+              <div class="cv-box-top clearfix">
                 <span>简历情况：</span>
+                <button type="button" class="btn btn-default btn-xs" id="exports-btn">导出</button>
               </div>
               {{ markdown|safe }}
             </div>

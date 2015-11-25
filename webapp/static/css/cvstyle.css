@@ -20,7 +20,10 @@
 }
 #cv-confirm-form .form-btn{
   display: inline-block;
-  width: 10%;
+  width: 26%;
+}
+#cv-confirm-form .form-btn #goback-btn{
+  margin-left: 10%;
 }
 .form-group .btn-group{
   width: 80%;
@@ -55,4 +58,11 @@
   #cv-confirm-form .form-group .form-control{
     width: 100%;
   }
+  #cv-confirm-form .form-btn{
+    display: block;
+    width: 100%;
+  }
+}
+#exports-btn{
+  float: right;
 }

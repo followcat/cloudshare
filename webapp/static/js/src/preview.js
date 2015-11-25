@@ -73,7 +73,9 @@ require(['jquery', 'cvdeal', 'bootstrap'], function($, cvdeal, bootstrap){
         
 	});
 
-
-
+	//go back history
+	$("#goback-btn").on('click', function(){
+		history.go(-1);
+	})
 
 });

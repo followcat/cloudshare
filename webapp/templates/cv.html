@@ -142,7 +142,11 @@
                 <span>简历情况：</span>
                 <button type="button" class="btn btn-default btn-xs" id="exports-btn">导出</button>
               </div>
-              {{ markdown|safe }}
+              <div id="cv-content">
+                <div class="content">
+                  {{ markdown|safe }}
+                </div>
+              </div>
             </div>
           </div>
       </div>

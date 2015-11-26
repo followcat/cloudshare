@@ -155,7 +155,7 @@ class UploadFile(User):
         rv = self.upload('core/test/cv_1.doc')
         assert(rv.data == 'True')
         rv = self.uppreview()
-        assert('CV Templates' in rv.data)
+        assert('13888888888' in rv.data)
         rv = self.confirm('name', 'origin', 'id')
         assert(json.loads(rv.data)['result'] is True)
         commit = self.data_db.repo.get_object(self.data_db.repo.head())
@@ -171,7 +171,7 @@ class Search(User):
         rv = self.upload('core/test/cv_1.doc')
         assert(rv.data == 'True')
         rv = self.uppreview()
-        assert('CV Templates' in rv.data)
+        assert('13888888888' in rv.data)
         rv = self.confirm('name', 'origin', 'id')
         assert(json.loads(rv.data)['result'] is True)
 

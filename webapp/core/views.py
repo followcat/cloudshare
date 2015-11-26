@@ -82,8 +82,7 @@ class Confirm(flask.views.MethodView):
     def post(self):
         info = {
             'name': flask.request.form['name'],
-            'origin': flask.request.form['origin'],
-            'id': flask.request.form['id']
+            'origin': flask.request.form['origin']
         }
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session['upload'])

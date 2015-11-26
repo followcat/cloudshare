@@ -42,8 +42,10 @@
   </head>
   <body>
   	<header class="header-box">
+      <a href="/search">
         <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
-        <span id="current-id">{{ current_user.id }}</span>
+      </a> 
+      <span id="current-id">{{ current_user.id }}</span>
     </header> 
 		{% block content %}
 		{% endblock %}

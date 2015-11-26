@@ -43,19 +43,24 @@ require(['jquery', 'cvdeal', 'bootstrap'], function($, cvdeal, bootstrap){
 	$("#origin-menu").delegate('a', 'click', function(){
 		var value = $(this).text();
 		$(".origin").text(value);
+		$(".origin").val(value);
 	});
 
 	$("#confirm-btn").on('click', function(){
 		var aForm = $("#cv-confirm-form");
 		var aText = aForm.find(":text");
 
+		var originVal = $(".origin").val();
 
-		if(aText[0].value !== "" && aText[1].value !== "" && aText[2].value !== "")
+		if(aText[0].value !== "" && originVal !== "")
 		{
 			$.ajax({
 				url: '/confirm',
 				type: 'POST',
-				data: aForm.serialize(),
+				data: {
+					'name' : aText[0].value,
+					'origin' : originVal
+				},
 				success: function(result){
 					if(result.result)
 					{

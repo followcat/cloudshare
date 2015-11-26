@@ -3,19 +3,48 @@ require.config({
 
 	paths: {
 		jquery: 'lib/jquery',
-		cvdeal: 'src/cvdeal'
+		cvdeal: 'src/cvdeal',
+		bootstrap: 'lib/bootstrap'
 	},
 	shim: {
 		cvdeal:{
 			deps: ['jquery'],
 			exports: 'cvdeal'
+		},
+		bootstrap: {
+			deps: ['jquery'],
+			exports: 'bootstrap'
 		}
 	}
 });
 
-require(['jquery', 'cvdeal'], function($, cvdeal){
+require(['jquery', 'cvdeal', 'bootstrap'], function($, cvdeal, bootstrap){
 
-	window.onload = cvdeal.CVdeal();
+	//load the origin data to the origin dropdown menu
+	var LoadOrigin = function(){
+		$.getJSON('/static/origindata.json', function(data){
+			var menu = $("#origin-menu");
+			$.each(data, function(index, value){
+				if(index === 0)
+				{
+					$(".origin").text(value['origin']);
+				}
+				menu.append("<li><a href='javascript:;'>" + value['origin'] + "</a></li>");
+			});
+		});
+	};
+
+	//document were load ready, load the function
+	$(document).ready(function(){
+		cvdeal.CVdeal();
+		LoadOrigin();
+	});
+
+	$("#origin-menu").delegate('a', 'click', function(){
+		var value = $(this).text();
+		$(".origin").text(value);
+	});
+
 	$("#confirm-btn").on('click', function(){
 		var aForm = $("#cv-confirm-form");
 		var aText = aForm.find(":text");
@@ -44,7 +73,9 @@ require(['jquery', 'cvdeal'], function($, cvdeal){
         
 	});
 
-
-
+	//go back history
+	$("#goback-btn").on('click', function(){
+		history.go(-1);
+	})
 
 });

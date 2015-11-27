@@ -220,7 +220,6 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 	var style = $("style").html();
 	var meta = "<meta charset='UTF-8'>";
 	var html = meta + "<style>" + style + "</style>" + content;
-	console.log(html);
 	$('#exports-btn').click(function() {
 		var filename = $('title').text();
 		export_raw(filename + '.html', html);

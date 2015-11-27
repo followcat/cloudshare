@@ -28,6 +28,7 @@ require(['jquery', 'cvdeal', 'bootstrap'], function($, cvdeal, bootstrap){
 				if(index === 0)
 				{
 					$(".origin").text(value['origin']);
+					$(".origin").val(value['origin']);
 				}
 				menu.append("<li><a href='javascript:;'>" + value['origin'] + "</a></li>");
 			});

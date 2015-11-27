@@ -62,7 +62,7 @@ define(['jquery'], function(){
 
 		allElementP.each(function(){
 			var oP = $(this);
-			var reg = /&nbsp;/;
+			var reg = /^(&nbsp;)(&nbsp;)*(&nbsp;)$/;
 			if(reg.test(oP.html()))
 			{
 				oP.remove();

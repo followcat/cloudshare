@@ -218,7 +218,8 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 
 	var content = $('#cv-content').html();
 	var style = $("style").html();
-	var html = "<style>"+ style + "</style>" + content;
+	var meta = "<meta charset='UTF-8'>";
+	var html = meta + "<style>" + style + "</style>" + content;
 	console.log(html);
 	$('#exports-btn').click(function() {
 		var filename = $('title').text();

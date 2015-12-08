@@ -29,10 +29,16 @@ class Search(flask.views.MethodView):
             repo = flask.current_app.config['DATA_DB']
             search_text = flask.request.args['search_text']
             result = repo.grep(search_text)
+            yaml_result = repo.grep_yaml(search_text)
             datas = []
-            for each in result:
+            names = []
+            for each in result+yaml_result:
                 base, suffix = os.path.splitext(each)
                 name = core.outputstorage.ConvertName(base)
+                if name not in names:
+                    names.append(name)
+                else:
+                    continue
                 yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
                 info = {
                     'author': yaml_data['committer'],
@@ -76,8 +82,7 @@ class Confirm(flask.views.MethodView):
     def post(self):
         info = {
             'name': flask.request.form['name'],
-            'origin': flask.request.form['origin'],
-            'id': flask.request.form['id']
+            'origin': flask.request.form['origin']
         }
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session['upload'])
@@ -190,7 +195,7 @@ class UserInfo(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         user = flask.ext.login.current_user
         info_list = repo.history(user.id, max_commits=10)
-        return flask.jsonify({'commits': info_list})
+        return flask.render_template('userinfo.html', info=info_list)
 
 
 class AddUser(flask.views.MethodView):

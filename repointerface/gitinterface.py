@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import re
 import time
 import os.path
 import subprocess
@@ -112,6 +114,44 @@ class GitInterface(object):
             for each in keywords:
                 command.append('-e')
                 command.append(each)
+            p = subprocess.Popen(command,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT,
+                                 cwd=self.repo.path)
+            returncode = p.communicate()[0]
+            for each in returncode.split('\n'):
+                if each:
+                    grep_list.append(each)
+        return grep_list
+
+    def grep_yaml(self, restrings):
+        """
+            >>> import yaml
+            >>> import shutil
+            >>> import repointerface.gitinterface
+            >>> repo_name = 'repointerface/test_repo'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> path = interface.repo.path
+            >>> data = {'name': u'中文名字'}
+            >>> with open('repointerface/test_repo/test_file.yaml', 'w') as file:
+            ...     file.write(yaml.dump(data))
+            >>> commit_id = interface.add_files(['test_file.yaml'],
+            ... b'Test commit', b'test<test@test.com>')
+            >>> interface.grep_yaml('name')
+            ['test_file.yaml']
+            >>> shutil.rmtree(repo_name)
+        """
+        grep_list = []
+        keywords = restrings.split()
+        if keywords:
+            command = ['git', 'grep', '-l', '--all-match']
+            for each in keywords:
+                command.append('-e')
+                unicode_str = re.sub(r'\\u[a-z0-9]{4}',
+                                     lambda a: a.group().upper(),
+                                     each.__repr__()[2:-1]).replace('\\U',
+                                                                    '\\\\\\u')
+                command.append(unicode_str)
             p = subprocess.Popen(command,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,

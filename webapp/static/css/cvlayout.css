@@ -28,6 +28,7 @@ body{
   position: relative;
   width: 100%;
   margin-top: 4px;
+  margin-bottom: 20px;
   padding: 8px 10px;
   border: 1px solid #D9D9D9;
   background-color: #fff;
@@ -86,7 +87,6 @@ body{
 #cv-box table tbody tr td{
   padding-top: 2px;
   padding-bottom: 2px;
-  text-align: center;
   border: 1px solid #c2c2c2;
   line-height: 22px;
 }

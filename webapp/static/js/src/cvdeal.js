@@ -62,7 +62,7 @@ define(['jquery'], function(){
 
 		allElementP.each(function(){
 			var oP = $(this);
-			var reg = /&nbsp;/;
+			var reg = /^(&nbsp;)(&nbsp;)*(&nbsp;)$/;
 			if(reg.test(oP.html()))
 			{
 				oP.remove();
@@ -98,6 +98,18 @@ define(['jquery'], function(){
 		}
 	};
 
+	CVDeal.prototype.ConcatTd = function(){
+		var allElementTd = this.cv.find("td");
+
+		allElementTd.each(function(){
+			var This = $(this);
+			if(This.next().html() == ""){
+				This.next().remove();
+				This.attr("colspan","2");
+			}
+		});
+	};
+
 	return {
 		CVdeal: function(){
 			var objCV = new CVDeal($("#cv-box"));
@@ -106,7 +118,7 @@ define(['jquery'], function(){
 			objCV.DeleteSection();
 			objCV.DeleteLink();
 		  objCV.DeleleLine();
-
+		  objCV.ConcatTd();
 		  objCV = null;
 
 			$("#loding-img").remove();

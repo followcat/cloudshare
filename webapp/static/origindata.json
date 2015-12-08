@@ -1,0 +1,42 @@
+[
+	{ 
+		"num" : 1,
+		"origin" : "前程无忧"
+	},
+	{  
+		"num" : 2,
+		"origin" : "猎聘网"
+	},
+	{
+		"num" : 3,
+		"origin" : "领英网"
+	},
+	{
+		"num" : 4,
+		"origin" : "若邻网"
+	},
+	{ 
+		"num" : 5,
+		"origin" : "大街网"
+	},
+	{  
+		"num" : 6,
+		"origin" : "论坛"
+	},
+	{
+		"num" : 7,
+		"origin" : "QQ群"
+	},
+	{ 
+		"num" : 8,
+		"origin" : "他荐"
+	},
+	{  
+		"num" : 9,
+		"origin" : "Cold Call"
+	},
+	{
+		"num" : 10,
+		"origin" : "其它"
+	}
+]

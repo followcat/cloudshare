@@ -1,0 +1,42 @@
+.per-info{
+  margin-top: 20px;
+}
+.per-info-box{
+  width: 100%;
+  padding: 0 34px 8px 34px;
+  border-radius: 8px;
+  border: 1px solid #c2c2c2;
+}
+.newupdate-box{
+  margin-top: 25px;
+}
+.newupdate-box-top{
+  border-radius: 8px 8px 0 0;
+  border: 1px solid #c2c2c2;
+  background-color: #eee;
+}
+.newupdate-title{
+  font-size: 0.875em;
+  font-weight: bold;
+  text-indent: 20px;
+}
+.newupdate-box-bottom{
+  border-radius: 0 0 8px 8px;
+  border-left: 1px solid #c2c2c2;
+  border-right: 1px solid #c2c2c2;
+  border-bottom: 1px solid #c2c2c2;
+}
+.operate-list{
+  width: 94%;
+  margin: 0 auto;
+  padding: 10px 12px 12px 8px;
+}
+.operate-list-item{
+  border-bottom: 1px solid #eee;
+}
+.operate-list-item span{
+  color: #999;
+}
+.operate-list-item p{
+  text-indent: 10px;
+}

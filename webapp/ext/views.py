@@ -49,6 +49,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/edit/<path:filename>',
+        view_func=webapp.core.views.Edit.as_view('edit'),
+        )
+
+    app.add_url_rule(
         '/updateinfo',
         view_func=webapp.core.views.UpdateInfo.as_view('updateinfo'),
         )

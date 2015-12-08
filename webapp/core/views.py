@@ -105,6 +105,20 @@ class Show(flask.views.MethodView):
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
 
+class Edit(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self, filename):
+        repo = flask.current_app.config['DATA_DB']
+        name = core.outputstorage.ConvertName(filename)
+        with codecs.open(os.path.join(repo.repo.path, name.md),
+                         'r', encoding='utf-8') as file:
+            md_data = file.read()
+        md = pypandoc.convert(md_data, 'html', format='markdown')
+        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+        return flask.render_template('edit.html', markdown=md, yaml=yaml_info)
+
+
 class UpdateInfo(flask.views.MethodView):
 
     @flask.ext.login.login_required

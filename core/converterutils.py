@@ -280,3 +280,37 @@ class FileProcesser():
                        committer=committer)
         logger.info('Finish')
         return True
+
+    def storage_md(self, repo, committer=None):
+        """
+            >>> import glob
+            >>> import shutil
+            >>> import os.path
+            >>> import core.outputstorage
+            >>> import core.converterutils
+            >>> import repointerface.gitinterface
+            >>> basepath = 'core/test_output'
+            >>> repo_name = 'core/test_repo'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> cv1 = core.converterutils.FileProcesser('core/test',
+            ... 'cv_1.doc', basepath)
+            >>> cv1.storage_md(interface)
+            True
+            >>> md_files = glob.glob(os.path.join(repo_name, '*.md'))
+            >>> len(md_files)
+            1
+            >>> yaml_files = glob.glob(os.path.join(repo_name, '*.yaml'))
+            >>> len(yaml_files)
+            0
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(basepath)
+        """
+        if self.result is False:
+            return False
+        path = repo.repo.path
+        shutil.copy(os.path.join(self.markdown_path, self.name.md),
+                    os.path.join(path, self.name.md))
+        repo.add_files([self.name.md],
+                       committer=committer)
+        logger.info('Finish')
+        return True

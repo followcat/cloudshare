@@ -119,6 +119,35 @@ class Edit(flask.views.MethodView):
         return flask.render_template('edit.html', markdown=md, yaml=yaml_info)
 
 
+class Modify(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self, filename):
+        repo = flask.current_app.config['DATA_DB']
+        name = core.outputstorage.ConvertName(filename)
+        with codecs.open(os.path.join(repo.repo.path, name.md),
+                         'r', encoding='utf-8') as file:
+            md_data = file.read()
+        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+        return flask.render_template('modify.html', markdown=md_data, yaml=yaml_info)
+
+    def post(self, filename):
+        user = flask.ext.login.current_user
+        md_data = flask.request.form['mddata']
+        repo = flask.current_app.config['DATA_DB']
+        name = core.outputstorage.ConvertName(filename)
+        repo.modify_file(bytes(name.md), md_data.encode('utf-8'), committer=user.id)
+        return "True"
+
+
+class Preview(flask.views.MethodView):
+
+    def post(self):
+        md_data = flask.request.form['mddata']
+        md = pypandoc.convert(md_data, 'html', format='markdown')
+        return flask.render_template('preview.html', markdown=md)
+
+
 class UpdateInfo(flask.views.MethodView):
 
     @flask.ext.login.login_required

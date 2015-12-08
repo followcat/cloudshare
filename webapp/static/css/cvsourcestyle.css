@@ -111,8 +111,10 @@
 .label-primary{
   cursor: pointer;
 }
-#edit{
-  display: block;
-  float: right;
-  margin-right: 40px;
+.tool-bar{
+	width: 40%;
+	float: right;
+}
+.tool-bar a{
+	margin-right: 8px;
 }

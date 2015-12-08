@@ -194,10 +194,12 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		
 	});
 
-	function edit(){
+	function Route(){
 		var url = window.location.href.split('/');
 		var filename = url[url.length-1];
 		$("#edit").attr('href', '/edit/' + filename);
+		$("#modify").attr('href', '/modify/' + filename);
 	}
-	edit();
+	Route();
+
 });

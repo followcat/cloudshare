@@ -86,6 +86,20 @@ class Confirm(flask.views.MethodView):
         return flask.jsonify(result=result)
 
 
+class ConfirmEnglish(flask.views.MethodView):
+
+    def post(self):
+        repo = flask.current_app.config['DATA_DB']
+        user = flask.ext.login.current_user
+        yaml_name = flask.request.form['name']
+        yaml_data = utils.builtin.load_yaml(repo.repo.path, yaml_name)
+        upobj = pickle.loads(flask.session['upload'])
+        result = upobj.confirm_md(flask.current_app.config['DATA_DB'], user.id)
+        yaml_data['enversion'] = upobj.storage.name.md
+        utils.builtin.save_yaml(yaml_data, repo.repo.path, yaml_name)
+        return flask.jsonify(result=result)
+
+
 class Show(flask.views.MethodView):
 
     @flask.ext.login.login_required

@@ -49,7 +49,6 @@ class UploadObject(object):
 
     def confirm(self, repo, committer=None):
         """
-            >>> import glob
             >>> import shutil
             >>> import os.path
             >>> import webapp.core.upload
@@ -78,6 +77,30 @@ class UploadObject(object):
         except core.exception.DuplicateException:
             self.information = 'Exists File'
         return result
+
+    def confirm_md(self, repo, committer=None):
+        """
+            >>> import shutil
+            >>> import os.path
+            >>> import webapp.core.upload
+            >>> import repointerface.gitinterface
+            >>> root = "core/test"
+            >>> name = "cv_1.doc"
+            >>> repo_name = 'webapp/core/test_repo'
+            >>> test_path = "webapp/core/test_output"
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> obj = open(os.path.join(root, name))
+            >>> os.makedirs(test_path)
+            >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
+            >>> up.confirm(interface)
+            True
+            >>> up.confirm_md(interface)
+            True
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(test_path)
+        """
+        self.storage.storage_md(repo, committer=committer)
+        return True
 
     def remove(self):
         """

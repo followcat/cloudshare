@@ -44,6 +44,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/confirmenglish',
+        view_func=webapp.core.views.ConfirmEnglish.as_view('confirmenglish'),
+        )
+
+    app.add_url_rule(
         '/show/<path:filename>',
         view_func=webapp.core.views.Show.as_view('show'),
         )

@@ -74,7 +74,6 @@ class FileProcesser():
     def copy(self, des=None, name=None):
         """
             >>> import shutil
-            >>> import core.outputstorage
             >>> import core.converterutils
             >>> basepath = 'core/test_output'
             >>> cv1 = core.converterutils.FileProcesser('core/test',
@@ -145,7 +144,6 @@ class FileProcesser():
         """
             >>> import os
             >>> import shutil
-            >>> import core.outputstorage
             >>> import core.converterutils
             >>> import xml.etree.ElementTree
             >>> basepath = 'core/test_output'
@@ -199,7 +197,6 @@ class FileProcesser():
         """
             >>> import shutil
             >>> import os.path
-            >>> import core.outputstorage
             >>> import core.converterutils
             >>> basepath = 'core/test_output'
             >>> cv1 = core.converterutils.FileProcesser('core/test',
@@ -236,7 +233,6 @@ class FileProcesser():
             >>> import glob
             >>> import shutil
             >>> import os.path
-            >>> import core.outputstorage
             >>> import core.converterutils
             >>> import repointerface.gitinterface
             >>> basepath = 'core/test_output'
@@ -286,7 +282,6 @@ class FileProcesser():
             >>> import glob
             >>> import shutil
             >>> import os.path
-            >>> import core.outputstorage
             >>> import core.converterutils
             >>> import repointerface.gitinterface
             >>> basepath = 'core/test_output'

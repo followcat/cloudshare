@@ -1,0 +1,15 @@
+{% extends "share/cv_layout.html" %}
+{% block content %}
+<div id="cv-box">
+  <div class="cv-box-top clearfix">
+    <span>简历情况：</span>
+    <button type="button" class="btn btn-default btn-xs" id="exports-btn">导出</button>
+  </div>
+  <div id="cv-content">
+    <div class="content">
+      {{ markdown|safe }}
+    </div>
+  </div>
+</div>
+<script data-main="{{ url_for('static', filename='js/src/edit') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+{% endblock %}

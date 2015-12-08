@@ -111,7 +111,10 @@
 .label-primary{
   cursor: pointer;
 }
-#exports-btn{
+.tool-bar{
+	width: 40%;
 	float: right;
-	margin-right: 40px;
+}
+.tool-bar a{
+	margin-right: 8px;
 }

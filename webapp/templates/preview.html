@@ -1,0 +1,15 @@
+{% extends "share/cv_layout.html" %}
+{% block content %}
+<div id="cv-box">
+  <div class="cv-box-top">
+    <span>简历情况：</span>
+  </div>
+  <div id="cv-content">
+    <div class="content">
+      <img id="loding-img" src="{{  url_for('static', filename='images/loading.gif') }}">
+      {{ markdown|safe }}
+    </div>
+  </div>
+</div>
+<script data-main="{{ url_for('static', filename='js/src/preview') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+{% endblock %}

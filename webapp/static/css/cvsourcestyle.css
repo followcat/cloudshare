@@ -111,7 +111,8 @@
 .label-primary{
   cursor: pointer;
 }
-#exports-btn{
-	float: right;
-	margin-right: 40px;
+#edit{
+  display: block;
+  float: right;
+  margin-right: 40px;
 }

@@ -39,7 +39,11 @@ class Search(flask.views.MethodView):
                     names.append(name)
                 else:
                     continue
-                yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+                try:
+                    yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+                except IOError:
+                    names.pop(name)
+                    continue
                 info = {
                     'author': yaml_data['committer'],
                     'time': utils.builtin.strftime(yaml_data['date']),

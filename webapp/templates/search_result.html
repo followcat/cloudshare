@@ -35,6 +35,23 @@
           <li class="company"><strong>公司: </strong><span>{{ item[1].company }}</span></li>
         </ul>
       </div>
+      <div class="work-experience">
+        <a href="javascript:;" class='show-more'>展开</a>
+          {% for e in item[1].experience %}
+            {% if loop.index > 2 %}
+              <div class='experience-hide'>
+                <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
+                <div class='experience-company'>{{ e[2] }}</div> 
+              </div>
+            {% else %}
+              <div>
+                <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
+                <div class='experience-company'>{{ e[2] }}</div> 
+              </div>
+            {% endif %}
+          {% endfor %}
+<!--           <a href="javascript:;" class='show-more'>+显示更多</a> -->
+      </div>
       <div class="label-box">
         <span class="label-title">标签:</span>
         {% for tags in item[1].tag %}
@@ -71,7 +88,6 @@
       </div>
     </div>
     {% endfor %}
-
   </div>
 {% endblock %}
 

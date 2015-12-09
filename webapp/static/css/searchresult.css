@@ -114,3 +114,28 @@
 .label-primary{
   cursor: pointer;
 }
+.work-experience{
+  margin-top: 4px;
+  padding-left: 30px;
+  overflow: hidden;
+  position: relative;
+}
+.work-experience a{
+  font-size: 0.875em;
+}
+.work-experience .experience-time{
+  width: 14%;
+  float: left;
+}
+.work-experience .experience-company{
+  width: 85%;
+  float: left;
+}
+.experience-hide{
+  display: none;
+}
+.show-more{
+  position: absolute;
+  top: 2px;
+  left: 0
+}

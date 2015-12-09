@@ -97,4 +97,20 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload'], function($,
 	$(".comment-link").on('click', function(){
 		AddedInfoHandler($(this));
 	});
+
+	//show more experience
+	$('.show-more').on('click', function(){
+		var text = $(this).text();
+		if( text.indexOf('展开') !== -1 ){
+			$(this).parent().find('.experience-hide').css({
+				'display' : 'block'
+			});
+			$(this).text('折叠');
+		}else{
+			$(this).parent().find('.experience-hide').css({
+				'display' : 'none'
+			});
+			$(this).text('展开');
+		}
+	});
 });

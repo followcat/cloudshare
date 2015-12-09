@@ -50,35 +50,48 @@ require(['jquery', 'cvdeal'], function($, cvdeal){
 	Edit(oTd);
 	Edit(oP);
 
-		// export html to file
-	function fake_click(obj) {
-    var ev = document.createEvent("MouseEvents");
-    ev.initMouseEvent(
-        "click", true, false, window, 0, 0, 0, 0, 0
-        , false, false, false, false, 0, null
-        );
-    obj.dispatchEvent(ev);
-	}
+	// 	// export html to file
+	// function fake_click(obj) {
+ //    var ev = document.createEvent("MouseEvents");
+ //    ev.initMouseEvent(
+ //        "click", true, false, window, 0, 0, 0, 0, 0
+ //        , false, false, false, false, 0, null
+ //        );
+ //    obj.dispatchEvent(ev);
+	// }
 	 
-	function export_raw(name, data) {
-	   var urlObject = window.URL || window.webkitURL || window;
+	// function export_raw(name, data) {
+	//    var urlObject = window.URL || window.webkitURL || window;
 	 
-	   var export_blob = new Blob([data]);
+	//    var export_blob = new Blob([data]);
 	 
-	   var save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
-	   save_link.href = urlObject.createObjectURL(export_blob);
-	   save_link.download = name;
-	   fake_click(save_link);
-	}
-
-
+	//    var save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+	//    save_link.href = urlObject.createObjectURL(export_blob);
+	//    save_link.download = name;
+	//    fake_click(save_link);
+	// }
+	var content = $('#cv-box').html();
+	var obj = $(content);
+	console.log(content);
 	$('#exports-btn').click(function() {
 		var content = $('#cv-content').html();
+		var header = $("header").html();
 		var style = $("style").html();
-		var meta = "<meta charset='UTF-8'>";
-		var html = meta + "<style>" + style + "</style>" + content;
+		var meta = "<meta charset='utf-8'>";
+		var html = meta
+		 					+ "<style>" + style + "</style>" 
+							+ "<header class='header-box'>" + header + "</header>"
+							+ "<div id='cv-box'><div id='cv-content'>"
+							+ content
+							+ "</div></div>";
 		var filename = $('title').text();
-		export_raw(filename + '.html', html);
+
+		var link = document.createElement('a');
+    mimeType = 'text/html';
+    link.setAttribute('download', filename);
+    link.setAttribute('href', 'data:' + mimeType  +  ';charset=utf-8,' + encodeURIComponent(html));
+    link.click();
+		// export_raw(filename + '.html', html);
 	});
 
 	function setTitle(){
@@ -87,4 +100,22 @@ require(['jquery', 'cvdeal'], function($, cvdeal){
 		$('title').text(title);
 	}
 	setTitle();
+
+	function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+
+    var dataURL = canvas.toDataURL("image/png");
+
+    return dataURL;
+	}
+
+	//logo image to base64
+	$('.logo')[0].src = getBase64Image($('.logo')[0]);
+
 });

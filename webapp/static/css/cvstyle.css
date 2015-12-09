@@ -9,6 +9,7 @@
 .wrap-top .confirm-box{;
   margin-top: 20px; 
   margin-bottom: 20px;
+  margin-left: 16px;
 }
 #cv-confirm-form .form-group{
   float: left;

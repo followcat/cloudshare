@@ -42,7 +42,7 @@ class Search(flask.views.MethodView):
                 try:
                     yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
                 except IOError:
-                    names.pop(name)
+                    names.remove(name)
                     continue
                 info = {
                     'author': yaml_data['committer'],

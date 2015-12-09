@@ -88,9 +88,13 @@ require(['jquery', 'cvdeal', 'bootstrap'], function($, cvdeal, bootstrap){
 				'name' : localStorage.name
 			},
 			success: function(response){
-				console.log(response.result);
 				if(response.result){
 					localStorage.removeItem('name');
+					alert('简历上传成功');
+					history.go(-1);
+				}else{
+					alert('简历上传失败');
+					history.go(-1);
 				}
 			}
 		});

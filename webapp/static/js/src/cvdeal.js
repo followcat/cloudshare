@@ -30,7 +30,7 @@ define(['jquery'], function(){
 	CVDeal.prototype.DeleteLink = function(){
 		var reg = /[\u4e00-\u9fa5]+/;
 
-		var childP = this.cv.children("p");
+		var childP = this.cv.find("p");
 
 		childP.each(function(){
 			var a = $(this).children("a");

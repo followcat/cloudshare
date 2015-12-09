@@ -81,4 +81,10 @@ require(['jquery', 'cvdeal'], function($, cvdeal){
 		export_raw(filename + '.html', html);
 	});
 
+	function setTitle(){
+		var title = localStorage.title;
+		localStorage.removeItem('title');
+		$('title').text(title);
+	}
+	setTitle();
 });

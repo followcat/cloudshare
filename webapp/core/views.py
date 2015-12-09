@@ -133,8 +133,7 @@ class Edit(flask.views.MethodView):
                          'r', encoding='utf-8') as file:
             md_data = file.read()
         md = pypandoc.convert(md_data, 'html', format='markdown')
-        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
-        return flask.render_template('edit.html', markdown=md, yaml=yaml_info)
+        return flask.render_template('edit.html', markdown=md)
 
 
 class Modify(flask.views.MethodView):

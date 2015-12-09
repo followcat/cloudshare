@@ -5,7 +5,8 @@ require.config({
 		bootstrap: 'lib/bootstrap',
 		datetimepicker: 'lib/bootstrap-datetimepicker.min',
 		datetimepickerCN: 'lib/bootstrap-datetimepicker.zh-CN',
-		cvdeal: 'src/cvdeal'
+		cvdeal: 'src/cvdeal',
+		Upload: 'src/upload'
 	},
 	shim: {
 		bootstrap: {
@@ -28,7 +29,7 @@ require.config({
 });
 
 
-require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'], function($, bootstrap, datetimepicker, datetimepickerCN, cvdeal){
+require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 'Upload'], function($, bootstrap, datetimepicker, datetimepickerCN, cvdeal, Upload){
 	
 	window.onload = cvdeal.CVdeal();
 
@@ -193,13 +194,31 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal'],
 		}
 		
 	});
+	
+	var url = window.location.href.split('/');
+	var filename = url[url.length-1];
 
 	function Route(){
-		var url = window.location.href.split('/');
-		var filename = url[url.length-1];
 		$("#edit").attr('href', '/edit/' + filename);
 		$("#modify").attr('href', '/modify/' + filename);
 	}
 	Route();
+	
+	//upload english file
+	$("#upload-btn").on('click', function(){
+		localStorage.name = filename;
 
+		var uploader = new Upload("file-form");
+			uploader.Uploadfile(function(){
+					setTimeout(function(){
+						window.location.href = "/preview";
+					}, 1000);
+			});
+	});
+	$(".upload").on('click', function(){
+		$("#file").val("");
+		$("#progressmsg").html("");
+	});
+
+	localStorage.title = $('title').text().split('-')[0];
 });

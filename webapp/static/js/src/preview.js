@@ -79,9 +79,26 @@ require(['jquery', 'cvdeal', 'bootstrap'], function($, cvdeal, bootstrap){
         
 	});
 
+	//English CV confirm
+	$("#enconfirm-btn").on('click', function(){
+		$.ajax({
+			url: '/confirmenglish',
+			type: 'POST',
+			data: {
+				'name' : localStorage.name
+			},
+			success: function(response){
+				console.log(response.result);
+				if(response.result){
+					localStorage.removeItem('name');
+				}
+			}
+		});
+	});
+
 	//go back history
 	$("#goback-btn").on('click', function(){
 		history.go(-1);
-	})
+	});
 
 });

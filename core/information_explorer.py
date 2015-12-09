@@ -53,6 +53,27 @@ def getInfoFromRestr(stream, restring):
     return result
 
 
+def getExperience(stream):
+    """
+        >>> import core.information_explorer
+        >>> core.information_explorer.getExperience("2015.03 - 2015.05   XXCOM")
+        [(u'2015.03', u'2015.05', u'XXCOM')]
+        >>> core.information_explorer.getExperience("2015/03 - 2015/05   XXCOM")
+        [(u'2015/03', u'2015/05', u'XXCOM')]
+        >>> core.information_explorer.getExperience("2015/03 - 至今   XXCOM")
+        [(u'2015/03', u'\u81f3\u4eca', u'XXCOM')]
+        >>> core.information_explorer.getExperience("2015/03 - 至今   XXCOM XXX")
+        [(u'2015/03', u'\u81f3\u4eca', u'XXCOM XXX')]
+    """
+    output = []
+    restr = ur"(\d{4}[/.\\年 ]+\d{1,2}[月]*)[-– —]*(\d{4}[/.\\年 ]+\d{1,2}[月]*|至今)[：: ]*([^\n,，.。（（:]*)"
+    result = getInfoFromRestr(stream, restr)
+    for each in result:
+        if each[0] and each[1] and len(each[2]) > 1:
+            output.append(each)
+    return output
+
+
 def info_by_re_iter(stream, restr):
     result_iter = iter(getInfoFromRestr(stream, restr))
     try:
@@ -75,6 +96,7 @@ def catch(path, convertname, basename):
         "email":        '',
         "origin":       '',
         "id":           '',
+        "experience":   [],
         "comment":      [],
         "tag":          [],
         "tracking":     [],
@@ -137,4 +159,5 @@ def catch(path, convertname, basename):
         info_dict["phone"] = getTagFromString('电话', stream) or phone
         info_dict["email"] = getTagFromString('邮件', stream) or \
             getTagFromString('邮箱', stream) or email
+        info_dict["experience"] = getExperience(stream)
     return info_dict

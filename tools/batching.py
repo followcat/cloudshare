@@ -96,3 +96,22 @@ def classify(path, temp_output):
         for name in files:
             processfile = core.converterutils.FileProcesser(root, name, temp_output)
             filter(processfile, root, name)
+
+
+def readd_experience(repo_path):
+    import glob
+    import utils.builtin
+    import core.outputstorage
+    for position in glob.glob(os.path.join(repo_path, '*.md')):
+        name = core.outputstorage.ConvertName(position)
+        yamlname = name.yaml
+        with open(position) as f:
+            stream = f.read()
+            experience = core.information_explorer.getExperience(stream)
+        try:
+            yamldata = utils.builtin.load_yaml('', yamlname)
+        except IOError:
+            print(yamlname, "not here.")
+            continue
+        yamldata['experience'] = experience
+        utils.builtin.save_yaml(yamldata, '', yamlname)

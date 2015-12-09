@@ -96,7 +96,7 @@ class ConfirmEnglish(flask.views.MethodView):
     def post(self):
         repo = flask.current_app.config['DATA_DB']
         user = flask.ext.login.current_user
-        yaml_name = flask.request.form['name']
+        yaml_name = core.outputstorage.ConvertName(flask.request.form['name']).yaml
         yaml_data = utils.builtin.load_yaml(repo.repo.path, yaml_name)
         upobj = pickle.loads(flask.session['upload'])
         result = upobj.confirm_md(flask.current_app.config['DATA_DB'], user.id)
@@ -155,6 +155,10 @@ class Modify(flask.views.MethodView):
 
 
 class Preview(flask.views.MethodView):
+    def get(self):
+        upobj = pickle.loads(flask.session['upload'])
+        output = upobj.preview_markdown()
+        return flask.render_template('preview.html', markdown=output, method='get')
 
     def post(self):
         md_data = flask.request.form['mddata']

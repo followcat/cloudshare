@@ -72,19 +72,21 @@ def filter(processer, origin_path, filename):
         move_file(path, origin_path, filename)
 
 
-def convert_folder(path, repo, temp_output):
+def convert_folder(path, repo, temp_output, committer=None, origin=None):
     if not os.path.exists(temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for filename in files:
             processfile = core.converterutils.FileProcesser(root, filename, temp_output)
+            if origin is not None:
+                processfile.yamlinfo['origin'] = origin
             if not processfile.yamlinfo['name']:
                 name = name_from_51job(processfile.markdown_stream)
                 processfile.yamlinfo['name'] = name
                 if not processfile.yamlinfo['name']:
                     processfile.yamlinfo['name'] = name_from_filename(filename)
             try:
-                processfile.storage(repo)
+                processfile.storage(repo, committer=committer)
             except core.exception.DuplicateException as error:
                 continue
 

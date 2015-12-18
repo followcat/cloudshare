@@ -54,6 +54,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/miningcompany',
+        view_func=webapp.core.views.MiningCompany.as_view('miningcompany'),
+        )
+
+    app.add_url_rule(
         '/edit/<path:filename>',
         view_func=webapp.core.views.Edit.as_view('edit'),
         )

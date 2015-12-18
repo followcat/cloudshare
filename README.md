@@ -10,6 +10,7 @@ share，edit your doc，pdf，md and so on...
     dulwich==0.10.2
     pypandoc==1.0.1
     emaildata==0.3.2
+    jieba==0.38
 
     pandoc 1.13.2.1
     pdftohtml 0.18.4
@@ -55,9 +56,11 @@ Here is a demo bash script to run Jenkins test:
 
 ## How to
 
-0) Install libreoffice/Openoffice, and start service.
+0) Install libreoffice/Openoffice, add libreoffice uno env, and start service.
 
 ```
+export PYTHONPATH=/usr/share/pyshared:$PYTHONPATH
+export LD_LIBRARY_PATH=/usr/lib/libreoffice/program:$LD_LIBRARY_PATH
 libreoffice --invisible "--accept=socket,host=localhost,port=8100;urp;"
 ```
 

@@ -77,7 +77,8 @@ def convert_folder(path, repo, temp_output, committer=None, origin=None):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for filename in files:
-            processfile = core.converterutils.FileProcesser(root, filename, temp_output)
+            f = open(os.path.join(root, filename), 'r')
+            processfile = core.converterutils.FileProcesser(f, filename, temp_output)
             if origin is not None:
                 processfile.yamlinfo['origin'] = origin
             if not processfile.yamlinfo['name']:

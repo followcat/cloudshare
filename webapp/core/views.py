@@ -55,6 +55,31 @@ class Search(flask.views.MethodView):
         else:
             return flask.render_template('search.html')
 
+class BatchUpload(flask.views.MethodView):
+
+    def post(self):
+        fail_list = []
+        sucess_list = []
+        duplicate_list = []
+        user = flask.ext.login.current_user
+        netword_files = flask.request.files['files']
+        temp_path = flask.current_app.config['UPLOAD_TEMP']
+        for each in netword_files:
+            upobj = webapp.core.upload.UploadObject(each.filename,
+                                                    each,
+                                                    temp_path)
+            if upobj.request:
+                result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
+                if result:
+                    sucess_list.append(each.filename)
+                else:
+                    duplicate_list.append(each.filename)
+            else:
+                fail_list.append(each.filename)
+        return flask.jsonify(sucess=sucess_list,
+                             fail=fail_list,
+                             duplicate=duplicate_list)
+
 
 class Upload(flask.views.MethodView):
 

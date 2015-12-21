@@ -35,14 +35,13 @@ def convert_docfile(input, filename, output, outputname):
 
 class FileProcesser():
 
-    def __init__(self, root, name, output_base):
+    def __init__(self, fileobj, name, output_base):
         self.yamlinfo = {}
         self.markdown_stream = ''
 
-        self.root = root
         self.base = core.outputstorage.ConvertName(name)
         self.name = self.base.random
-        self.stream = self.load()
+        self.stream = fileobj.read()
 
         self.output_path = core.outputstorage.OutputPath(output_base)
         self.source_path = self.output_path.source
@@ -65,25 +64,20 @@ class FileProcesser():
                                         self.source_path, self.name.origin))[0]
         return mimetype
 
-    def load(self):
-        data = ""
-        with open(os.path.join(self.root, self.base), 'r') as f:
-            data = f.read()
-        return data
-
     def copy(self, des=None, name=None):
         """
             >>> import shutil
             >>> import core.converterutils
             >>> basepath = 'core/test_output'
-            >>> cv1 = core.converterutils.FileProcesser('core/test',
-            ... 'cv_1.doc', basepath)
+            >>> f = open('core/test/cv_1.doc', 'r')
+            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> ori = cv1.name
             >>> des = cv1.copy()
             >>> cv1.name == ori
             False
+            >>> f.close()
             >>> shutil.rmtree(basepath)
         """
         if des is None:
@@ -147,8 +141,8 @@ class FileProcesser():
             >>> import core.converterutils
             >>> import xml.etree.ElementTree
             >>> basepath = 'core/test_output'
-            >>> cv1 = core.converterutils.FileProcesser('core/test',
-            ... 'cv_1.doc', basepath)
+            >>> f = open('core/test/cv_1.doc', 'r')
+            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> e = xml.etree.ElementTree.parse(os.path.join(
@@ -160,9 +154,10 @@ class FileProcesser():
             ...     data = file.read()
             >>> 'http://jianli.yjbys.com/' in data
             True
+            >>> f.close()
             >>> shutil.rmtree(basepath)
         """
-        logger.info('Convert: %s' % os.path.join(self.root, self.base))
+        logger.info('Convert: %s' % self.base)
         if self.mimetype in ['application/msword',
                              "application/vnd.openxmlformats-officedocument"
                              ".wordprocessingml.document"]:
@@ -199,8 +194,8 @@ class FileProcesser():
             >>> import os.path
             >>> import core.converterutils
             >>> basepath = 'core/test_output'
-            >>> cv1 = core.converterutils.FileProcesser('core/test',
-            ... 'cv_1.doc', basepath)
+            >>> f = open('core/test/cv_1.doc', 'r')
+            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> os.path.isfile(os.path.join(cv1.markdown_path,
@@ -210,6 +205,7 @@ class FileProcesser():
             >>> os.path.isfile(os.path.join(cv1.markdown_path,
             ... cv1.name.md))
             False
+            >>> f.close()
             >>> shutil.rmtree(basepath)
         """
         filename = os.path.join(self.docx_path, self.name.docx)
@@ -238,10 +234,10 @@ class FileProcesser():
             >>> basepath = 'core/test_output'
             >>> repo_name = 'core/test_repo'
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> cv1 = core.converterutils.FileProcesser('core/test',
-            ... 'cv_1.doc', basepath)
-            >>> cv2 = core.converterutils.FileProcesser('core/test',
-            ... 'cv_2.doc', basepath)
+            >>> f1 = open('core/test/cv_1.doc', 'r')
+            >>> f2 = open('core/test/cv_2.doc', 'r')
+            >>> cv1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', basepath)
+            >>> cv2 = core.converterutils.FileProcesser(f2, 'cv_2.doc', basepath)
             >>> cv1.storage(interface)
             True
             >>> cv2.storage(interface)
@@ -256,6 +252,8 @@ class FileProcesser():
             ...         yaml_list.append(f.read())
             >>> len(yaml_list)
             2
+            >>> f1.close()
+            >>> f2.close()
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(basepath)
         """
@@ -287,8 +285,8 @@ class FileProcesser():
             >>> basepath = 'core/test_output'
             >>> repo_name = 'core/test_repo'
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> cv1 = core.converterutils.FileProcesser('core/test',
-            ... 'cv_1.doc', basepath)
+            >>> f = open('core/test/cv_1.doc', 'r')
+            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
             >>> cv1.storage_md(interface)
             True
             >>> md_files = glob.glob(os.path.join(repo_name, '*.md'))
@@ -297,6 +295,7 @@ class FileProcesser():
             >>> yaml_files = glob.glob(os.path.join(repo_name, '*.yaml'))
             >>> len(yaml_files)
             0
+            >>> f.close()
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(basepath)
         """

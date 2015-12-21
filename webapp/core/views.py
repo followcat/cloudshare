@@ -9,7 +9,7 @@ import flask.views
 import flask.ext.login
 
 import utils.builtin
-import utils.info_mining
+import core.mining.info
 import webapp.core.upload
 import core.outputstorage
 import webapp.core.account
@@ -196,7 +196,7 @@ class MiningCompany(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         search_text = flask.request.args['search_text']
         searches = repo.grep(search_text)
-        result = utils.info_mining.company(repo, searches, search_text)
+        result = core.mining.info.company(repo, searches, search_text)
         return flask.jsonify(result=result)
 
 

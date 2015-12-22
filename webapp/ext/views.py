@@ -1,6 +1,7 @@
 import flask.ext.login
 
 import webapp.core.views
+import webapp.core.mining
 import webapp.core.account
 
 
@@ -54,13 +55,13 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/miningcompany',
-        view_func=webapp.core.views.MiningCompany.as_view('miningcompany'),
+        '/mining/company',
+        view_func=webapp.core.mining.Company.as_view('miningcompany'),
         )
 
     app.add_url_rule(
-        '/miningoneregion',
-        view_func=webapp.core.views.MiningOneRegion.as_view('miningoneregion'),
+        '/mining/oneregion',
+        view_func=webapp.core.mining.OneRegion.as_view('miningoneregion'),
         )
 
     app.add_url_rule(

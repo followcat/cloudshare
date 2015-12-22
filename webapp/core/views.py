@@ -191,28 +191,6 @@ class UpdateInfo(flask.views.MethodView):
         return flask.jsonify(result=result)
 
 
-class MiningCompany(flask.views.MethodView):
-
-    def get(self):
-        repo = flask.current_app.config['DATA_DB']
-        search_text = flask.request.args['search_text']
-        searches = repo.grep(search_text)
-        result = core.mining.info.company(repo, searches, search_text)
-        return flask.jsonify(result=result)
-
-
-class MiningOneRegion(flask.views.MethodView):
-
-    def get(self):
-        repo = flask.current_app.config['DATA_DB']
-        markdown_id = flask.request.args['md_id']
-        name = core.outputstorage.ConvertName(markdown_id)
-        with open(os.path.join(repo.repo.path, name.md)) as f:
-            stream = f.read()
-        result = core.mining.info.region(stream.decode('utf-8'))
-        return flask.jsonify(result=result)
-
-
 class Index(flask.views.MethodView):
 
     def get(self):

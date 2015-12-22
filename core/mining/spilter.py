@@ -27,6 +27,7 @@ class Info(object):
         for index, data in enumerate(lines.splits):
             for item in self.regex.finditer(data):
                 self.positions.append((index, item.pos))
+                break
 
     def ceiling(self, pos, level=0):
         """

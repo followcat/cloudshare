@@ -1,9 +1,34 @@
 # -*- coding: utf-8 -*-
 import os
+import json
 import codecs
+
+import jieba
 
 import core.mining.spilter
 
+
+class RegionSearcher(dict):
+    def __init__(self, json_data):
+        for each in json_data:
+            for pos in json_data[each]:
+                if 'name' in pos:
+                    self[pos['name']] = pos
+                if 'DisName' in pos:
+                    self[pos['DisName']] = pos
+
+    def get(self, x):
+        city_x = x + u'市'
+        dis_x = x + u'区'
+        if x in self:
+            return self[x]
+        elif city_x in self:
+            return self[city_x]
+        elif dis_x in self:
+            return self[dis_x]
+
+region_json = json.load(open('core/mining/region.json'))
+rs = RegionSearcher(region_json)
 
 organization = (u'有限公司', U'公司', u'集团', u'院')
 organization_restr = u'([a-zA-Z0-9\u4E00-\u9FA5]+)('
@@ -22,7 +47,6 @@ for each in position_keylist:
     position_restr += '|'
 position_restr = position_restr[:-1] + ')'
 
-
 wc = core.mining.spilter.WordCatcher(position_restr)
 
 
@@ -37,7 +61,7 @@ def company(repo, searches, search_text):
         key = core.mining.spilter.Info(ms, search_text)
         filter1 = core.mining.spilter.Info(ms, organization_restr)
         filter2 = core.mining.spilter.Info(ms, time_restr)
-        wc.reset() 
+        wc.reset()
         for each in key.positions:
             ranges = []
             try:
@@ -60,3 +84,26 @@ def company(repo, searches, search_text):
                 result_dict[each] = []
             result_dict[each].append(search)
     return result_dict
+
+def region(stream):
+    ms = core.mining.spilter.MarkdownStruct(stream)
+    filter1 = core.mining.spilter.Info(ms, organization_restr)
+    filter2 = core.mining.spilter.Info(ms, time_restr)
+    ranges = []
+    for each in filter1.positions:
+        try:
+            range = filter2.range(each, 0, 1)
+            ranges.append(range)
+        except ValueError:
+            pass
+        if len(ranges) == 0:
+            continue
+    results = []
+    for range in set(ranges):
+        findstream = ''.join(ms.get_strs_from_positions([range]))
+        for w in jieba.posseg.cut(findstream, HMM=False):
+            if w.flag == 'ns':
+                result = rs.get(w.word)
+                if result:
+                    results.append(result)
+    return results

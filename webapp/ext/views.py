@@ -59,6 +59,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/miningoneregion',
+        view_func=webapp.core.views.MiningOneRegion.as_view('miningoneregion'),
+        )
+
+    app.add_url_rule(
         '/edit/<path:filename>',
         view_func=webapp.core.views.Edit.as_view('edit'),
         )

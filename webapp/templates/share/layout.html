@@ -32,8 +32,12 @@
 	    </div>
 	  </div>
 
-	  <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 upload" data-toggle="modal" data-target=".upload-modal">
-	  	<span class="glyphicon glyphicon-upload"></span> Upload
+	  <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 upload" data-toggle="modal" >
+	  	<span id="upload"><span class="glyphicon glyphicon-upload"></span>Upload</span>
+      <div class="upload-menu">
+        <a href="#" data-toggle="modal" data-target=".upload-modal">Upload</a>
+        <a href="/batchupload" target='_blank'>BatchUpload</a>
+      </div>
 	  </div>
 
 	</header>
@@ -43,7 +47,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="myModalLabel">Upload File</h4>
+          <h4 class="modal-title" id="UploadModalLabel">Upload File</h4>
         </div>
         <div class="modal-body">
           <form id="file-form" action="/upload" method="POST" enctype="multipart/form-data">
@@ -65,7 +69,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Confirm</h4>
+            <h4 class="modal-title" id="confirmModalLabel">Confirm</h4>
           </div>
           <div class="modal-body">
             <p>Are you sure to quit?</p>
@@ -85,7 +89,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Change password</h4>
+            <h4 class="modal-title" id="pwdModalLabel">Change password</h4>
           </div>
           <form id="cpwd-form" action="/changepassword" method="POST">          
           <div class="modal-body">

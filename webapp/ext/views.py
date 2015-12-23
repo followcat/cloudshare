@@ -127,3 +127,5 @@ def configure(app):
         '/deleteuser',
         view_func=webapp.core.views.DeleteUser.as_view('deleteuser'),
         )
+
+

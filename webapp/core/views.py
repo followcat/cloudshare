@@ -55,30 +55,21 @@ class Search(flask.views.MethodView):
         else:
             return flask.render_template('search.html')
 
+
 class BatchUpload(flask.views.MethodView):
 
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('batchupload.html')
+
     def post(self):
-        fail_list = []
-        sucess_list = []
-        duplicate_list = []
         user = flask.ext.login.current_user
-        netword_files = flask.request.files['files']
-        temp_path = flask.current_app.config['UPLOAD_TEMP']
-        for each in netword_files:
-            upobj = webapp.core.upload.UploadObject(each.filename,
-                                                    each,
-                                                    temp_path)
-            if upobj.request:
-                result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
-                if result:
-                    sucess_list.append(each.filename)
-                else:
-                    duplicate_list.append(each.filename)
-            else:
-                fail_list.append(each.filename)
-        return flask.jsonify(sucess=sucess_list,
-                             fail=fail_list,
-                             duplicate=duplicate_list)
+        netword_file = flask.request.files['files']
+        upobj = webapp.core.upload.UploadObject(netword_file.filename,
+                                                netword_file,
+                                                flask.current_app.config['UPLOAD_TEMP'])
+        result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
+        return flask.jsonify(result=result)
 
 
 class Upload(flask.views.MethodView):
@@ -331,3 +322,10 @@ class DeleteUser(flask.views.MethodView):
         repoaccount = flask.current_app.config['REPO_ACCOUNT']
         result = repoaccount.delete(user.id, name)
         return flask.jsonify(result=result)
+
+
+class UploadFile(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('uploadfile.html')

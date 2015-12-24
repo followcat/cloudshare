@@ -70,6 +70,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/mining/onecapacity',
+        view_func=webapp.core.mining.OneCapacity.as_view('miningonecapacity'),
+        )
+
+    app.add_url_rule(
         '/edit/<path:filename>',
         view_func=webapp.core.views.Edit.as_view('edit'),
         )

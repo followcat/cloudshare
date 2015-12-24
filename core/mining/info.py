@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 import json
 import codecs
 
@@ -31,12 +32,12 @@ region_json = json.load(open('core/mining/region.json'))
 rs = RegionSearcher(region_json)
 
 organization = (u'有限公司', U'公司', u'集团', u'院')
-organization_restr = u'([a-zA-Z0-9\u4E00-\u9FA5]+)('
+organization_restr = u'([a-zA-Z0-9\u4E00-\u9FA5]+'
 for each in organization:
     organization_restr += each + '|'
 organization_restr = organization_restr[:-1] + ')'
 
-time_restr = ur'\d{4}[/.\\年 ]+\d{1,2}[月]*'
+time_restr = ur'(\d{4})[/.\\年 ]+(\d{1,2})[月]*'
 
 with codecs.open('core/mining/position.txt', 'r', encoding='utf-8') as f:
     position_key = f.read()
@@ -85,6 +86,7 @@ def company(repo, searches, search_text):
             result_dict[each].append(search)
     return result_dict
 
+
 def region(stream):
     ms = core.mining.spilter.MarkdownStruct(stream)
     filter1 = core.mining.spilter.Info(ms, organization_restr)
@@ -106,4 +108,41 @@ def region(stream):
                 result = rs.get(w.word)
                 if result:
                     results.append(result)
+    return results
+
+
+def capacity(stream):
+    ms = core.mining.spilter.MarkdownStruct(stream)
+    filter1 = core.mining.spilter.Info(ms, organization_restr)
+    filter2 = core.mining.spilter.Info(ms, time_restr)
+    ranges = []
+    for each in filter1.positions:
+        try:
+            range = filter2.range(each, 0, 1)
+            ranges.append(range)
+        except ValueError:
+            pass
+        if len(ranges) == 0:
+            continue
+    results = []
+    for range in set(ranges):
+        job_info = dict()
+        findstream = ''.join(ms.get_strs_from_positions([range]))
+        clean_stream = findstream.replace(' ', '').replace(' ', '')
+        wordcut = jieba.posseg.cut(clean_stream)
+        count = 0
+        for each in wordcut:
+            if each.flag == 'v':
+                count += 1
+        if count == 0:
+            continue
+        job_info['doclen'] = len(clean_stream)
+        job_info['actpoint'] = count
+        timeline = re.findall(time_restr, findstream)
+        job_info['begin'] = timeline[0]
+        try:
+            job_info['end'] = timeline[1]
+        except IndexError:
+            job_info['end'] = ''
+        results.append(job_info)
     return results

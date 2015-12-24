@@ -62,11 +62,11 @@ require(['jquery', 'cvdeal', 'bootstrap'], function($, cvdeal, bootstrap){
 					'name' : aText[0].value,
 					'origin' : originVal
 				},
-				success: function(result){
-					if(result.result)
+				success: function(response){
+					if(response.result)
 					{
 						setTimeout(function(){
-							window.location.href = "/search";
+							window.location.href = "/show/" + response.filename;
 						},500);
 					}
 					else

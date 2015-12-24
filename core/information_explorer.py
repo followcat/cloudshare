@@ -156,8 +156,8 @@ def catch(path, convertname, basename):
             info_by_re_iter(stream, education_restr)
         info_dict["id"] = getTagFromString('ID', stream, rule='a-zA-Z0-9')
         info_dict["age"] = getTagFromString('年龄', stream) or age
-        info_dict["phone"] = getTagFromString('电话', stream) or phone
-        info_dict["email"] = getTagFromString('邮件', stream) or \
+        info_dict["phone"] = getTagFromString('电话', stream, ur'\d\-－()（）') or phone
+        info_dict["email"] = getTagFromString('邮件', stream, email_restr) or \
             getTagFromString('邮箱', stream) or email
         info_dict["experience"] = getExperience(stream)
     return info_dict

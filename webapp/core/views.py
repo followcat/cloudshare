@@ -57,6 +57,22 @@ class Search(flask.views.MethodView):
             return flask.render_template('search.html')
 
 
+class BatchUpload(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('batchupload.html')
+
+    def post(self):
+        user = flask.ext.login.current_user
+        netword_file = flask.request.files['files']
+        upobj = webapp.core.upload.UploadObject(netword_file.filename,
+                                                netword_file,
+                                                flask.current_app.config['UPLOAD_TEMP'])
+        result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
+        return flask.jsonify(result=result)
+
+
 class Upload(flask.views.MethodView):
 
     def post(self):
@@ -93,7 +109,7 @@ class Confirm(flask.views.MethodView):
         upobj = pickle.loads(flask.session['upload'])
         upobj.storage.yamlinfo.update(info)
         result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
-        return flask.jsonify(result=result)
+        return flask.jsonify(result=result, filename=upobj.storage.name.md)
 
 
 class ConfirmEnglish(flask.views.MethodView):
@@ -307,3 +323,10 @@ class DeleteUser(flask.views.MethodView):
         repoaccount = flask.current_app.config['REPO_ACCOUNT']
         result = repoaccount.delete(user.id, name)
         return flask.jsonify(result=result)
+
+
+class UploadFile(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('uploadfile.html')

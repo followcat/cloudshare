@@ -13,8 +13,8 @@ class UniqueSearcher(object):
             >>> repo_name = 'core/test_repo'
             >>> basepath = 'core/test_output'
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> cv1 = core.converterutils.FileProcesser('core/test',
-            ... 'cv_1.doc', basepath)
+            >>> f1 = open('core/test/cv_1.doc', 'r')
+            >>> cv1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', basepath)
             >>> cv1.convert()
             True
             >>> us = core.uniquesearcher.UniqueSearcher(interface)
@@ -31,6 +31,7 @@ class UniqueSearcher(object):
             Traceback (most recent call last):
             ...
             DuplicateException: Duplicate files: cv_1
+            >>> f1.close()
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(basepath)
         """

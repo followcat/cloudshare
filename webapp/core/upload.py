@@ -31,9 +31,7 @@ class UploadObject(object):
         self.tmp_path = path
         self.convertname = core.outputstorage.ConvertName(
             filename.encode('utf-8'))
-        core.outputstorage.save_stream(self.tmp_path, self.convertname,
-                                       fileobject.read())
-        self.storage = core.converterutils.FileProcesser(self.tmp_path,
+        self.storage = core.converterutils.FileProcesser(fileobject,
                                                          self.convertname,
                                                          self.tmp_path)
         self.result = self.storage.result

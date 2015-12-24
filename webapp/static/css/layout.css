@@ -35,28 +35,28 @@ body{
     margin-left: 80%;
   }
 }
-.profile:hover{
+.profile:hover, .upload:hover{
   background-color: #004B97;
 }
-.profile:hover .profile-menu{
+.profile:hover .profile-menu, .upload:hover .upload-menu{
   display: block;
 }
 .profile #name{
   font-size: 1.25em;
   color: #fcfcfc;
 }
-.profile-menu{
+.profile-menu, .upload-menu{
   display: none;
   background-color: #004B97;
 }
-.profile-menu a{
+.profile-menu a, .upload-menu a{
   display: block;
   width: 100%;
   height: 50px;
   line-height: 50px;
   color: #fcfcfc;
 }
-.profile-menu a:hover{
+.profile-menu a:hover, .upload-menu a:hover{
   text-decoration: none;
   background-color: #003D79;
 }
@@ -73,9 +73,6 @@ body{
   .upload{
     display: none;
   }
-}
-.upload:hover{
-  background-color: #003D79;
 }
 .search-item{
   position: absolute;

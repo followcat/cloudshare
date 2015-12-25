@@ -51,40 +51,36 @@ position_restr = position_restr[:-1] + ')'
 wc = core.mining.spilter.WordCatcher(position_restr)
 
 
-def company(repo, searches, search_text):
+def company(repo, stream, search_text):
     global wc
     result_dict = {}
-    for search in searches:
-        with codecs.open(os.path.join(repo.repo.path, search),
-                         'r', encoding='utf-8') as file:
-            md_data = file.read()
-        ms = core.mining.spilter.MarkdownStruct(md_data)
-        key = core.mining.spilter.Info(ms, search_text)
-        filter1 = core.mining.spilter.Info(ms, organization_restr)
-        filter2 = core.mining.spilter.Info(ms, time_restr)
-        wc.reset()
-        for each in key.positions:
-            ranges = []
-            try:
-                range1 = filter1.range(each, 0, 1)
-                ranges.append(range1)
-            except ValueError:
-                pass
-            try:
-                range2 = filter2.range(each, 1, 1)
-                ranges.append(range2)
-            except ValueError:
-                pass
-            if len(ranges) == 0:
-                continue
-            findstream = ''.join(ms.get_strs_from_positions(ranges))
-            cleanstream = re.sub('[- ]+' ,' ' , findstream)
-            wc.bn_bn(cleanstream)
-        page_result = wc.result()
-        for each in page_result:
-            if each not in result_dict:
-                result_dict[each] = []
-            result_dict[each].append(search)
+    ms = core.mining.spilter.MarkdownStruct(stream)
+    key = core.mining.spilter.Info(ms, search_text)
+    filter1 = core.mining.spilter.Info(ms, organization_restr)
+    filter2 = core.mining.spilter.Info(ms, time_restr)
+    wc.reset()
+    for each in key.positions:
+        ranges = []
+        try:
+            range1 = filter1.range(each, 0, 1)
+            ranges.append(range1)
+        except ValueError:
+            pass
+        try:
+            range2 = filter2.range(each, 1, 1)
+            ranges.append(range2)
+        except ValueError:
+            pass
+        if len(ranges) == 0:
+            continue
+        findstream = ''.join(ms.get_strs_from_positions(ranges))
+        cleanstream = re.sub('[- ]+' ,' ' , findstream)
+        wc.bn_bn(cleanstream)
+    page_result = wc.result()
+    for each in page_result:
+        if each not in result_dict:
+            result_dict[each] = []
+        result_dict[each].append(search)
     return result_dict
 
 

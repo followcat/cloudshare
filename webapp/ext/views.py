@@ -65,13 +65,13 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/mining/oneregion',
-        view_func=webapp.core.mining.OneRegion.as_view('miningoneregion'),
+        '/mining/region',
+        view_func=webapp.core.mining.Region.as_view('miningregion'),
         )
 
     app.add_url_rule(
-        '/mining/onecapacity',
-        view_func=webapp.core.mining.OneCapacity.as_view('miningonecapacity'),
+        '/mining/capacity',
+        view_func=webapp.core.mining.Capacity.as_view('miningcapacity'),
         )
 
     app.add_url_rule(

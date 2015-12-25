@@ -60,8 +60,8 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/mining/company',
-        view_func=webapp.core.mining.Company.as_view('miningcompany'),
+        '/mining/position',
+        view_func=webapp.core.mining.Position.as_view('miningposition'),
         )
 
     app.add_url_rule(

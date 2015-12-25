@@ -51,9 +51,8 @@ position_restr = position_restr[:-1] + ')'
 wc = core.mining.spilter.WordCatcher(position_restr)
 
 
-def company(repo, stream, search_text):
+def position(repo, stream, search_text):
     global wc
-    result_dict = {}
     ms = core.mining.spilter.MarkdownStruct(stream)
     key = core.mining.spilter.Info(ms, search_text)
     filter1 = core.mining.spilter.Info(ms, organization_restr)
@@ -76,12 +75,7 @@ def company(repo, stream, search_text):
         findstream = ''.join(ms.get_strs_from_positions(ranges))
         cleanstream = re.sub('[- ]+' ,' ' , findstream)
         wc.bn_bn(cleanstream)
-    page_result = wc.result()
-    for each in page_result:
-        if each not in result_dict:
-            result_dict[each] = []
-        result_dict[each].append(search)
-    return result_dict
+    return wc.result()
 
 
 def region(stream):

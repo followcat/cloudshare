@@ -1,3 +1,4 @@
+import codecs
 import os.path
 
 import flask
@@ -7,7 +8,7 @@ import core.mining.info
 import core.outputstorage
 
 
-class Company(flask.views.MethodView):
+class Position(flask.views.MethodView):
 
     def get(self):
         repo = flask.current_app.config['DATA_DB']
@@ -18,11 +19,11 @@ class Company(flask.views.MethodView):
             with codecs.open(os.path.join(repo.repo.path, search),
                              'r', encoding='utf-8') as file:
                 md_data = file.read()
-            companys = core.mining.info.company(repo, md_data, search_text)
-            for company in tmp:
-                if company not in result:
-                    result[company] = []
-                result[company].extend(tmp[company])
+            positions = core.mining.info.position(repo, md_data, search_text)
+            for position in positions:
+                if position not in result:
+                    result[position] = []
+                result[position].append(search)
         return flask.jsonify(result=result)
 
 
@@ -34,9 +35,10 @@ class Region(flask.views.MethodView):
         result = []
         for id in markdown_ids:
             name = core.outputstorage.ConvertName(id)
-            with open(os.path.join(repo.repo.path, name.md)) as f:
-                stream = f.read()
-            result.append(core.mining.info.region(stream.decode('utf-8')))
+            with codecs.open(os.path.join(repo.repo.path, name.md),
+                             'r', encoding='utf-8') as file:
+                stream = file.read()
+            result.append(core.mining.info.region(stream))
         return flask.jsonify(result=result)
 
 
@@ -48,7 +50,8 @@ class Capacity(flask.views.MethodView):
         result = []
         for id in markdown_ids:
             name = core.outputstorage.ConvertName(id)
-            with open(os.path.join(repo.repo.path, name.md)) as f:
-                stream = f.read()
-            result.append(core.mining.info.capacity(stream.decode('utf-8')))
+            with codecs.open(os.path.join(repo.repo.path, name.md),
+                             'r', encoding='utf-8') as file:
+                stream = file.read()
+            result.append(core.mining.info.capacity(stream))
         return flask.jsonify(result=result)

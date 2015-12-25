@@ -78,7 +78,8 @@ def company(repo, searches, search_text):
             if len(ranges) == 0:
                 continue
             findstream = ''.join(ms.get_strs_from_positions(ranges))
-            wc.bn_bn(findstream)
+            cleanstream = re.sub('[- ]+' ,' ' , findstream)
+            wc.bn_bn(cleanstream)
         page_result = wc.result()
         for each in page_result:
             if each not in result_dict:
@@ -103,7 +104,8 @@ def region(stream):
     results = []
     for range in set(ranges):
         findstream = ''.join(ms.get_strs_from_positions([range]))
-        for w in jieba.posseg.cut(findstream, HMM=False):
+        cleanstream = re.sub('[- ]+' ,' ' , findstream)
+        for w in jieba.posseg.cut(cleanstream, HMM=False):
             if w.flag == 'ns':
                 result = rs.get(w.word)
                 if result:
@@ -128,8 +130,8 @@ def capacity(stream):
     for range in set(ranges):
         job_info = dict()
         findstream = ''.join(ms.get_strs_from_positions([range]))
-        clean_stream = findstream.replace(' ', '').replace(' ', '')
-        wordcut = jieba.posseg.cut(clean_stream)
+        cleanstream = re.sub('[- ]+' ,' ' , findstream)
+        wordcut = jieba.posseg.cut(cleanstream)
         count = 0
         for each in wordcut:
             if each.flag == 'v':

@@ -92,7 +92,7 @@ class WordCatcher(object):
 
     def bn_bn(self, stream):
         word = []
-        for w in jieba.posseg.cut(stream):
+        for w in jieba.posseg.cut(stream, HMM=False):
             if w.flag[0] in ['b', 'n']:
                 word.append(w)
             elif word:

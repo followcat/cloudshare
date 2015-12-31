@@ -4,6 +4,7 @@ import os.path
 import flask
 import flask.views
 
+import utils.builtin
 import core.mining.info
 import core.mining.lsimodel
 import core.outputstorage
@@ -21,10 +22,12 @@ class Position(flask.views.MethodView):
                              'r', encoding='utf-8') as file:
                 md_data = file.read()
             positions = core.mining.info.position(repo, md_data, search_text)
+            name = core.outputstorage.ConvertName(search)
+            yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
             for position in positions:
                 if position not in result:
                     result[position] = []
-                result[position].append(search)
+                result[position].append({search: yaml_data})
         return flask.jsonify(result=result)
 
 

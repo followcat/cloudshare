@@ -269,6 +269,7 @@ class UserInfo(flask.views.MethodView):
                     info['filenames'] = utils.builtin.load_yaml(repo.repo.path, name.yaml)
                 except IOError:
                     info['filenames'] = name
+                info['name'] = name
         return flask.render_template('userinfo.html', info=info_list)
 
 

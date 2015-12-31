@@ -30,7 +30,10 @@
 	  		{% for item in info %}
 	  	  <div class="operate-list-item">
 	  	    <span>{{ item.time }}</span>
-	  	    <p>{{ item.message }}</p>
+	  	    <p>
+	  	    	{{ item.message }}
+	  	    	<a href='/show/{{ item.name }}.md' target='_blank'>{{ item.filenames.name }}</a>
+	  	    </p>  
 	  	  </div>
 	  	  {% endfor %}
 	  	</div>

@@ -7,6 +7,8 @@ import flask.views
 import core.mining.info
 import core.outputstorage
 
+import json
+
 
 class Position(flask.views.MethodView):
 
@@ -29,9 +31,10 @@ class Position(flask.views.MethodView):
 
 class Region(flask.views.MethodView):
 
-    def get(self):
+    def post(self):
         repo = flask.current_app.config['DATA_DB']
-        markdown_ids = flask.request.args['md_ids']
+        markdown_ids = flask.request.form['md_ids']
+        markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
             name = core.outputstorage.ConvertName(id)

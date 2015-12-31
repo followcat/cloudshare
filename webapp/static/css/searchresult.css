@@ -1,7 +1,4 @@
 /* Search result page */
-.result-list{
-  margin-top: 26px;
-}
 .result-list-item{
   margin-bottom: 20px;
   padding-bottom: 8px;
@@ -138,4 +135,23 @@
   position: absolute;
   top: 2px;
   left: 0
+}
+.tool-bar{
+  margin-top: 6px;
+  margin-bottom: 26px;
+}
+#data-main{
+  width:100%;
+  height:300px;
+  margin-bottom: 40px;
+}
+#echarts-wrap{
+  width: 100%;
+  height: 100%;
+}
+#action-msg a{
+  margin-left: 6px;
+}
+.vd-region{
+  margin-left: 20px;
 }

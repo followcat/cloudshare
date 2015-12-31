@@ -69,7 +69,6 @@ class LSI(flask.views.MethodView):
         lsi = flask.current_app.config['LSI_MODEL']
         doc = flask.request.args['doc']
         result = lsi.probability(doc)
-        print result[:20]
         kv = dict()
         s = "<html>"
         for each in result[:20]:

@@ -17,3 +17,5 @@ DATA_DB = repointerface.gitinterface.GitInterface(DATA_DB_NAME)
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = repointerface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 REPO_ACCOUNT = webapp.core.account.RepoAccount(ACCOUNT_DB)
+
+LSI_MODEL = None

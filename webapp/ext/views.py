@@ -75,6 +75,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/analysis/lsi',
+        view_func=webapp.core.mining.LSI.as_view('lsi'),
+        )
+
+    app.add_url_rule(
         '/edit/<path:filename>',
         view_func=webapp.core.views.Edit.as_view('edit'),
         )
@@ -143,5 +148,3 @@ def configure(app):
         '/deleteuser',
         view_func=webapp.core.views.DeleteUser.as_view('deleteuser'),
         )
-
-

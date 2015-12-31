@@ -219,7 +219,7 @@ require(
 
 				      roam:true,
 
-				      data : [],
+          data : [],
 
 				      markPoint : {
 				        symbolSize: 10,       // 标注大小，半宽（半径）参数，当图形为方向或菱形则总宽度为symbolSize * 2
@@ -350,7 +350,7 @@ require(
 
 					if(response.result !== ''){
 
-			      var dataArr = dealPosition(response.result);
+			   var dataArr = dealPosition(response.result);
 
 						myCharts.hideLoading();
 
@@ -390,7 +390,7 @@ require(
 
 									  for(var i = 0, len = dataArr.length; i < len; i++){
                       
-                      list.push(dataArr[i].name);
+             list.push(dataArr[i].name);
 
 									  }
 
@@ -415,20 +415,20 @@ require(
 							],
 
 							series: [
-								{
+							{
 									name: '数量',
 									type: 'bar',
 									data: function(){
 										
 										var list = [];
 
-                    for(var i = 0, len = dataArr.length; i < len; i++){
+          for(var i = 0, len = dataArr.length; i < len; i++){
                       
-                      list.push(dataArr[i].value);
+             list.push(dataArr[i].value);
 
-                    }
+           }
 
-                    return list;
+           return list;
 
 									}()
 								}
@@ -439,36 +439,51 @@ require(
 
 						//Echarts event handle
 
- 	          var ecConfig = require('echarts/config');
+ 	    var ecConfig = require('echarts/config');
 						
 						myCharts.on(ecConfig.EVENT.CLICK, function(param){
               
-              //init action massage box html
-              $('#action-msg').html('');
+        //init action massage box html
+        $('#action-msg').html('');
 
-              var name = param.name;
+        var name = param.name;
+        
+        var str = '';
+
+        for(var i = 0, len = dataArr.length; i < len; i++){
+
+        	if( name === dataArr[i].name ){
+
+            var source = dataArr[i].source;
+
+            str = '与<b>' + name + '</b>相关的人选:';
+
+            $.each(source, function(index, data){
               
-              var str = '';
+              var link;
 
-              for(var i = 0, len = dataArr.length; i < len; i++){
+              for(var obj in data){
+              	 if(data[obj].name === ''){
+              	 
+              	   str += "<a href='\/show\/" + obj + "' target='_blank'>-[" + obj + "]</a>";
+              	 
+              	 }else{
 
-              	if( name === dataArr[i].name ){
-
-                  var source = dataArr[i].source;
-
-                  str = '与<b>' + name + '</b>相关的人选:';
-
-                  $.each(source, function(index, data){
-                    
-                    str += "<a href='\/show\/" + data + "' target='_blank'>" + data + "</a>";
-
-                  });
-
-              	}
-
+                  str += "<a href='\/show\/" + obj + "' target='_blank'>" + data[obj].name + "</a>";
+                
+                }
               }
               
-              $('#action-msg').html(str);
+
+              
+
+            });
+
+        	}
+
+        }
+        
+        $('#action-msg').html(str);
 
 						});
 

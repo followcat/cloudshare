@@ -261,6 +261,14 @@ class UserInfo(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         user = flask.ext.login.current_user
         info_list = repo.history(user.id, max_commits=10)
+        for info in info_list:
+            for md5 in info['filenames']:
+                name = core.outputstorage.ConvertName(md5)
+                try:
+                    info['filenames'] = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+                except IOError:
+                    info['filenames'] = name
+                info['name'] = name
         return flask.render_template('userinfo.html', info=info_list)
 
 

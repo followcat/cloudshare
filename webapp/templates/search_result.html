@@ -31,7 +31,9 @@
         <a href="/show/{{ item[0] }}.md" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
         <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
         </em>
-<!--         <button class='btn btn-default btn-xs vd-region' data-toggle="modal" data-target=".vdRegion-modal">查看迁徙情况</button> -->
+        {% if item[1].enversion %}
+        <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>查看英文简历</a>
+        {% endif %}
       </div>
       <div class="container-fluid">
         <ul class="list-unstyled info">

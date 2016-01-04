@@ -4,7 +4,6 @@ import os.path
 
 import yaml
 import flask
-import pypandoc
 import flask.views
 import flask.ext.login
 
@@ -135,7 +134,7 @@ class Show(flask.views.MethodView):
         with codecs.open(os.path.join(repo.repo.path, name.md),
                          'r', encoding='utf-8') as file:
             md_data = file.read()
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
@@ -149,7 +148,7 @@ class Edit(flask.views.MethodView):
         with codecs.open(os.path.join(repo.repo.path, name.md),
                          'r', encoding='utf-8') as file:
             md_data = file.read()
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         return flask.render_template('edit.html', markdown=md)
 
 
@@ -182,7 +181,7 @@ class Preview(flask.views.MethodView):
 
     def post(self):
         md_data = flask.request.form['mddata']
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         return flask.render_template('preview.html', markdown=md)
 
 

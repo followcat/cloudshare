@@ -17,7 +17,14 @@
 
 {% block content %}
   <div class="col-md-10 col-md-offset-1 result-list">
-
+    <div class='tool-bar'>
+      <button class='btn btn-default btn-xs' id='vd-position'>显示统计结果</button>
+      <button class='btn btn-default btn-xs' id='vd-position-region'>显示职业分布结果</button>    
+      <div id='data-main' style='display: none;'>
+        <div id='echarts-wrap'></div>
+        <div id='action-msg'></div>
+      </div>
+    </div>
     {% for item in result %}
     <div class="result-list-item">
       <div class="item-link">
@@ -89,11 +96,14 @@
           </ul>
         </div>
       </div>
+
     </div>
     {% endfor %}
   </div>
 {% endblock %}
 
 {% block script%}
-<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/search_result') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+<script src='{{ url_for("static", filename="js/lib/source/echarts.js") }}'></script>
+<script src='{{ url_for("static", filename="js/src/search_result.js") }}'></script>
+<!-- <script type="text/javascript" data-main="{{ url_for('static', filename='js/src/search_result') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script> -->
 {% endblock%}

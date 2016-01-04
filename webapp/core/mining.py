@@ -9,6 +9,8 @@ import core.mining.info
 import core.mining.lsimodel
 import core.outputstorage
 
+import json
+
 
 class Position(flask.views.MethodView):
 
@@ -23,7 +25,10 @@ class Position(flask.views.MethodView):
                 md_data = file.read()
             positions = core.mining.info.position(repo, md_data, search_text)
             name = core.outputstorage.ConvertName(search)
-            yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+            try:
+                yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+            except IOError:
+                continue
             for position in positions:
                 if position not in result:
                     result[position] = []
@@ -33,9 +38,10 @@ class Position(flask.views.MethodView):
 
 class Region(flask.views.MethodView):
 
-    def get(self):
+    def post(self):
         repo = flask.current_app.config['DATA_DB']
-        markdown_ids = flask.request.args['md_ids']
+        markdown_ids = flask.request.form['md_ids']
+        markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
             name = core.outputstorage.ConvertName(id)
@@ -69,7 +75,6 @@ class LSI(flask.views.MethodView):
         lsi = flask.current_app.config['LSI_MODEL']
         doc = flask.request.args['doc']
         result = lsi.probability(doc)
-        print result[:20]
         kv = dict()
         s = "<html>"
         for each in result[:20]:

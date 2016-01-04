@@ -27,6 +27,16 @@ body{
   cursor: pointer;
   z-index: 2;
 }
+.upload{
+  position:absolute;
+  width: 100px;
+  line-height: 50px;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 2;
+}
 @media (max-width: 768px){
   .search-item{
     width: 240px;
@@ -40,6 +50,7 @@ body{
 }
 .profile:hover .profile-menu, .upload:hover .upload-menu{
   display: block;
+  background-color: #004B97;
 }
 .profile #name{
   font-size: 1.25em;
@@ -47,7 +58,6 @@ body{
 }
 .profile-menu, .upload-menu{
   display: none;
-  background-color: #004B97;
 }
 .profile-menu a, .upload-menu a{
   display: block;
@@ -60,15 +70,7 @@ body{
   text-decoration: none;
   background-color: #003D79;
 }
-.upload{
-  width: 100px;
-  height: 50px;
-  line-height: 50px;
-  text-align: center;
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
-}
+
 @media (max-width: 768px){
   .upload{
     display: none;

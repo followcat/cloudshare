@@ -128,6 +128,8 @@ require(
 
 	$('#vd-position-region').on('click', function(){
 
+		$('#action-msg').text('');
+
 		if($('#data-main').css('display') === 'none'){
 
 			$('#data-main').css('display', 'block');

@@ -473,10 +473,7 @@ require(
                 
                 }
               }
-              
-
-              
-
+     
             });
 
         	}
@@ -498,6 +495,8 @@ require(
 		}else{
 
 			$('#data-main').css('display', 'none');
+
+   $('#action-msg').text('');
 
 		}
 		

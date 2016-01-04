@@ -25,7 +25,10 @@ class Position(flask.views.MethodView):
                 md_data = file.read()
             positions = core.mining.info.position(repo, md_data, search_text)
             name = core.outputstorage.ConvertName(search)
-            yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+            try:
+                yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+            except IOError:
+                continue
             for position in positions:
                 if position not in result:
                     result[position] = []

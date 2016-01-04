@@ -183,4 +183,7 @@ class GitInterface(object):
         info_dict['message'] = commit.message
         info_dict['time'] = utils.builtin.strftime(commit.author_time)
         info_dict['id'] = commit.id
+        info_dict['filenames'] = dict()
+        for name in re.findall(ur' ([a-z0-9]{8}).[yaml|md]', commit.message):
+            info_dict['filenames'][name] = None
         return info_dict

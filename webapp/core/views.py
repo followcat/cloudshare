@@ -4,7 +4,6 @@ import os.path
 
 import yaml
 import flask
-import pypandoc
 import flask.views
 import flask.ext.login
 
@@ -135,7 +134,7 @@ class Show(flask.views.MethodView):
         with codecs.open(os.path.join(repo.repo.path, name.md),
                          'r', encoding='utf-8') as file:
             md_data = file.read()
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
@@ -149,7 +148,7 @@ class Edit(flask.views.MethodView):
         with codecs.open(os.path.join(repo.repo.path, name.md),
                          'r', encoding='utf-8') as file:
             md_data = file.read()
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         return flask.render_template('edit.html', markdown=md)
 
 
@@ -182,7 +181,7 @@ class Preview(flask.views.MethodView):
 
     def post(self):
         md_data = flask.request.form['mddata']
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         return flask.render_template('preview.html', markdown=md)
 
 
@@ -262,6 +261,14 @@ class UserInfo(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         user = flask.ext.login.current_user
         info_list = repo.history(user.id, max_commits=10)
+        for info in info_list:
+            for md5 in info['filenames']:
+                name = core.outputstorage.ConvertName(md5)
+                try:
+                    info['filenames'] = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+                except IOError:
+                    info['filenames'] = name
+                info['name'] = name
         return flask.render_template('userinfo.html', info=info_list)
 
 

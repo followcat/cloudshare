@@ -30,7 +30,16 @@
 	  		{% for item in info %}
 	  	  <div class="operate-list-item">
 	  	    <span>{{ item.time }}</span>
-	  	    <p>{{ item.message }}</p>
+	  	    <p>
+	  	    	{{ item.message }}
+	  	    </p>
+	  	    <span class='filename' style='display:none;'>{{ item.name }}</span>
+	  	    <span class='name' style='display:none;'>{{ item.filenames.name }}</span>
+<!-- 	  	    {% if item.filenames.name !='' %}
+	  	    	<a href='/show/{{ item.name }}.md' target='_blank'>{{ item.filenames.name }}</a>
+	  	    	{% else %}
+	  	    	<a href='/show/{{ item.name }}.md' target='_blank'>{{ item.name }}.md</a>
+         {% endif %}      -->
 	  	  </div>
 	  	  {% endfor %}
 	  	</div>

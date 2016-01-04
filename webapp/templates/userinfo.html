@@ -30,7 +30,11 @@
 	  		{% for item in info %}
 	  	  <div class="operate-list-item">
 	  	    <span>{{ item.time }}</span>
-	  	    <p>{{ item.message }}</p>
+	  	    <p>
+	  	    	{{ item.message }}
+	  	    </p>
+	  	    <span class='filename' style='display:none;'>{{ item.name }}</span>
+	  	    <span class='name' style='display:none;'>{{ item.filenames.name }}</span>
 	  	  </div>
 	  	  {% endfor %}
 	  	</div>

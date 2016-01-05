@@ -146,12 +146,15 @@
 }
 #data-main{
   width:100%;
-  height:300px;
+  
   margin-bottom: 40px;
 }
 #echarts-wrap{
   width: 100%;
-  height: 100%;
+  height:300px;
+}
+#action-msg{
+  overflow: hidden;
 }
 #action-msg a{
   margin-left: 6px;

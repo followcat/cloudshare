@@ -57,7 +57,6 @@ class Capacity(flask.views.MethodView):
     def post(self):
         repo = flask.current_app.config['DATA_DB']
         markdown_ids = flask.request.form['md_ids']
-        print(markdown_ids)
         markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:

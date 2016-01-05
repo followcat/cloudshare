@@ -128,7 +128,7 @@ def capacity(stream):
                 count += 1
         if count == 0:
             continue
-        job_info['doclen'] = len(clean_stream)
+        job_info['doclen'] = len(cleanstream)
         job_info['actpoint'] = count
         timeline = re.findall(time_restr, findstream)
         job_info['begin'] = timeline[0]

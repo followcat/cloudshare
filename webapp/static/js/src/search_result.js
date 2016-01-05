@@ -29,6 +29,7 @@ require(
 		'echarts/chart/line', 
 		'echarts/chart/bar',
 		'echarts/chart/map',
+		'echarts/chart/scatter',
 		'bootstrap', 
 		'header', 
 		'formvalidate', 
@@ -124,6 +125,28 @@ require(
 		}
 	}
 
+
+ //Get the md_ids lists
+
+ function GetMdLists(){
+
+ 	 var mdList = [];
+
+			var titleList = $('.item-title');
+
+			$.each(titleList, function(index, data){
+
+				var mdId = $(data).attr('href').split('/')[2];
+
+				mdList.push(mdId);
+
+			});
+
+			return mdList;
+
+ }
+
+
 	//Show position region button handle
 
 	$('#vd-position-region').on('click', function(){
@@ -151,17 +174,7 @@ require(
 
 			//Get the md_ids lists
 
-			var mdList = [];
-
-			var titleList = $('.item-title');
-
-			$.each(titleList, function(index, data){
-
-				var mdId = $(data).attr('href').split('/')[2];
-
-				mdList.push(mdId);
-
-			});
+			var mdList = GetMdLists();
 
 			$.ajax({
 
@@ -258,6 +271,7 @@ require(
                       /*end option*/
 
 					positionCharts.setOption(option);
+
 				}
 			});
 		}else{
@@ -504,8 +518,168 @@ require(
 		
 	});
 
-	
 
+function getCapacityData(result){
+
+  var dataArr = new Array();
+
+  for (var i = result.length - 1; i >= 0; i--) {
+    
+    var actDoc = [];
+
+    var actpoint = 0, 
+        doclen = 0;
+
+    var objArr = result[i];
+    
+    $.each(objArr, function(index, data){
+    
+      actpoint += data.actpoint;
+
+      doclen += data.doclen;
+      
+    });
+
+    actDoc[0] = doclen;
+
+    actDoc[1] = actpoint;
+
+    dataArr.push(actDoc);
+
+  };
+
+  return dataArr;
+
+}
+
+
+//Echarts visualize data
+
+$('#test').on('click', function(){
+  
+  if($('#data-main').css('display') === 'none'){
+
+			 $('#data-main').css('display', 'block');
+
+    var mdList = GetMdLists();
+    
+    var scatterCharts = ec.init(document.getElementById('echarts-wrap'), 'macarons');
+
+			 scatterCharts.showLoading({
+
+				 text: '数据加载中...',
+
+				 effect: 'whirling',
+
+				 textStyle: {
+
+					 fontSize: 20
+
+				 }
+
+				});
+
+    $.ajax({
+    
+     url: '/mining/capacity',
+
+     type: 'post',
+
+     data: {
+       'md_ids': JSON.stringify(mdList)
+     },
+
+     success: function(response){
+
+       var data = getCapacityData(response.result);
+
+       console.log(response.result);
+
+       scatterCharts.hideLoading();
+
+       var scatterOption = {
+       
+         title: {
+           text: 'test'
+         },
+         
+         tooltip: {
+           trigger: 'axis',
+           
+           showDelay: 0,
+           
+           formatter: function(params){
+             
+             if(params.value.length > 1){
+               
+               return params.value[0] + '字' + params.value[1] + '个';
+
+             }
+
+           },
+
+           axisPointer:{
+            show: true,
+            type : 'cross',
+            lineStyle: {
+                type : 'dashed',
+                width : 1
+            }
+           }
+         },
+
+         toolbox: {
+           show : true,
+           feature : {
+             mark : {show: true},
+             dataZoom : {show: true},
+             dataView : {show: true, readOnly: false},
+             restore : {show: true},
+             saveAsImage : {show: true}
+           }
+         },
+
+         xAxis : [
+         {
+           type : 'value',
+           scale:true,
+           axisLabel: {
+             formatter: '{value} 字'
+           }
+         }],
+
+         yAxis : [
+         {
+           type : 'value',
+           scale:true,
+           axisLabel: {
+             formatter: '{value} 个'
+           }
+         }],
+
+         series : [
+         {
+           name: 'test',
+
+           type: 'scatter',
+
+           data: data
+
+         }]
+       
+       };
+      
+        scatterCharts.setOption(scatterOption);
+
+      }
+
+    });
+		}else{
+
+			$('#data-main').css('display', 'none');
+
+		}
+});
 	
 	
 	//deal with something information

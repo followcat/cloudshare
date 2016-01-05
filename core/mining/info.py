@@ -121,7 +121,7 @@ def capacity(stream):
         job_info = dict()
         findstream = ''.join(ms.get_strs_from_positions([range]))
         cleanstream = re.sub('[- ]+' ,' ' , findstream)
-        wordcut = jieba.posseg.cut(cleanstream)
+        wordcut = jieba.posseg.cut(cleanstream, HMM=False)
         count = 0
         for each in wordcut:
             if each.flag == 'v':

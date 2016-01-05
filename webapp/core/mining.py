@@ -64,7 +64,7 @@ class Capacity(flask.views.MethodView):
             with codecs.open(os.path.join(repo.repo.path, name.md),
                              'r', encoding='utf-8') as file:
                 stream = file.read()
-            result.append({id: core.mining.info.capacity(stream)})
+            result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return flask.jsonify(result=result)
 
 class LSI(flask.views.MethodView):

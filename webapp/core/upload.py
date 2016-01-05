@@ -1,8 +1,6 @@
 import codecs
 import os.path
 
-import pypandoc
-
 import core.exception
 import core.outputstorage
 import core.converterutils
@@ -41,8 +39,7 @@ class UploadObject(object):
             self.information = 'Sucess'
 
     def preview_markdown(self):
-        output = pypandoc.convert(self.storage.markdown_stream,
-                                  'html', format='markdown')
+        output = core.converterutils.md_to_html(self.storage.markdown_stream)
         return output
 
     def confirm(self, repo, committer=None):

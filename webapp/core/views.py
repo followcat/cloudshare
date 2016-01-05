@@ -8,7 +8,6 @@ import flask.views
 import flask.ext.login
 
 import utils.builtin
-import core.mining.info
 import webapp.core.upload
 import core.outputstorage
 import webapp.core.account

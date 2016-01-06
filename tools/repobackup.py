@@ -25,4 +25,4 @@ if __name__ == '__main__':
         assure_path_exists(data_backup_path)
         assure_path_exists(account_backup_path)
         dulwich.porcelain.clone(source_repo.path, data_backup_path, bare=True)
-        dulwich.porcelain.clone(source_repo.path, account_backup_path, bare=True)
+        dulwich.porcelain.clone(account_repo.path, account_backup_path, bare=True)

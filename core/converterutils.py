@@ -127,22 +127,16 @@ class FileProcesser():
         e.write(position, encoding='utf-8')
 
     def file_docbook_to_markdown(self):
+        self.markdown_stream = ''
         input_file = os.path.join(self.docbook_path, self.name.xml)
         output_file = os.path.join(self.markdown_path, self.name.md)
         try:
-            pypandoc.convert(input_file, 'markdown', format='docbook', outputfile=output_file)
-            with open(output_file, 'r') as f:
-                reformat = []
-                for each in f.readlines():
-                    reformat.append(each)
-                    if each[0] == '-':
-                        break
-                else:
-                    with open(output_file, 'w') as f:
-                        for line in reformat:
-                            data = line.lstrip(' ')
-                            f.write(data)
-                            self.markdown_stream += data
+            output = pypandoc.convert(input_file, 'markdown', format='docbook')
+            with open(output_file, 'w') as f:
+                for line in output.split('\n'):
+                    data = line.lstrip(' ')+'\n'
+                    f.write(data.encode('utf-8'))
+                    self.markdown_stream += data
         except RuntimeError as e:
             pass
 

@@ -69,19 +69,21 @@ class Capacity(flask.views.MethodView):
 
 class LSI(flask.views.MethodView):
 
-    def get(self):
+    def post(self):
+        repo = flask.current_app.config['DATA_DB']
         if flask.current_app.config['LSI_MODEL'] is None:
             flask.current_app.config['LSI_MODEL'] = core.mining.lsimodel.LSImodel('repo')
             flask.current_app.config['LSI_MODEL'].setup()
         lsi = flask.current_app.config['LSI_MODEL']
-        doc = flask.request.args['doc']
+        doc = flask.request.form['doc']
         result = lsi.probability(doc)
         kv = dict()
-        s = "<html>"
+        lsiJson = []
         for each in result[:20]:
             kv[each[0]] = str(each[1])
-            s += "<a href=/show/"+lsi.names[each[0]]+">"+str(each[1])+"</a></br>"
-        s += "</html>"
-        return s
+            name = core.outputstorage.ConvertName(lsi.names[each[0]])
+            yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+            lsiJson.append({'str': str(each[1]), 'filename': lsi.names[each[0]], 'yaml': yaml_info})
+        return flask.jsonify(result=lsiJson)
 
 

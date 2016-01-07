@@ -337,3 +337,10 @@ class UploadFile(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         return flask.render_template('uploadfile.html')
+
+
+class Lsi(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('lsipage.html')

@@ -518,14 +518,24 @@ require(
 		
 	});
 
+//return array
+
+function getCapacityDataArr(xData, yData){
+  
+  var arr = [];
+
+  arr[0] = xData;
+
+  arr[1] = yData;
+
+  return arr;
+}
 
 function getCapacityData(result){
 
   var dataArr = new Array();
 
   for (var i = result.length - 1; i >= 0; i--) {
-    
-    var actDoc = [];
 
     var actpoint = 0, 
         doclen = 0;
@@ -540,9 +550,7 @@ function getCapacityData(result){
       
     });
 
-    actDoc[0] = doclen;
-
-    actDoc[1] = actpoint;
+    var actDoc = getCapacityDataArr(doclen, actpoint);
 
     dataArr.push(actDoc);
 
@@ -592,9 +600,7 @@ $('#test').on('click', function(){
      success: function(response){
 
        var data = getCapacityData(response.result);
-
-       console.log(response.result);
-
+       console.log(data);
        scatterCharts.hideLoading();
 
        var scatterOption = {
@@ -680,8 +686,301 @@ $('#test').on('click', function(){
 
 		}
 });
-	
-	
+
+
+function changeTwoDecimal(x) {
+
+  var f_x = parseFloat(x);
+
+  f_x = Math.round(x * 100) / 100;
+
+  var s_x = f_x.toString();
+
+  var pos_decimal = s_x.indexOf('.');
+
+  if (pos_decimal < 0) {
+
+      pos_decimal = s_x.length;
+
+      s_x += '.';
+
+  }
+
+  while (s_x.length <= pos_decimal + 2) {
+
+      s_x += '0';
+
+  }
+
+  return s_x;
+
+}
+
+//get sum Month function
+
+function getSumMonth(beginYear, beginMonth, endYear, endMonth){
+
+  	var year = endYear - beginYear;
+  	var month, 
+  	    monthCount;
+    
+  	if( year < 0 ){
+
+  		 return -1;
+  	
+  	}else{
+          
+     if( parseInt(beginMonth) < parseInt(endMonth) ){
+
+  	    month = endMonth - beginMonth;
+  	  
+  	  }else{
+  		   
+  		   month = beginMonth - endMonth;
+  	  
+  	  }
+
+     monthCount = year * 12 + month;
+     
+  	  return monthCount;
+
+  	}
+  	
+}
+
+//get working time function
+
+function getWorkTime(time){
+
+  var workingYear = parseInt(time / 12);
+  
+  var workingMonth = time % 12;
+
+  var workingTime = changeTwoDecimal(workingYear + ( workingMonth / 100));
+
+  return workingTime;
+
+}
+
+//get scatter data array
+
+function getScatterData(capacity){
+  
+  var time = 0, actpointSum = 0, doclenSum = 0;
+
+  for (var i = capacity.length - 1; i >= 0; i--) {
+  	 
+  	 var obj = capacity[i];
+    
+    if( obj.begin !== '' && obj.end !== '' ){
+      
+      var num = getSumMonth(obj.begin[0], obj.begin[1], obj.end[0], obj.end[1]);
+
+      if( num === -1){
+        continue;
+      }else{
+
+        time += num;
+
+        actpointSum += obj.actpoint;
+
+        doclenSum += obj.doclen;
+
+      }
+    }
+  };
+
+  var workTime = getWorkTime(time);
+
+  // var actdocPro = (actpointSum/doclenSum) * 100;
+  var actdocPro = actpointSum;
+
+  if ( workTime && actdocPro ){
+    
+    return getCapacityDataArr(workTime, actdocPro);
+
+  }else{
+
+  	 return 0;
+
+  }
+
+}
+
+function getPointData(result){
+
+  var dataArr = new Array();
+  
+  for (var i = result.length - 1; i >= 0; i--) {
+
+    var dataObj = {};
+
+    var personObj = result[i];
+    
+    var capacity = personObj.capacity;
+    
+    var scatterData = getScatterData(capacity);
+
+    dataObj.fileName = personObj.md;
+
+    dataObj.data = scatterData;
+
+    dataArr.push(dataObj);
+
+    dataObj = null;
+
+  }
+
+  return dataArr;
+
+}
+
+//Echarts visualize data
+
+$('#vd-capacity').on('click', function(){
+  if($('#data-main').css('display') === 'none'){
+
+			 $('#data-main').css('display', 'block');
+    
+    var timeCharts = ec.init(document.getElementById('echarts-wrap'), 'macarons');
+
+    timeCharts.showLoading({
+
+				 text: '数据加载中...',
+
+				 effect: 'whirling',
+
+				 textStyle: {
+
+					 fontSize: 20
+
+				 }
+
+				});
+
+    var mdList = GetMdLists();
+
+				$.ajax({
+
+      url: '/mining/capacity',
+
+      type: 'post',
+
+      data: {
+        'md_ids': JSON.stringify(mdList)
+      },
+
+      success: function(response){
+        
+        var dataArr = getPointData(response.result);
+        
+        console.log(dataArr);
+
+        timeCharts.hideLoading();
+
+        var timeOption = {
+
+          title: {
+            text: '工作经验分布'
+          },
+         
+          tooltip: {
+            trigger: 'axis',
+           
+            showDelay: 0,
+           
+            formatter: function(params){
+              
+              if(params.value.length > 1){
+               
+                return params.value[0] + '年' + params.value[1] + '个' ;
+
+              }
+
+            },
+
+	           axisPointer:{
+	            show: true,
+	            type : 'cross',
+	            lineStyle: {
+	                type : 'dashed',
+	                width : 1
+	            }
+	           }
+	         },
+
+	         toolbox: {
+	           show : true,
+	           feature : {
+	             mark : {show: true},
+	             dataZoom : {show: true},
+	             dataView : {show: true, readOnly: false},
+	             restore : {show: true},
+	             saveAsImage : {show: true}
+	           }
+	         },
+
+	         xAxis : [
+	         {
+	           type : 'value',
+	           scale:true,
+	           axisLabel: {
+	             formatter: '{value} 年'
+	           }
+	         }],
+
+	         yAxis : [
+	         {
+	           type : 'value',
+	           scale:true,
+	           axisLabel: {
+	             formatter: '{value} 个'
+	           }
+	         }],
+
+	         series : [
+	         {
+	           name: '工作经验',
+
+	           type: 'scatter',
+
+	           data: function(){
+	             var list = [];
+
+	             for(var i = 0, len = dataArr.length; i < len; i++){
+
+	               list.push(dataArr[i].data);
+
+	             }
+
+	             return list;
+	           }()
+
+	         }]
+	       
+	       };
+        
+        timeCharts.setOption(timeOption);
+
+        var ecConfig = require('echarts/config');
+						
+						  timeCharts.on(ecConfig.EVENT.CLICK, function(param){
+          var index = param.dataIndex;
+          $('#action-msg').html('');
+          $('#action-msg').append("简历链接:<a href='/show/"+dataArr[index].fileName+"'>"+dataArr[index].fileName+"</a>");
+						  });
+
+      }
+
+				});
+
+		}else{
+
+			 $('#data-main').css('display', 'none');
+
+		}
+});
+
 	//deal with something information
 	var infoDeal = {};
 

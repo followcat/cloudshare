@@ -98,7 +98,7 @@ require(
 
 				  	}else{
 
-				  		var regionObj = new Object();
+				  		 var regionObj = new Object();
 
 				 		 	regionObj.name = obj.name;
 
@@ -260,7 +260,19 @@ require(
 				          }
 				        },
 
-				        data : regionObj.regionDataArr
+				        data : function(){
+              var list = [];
+
+              for (var i = regionObj.regionDataArr.length - 1; i >= 0; i--) {
+              	 if(regionObj.regionDataArr[i].value > 2){
+              	 	 list.push(regionObj.regionDataArr[i]);
+              	 }else{
+              	 	 continue;
+              	 }
+              }
+              return list;
+
+				        }()
 
 				      },
 
@@ -560,10 +572,42 @@ function getCapacityData(result){
 
 }
 
+//get Proportion point data
+
+function getProPointData(result){
+
+  var dataArr = new Array();
+  
+  for (var i = result.length - 1; i >= 0; i--) {
+
+    var dataObj = {};
+
+    var personObj = result[i];
+    
+    var capacity = personObj.capacity;
+    
+    var scatterData = getScatterData(capacity);
+    
+    var pro = (scatterData.actpointSum / scatterData.doclenSum) * 100;
+    var actdocPro = Math.pow(pro, 3);
+
+    dataObj.fileName = personObj.md;
+
+    dataObj.data = getCapacityDataArr(scatterData.workTime, actdocPro);
+
+    dataArr.push(dataObj);
+
+    dataObj = null;
+
+  }
+
+  return dataArr;
+
+}
 
 //Echarts visualize data
 
-$('#test').on('click', function(){
+$('#vd-capacity-pro').on('click', function(){
   
   if($('#data-main').css('display') === 'none'){
 
@@ -599,8 +643,8 @@ $('#test').on('click', function(){
 
      success: function(response){
 
-       var data = getCapacityData(response.result);
-       console.log(data);
+       var data = getProPointData(response.result);
+
        scatterCharts.hideLoading();
 
        var scatterOption = {
@@ -618,7 +662,7 @@ $('#test').on('click', function(){
              
              if(params.value.length > 1){
                
-               return params.value[0] + '字' + params.value[1] + '个';
+               return params.value[0] + '年' + params.value[1] + '个';
 
              }
 
@@ -650,7 +694,7 @@ $('#test').on('click', function(){
            type : 'value',
            scale:true,
            axisLabel: {
-             formatter: '{value} 字'
+             formatter: '{value} 年'
            }
          }],
 
@@ -669,13 +713,31 @@ $('#test').on('click', function(){
 
            type: 'scatter',
 
-           data: data
+           data: function(){
+             var list = [];
+
+             for (var i = data.length - 1; i >= 0; i--) {
+               list.push(data[i].data);
+             };
+
+             return list;
+           }()
 
          }]
        
        };
       
         scatterCharts.setOption(scatterOption);
+        
+        var ecConfig = require('echarts/config');
+						
+						  scatterCharts.on(ecConfig.EVENT.CLICK, function(param){
+          var index = param.dataIndex;
+
+          $('#action-msg').html('');
+          $('#action-msg').append("简历链接:<a href='/show/"+data[index].fileName+"'>"+data[index].fileName+"</a>");
+						  
+						  });
 
       }
 
@@ -793,11 +855,11 @@ function getScatterData(capacity){
   var workTime = getWorkTime(time);
 
   // var actdocPro = (actpointSum/doclenSum) * 100;
-  var actdocPro = actpointSum;
 
-  if ( workTime && actdocPro ){
+  if ( workTime < 40 ){
     
-    return getCapacityDataArr(workTime, actdocPro);
+    // return getCapacityDataArr(workTime, actdocPro);
+    return { workTime: workTime, actpointSum: actpointSum, doclenSum: doclenSum };
 
   }else{
 
@@ -820,10 +882,10 @@ function getPointData(result){
     var capacity = personObj.capacity;
     
     var scatterData = getScatterData(capacity);
-
+    
     dataObj.fileName = personObj.md;
 
-    dataObj.data = scatterData;
+    dataObj.data = getCapacityDataArr(scatterData.workTime, scatterData.actpointSum);
 
     dataArr.push(dataObj);
 
@@ -873,8 +935,6 @@ $('#vd-capacity').on('click', function(){
       success: function(response){
         
         var dataArr = getPointData(response.result);
-        
-        console.log(dataArr);
 
         timeCharts.hideLoading();
 

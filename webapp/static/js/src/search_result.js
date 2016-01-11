@@ -734,10 +734,12 @@ $('#vd-capacity-pro').on('click', function(){
         var ecConfig = require('echarts/config');
 						
 						  scatterCharts.on(ecConfig.EVENT.CLICK, function(param){
+						  	
           var index = param.dataIndex;
-
-          $('#action-msg').html('');
-          $('#action-msg').append("简历链接:<a href='/show/"+data[index].fileName+"'>"+data[index].fileName+"</a>");
+          
+          var str = "<a href=\'\/show\/"+data[index].fileName+"\' target=\'_blank\'><\/a>";
+          
+          $(str)[0].click();
 						  
 						  });
 
@@ -1032,11 +1034,11 @@ $('#vd-capacity').on('click', function(){
 						  timeCharts.on(ecConfig.EVENT.CLICK, function(param){
 
           var index = param.dataIndex;
-
-          $('#action-msg').html('');
-
-          $('#action-msg').append("简历链接:<a href='/show/"+dataArr[index].fileName+"'>"+dataArr[index].fileName+"</a>");
           
+          var str = "<a href=\'\/show\/"+dataArr[index].fileName+"\' target=\'_blank\'><\/a>";
+          
+          $(str)[0].click();
+
 						  });
 
       }

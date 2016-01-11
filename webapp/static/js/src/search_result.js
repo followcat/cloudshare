@@ -608,6 +608,8 @@ function getProPointData(result){
 //Echarts visualize data
 
 $('#vd-capacity-pro').on('click', function(){
+
+	 $('#action-msg').html('');
   
   if($('#data-main').css('display') === 'none'){
 
@@ -650,7 +652,7 @@ $('#vd-capacity-pro').on('click', function(){
        var scatterOption = {
        
          title: {
-           text: 'test'
+           text: '能力分布'
          },
          
          tooltip: {
@@ -900,6 +902,9 @@ function getPointData(result){
 //Echarts visualize data
 
 $('#vd-capacity').on('click', function(){
+
+	 $('#action-msg').html('');
+  
   if($('#data-main').css('display') === 'none'){
 
 			 $('#data-main').css('display', 'block');
@@ -1025,9 +1030,13 @@ $('#vd-capacity').on('click', function(){
         var ecConfig = require('echarts/config');
 						
 						  timeCharts.on(ecConfig.EVENT.CLICK, function(param){
+
           var index = param.dataIndex;
+
           $('#action-msg').html('');
+
           $('#action-msg').append("简历链接:<a href='/show/"+dataArr[index].fileName+"'>"+dataArr[index].fileName+"</a>");
+          
 						  });
 
       }

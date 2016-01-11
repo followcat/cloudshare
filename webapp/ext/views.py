@@ -153,3 +153,8 @@ def configure(app):
         '/lsipage',
         view_func=webapp.core.views.Lsi.as_view('lsipage'),
         )
+
+    app.add_url_rule(
+        '/makechart',
+        view_func=webapp.core.views.MakeChart.as_view('makechart'),
+        )

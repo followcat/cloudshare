@@ -1,0 +1,81 @@
+{% extends "share/layout.html" %}
+
+{% block style %}
+<style type="text/css">
+#form-wrap{
+  margin-top: 20px;
+}
+.param-form, .person-value-wrap{
+  float: left;
+}
+#chart-wrap{
+	height: 400px;
+}
+/*table tbody tr td input{
+  display: block;
+  width: 100%;
+}*/
+</style>
+{% endblock %}
+{% block content %}
+<div id='form-wrap' class='container'>
+  <div class='param-form col-md-3 form-horizontal form-inline'>
+    <h4>输入参数</h4>
+    <div>
+      <label>参数1</label>
+      <input type='text' class='param' />
+    </div>
+    <div>
+      <label>参数2</label>
+      <input type='text' class='param' />
+    </div>
+    <div>
+      <label>参数3</label>
+      <input type='text' class='param' />
+    </div>
+    <div>
+      <label>参数4</label>
+      <input type='text' class='param' disabled='disabled'/>
+      <button class='btn btn-xs btn-default open-btn'>开启</button>
+    </div>
+    <div>
+      <label>参数5</label>
+      <input type='text' class='param' disabled='disabled' />
+      <button class='btn btn-xs btn-default open-btn'>开启</button>
+    </div>
+    <div>
+      <label>参数6</label>
+      <input type='text' class='param' disabled='disabled' />
+      <button class='btn btn-xs btn-default open-btn'>开启</button>
+    </div>
+    <div>
+      <label>参数7</label>
+      <input type='text' class='param' disabled='disabled' />
+      <button class='btn btn-xs btn-default open-btn'>开启</button>
+    </div>
+    <div>
+      <label>参数8</label>
+      <input type='text' class='param' disabled='disabled' />
+      <button class='btn btn-xs btn-default'>开启</button>
+    </div>
+    <button type='button' class='btn btn-primary' id='submit-params'>提交</button>
+  </div>
+  <div class='person-value-wrap col-md-9'>
+    <table class='table table-bordered table-condensed' id='params-table'>
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+
+    <a href='javascript:;' id='add-row'>添加一行</a>
+    <button class='btn btn-primary' id='make-chart-btn'>生成图表</button>
+  </div>
+</div>
+<div id='chart-wrap' class='col-md-7 col-md-offset-3'>
+	
+</div>
+{% endblock%}
+
+{% block script %}
+<script src='{{ url_for("static", filename="js/lib/source/echarts.js") }}'></script>
+<script src='{{ url_for("static", filename="js/src/makechart.js") }}'></script>
+{% endblock %}

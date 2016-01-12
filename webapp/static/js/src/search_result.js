@@ -371,7 +371,7 @@ require(
 				type: 'get',
 
 				data:{
-					'search_text' : $('input[name="search_text"]').val()
+					'search_text' : $('#search_text').val()
 				},
 
 				success: function(response){

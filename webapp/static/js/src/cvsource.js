@@ -221,4 +221,39 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 	});
 
 	localStorage.title = $('title').text().split('-')[0];
+
+
+	//CV Title Data Modify
+
+ //Tranform Title Data Modify status
+ $('#tranform-check').click(function(){
+   
+   if( $(this).attr('checked') ){
+
+   	$(this).removeAttr('checked');
+    
+    $('#title-table tbody tr input').attr('disabled', 'disabled');
+
+   	$('#title-submit-btn').css('display','none');
+   
+   }else{
+     
+     $(this).attr('checked','checked');
+
+     $('#title-table tbody tr input').removeAttr('disabled');
+     
+     $('#title-submit-btn').css('display','block');
+
+   }
+
+ });
+
+
+	//Title Button Handle
+
+	$('#title-submit-btn').on('click', function(){
+   
+   
+	});
+
 });

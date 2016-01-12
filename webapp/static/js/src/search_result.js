@@ -526,7 +526,7 @@ require(
 
    $('#action-msg').text('');
 
-		}
+  }
 		
 	});
 
@@ -609,29 +609,29 @@ function getProPointData(result){
 
 $('#vd-capacity-pro').on('click', function(){
 
-	 $('#action-msg').html('');
+  $('#action-msg').html('');
   
   if($('#data-main').css('display') === 'none'){
 
-			 $('#data-main').css('display', 'block');
+    $('#data-main').css('display', 'block');
 
     var mdList = GetMdLists();
     
     var scatterCharts = ec.init(document.getElementById('echarts-wrap'), 'macarons');
 
-			 scatterCharts.showLoading({
+    scatterCharts.showLoading({
 
-				 text: '数据加载中...',
+      text: '数据加载中...',
 
-				 effect: 'whirling',
+      effect: 'whirling',
 
-				 textStyle: {
+      textStyle: {
 
-					 fontSize: 20
+        fontSize: 20
 
-				 }
+      }
 
-				});
+    });
 
     $.ajax({
     
@@ -732,16 +732,19 @@ $('#vd-capacity-pro').on('click', function(){
         scatterCharts.setOption(scatterOption);
         
         var ecConfig = require('echarts/config');
-						
-						  scatterCharts.on(ecConfig.EVENT.CLICK, function(param){
-						  	
+ 
+        scatterCharts.on(ecConfig.EVENT.CLICK, function(param){
+          
           var index = param.dataIndex;
           
-          var str = "<a href=\'\/show\/"+data[index].fileName+"\' target=\'_blank\'><\/a>";
-          
-          $(str)[0].click();
+          var a = $("<a href=\'\/show\/"+data[index].fileName+"\' target=\'_blank\'><\/a>").get(0);  
+              
+          var e = document.createEvent('MouseEvents');  
+
+          e.initEvent('click', true, true);  
+          a.dispatchEvent(e);
 						  
-						  });
+        });
 
       }
 
@@ -1035,9 +1038,12 @@ $('#vd-capacity').on('click', function(){
 
           var index = param.dataIndex;
           
-          var str = "<a href=\'\/show\/"+dataArr[index].fileName+"\' target=\'_blank\'><\/a>";
-          
-          $(str)[0].click();
+          var a = $("<a href='\/show\/" + dataArr[index].fileName + "\' target='_blank'>click</a>").get(0);  
+              
+          var e = document.createEvent('MouseEvents');  
+
+          e.initEvent('click', true, true);  
+          a.dispatchEvent(e);
 
 						  });
 

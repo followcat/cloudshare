@@ -313,7 +313,6 @@ $('#make-chart-btn').on('click', function(){
                 }
               }
               
-              console.log(list);
               return list;
 
             }()
@@ -329,7 +328,3 @@ $('#make-chart-btn').on('click', function(){
 
 
 });
-
-/*
-
-*/

@@ -62,31 +62,44 @@ $('#submit-params').on('click', function(){
 
   var paramsEle = $('.param');
 
+  var standard = ['<input type=\'text\' class=\'form-control input-sm\' value=\'标准\' >'];
+
   for (var i = 0, len = paramsEle.length - 1; i < len; i++) {
 
     if( !$(paramsEle[i]).attr('disabled') ){
 
       paramsArr.push($(paramsEle[i]).val());
+      
+      standard.push('<input type=\'text\' class=\'form-control input-sm\' value=\'\' >');
 
     }
-  };
+
+  }
   
   paramsArr.push('#');
 
-  var thStr = '';
+  standard.push('<button type=\'button\' class=\'btn btn-default btn-sm delete\'>delete</button>');
 
+  var thStr = '';
+  
+  var tdStr = '';
   // $('table thead').append('<tr></tr>');
 
   for(i = 0, len = paramsArr.length; i < len; i++){
 
     var str = '<th>'+ paramsArr[i] +'</th>';
+    
+    var standardStr = '<td>' + standard[i] + '</td>';
 
     thStr += str;
+
+    tdStr += standardStr;
+
   }
   
   $('table thead').append('<tr>'+ thStr +'</tr>');
 
-
+  $('table tbody').append('<tr>'+ tdStr +'</tr>');
 
 });
 
@@ -232,16 +245,16 @@ $('#make-chart-btn').on('click', function(){
   var indicator = getIndicator(keyArr, personArr);
 
   var option = {
-    // title : {
-    //     text: '预算 vs 开销（Budget vs spending）',
-    // },
+    title : {
+        subtext: '预算 vs 开销（Budget vs spending)\nasdasd',
+    },
     tooltip : {
         trigger: 'axis'
     },
     legend: {
         orient : 'vertical',
         x : 'left',
-        y : 'top',
+        y : 'bottom',
         data:function(){
           
           var list = [];
@@ -274,7 +287,36 @@ $('#make-chart-btn').on('click', function(){
     series : [
         {
             type: 'radar',
-            data : personArr
+            data : function(){
+
+              var list = [];
+              
+              for(var i = 0, len = personArr.length; i < len; i++){
+
+                if(personArr[i].name === '标准' || i === 0){
+
+                  var obj = {}, itemStyle = {}, normal = {}, lineStyle = {};
+
+                  obj.name = personArr[i].name;
+                  obj.value = personArr[i].value;
+                  lineStyle.type = 'dashed';
+                  normal.lineStyle = lineStyle;
+                  itemStyle.normal = normal;
+                  obj.itemStyle = itemStyle;
+
+                  list.push(obj);
+
+                }else{
+
+                  list.push(personArr[i]);
+
+                }
+              }
+              
+              console.log(list);
+              return list;
+
+            }()
         }
     ]
   };
@@ -287,3 +329,7 @@ $('#make-chart-btn').on('click', function(){
 
 
 });
+
+/*
+
+*/

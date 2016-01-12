@@ -151,7 +151,7 @@ def configure(app):
 
     app.add_url_rule(
         '/lsipage',
-        view_func=webapp.core.views.Lsi.as_view('lsipage'),
+        view_func=webapp.core.mining.LSI.as_view('lsipage'),
         )
 
     app.add_url_rule(

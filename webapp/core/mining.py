@@ -67,23 +67,32 @@ class Capacity(flask.views.MethodView):
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return flask.jsonify(result=result)
 
+
 class LSI(flask.views.MethodView):
 
-    def post(self):
-        repo = flask.current_app.config['DATA_DB']
-        if flask.current_app.config['LSI_MODEL'] is None:
-            flask.current_app.config['LSI_MODEL'] = core.mining.lsimodel.LSImodel('repo')
-            flask.current_app.config['LSI_MODEL'].setup()
-        lsi = flask.current_app.config['LSI_MODEL']
-        doc = flask.request.form['doc']
-        result = lsi.probability(doc)
-        kv = dict()
-        lsiJson = []
-        for each in result[:20]:
-            kv[each[0]] = str(each[1])
-            name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
-            lsiJson.append({'str': str(each[1]), 'filename': lsi.names[each[0]], 'yaml': yaml_info})
-        return flask.jsonify(result=lsiJson)
+    def get(self):
+        if 'search_text' in flask.request.args:
+            repo = flask.current_app.config['DATA_DB']
+            if flask.current_app.config['LSI_MODEL'] is None:
+                flask.current_app.config['LSI_MODEL'] = core.mining.lsimodel.LSImodel('repo')
+                flask.current_app.config['LSI_MODEL'].setup()
+            lsi = flask.current_app.config['LSI_MODEL']
+            doc = flask.request.args['search_text']
+            result = lsi.probability(doc)
+            kv = dict()
+            datas = []
+            for each in result[:20]:
+                kv[each[0]] = str(each[1])
+                name = core.outputstorage.ConvertName(lsi.names[each[0]])
+                yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+                info = {
+                    'author': yaml_info['committer'],
+                    'time': utils.builtin.strftime(yaml_info['date']),
+                    'match': str(each[1])
+                }
+                datas.append([name, yaml_info, info])
+            return flask.render_template('lsipage.html',result=datas, search_text=doc)
+        else:
+            return flask.render_template('lsipage.html')
 
 

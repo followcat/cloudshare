@@ -1,6 +1,7 @@
 {% extends "share/layout.html" %}
 
 {% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/searchresult.css') }}">
 <style type="text/css">
 	.wrap-left, #result{
 	  width: 50%;
@@ -8,12 +9,8 @@
 	  float: left;
 	}
 	textarea{
+		 margin-top: 2px;
 		 width: 100%;
-	  height:200px;
-	}
-	.check{
-	  float: right;
-	  margin-right: 10px;
 	}
 	#result{
 		 overflow-y: auto;
@@ -31,16 +28,105 @@
 {% endblock %}
 
 {% block content %}
-<div class='wrap-left'>
-	<textarea></textarea>
- <button class='btn btn-default check' id='check'>Check</button>
+<div class='col-md-6 col-md-offset-3'>
+	<form action='/lsipage' method='GET'>
+		 <textarea class='form-control' name='search_text' id='search_text' rows='4'>{% if search_text %}{{ search_text }}{% endif %}</textarea>
+   <button type='submit' class='btn btn-default'>Check</button>
+	</form>
 </div>
 
-<div id='result'>
+<div class="col-md-10 col-md-offset-1 result-list">
+  <div class='tool-bar'>
+    <button class='btn btn-default btn-xs' id='vd-position'>显示统计结果</button>
+    <button class='btn btn-default btn-xs' id='vd-position-region'>显示职业分布结果</button>
+    <button class='btn btn-default btn-xs' id='vd-capacity-pro'>显示能力分布</button>
+    <button class='btn btn-default btn-xs' id='vd-capacity'>显示工作经验分布</button>
+    <div id='data-main' style='display: none;'>
+      <div id='echarts-wrap'></div>
+      <div id='action-msg'></div>
+    </div>
+  </div>
+  {% if result %}
+  {% for item in result %}
+  <div class="result-list-item">
+    <div class="item-link">
+      <a href="/show/{{ item[0] }}" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
+      <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
+      </em>
+      <p>匹配值:{{ item[2].match }}</p>
+      {% if item[1].enversion %}
+      <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>查看英文简历</a>
+      {% endif %}
+    </div>
+    <div class="container-fluid">
+      <ul class="list-unstyled info">
+        <li class="name"><strong>姓名: </strong><span>{{ item[1].name }}</span></li>
+        <li class="age"><strong>年龄: </strong><span>{{ item[1].age }}</span></li>
+        <li class="education"><strong>学历: </strong><span>{{ item[1].education }}</span></li>
+        <li class="school"><strong>院校: </strong><span>{{ item[1].school }}</span></li>
+        <li class="position"><strong>职位: </strong><span>{{ item[1].position }}</span></li>
+        <li class="company"><strong>公司: </strong><span>{{ item[1].company }}</span></li>
+      </ul>
+    </div>
+    <div class="work-experience">
+      <a href="javascript:;" class='show-more'>展开</a>
+        {% for e in item[1].experience %}
+          {% if loop.index > 2 %}
+            <div class='experience-hide'>
+              <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
+              <div class='experience-company'>{{ e[2] }}</div> 
+            </div>
+          {% else %}
+            <div>
+              <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
+              <div class='experience-company'>{{ e[2] }}</div> 
+            </div>
+          {% endif %}
+        {% endfor %}
+<!--           <a href="javascript:;" class='show-more'>+显示更多</a> -->
+    </div>
+    <div class="label-box">
+      <span class="label-title">标签:</span>
+      {% for tags in item[1].tag %}
+        <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
+      {% endfor %}
+    </div>
+    <div class="tracking-box">
+      <a href="javascript:;" class="tracking-link"><span>+</span>跟进联系人</a>
+      <div class="tracking-info">
+        <span class="triangle-up"></span>
+        <span class="triangle-up-z"></span>
+        <ul class="list-inline clearfix">
+          {% for tracking in item[1].tracking %}
+            <li>{{ tracking.author }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="comment-box">
+      <a href="javascript:;" class="comment-link"><span>+</span>评论</a>
+      <div class="comment-info">
+        <span class="triangle-up"></span>
+        <span class="triangle-up-z"></span>
+        <ul class="list-unstyled clearfix">
+          {% for comments in item[1].comment %}
+            {%- if loop.index > 3 %}{% break %}{% endif %}
+            <li class="comment-item">
+              <p>{{ comments.content }}</p>
+              <em class="author">{{ comments.author }}</em>
+            </li>
+          {%- endfor %}
+        </ul>
+      </div>
+    </div>
 
+  </div>
+  {% endfor %}
+  {% endif %}
 </div>
 {% endblock %}
 
-{% block script %}
-<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/lsi') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
-{% endblock %}
+{% block script%}
+<script src='{{ url_for("static", filename="js/lib/source/echarts.js") }}'></script>
+<script src='{{ url_for("static", filename="js/src/search_result.js") }}'></script>
+{% endblock%}

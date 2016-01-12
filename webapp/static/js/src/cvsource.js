@@ -253,7 +253,50 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 
 	$('#title-submit-btn').on('click', function(){
    
+   var filename = window.location.href.split('/');
    
+   filename = filename[filename.length-1];
+
+   $.ajax({
+   
+     url: '/updateinfo',
+
+     type: 'post',
+
+     dataType: 'json',
+
+				 contentType: 'application/json',
+
+     data: JSON.stringify({
+
+       'filename': filename,
+      
+       'yamlinfo': {
+         'id': $('#Id').val(),
+         'name': $('#name').val(),
+         'origin': $('#origin').val(),
+         'phone': $('#phone').val(),
+         'email': $('#email').val()
+       }
+
+     }),
+
+     success: function(response){
+
+       if(response.result){
+         
+         window.location.reload();
+
+       }else{
+
+       	 alert('提交失败');
+
+       }
+       
+     }
+
+   });
+
 	});
 
 });

@@ -209,7 +209,7 @@ class UpdateInfo(flask.views.MethodView):
                 break
         else:
             repo.modify_file(bytes(name.yaml), yaml.dump(yaml_info),
-                             commit_string, user.id)
+                             commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)
 
 

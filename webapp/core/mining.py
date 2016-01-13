@@ -71,13 +71,13 @@ class Capacity(flask.views.MethodView):
 class LSI(flask.views.MethodView):
 
     def get(self):
-        if 'search_text' in flask.request.args:
+        if 'search_textarea' in flask.request.args:
             repo = flask.current_app.config['DATA_DB']
             if flask.current_app.config['LSI_MODEL'] is None:
                 flask.current_app.config['LSI_MODEL'] = core.mining.lsimodel.LSImodel('repo')
                 flask.current_app.config['LSI_MODEL'].setup()
             lsi = flask.current_app.config['LSI_MODEL']
-            doc = flask.request.args['search_text']
+            doc = flask.request.args['search_textarea']
             result = lsi.probability(doc)
             kv = dict()
             datas = []
@@ -91,7 +91,7 @@ class LSI(flask.views.MethodView):
                     'match': str(each[1])
                 }
                 datas.append([name, yaml_info, info])
-            return flask.render_template('lsipage.html',result=datas, search_text=doc)
+            return flask.render_template('lsipage.html',result=datas, search_textarea=doc)
         else:
             return flask.render_template('lsipage.html')
 

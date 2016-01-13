@@ -364,6 +364,19 @@ require(
 
 			});
 
+   var search_text;
+
+   //check search textarea element exist
+   if($('#search_textarea').length > 0){
+   
+     search_text = '公司';
+   
+   }else{
+     
+     search_text = $('#search_text').val()
+
+   }
+   console.log(search_text);
 			$.ajax({
 
 				url: '/mining/position',
@@ -371,7 +384,7 @@ require(
 				type: 'get',
 
 				data:{
-					'search_text' : $('#search_text').val()
+					'search_text' : search_text
 				},
 
 				success: function(response){
@@ -440,7 +453,7 @@ require(
 									type: 'value'
 
 								}
-							],
+       ],
 
 							series: [
 							{

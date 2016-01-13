@@ -17,14 +17,17 @@ class Position(flask.views.MethodView):
     def get(self):
         repo = flask.current_app.config['DATA_DB']
         search_text = flask.request.args['search_text']
-        searches = repo.grep(search_text)
+        if 'md_ids' in flask.request.form and len(markdown_ids) > 0:
+            searches = flask.request.form['md_ids']
+        else:
+            searches = repo.grep(search_text)
         result = dict()
         for search in searches:
-            with codecs.open(os.path.join(repo.repo.path, search),
+            name = core.outputstorage.ConvertName(search)
+            with codecs.open(os.path.join(repo.repo.path, name.md),
                              'r', encoding='utf-8') as file:
                 md_data = file.read()
             positions = core.mining.info.position(repo, md_data, search_text)
-            name = core.outputstorage.ConvertName(search)
             try:
                 yaml_data = utils.builtin.load_yaml(repo.repo.path, name.yaml)
             except IOError:

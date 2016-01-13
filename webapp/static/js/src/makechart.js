@@ -101,6 +101,8 @@ $('#submit-params').on('click', function(){
 
   $('table tbody').append('<tr>'+ tdStr +'</tr>');
 
+  $('<p>图例说明<\/p><textarea class=\'form-control\' rows=\'3\' id=\'mark-point\'><\/textarea>').insertAfter('#add-row');
+
 });
 
 
@@ -246,15 +248,15 @@ $('#make-chart-btn').on('click', function(){
 
   var option = {
     title : {
-        subtext: '预算 vs 开销（Budget vs spending)\nasdasd',
+        subtext: $('#mark-point').val(),
     },
     tooltip : {
         trigger: 'axis'
     },
     legend: {
         orient : 'vertical',
-        x : 'left',
-        y : 'bottom',
+        x : 'right',
+        y : 'center',
         data:function(){
           
           var list = [];

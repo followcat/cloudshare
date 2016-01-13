@@ -593,10 +593,10 @@ function getProPointData(result){
 
     dataObj.fileName = personObj.md;
 
-    dataObj.data = getCapacityDataArr(scatterData.workTime, actdocPro);
-
+    dataObj.data = getCapacityDataArr(scatterData.workTime, pro);
+    
     dataArr.push(dataObj);
-
+    
     dataObj = null;
 
   }
@@ -716,13 +716,17 @@ $('#vd-capacity-pro').on('click', function(){
            type: 'scatter',
 
            data: function(){
+
              var list = [];
 
-             for (var i = data.length - 1; i >= 0; i--) {
+             for(var i = 0, len = data.length; i < len; i++){
+
                list.push(data[i].data);
-             };
+
+             }
 
              return list;
+
            }()
 
          }]
@@ -734,7 +738,7 @@ $('#vd-capacity-pro').on('click', function(){
         var ecConfig = require('echarts/config');
  
         scatterCharts.on(ecConfig.EVENT.CLICK, function(param){
-          
+
           var index = param.dataIndex;
           
           var a = $("<a href=\'\/show\/"+data[index].fileName+"\' target=\'_blank\'><\/a>").get(0);  

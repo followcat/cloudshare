@@ -193,15 +193,23 @@ class UpdateInfo(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         filename = flask.request.json['filename']
         updateinfo = flask.request.json['yamlinfo']
-        key, value = updateinfo.popitem()
         name = core.outputstorage.ConvertName(filename)
         yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
-        if key in yaml_info:
-            yaml_info[key].insert(0, {'author': user.id, 'content': value})
-            repo.modify_file(bytes(name.yaml), yaml.dump(yaml_info),
-                             "Add %s in %s." % (key, name.yaml), user.id)
+        commit_string = "File %s: " % (name.yaml)
+        for key, value in updateinfo.iteritems():
+            if key in yaml_info:
+                if key in ['tag', 'tracking', 'comment']:
+                    yaml_info[key].insert(0, {'author': user.id, 'content': value})
+                    commit_string += " Add %s." % (key)
+                else:
+                    yaml_info[key] = value
+                    commit_string += " Modify %s to %s." % (key, value)
+            else:
+                result = False
+                break
         else:
-            result = False
+            repo.modify_file(bytes(name.yaml), yaml.dump(yaml_info),
+                             commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)
 
 

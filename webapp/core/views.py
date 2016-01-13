@@ -344,3 +344,10 @@ class UploadFile(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         return flask.render_template('uploadfile.html')
+
+
+class MakeChart(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('makechart.html')

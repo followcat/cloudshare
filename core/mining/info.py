@@ -121,14 +121,14 @@ def capacity(stream):
         job_info = dict()
         findstream = ''.join(ms.get_strs_from_positions([range]))
         cleanstream = re.sub('[- ]+' ,' ' , findstream)
-        wordcut = jieba.posseg.cut(cleanstream)
+        wordcut = jieba.posseg.cut(cleanstream, HMM=False)
         count = 0
         for each in wordcut:
             if each.flag == 'v':
                 count += 1
         if count == 0:
             continue
-        job_info['doclen'] = len(clean_stream)
+        job_info['doclen'] = len(cleanstream)
         job_info['actpoint'] = count
         timeline = re.findall(time_restr, findstream)
         job_info['begin'] = timeline[0]

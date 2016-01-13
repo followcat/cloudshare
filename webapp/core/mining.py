@@ -14,11 +14,11 @@ import json
 
 class Position(flask.views.MethodView):
 
-    def get(self):
+    def post(self):
         repo = flask.current_app.config['DATA_DB']
-        search_text = flask.request.args['search_text']
-        if 'md_ids' in flask.request.form and len(markdown_ids) > 0:
-            searches = flask.request.form['md_ids']
+        search_text = flask.request.form['search_text']
+        if 'md_ids' in flask.request.form and len(search_text) > 0:
+            searches = json.loads(flask.request.form['md_ids'])
         else:
             searches = repo.grep(search_text)
         result = dict()

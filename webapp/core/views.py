@@ -8,6 +8,7 @@ import flask.views
 import flask.ext.login
 
 import utils.builtin
+import tools.batching
 import webapp.core.upload
 import core.outputstorage
 import webapp.core.account
@@ -71,7 +72,9 @@ class BatchUpload(flask.views.MethodView):
         upobj = webapp.core.upload.UploadObject(filename,
                                                 netword_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
-
+        if not upobj.storage.yamlinfo['name']:
+            u_filename = filename.encode('utf-8')
+            upobj.storage.yamlinfo['name'] = tools.batching.name_from_filename(u_filename)
         flask.session[user.id]['batchupload'] = upobj
         flask.session.modified = True
         return flask.jsonify(result=upobj.result, name=upobj.storage.yamlinfo['name'])

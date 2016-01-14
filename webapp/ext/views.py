@@ -35,6 +35,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/batchconfirm',
+        view_func=webapp.core.views.BatchConfirm.as_view('batchconfirm'),
+        )
+
+    app.add_url_rule(
         '/upload',
         view_func=webapp.core.views.Upload.as_view('upload'),
         )

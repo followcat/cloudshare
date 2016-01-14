@@ -87,7 +87,7 @@ class GitInterface(object):
             command = ['git', 'grep', '-l', '--all-match']
             for each in keywords:
                 command.append('-e')
-                command.append(each)
+                command.append(each.encode('utf-8'))
             p = subprocess.Popen(command,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,

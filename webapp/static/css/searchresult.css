@@ -136,19 +136,25 @@
   top: 2px;
   left: 0
 }
-<<<<<<< HEAD
+.check-en{
+  margin-left: 30px;
+  font-size: 0.875em;
+}
 .tool-bar{
   margin-top: 6px;
   margin-bottom: 26px;
 }
 #data-main{
   width:100%;
-  height:300px;
+  
   margin-bottom: 40px;
 }
 #echarts-wrap{
   width: 100%;
-  height: 100%;
+  height:300px;
+}
+#action-msg{
+  overflow: hidden;
 }
 #action-msg a{
   margin-left: 6px;
@@ -156,9 +162,3 @@
 .vd-region{
   margin-left: 20px;
 }
-=======
-.check-en{
-  margin-left: 30px;
-  font-size: 0.875em;
-}
->>>>>>> origin/account

@@ -29,6 +29,7 @@ require(
 		'echarts/chart/line', 
 		'echarts/chart/bar',
 		'echarts/chart/map',
+		'echarts/chart/scatter',
 		'bootstrap', 
 		'header', 
 		'formvalidate', 
@@ -97,7 +98,7 @@ require(
 
 				  	}else{
 
-				  		var regionObj = new Object();
+				  		 var regionObj = new Object();
 
 				 		 	regionObj.name = obj.name;
 
@@ -123,6 +124,28 @@ require(
 
 		}
 	}
+
+
+ //Get the md_ids lists
+
+ function GetMdLists(){
+
+ 	 var mdList = [];
+
+			var titleList = $('.item-title');
+
+			$.each(titleList, function(index, data){
+
+				var mdId = $(data).attr('href').split('/')[2];
+
+				mdList.push(mdId);
+
+			});
+
+			return mdList;
+
+ }
+
 
 	//Show position region button handle
 
@@ -151,17 +174,7 @@ require(
 
 			//Get the md_ids lists
 
-			var mdList = [];
-
-			var titleList = $('.item-title');
-
-			$.each(titleList, function(index, data){
-
-				var mdId = $(data).attr('href').split('/')[2];
-
-				mdList.push(mdId);
-
-			});
+			var mdList = GetMdLists();
 
 			$.ajax({
 
@@ -247,7 +260,19 @@ require(
 				          }
 				        },
 
-				        data : regionObj.regionDataArr
+				        data : function(){
+              var list = [];
+
+              for (var i = regionObj.regionDataArr.length - 1; i >= 0; i--) {
+              	 if(regionObj.regionDataArr[i].value > 2){
+              	 	 list.push(regionObj.regionDataArr[i]);
+              	 }else{
+              	 	 continue;
+              	 }
+              }
+              return list;
+
+				        }()
 
 				      },
 
@@ -258,6 +283,7 @@ require(
                       /*end option*/
 
 					positionCharts.setOption(option);
+
 				}
 			});
 		}else{
@@ -338,15 +364,29 @@ require(
 
 			});
 
+
+   var formdata = {};
+
+   //check search textarea element exist
+   if($('#search_textarea').length > 0){
+
+     formdata['search_text'] =  '公司';
+
+     formdata['md_ids'] = JSON.stringify(GetMdLists());
+
+   }else{
+     
+     formdata['search_text'] = $('#search_text').val();
+   
+   }
+   
 			$.ajax({
 
 				url: '/mining/position',
 
-				type: 'get',
-
-				data:{
-					'search_text' : $('input[name="search_text"]').val()
-				},
+				type: 'post',
+    
+				data: formdata,
 
 				success: function(response){
 
@@ -414,7 +454,7 @@ require(
 									type: 'value'
 
 								}
-							],
+       ],
 
 							series: [
 							{
@@ -500,14 +540,542 @@ require(
 
    $('#action-msg').text('');
 
-		}
+  }
 		
 	});
 
-	
+//return array
 
-	
-	
+function getCapacityDataArr(xData, yData){
+  
+  var arr = [];
+
+  arr[0] = xData;
+
+  arr[1] = yData;
+
+  return arr;
+}
+
+function getCapacityData(result){
+
+  var dataArr = new Array();
+
+  for (var i = result.length - 1; i >= 0; i--) {
+
+    var actpoint = 0, 
+        doclen = 0;
+
+    var objArr = result[i];
+    
+    $.each(objArr, function(index, data){
+    
+      actpoint += data.actpoint;
+
+      doclen += data.doclen;
+      
+    });
+
+    var actDoc = getCapacityDataArr(doclen, actpoint);
+
+    dataArr.push(actDoc);
+
+  };
+
+  return dataArr;
+
+}
+
+//get Proportion point data
+
+function getProPointData(result){
+
+  var dataArr = new Array();
+  
+  for (var i = result.length - 1; i >= 0; i--) {
+
+    var dataObj = {};
+
+    var personObj = result[i];
+    
+    var capacity = personObj.capacity;
+    
+    var scatterData = getScatterData(capacity);
+    
+    var pro = (scatterData.actpointSum / scatterData.doclenSum) * 100;
+    var actdocPro = Math.pow(pro, 3);
+
+    dataObj.fileName = personObj.md;
+
+    dataObj.data = getCapacityDataArr(scatterData.workTime, pro);
+    
+    dataArr.push(dataObj);
+    
+    dataObj = null;
+
+  }
+
+  return dataArr;
+
+}
+
+//Echarts visualize data
+
+$('#vd-capacity-pro').on('click', function(){
+
+  $('#action-msg').html('');
+  
+  if($('#data-main').css('display') === 'none'){
+
+    $('#data-main').css('display', 'block');
+
+    var mdList = GetMdLists();
+    
+    var scatterCharts = ec.init(document.getElementById('echarts-wrap'), 'macarons');
+
+    scatterCharts.showLoading({
+
+      text: '数据加载中...',
+
+      effect: 'whirling',
+
+      textStyle: {
+
+        fontSize: 20
+
+      }
+
+    });
+
+    $.ajax({
+    
+     url: '/mining/capacity',
+
+     type: 'post',
+
+     data: {
+       'md_ids': JSON.stringify(mdList)
+     },
+
+     success: function(response){
+
+       var data = getProPointData(response.result);
+
+       scatterCharts.hideLoading();
+
+       var scatterOption = {
+       
+         title: {
+           text: '能力分布'
+         },
+         
+         tooltip: {
+           trigger: 'axis',
+           
+           showDelay: 0,
+           
+           formatter: function(params){
+             
+             if(params.value.length > 1){
+               
+               return params.value[0] + '年' + params.value[1] + '个';
+
+             }
+
+           },
+
+           axisPointer:{
+            show: true,
+            type : 'cross',
+            lineStyle: {
+                type : 'dashed',
+                width : 1
+            }
+           }
+         },
+
+         toolbox: {
+           show : true,
+           feature : {
+             mark : {show: true},
+             dataZoom : {show: true},
+             dataView : {show: true, readOnly: false},
+             restore : {show: true},
+             saveAsImage : {show: true}
+           }
+         },
+
+         xAxis : [
+         {
+           type : 'value',
+           scale:true,
+           axisLabel: {
+             formatter: '{value} 年'
+           }
+         }],
+
+         yAxis : [
+         {
+           type : 'value',
+           scale:true,
+           axisLabel: {
+             formatter: '{value} 个'
+           }
+         }],
+
+         series : [
+         {
+           name: 'test',
+
+           type: 'scatter',
+
+           data: function(){
+
+             var list = [];
+
+             for(var i = 0, len = data.length; i < len; i++){
+
+               list.push(data[i].data);
+
+             }
+
+             return list;
+
+           }()
+
+         }]
+       
+       };
+      
+        scatterCharts.setOption(scatterOption);
+        
+        var ecConfig = require('echarts/config');
+ 
+        scatterCharts.on(ecConfig.EVENT.CLICK, function(param){
+
+          var index = param.dataIndex;
+          
+          var a = $("<a href=\'\/show\/"+data[index].fileName+"\' target=\'_blank\'><\/a>").get(0);  
+              
+          var e = document.createEvent('MouseEvents');  
+
+          e.initEvent('click', true, true);  
+          a.dispatchEvent(e);
+						  
+        });
+
+      }
+
+    });
+		}else{
+
+			$('#data-main').css('display', 'none');
+
+		}
+});
+
+
+function changeTwoDecimal(x) {
+
+  var f_x = parseFloat(x);
+
+  f_x = Math.round(x * 100) / 100;
+
+  var s_x = f_x.toString();
+
+  var pos_decimal = s_x.indexOf('.');
+
+  if (pos_decimal < 0) {
+
+      pos_decimal = s_x.length;
+
+      s_x += '.';
+
+  }
+
+  while (s_x.length <= pos_decimal + 2) {
+
+      s_x += '0';
+
+  }
+
+  return s_x;
+
+}
+
+//get sum Month function
+
+function getSumMonth(beginYear, beginMonth, endYear, endMonth){
+
+  	var year = endYear - beginYear;
+  	var month, 
+  	    monthCount;
+    
+  	if( year < 0 ){
+
+  		 return -1;
+  	
+  	}else{
+          
+     if( parseInt(beginMonth) < parseInt(endMonth) ){
+
+  	    month = endMonth - beginMonth;
+  	  
+  	  }else{
+  		   
+  		   month = beginMonth - endMonth;
+  	  
+  	  }
+
+     monthCount = year * 12 + month;
+     
+  	  return monthCount;
+
+  	}
+  	
+}
+
+//get working time function
+
+function getWorkTime(time){
+
+  var workingYear = parseInt(time / 12);
+  
+  var workingMonth = time % 12;
+
+  var workingTime = changeTwoDecimal(workingYear + ( workingMonth / 100));
+
+  return workingTime;
+
+}
+
+//get scatter data array
+
+function getScatterData(capacity){
+  
+  var time = 0, actpointSum = 0, doclenSum = 0;
+
+  for (var i = capacity.length - 1; i >= 0; i--) {
+  	 
+  	 var obj = capacity[i];
+    
+    if( obj.begin !== '' && obj.end !== '' ){
+      
+      var num = getSumMonth(obj.begin[0], obj.begin[1], obj.end[0], obj.end[1]);
+
+      if( num === -1){
+        continue;
+      }else{
+
+        time += num;
+
+        actpointSum += obj.actpoint;
+
+        doclenSum += obj.doclen;
+
+      }
+    }
+  };
+
+  var workTime = getWorkTime(time);
+
+  // var actdocPro = (actpointSum/doclenSum) * 100;
+
+  if ( workTime < 40 ){
+    
+    // return getCapacityDataArr(workTime, actdocPro);
+    return { workTime: workTime, actpointSum: actpointSum, doclenSum: doclenSum };
+
+  }else{
+
+  	 return 0;
+
+  }
+
+}
+
+function getPointData(result){
+
+  var dataArr = new Array();
+  
+  for (var i = result.length - 1; i >= 0; i--) {
+
+    var dataObj = {};
+
+    var personObj = result[i];
+    
+    var capacity = personObj.capacity;
+    
+    var scatterData = getScatterData(capacity);
+    
+    dataObj.fileName = personObj.md;
+
+    dataObj.data = getCapacityDataArr(scatterData.workTime, scatterData.actpointSum);
+
+    dataArr.push(dataObj);
+
+    dataObj = null;
+
+  }
+
+  return dataArr;
+
+}
+
+//Echarts visualize data
+
+$('#vd-capacity').on('click', function(){
+
+	 $('#action-msg').html('');
+  
+  if($('#data-main').css('display') === 'none'){
+
+			 $('#data-main').css('display', 'block');
+    
+    var timeCharts = ec.init(document.getElementById('echarts-wrap'), 'macarons');
+
+    timeCharts.showLoading({
+
+				 text: '数据加载中...',
+
+				 effect: 'whirling',
+
+				 textStyle: {
+
+					 fontSize: 20
+
+				 }
+
+				});
+
+    var mdList = GetMdLists();
+
+				$.ajax({
+
+      url: '/mining/capacity',
+
+      type: 'post',
+
+      data: {
+        'md_ids': JSON.stringify(mdList)
+      },
+
+      success: function(response){
+        
+        var dataArr = getPointData(response.result);
+
+        timeCharts.hideLoading();
+
+        var timeOption = {
+
+          title: {
+            text: '工作经验分布'
+          },
+         
+          tooltip: {
+            trigger: 'axis',
+           
+            showDelay: 0,
+           
+            formatter: function(params){
+              
+              if(params.value.length > 1){
+               
+                return params.value[0] + '年' + params.value[1] + '个' ;
+
+              }
+
+            },
+
+	           axisPointer:{
+	            show: true,
+	            type : 'cross',
+	            lineStyle: {
+	                type : 'dashed',
+	                width : 1
+	            }
+	           }
+	         },
+
+	         toolbox: {
+	           show : true,
+	           feature : {
+	             mark : {show: true},
+	             dataZoom : {show: true},
+	             dataView : {show: true, readOnly: false},
+	             restore : {show: true},
+	             saveAsImage : {show: true}
+	           }
+	         },
+
+	         xAxis : [
+	         {
+	           type : 'value',
+	           scale:true,
+	           axisLabel: {
+	             formatter: '{value} 年'
+	           }
+	         }],
+
+	         yAxis : [
+	         {
+	           type : 'value',
+	           scale:true,
+	           axisLabel: {
+	             formatter: '{value} 个'
+	           }
+	         }],
+
+	         series : [
+	         {
+	           name: '工作经验',
+
+	           type: 'scatter',
+
+	           data: function(){
+	             var list = [];
+
+	             for(var i = 0, len = dataArr.length; i < len; i++){
+
+	               list.push(dataArr[i].data);
+
+	             }
+
+	             return list;
+	           }()
+
+	         }]
+	       
+	       };
+        
+        timeCharts.setOption(timeOption);
+
+        var ecConfig = require('echarts/config');
+						
+						  timeCharts.on(ecConfig.EVENT.CLICK, function(param){
+
+          var index = param.dataIndex;
+          
+          var a = $("<a href='\/show\/" + dataArr[index].fileName + "\' target='_blank'>click</a>").get(0);  
+              
+          var e = document.createEvent('MouseEvents');  
+
+          e.initEvent('click', true, true);  
+          a.dispatchEvent(e);
+
+						  });
+
+      }
+
+				});
+
+		}else{
+
+			 $('#data-main').css('display', 'none');
+
+		}
+});
+
 	//deal with something information
 	var infoDeal = {};
 

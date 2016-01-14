@@ -137,15 +137,37 @@
           <div class="wrap-left">
             <div id="cv-box">
               <div class="cv-box-top clearfix">
-                <span>简历情况：</span>
+                <span class='cv-box-title'>简历情况：</span>
                 <div class="tool-bar">
+                  <span class='check-box'><input type='checkbox' id='tranform-check'>切换修改标题状态</span>
                   <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">修改</a>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="edit">编辑</a>
+                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="edit">导出</a>
                   <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">添加英文简历</a>
                   {% if yaml.enversion %}
                   <a href="/edit/{{ yaml.enversion }}" target='_blank'>查看英文简历</a>
                   {% endif %}
                 </div>
+                <table class='table table-bordered table-condensed' id='title-table'>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>人名</th>
+                      <th>来源</th>
+                      <th>电话</th>
+                      <th>Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type='text' class='form-control input-sm' id='Id' value='{{ yaml.id }}' disabled='disabled'></td>
+                      <td><input type='text' class='form-control input-sm' id='name' value='{{ yaml.name }}' disabled='disabled'></td>
+                      <td><input type='text' class='form-control input-sm' id='origin' value='{{ yaml.origin }}' disabled='disabled'></td>
+                      <td><input type='text' class='form-control input-sm' id='phone' value='{{ yaml.phone }}' disabled='disabled'></td>
+                      <td><input type='text' class='form-control input-sm' id='email' value='{{ yaml.email }}' disabled='disabled'></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button type='button' class='btn btn-primary col-md-2 col-md-offset-5' id='title-submit-btn'>提交</button>
               </div>
               <div id="cv-content">
                 <div class="content">

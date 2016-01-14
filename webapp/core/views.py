@@ -4,12 +4,10 @@ import os.path
 
 import yaml
 import flask
-import pypandoc
 import flask.views
 import flask.ext.login
 
 import utils.builtin
-import core.mining.info
 import webapp.core.upload
 import core.outputstorage
 import webapp.core.account
@@ -135,7 +133,7 @@ class Show(flask.views.MethodView):
         with codecs.open(os.path.join(repo.repo.path, name.md),
                          'r', encoding='utf-8') as file:
             md_data = file.read()
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
@@ -149,7 +147,7 @@ class Edit(flask.views.MethodView):
         with codecs.open(os.path.join(repo.repo.path, name.md),
                          'r', encoding='utf-8') as file:
             md_data = file.read()
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         return flask.render_template('edit.html', markdown=md)
 
 
@@ -182,7 +180,7 @@ class Preview(flask.views.MethodView):
 
     def post(self):
         md_data = flask.request.form['mddata']
-        md = pypandoc.convert(md_data, 'html', format='markdown')
+        md = core.converterutils.md_to_html(md_data)
         return flask.render_template('preview.html', markdown=md)
 
 
@@ -195,15 +193,23 @@ class UpdateInfo(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         filename = flask.request.json['filename']
         updateinfo = flask.request.json['yamlinfo']
-        key, value = updateinfo.popitem()
         name = core.outputstorage.ConvertName(filename)
         yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
-        if key in yaml_info:
-            yaml_info[key].insert(0, {'author': user.id, 'content': value})
-            repo.modify_file(bytes(name.yaml), yaml.dump(yaml_info),
-                             "Add %s in %s." % (key, name.yaml), user.id)
+        commit_string = "File %s: " % (name.yaml)
+        for key, value in updateinfo.iteritems():
+            if key in yaml_info:
+                if key in ['tag', 'tracking', 'comment']:
+                    yaml_info[key].insert(0, {'author': user.id, 'content': value})
+                    commit_string += " Add %s." % (key)
+                else:
+                    yaml_info[key] = value
+                    commit_string += " Modify %s to %s." % (key, value)
+            else:
+                result = False
+                break
         else:
-            result = False
+            repo.modify_file(bytes(name.yaml), yaml.dump(yaml_info),
+                             commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)
 
 
@@ -338,3 +344,10 @@ class UploadFile(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         return flask.render_template('uploadfile.html')
+
+
+class MakeChart(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('makechart.html')

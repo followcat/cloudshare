@@ -112,9 +112,16 @@
   cursor: pointer;
 }
 .tool-bar{
-	width: 40%;
+	width: 55%;
 	float: right;
+}
+.tool-bar .check-box{
+	font-size: 0.88em;
+	margin-right: 20px;
 }
 .tool-bar a{
 	margin-right: 8px;
+}
+#title-submit-btn{
+	display:none;
 }

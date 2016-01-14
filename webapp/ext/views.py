@@ -148,3 +148,13 @@ def configure(app):
         '/deleteuser',
         view_func=webapp.core.views.DeleteUser.as_view('deleteuser'),
         )
+
+    app.add_url_rule(
+        '/lsipage',
+        view_func=webapp.core.mining.LSI.as_view('lsipage'),
+        )
+
+    app.add_url_rule(
+        '/makechart',
+        view_func=webapp.core.views.MakeChart.as_view('makechart'),
+        )

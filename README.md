@@ -11,6 +11,9 @@ share，edit your doc，pdf，md and so on...
     pypandoc==1.0.1
     emaildata==0.3.2
     jieba==0.38
+    gensim==0.12.3
+    Theano==0.7.0(choosable)
+    Pattern==2.6(choosable)
 
     pandoc 1.13.2.1
     pdftohtml 0.18.4

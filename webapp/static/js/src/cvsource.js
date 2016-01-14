@@ -274,9 +274,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
        'yamlinfo': {
          'id': $('#Id').val(),
          'name': $('#name').val(),
-         'origin': $('#origin').val(),
-         'phone': $('#phone').val(),
-         'email': $('#email').val()
+         'origin': $('#origin').val()
        }
 
      }),

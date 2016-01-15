@@ -60,8 +60,8 @@ class BatchUpload(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        if 'batchupload' not in flask.session[user.id]:
-            flask.session[user.id]['batchupload'] = dict()
+        user = flask.ext.login.current_user
+        flask.session[user.id]['batchupload'] = dict()
         return flask.render_template('batchupload.html')
 
     @flask.ext.login.login_required

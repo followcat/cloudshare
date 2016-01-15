@@ -76,7 +76,9 @@
 
 		afterUploadAll:function(obj){
 
-			$("#message").html($("#message").html()+"<p/>所有文件提交已经完成！</p><p style='color:red;'>请确认上传所有文件！</p>");
+			$("#message").html($("#message").html()+"<p/>所有文件分析已经完成！</p>");
+
+			$('#message').prepend('<p style=\'color:red;\'>请点击确认按钮确认所有上传文件！<\/p>')
 		
 		},
 	});
@@ -141,7 +143,21 @@
 				},
 				success: function(response){
 
-					console.log(response.result);
+					$('#message').html('');
+
+					$.each(response.result, function(index, data){
+
+						if(data){
+
+							$('#message').append('<p style=\'color:green\'>上传<strong>'+ index +'</strong>成功！</p>');
+						
+						}else{
+
+							$('#message').append('<p style=\'color:red\'>上传<strong>'+ index +'</strong>失败！文件或已经存在.</p>');
+
+						}
+
+					});
 
 				}
 

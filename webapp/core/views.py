@@ -52,7 +52,8 @@ class Search(flask.views.MethodView):
                 datas.append([name, yaml_data, info])
             return flask.render_template('search_result.html',
                                          search_key=search_text,
-                                         result=datas)
+                                         result=datas,
+                                         nums=len(datas))
         else:
             return flask.render_template('search.html')
 

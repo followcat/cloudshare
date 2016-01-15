@@ -61,6 +61,8 @@ class BatchUpload(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
+        if 'batchupload' not in flask.session[user.id]:
+            flask.session[user.id]['batchupload'] = dict()
         return flask.render_template('batchupload.html')
 
     @flask.ext.login.login_required
@@ -68,8 +70,6 @@ class BatchUpload(flask.views.MethodView):
         user = flask.ext.login.current_user
         netword_file = flask.request.files['files']
         filename = netword_file.filename
-        if 'batchupload' not in flask.session[user.id]:
-            flask.session[user.id]['batchupload'] = dict()
         upobj = webapp.core.upload.UploadObject(filename,
                                                 netword_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])

@@ -14,6 +14,7 @@ import core.outputstorage
 import webapp.core.account
 import webapp.core.exception
 
+import json
 
 class LoginRedirect(flask.views.MethodView):
 
@@ -75,7 +76,7 @@ class BatchUpload(flask.views.MethodView):
         if not upobj.storage.yamlinfo['name']:
             u_filename = filename.encode('utf-8')
             upobj.storage.yamlinfo['name'] = tools.batching.name_from_filename(u_filename)
-        flask.session[user.id]['batchupload'] = upobj
+        flask.session[user.id]['batchupload'][filename] = upobj
         flask.session.modified = True
         return flask.jsonify(result=upobj.result, name=upobj.storage.yamlinfo['name'])
 
@@ -86,8 +87,8 @@ class BatchConfirm(flask.views.MethodView):
     def post(self):
         results = dict()
         user = flask.ext.login.current_user
-        updates = flask.request.form['updates']
-        for filename, upobj in flask.session[user.id]['batchupload']:
+        updates = json.loads(flask.request.form['updates'])
+        for filename, upobj in flask.session[user.id]['batchupload'].iteritems():
             if filename in updates:
                 for key, value in updates[filename].iteritems():
                     if key in upobj.storage.yamlinfo:

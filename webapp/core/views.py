@@ -8,11 +8,13 @@ import flask.views
 import flask.ext.login
 
 import utils.builtin
+import tools.batching
 import webapp.core.upload
 import core.outputstorage
 import webapp.core.account
 import webapp.core.exception
 
+import json
 
 class LoginRedirect(flask.views.MethodView):
 
@@ -50,7 +52,8 @@ class Search(flask.views.MethodView):
                 datas.append([name, yaml_data, info])
             return flask.render_template('search_result.html',
                                          search_key=search_text,
-                                         result=datas)
+                                         result=datas,
+                                         nums=len(datas))
         else:
             return flask.render_template('search.html')
 
@@ -59,34 +62,64 @@ class BatchUpload(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
+        user = flask.ext.login.current_user
+        flask.session[user.id]['batchupload'] = dict()
         return flask.render_template('batchupload.html')
 
+    @flask.ext.login.login_required
     def post(self):
         user = flask.ext.login.current_user
         netword_file = flask.request.files['files']
-        upobj = webapp.core.upload.UploadObject(netword_file.filename,
+        filename = netword_file.filename
+        upobj = webapp.core.upload.UploadObject(filename,
                                                 netword_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
-        result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
-        return flask.jsonify(result=result)
+        if not upobj.storage.yamlinfo['name']:
+            u_filename = filename.encode('utf-8')
+            upobj.storage.yamlinfo['name'] = tools.batching.name_from_filename(u_filename)
+        flask.session[user.id]['batchupload'][filename] = upobj
+        flask.session.modified = True
+        return flask.jsonify(result=upobj.result, name=upobj.storage.yamlinfo['name'])
+
+
+class BatchConfirm(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def post(self):
+        results = dict()
+        user = flask.ext.login.current_user
+        updates = json.loads(flask.request.form['updates'])
+        for filename, upobj in flask.session[user.id]['batchupload'].iteritems():
+            if filename in updates:
+                for key, value in updates[filename].iteritems():
+                    if key in upobj.storage.yamlinfo:
+                        upobj.storage.yamlinfo[key] = value
+            result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
+            results[filename] = result
+        flask.session[user.id]['batchupload'] = dict()
+        return flask.jsonify(result=results)
 
 
 class Upload(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def post(self):
+        user = flask.ext.login.current_user
         network_file = flask.request.files['file']
         upobj = webapp.core.upload.UploadObject(network_file.filename,
                                                 network_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
-        flask.session['upload'] = pickle.dumps(upobj)
+        flask.session[user.id]['upload'] = pickle.dumps(upobj)
         flask.session.modified = True
         return str(upobj.result)
 
 
 class UploadPreview(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def get(self):
-        upobj = pickle.loads(flask.session['upload'])
+        user = flask.ext.login.current_user
+        upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
         info = {
             "name": upobj.storage.yamlinfo['name'],
@@ -98,13 +131,14 @@ class UploadPreview(flask.views.MethodView):
 
 class Confirm(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def post(self):
         info = {
             'name': flask.request.form['name'],
             'origin': flask.request.form['origin']
         }
         user = flask.ext.login.current_user
-        upobj = pickle.loads(flask.session['upload'])
+        upobj = pickle.loads(flask.session[user.id]['upload'])
         upobj.storage.yamlinfo.update(info)
         result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
         return flask.jsonify(result=result, filename=upobj.storage.name.md)
@@ -112,12 +146,13 @@ class Confirm(flask.views.MethodView):
 
 class ConfirmEnglish(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def post(self):
         repo = flask.current_app.config['DATA_DB']
         user = flask.ext.login.current_user
         yaml_name = core.outputstorage.ConvertName(flask.request.form['name']).yaml
         yaml_data = utils.builtin.load_yaml(repo.repo.path, yaml_name)
-        upobj = pickle.loads(flask.session['upload'])
+        upobj = pickle.loads(flask.session[user.id]['upload'])
         result = upobj.confirm_md(flask.current_app.config['DATA_DB'], user.id)
         yaml_data['enversion'] = upobj.storage.name.md
         repo.modify_file(bytes(yaml_name), yaml.dump(yaml_data), committer=user.id)
@@ -173,11 +208,15 @@ class Modify(flask.views.MethodView):
 
 
 class Preview(flask.views.MethodView):
+
+    @flask.ext.login.login_required
     def get(self):
-        upobj = pickle.loads(flask.session['upload'])
+        user = flask.ext.login.current_user
+        upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
         return flask.render_template('preview.html', markdown=output, method='get')
 
+    @flask.ext.login.login_required
     def post(self):
         md_data = flask.request.form['mddata']
         md = core.converterutils.md_to_html(md_data)
@@ -247,6 +286,7 @@ class LoginCheck(flask.views.MethodView):
             if(user.id == "root"):
                 return flask.redirect(flask.url_for("urm"))
             else:
+                flask.session[user.id] = dict()
                 return flask.redirect(flask.url_for("search"))
         else:
             # flask.flash('Username or Password Incorrect.')
@@ -257,6 +297,7 @@ class LoginCheck(flask.views.MethodView):
 
 class Logout(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def get(self):
         flask.ext.login.logout_user()
         return flask.redirect(flask.url_for('index'))
@@ -264,6 +305,7 @@ class Logout(flask.views.MethodView):
 
 class UserInfo(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def get(self):
         repo = flask.current_app.config['DATA_DB']
         user = flask.ext.login.current_user
@@ -281,6 +323,7 @@ class UserInfo(flask.views.MethodView):
 
 class AddUser(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def post(self):
         result = False
         id = flask.request.form['username']
@@ -296,6 +339,7 @@ class AddUser(flask.views.MethodView):
 
 class ChangePassword(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def post(self):
         result = False
         oldpassword = flask.request.form['oldpassword']
@@ -331,6 +375,7 @@ class UrmSetting(flask.views.MethodView):
 
 class DeleteUser(flask.views.MethodView):
 
+    @flask.ext.login.login_required
     def post(self):
         name = flask.request.form['name']
         user = flask.ext.login.current_user

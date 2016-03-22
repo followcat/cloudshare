@@ -42,7 +42,7 @@
   	</div>
   	<div class='col-md-2 clearfix btn-bar'>
   		<button class='btn btn-sm btn-success' id='start-upload'>提交</button>
-  		<button class='btn btn-sm btn-default' id='clear-btn'>清除</button>
+  		<button class='btn btn-sm btn-primary' id='confirm-btn'>确认</button>
   	</div>
   	<div class='col-md-4'>
   		<h5>上传信息:</h5>
@@ -53,50 +53,7 @@
   	
   </div>
   <script src="{{ url_for('static',filename='js/lib/jquery.js') }}"></script>
-	<script src="{{ url_for('static',filename='js/lib/jquery.uploadfile.min.js') }}"></script>
-	<script>
-	(function(){
-		var uploadObj = $("#fileuploader").uploadFile({
-											url:"/batchupload",
-											fileName:"files",
-											sequential:true,
-											sequentialCount:1,
-											autoSubmit:false,
-											onLoad:function(obj)
-											{
-													$("#message").html($("#message").html()+"<p>上传控件已加载:</p>");
-											},
-											onSubmit:function(files)
-											{
-												$("#message").html($("#message").html()+"<p>提交:"+JSON.stringify(files)+"中...</p>");
-												//return false;
-											},
-											onSuccess: function(files,data,xhr,pd){
-												if(data.result){
-													$("#message").html($("#message").html()+"<p style='color:green;'>上传:"+JSON.stringify(files) + "成功</p>");
-												}else{
-													$("#message").html($("#message").html()+"<p style='color:red;'>上传:"+JSON.stringify(files) + "失败,文件已存在</p>");
-												}
-											},
-											onError: function(files,status,errMsg,pd){
-												$("#message").html($("#message").html()+"<p style='color:red;'>上传:"+JSON.stringify(files) + "错误.(" + status + ":" + errMsg + ")</p>");
-											},
-											afterUploadAll:function(obj)
-											{
-												$("#message").html($("#message").html()+"<p/>所有文件上传已经完成！</p>");
-												
-
-											},
-										});
-		$('#start-upload').on('click', function(){
-			uploadObj.startUpload();
-		});
-
-		$('#clear-btn').on('click', function(){
-			$('.ajax-file-upload-container').html('');
-			$('#message').html('');
-		});
-	}());
-	</script>
+	 <script src="{{ url_for('static',filename='js/lib/jquery.uploadfile.min.js') }}"></script>
+	 <script src="{{ url_for('static',filename='js/src/batchupload.js') }}"></script>
 </body>
 </html>

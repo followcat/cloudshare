@@ -82,7 +82,7 @@ class LSImodel(object):
                     count_dict[word] += 1
         for word in count_dict:
             if count_dict[word] < minimum or count_dict[word] > maximum:
-                self.token_once[word] = count_dict[word]
+                self.token_once[word] += count_dict[word]
         text = [word for word in seg if word not in self.token_once]
         self.texts.append(text)
         self.dictionary.add_documents([text])

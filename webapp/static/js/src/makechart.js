@@ -192,9 +192,9 @@ function getIndicator(keyArr, personArr){
 
   var arr = [];
 
-  for(var i = 1, len = keyArr.length; i < len; i++){
+  var max = 0;
 
-    var max = 0;
+  for(var i = 1, len = keyArr.length; i < len; i++){
 
     for(var j = 0, personLen = personArr.length; j < personLen; j++){
 
@@ -210,12 +210,14 @@ function getIndicator(keyArr, personArr){
 
     obj.text = keyArr[i];
 
-    obj.max = parseInt(max);
-
     arr.push(obj);
 
     obj = null;
 
+  }
+
+  for(var i = 0, len = arr.length; i < len; i++){
+    arr[i].max = max;
   }
 
   return arr;

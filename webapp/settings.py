@@ -24,12 +24,13 @@ ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = repointerface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 REPO_ACCOUNT = webapp.views.account.RepoAccount(ACCOUNT_DB)
 
-def init_lsimodel():
+def build_lsimodel(lsimodel, lsipath):
     global DATA_DB_NAME
     names = []
     texts = []
     def elt(s):
         return s
+    count = 0
     for pathfile in glob.glob(os.path.join(DATA_DB_NAME, '*.yaml')):
         mdfile = pathfile.replace('.yaml', '.md')
         if os.path.isfile(mdfile):
@@ -39,8 +40,17 @@ def init_lsimodel():
             names.append(name)
             seg = filter(lambda x: len(x) > 0, map(elt, jieba.cut(data, cut_all=False)))
             texts.append(seg)
-    lsi = core.mining.lsimodel.LSImodel()
-    lsi.setup(names, texts)
-    return lsi
+            count += 1
+    if count > 0:
+        lsimodel.setup(names, texts)
+        lsimodel.save(lsipath)
 
-LSI_MODEL = init_lsimodel()
+def init_lsimodel(lsi, lsipath):
+    try:
+        lsi.load(lsipath)
+    except IOError:
+        build_lsimodel(lsi, lsipath)
+
+LSI_SAVE_PATH = 'lsimodel'
+LSI_MODEL = core.mining.lsimodel.LSImodel()
+init_lsimodel(LSI_MODEL, LSI_SAVE_PATH)

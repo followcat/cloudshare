@@ -1,6 +1,11 @@
-import os.path
+import os
+import re
+import glob
 
-import webapp.core.account
+import jieba
+
+import webapp.views.account
+import core.mining.lsimodel
 import repointerface.gitinterface
 
 
@@ -17,6 +22,25 @@ DATA_DB = repointerface.gitinterface.GitInterface(DATA_DB_NAME)
 
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = repointerface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
-REPO_ACCOUNT = webapp.core.account.RepoAccount(ACCOUNT_DB)
+REPO_ACCOUNT = webapp.views.account.RepoAccount(ACCOUNT_DB)
 
-LSI_MODEL = None
+def init_lsimodel():
+    global DATA_DB_NAME
+    names = []
+    texts = []
+    def elt(s):
+        return s
+    for pathfile in glob.glob(os.path.join(DATA_DB_NAME, '*.yaml')):
+        mdfile = pathfile.replace('.yaml', '.md')
+        if os.path.isfile(mdfile):
+            data = open(mdfile, 'rb').read()
+            data = re.sub(ur'[\n- /]+' ,' ' , data)
+            path, name = mdfile.split('/')
+            names.append(name)
+            seg = filter(lambda x: len(x) > 0, map(elt, jieba.cut(data, cut_all=False)))
+            texts.append(seg)
+    lsi = core.mining.lsimodel.LSImodel()
+    lsi.setup(names, texts)
+    return lsi
+
+LSI_MODEL = init_lsimodel()

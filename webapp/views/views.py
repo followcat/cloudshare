@@ -9,10 +9,10 @@ import flask.ext.login
 
 import utils.builtin
 import tools.batching
-import webapp.core.upload
+import webapp.views.upload
 import core.outputstorage
-import webapp.core.account
-import webapp.core.exception
+import webapp.views.account
+import webapp.views.exception
 
 import json
 
@@ -71,7 +71,7 @@ class BatchUpload(flask.views.MethodView):
         user = flask.ext.login.current_user
         netword_file = flask.request.files['files']
         filename = netword_file.filename
-        upobj = webapp.core.upload.UploadObject(filename,
+        upobj = webapp.views.upload.UploadObject(filename,
                                                 netword_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
         if not upobj.storage.yamlinfo['name']:
@@ -106,7 +106,7 @@ class Upload(flask.views.MethodView):
     def post(self):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
-        upobj = webapp.core.upload.UploadObject(network_file.filename,
+        upobj = webapp.views.upload.UploadObject(network_file.filename,
                                                 network_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
         flask.session[user.id]['upload'] = pickle.dumps(upobj)
@@ -278,7 +278,7 @@ class LoginCheck(flask.views.MethodView):
         username = flask.request.form['username']
         password = flask.request.form['password']
         repoaccount = flask.current_app.config['REPO_ACCOUNT']
-        user = webapp.core.account.User.get(username, repoaccount)
+        user = webapp.views.account.User.get(username, repoaccount)
         upassword = utils.builtin.md5(password)
         error = None
         if (user and user.password == upassword):
@@ -332,7 +332,7 @@ class AddUser(flask.views.MethodView):
         try:
             repoaccount = flask.current_app.config['REPO_ACCOUNT']
             result = repoaccount.add(user.id, id, password)
-        except webapp.core.exception.ExistsUser:
+        except webapp.views.exception.ExistsUser:
             pass
         return flask.jsonify(result=result)
 
@@ -352,7 +352,7 @@ class ChangePassword(flask.views.MethodView):
                 result = True
             else:
                 result = False
-        except webapp.core.exception.ExistsUser:
+        except webapp.views.exception.ExistsUser:
             pass
         return flask.jsonify(result=result)
 

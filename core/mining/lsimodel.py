@@ -1,20 +1,11 @@
-import os
-import re
-import glob
-import jieba
-import random
-
 from gensim import corpora, models, similarities
 
 
 class LSImodel(object):
-    def __init__(self, directory):
-        self.dir = directory
+    def __init__(self):
         self.names = []
-        self.datas = []
         self.texts = []
         self.corpus = []
-        self.set_data()
 
         self.lsi = None
         self.index = None
@@ -22,32 +13,18 @@ class LSImodel(object):
         self.dictionary = None
         self.corpus_tfidf = None
 
-    def setup(self, dictionary=None):
+    def setup(self, names, texts):
+        self.names = names
+        self.texts = texts
         self.silencer(2, 100)
-        self.set_dictionary(dictionary)
+        self.set_dictionary()
         self.set_corpus()
         self.set_tfidf()
         self.set_lsimodel()
 
-    def set_data(self):
-        def elt(s):
-            return s
-        for pathfile in glob.glob(os.path.join(self.dir, '*.md')):
-            if os.path.isfile(pathfile):
-                data = open(pathfile, 'rb').read()
-                data = re.sub(ur'[\n- /]+' ,' ' , data)
-                path, name = pathfile.split('/')
-                self.names.append(name)
-                self.datas.append(data)
-                seg = filter(lambda x: len(x) > 0, map(elt, jieba.cut(data, cut_all=False)))
-                self.texts.append(seg)
-
-    def set_dictionary(self, dictionary=None):
-        if dictionary is None:
-            self.dictionary = corpora.Dictionary(self.texts)
-        else:
-            self.dictionary = dictionary
-
+    def set_dictionary(self):
+        self.dictionary = corpora.Dictionary(self.texts)
+        
     def set_corpus(self):
         for text in self.texts:
             self.corpus.append(self.dictionary.doc2bow(text))
@@ -74,11 +51,6 @@ class LSImodel(object):
             if count_dict[word] < minimum or count_dict[word] > maximum:
                 token_once[word] = count_dict[word]
         self.texts = [[word for word in text if word not in token_once] for text in self.texts]
-
-    def random_doc(self):
-        name = random.choice(os.listdir(self.dir))
-        data = open(os.path.join(self.dir, name), 'rb').read()
-        return name, data
 
     def probability(self, doc):
         vec_bow = self.dictionary.doc2bow(jieba.cut(doc, cut_all=False))

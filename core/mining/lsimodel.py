@@ -106,7 +106,7 @@ class LSImodel(object):
 
     def set_lsimodel(self, topics=100):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                    num_topics=topics)
+                                   num_topics=topics, power_iters=6, extra_samples=300)
         self.index = similarities.MatrixSimilarity(self.lsi[self.corpus])
 
     def silencer(self, minimum=2, maximum=100):

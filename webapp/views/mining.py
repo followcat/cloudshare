@@ -6,7 +6,7 @@ import flask.views
 
 import utils.builtin
 import core.mining.info
-import core.mining.lsimodel
+import core.mining.valuable
 import core.outputstorage
 
 import json
@@ -76,9 +76,6 @@ class LSI(flask.views.MethodView):
     def get(self):
         if 'search_textarea' in flask.request.args:
             repo = flask.current_app.config['DATA_DB']
-            if flask.current_app.config['LSI_MODEL'] is None:
-                flask.current_app.config['LSI_MODEL'] = core.mining.lsimodel.LSImodel('repo')
-                flask.current_app.config['LSI_MODEL'].setup()
             lsi = flask.current_app.config['LSI_MODEL']
             doc = flask.request.args['search_textarea']
             result = lsi.probability(doc)
@@ -99,3 +96,10 @@ class LSI(flask.views.MethodView):
             return flask.render_template('lsipage.html')
 
 
+class Valuable(flask.views.MethodView):
+
+    def get(self):
+        lsi = flask.current_app.config['LSI_MODEL']
+        doc = flask.request.args['search_textarea']
+        result = core.mining.valuable.rate(lsi, doc)
+        return flask.jsonify(result=result)

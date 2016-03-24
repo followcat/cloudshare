@@ -13,13 +13,13 @@ class UploadObject(object):
             >>> import os
             >>> import shutil
             >>> import os.path
-            >>> import webapp.core.upload
+            >>> import webapp.views.upload
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> obj = open(os.path.join(root, name))
-            >>> test_path = "webapp/core/test_output"
+            >>> test_path = "webapp/views/test_output"
             >>> os.makedirs(test_path)
-            >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
+            >>> up = webapp.views.upload.UploadObject(name, obj, test_path)
             >>> up.result
             True
             >>> up.remove()
@@ -46,16 +46,16 @@ class UploadObject(object):
         """
             >>> import shutil
             >>> import os.path
-            >>> import webapp.core.upload
+            >>> import webapp.views.upload
             >>> import repointerface.gitinterface
             >>> root = "core/test"
             >>> name = "cv_1.doc"
-            >>> repo_name = 'webapp/core/test_repo'
-            >>> test_path = "webapp/core/test_output"
+            >>> repo_name = 'webapp/views/test_repo'
+            >>> test_path = "webapp/views/test_output"
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
-            >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
+            >>> up = webapp.views.upload.UploadObject(name, obj, test_path)
             >>> up.confirm(interface)
             True
             >>> up.confirm(interface)
@@ -77,16 +77,16 @@ class UploadObject(object):
         """
             >>> import shutil
             >>> import os.path
-            >>> import webapp.core.upload
+            >>> import webapp.views.upload
             >>> import repointerface.gitinterface
             >>> root = "core/test"
             >>> name = "cv_1.doc"
-            >>> repo_name = 'webapp/core/test_repo'
-            >>> test_path = "webapp/core/test_output"
+            >>> repo_name = 'webapp/views/test_repo'
+            >>> test_path = "webapp/views/test_output"
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
-            >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
+            >>> up = webapp.views.upload.UploadObject(name, obj, test_path)
             >>> up.confirm(interface)
             True
             >>> up.confirm_md(interface)
@@ -102,13 +102,13 @@ class UploadObject(object):
             >>> import os
             >>> import shutil
             >>> import os.path
-            >>> import webapp.core.upload
+            >>> import webapp.views.upload
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> obj = open(os.path.join(root, name))
-            >>> test_path = "webapp/core/test_output"
+            >>> test_path = "webapp/views/test_output"
             >>> os.makedirs(test_path)
-            >>> up = webapp.core.upload.UploadObject(name, obj, test_path)
+            >>> up = webapp.views.upload.UploadObject(name, obj, test_path)
             >>> fn = os.path.join(up.storage.markdown_path, up.storage.name.md)
             >>> os.path.exists(fn)
             True

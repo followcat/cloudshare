@@ -4,17 +4,17 @@ import yaml
 import flask.ext.login
 
 import utils.builtin
-import webapp.core.exception
+import webapp.views.exception
 
 
 class RepoAccount(object):
     """
         >>> import shutil
-        >>> import webapp.core.account
+        >>> import webapp.views.account
         >>> import repointerface.gitinterface
-        >>> repo_name = 'webapp/core/test_repo'
+        >>> repo_name = 'webapp/views/test_repo'
         >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-        >>> repoaccount = webapp.core.account.RepoAccount(interface)
+        >>> repoaccount = webapp.views.account.RepoAccount(interface)
         >>> repoaccount.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> repoaccount.add('root', 'admin', 'password')
@@ -55,7 +55,7 @@ class RepoAccount(object):
         uid = unicode(id)
         upw = utils.builtin.md5(password)
         if uid in data:
-            raise webapp.core.exception.ExistsUser(uid)
+            raise webapp.views.exception.ExistsUser(uid)
         data[uid] = upw
         dump_data = yaml.dump(data)
         self.repo.modify_file(self.account_filename, dump_data,
@@ -106,7 +106,7 @@ class User(flask.ext.login.UserMixin):
         self.id = id
         self.repoaccount = repoaccount
         if id not in repoaccount.USERS:
-            raise webapp.core.exception.UserNotFoundError()
+            raise webapp.views.exception.UserNotFoundError()
         self.password = repoaccount.USERS[unicode(id)]
 
     def changepassword(self, password):
@@ -116,21 +116,21 @@ class User(flask.ext.login.UserMixin):
     def get(self_class, id, repoaccount):
         """
             >>> import shutil
-            >>> import webapp.core.account
+            >>> import webapp.views.account
             >>> import repointerface.gitinterface
-            >>> repo_name = 'webapp/core/test_repo'
+            >>> repo_name = 'webapp/views/test_repo'
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> repoaccount = webapp.core.account.RepoAccount(interface)
-            >>> user = webapp.core.account.User.get('root', repoaccount)
+            >>> repoaccount = webapp.views.account.RepoAccount(interface)
+            >>> user = webapp.views.account.User.get('root', repoaccount)
             >>> user.id
             'root'
             >>> user.password
             u'5f4dcc3b5aa765d61d8327deb882cf99'
-            >>> type(webapp.core.account.User.get('None', repoaccount))
+            >>> type(webapp.views.account.User.get('None', repoaccount))
             <type 'NoneType'>
             >>> shutil.rmtree(repo_name)
         """
         try:
             return self_class(id, repoaccount)
-        except webapp.core.exception.UserNotFoundError:
+        except webapp.views.exception.UserNotFoundError:
             return None

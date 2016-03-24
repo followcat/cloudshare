@@ -85,6 +85,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/analysis/valuable',
+        view_func=webapp.views.mining.Valuable.as_view('valuable'),
+        )
+
+    app.add_url_rule(
         '/edit/<path:filename>',
         view_func=webapp.views.views.Edit.as_view('edit'),
         )

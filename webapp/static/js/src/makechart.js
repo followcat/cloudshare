@@ -8,7 +8,7 @@ require.config({
 		'header': 'src/header',
 		'formvalidate': 'src/formvalidate',
 		'Upload': 'src/upload',
-		'echarts': 'lib/source'
+		'echarts': 'lib/echarts'
 	},
 
 	shim: {
@@ -24,13 +24,11 @@ require(
 	[
 		'jquery',
 		'echarts', 
-		'echarts/theme/macarons', 
-		'echarts/chart/radar', 
 		'bootstrap', 
 		'header', 
 		'formvalidate', 
 		'Upload',
-	], function($, ec){
+	], function($, echarts){
 
 //set params input disabled
 
@@ -227,7 +225,7 @@ function getIndicator(keyArr, personArr){
 
 $('#make-chart-btn').on('click', function(){
   
-  var charts = ec.init(document.getElementById('chart-wrap'), 'macarons');
+  var charts = echarts.init(document.getElementById('chart-wrap'));
   
   charts.showLoading({
 
@@ -246,7 +244,7 @@ $('#make-chart-btn').on('click', function(){
 
   var personArr = getPersonObjArr();
 
-  var indicator = getIndicator(keyArr, personArr);
+  //var indicator = getIndicator(keyArr, personArr);
 
   var option = {
     title : {
@@ -284,7 +282,7 @@ $('#make-chart-btn').on('click', function(){
     },
     polar : [
        {
-           indicator : indicator
+           indicator : getIndicator(keyArr, personArr)
         }
     ],
     calculable : true,

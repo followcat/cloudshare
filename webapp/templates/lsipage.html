@@ -41,6 +41,7 @@
     <button class='btn btn-default btn-xs' id='vd-position-region'>显示职业分布结果</button>
     <button class='btn btn-default btn-xs' id='vd-capacity-pro'>显示能力分布</button>
     <button class='btn btn-default btn-xs' id='vd-capacity'>显示工作经验分布</button>
+    <button class='btn btn-default btn-xs' id='vd-valuable'>test</button>
     <div id='data-main' style='display: none;'>
       <div id='echarts-wrap'></div>
       <div id='action-msg'></div>
@@ -127,6 +128,5 @@
 {% endblock %}
 
 {% block script%}
-<script src='{{ url_for("static", filename="js/lib/source/echarts.js") }}'></script>
-<script src='{{ url_for("static", filename="js/src/search_result.js") }}'></script>
+<script data-main="{{ url_for('static', filename='js/src/search_result') }}" src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
 {% endblock%}

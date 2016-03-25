@@ -117,9 +117,9 @@ define(['jquery'], function(){
 			objCV.DeleteHr();
 			objCV.DeleteSection();
 			objCV.DeleteLink();
-		  objCV.DeleleLine();
-		  objCV.ConcatTd();
-		  objCV = null;
+			objCV.DeleleLine();
+			objCV.ConcatTd();
+			objCV = null;
 
 			$("#loding-img").remove();
 			$("#cv-box").show();

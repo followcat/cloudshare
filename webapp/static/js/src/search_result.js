@@ -10,7 +10,8 @@ require.config({
         'Upload': 'src/upload',
         'radarcharts': 'src/charts/radarcharts',
         'barcharts': 'src/charts/barcharts',
-        'scatters': "src/charts/scattercharts"
+        'scatters': "src/charts/scattercharts",
+        'colorgrad': 'src/color/colorgrad'
     },
 
     shim: {
@@ -29,12 +30,13 @@ require(
         'radarcharts',
         'barcharts',
         'scatters',
+        'colorgrad',
         'bootstrap',
         'header',
         'formvalidate',
         'Upload'
     ],
-    function($, radarcharts, barcharts, scatterCharts) {
+    function($, radarcharts, barcharts, scattercharts, ColorGrad) {
         //Echarts - visualized data
         function isExist(array, value) {
             for (var i = 0, len = array.length; i < len; i++) {
@@ -363,7 +365,7 @@ require(
                 $('#data-main').css('display', 'block');
 
                 var mdList = GetMdLists();
-                var scatter = scatterCharts('echarts-wrap');
+                var scatter = scattercharts('echarts-wrap');
 
                 $.ajax({
                     url: '/mining/capacity',
@@ -631,4 +633,15 @@ require(
                 });
             }
         });
+
+        //Color Gradient according the score
+        var itemLink = $('.item-link');
+        var colorgrad = ColorGrad();
+        for(var i = 0, len = itemLink.length; i < len; i++){
+            var match = $(itemLink[i]).children('p').text();
+            var matchToNum = parseFloat(match);
+
+            var grad = colorgrad.gradient(parseInt(matchToNum*100));
+            $(itemLink[i]).children('a').css({'color': grad});
+        }
     });

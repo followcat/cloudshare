@@ -54,7 +54,7 @@
       <a href="/show/{{ item[0] }}" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
       <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
       </em>
-      <p>匹配值:{{ item[2].match }}</p>
+      <p style='display: none;'>{{ item[2].match }}</p>
       {% if item[1].enversion %}
       <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>查看英文简历</a>
       {% endif %}

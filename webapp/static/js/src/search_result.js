@@ -639,8 +639,11 @@ require(
         var colorgrad = ColorGrad();
         for(var i = 0, len = itemLink.length; i < len; i++){
             var match = $(itemLink[i]).children('p').text();
-            var matchToNum = parseFloat(match);
+            if (match === ''){
+                break;
+            }
 
+            var matchToNum = parseFloat(match);
             var grad = colorgrad.gradient(parseInt(matchToNum*100));
             $(itemLink[i]).children('a').css({'color': grad});
         }

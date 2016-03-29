@@ -274,7 +274,6 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 			var datas = response.result,
 				colorgrad = ColorGrad();
 			for(var i = 0, len = datas.length; i < len; i++){
-				console.log(datas[i])
 				var fileName = datas[i][0],
 					name = datas[i][1].name,
 					match = datas[i][2].match;

@@ -99,7 +99,6 @@ class LSI(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         lsi = flask.current_app.config['LSI_MODEL']
         doc = flask.request.form['doc']
-        print doc
         result = lsi.probability(doc)
         kv = dict()
         datas = []

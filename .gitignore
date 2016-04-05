@@ -10,3 +10,5 @@ repo/
 default_repo/
 account/
 lsimodel/
+celerybeat-schedule
+similarity.*

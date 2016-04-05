@@ -1,3 +1,4 @@
+import re
 import os
 import pickle
 
@@ -16,7 +17,8 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     once_save_name = 'lsi.once'
 
-    def __init__(self):
+    def __init__(self, topics=100):
+        self.topics = topics
         self.names = []
         self.texts = []
         self.corpus = []
@@ -64,34 +66,43 @@ class LSImodel(object):
         self.lsi = models.LsiModel.load(os.path.join(path, self.model_save_name))
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(path,
                                                              self.corpu_dict_save_name))
-        self.index = similarities.MatrixSimilarity.load(os.path.join(path,
+        self.index = similarities.Similarity.load(os.path.join(path,
                                                         self.matrix_save_name))
 
-    def add(self, documents, minimum=0, maximum=100):
+    def add(self, name, document, minimum=0, maximum=100):
         def elt(s):
             return s
         count_dict = {}
-        for name in documents:
-            self.names.append(name)
-            data = documents[name]
-            seg = filter(lambda x: len(x) > 0, map(elt, jieba.cut(data, cut_all=False)))
-            for word in seg:
-                if word not in count_dict:
-                    count_dict[word] = 1
-                else:
-                    count_dict[word] += 1
+        self.names.append(name)
+        data = re.sub(ur'[\n- /]+' ,' ' , document)
+        seg = filter(lambda x: len(x) > 0, map(elt, jieba.cut(data, cut_all=False)))
+        for word in seg:
+            if word not in count_dict:
+                count_dict[word] = 1
+            else:
+                count_dict[word] += 1
         for word in count_dict:
             if count_dict[word] < minimum or count_dict[word] > maximum:
+                if word not in self.token_once:
+                    self.token_once[word] = 0
                 self.token_once[word] += count_dict[word]
         text = [word for word in seg if word not in self.token_once]
         self.texts.append(text)
-        self.dictionary.add_documents([text])
+        if self.dictionary is None:
+            self.dictionary = corpora.Dictionary(self.texts)
         corpu = self.dictionary.doc2bow(text)
         self.corpus.append(corpu)
-        tfidf = models.TfidfModel([corpu])
+        tfidf = models.TfidfModel(self.corpus)
         corpu_tfidf = tfidf[[corpu]]
-        self.lsi.add_documents(corpu_tfidf)
-        self.index = similarities.MatrixSimilarity(self.lsi[self.corpus])
+        if self.lsi is None:
+            self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
+                            num_topics=self.topics, power_iters=6, extra_samples=300)
+        else:
+            self.lsi.add_documents(corpu_tfidf)
+        if self.index is None:
+            self.index = similarities.Similarity("similarity", [self.lsi[corpu]], self.topics)
+        else:
+            self.index.add_documents([self.lsi[corpu]])
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
@@ -104,10 +115,10 @@ class LSImodel(object):
         self.tfidf = models.TfidfModel(self.corpus)
         self.corpus_tfidf = self.tfidf[self.corpus]
 
-    def set_lsimodel(self, topics=100):
+    def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=topics, power_iters=6, extra_samples=300)
-        self.index = similarities.MatrixSimilarity(self.lsi[self.corpus])
+                                   num_topics=self.topics, power_iters=6, extra_samples=300)
+        self.index = similarities.Similarity("similarity", self.lsi[self.corpus], self.topics)
 
     def silencer(self, minimum=2, maximum=100):
         count_dict = {}

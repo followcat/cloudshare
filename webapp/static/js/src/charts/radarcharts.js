@@ -26,15 +26,15 @@ define(['../js/lib/echarts'], function(echarts) {
     }
 
     //Define RadarChart 
-    RadarChart.prototype.makeRadar = function(jsonData){
+    RadarChart.prototype.makeRadar = function(datas){
         //judge json data type, if string, translate to json object
-        if (typeof jsonData == 'string') {
-            jsonData = JSON.parse(jsonData);
-        } else if (typeof jsonData == 'undefined') {
+        if (typeof datas === 'string') {
+            datas = JSON.parse(datas);
+        } else if (typeof datas === 'undefined') {
             return 'Json data is undefined'
         }
 
-        var option = getOption(jsonData);  //get the radar charts option
+        var option = getOption(datas);  //get the radar charts option
         setCharts(this.charts, option);    //set radar charts
     }
 
@@ -45,60 +45,67 @@ define(['../js/lib/echarts'], function(echarts) {
     }
 
     //Make legend list
-    function getLegendList(jsonData) {
-        var list = [];
+    function getLegendList(datas) {
+        var list = [],
+            values = datas[0]['value'];
 
-        for (var index in jsonData) {
-            list.push(index);
+        for (var i = 0, valuesLen = values.length; i < valuesLen; i++) {
+            if (values[i]['name'] !== ''){ 
+                list.push(values[i]['name']);
+            }else{
+                list.push(values[i]['filename']);
+            }
         }
 
         return list;
     }
 
     //Make indicator list
-    function getIndicator(jsonData) {
+    function getIndicator(datas) {
         var keyArr = [],
             max = 0;
-
-        for (var index in jsonData) {
-            for (var i = 0, len = jsonData[index].length; i < len; i++) {
-                if (keyArr.indexOf(jsonData[index][i]['key']) < 0) {
-                    keyArr.push(jsonData[index][i]['key']);
-                }
-
-                if (jsonData[index][i]['value'] > max) {
-                    max = parseInt(jsonData[index][i]['value']);
+        for (var i = 0, datasLen = datas.length; i < datasLen; i++) {
+            keyArr.push(datas[i]['description']);
+            values = datas[i]['value'];
+            for (var j = values.length - 1; j >= 0; j--) {
+                var match = parseInt(values[j]['match']);
+                if ( match > max ){
+                    max = match;
                 }
             }
         }
 
-        var array = [];
-
-        for (var j = 0, len = keyArr.length; j < len; j++) {
-            var obj = Object();
-
-            obj.text = keyArr[j];
+        var indicatorArr = [];
+        for (var i = 0, keyArrLen = keyArr.length; i < keyArrLen; i++){
+            var obj = new Object();
+            obj.name = keyArr[i];
             obj.max = max;
-            array.push(obj);
+            indicatorArr.push(obj);
             obj = null;
         }
 
-        return array;
+        return indicatorArr;
     }
 
-    function getSeriesData(jsonData) {
-        var list = [];
+    function getSeriesData(datas) {
+        var list = [], 
+            flag = false;
 
-        for (var index in jsonData) {
-            var obj = Object();
-
-            obj.name = index;
+        var valuesLen = datas[0]['value'].length;
+        for (var i = 0; i < valuesLen; i++){
+            var obj = new Object();
             obj.value = [];
 
-            for (var i = 0, len = jsonData[index].length; i < len; i++) {
-                obj.value.push(parseInt(jsonData[index][i]['value']));
+            for ( var j = 0, datasLen = datas.length; j < datasLen; j++){
+                var match = datas[j]['value'][i]['match'];
+                obj.value.push(parseInt(match));
+                if(!obj['name']){
+                    obj['name'] = datas[j]['value'][i]['name'];
+                }else{
+                    continue;
+                }
             }
-
+            
             list.push(obj);
             obj = null;
         }
@@ -106,7 +113,7 @@ define(['../js/lib/echarts'], function(echarts) {
         return list;
     }
 
-    function getOption(jsonData) {
+    function getOption(datas) {
         var option = {
             title: {
                 text: 'Radar'
@@ -116,10 +123,10 @@ define(['../js/lib/echarts'], function(echarts) {
                 position: 'bottom',
             },
             legend: {
-                orient: 'vertical',
+                orient: 'horizontal',
                 x: 'right',
-                y: 'center',
-                data: getLegendList(jsonData)
+                y: 'bottom',
+                data: getLegendList(datas)
             },
             toolbox: {
                 show: true,
@@ -140,12 +147,12 @@ define(['../js/lib/echarts'], function(echarts) {
                 }
             },
             radar: [{
-                indicator: getIndicator(jsonData)
+                indicator: getIndicator(datas)
             }],
             calculable: true,
             series: [{
                 type: 'radar',
-                data: getSeriesData(jsonData)
+                data: getSeriesData(datas)
             }]
         };
 

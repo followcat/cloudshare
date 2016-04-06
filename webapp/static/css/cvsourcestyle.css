@@ -9,7 +9,7 @@
 .wrap-left{
 	width: 68%;
 }
-.tracking-box, .comment-box{
+.tracking-box, .comment-box, .similar-box{
 	width: 100%;
 	height: auto;
 	padding: 0 4px;
@@ -25,8 +25,14 @@
 	-o-box-shadow: 0 0 10px #c2c2c2;
 	box-shadow: 0 0 10px #c2c2c2;
 }
-.comment-box{
+.comment-box, .similar-box{
 	margin-top: 8px;
+}
+#similar-person{
+	padding: 6px;
+}
+#similar-person a{
+	margin-right: 6px;
 }
 .label-box{
 	width: 100%;

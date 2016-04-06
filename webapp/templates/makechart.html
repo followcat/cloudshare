@@ -77,6 +77,5 @@
 {% endblock%}
 
 {% block script %}
-<script src='{{ url_for("static", filename="js/lib/source/echarts.js") }}'></script>
-<script src='{{ url_for("static", filename="js/src/makechart.js") }}'></script>
+<script data-main="{{ url_for('static', filename='js/src/makechart') }}" src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
 {% endblock %}

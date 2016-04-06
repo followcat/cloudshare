@@ -133,6 +133,12 @@
                 {% endfor %}
               </div>
             </div>
+            <div class='similar-box'>
+              <div class='title'>
+                <span>相似人推荐</span>
+              </div>
+              <div id='similar-person'></div>
+            </div>
           </div>
           <div class="wrap-left">
             <div id="cv-box">
@@ -141,7 +147,7 @@
                 <div class="tool-bar">
                   <span class='check-box'><input type='checkbox' id='tranform-check'>切换修改标题状态</span>
                   <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">修改</a>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="edit">导出</a>
+                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">下载简历</a>
                   <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">添加英文简历</a>
                   {% if yaml.enversion %}
                   <a href="/edit/{{ yaml.enversion }}" target='_blank'>查看英文简历</a>

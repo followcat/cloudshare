@@ -31,14 +31,13 @@
 <div class='col-md-6 col-md-offset-3'>
 	<form action='/lsipage' method='GET'>
 		 <textarea class='form-control' name='search_textarea' id='search_textarea' rows='4'>{% if search_textarea %}{{ search_textarea }}{% endif %}</textarea>
-   <button type='submit' class='btn btn-default'>Check</button>
+   <button type='submit' class='btn btn-default'>Match</button>
 	</form>
 </div>
 
 <div class="col-md-10 col-md-offset-1 result-list">
   <div class='tool-bar'>
     <button class='btn btn-default btn-xs' id='vd-position'>显示统计结果</button>
-<!--     <button class='btn btn-default btn-xs' id='vd-position-region'>显示职业分布结果</button> -->
     <button class='btn btn-default btn-xs' id='vd-capacity-pro'>显示能力分布</button>
     <button class='btn btn-default btn-xs' id='vd-capacity'>显示工作经验分布</button>
     <button class='btn btn-default btn-xs' id='vd-valuable'>test</button>

@@ -488,7 +488,7 @@ require(
             if ($('#data-main').css('display') === 'none') {
                 $('#data-main').css('display', 'block');
 
-                var scatter = scatterCharts('echarts-wrap');
+                var scatter = scattercharts('echarts-wrap');
                 var mdList = GetMdLists();
 
                 $.ajax({
@@ -610,25 +610,7 @@ require(
                         'search_textarea': $('#search_textarea').text()
                     },
                     success: function(response) {
-                        var data = response.result;
-                        var jsonObj = Object();
-                        for (var i = 0, len = data.length; i < len; i++) {
-                            var keyword = data[i][0];
-                            for (var j = 0; j < data[i][1].length; j++) {
-                                var obj = Object();
-                                obj.key = keyword;
-                                obj.value = data[i][1][j][1];
-
-                                if (typeof jsonObj[data[i][1][j][0]] == "undefined") {
-                                    jsonObj[data[i][1][j][0]] = Array();
-                                    jsonObj[data[i][1][j][0]].push(obj);
-                                } else {
-                                    jsonObj[data[i][1][j][0]].push(obj);
-                                }
-                                obj = null;
-                            }
-                        }
-                        radar.makeRadar(jsonObj);
+                        radar.makeRadar(response.data);
                     }
                 });
             }

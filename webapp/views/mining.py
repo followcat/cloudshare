@@ -120,4 +120,19 @@ class Valuable(flask.views.MethodView):
         lsi = flask.current_app.config['LSI_MODEL']
         doc = flask.request.args['search_textarea']
         result = core.mining.valuable.rate(lsi, doc)
-        return flask.jsonify(result=result)
+        repo = flask.current_app.config['DATA_DB']
+        response = dict()
+        datas = []
+        for index in result:
+            item = dict()
+            item['description'] = index[0]
+            values = []
+            for match_item in index[1]:
+                name = match_item[0]
+                yaml_data = utils.builtin.load_yaml(repo.repo.path, name + '.yaml')
+                yaml_data['match'] = match_item[1]
+                values.append(yaml_data)
+            item['value'] = values
+            datas.append(item)
+        response['data'] = datas
+        return flask.jsonify(response)

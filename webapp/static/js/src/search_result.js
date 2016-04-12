@@ -597,22 +597,52 @@ require(
             }
         });
 
+
+        function getNameLists(checkboxLists){
+            var nameLists = [];
+            for(var i = 0, len = checkboxLists.length; i < len; i++){
+                if ( $(checkboxLists[i]).is(':checked') ){
+                    nameLists.push($(checkboxLists[i]).next().attr('href').split('/')[2])
+                }else{
+                    continue;
+                }
+            }
+            return nameLists;
+        }
+
         $('#vd-valuable').on('click', function() {
             if ($('#data-main').css('display') === 'none') {
                 $('#data-main').css('display', 'block');
 
+                var checkboxLists = $('.checkbox-name');           
+                var nameLists = getNameLists(checkboxLists);
                 var radar = radarcharts('echarts-wrap');
-
-                $.ajax({
-                    url: '/analysis/valuable',
-                    type: 'get',
-                    data: {
-                        'search_textarea': $('#search_textarea').text()
-                    },
-                    success: function(response) {
-                        radar.makeRadar(response.data);
-                    }
-                });
+                if( nameLists.length > 0){
+                    $.ajax({
+                        url: '/analysis/valuable',
+                        type: 'post',
+                        data: {
+                            'search_textarea': $('#search_textarea').text(),
+                            'name_list': JSON.stringify(nameLists)
+                        },
+                        success: function(response) {
+                            radar.makeRadar(response.data);
+                        }
+                    });
+                }else{
+                    $.ajax({
+                        url: '/analysis/valuable',
+                        type: 'get',
+                        data: {
+                            'search_textarea': $('#search_textarea').text()
+                        },
+                        success: function(response) {
+                            radar.makeRadar(response.data);
+                        }
+                    });
+                }                
+            }else{
+                $('#data-main').css('display', 'none');
             }
         });
 

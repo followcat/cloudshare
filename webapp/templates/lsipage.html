@@ -40,7 +40,7 @@
     <button class='btn btn-default btn-xs' id='vd-position'>显示统计结果</button>
     <button class='btn btn-default btn-xs' id='vd-capacity-pro'>显示能力分布</button>
     <button class='btn btn-default btn-xs' id='vd-capacity'>显示工作经验分布</button>
-    <button class='btn btn-default btn-xs' id='vd-valuable'>test</button>
+    <button class='btn btn-default btn-xs' id='vd-valuable'>雷达图</button>
     <div id='data-main' style='display: none;'>
       <div id='echarts-wrap'></div>
       <div id='action-msg'></div>
@@ -50,6 +50,7 @@
   {% for item in result %}
   <div class="result-list-item">
     <div class="item-link">
+      <input type='checkbox' class='checkbox-name'></input>
       <a href="/show/{{ item[0] }}" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
       <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
       </em>

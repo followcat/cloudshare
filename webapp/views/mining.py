@@ -136,3 +136,26 @@ class Valuable(flask.views.MethodView):
             datas.append(item)
         response['data'] = datas
         return flask.jsonify(response)
+
+    def post(self):
+        lsi = lsi = flask.current_app.config['LSI_MODEL']
+        doc = flask.request.form['search_textarea']
+        name_list = flask.request.form['name_list']
+        name_list = json.loads(name_list)
+        result = core.mining.valuable.rate(lsi, doc, name_list=name_list)
+        repo = flask.current_app.config['DATA_DB']
+        response = dict()
+        datas = []
+        for index in result:
+            item = dict()
+            item['description'] = index[0]
+            values = []
+            for match_item in index[1]:
+                name = match_item[0]
+                yaml_data = utils.builtin.load_yaml(repo.repo.path, name + '.yaml')
+                yaml_data['match'] = match_item[1]
+                values.append(yaml_data)
+            item['value'] = values
+            datas.append(item)
+        response['data'] = datas
+        return flask.jsonify(response)

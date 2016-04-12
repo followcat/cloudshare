@@ -6,9 +6,9 @@ import core.mining.lsimodel
 import core.outputstorage
 
 
-def rate(lsi, doc, top=5):
+def rate(lsi, doc, top=5, name_list=None):
     result = []
-    rating = next(lsi, doc, top)
+    rating = next(lsi, doc, top, name_list)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]
     for text, rate in rating:
@@ -33,16 +33,26 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[-1]['match']))
     return result
 
-def next(lsi, doc, top):
+def next(lsi, doc, top, name_list):
     rating = []
-    data_full = mine(lsi, doc, top)
-    rating.append(('', extract(data_full)))
-    for text in doc.split('\n'):
-        if not text:
-            continue
-        new_doc = doc.replace(text, '')
-        new_data = mine(lsi, new_doc, top)
-        rating.append((text, extract(new_data)))
+    if name_list is None:
+        data_full = mine(lsi, doc, top)
+        rating.append(('', extract(data_full)))
+        for text in doc.split('\n'):
+            if not text:
+                continue
+            new_doc = doc.replace(text, '')
+            new_data = mine(lsi, new_doc, top)
+            rating.append((text, extract(new_data)))
+    else:
+        data_full = checkbox_mine(lsi, doc, name_list)
+        rating.append(('', extract(data_full)))
+        for text in doc.split('\n'):
+            if not text:
+                continue
+            new_doc = doc.replace(text, '')
+            new_data = checkbox_mine(lsi, new_doc, name_list)
+            rating.append((text, extract(new_data)))
     return rating
 
 def mine(lsi, doc, top):
@@ -61,3 +71,22 @@ def mine(lsi, doc, top):
         datas.append([name, yaml_info, info])
     return datas
 
+def checkbox_mine(lsi, doc, lists):
+    result = lsi.probability(doc)
+    kv = dict()
+    datas = []
+    for e in lists:
+        for each in result:
+            kv[each[0]] = str(each[1])
+            name = core.outputstorage.ConvertName(lsi.names[each[0]])
+            if ( name == e ):
+                yaml_info = utils.builtin.load_yaml('repo', name.yaml)
+                info = {
+                    'author': yaml_info['committer'],
+                    'time': utils.builtin.strftime(yaml_info['date']),
+                    'match': str(each[1])
+                }
+                datas.append([name, yaml_info, info])
+            else:
+                continue
+    return datas

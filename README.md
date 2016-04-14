@@ -12,6 +12,7 @@ share，edit your doc，pdf，md and so on...
     emaildata==0.3.2
     jieba==0.38
     gensim==0.12.3
+    APScheduler==3.0.6
     Theano==0.7.0(choosable)
     Pattern==2.6(choosable)
 

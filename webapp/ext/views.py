@@ -1,8 +1,8 @@
 import flask.ext.login
 
-import webapp.core.views
-import webapp.core.mining
-import webapp.core.account
+import webapp.views.views
+import webapp.views.mining
+import webapp.views.account
 
 
 def init_login(app):
@@ -12,7 +12,7 @@ def init_login(app):
 
     @login_manager.user_loader
     def load_user(id):
-        return webapp.core.account.User.get(id, app.config['REPO_ACCOUNT'])
+        return webapp.views.account.User.get(id, app.config['REPO_ACCOUNT'])
 
 
 def configure(app):
@@ -21,145 +21,150 @@ def configure(app):
 
     app.add_url_rule(
         '/gotologin',
-        view_func=webapp.core.views.LoginRedirect.as_view('gotologin'),
+        view_func=webapp.views.views.LoginRedirect.as_view('gotologin'),
         )
 
     app.add_url_rule(
         '/search',
-        view_func=webapp.core.views.Search.as_view('search'),
+        view_func=webapp.views.views.Search.as_view('search'),
         )
 
     app.add_url_rule(
         '/batchupload',
-        view_func=webapp.core.views.BatchUpload.as_view('batchupload'),
+        view_func=webapp.views.views.BatchUpload.as_view('batchupload'),
         )
 
     app.add_url_rule(
         '/batchconfirm',
-        view_func=webapp.core.views.BatchConfirm.as_view('batchconfirm'),
+        view_func=webapp.views.views.BatchConfirm.as_view('batchconfirm'),
         )
 
     app.add_url_rule(
         '/upload',
-        view_func=webapp.core.views.Upload.as_view('upload'),
+        view_func=webapp.views.views.Upload.as_view('upload'),
         )
 
     app.add_url_rule(
         '/uppreview',
-        view_func=webapp.core.views.UploadPreview.as_view('uppreview'),
+        view_func=webapp.views.views.UploadPreview.as_view('uppreview'),
         )
 
     app.add_url_rule(
         '/confirm',
-        view_func=webapp.core.views.Confirm.as_view('confirm'),
+        view_func=webapp.views.views.Confirm.as_view('confirm'),
         )
 
     app.add_url_rule(
         '/confirmenglish',
-        view_func=webapp.core.views.ConfirmEnglish.as_view('confirmenglish'),
+        view_func=webapp.views.views.ConfirmEnglish.as_view('confirmenglish'),
         )
 
     app.add_url_rule(
         '/show/<path:filename>',
-        view_func=webapp.core.views.Show.as_view('show'),
+        view_func=webapp.views.views.Show.as_view('show'),
         )
 
     app.add_url_rule(
         '/mining/position',
-        view_func=webapp.core.mining.Position.as_view('miningposition'),
+        view_func=webapp.views.mining.Position.as_view('miningposition'),
         )
 
     app.add_url_rule(
         '/mining/region',
-        view_func=webapp.core.mining.Region.as_view('miningregion'),
+        view_func=webapp.views.mining.Region.as_view('miningregion'),
         )
 
     app.add_url_rule(
         '/mining/capacity',
-        view_func=webapp.core.mining.Capacity.as_view('miningcapacity'),
+        view_func=webapp.views.mining.Capacity.as_view('miningcapacity'),
         )
 
     app.add_url_rule(
         '/analysis/lsi',
-        view_func=webapp.core.mining.LSI.as_view('lsi'),
+        view_func=webapp.views.mining.LSI.as_view('lsi'),
+        )
+
+    app.add_url_rule(
+        '/analysis/valuable',
+        view_func=webapp.views.mining.Valuable.as_view('valuable'),
         )
 
     app.add_url_rule(
         '/edit/<path:filename>',
-        view_func=webapp.core.views.Edit.as_view('edit'),
+        view_func=webapp.views.views.Edit.as_view('edit'),
         )
 
     app.add_url_rule(
         '/modify/<path:filename>',
-        view_func=webapp.core.views.Modify.as_view('modify'),
+        view_func=webapp.views.views.Modify.as_view('modify'),
         )
 
     app.add_url_rule(
         '/preview',
-        view_func=webapp.core.views.Preview.as_view('preview'),
+        view_func=webapp.views.views.Preview.as_view('preview'),
         )
 
     app.add_url_rule(
         '/updateinfo',
-        view_func=webapp.core.views.UpdateInfo.as_view('updateinfo'),
+        view_func=webapp.views.views.UpdateInfo.as_view('updateinfo'),
         )
 
     app.add_url_rule(
         '/',
-        view_func=webapp.core.views.Index.as_view('index'),
+        view_func=webapp.views.views.Index.as_view('index'),
         )
 
     app.add_url_rule(
         '/login',
-        view_func=webapp.core.views.Login.as_view('login'),
+        view_func=webapp.views.views.Login.as_view('login'),
         )
 
     app.add_url_rule(
         '/login/check',
-        view_func=webapp.core.views.LoginCheck.as_view('logincheck'),
+        view_func=webapp.views.views.LoginCheck.as_view('logincheck'),
         )
 
     app.add_url_rule(
         '/logout',
-        view_func=webapp.core.views.Logout.as_view('logout'),
+        view_func=webapp.views.views.Logout.as_view('logout'),
         )
 
     app.add_url_rule(
         '/userinfo',
-        view_func=webapp.core.views.UserInfo.as_view('userinfo'),
+        view_func=webapp.views.views.UserInfo.as_view('userinfo'),
         )
 
     app.add_url_rule(
         '/adduser',
-        view_func=webapp.core.views.AddUser.as_view('adduser'),
+        view_func=webapp.views.views.AddUser.as_view('adduser'),
         )
 
     app.add_url_rule(
         '/changepassword',
-        view_func=webapp.core.views.ChangePassword.as_view('changepassword'),
+        view_func=webapp.views.views.ChangePassword.as_view('changepassword'),
         )
 
     app.add_url_rule(
         '/urm',
-        view_func=webapp.core.views.Urm.as_view('urm'),
+        view_func=webapp.views.views.Urm.as_view('urm'),
         )
 
     app.add_url_rule(
         '/urmsetting',
-        view_func=webapp.core.views.UrmSetting.as_view('urmsetting'),
+        view_func=webapp.views.views.UrmSetting.as_view('urmsetting'),
         )
 
     app.add_url_rule(
         '/deleteuser',
-        view_func=webapp.core.views.DeleteUser.as_view('deleteuser'),
+        view_func=webapp.views.views.DeleteUser.as_view('deleteuser'),
         )
 
     app.add_url_rule(
         '/lsipage',
-        view_func=webapp.core.mining.LSI.as_view('lsipage'),
+        view_func=webapp.views.mining.LSI.as_view('lsipage'),
         )
 
     app.add_url_rule(
         '/makechart',
-        view_func=webapp.core.views.MakeChart.as_view('makechart'),
+        view_func=webapp.views.views.MakeChart.as_view('makechart'),
         )

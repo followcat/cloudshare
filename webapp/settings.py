@@ -20,6 +20,13 @@ BACKUP_DIRS = [os.path.join(USER_HOME, BACKUP_FOLDER),
 DATA_DB_NAME = 'repo'
 DATA_DB = repointerface.gitinterface.GitInterface(DATA_DB_NAME)
 
+CO_DB_NAME = 'co_repo'
+CO_DB = repointerface.gitinterface.GitInterface(CO_DB_NAME)
+REPO_CO = webapp.core.company.RepoCompany(CO_DB)
+
+JD_DB_NAME = 'jd_repo'
+JD_DB = repointerface.gitinterface.GitInterface(JD_DB_NAME)
+
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = repointerface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 REPO_ACCOUNT = webapp.views.account.RepoAccount(ACCOUNT_DB)

@@ -5,6 +5,8 @@ import glob
 import jieba
 
 import webapp.views.account
+import webapp.views.company
+import webapp.views.jobdescription
 import core.mining.lsimodel
 import repointerface.gitinterface
 
@@ -22,10 +24,11 @@ DATA_DB = repointerface.gitinterface.GitInterface(DATA_DB_NAME)
 
 CO_DB_NAME = 'co_repo'
 CO_DB = repointerface.gitinterface.GitInterface(CO_DB_NAME)
-REPO_CO = webapp.core.company.RepoCompany(CO_DB)
+REPO_CO = webapp.views.company.RepoCompany(CO_DB)
 
 JD_DB_NAME = 'jd_repo'
 JD_DB = repointerface.gitinterface.GitInterface(JD_DB_NAME)
+REPO_JD = webapp.views.jobdescription.RepoJobDescription(JD_DB)
 
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = repointerface.gitinterface.GitInterface(ACCOUNT_DB_NAME)

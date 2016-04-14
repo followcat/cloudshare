@@ -2,6 +2,7 @@ import os.path
 
 import yaml
 import flask.views
+import flask.ext.login
 
 import webapp.views.exception
 
@@ -29,6 +30,10 @@ class RepoCompany(object):
         ExistsCompany: CompanyA
         >>> repocompany.names()
         ['CompanyA']
+        >>> repocompany.company('CompanyB') # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        NotExistsCompany
         >>> shutil.rmtree(repo_name)
     """
     company_filename = 'company.yaml'

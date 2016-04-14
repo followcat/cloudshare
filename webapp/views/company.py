@@ -105,7 +105,7 @@ class AddCompany(flask.views.MethodView):
         return flask.jsonify(result=result)
 
 
-class CompanyList(flask.views.MethodView):
+class ListCompany(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):

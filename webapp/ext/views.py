@@ -2,7 +2,9 @@ import flask.ext.login
 
 import webapp.views.views
 import webapp.views.mining
+import webapp.views.company
 import webapp.views.account
+import webapp.views.jobdescription
 
 
 def init_login(app):
@@ -167,4 +169,29 @@ def configure(app):
     app.add_url_rule(
         '/makechart',
         view_func=webapp.views.views.MakeChart.as_view('makechart'),
+        )
+
+    app.add_url_rule(
+        '/addcompany',
+        view_func=webapp.views.company.AddCompany.as_view('addcompany'),
+        )
+
+    app.add_url_rule(
+        '/listcompany',
+        view_func=webapp.views.company.ListCompany.as_view('listcompany'),
+        )
+
+    app.add_url_rule(
+        '/companybyname',
+        view_func=webapp.views.company.CompanyByName.as_view('companybyname'),
+        )
+
+    app.add_url_rule(
+        '/addjd',
+        view_func=webapp.views.jobdescription.AddJobDescription.as_view('addjd'),
+        )
+
+    app.add_url_rule(
+        '/modifyjd',
+        view_func=webapp.views.jobdescription.ModifyJobDescription.as_view('modifyjd'),
         )

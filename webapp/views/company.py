@@ -101,7 +101,7 @@ class AddCompany(flask.views.MethodView):
         introduction = flask.request.form['introduction']
         user = flask.ext.login.current_user
         repocompany = flask.current_app.config['REPO_CO']
-        result = repocompany.add(user.id, introduction, name)
+        result = repocompany.add(name, introduction, user.id)
         return flask.jsonify(result=result)
 
 

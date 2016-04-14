@@ -84,3 +84,27 @@ class RepoJobDescription(object):
     def search(self, keyword):
         return self.repo.grep_yaml(keyword)
 
+
+class AddJobDescription(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        co_name = flask.request.form['coname']
+        jd_name = flask.request.form['jdname']
+        description = flask.request.form['description']
+        user = flask.ext.login.current_user
+        repojd = flask.current_app.config['REPO_JD']
+        result = repojd.add(co_name, jd_name, description, user.id)
+        return flask.jsonify(result=result)
+
+
+class ModifyJobDescription(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        id = flask.request.form['id']
+        description = flask.request.form['description']
+        user = flask.ext.login.current_user
+        repojd = flask.current_app.config['REPO_JD']
+        result = repojd.modify(id, description, user.id)
+        return flask.jsonify(result=result)

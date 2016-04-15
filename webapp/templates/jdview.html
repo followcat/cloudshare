@@ -1,0 +1,106 @@
+{% extends "share/layout.html" %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-table.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/jdview.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class='container'>
+  <div class='row'>
+    <div class='col-md-10 col-md-offset-1'>
+      <div class="panel panel-default panel-wrapper">
+        <div class='panel-heading'>Conpany Lists</div>
+        <div id="toolbar" class="btn-group">
+          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addCompanyModal">
+              <i class="glyphicon glyphicon-plus"></i>
+          </button>
+          <button type="button" class="btn btn-default">
+              <i class="glyphicon glyphicon-trash"></i>
+          </button>
+        </div>
+        <table data-toggle="table"  data-url="/listcompany" data-search="true" data-show-refresh="true" data-click-to-select="true" data-toolbar="#toolbar" data-height='500'>
+          <thead>
+            <tr>
+              <th data-field="state" data-checkbox="true"></th>
+              <th>Company Name</th>
+              <th>Company Introduction</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in result %}
+            <tr>
+              <td data-field="state" data-checkbox="true"></td>
+              <td>{{item}}</td>
+              <td></td>
+              <td>
+                <button class='btn btn-primary btn-xs' data-toggle="modal" data-target="#addJobDescriptionModal" data-whatever="{{ item }}">Add JD</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div><!-- panel end -->
+    </div><!-- col-md end -->
+  </div><!-- row end -->
+</div><!-- container end -->
+
+<div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog" aria-labelledby="AddCompany">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="AddCompany">Add Company</h4>
+      </div><!-- modal-header end -->
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="company-name" class="control-label">Conpany Name:</label>
+          <input type="text" class="form-control" id="company-name">
+        </div>
+        <div class="form-group">
+          <label for="introduction" class="control-label">Introduction:</label>
+          <textarea class="form-control" id="introduction"></textarea>
+        </div>
+      </div><!-- modal-body end -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id='save-company'>Save</button>
+      </div><!-- modal-footer end -->
+    </div><!-- modal-content end -->
+  </div><!-- modal-dialog end -->
+</div><!-- Add company modal end -->
+
+<div class="modal fade" id="addJobDescriptionModal" tabindex="-1" role="dialog" aria-labelledby="AddJobDescription">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="AddJobDescription">Add Job Description</h4>
+      </div><!-- modal-header end -->
+      <div class="modal-body" id='jd-madal-body'>
+        <div class="form-group">
+          <label for="jd-company-name" class="control-label">Company Name:</label>
+          <input type='text' class="form-control" id="jd-company-name" disabled="true"></input>
+        </div>
+        <div class="form-group">
+          <label for="job-description-name" class="control-label">Job Description Name:</label>
+          <input type='text' class="form-control" id="job-description-name"></input>
+        </div>
+        <div class="form-group">
+          <label for="job-description" class="control-label">Job Description:</label>
+          <textarea class="form-control" id="job-description" rows='4'></textarea>
+        </div>
+      </div><!-- modal-body end -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id='save-jd'>Save</button>
+      </div><!-- modal-footer end -->
+    </div><!-- modal-content end -->
+  </div><!-- modal-dialog end -->
+</div><!-- Add JD modal end -->
+{% endblock %}
+
+{% block script %}
+<script data-main="{{ url_for('static', filename='js/src/jdview.js') }}" src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
+{% endblock %}

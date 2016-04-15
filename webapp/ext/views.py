@@ -195,3 +195,13 @@ def configure(app):
         '/modifyjd',
         view_func=webapp.views.jobdescription.ModifyJobDescription.as_view('modifyjd'),
         )
+
+    app.add_url_rule(
+        '/searchjd',
+        view_func=webapp.views.jobdescription.SearchJobDescription.as_view('searchjd'),
+        )
+
+    app.add_url_rule(
+        '/listjd',
+        view_func=webapp.views.jobdescription.ListJobDescription.as_view('listjd'),
+        )

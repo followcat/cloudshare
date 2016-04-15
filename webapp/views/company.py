@@ -111,7 +111,7 @@ class ListCompany(flask.views.MethodView):
     def get(self):
         repocompany = flask.current_app.config['REPO_CO']
         names = repocompany.names()
-        return flask.render_template('jdview.html', result=names)
+        return flask.render_template('companyview.html', result=names)
 
 
 class CompanyByName(flask.views.MethodView):

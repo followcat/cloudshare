@@ -74,35 +74,16 @@ class Capacity(flask.views.MethodView):
 class LSI(flask.views.MethodView):
 
     def get(self):
-        if 'search_textarea' in flask.request.args:
-            repo = flask.current_app.config['DATA_DB']
-            lsi = flask.current_app.config['LSI_MODEL']
-            doc = flask.request.args['search_textarea']
-            result = lsi.probability(doc)
-            kv = dict()
-            datas = []
-            for each in result[:20]:
-                kv[each[0]] = str(each[1])
-                name = core.outputstorage.ConvertName(lsi.names[each[0]])
-                yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
-                info = {
-                    'author': yaml_info['committer'],
-                    'time': utils.builtin.strftime(yaml_info['date']),
-                    'match': str(each[1])
-                }
-                datas.append([name, yaml_info, info])
-            return flask.render_template('lsipage.html',result=datas, search_textarea=doc)
-        else:
-            return flask.render_template('lsipage.html')
-
-    def post(self):
         repo = flask.current_app.config['DATA_DB']
         lsi = flask.current_app.config['LSI_MODEL']
-        doc = flask.request.form['doc']
+        jd_db = flask.current_app.config['JD_DB']
+        jd_id = flask.request.args['jd_id']
+        jd_yaml = utils.builtin.load_yaml(jd_db.repo.path, jd_id + '.yaml')
+        doc = jd_yaml['description']
         result = lsi.probability(doc)
         kv = dict()
         datas = []
-        for each in result[1:9]:
+        for each in result[:20]:
             kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
             yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
@@ -112,37 +93,23 @@ class LSI(flask.views.MethodView):
                 'match': str(each[1])
             }
             datas.append([name, yaml_info, info])
-        return flask.jsonify(result=datas)        
+        return flask.render_template('lsipage.html',result=datas)
+   
 
 class Valuable(flask.views.MethodView):
 
-    def get(self):
-        lsi = flask.current_app.config['LSI_MODEL']
-        doc = flask.request.args['search_textarea']
-        result = core.mining.valuable.rate(lsi, doc)
-        repo = flask.current_app.config['DATA_DB']
-        response = dict()
-        datas = []
-        for index in result:
-            item = dict()
-            item['description'] = index[0]
-            values = []
-            for match_item in index[1]:
-                name = match_item[0]
-                yaml_data = utils.builtin.load_yaml(repo.repo.path, name + '.yaml')
-                yaml_data['match'] = match_item[1]
-                values.append(yaml_data)
-            item['value'] = values
-            datas.append(item)
-        response['data'] = datas
-        return flask.jsonify(response)
-
     def post(self):
         lsi = lsi = flask.current_app.config['LSI_MODEL']
-        doc = flask.request.form['search_textarea']
+        jd_db = flask.current_app.config['JD_DB']
+        jd_id = flask.request.form['jd_id']
+        jd_yaml = utils.builtin.load_yaml(jd_db.repo.path, jd_id + '.yaml')
+        doc = jd_yaml['description']
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
-        result = core.mining.valuable.rate(lsi, doc, name_list=name_list)
+        if len(name_list) == 0:
+            result = core.mining.valuable.rate(lsi, doc)
+        else:
+            result = core.mining.valuable.rate(lsi, doc, name_list=name_list)
         repo = flask.current_app.config['DATA_DB']
         response = dict()
         datas = []

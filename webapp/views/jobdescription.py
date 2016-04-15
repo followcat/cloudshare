@@ -138,4 +138,4 @@ class ListJobDescription(flask.views.MethodView):
     def get(self):
         repojd = flask.current_app.config['REPO_JD']
         results = repojd.lists()
-        return flask.jsonify(result=results)
+        return flask.render_template('jdview.html', result=results)

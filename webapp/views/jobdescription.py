@@ -1,5 +1,5 @@
 import os.path
-
+import flask
 import yaml
 import uuid
 
@@ -88,7 +88,7 @@ class RepoJobDescription(object):
 class AddJobDescription(flask.views.MethodView):
 
     @flask.ext.login.login_required
-    def get(self):
+    def post(self):
         co_name = flask.request.form['coname']
         jd_name = flask.request.form['jdname']
         description = flask.request.form['description']

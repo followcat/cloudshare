@@ -96,7 +96,7 @@ class RepoCompany(object):
 class AddCompany(flask.views.MethodView):
 
     @flask.ext.login.login_required
-    def get(self):
+    def post(self):
         name = flask.request.form['name']
         introduction = flask.request.form['introduction']
         user = flask.ext.login.current_user
@@ -111,7 +111,7 @@ class ListCompany(flask.views.MethodView):
     def get(self):
         repocompany = flask.current_app.config['REPO_CO']
         names = repocompany.names()
-        return flask.jsonify(result=names)
+        return flask.render_template('jdview.html', result=names)
 
 
 class CompanyByName(flask.views.MethodView):

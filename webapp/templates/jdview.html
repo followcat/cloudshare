@@ -6,11 +6,15 @@
 {% endblock %}
 
 {% block content %}
-<div class='container'>
+<div class='container main-wrapper'>
   <div class='row'>
     <div class='col-md-10 col-md-offset-1'>
-      <div class="panel panel-default panel-wrapper">
-        <div class='panel-heading'>Conpany Lists</div>
+      <ul class="nav nav-tabs">
+        <li role="presentation"><a href="/listcompany">Company</a></li>
+        <li role="presentation" class="active"><a href="/listjd">Job Description</a></li>
+      </ul>
+      <div class="panel panel-default">
+<!--         <div class='panel-heading'>Company Lists</div> -->
         <div id="toolbar" class="btn-group">
           <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addCompanyModal">
               <i class="glyphicon glyphicon-plus"></i>
@@ -24,18 +28,20 @@
             <tr>
               <th data-field="state" data-checkbox="true"></th>
               <th>Company Name</th>
-              <th>Company Introduction</th>
-              <th>Action</th>
+              <th>JD Item Name</th>
+              <th>Job Description</th>
+              <th>Aciton</th>
             </tr>
           </thead>
           <tbody>
             {% for item in result %}
             <tr>
               <td data-field="state" data-checkbox="true"></td>
-              <td>{{item}}</td>
-              <td></td>
+              <td>{{ item.company }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.description }}</td>
               <td>
-                <button class='btn btn-primary btn-xs' data-toggle="modal" data-target="#addJobDescriptionModal" data-whatever="{{ item }}">Add JD</button>
+                <a class='btn btn-primary btn-xs' id='match' href='/lsipage?jd_id={{ item.id }}' target='_blank'>Match</a>
               </td>
             </tr>
             {% endfor %}

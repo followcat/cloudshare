@@ -617,30 +617,20 @@ require(
                 var checkboxLists = $('.checkbox-name');           
                 var nameLists = getNameLists(checkboxLists);
                 var radar = radarcharts('echarts-wrap');
-                if( nameLists.length > 0){
-                    $.ajax({
-                        url: '/analysis/valuable',
-                        type: 'post',
-                        data: {
-                            'search_textarea': $('#search_textarea').text(),
-                            'name_list': JSON.stringify(nameLists)
-                        },
-                        success: function(response) {
-                            radar.makeRadar(response.data);
-                        }
-                    });
-                }else{
-                    $.ajax({
-                        url: '/analysis/valuable',
-                        type: 'get',
-                        data: {
-                            'search_textarea': $('#search_textarea').text()
-                        },
-                        success: function(response) {
-                            radar.makeRadar(response.data);
-                        }
-                    });
-                }                
+
+                var jd_id = window.location.href.split('=')[1];
+
+                $.ajax({
+                    url: '/analysis/valuable',
+                    type: 'post',
+                    data: {
+                        'jd_id': jd_id,
+                        'name_list': JSON.stringify(nameLists)
+                    },
+                    success: function(response) {
+                        radar.makeRadar(response.data);
+                    }
+                });            
             }else{
                 $('#data-main').css('display', 'none');
             }

@@ -1,8 +1,12 @@
+import glob
+import uuid
 import os.path
 
 import yaml
-import uuid
+import flask.views
+import flask.ext.login
 
+import utils.builtin
 import webapp.views.exception
 
 
@@ -34,7 +38,9 @@ class RepoJobDescription(object):
         >>> data = utils.builtin.load_yaml(repojd.repo.repo.path, results[0])
         >>> data['description']
         'JD-B description'
-
+        >>> lists = repojd.lists()
+        >>> lists[0]['company'], lists[0]['description']
+        ('CompanyA', 'JD-B description')
         >>> shutil.rmtree(jd_repo_name)
         >>> shutil.rmtree(co_repo_name)
     """
@@ -68,9 +74,7 @@ class RepoJobDescription(object):
 
     def modify(self, hex_id, description, committer):
         filename = self.filename(hex_id)
-        data = None
-        with open(os.path.join(self.repo.repo.path, filename), 'r') as f:
-            data = yaml.load(f.read())
+        data = utils.builtin.load_yaml(self.repo.repo.path, filename)
         data['description'] = description
         dump_data = yaml.dump(data)
         self.repo.modify_file(filename, dump_data,
@@ -83,6 +87,14 @@ class RepoJobDescription(object):
 
     def search(self, keyword):
         return self.repo.grep_yaml(keyword)
+
+    def lists(self):
+        results = []
+        for pathfile in glob.glob(os.path.join(self.repo.repo.path, '*.yaml')):
+            filename = pathfile.split('/')[-1]
+            data = utils.builtin.load_yaml(self.repo.repo.path, filename)
+            results.append(data)
+        return results
 
 
 class AddJobDescription(flask.views.MethodView):
@@ -108,3 +120,22 @@ class ModifyJobDescription(flask.views.MethodView):
         repojd = flask.current_app.config['REPO_JD']
         result = repojd.modify(id, description, user.id)
         return flask.jsonify(result=result)
+
+
+class SearchJobDescription(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        keyword = flask.request.form['keyword']
+        repojd = flask.current_app.config['REPO_JD']
+        results = repojd.search(keyword)
+        return flask.jsonify(result=results)
+
+
+class ListJobDescription(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        repojd = flask.current_app.config['REPO_JD']
+        results = repojd.lists()
+        return flask.jsonify(result=results)

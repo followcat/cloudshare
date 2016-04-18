@@ -16,19 +16,19 @@
       <div class="panel panel-default">
 <!--         <div class='panel-heading'>Company Lists</div> -->
         <div id="toolbar" class="btn-group">
-          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addCompanyModal">
+          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addJDModal">
               <i class="glyphicon glyphicon-plus"></i>
           </button>
           <button type="button" class="btn btn-default">
               <i class="glyphicon glyphicon-trash"></i>
           </button>
         </div>
-        <table data-toggle="table"  data-url="/listcompany" data-search="true" data-show-refresh="true" data-click-to-select="true" data-toolbar="#toolbar" data-height='500'>
+        <table data-toggle="table"  data-url="/listjd" data-search="true" data-show-refresh="true" data-click-to-select="true" data-toolbar="#toolbar" data-height='500'>
           <thead>
             <tr>
               <th data-field="state" data-checkbox="true"></th>
               <th>Company Name</th>
-              <th>JD Item Name</th>
+              <th>JD Project Name</th>
               <th>Job Description</th>
               <th>Aciton</th>
             </tr>
@@ -52,32 +52,7 @@
   </div><!-- row end -->
 </div><!-- container end -->
 
-<div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog" aria-labelledby="AddCompany">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="AddCompany">Add Company</h4>
-      </div><!-- modal-header end -->
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="company-name" class="control-label">Conpany Name:</label>
-          <input type="text" class="form-control" id="company-name">
-        </div>
-        <div class="form-group">
-          <label for="introduction" class="control-label">Introduction:</label>
-          <textarea class="form-control" id="introduction"></textarea>
-        </div>
-      </div><!-- modal-body end -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id='save-company'>Save</button>
-      </div><!-- modal-footer end -->
-    </div><!-- modal-content end -->
-  </div><!-- modal-dialog end -->
-</div><!-- Add company modal end -->
-
-<div class="modal fade" id="addJobDescriptionModal" tabindex="-1" role="dialog" aria-labelledby="AddJobDescription">
+<div class="modal fade" id="addJDModal" tabindex="-1" role="dialog" aria-labelledby="AddJobDescription">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -86,16 +61,16 @@
       </div><!-- modal-header end -->
       <div class="modal-body" id='jd-madal-body'>
         <div class="form-group">
-          <label for="jd-company-name" class="control-label">Company Name:</label>
-          <input type='text' class="form-control" id="jd-company-name" disabled="true"></input>
+          <label for="company-name" class="control-label">Company Name:</label>
+          <input type="text" class="form-control" id="company-name">
         </div>
         <div class="form-group">
-          <label for="job-description-name" class="control-label">Job Description Name:</label>
-          <input type='text' class="form-control" id="job-description-name"></input>
+          <label for="company-name" class="control-label">Job Description Project Name:</label>
+          <input type="text" class="form-control" id="jd-project-name">
         </div>
         <div class="form-group">
-          <label for="job-description" class="control-label">Job Description:</label>
-          <textarea class="form-control" id="job-description" rows='4'></textarea>
+          <label for="introduction" class="control-label">Job Description:</label>
+          <textarea class="form-control" id="jd" rows='4'></textarea>
         </div>
       </div><!-- modal-body end -->
       <div class="modal-footer">
@@ -104,7 +79,7 @@
       </div><!-- modal-footer end -->
     </div><!-- modal-content end -->
   </div><!-- modal-dialog end -->
-</div><!-- Add JD modal end -->
+</div><!-- Add company modal end -->
 {% endblock %}
 
 {% block script %}

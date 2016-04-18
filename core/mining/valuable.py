@@ -6,7 +6,7 @@ import core.mining.lsimodel
 import core.outputstorage
 
 
-def rate(lsi, doc, top=5, name_list=None):
+def rate(lsi, doc, top=10, selected=5, name_list=None):
     result = []
     rating = next(lsi, doc, top, name_list)
     blank, reference = rating.pop(0)
@@ -18,27 +18,24 @@ def rate(lsi, doc, top=5, name_list=None):
             if n not in high:
                 score.append(0.)
             else:
-                score.append((float(reference[i][2]) - float(rate[high.index(n)][2]))*1000)
-                if score[-1] < 0.:
-                    score[-1] = 0.
-        if numpy.average(score) <= numpy.average([float(r[2]) for r in reference]):
-            continue
+                score.append(float(rate[high.index(n)][2]))
+        precent = [float(each)*100/(max(score)*1.2) for each in score]
+        if name_list is not None:
+            namelist_candidate = []
+            namelist_precent = []
+            namelist_score = []
+            for name in name_list:
+                id = name.split('.')[0]
+                index = candidate.index(id)
+                namelist_candidate.append(candidate[index])
+                namelist_precent.append(precent[index])
+                namelist_score.append(score[index])
+            result.append((text, zip(namelist_candidate,
+                                     namelist_precent, namelist_score)))
         else:
-            precent = [float(each)*100/(max(score)*1.2) for each in score]
-            if name_list is not None:
-                namelist_candidate = []
-                namelist_precent = []
-                namelist_score = []
-                for name in name_list:
-                    id = name.split('.')[0]
-                    index = candidate.index(id)
-                    namelist_candidate.append(candidate[index])
-                    namelist_precent.append(precent[index])
-                    namelist_score.append(score[index])
-                result.append((text, zip(namelist_candidate,
-                                         namelist_precent, namelist_score)))
-            else:
-                result.append((text, zip(candidate, precent, score)))
+            result.append((text, zip(candidate[:selected],
+                                     precent[:selected],
+                                     score[:selected])))
     return result
     
 def extract(datas):

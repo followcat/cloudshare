@@ -23,7 +23,7 @@
       <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
     </a>
     {% block search %}{% endblock %}
-	  <div class="col-xs-offset-8 col-sm-offset-8 col-md-offset-9 profile">
+	  <div class="col-xs-offset-6 col-sm-offset-6 col-md-offset-8 profile">
 	    <span id="name"><span class="glyphicon glyphicon-user"></span> {{ current_user.id }} </span>
 	    <div class="profile-menu">
         <a href="/userinfo">Center</a>
@@ -32,15 +32,16 @@
 	    </div>
 	  </div>
 
-	  <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 upload" data-toggle="modal" >
+	  <div class="col-xs-offset-8 col-sm-offset-8 col-md-offset-9 upload" data-toggle="modal" >
 	  	<span id="tool"><span class="glyphicon glyphicon-upload"></span>Tools</span>
       <div class="upload-menu">
         <a href="#" data-toggle="modal" data-target=".upload-modal">Upload</a>
         <a href="/batchupload" target='_blank'>BatchUpload</a>
-        <a href="/lsipage" target='_blank'>Predictions</a>
       </div>
 	  </div>
-
+    <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 prediction" data-toggle="modal" >
+        <a href="/listjd" target='_blank'>Predictions</a>
+    </div>
 	</header>
 	<!-- upload modal begin-->
 	<div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">

@@ -628,7 +628,7 @@ require(
                         'name_list': JSON.stringify(nameLists)
                     },
                     success: function(response) {
-                        radar.makeRadar(response.data);
+                        radar.makeRadar(response.data, response.max);
                     }
                 });            
             }else{

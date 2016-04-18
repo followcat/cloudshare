@@ -272,11 +272,11 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 		},
 		success: function(response) {
 			var datas = response.result,
-				colorgrad = ColorGrad();
+					colorgrad = ColorGrad();
 			for(var i = 0, len = datas.length; i < len; i++){
 				var fileName = datas[i][0],
-					name = datas[i][1].name,
-					match = datas[i][2].match;
+						name = datas[i][1].name,
+						match = datas[i][2].match;
 
 				colorStyle = colorgrad.gradient(parseInt(match*100));
 				$('#similar-person').append("<a href=\"/show/"+ fileName +"\" style=\"color:"+ colorStyle +"\" target=\"_blank\">" + name + "</a>");

@@ -60,7 +60,12 @@ require(
           'introduction': introduction
         },
         success: function(response){
-          console.log(response)
+          if (response.result){
+            $('#company-madal-body').append("<div class=\"alert alert-success\" role=\"alert\"><strong>Well done!<\/strong>You successfully save this company informations.<\/div>");
+            window.location.reload();
+          }else{
+            $('#company-madal-body').append("<div class=\"alert alert-danger\" role=\"alert\"><strong>Fail!<\/strong>You failed save this company informations.<\/div>");
+          }
         }
       });
     });
@@ -81,9 +86,10 @@ require(
         },
         success: function(response){
           if (response.result){
-            $('#jd-madal-body').append("<div class=\"alert alert-success\" role=\"alert\"><strong>Well done!</strong>You successfully save this job description.<\/div>");
+            $('#jd-madal-body').append("<div class=\"alert alert-success\" role=\"alert\"><strong>Well done!<\/strong>You successfully save this job description.<\/div>");
+            window.location.reload();
           }else{
-            $('#jd-madal-body').append("<div class=\"alert alert-danger\" role=\"alert\"><strong>Fail!</strong>You failed save this job description.<\/div>");
+            $('#jd-madal-body').append("<div class=\"alert alert-danger\" role=\"alert\"><strong>Fail!<\/strong>You failed save this job description.<\/div>");
           }
         }
       });

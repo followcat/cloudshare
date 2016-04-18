@@ -83,6 +83,13 @@ class LSI(flask.views.MethodView):
         result = lsi.probability(doc)
         kv = dict()
         datas = []
+        for each in result:
+            if lsi.names[each[0]] == 'lz182l54.md':
+                print each
+                break
+
+        result[0] = each
+
         for each in result[:20]:
             kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
@@ -125,4 +132,5 @@ class Valuable(flask.views.MethodView):
             item['value'] = values
             datas.append(item)
         response['data'] = datas
+        response['max'] = 100
         return flask.jsonify(response)

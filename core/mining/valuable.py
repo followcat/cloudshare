@@ -24,7 +24,21 @@ def rate(lsi, doc, top=5, name_list=None):
         if numpy.average(score) <= numpy.average([float(r[2]) for r in reference]):
             continue
         else:
-            result.append((text, zip(candidate, score)))
+            precent = [float(each)*100/(max(score)*1.2) for each in score]
+            if name_list is not None:
+                namelist_candidate = []
+                namelist_precent = []
+                namelist_score = []
+                for name in name_list:
+                    id = name.split('.')[0]
+                    index = candidate.index(id)
+                    namelist_candidate.append(candidate[index])
+                    namelist_precent.append(precent[index])
+                    namelist_score.append(score[index])
+                result.append((text, zip(namelist_candidate,
+                                         namelist_precent, namelist_score)))
+            else:
+                result.append((text, zip(candidate, precent, score)))
     return result
     
 def extract(datas):
@@ -33,48 +47,24 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[-1]['match']))
     return result
 
-def next(lsi, doc, top, name_list):
+def next(lsi, doc, top, name_list=None):
     rating = []
-    if name_list is None:
-        data_full = mine(lsi, doc, top)
-        rating.append(('', extract(data_full)))
-        for text in doc.split('\n'):
-            if not text:
-                continue
-            new_doc = doc.replace(text, '')
-            new_data = mine(lsi, new_doc, top)
-            rating.append((text, extract(new_data)))
-    else:
-        data_full = checkbox_mine(lsi, doc, name_list)
-        rating.append(('', extract(data_full)))
-        for text in doc.split('\n'):
-            if not text:
-                continue
-            new_doc = doc.replace(text, '')
-            new_data = checkbox_mine(lsi, new_doc, name_list)
-            rating.append((text, extract(new_data)))
+    data_full = mine(lsi, doc, top, name_list)
+    rating.append(('', extract(data_full)))
+    for text in doc.split('\n'):
+        if not text:
+            continue
+        new_doc = doc.replace(text, '')
+        new_data = mine(lsi, new_doc, top, name_list)
+        rating.append((text, extract(new_data)))
     return rating
 
-def mine(lsi, doc, top):
+def mine(lsi, doc, top, lists=None):
     result = lsi.probability(doc)
     kv = dict()
     datas = []
-    for each in result[:top]:
-        kv[each[0]] = str(each[1])
-        name = core.outputstorage.ConvertName(lsi.names[each[0]])
-        yaml_info = utils.builtin.load_yaml('repo', name.yaml)
-        info = {
-            'author': yaml_info['committer'],
-            'time': utils.builtin.strftime(yaml_info['date']),
-            'match': str(each[1])
-        }
-        datas.append([name, yaml_info, info])
-    return datas
-
-def checkbox_mine(lsi, doc, lists):
-    result = lsi.probability(doc)
-    kv = dict()
-    datas = []
+    if lists is None:
+        lists = []
     for e in lists:
         for each in result:
             kv[each[0]] = str(each[1])
@@ -89,4 +79,14 @@ def checkbox_mine(lsi, doc, lists):
                 datas.append([name, yaml_info, info])
             else:
                 continue
+    for each in result[:top]:
+        kv[each[0]] = str(each[1])
+        name = core.outputstorage.ConvertName(lsi.names[each[0]])
+        yaml_info = utils.builtin.load_yaml('repo', name.yaml)
+        info = {
+            'author': yaml_info['committer'],
+            'time': utils.builtin.strftime(yaml_info['date']),
+            'match': str(each[1])
+        }
+        datas.append([name, yaml_info, info])
     return datas

@@ -1,7 +1,5 @@
 import re
-import time
 import email
-import shutil
 import logging
 import os.path
 import mimetypes
@@ -15,7 +13,6 @@ import utils.builtin
 import utils.unoconverter
 import core.exception
 import core.outputstorage
-import core.uniquesearcher
 import core.information_explorer
 
 
@@ -229,88 +226,3 @@ class FileProcesser():
         filename = os.path.join(self.markdown_path, self.name.md)
         if os.path.isfile(filename):
             os.remove(filename)
-
-    def storage(self, repo, committer=None):
-        """
-            >>> import glob
-            >>> import shutil
-            >>> import os.path
-            >>> import core.converterutils
-            >>> import repointerface.gitinterface
-            >>> basepath = 'core/test_output'
-            >>> repo_name = 'core/test_repo'
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> f2 = open('core/test/cv_2.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', basepath)
-            >>> cv2 = core.converterutils.FileProcesser(f2, 'cv_2.doc', basepath)
-            >>> cv1.storage(interface)
-            True
-            >>> cv2.storage(interface)
-            True
-            >>> md_list = []
-            >>> for position in glob.glob(os.path.join(repo_name, '*.md')):
-            ...     with open(position) as f:
-            ...         md_list.append(f.read())
-            >>> yaml_list = []
-            >>> for position in glob.glob(os.path.join(repo_name, '*.yaml')):
-            ...     with open(position) as f:
-            ...         yaml_list.append(f.read())
-            >>> len(yaml_list)
-            2
-            >>> f1.close()
-            >>> f2.close()
-            >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree(basepath)
-        """
-        if self.result is False:
-            return False
-        path = repo.repo.path
-        unique_checker = core.uniquesearcher.UniqueSearcher(repo)
-        if unique_checker.unique(self.yamlinfo) is False:
-            error = 'Duplicate files: %s' % self.base.base
-            logger.info(error)
-            raise core.exception.DuplicateException(error)
-        shutil.copy(os.path.join(self.markdown_path, self.name.md),
-                    os.path.join(path, self.name.md))
-        self.yamlinfo['committer'] = committer
-        self.yamlinfo['date'] = time.time()
-        utils.builtin.save_yaml(self.yamlinfo, path, self.name.yaml)
-        repo.add_files([self.name.md, self.name.yaml],
-                       committer=committer)
-        logger.info('Finish')
-        return True
-
-    def storage_md(self, repo, committer=None):
-        """
-            >>> import glob
-            >>> import shutil
-            >>> import os.path
-            >>> import core.converterutils
-            >>> import repointerface.gitinterface
-            >>> basepath = 'core/test_output'
-            >>> repo_name = 'core/test_repo'
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
-            >>> cv1.storage_md(interface)
-            True
-            >>> md_files = glob.glob(os.path.join(repo_name, '*.md'))
-            >>> len(md_files)
-            1
-            >>> yaml_files = glob.glob(os.path.join(repo_name, '*.yaml'))
-            >>> len(yaml_files)
-            0
-            >>> f.close()
-            >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree(basepath)
-        """
-        if self.result is False:
-            return False
-        path = repo.repo.path
-        shutil.copy(os.path.join(self.markdown_path, self.name.md),
-                    os.path.join(path, self.name.md))
-        repo.add_files([self.name.md],
-                       committer=committer)
-        logger.info('Finish')
-        return True

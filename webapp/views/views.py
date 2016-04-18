@@ -9,7 +9,7 @@ import flask.ext.login
 
 import utils.builtin
 import tools.batching
-import webapp.views.upload
+import webapp.views.cv
 import core.outputstorage
 import webapp.views.account
 import webapp.views.exception
@@ -71,15 +71,15 @@ class BatchUpload(flask.views.MethodView):
         user = flask.ext.login.current_user
         netword_file = flask.request.files['files']
         filename = netword_file.filename
-        upobj = webapp.views.upload.UploadObject(filename,
+        upobj = webapp.views.cv.CurriculumVitaeObject(filename,
                                                 netword_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
-        if not upobj.storage.yamlinfo['name']:
+        if not upobj.filepro.yamlinfo['name']:
             u_filename = filename.encode('utf-8')
-            upobj.storage.yamlinfo['name'] = tools.batching.name_from_filename(u_filename)
+            upobj.filepro.yamlinfo['name'] = tools.batching.name_from_filename(u_filename)
         flask.session[user.id]['batchupload'][filename] = upobj
         flask.session.modified = True
-        return flask.jsonify(result=upobj.result, name=upobj.storage.yamlinfo['name'])
+        return flask.jsonify(result=upobj.result, name=upobj.filepro.yamlinfo['name'])
 
 
 class BatchConfirm(flask.views.MethodView):
@@ -92,8 +92,8 @@ class BatchConfirm(flask.views.MethodView):
         for filename, upobj in flask.session[user.id]['batchupload'].iteritems():
             if filename in updates:
                 for key, value in updates[filename].iteritems():
-                    if key in upobj.storage.yamlinfo:
-                        upobj.storage.yamlinfo[key] = value
+                    if key in upobj.filepro.yamlinfo:
+                        upobj.filepro.yamlinfo[key] = value
             result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
             results[filename] = result
         flask.session[user.id]['batchupload'] = dict()
@@ -106,7 +106,7 @@ class Upload(flask.views.MethodView):
     def post(self):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
-        upobj = webapp.views.upload.UploadObject(network_file.filename,
+        upobj = webapp.views.cv.CurriculumVitaeObject(network_file.filename,
                                                 network_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
         flask.session[user.id]['upload'] = pickle.dumps(upobj)
@@ -122,9 +122,9 @@ class UploadPreview(flask.views.MethodView):
         upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
         info = {
-            "name": upobj.storage.yamlinfo['name'],
-            "origin": upobj.storage.yamlinfo['origin'],
-            "id": upobj.storage.yamlinfo['id']
+            "name": upobj.filepro.yamlinfo['name'],
+            "origin": upobj.filepro.yamlinfo['origin'],
+            "id": upobj.filepro.yamlinfo['id']
         }
         return flask.render_template('cv.html', markdown=output, info=info)
 
@@ -139,9 +139,9 @@ class Confirm(flask.views.MethodView):
         }
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session[user.id]['upload'])
-        upobj.storage.yamlinfo.update(info)
+        upobj.filepro.yamlinfo.update(info)
         result = upobj.confirm(flask.current_app.config['DATA_DB'], user.id)
-        return flask.jsonify(result=result, filename=upobj.storage.name.md)
+        return flask.jsonify(result=result, filename=upobj.filepro.name.md)
 
 
 class ConfirmEnglish(flask.views.MethodView):

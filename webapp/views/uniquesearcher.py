@@ -8,24 +8,25 @@ class UniqueSearcher(object):
     def __init__(self, repo):
         """
             >>> import shutil
-            >>> import core.converterutils
+            >>> import webapp.views.cv
+            >>> import webapp.views.uniquesearcher
             >>> import repointerface.gitinterface
             >>> repo_name = 'core/test_repo'
             >>> basepath = 'core/test_output'
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', basepath)
-            >>> cv1.convert()
+            >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f1, basepath)
+            >>> cv1.result
             True
-            >>> us = core.uniquesearcher.UniqueSearcher(interface)
-            >>> us.unique(cv1.yamlinfo)
+            >>> us = webapp.views.uniquesearcher.UniqueSearcher(interface)
+            >>> us.unique(cv1.filepro.yamlinfo)
             True
-            >>> cv1.storage(interface)
+            >>> cv1.confirm(interface)
             True
-            >>> us.unique(cv1.yamlinfo)
+            >>> us.unique(cv1.filepro.yamlinfo)
             True
             >>> us.reload()
-            >>> us.unique(cv1.yamlinfo)
+            >>> us.unique(cv1.filepro.yamlinfo)
             False
             >>> cv1.storage(interface)  # doctest: +ELLIPSIS
             Traceback (most recent call last):

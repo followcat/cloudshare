@@ -65,7 +65,11 @@
       <div class="modal-body" id='jd-madal-body'>
         <div class="form-group">
           <label for="company-name" class="control-label">Company Name:</label>
-          <input type="text" class="form-control" id="company-name">
+          <select class="form-control" id="company-name">
+            {% for item in names %}
+            <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+          </select>
         </div>
         <div class="form-group">
           <label for="company-name" class="control-label">Job Description Project Name:</label>

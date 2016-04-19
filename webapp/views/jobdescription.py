@@ -139,3 +139,12 @@ class ListJobDescription(flask.views.MethodView):
         repojd = flask.current_app.config['REPO_JD']
         results = repojd.lists()
         return flask.render_template('jdview.html', result=results)
+
+
+class ResumeToJobDescription(flask.views.MethodView):
+    
+    @flask.ext.login.login_required
+    def get(self, filename):
+        repojd = flask.current_app.config['REPO_JD']
+        results = repojd.lists()
+        return flask.render_template('jdview.html', result=results, filename=filename)

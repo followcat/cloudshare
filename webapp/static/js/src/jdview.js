@@ -8,7 +8,8 @@ require.config({
     'bootstraptable': 'lib/bootstrap-table.min',
     'header': 'src/header',
     'formvalidate': 'src/formvalidate',
-    'Upload': 'src/upload'
+    'Upload': 'src/upload',
+    'radarcharts': 'src/charts/radarcharts'
   },
 
   shim: {
@@ -27,13 +28,14 @@ require.config({
 require(
   [
     'jquery',
+    'radarcharts',
     'bootstrap',
     'bootstraptable',
     'header',
     'formvalidate',
     'Upload'
   ],
-  function($){
+  function($, radarcharts){
     $('#match').on('click', function(e){
       e.stopPropagation();
     });
@@ -61,6 +63,39 @@ require(
           }
         }
       });
+    });
+
+    $('.cv-jd-match').on('click', function(){
+      $('#chart-wrapper').html('');
+      var That = $(this);
+
+      //闭包传递this对象
+      (function(That){
+        setTimeout(function(){
+
+          var radar = radarcharts('chart-wrapper'),
+              jd_id = That.prev().attr('href').split('=')[1],
+              title = That.attr('title');
+
+          var name_list = [];
+          name_list.push(title);
+
+          $.ajax({
+              url: '/analysis/valuable',
+              type: 'post',
+              data: {
+                  'jd_id': jd_id,
+                  'name_list': JSON.stringify(name_list)
+              },
+              success: function(response) {
+                  radar.makeRadar(response.data, response.max);
+              }
+          });
+
+        }, 500);
+
+      })(That);
+    
     });
   }
 )

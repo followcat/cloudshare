@@ -134,9 +134,13 @@ define(['../js/lib/echarts'], function(echarts) {
                     }
                 }
             },
-            radar: [{
+            radar: {
                 indicator: getIndicator(datas, max)
-            }],
+            },
+            textStyle: {
+                fontStyle: 'bolder',
+                fontSize: 14
+            },
             calculable: true,
             series: [{
                 type: 'radar',

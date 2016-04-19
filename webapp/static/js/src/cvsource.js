@@ -198,6 +198,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 	function Route() {
 		$("#download").attr('href', '/download/' + filename.split('.')[0] + '.doc');
 		$("#modify").attr('href', '/modify/' + filename);
+		$('#match').attr('href', '/resumetojd/' + filename);
 	}
 	Route();
 

@@ -102,7 +102,7 @@ class LSI(flask.views.MethodView):
         result = lsi.probability(doc)
         kv = dict()
         datas = []
-        for each in result[:8]:
+        for each in result[2:10]:
             kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
             yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)

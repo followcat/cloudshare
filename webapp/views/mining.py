@@ -76,9 +76,9 @@ class LSI(flask.views.MethodView):
     def get(self):
         repo = flask.current_app.config['DATA_DB']
         lsi = flask.current_app.config['LSI_MODEL']
-        jd_db = flask.current_app.config['JD_DB']
+        repo_jd = flask.current_app.config['REPO_JD']
         jd_id = flask.request.args['jd_id']
-        jd_yaml = utils.builtin.load_yaml(jd_db.repo.path, jd_id + '.yaml')
+        jd_yaml = utils.builtin.load_yaml(repo_jd.repo_path, jd_id + '.yaml')
         doc = jd_yaml['description']
         result = lsi.probability(doc)
         kv = dict()
@@ -99,10 +99,10 @@ class LSI(flask.views.MethodView):
 class Valuable(flask.views.MethodView):
 
     def post(self):
-        lsi = lsi = flask.current_app.config['LSI_MODEL']
-        jd_db = flask.current_app.config['JD_DB']
-        jd_id = flask.request.form['jd_id']
-        jd_yaml = utils.builtin.load_yaml(jd_db.repo.path, jd_id + '.yaml')
+        lsi = flask.current_app.config['LSI_MODEL']
+        repo_jd = flask.current_app.config['REPO_JD']
+        jd_id = flask.request.args['jd_id']
+        jd_yaml = utils.builtin.load_yaml(repo_jd.repo_path, jd_id + '.yaml')
         doc = jd_yaml['description']
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)

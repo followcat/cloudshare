@@ -1,6 +1,9 @@
 body{
   background-color: #F8F8FF;
 }
+a{
+  text-decoration: none;
+}
 .header-box{
   position: relative;
   width: 100%;
@@ -37,6 +40,20 @@ body{
   font-weight: bold;
   z-index: 2;
 }
+.prediction{
+  position:absolute;
+  width: 100px;
+  line-height: 50px;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 2;
+}
+.prediction a{
+  display: block;
+  color: #fff;
+}
 @media (max-width: 768px){
   .search-item{
     width: 240px;
@@ -66,7 +83,7 @@ body{
   line-height: 50px;
   color: #fcfcfc;
 }
-.profile-menu a:hover, .upload-menu a:hover{
+.profile-menu a:hover, .upload-menu a:hover, .prediction a:hover{
   text-decoration: none;
   background-color: #003D79;
 }

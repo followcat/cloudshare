@@ -205,3 +205,9 @@ def configure(app):
         '/listjd',
         view_func=webapp.views.jobdescription.ListJobDescription.as_view('listjd'),
         )
+
+    app.add_url_rule(
+        '/resumetojd/<path:filename>',
+        view_func=webapp.views.jobdescription.ResumeToJobDescription.as_view('resumetojd'),
+        )
+

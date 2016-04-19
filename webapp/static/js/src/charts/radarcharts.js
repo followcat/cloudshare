@@ -26,7 +26,7 @@ define(['../js/lib/echarts'], function(echarts) {
     }
 
     //Define RadarChart 
-    RadarChart.prototype.makeRadar = function(datas){
+    RadarChart.prototype.makeRadar = function(datas, max){
         //judge json data type, if string, translate to json object
         if (typeof datas === 'string') {
             datas = JSON.parse(datas);
@@ -34,7 +34,7 @@ define(['../js/lib/echarts'], function(echarts) {
             return 'Json data is undefined'
         }
 
-        var option = getOption(datas);  //get the radar charts option
+        var option = getOption(datas, max);  //get the radar charts option
         setCharts(this.charts, option);    //set radar charts
     }
 
@@ -61,24 +61,12 @@ define(['../js/lib/echarts'], function(echarts) {
     }
 
     //Make indicator list
-    function getIndicator(datas) {
-        var keyArr = [],
-            max = 0;
-        for (var i = 0, datasLen = datas.length; i < datasLen; i++) {
-            keyArr.push(datas[i]['description']);
-            values = datas[i]['value'];
-            for (var j = values.length - 1; j >= 0; j--) {
-                var match = parseInt(values[j]['match']);
-                if ( match > max ){
-                    max = match;
-                }
-            }
-        }
-
+    function getIndicator(datas, max) {
         var indicatorArr = [];
-        for (var i = 0, keyArrLen = keyArr.length; i < keyArrLen; i++){
+
+        for (var i = 0, datasLen = datas.length; i < datasLen; i++){
             var obj = new Object();
-            obj.name = keyArr[i];
+            obj.name = datas[i]['description'];
             obj.max = max;
             indicatorArr.push(obj);
             obj = null;
@@ -113,7 +101,7 @@ define(['../js/lib/echarts'], function(echarts) {
         return list;
     }
 
-    function getOption(datas) {
+    function getOption(datas, max) {
         var option = {
             title: {
                 text: 'Radar'
@@ -146,9 +134,13 @@ define(['../js/lib/echarts'], function(echarts) {
                     }
                 }
             },
-            radar: [{
-                indicator: getIndicator(datas)
-            }],
+            radar: {
+                indicator: getIndicator(datas, max)
+            },
+            textStyle: {
+                fontStyle: 'bolder',
+                fontSize: 14
+            },
             calculable: true,
             series: [{
                 type: 'radar',

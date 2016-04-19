@@ -41,7 +41,10 @@
               <td>{{ item.name }}</td>
               <td>{{ item.description }}</td>
               <td>
-                <a class='btn btn-primary btn-xs' id='match' href='/lsipage?jd_id={{ item.id }}' target='_blank'>Match</a>
+                <a class='btn btn-primary btn-xs match' href='/lsipage?jd_id={{ item.id }}' target='_blank'>Match</a>
+                {% if filename %}
+                  <button type='button' class='btn btn-success btn-xs cv-jd-match' title='{{ filename }}' data-toggle="modal" data-target=".bs-example-modal-lg">OneToOne</button>
+                {% endif %}
               </td>
             </tr>
             {% endfor %}
@@ -62,7 +65,11 @@
       <div class="modal-body" id='jd-madal-body'>
         <div class="form-group">
           <label for="company-name" class="control-label">Company Name:</label>
-          <input type="text" class="form-control" id="company-name">
+          <select class="form-control" id="company-name">
+            {% for item in names %}
+            <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+          </select>
         </div>
         <div class="form-group">
           <label for="company-name" class="control-label">Job Description Project Name:</label>
@@ -80,6 +87,27 @@
     </div><!-- modal-content end -->
   </div><!-- modal-dialog end -->
 </div><!-- Add company modal end -->
+
+{% if filename %}
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Radar Charts</h4>
+      </div>
+      <div class="modal-body">
+        <div id='chart-wrapper'>
+        
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div><!-- Charts modal end -->
+{% endif %}
 {% endblock %}
 
 {% block script %}

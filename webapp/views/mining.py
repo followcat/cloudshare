@@ -94,7 +94,26 @@ class LSI(flask.views.MethodView):
             }
             datas.append([name, yaml_info, info])
         return flask.render_template('lsipage.html',result=datas)
-   
+
+    def post(self):
+        repo = flask.current_app.config['DATA_DB']
+        lsi = flask.current_app.config['LSI_MODEL']
+        doc = flask.request.form['doc']
+        result = lsi.probability(doc)
+        kv = dict()
+        datas = []
+        for each in result[2:10]:
+            kv[each[0]] = str(each[1])
+            name = core.outputstorage.ConvertName(lsi.names[each[0]])
+            yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+            info = {
+                'author': yaml_info['committer'],
+                'time': utils.builtin.strftime(yaml_info['date']),
+                'match': str(each[1])
+            }
+            datas.append([name, yaml_info, info])
+        return flask.jsonify(result=datas)
+
 
 class Valuable(flask.views.MethodView):
 

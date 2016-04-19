@@ -610,15 +610,45 @@ require(
             return nameLists;
         }
 
+        function replaceName(datas){
+            for( var i = 0, datasLen = datas.length; i < datasLen; i++){
+                for ( var j = 0, valuesLen = datas[i]['value'].length; j < valuesLen; j++){
+                    var name = datas[i]['value'][j]['name'];
+                    name = name.split('');
+                    if ( name.length === 2) {
+                        name[1] = '*';
+                    }else if ( name.length === 3 ) {
+                        name[1] = '*';
+                        name[2] = '*';
+                    }else if ( name.length === 4) {
+                        name[1] = '*';
+                        name[2] = '*';
+                        name[3] = '*';
+                    }else if ( name.length > 4){
+                        var temp = name;
+                        for (var z = temp.length - 1; z >= 3; z--) {
+                            temp[z] = ''
+                        }
+                        name = temp;
+                        name[1] = '*';
+                        name[2] = '*';
+                    }
+                    name = name.join('');
+                    datas[i]['value'][j]['name'] = name;
+                }
+            }
+            return datas;
+        }
+
         $('#vd-valuable').on('click', function() {
             if ($('#data-main').css('display') === 'none') {
                 $('#data-main').css('display', 'block');
 
                 var checkboxLists = $('.checkbox-name');           
                 var nameLists = getNameLists(checkboxLists);
-                var radar = radarcharts('echarts-wrap');
 
-                var jd_id = window.location.href.split('=')[1];
+                var radar = radarcharts('echarts-wrap'),
+                    jd_id = window.location.href.split('=')[1];
 
                 $.ajax({
                     url: '/analysis/valuable',
@@ -628,7 +658,13 @@ require(
                         'name_list': JSON.stringify(nameLists)
                     },
                     success: function(response) {
-                        radar.makeRadar(response.data);
+                        var datas;
+                        if ($('#anonymous-checkbox').is(':checked')){
+                            datas = replaceName(response.data);
+                        }else{
+                            datas = response.data;
+                        }
+                        radar.makeRadar(datas, response.max);
                     }
                 });            
             }else{

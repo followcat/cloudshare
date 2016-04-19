@@ -24,6 +24,10 @@
 		 float: left;
 		 width: 16.66%;
 	}
+  .anonymous{
+     display: inline-block;
+     font-weight: bold;
+  }
 </style>
 {% endblock %}
 
@@ -34,6 +38,11 @@
     <button class='btn btn-default btn-xs' id='vd-capacity-pro'>显示能力分布</button>
     <button class='btn btn-default btn-xs' id='vd-capacity'>显示工作经验分布</button>
     <button class='btn btn-default btn-xs' id='vd-valuable'>雷达图</button>
+    <div class="checkbox anonymous">
+      <label>
+        <input type="checkbox" id='anonymous-checkbox'> 匿名
+      </label>
+    </div>
     <div id='data-main' style='display: none;'>
       <div id='echarts-wrap'></div>
       <div id='action-msg'></div>

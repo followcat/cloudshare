@@ -65,6 +65,28 @@ require(
       });
     });
 
+    function replaceName(datas){
+        for( var i = 0, datasLen = datas.length; i < datasLen; i++){
+            for ( var j = 0, valuesLen = datas[i]['value'].length; j < valuesLen; j++){
+                var name = datas[i]['value'][j]['name'];
+                name = name.split('');
+                if ( name.length === 2) {
+                    name[1] = '*';
+                }else if ( name.length === 3 ) {
+                    name[1] = '*';
+                    name[2] = '*';
+                }else if ( name.length === 4) {
+                    name[1] = '*';
+                    name[2] = '*';
+                    name[3] = '*';
+                }
+                name = name.join('');
+                datas[i]['value'][j]['name'] = name;
+            }
+        }
+        return datas;
+    }
+
     $('.cv-jd-match').on('click', function(){
       $('#chart-wrapper').html('');
       var That = $(this);
@@ -88,7 +110,8 @@ require(
                   'name_list': JSON.stringify(name_list)
               },
               success: function(response) {
-                  radar.makeRadar(response.data, response.max);
+                var datas = replaceName(response.data);
+                radar.makeRadar(datas, response.max);
               }
           });
 

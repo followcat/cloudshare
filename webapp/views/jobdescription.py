@@ -18,15 +18,13 @@ class RepoJobDescription(object):
         >>> import webapp.views.jobdescription
         >>> import repointerface.gitinterface
         
-        >>> co_repo_name = 'webapp/views/test_co_repo'
-        >>> co_interface = repointerface.gitinterface.GitInterface(co_repo_name)
-        >>> repocompany = webapp.views.company.RepoCompany(co_interface)
+        >>> repo_name = 'webapp/views/test_repo'
+        >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+        >>> repocompany = webapp.views.company.RepoCompany(interface)
         >>> repocompany.add('CompanyA', 'This is Co.A', 'Dever')
         True
 
-        >>> jd_repo_name = 'webapp/views/test_jd_repo'
-        >>> jd_interface = repointerface.gitinterface.GitInterface(jd_repo_name)
-        >>> repojd = webapp.views.jobdescription.RepoJobDescription(jd_interface, repocompany)
+        >>> repojd = webapp.views.jobdescription.RepoJobDescription(interface, repocompany)
         >>> repojd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
         >>> results = repojd.search('JD-A')
@@ -41,14 +39,17 @@ class RepoJobDescription(object):
         >>> lists = repojd.lists()
         >>> lists[0]['company'], lists[0]['description']
         ('CompanyA', 'JD-B description')
-        >>> shutil.rmtree(jd_repo_name)
-        >>> shutil.rmtree(co_repo_name)
+        >>> shutil.rmtree(repo_name)
     """
+    path = 'JD'
 
     def __init__(self, repo, repo_co):
         self.repo = repo
+        self.repo_path = self.repo.repo.path + "/" + self.path
         self.repo_co = repo_co
         self.info = ""
+        if not os.path.exists(self.repo_path):
+            os.makedirs(self.repo_path)
 
     def add(self, company, name, description, committer):
         try:
@@ -67,17 +68,19 @@ class RepoJobDescription(object):
             'committer': committer
         }
         filename = self.filename(hex_id)
-        with open(os.path.join(self.repo.repo.path, filename), 'w') as f:
+        file_path = os.path.join(self.repo_path, filename)
+        with open(file_path, 'w') as f:
             f.write(yaml.dump(data))
-        self.repo.add_files(filename, "Add job description file: " + filename)
+        self.repo.add_files(os.path.join(self.path, filename),
+                            "Add job description file: " + filename)
         return True
 
     def modify(self, hex_id, description, committer):
         filename = self.filename(hex_id)
-        data = utils.builtin.load_yaml(self.repo.repo.path, filename)
+        data = utils.builtin.load_yaml(self.repo_path, filename)
         data['description'] = description
         dump_data = yaml.dump(data)
-        self.repo.modify_file(filename, dump_data,
+        self.repo.modify_file(os.path.join(self.path, filename), dump_data,
                               message="Modify job description: " + filename,
                               committer=committer)
         return True
@@ -90,9 +93,9 @@ class RepoJobDescription(object):
 
     def lists(self):
         results = []
-        for pathfile in glob.glob(os.path.join(self.repo.repo.path, '*.yaml')):
+        for pathfile in glob.glob(os.path.join(self.repo_path, '*.yaml')):
             filename = pathfile.split('/')[-1]
-            data = utils.builtin.load_yaml(self.repo.repo.path, filename)
+            data = utils.builtin.load_yaml(self.repo_path, filename)
             results.append(data)
         return results
 

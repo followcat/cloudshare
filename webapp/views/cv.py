@@ -12,6 +12,8 @@ import core.converterutils
 
 class CurriculumVitaeObject(object):
 
+    path = 'CV'
+
     def __init__(self, filename, fileobject, path):
         """
             >>> import os

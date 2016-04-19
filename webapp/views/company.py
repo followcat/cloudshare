@@ -1,4 +1,4 @@
-import os.path
+import os
 
 import yaml
 import flask.views
@@ -12,7 +12,7 @@ class RepoCompany(object):
         >>> import shutil
         >>> import webapp.views.company
         >>> import repointerface.gitinterface
-        >>> repo_name = 'webapp/views/test_co_repo'
+        >>> repo_name = 'webapp/views/test_repo'
         >>> interface = repointerface.gitinterface.GitInterface(repo_name)
         >>> repocompany = webapp.views.company.RepoCompany(interface)
         >>> repocompany.COMPANYS
@@ -37,28 +37,32 @@ class RepoCompany(object):
         >>> shutil.rmtree(repo_name)
     """
     company_filename = 'company.yaml'
+    path = 'CO'
 
     def __init__(self, repo):
         self.repo = repo
+        self.repo_path = self.repo.repo.path + "/" + self.path
+        self.file_path = os.path.join(self.repo_path, self.company_filename)
+        if not os.path.exists(self.repo_path):
+            os.makedirs(self.repo_path)
 
     @property
     def COMPANYS(self):
         company_file = self.repo.repo.get_named_file(
-            os.path.join('..', self.company_filename))
+            os.path.join('..', self.path, self.company_filename))
         if company_file is None:
             self.create()
             company_file = self.repo.repo.get_named_file(
-                os.path.join('..', self.company_filename))
+                os.path.join('..', self.path, self.company_filename))
         data = yaml.load(company_file.read())
         company_file.close()
         return data
 
     def create(self):
         empty_list = []
-        with open(os.path.join(self.repo.repo.path, self.company_filename),
-                  'w') as f:
+        with open(self.file_path, 'w') as f:
             f.write(yaml.dump(empty_list))
-        self.repo.add_files(self.company_filename, "Add company file.")
+        self.repo.add_files(self.file_path, "Add company file.")
 
     def add(self, name, introduction, committer):
         companys = self.COMPANYS
@@ -72,8 +76,8 @@ class RepoCompany(object):
         }
         companys.append(data)
         dump_data = yaml.dump(companys)
-        self.repo.modify_file(self.company_filename, dump_data,
-                              message="Add company: " + name,
+        self.repo.modify_file(os.path.join(self.path, self.company_filename),
+                              dump_data, message="Add company: " + name,
                               committer=committer)
         return True
 

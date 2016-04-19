@@ -624,6 +624,14 @@ require(
                         name[1] = '*';
                         name[2] = '*';
                         name[3] = '*';
+                    }else if ( name.length > 4){
+                        var temp = name;
+                        for (var z = temp.length - 1; z >= 3; z--) {
+                            temp[z] = ''
+                        }
+                        name = temp;
+                        name[1] = '*';
+                        name[2] = '*';
                     }
                     name = name.join('');
                     datas[i]['value'][j]['name'] = name;

@@ -120,7 +120,7 @@ class Valuable(flask.views.MethodView):
     def post(self):
         lsi = flask.current_app.config['LSI_MODEL']
         repo_jd = flask.current_app.config['REPO_JD']
-        jd_id = flask.request.args['jd_id']
+        jd_id = flask.request.form['jd_id']
         jd_yaml = utils.builtin.load_yaml(repo_jd.repo_path, jd_id + '.yaml')
         doc = jd_yaml['description']
         name_list = flask.request.form['name_list']

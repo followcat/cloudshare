@@ -20,8 +20,9 @@ def rate(lsi, doc, top=10, selected=5, name_list=None):
             else:
                 score.append(float(reference[i][2]) - float(rate[high.index(n)][2]))
         deepest = min(score)
-        for index in range(len(score)):
-            score[index] += abs(deepest)
+        if deepest < 0:
+            for index in range(len(score)):
+                score[index] += abs(deepest)
         best = max(score)
         if best == 0:
             continue

@@ -18,8 +18,14 @@ def rate(lsi, doc, top=10, selected=5, name_list=None):
             if n not in high:
                 score.append(0.)
             else:
-                score.append(float(rate[high.index(n)][2]))
-        precent = [float(each)*100/(max(score)*1.2) for each in score]
+                score.append(float(reference[i][2]) - float(rate[high.index(n)][2]))
+        deepest = min(score)
+        for index in range(len(score)):
+            score[index] += abs(deepest)
+        best = max(score)
+        if best == 0:
+            continue
+        precent = [(float(each)/(best*1.2))*100 for each in score]
         if name_list is not None:
             namelist_candidate = []
             namelist_precent = []

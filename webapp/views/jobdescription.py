@@ -78,6 +78,8 @@ class RepoJobDescription(object):
     def modify(self, hex_id, description, committer):
         filename = self.filename(hex_id)
         data = utils.builtin.load_yaml(self.repo_path, filename)
+        if data['committer'] is not committer:
+            return False
         data['description'] = description
         dump_data = yaml.dump(data)
         self.repo.modify_file(os.path.join(self.path, filename), dump_data,

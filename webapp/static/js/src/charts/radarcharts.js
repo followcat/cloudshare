@@ -65,8 +65,16 @@ define(['../js/lib/echarts'], function(echarts) {
         var indicatorArr = [];
 
         for (var i = 0, datasLen = datas.length; i < datasLen; i++){
-            var obj = new Object();
-            obj.name = datas[i]['description'];
+            var obj = new Object(),
+                short_jd = '',
+                jdStr = datas[i]['description'];
+            if ( jdStr.length > 16 ) {
+                short_jd = jdStr.slice(0, 17) + '...'
+            } else {
+                short_jd = jdStr;
+            }
+            obj.name = short_jd;
+
             obj.max = max;
             indicatorArr.push(obj);
             obj = null;
@@ -130,7 +138,8 @@ define(['../js/lib/echarts'], function(echarts) {
                         show: true
                     },
                     saveAsImage: {
-                        show: true
+                        show: true,
+                        pixelRatio: 1.5
                     }
                 }
             },

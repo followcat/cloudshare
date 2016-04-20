@@ -150,8 +150,9 @@
   margin-bottom: 40px;
 }
 #echarts-wrap{
-  width: 100%;
-  height:300px;
+  width: 84%;
+  height:500px;
+  margin: 0 auto;
 }
 #action-msg{
   overflow: hidden;

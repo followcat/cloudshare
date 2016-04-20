@@ -104,7 +104,7 @@ require(
         setTimeout(function(){
 
           var radar = radarcharts('chart-wrapper'),
-              jd_id = That.prev().attr('href').split('=')[1],
+              jd_id = That.parent().parent().find('.jd-td').attr('title'),
               title = That.attr('title');
 
           var name_list = [];

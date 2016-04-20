@@ -7,3 +7,10 @@
 #chart-wrapper{
   height: 400px;
 }
+.edit-jd{
+  margin-top: 8px;
+}
+#message{
+  text-align: center;
+  font-size: 1.25em;
+}

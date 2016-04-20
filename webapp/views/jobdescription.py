@@ -118,7 +118,7 @@ class AddJobDescription(flask.views.MethodView):
 class ModifyJobDescription(flask.views.MethodView):
 
     @flask.ext.login.login_required
-    def get(self):
+    def post(self):
         id = flask.request.form['id']
         description = flask.request.form['description']
         user = flask.ext.login.current_user

@@ -128,5 +128,46 @@ require(
       })(That);
     
     });
+
+    //Edit job description Event
+    $('.edit-jd').on('click', function(){
+      if ($(this).parent().prev().text() === $('#name').text().trim()){
+        var jdTd = $(this).parent().parent().find('.jd-td');
+        var id = jdTd.attr('title');
+        $('#change-jd').val(jdTd.text());
+        $('#change-jd').attr('title', id);
+        $('#modifyJDModal').modal('show');
+      }else{
+        $('#message').text('You can\'t change this job description!');
+        $('#messageModal').modal('show');
+      }
+
+    });
+
+    //Change job description button Event
+    $('#change-jd-btn').on('click', function(){
+      $.ajax({
+        url: '/modifyjd',
+        type: 'POST',
+        data: {
+          'id': $('#change-jd').attr('title'),
+          'description': $('#change-jd').val()
+        },
+        success: function(response){
+          if ( response.result ) {
+            $('#modifyJDModal').modal('hide');
+            $('#message').text('Change this job description success!');
+            $('#messageModal').modal('show');
+            $('#messageModal').on('hidden.bs.modal', function (e) {
+              window.location.reload();
+            });
+          }else{
+            $('#modifyJDModal').modal('hide');
+            $('#message').text('Change this job description failed!');
+            $('#messageModal').modal('show');
+          }
+        }
+      })
+    });
   }
 )

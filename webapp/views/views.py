@@ -36,6 +36,8 @@ class Search(flask.views.MethodView):
             for each in result+yaml_result:
                 base, suffix = os.path.splitext(each)
                 name = core.outputstorage.ConvertName(base)
+                if name.startswith('CO/') or name.startswith('JD/'):
+                    continue
                 if name not in names:
                     names.append(name)
                 else:

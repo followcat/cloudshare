@@ -61,10 +61,16 @@ require(
         },
         success: function(response){
           if (response.result){
-            $('#company-madal-body').append("<div class=\"alert alert-success\" role=\"alert\"><strong>Well done!<\/strong>You successfully save this company informations.<\/div>");
-            window.location.reload();
+            $('#addCompanyModal').modal('hide');
+            $('#message').text('Add company informations success!');
+            $('#messageModal').modal('show');
+            $('#messageModal').on('hidden.bs.modal', function (e) {
+              window.location.reload();
+            });
           }else{
-            $('#company-madal-body').append("<div class=\"alert alert-danger\" role=\"alert\"><strong>Fail!<\/strong>You failed save this company informations.<\/div>");
+            $('#modifyJDModal').modal('hide');
+            $('#message').text('Add company informations failed!');
+            $('#messageModal').modal('show');
           }
         }
       });
@@ -86,10 +92,16 @@ require(
         },
         success: function(response){
           if (response.result){
-            $('#jd-madal-body').append("<div class=\"alert alert-success\" role=\"alert\"><strong>Well done!<\/strong>You successfully save this job description.<\/div>");
-            window.location.reload();
+            $('#addJobDescriptionModal').modal('hide');
+            $('#message').text('You successfully save this job description.');
+            $('#messageModal').modal('show');
+            $('#messageModal').on('hidden.bs.modal', function (e) {
+              window.location.reload();
+            });
           }else{
-            $('#jd-madal-body').append("<div class=\"alert alert-danger\" role=\"alert\"><strong>Fail!<\/strong>You failed save this job description.<\/div>");
+            $('#modifyJDModal').modal('hide');
+            $('#message').text('You failed save this job description.');
+            $('#messageModal').modal('show');
           }
         }
       });

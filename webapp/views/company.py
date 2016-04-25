@@ -76,8 +76,9 @@ class RepoCompany(object):
         }
         companys.append(data)
         dump_data = yaml.dump(companys)
+        message = "Add company: " + name
         self.repo.modify_file(os.path.join(self.path, self.company_filename),
-                              dump_data, message="Add company: " + name,
+                              dump_data, message=message.encode('utf-8'),
                               committer=committer)
         return True
 

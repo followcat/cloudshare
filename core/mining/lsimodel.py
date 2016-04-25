@@ -99,10 +99,7 @@ class LSImodel(object):
                             num_topics=self.topics, power_iters=6, extra_samples=300)
         else:
             self.lsi.add_documents(corpu_tfidf)
-        if self.index is None:
-            self.index = similarities.Similarity("similarity", [self.lsi[corpu]], self.topics)
-        else:
-            self.index.add_documents([self.lsi[corpu]])
+        self.index = similarities.Similarity("similarity", self.lsi[self.corpus], self.topics)
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)

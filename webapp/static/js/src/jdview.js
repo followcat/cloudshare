@@ -129,20 +129,29 @@ require(
     
     });
 
-    //Edit job description Event
-    $('.edit-jd').on('click', function(){
-      if ($(this).parent().prev().text() === $('#name').text().trim()){
-        var jdTd = $(this).parent().parent().find('.jd-td');
-        var id = jdTd.attr('title');
-        $('#change-jd').val(jdTd.text());
-        $('#change-jd').attr('title', id);
-        $('#modifyJDModal').modal('show');
-      }else{
-        $('#message').text('You can\'t change this job description!');
-        $('#messageModal').modal('show');
-      }
+    function bindEditJDEvent(){
+      $('.edit-jd').on('click', function(){
+        if ($(this).parent().prev().text() === $('#name').text().trim()){
+          var jdTd = $(this).parent().parent().find('.jd-td');
+          var id = jdTd.attr('title');
+          $('#change-jd').val(jdTd.text());
+          $('#change-jd').attr('title', id);
+          $('#modifyJDModal').modal('show');
+        }else{
+          $('#message').text('You can\'t change this job description!');
+          $('#messageModal').modal('show');
+        }
 
+      });
+    }
+    //Edit job description Event
+    bindEditJDEvent();
+
+    //bootstrap-table search event
+    $('#jd-table').on('search.bs.table', function(e){
+      bindEditJDEvent();
     });
+
 
     //Change job description button Event
     $('#change-jd-btn').on('click', function(){

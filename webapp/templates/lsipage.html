@@ -34,13 +34,13 @@
 {% block content %}
 <div class="col-md-10 col-md-offset-1 result-list">
   <div class='tool-bar'>
-    <button class='btn btn-default btn-xs' id='vd-position'>显示统计结果</button>
-    <button class='btn btn-default btn-xs' id='vd-capacity-pro'>显示能力分布</button>
-    <button class='btn btn-default btn-xs' id='vd-capacity'>显示工作经验分布</button>
-    <button class='btn btn-default btn-xs' id='vd-valuable'>雷达图</button>
+    <button class='btn btn-default btn-xs' id='vd-position'>Show No. of Positions</button>
+    <button class='btn btn-default btn-xs' id='vd-capacity-pro'>Show Competency</button>
+    <button class='btn btn-default btn-xs' id='vd-capacity'>Show Work experience</button>
+    <button class='btn btn-default btn-xs' id='vd-valuable'>Show Radar Chart</button>
     <div class="checkbox anonymous">
       <label>
-        <input type="checkbox" id='anonymous-checkbox'> 匿名
+        <input type="checkbox" id='anonymous-checkbox'>Anonymous
       </label>
     </div>
     <div id='data-main' style='display: none;'>
@@ -58,21 +58,21 @@
       </em>
       <p style='display: none;'>{{ item[2].match }}</p>
       {% if item[1].enversion %}
-      <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>查看英文简历</a>
+      <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>English CV</a>
       {% endif %}
     </div>
     <div class="container-fluid">
       <ul class="list-unstyled info">
-        <li class="name"><strong>姓名: </strong><span>{{ item[1].name }}</span></li>
-        <li class="age"><strong>年龄: </strong><span>{{ item[1].age }}</span></li>
-        <li class="education"><strong>学历: </strong><span>{{ item[1].education }}</span></li>
-        <li class="school"><strong>院校: </strong><span>{{ item[1].school }}</span></li>
-        <li class="position"><strong>职位: </strong><span>{{ item[1].position }}</span></li>
-        <li class="company"><strong>公司: </strong><span>{{ item[1].company }}</span></li>
+        <li class="name"><strong>Name: </strong><span>{{ item[1].name }}</span></li>
+        <li class="age"><strong>Age: </strong><span>{{ item[1].age }}</span></li>
+        <li class="education"><strong>Education: </strong><span>{{ item[1].education }}</span></li>
+        <li class="school"><strong>University: </strong><span>{{ item[1].school }}</span></li>
+        <li class="position"><strong>Position: </strong><span>{{ item[1].position }}</span></li>
+        <li class="company"><strong>Company: </strong><span>{{ item[1].company }}</span></li>
       </ul>
     </div>
     <div class="work-experience">
-      <a href="javascript:;" class='show-more'>展开</a>
+      <a href="javascript:;" class='show-more'>Unfold</a>
         {% for e in item[1].experience %}
           {% if loop.index > 2 %}
             <div class='experience-hide'>
@@ -89,13 +89,13 @@
 <!--           <a href="javascript:;" class='show-more'>+显示更多</a> -->
     </div>
     <div class="label-box">
-      <span class="label-title">标签:</span>
+      <span class="label-title">Tags:</span>
       {% for tags in item[1].tag %}
         <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
       {% endfor %}
     </div>
     <div class="tracking-box">
-      <a href="javascript:;" class="tracking-link"><span>+</span>跟进联系人</a>
+      <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
       <div class="tracking-info">
         <span class="triangle-up"></span>
         <span class="triangle-up-z"></span>
@@ -107,7 +107,7 @@
       </div>
     </div>
     <div class="comment-box">
-      <a href="javascript:;" class="comment-link"><span>+</span>评论</a>
+      <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
       <div class="comment-info">
         <span class="triangle-up"></span>
         <span class="triangle-up-z"></span>

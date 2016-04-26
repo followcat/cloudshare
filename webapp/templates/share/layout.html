@@ -23,25 +23,25 @@
       <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
     </a>
     {% block search %}{% endblock %}
-	  <div class="col-xs-offset-6 col-sm-offset-6 col-md-offset-8 profile">
-	    <span id="name"><span class="glyphicon glyphicon-user"></span> {{ current_user.id }} </span>
-	    <div class="profile-menu">
-        <a href="/userinfo">Center</a>
-        <a href="#" data-toggle="modal" data-target=".setting-modal">Setting</a>
-	      <a href="#" data-toggle="modal" data-target=".quit-modal">Quit</a>
-	    </div>
-	  </div>
-
-	  <div class="col-xs-offset-8 col-sm-offset-8 col-md-offset-9 upload" data-toggle="modal" >
-	  	<span id="tool"><span class="glyphicon glyphicon-upload"></span>Tools</span>
-      <div class="upload-menu">
-        <a href="#" data-toggle="modal" data-target=".upload-modal">Upload</a>
-        <a href="/batchupload" target='_blank'>BatchUpload</a>
-      </div>
-	  </div>
-    <div class="col-xs-offset-10 col-sm-offset-10 col-md-offset-10 prediction" data-toggle="modal" >
-        <a href="/listjd" target='_blank'>Predictions</a>
-    </div>
+    <ul class="nav navbar-nav navbar-right nav-list">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id='name'><span class="glyphicon glyphicon-user"></span>{{ current_user.id }} <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="/userinfo">Individual Center</a></li>
+          <li><a href="#" data-toggle="modal" data-target=".setting-modal">Change Password</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a href="#" data-toggle="modal" data-target=".quit-modal">Quit</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-upload"></span>Tools <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="#" data-toggle="modal" data-target=".upload-modal">Upload</a></li>
+          <li><a href="/batchupload" target='_blank'>Bulk Upload</a></li>
+        </ul>
+      </li>
+      <li><a href="/listjd">Select a JD</a></li>
+    </ul>
 	</header>
 	<!-- upload modal begin-->
 	<div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">

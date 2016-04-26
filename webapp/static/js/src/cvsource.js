@@ -62,10 +62,10 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 		var display = $(".add-label-box").css("display");
 
 		if (display === 'none') {
-			$(this).text("收起");
+			$(this).text("Fold");
 			$(".add-label-box").css("display", "table");
 		} else {
-			$(this).text("添加标签");
+			$(this).text("Add a Tag");
 			$(".add-label-box").css("display", "none");
 		}
 
@@ -116,7 +116,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 						$(".label-item").prepend("<span class='label label-primary' title=" + current_user + ">" + label_text + "</span>");
 						$("#label-text").val("");
 					} else {
-						alert("操作失败");
+						alert("Operation failed");
 					}
 				}
 			});
@@ -259,7 +259,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 				if (response.result) {
 					window.location.reload();
 				} else {
-					alert('提交失败');
+					alert('Failed to submit');
 				}
 			}
 		});

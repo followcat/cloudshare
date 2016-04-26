@@ -3,6 +3,7 @@ import flask
 import flask.ext.session
 import jinja2.ext
 import ext.views
+import os
 
 app = flask.Flask(__name__)
 app.config.from_object('webapp.settings')
@@ -13,3 +14,8 @@ app.secret_key = 'super secret key'
 app.config['SESSION_TYPE'] = 'filesystem'
 sess = flask.ext.session.Session()
 sess.init_app(app)
+
+@app.route("/download/<path:filename>")
+def download(filename):
+    directory = os.path.join(flask.current_app.root_path, '..',app.config['UPLOAD_TEMP'], 'source')
+    return flask.send_from_directory(directory, filename, as_attachment=True)

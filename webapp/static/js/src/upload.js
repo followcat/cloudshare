@@ -88,7 +88,6 @@ define('Upload', function(){
 			}, false);
 
 			xhr.addEventListener("error", function(event){
-				console.log(event);
 				progressmsg.innerHTML = "Error." + Upload.Error;
 			}, false);
 

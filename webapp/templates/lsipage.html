@@ -24,23 +24,25 @@
 		 float: left;
 		 width: 16.66%;
 	}
+  .anonymous{
+     display: inline-block;
+     font-weight: bold;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class='col-md-6 col-md-offset-3'>
-	<form action='/lsipage' method='GET'>
-		 <textarea class='form-control' name='search_textarea' id='search_textarea' rows='4'>{% if search_textarea %}{{ search_textarea }}{% endif %}</textarea>
-   <button type='submit' class='btn btn-default'>Check</button>
-	</form>
-</div>
-
 <div class="col-md-10 col-md-offset-1 result-list">
   <div class='tool-bar'>
     <button class='btn btn-default btn-xs' id='vd-position'>显示统计结果</button>
-    <button class='btn btn-default btn-xs' id='vd-position-region'>显示职业分布结果</button>
     <button class='btn btn-default btn-xs' id='vd-capacity-pro'>显示能力分布</button>
     <button class='btn btn-default btn-xs' id='vd-capacity'>显示工作经验分布</button>
+    <button class='btn btn-default btn-xs' id='vd-valuable'>雷达图</button>
+    <div class="checkbox anonymous">
+      <label>
+        <input type="checkbox" id='anonymous-checkbox'> 匿名
+      </label>
+    </div>
     <div id='data-main' style='display: none;'>
       <div id='echarts-wrap'></div>
       <div id='action-msg'></div>
@@ -50,10 +52,11 @@
   {% for item in result %}
   <div class="result-list-item">
     <div class="item-link">
+      <input type='checkbox' class='checkbox-name'></input>
       <a href="/show/{{ item[0] }}" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
       <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
       </em>
-      <p>匹配值:{{ item[2].match }}</p>
+      <p style='display: none;'>{{ item[2].match }}</p>
       {% if item[1].enversion %}
       <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>查看英文简历</a>
       {% endif %}
@@ -127,6 +130,5 @@
 {% endblock %}
 
 {% block script%}
-<script src='{{ url_for("static", filename="js/lib/source/echarts.js") }}'></script>
-<script src='{{ url_for("static", filename="js/src/search_result.js") }}'></script>
+<script data-main="{{ url_for('static', filename='js/src/search_result') }}" src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
 {% endblock%}

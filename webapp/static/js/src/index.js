@@ -28,7 +28,7 @@ require(['jquery', 'formvalidate', 'marked', 'bootstrap'], function($, formvalid
 		//illegal string
 		if(!formvalidate.ValidateAccount(value))
 		{
-			msg_box.text("illegal account");
+			msg_box.text("Invalid User Name");
 		}
 		else
 		{
@@ -40,7 +40,7 @@ require(['jquery', 'formvalidate', 'marked', 'bootstrap'], function($, formvalid
 		var value = this.value;
 		if(!formvalidate.ValidatePassword(value))
 		{
-			msg_box.text("illegal password. At least 6-12 strings");
+			msg_box.text("Invalid Password (At least 6-12 characters)");
 		}
 		else
 		{

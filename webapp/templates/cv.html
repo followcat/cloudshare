@@ -13,7 +13,7 @@
                   <input type="text" name="name" placeholder="Please Input Name" class="form-control" value="{{ info.name }}" required="required" />
                 </div>
                 <div class="form-group">
-                  <label for="origin">Origin:</label>
+                  <label for="origin">Source:</label>
                   <div class="btn-group">
                     <button type="text" name="origin" class="btn btn-default origin" disabled="true"></button>
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -62,33 +62,33 @@
                     {% endfor %}
                   {% endif %}
                 {% endfor %}
-                <a href="javascript:;" id="add-label">添加标签</a>
+                <a href="javascript:;" id="add-label">Add a Tag</a>
               </div>
               <div class="input-group add-label-box">
-                <input type="text" class="form-control" id="label-text" required="required" placeholder="添加标签" />
+                <input type="text" class="form-control" id="label-text" required="required" placeholder="Add a Tag" />
                 <div class="input-group-btn">
-                  <button type="button" class="btn btn-primary" id="add-label-btn">完成</button>
+                  <button type="button" class="btn btn-primary" id="add-label-btn">Submit</button>
                 </div>               
               </div>
               
             </div>
             <div class="tracking-box">
               <div class="title">
-                <span>跟进情况</span>
+                <span>Follow up</span>
               </div>
               <div class="form-input">
-                <input type="text" class="form-control" placeholder="写下你的跟进情况..." id="tracking-text" required="required" />
+                <input type="text" class="form-control" placeholder="Write down your follow up situation..." id="tracking-text" required="required" />
                 <div class="btn-box">
                   <div class="form-group">
-                    <label for="date" class="col-md-2 control-label" style="padding:4px;">日期</label>
+                    <label for="date" class="col-md-2 control-label" style="padding:4px;">Date</label>
                     <div class="input-group date form_date col-md-9" data-date="" data-date-format="dd MM yyyy" data-link-field="date" data-link-format="yyyy-mm-dd">
                         <input class="form-control" size="16" type="text" value="" readonly>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     </div>
                     <input type="hidden" id="date" value="" />
                   </div>
-                  <a href="javascript:;" class="collapse">收起</a>
-                  <button type="button" class="btn btn-primary" id="tracking-btn">提交</button>
+                  <a href="javascript:;" class="collapse">Fold</a>
+                  <button type="button" class="btn btn-primary" id="tracking-btn">Submit</button>
                 </div>
               </div>
               <div class="tracking-content" id="tracking-content">
@@ -109,13 +109,13 @@
             </div>
             <div class="comment-box">
               <div class="title">
-                <span>评论</span>
+                <span>Comments</span>
               </div>
               <div class="form-input">
-                <input type="text" class="form-control" placeholder="写下你的评论..." id="comment-text" required="required" />
+                <input type="text" class="form-control" placeholder="Write down your comments..." id="comment-text" required="required" />
                 <div class="btn-box">
-                  <a href="javascript:;" class="collapse">收起</a>
-                  <button type="button" class="btn btn-primary" id="comment-btn">提交</button>
+                  <a href="javascript:;" class="collapse">Fold</a>
+                  <button type="button" class="btn btn-primary" id="comment-btn">Submit</button>
                 </div>
               </div>
               <div class="comment-content" id="comment-content">
@@ -135,7 +135,7 @@
             </div>
             <div class='similar-box'>
               <div class='title'>
-                <span>相似人推荐</span>
+                <span>Similar Profiles</span>
               </div>
               <div id='similar-person'></div>
             </div>
@@ -145,21 +145,21 @@
               <div class="cv-box-top clearfix">
                 <span class='cv-box-title'>简历情况：</span>
                 <div class="tool-bar">
-                  <span class='check-box'><input type='checkbox' id='tranform-check'>切换修改标题状态</span>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">修改</a>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">下载简历</a>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">添加英文简历</a>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="match">匹配JD</a>
+                  <span class='check-box'><input type='checkbox' id='tranform-check'>Switch to Modify Title</span>
+                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">Modify</a>
+                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
+                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">Add English CV</a>
+                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="match">Show JD</a>
                   {% if yaml.enversion %}
-                  <a href="/edit/{{ yaml.enversion }}" target='_blank'>查看英文简历</a>
+                  <a href="/edit/{{ yaml.enversion }}" target='_blank'>English CV</a>
                   {% endif %}
                 </div>
                 <table class='table table-bordered table-condensed' id='title-table'>
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>人名</th>
-                      <th>来源</th>
+                      <th>Name</th>
+                      <th>Source</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -170,7 +170,7 @@
                     </tr>
                   </tbody>
                 </table>
-                <button type='button' class='btn btn-primary col-md-2 col-md-offset-5' id='title-submit-btn'>提交</button>
+                <button type='button' class='btn btn-primary col-md-2 col-md-offset-5' id='title-submit-btn'>Submit</button>
               </div>
               <div id="cv-content">
                 <div class="content">

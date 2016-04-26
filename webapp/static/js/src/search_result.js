@@ -588,12 +588,12 @@ require(
 
         $('.show-more').on('click', function() {
             var text = $(this).text();
-            if (text.indexOf('展开') !== -1) {
+            if (text.indexOf('Unfold') !== -1) {
                 $(this).parent().find('.experience-hide').css({'display': 'block'});
-                $(this).text('折叠');
+                $(this).text('Fold');
             } else {
                 $(this).parent().find('.experience-hide').css({'display': 'none'});
-                $(this).text('展开');
+                $(this).text('Unfold');
             }
         });
 

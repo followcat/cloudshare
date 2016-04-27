@@ -119,15 +119,16 @@ class LSImodel(object):
 
     def silencer(self, minimum=2, maximum=100):
         count_dict = {}
+        count_all = 0
         for text in self.texts:
             for word in text:
                 if word not in count_dict:
                     count_dict[word] = 1
                 else:
                     count_dict[word] += 1
-
+                count_all += 1
         for word in count_dict:
-            if count_dict[word] < minimum or count_dict[word] > maximum:
+            if count_dict[word] > count_all*0.2:
                 self.token_once[word] = count_dict[word]
         self.texts = [[word for word in text if word not in self.token_once]
                         for text in self.texts]

@@ -2,7 +2,7 @@ import re
 import os
 import pickle
 
-import jieba
+import jieba.posseg
 
 from gensim import corpora, models, similarities
 
@@ -70,11 +70,9 @@ class LSImodel(object):
                                                         self.matrix_save_name))
 
     def add(self, name, document):
-        def elt(s):
-            return s
         self.names.append(name)
         data = re.sub(ur'[\n- /]+' ,' ' , document)
-        seg = filter(lambda x: len(x) > 0, map(elt, jieba.cut(data, cut_all=False)))
+        seg = [word.word for word in jieba.posseg.cut(data) if word.flag != 'x']
         text = [word for word in seg if word not in self.token_most]
         self.texts.append(text)
         if self.dictionary is None:
@@ -123,7 +121,8 @@ class LSImodel(object):
                         for text in self.texts]
 
     def probability(self, doc):
-        vec_bow = self.dictionary.doc2bow(jieba.cut(doc, cut_all=False))
+        texts = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
+        vec_bow = self.dictionary.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
         sims = sorted(enumerate(self.index[vec_lsi]), key=lambda item: -item[1])
         return sims

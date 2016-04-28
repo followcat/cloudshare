@@ -2,7 +2,7 @@ import os
 import re
 import glob
 
-import jieba
+import jieba.posseg
 
 import webapp.views.account
 import webapp.views.company
@@ -43,8 +43,8 @@ def build_lsimodel(lsimodel, lsipath):
             data = re.sub(ur'[\n- /]+' ,' ' , data)
             path, name = mdfile.split('/')
             names.append(name)
-            seg = filter(lambda x: len(x) > 0, map(elt, jieba.cut(data, cut_all=False)))
-            texts.append(seg)
+            text = [word.word for word in jieba.posseg.cut(data) if word.flag != 'x']
+            texts.append(text)
             count += 1
     if count > 0:
         lsimodel.setup(names, texts)

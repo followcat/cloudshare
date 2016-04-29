@@ -4,6 +4,7 @@ import glob
 
 import jieba.posseg
 
+import webapp.views.cv
 import webapp.views.account
 import webapp.views.company
 import webapp.views.jobdescription
@@ -21,6 +22,7 @@ BACKUP_DIRS = [os.path.join(USER_HOME, BACKUP_FOLDER),
 
 DATA_DB_NAME = 'repo'
 DATA_DB = repointerface.gitinterface.GitInterface(DATA_DB_NAME)
+REPO_CV = webapp.views.cv.RepoCurriculumVitae(DATA_DB)
 
 REPO_CO = webapp.views.company.RepoCompany(DATA_DB)
 REPO_JD = webapp.views.jobdescription.RepoJobDescription(DATA_DB, REPO_CO)

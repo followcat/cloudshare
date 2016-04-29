@@ -51,7 +51,7 @@ position_restr = position_restr[:-1] + ')'
 wc = core.mining.spilter.WordCatcher(position_restr)
 
 
-def position(repo, stream, search_text):
+def position(stream, search_text):
     global wc
     ms = core.mining.spilter.MarkdownStruct(stream)
     key = core.mining.spilter.Info(ms, search_text)

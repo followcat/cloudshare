@@ -28,12 +28,12 @@ class RepoJobDescription(object):
         >>> repojd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
         >>> results = repojd.search('JD-A')
-        >>> data = utils.builtin.load_yaml(repojd.repo.repo.path, results[0])
+        >>> data = utils.builtin.load_yaml(repojd.repo_path, results[0])
         >>> data['description']
         'JD-A description'
         >>> repojd.modify(data['id'], 'JD-B description', 'Dever')
         True
-        >>> data = utils.builtin.load_yaml(repojd.repo.repo.path, results[0])
+        >>> data = utils.builtin.load_yaml(repojd.repo_path, results[0])
         >>> data['description']
         'JD-B description'
         >>> lists = repojd.lists()
@@ -91,7 +91,7 @@ class RepoJobDescription(object):
         return hex_id + '.yaml'
 
     def search(self, keyword):
-        return self.repo.grep_yaml(keyword)
+        return self.repo.grep_yaml(keyword, self.path)
 
     def lists(self):
         results = []

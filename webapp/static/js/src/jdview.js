@@ -95,39 +95,7 @@ require(
         return datas;
     }
 
-    $('.cv-jd-match').on('click', function(){
-      $('#chart-wrapper').html('');
-      var That = $(this);
-
-      //闭包传递this对象
-      (function(That){
-        setTimeout(function(){
-
-          var radar = radarcharts('chart-wrapper'),
-              jd_id = That.parent().parent().find('.jd-td').attr('title'),
-              title = That.attr('title');
-
-          var name_list = [];
-          name_list.push(title);
-
-          $.ajax({
-              url: '/analysis/valuable',
-              type: 'post',
-              data: {
-                  'jd_id': jd_id,
-                  'name_list': JSON.stringify(name_list)
-              },
-              success: function(response) {
-                var datas = replaceName(response.data);
-                radar.makeRadar(datas, response.max);
-              }
-          });
-
-        }, 500);
-
-      })(That);
     
-    });
 
     function bindEditJDEvent(){
       $('.edit-jd').on('click', function(){
@@ -147,9 +115,49 @@ require(
     //Edit job description Event
     bindEditJDEvent();
 
+
+    function bindCVJDEvent(){
+      $('.cv-jd-match').on('click', function(){
+        $('#chart-wrapper').html('');
+        var That = $(this);
+
+        //闭包传递this对象
+        (function(That){
+          setTimeout(function(){
+
+            var radar = radarcharts('chart-wrapper'),
+                jd_id = That.parent().parent().find('.jd-td').attr('title'),
+                title = That.attr('title');
+
+            var name_list = [];
+            name_list.push(title);
+
+            $.ajax({
+                url: '/analysis/valuable',
+                type: 'post',
+                data: {
+                    'jd_id': jd_id,
+                    'name_list': JSON.stringify(name_list)
+                },
+                success: function(response) {
+                  var datas = replaceName(response.data);
+                  radar.makeRadar(datas, response.max);
+                }
+            });
+
+          }, 500);
+
+        })(That);
+      
+      });
+    }
+    //CV JD Match Event
+    bindCVJDEvent();
+
     //bootstrap-table search event
     $('#jd-table').on('search.bs.table', function(e){
       bindEditJDEvent();
+      bindCVJDEvent();
     });
 
 

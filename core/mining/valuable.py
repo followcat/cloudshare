@@ -18,15 +18,9 @@ def rate(lsi, doc, top=10, selected=5, name_list=None):
             if n not in high:
                 score.append(0.)
             else:
-                score.append(float(reference[i][2]) - float(rate[high.index(n)][2]))
-        deepest = min(score)
-        if deepest < 0:
-            for index in range(len(score)):
-                score[index] += abs(deepest)
+                score.append(float(rate[high.index(n)][2]))
         best = max(score)
-        if best == 0:
-            continue
-        precent = [(float(each)/(best*1.2))*100 for each in score]
+        precent = [(float(each))*100 for each in score]
         if name_list is not None:
             namelist_candidate = []
             namelist_precent = []
@@ -53,25 +47,42 @@ def extract(datas):
 
 def next(lsi, doc, top, name_list=None):
     rating = []
-    data_full = mine(lsi, doc, top, name_list)
-    rating.append(('', extract(data_full)))
+    top_data_full = minetop(lsi, doc, top)
+    extract_data_full = extract(top_data_full)
+    if name_list is not None:
+        names_data_full = minelist(lsi, doc, name_list)
+        extract_data_full.extend(extract(names_data_full))
+    else:
+        name_list = []
+        name_list.extend([core.outputstorage.ConvertName(each[1]).md
+                          for each in extract_data_full])
+    rating.append((doc, extract_data_full))
     for text in doc.split('\n'):
         if not text:
             continue
-        new_doc = doc.replace(text, '')
-        new_data = mine(lsi, new_doc, top, name_list)
+        new_data = minelist(lsi, text, name_list)
         rating.append((text, extract(new_data)))
     return rating
 
-def mine(lsi, doc, top, lists=None):
+def minetop(lsi, doc, top):
     result = lsi.probability(doc)
-    kv = dict()
     datas = []
-    if lists is None:
-        lists = []
+    for each in result[:top]:
+        name = core.outputstorage.ConvertName(lsi.names[each[0]])
+        yaml_info = utils.builtin.load_yaml('repo', name.yaml)
+        info = {
+            'author': yaml_info['committer'],
+            'time': utils.builtin.strftime(yaml_info['date']),
+            'match': str(each[1])
+        }
+        datas.append([name, yaml_info, info])
+    return datas
+
+def minelist(lsi, doc, lists):
+    result = lsi.probability(doc)
+    datas = []
     for e in lists:
         for each in result:
-            kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
             if ( name == e ):
                 yaml_info = utils.builtin.load_yaml('repo', name.yaml)
@@ -81,16 +92,4 @@ def mine(lsi, doc, top, lists=None):
                     'match': str(each[1])
                 }
                 datas.append([name, yaml_info, info])
-            else:
-                continue
-    for each in result[:top]:
-        kv[each[0]] = str(each[1])
-        name = core.outputstorage.ConvertName(lsi.names[each[0]])
-        yaml_info = utils.builtin.load_yaml('repo', name.yaml)
-        info = {
-            'author': yaml_info['committer'],
-            'time': utils.builtin.strftime(yaml_info['date']),
-            'match': str(each[1])
-        }
-        datas.append([name, yaml_info, info])
     return datas

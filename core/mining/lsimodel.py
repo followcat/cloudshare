@@ -2,7 +2,7 @@ import re
 import os
 import pickle
 
-import jieba
+import jieba.posseg
 
 from gensim import corpora, models, similarities
 
@@ -15,14 +15,14 @@ class LSImodel(object):
     corpu_dict_save_name = 'lsi.dict'
     corpus_save_name = 'lsi.corpus'
     texts_save_name = 'lsi.texts'
-    once_save_name = 'lsi.once'
+    most_save_name = 'lsi.most'
 
     def __init__(self, topics=100):
         self.topics = topics
         self.names = []
         self.texts = []
         self.corpus = []
-        self.token_once = {}
+        self.token_most = {}
 
         self.lsi = None
         self.index = None
@@ -48,8 +48,8 @@ class LSImodel(object):
             pickle.dump(self.corpus, f)
         with open(os.path.join(path, self.texts_save_name), 'w') as f:
             pickle.dump(self.texts, f)
-        with open(os.path.join(path, self.once_save_name), 'w') as f:
-            pickle.dump(self.token_once, f)
+        with open(os.path.join(path, self.most_save_name), 'w') as f:
+            pickle.dump(self.token_most, f)
         self.lsi.save(os.path.join(path, self.model_save_name))
         self.dictionary.save(os.path.join(path, self.corpu_dict_save_name))
         self.index.save(os.path.join(path, self.matrix_save_name))
@@ -61,32 +61,19 @@ class LSImodel(object):
             self.corpus = pickle.load(f)
         with open(os.path.join(path, self.texts_save_name), 'r') as f:
             self.texts = pickle.load(f)
-        with open(os.path.join(path, self.once_save_name), 'r') as f:
-            self.token_once = pickle.load(f)
+        with open(os.path.join(path, self.most_save_name), 'r') as f:
+            self.token_most = pickle.load(f)
         self.lsi = models.LsiModel.load(os.path.join(path, self.model_save_name))
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(path,
                                                              self.corpu_dict_save_name))
         self.index = similarities.Similarity.load(os.path.join(path,
                                                         self.matrix_save_name))
 
-    def add(self, name, document, minimum=0, maximum=100):
-        def elt(s):
-            return s
-        count_dict = {}
+    def add(self, name, document):
         self.names.append(name)
         data = re.sub(ur'[\n- /]+' ,' ' , document)
-        seg = filter(lambda x: len(x) > 0, map(elt, jieba.cut(data, cut_all=False)))
-        for word in seg:
-            if word not in count_dict:
-                count_dict[word] = 1
-            else:
-                count_dict[word] += 1
-        for word in count_dict:
-            if count_dict[word] < minimum or count_dict[word] > maximum:
-                if word not in self.token_once:
-                    self.token_once[word] = 0
-                self.token_once[word] += count_dict[word]
-        text = [word for word in seg if word not in self.token_once]
+        seg = [word.word for word in jieba.posseg.cut(data) if word.flag != 'x']
+        text = [word for word in seg if word not in self.token_most]
         self.texts.append(text)
         if self.dictionary is None:
             self.dictionary = corpora.Dictionary(self.texts)
@@ -117,23 +104,25 @@ class LSImodel(object):
                                    num_topics=self.topics, power_iters=6, extra_samples=300)
         self.index = similarities.Similarity("similarity", self.lsi[self.corpus], self.topics)
 
-    def silencer(self, minimum=2, maximum=100):
+    def silencer(self):
         count_dict = {}
+        count_all = 0
         for text in self.texts:
             for word in text:
                 if word not in count_dict:
                     count_dict[word] = 1
                 else:
                     count_dict[word] += 1
-
+                count_all += 1
         for word in count_dict:
-            if count_dict[word] < minimum or count_dict[word] > maximum:
-                self.token_once[word] = count_dict[word]
-        self.texts = [[word for word in text if word not in self.token_once]
+            if count_dict[word] > count_all*0.2:
+                self.token_most[word] = count_dict[word]
+        self.texts = [[word for word in text if word not in self.token_most]
                         for text in self.texts]
 
     def probability(self, doc):
-        vec_bow = self.dictionary.doc2bow(jieba.cut(doc, cut_all=False))
+        texts = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
+        vec_bow = self.dictionary.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
         sims = sorted(enumerate(self.index[vec_lsi]), key=lambda item: -item[1])
         return sims

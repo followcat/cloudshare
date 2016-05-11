@@ -156,7 +156,7 @@ class ConfirmEnglish(flask.views.MethodView):
         yaml_data = utils.builtin.load_yaml(repo.repo.path, yaml_name)
         upobj = pickle.loads(flask.session[user.id]['upload'])
         result = upobj.confirm_md(flask.current_app.config['DATA_DB'], user.id)
-        yaml_data['enversion'] = upobj.storage.name.md
+        yaml_data['enversion'] = upobj.filepro.name.md
         repo.modify_file(bytes(yaml_name), yaml.dump(yaml_data), committer=user.id)
         return flask.jsonify(result=result)
 

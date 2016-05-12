@@ -6,7 +6,7 @@ import os.path
 import utils.builtin
 import core.exception
 import core.outputstorage
-import core.uniquesearcher
+import webapp.views.uniquesearcher
 import core.converterutils
 
 
@@ -205,5 +205,4 @@ class CurriculumVitaeObject(object):
                     os.path.join(path, self.filepro.name.md))
         repo.add_files([self.filepro.name.md],
                        committer=committer)
-        return True
-
+        return True 

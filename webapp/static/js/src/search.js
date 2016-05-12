@@ -5,7 +5,8 @@ require.config({
 		bootstrap: 'lib/bootstrap',
 		header: 'src/header',
 		formvalidate: 'src/formvalidate',
-		Upload: 'src/upload'
+		Upload: 'src/upload',
+		Cookies: 'src/cookies'
 	},
 	shim: {
 		bootstrap: {
@@ -15,7 +16,7 @@ require.config({
 	}
 });
 
-require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload'], function($, bootstrap, header, formvalidate, Upload){
+require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'Cookies'], function($, bootstrap, header, formvalidate, Upload, Cookies){
     var item = $('.operate-list-item');
 
     for(var i = 0, len = item.length; i < len; i++){
@@ -31,5 +32,20 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload'], function($,
 
         strMsg = strMsg.replace(strFile, link);
         $(item[i]).find('p').html(strMsg);
+    }
+
+		var cookie = new Cookies();
+    var lists = cookie.readCookie();
+
+    if ( typeof lists === 'undefined' ) {
+      $('#browing-wrap').append('<p>You have no browsing history.</p>');
+    } else {
+      lists.reverse();
+      for (i = 0, len = lists.length; i < len; i++) {
+        if( i === 10 ) {
+          break;
+        }
+        $('#browing-wrap').append("<div class='list-item'><span>"+ lists[i].time +"</span><a href='/show/"+ lists[i].fileName +"'>"+ lists[i].name +"</a></div>");
+      }
     }
 });

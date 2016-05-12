@@ -7,7 +7,8 @@ require.config({
 		datetimepickerCN: 'lib/bootstrap-datetimepicker.zh-CN',
 		cvdeal: 'src/cvdeal',
 		Upload: 'src/upload',
-		colorgrad: 'src/color/colorgrad'
+		colorgrad: 'src/color/colorgrad',
+		Cookies: 'src/cookies'
 	},
 	shim: {
 		bootstrap: {
@@ -30,7 +31,16 @@ require.config({
 });
 
 
-require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 'Upload', 'colorgrad'], function($, bootstrap, datetimepicker, datetimepickerCN, cvdeal, Upload, ColorGrad) {
+require([
+	'jquery',
+	'bootstrap',
+	'datetimepicker',
+	'datetimepickerCN',
+	'cvdeal',
+	'Upload',
+	'colorgrad',
+	'Cookies'
+],function($, bootstrap, datetimepicker, datetimepickerCN, cvdeal, Upload, ColorGrad, Cookies) {
 
 	window.onload = cvdeal.CVdeal();
 
@@ -77,11 +87,11 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 		var filename = arr[arr.length - 1];
 
 		return filename;
-	};
+	}
 
 	function CheckBlank(val) {
 		var reg = /^\s*$/g;
-		if (val == "" || reg.test(val)) {
+		if (val === "" || reg.test(val)) {
 			return true;
 		} else {
 			return false;
@@ -113,7 +123,8 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 				}),
 				success: function(result) {
 					if (result.result) {
-						$(".label-item").prepend("<span class='label label-primary' title=" + current_user + ">" + label_text + "</span>");
+						$(".label-item").prepend("<span class='label label-primary' title=" +
+							current_user + ">" + label_text + "</span>");
 						$("#label-text").val("");
 					} else {
 						alert("Operation failed");
@@ -124,14 +135,14 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 
 	});
 
-	//Add tracking massage 
+	//Add tracking massage
 	$("#tracking-btn").on('click', function() {
 		var filename = GetFileName();
 		var tracking_text = $("#tracking-text").val();
 		var date = $("#date").val();
 		var current_user = $("#current-id").text();
 
-		if (CheckBlank(tracking_text) || date == "") {
+		if (CheckBlank(tracking_text) || date === "") {
 			$(this).attr("disable", false);
 			$("#tracking-text").focus();
 		} else {
@@ -192,9 +203,11 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 
 	});
 
+	//Get current url to get file name
 	var url = window.location.href.split('/');
 	var filename = url[url.length - 1];
 
+	//Add url into the link button
 	function Route() {
 		$("#download").attr('href', '/download/' + filename.split('.')[0] + '.doc');
 		$("#modify").attr('href', '/modify/' + filename);
@@ -265,6 +278,7 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 		});
 	});
 
+	//Get similar person data.
 	$.ajax({
 		url: '/analysis/lsi',
 		type: 'post',
@@ -280,8 +294,16 @@ require(['jquery', 'bootstrap', 'datetimepicker', 'datetimepickerCN', 'cvdeal', 
 						match = datas[i][2].match;
 
 				colorStyle = colorgrad.gradient(parseInt(match*100));
-				$('#similar-person').append("<a href=\"/show/"+ fileName +"\" style=\"color:"+ colorStyle +"\" target=\"_blank\">" + name + "</a>");
+				$('#similar-person').append("<a href=\"/show/"+ fileName +
+					"\" style=\"color:" + colorStyle +
+					"\" target=\"_blank\">" + name + "</a>");
 			}
 		}
 	});
+
+	//Write Cookie
+	var cookie = new Cookies(),
+			name = $('#name').val();
+	cookie.writeCookie(name, filename);
+
 });

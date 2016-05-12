@@ -19,22 +19,31 @@
 	<div class="col-md-6 col-md-offset-3 per-info">
 	  	<div class="per-info-box">
 	  	  <h2>{{ current_user.id }}</h2>
-	  	</div>  	
+	  	</div>
 	</div>
+  <div class="col-md-6 col-md-offset-3 history-info">
+    <div class="history-info-top">
+      <h2 class="history-info-title">Browing History</h2>
+    </div>
+    <div class="history-info-bottom">
+      <div class="list clearfix browing-wrap" id="browing-wrap">
+      </div>
+    </div>
+  </div>
 	<div class="col-md-6 col-md-offset-3 newupdate-box">
 	  <div class="newupdate-box-top">
 	    <h2 class="newupdate-title">New Update</h2>
 	  </div>
 	  <div class="newupdate-box-bottom">
-	  	<div class="operate-list clearfix">
+	  	<div class="list clearfix">
 	  		{% for item in info %}
-	  	  <div class="operate-list-item">
+	  	  <div class="list-item">
 	  	    <span>{{ item.time }}</span>
 	  	    <p>
 	  	    	{{ item.message }}
 	  	    </p>
-	  	    <span class='filename' style='display:none;'>{{ item.name }}</span>
-	  	    <span class='name' style='display:none;'>{{ item.filenames.name }}</span>
+	  	    <span class="filename" style="display:none;">{{ item.name }}</span>
+	  	    <span class="name" style="display:none;">{{ item.filenames.name }}</span>
 	  	  </div>
 	  	  {% endfor %}
 	  	</div>

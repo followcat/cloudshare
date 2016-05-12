@@ -320,6 +320,7 @@ class UserInfo(flask.views.MethodView):
                 except IOError:
                     info['filenames'] = name
                 info['name'] = name
+            info['message'] = info['message'].decode('utf-8')
         return flask.render_template('userinfo.html', info=info_list)
 
 

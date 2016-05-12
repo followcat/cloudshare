@@ -35,8 +35,8 @@ define(['jquery'], function() {
 
     CVDeal.prototype.DeleleLine = function() {
         var pattern = /-{3,}/g;
-        var allElementP = this.cv.find("p"), 
-            allElementTh = this.cv.find("th"), 
+        var allElementP = this.cv.find("p"),
+            allElementTh = this.cv.find("th"),
             allElementTd = this.cv.find("td");
 
         allElementTh.each(function() {
@@ -45,58 +45,58 @@ define(['jquery'], function() {
                 $(this).parent().remove();
             }
         });
-        allElementP.each(function() { 
-            var oP = $(this); 
-            var reg = /^(&nbsp;)(&nbsp;)*(&nbsp;)$/; 
+        allElementP.each(function() {
+            var oP = $(this);
+            var reg = /^(&nbsp;)(&nbsp;)*(&nbsp;)$/;
 
-            if (reg.test(oP.html())) { 
-                oP.remove(); 
-            } 
-            CVDeal.prototype.ParagraphBr(oP, pattern); 
-        }); 
-        allElementTd.each(function() { 
-            CVDeal.prototype.ParagraphBr($(this), pattern); 
+            if (reg.test(oP.html())) {
+                oP.remove();
+            }
+            CVDeal.prototype.ParagraphBr(oP, pattern);
         });
-    }; 
+        allElementTd.each(function() {
+            CVDeal.prototype.ParagraphBr($(this), pattern);
+        });
+    };
 
-    CVDeal.prototype.ParagraphBr = function(obj, pattern) { 
-        var text = obj.text(); 
-        var patternChinese = /[\u4e00-\u9fa5]{15,}/, 
-            patternPbr1 = /；|;/g, 
+    CVDeal.prototype.ParagraphBr = function(obj, pattern) {
+        var text = obj.text();
+        var patternChinese = /[\u4e00-\u9fa5]{15,}/,
+            patternPbr1 = /；|;/g,
             patternPbr2 = /。/g;
 
         if (pattern.test(text)) {
             text = text.replace(pattern, "");
             obj.text(text);
         }
-        if (patternChinese.test(text)) { 
-            text = text.replace(patternPbr1, "；<br />"); 
-            text = text.replace(patternPbr2, "。<br />"); 
+        if (patternChinese.test(text)) {
+            text = text.replace(patternPbr1, "；<br />");
+            text = text.replace(patternPbr2, "。<br />");
             obj.html(text);
-        } 
+        }
     };
 
     CVDeal.prototype.ConcatTd = function() {
-        var allElementTd = this.cv.find("td"); 
-        allElementTd.each(function() { 
-            var This = $(this); 
-            if (This.next().html() == "") { 
-                This.next().remove(); 
-                This.attr("colspan", "2"); 
-            } 
+        var allElementTd = this.cv.find("td");
+        allElementTd.each(function() {
+            var This = $(this);
+            if (This.next().html() === "") { 
+                This.next().remove();
+                This.attr("colspan", "2");
+            }
         });
     };
 
     return {
         CVdeal: function() {
-            var objCV = new CVDeal($("#cv-box")); 
-            objCV.DeleteHr(); 
-            objCV.DeleteSection(); 
-            objCV.DeleteLink(); 
-            objCV.DeleleLine(); 
-            objCV.ConcatTd(); 
-            objCV = null; 
-            $("#loding-img").remove(); 
+            var objCV = new CVDeal($("#cv-box"));
+            objCV.DeleteHr();
+            objCV.DeleteSection();
+            objCV.DeleteLink();
+            objCV.DeleleLine();
+            objCV.ConcatTd();
+            objCV = null;
+            $("#loding-img").remove();
             $("#cv-box").show();
         }
     };

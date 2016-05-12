@@ -53,4 +53,4 @@ require(['jquery', 'formvalidate', 'marked', 'bootstrap'], function($, formvalid
 		$("#preview").html(marked(text));
 	});
 
-})
+});

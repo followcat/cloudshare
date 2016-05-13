@@ -25,7 +25,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 	saveBtn.on('click', function(event){
 		//get the form
 		var aForm = $("#add-user-form");
-		
+
 		var aText = aForm.find(":text");
 		var aPwd = aForm.find(":password");
 
@@ -39,15 +39,15 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 
 			}, function(){
 				$("#addUserName").focus();
-				
+
 			});
 		}
-		
+
 
 		event.preventDefault();
 	});
 
-	//validate user name form	
+	//validate user name form
 	$("#addUserName").on('blur', function(){
 		var userName = this.value;
 
@@ -104,7 +104,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 				urmmain.ButtonAble(saveBtn);
 				msgBox.text("");
 			}
-		}	
+		}
 	});
 
 
@@ -112,7 +112,7 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 	$("table tbody button").on('click', function(){
 		var trParent = $(this).parent().parent();
 		var deletename = trParent.find(".name").text();
-		
+
 		if(confirm("Are you sure to delete " + deletename + "?"))
 		{
 			$.ajax({
@@ -127,9 +127,5 @@ require(['jquery', 'bootstrap', 'urmmain','formvalidate'],function($, bootstrap,
 
 			});
 		}
-
-
-
 	});
-
 });

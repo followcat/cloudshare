@@ -75,8 +75,8 @@ require(['jquery', 'cvdeal', 'bootstrap'], function($, cvdeal, bootstrap){
 					}
 				}
 			});
-		}	
-        
+		}
+
 	});
 
 	//English CV confirm

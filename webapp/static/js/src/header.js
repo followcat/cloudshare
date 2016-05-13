@@ -84,12 +84,12 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
 	//set button is disable
 	header.DisableBtn = function(obj){
 		obj.attr("disabled",true);
-	}
+	};
 
 	//set button is able
 	header.AbleBtn = function(obj){
 		obj.attr("disabled",false);
-	}
+	};
 
 	//password input validate
 	header.ValidatePwd = function(objOldPwd, objNewPwd, objCfPwd, objCPwdBtn, msgBox){
@@ -145,7 +145,7 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
 					header.AbleBtn(objCPwdBtn);
 					msgBox.text("");
 				}
-			}	
+			}
 		});
 	};
 

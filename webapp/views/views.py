@@ -157,7 +157,7 @@ class ConfirmEnglish(flask.views.MethodView):
         yaml_data = utils.builtin.load_yaml(repo_cv.repo_path, yaml_name)
         upobj = pickle.loads(flask.session[user.id]['upload'])
         result = repo_cv.add_md(upobj, user.id)
-        yaml_data['enversion'] = upobj.storage.name.md
+        yaml_data['enversion'] = upobj.filepro.name.md
         repo.modify_file(bytes(os.path.join(repo_cv.repo_path, yaml_name)),
                          yaml.dump(yaml_data), committer=user.id)
         return flask.jsonify(result=result)
@@ -326,6 +326,7 @@ class UserInfo(flask.views.MethodView):
                 except IOError:
                     info['filenames'] = name
                 info['name'] = name
+            info['message'] = info['message'].decode('utf-8')
         return flask.render_template('userinfo.html', info=info_list)
 
 

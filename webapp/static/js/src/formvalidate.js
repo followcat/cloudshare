@@ -8,7 +8,7 @@ define(function(){
 		{
 			return false;
 		}
-			
+
 		return true;
  	};
 
@@ -34,15 +34,15 @@ define(function(){
  	};
 
  	validation.ValidateBlank = function(arg){
- 		
+
  		var reg = /^\s*$/g;
 
  		if(typeof arg == "object"){
  			for(var i = 0, len = arg.len; i < len; i++){
- 				if( arg[i].value == "" || reg.test(arg[i].value)){
+ 				if( arg[i].value === "" || reg.test(arg[i].value)){
  					return true;
  				}else{
- 					return false
+ 					return false;
  				}
  			}
  		}else{
@@ -51,7 +51,7 @@ define(function(){
 	 		}else{
 	 			return false;
 	 		}
- 		}	
+ 		}
  	};
 
  	return validation;

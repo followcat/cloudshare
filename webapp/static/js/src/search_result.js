@@ -59,7 +59,7 @@ require(
                 var subArr = resultArr[i];
                 for (var j = 0, jLen = subArr.length; j < jLen; j++) {
                     var obj = subArr[j];
-                    //init regionDataArr 
+                    //init regionDataArr
                     if (obj.name) {
                         if (regionDataArr.length === 0) {
                             var regionObj = new Object();
@@ -644,7 +644,7 @@ require(
             if ($('#data-main').css('display') === 'none') {
                 $('#data-main').css('display', 'block');
 
-                var checkboxLists = $('.checkbox-name');           
+                var checkboxLists = $('.checkbox-name');
                 var nameLists = getNameLists(checkboxLists);
 
                 var radar = radarcharts('echarts-wrap'),
@@ -666,7 +666,7 @@ require(
                         }
                         radar.makeRadar(datas, response.max);
                     }
-                });            
+                });
             }else{
                 $('#data-main').css('display', 'none');
             }

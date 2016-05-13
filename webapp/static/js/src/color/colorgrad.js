@@ -38,9 +38,9 @@ define(function() {
         var index = option - 1;
 
         return gradientColorArray[index];
-    }
+    };
 
     return function() {
-        return new ColorGrad()
-    }
+        return new ColorGrad();
+    };
 });

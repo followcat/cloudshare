@@ -59,12 +59,9 @@ require(['jquery', 'cvdeal'], function($, cvdeal){
 		var header = $("header").html();
 		var style = $("style").html();
 		var meta = "<meta charset='utf-8'>";
-  var html = meta
-             + "<style>" + style + "</style>" 
-             + "<header class='header-box'>" + header + "</header>"
-             + "<div id='cv-box'><div id='cv-content'>"
-             + content
-             + "</div></div>";
+  var html = meta + "<style>" + style + "</style>" +
+              "<header class='header-box'>" + header + "</header>" +
+              "<div id='cv-box'><div id='cv-content'>" + content + "</div></div>";
 		var filename = $('title').text();
 
   var link = document.createElement('a');

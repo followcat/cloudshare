@@ -38,8 +38,8 @@ require(
     //Add JD
     $('#save-jd').on('click', function(){
       var companyName = $('#company-name').val(),
-          jdName = $('#jd-project-name').val(),
-          jd = $('#jd').val();
+        jdName = $('#jd-project-name').val(),
+        jd = $('#jd').val();
 
       $.ajax({
         url: '/addjd',
@@ -63,33 +63,33 @@ require(
     });
 
     function replaceName(datas){
-        for( var i = 0, datasLen = datas.length; i < datasLen; i++){
-            for ( var j = 0, valuesLen = datas[i].value.length; j < valuesLen; j++){
-                var name = datas[i].value[j].name;
-                name = name.split('');
-                if ( name.length === 2) {
-                    name[1] = '*';
-                }else if ( name.length === 3 ) {
-                    name[1] = '*';
-                    name[2] = '*';
-                }else if ( name.length === 4) {
-                    name[1] = '*';
-                    name[2] = '*';
-                    name[3] = '*';
-                }else if ( name.length > 4){
-                    var temp = name;
-                    for (var z = temp.length - 1; z >= 3; z--) {
-                        temp[z] = ''
-                    }
-                    name = temp;
-                    name[1] = '*';
-                    name[2] = '*';
-                }
-                name = name.join('');
-                datas[i].value[j].name = name;
+      for( var i = 0, datasLen = datas.length; i < datasLen; i++){
+        for ( var j = 0, valuesLen = datas[i].value.length; j < valuesLen; j++){
+          var name = datas[i].value[j].name;
+          name = name.split('');
+          if ( name.length === 2) {
+            name[1] = '*';
+          }else if ( name.length === 3 ) {
+            name[1] = '*';
+            name[2] = '*';
+          }else if ( name.length === 4) {
+            name[1] = '*';
+            name[2] = '*';
+            name[3] = '*';
+          }else if ( name.length > 4){
+            var temp = name;
+            for (var z = temp.length - 1; z >= 3; z--) {
+                temp[z] = '';
             }
+            name = temp;
+            name[1] = '*';
+            name[2] = '*';
+          }
+          name = name.join('');
+          datas[i].value[j].name = name;
         }
-        return datas;
+      }
+      return datas;
     }
 
     //Edit JD button click function
@@ -119,7 +119,6 @@ require(
         //Closure: send this object
         (function(That){
           setTimeout(function(){
-
             var radar = radarcharts('chart-wrapper'),
                 jd_id = That.parent().parent().find('.jd-td').attr('data-id'),
                 title = That.attr('data-filename');
@@ -131,19 +130,16 @@ require(
                 url: '/analysis/valuable',
                 type: 'post',
                 data: {
-                    'jd_id': jd_id,
-                    'name_list': JSON.stringify(name_list)
+                  'jd_id': jd_id,
+                  'name_list': JSON.stringify(name_list)
                 },
                 success: function(response) {
                   var datas = replaceName(response.data);
                   radar.makeRadar(datas, response.max);
                 }
             });
-
           }, 500);
-
         })(That);
-
       });
     }
     //Call Draw charts click function

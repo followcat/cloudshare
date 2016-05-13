@@ -6,13 +6,119 @@ import os.path
 import utils.builtin
 import core.exception
 import core.outputstorage
-import webapp.views.uniquesearcher
 import core.converterutils
+import webapp.views.uniquesearcher
+
+
+class RepoCurriculumVitae(object):
+
+    path = 'CV'
+
+    def __init__(self, repo):
+        self.repo = repo
+        self.repo_path = self.repo.repo.path + "/" + self.path
+        self.info = ""
+        if not os.path.exists(self.repo_path):
+            os.makedirs(self.repo_path)
+
+    def add(self, cvobj, committer=None):
+        """
+            >>> import glob
+            >>> import shutil
+            >>> import os.path
+            >>> import webapp.views.cv
+            >>> import repointerface.gitinterface
+            >>> repo_name = 'webapp/views/test_repo'
+            >>> test_path = "webapp/views/test_output"
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
+            >>> f1 = open('core/test/cv_1.doc', 'r')
+            >>> f2 = open('core/test/cv_2.doc', 'r')
+            >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f1, test_path)
+            >>> cv2 = webapp.views.cv.CurriculumVitaeObject('cv_2.doc', f2, test_path)
+            >>> repocv.add(cv1)
+            True
+            >>> repocv.add(cv2)
+            True
+            >>> md_files = glob.glob(os.path.join(repocv.repo_path, '*.md'))
+            >>> len(md_files)
+            2
+            >>> yaml_files = glob.glob(os.path.join(repocv.repo_path, '*.yaml'))
+            >>> len(yaml_files)
+            2
+            >>> repocv.add(cv1)
+            False
+            >>> repocv.info
+            'Exists File'
+            >>> f1.close()
+            >>> f2.close()
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(test_path)
+        """
+        if cvobj.result is False:
+            return False
+        unique_checker = webapp.views.uniquesearcher.UniqueSearcher(self.repo_path)
+        if unique_checker.unique(cvobj.filepro.yamlinfo) is False:
+            self.info = "Exists File"
+            return False
+        shutil.copy(os.path.join(cvobj.filepro.markdown_path, cvobj.filepro.name.md),
+                    os.path.join(self.repo_path, cvobj.filepro.name.md))
+        cvobj.filepro.yamlinfo['committer'] = committer
+        cvobj.filepro.yamlinfo['date'] = time.time()
+        utils.builtin.save_yaml(cvobj.filepro.yamlinfo,
+                                self.repo_path, cvobj.filepro.name.yaml)
+        self.repo.add_files([
+                       os.path.join(self.repo_path, cvobj.filepro.name.md),
+                       os.path.join(self.repo_path, cvobj.filepro.name.yaml)],
+                       committer=committer)
+        return True
+
+    def add_md(self, cvobj, committer=None):
+        """
+            >>> import glob
+            >>> import shutil
+            >>> import os.path
+            >>> import webapp.views.cv
+            >>> import repointerface.gitinterface
+            >>> root = "core/test"
+            >>> name = "cv_1.doc"
+            >>> test_path = "webapp/views/test_output"
+            >>> repo_name = 'webapp/views/test_repo'
+            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
+            >>> obj = open(os.path.join(root, name))
+            >>> os.makedirs(test_path)
+            >>> cv1 = webapp.views.cv.CurriculumVitaeObject(name, obj, test_path)
+            >>> repocv.add_md(cv1)
+            True
+            >>> md_files = glob.glob(os.path.join(repocv.repo_path, '*.md'))
+            >>> len(md_files)
+            1
+            >>> yaml_files = glob.glob(os.path.join(repocv.repo_path, '*.yaml'))
+            >>> len(yaml_files)
+            0
+            >>> obj.close()
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(test_path)
+        """
+        if cvobj.result is False:
+            return False
+        shutil.copy(os.path.join(cvobj.filepro.markdown_path, cvobj.filepro.name.md),
+                    os.path.join(self.repo_path, cvobj.filepro.name.md))
+        self.repo.add_files([os.path.join(self.repo_path, cvobj.filepro.name.md)],
+                       committer=committer)
+        return True
+
+    def search(self, keyword):
+        results = self.repo.grep(keyword, self.path)
+        return results
+
+    def search_yaml(self, keyword):
+        results = self.repo.grep_yaml(keyword, self.path)
+        return results
 
 
 class CurriculumVitaeObject(object):
-
-    path = 'CV'
 
     def __init__(self, filename, fileobject, path):
         """
@@ -48,61 +154,6 @@ class CurriculumVitaeObject(object):
         output = core.converterutils.md_to_html(self.filepro.markdown_stream)
         return output
 
-    def confirm(self, repo, committer=None):
-        """
-            >>> import shutil
-            >>> import os.path
-            >>> import webapp.views.cv
-            >>> import repointerface.gitinterface
-            >>> root = "core/test"
-            >>> name = "cv_1.doc"
-            >>> repo_name = 'webapp/views/test_repo'
-            >>> test_path = "webapp/views/test_output"
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> obj = open(os.path.join(root, name))
-            >>> os.makedirs(test_path)
-            >>> up = webapp.views.cv.CurriculumVitaeObject(name, obj, test_path)
-            >>> up.confirm(interface)
-            True
-            >>> up.confirm(interface)
-            False
-            >>> up.information
-            'Exists File'
-            >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree(test_path)
-        """
-        result = False
-        try:
-            self.storage(repo, committer=committer)
-            result = True
-        except core.exception.DuplicateException:
-            self.information = 'Exists File'
-        return result
-
-    def confirm_md(self, repo, committer=None):
-        """
-            >>> import shutil
-            >>> import os.path
-            >>> import webapp.views.cv
-            >>> import repointerface.gitinterface
-            >>> root = "core/test"
-            >>> name = "cv_1.doc"
-            >>> repo_name = 'webapp/views/test_repo'
-            >>> test_path = "webapp/views/test_output"
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> obj = open(os.path.join(root, name))
-            >>> os.makedirs(test_path)
-            >>> up = webapp.views.cv.CurriculumVitaeObject(name, obj, test_path)
-            >>> up.confirm(interface)
-            True
-            >>> up.confirm_md(interface)
-            True
-            >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree(test_path)
-        """
-        self.storage_md(repo, committer=committer)
-        return True
-
     def remove(self):
         """
             >>> import os
@@ -124,85 +175,3 @@ class CurriculumVitaeObject(object):
             >>> shutil.rmtree(test_path)
         """
         self.filepro.deleteconvert()
-
-    def storage(self, repo, committer=None):
-        """
-            >>> import glob
-            >>> import shutil
-            >>> import os.path
-            >>> import webapp.views.cv
-            >>> import repointerface.gitinterface
-            >>> basepath = 'core/test_output'
-            >>> repo_name = 'core/test_repo'
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> f2 = open('core/test/cv_2.doc', 'r')
-            >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f1, basepath)
-            >>> cv2 = webapp.views.cv.CurriculumVitaeObject('cv_2.doc', f2, basepath)
-            >>> cv1.storage(interface)
-            True
-            >>> cv2.storage(interface)
-            True
-            >>> md_list = []
-            >>> for position in glob.glob(os.path.join(repo_name, '*.md')):
-            ...     with open(position) as f:
-            ...         md_list.append(f.read())
-            >>> yaml_list = []
-            >>> for position in glob.glob(os.path.join(repo_name, '*.yaml')):
-            ...     with open(position) as f:
-            ...         yaml_list.append(f.read())
-            >>> len(yaml_list)
-            2
-            >>> f1.close()
-            >>> f2.close()
-            >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree(basepath)
-        """
-        if self.result is False:
-            return False
-        path = repo.repo.path
-        unique_checker = core.uniquesearcher.UniqueSearcher(repo)
-        if unique_checker.unique(self.filepro.yamlinfo) is False:
-            error = 'Duplicate files: %s' % self.convertname.base
-            raise core.exception.DuplicateException(error)
-        shutil.copy(os.path.join(self.filepro.markdown_path, self.filepro.name.md),
-                    os.path.join(path, self.filepro.name.md))
-        self.filepro.yamlinfo['committer'] = committer
-        self.filepro.yamlinfo['date'] = time.time()
-        utils.builtin.save_yaml(self.filepro.yamlinfo, path, self.filepro.name.yaml)
-        repo.add_files([self.filepro.name.md, self.filepro.name.yaml],
-                       committer=committer)
-        return True
-
-    def storage_md(self, repo, committer=None):
-        """
-            >>> import glob
-            >>> import shutil
-            >>> import os.path
-            >>> import webapp.views.cv
-            >>> import repointerface.gitinterface
-            >>> basepath = 'core/test_output'
-            >>> repo_name = 'core/test_repo'
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
-            >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f, basepath)
-            >>> cv1.storage_md(interface)
-            True
-            >>> md_files = glob.glob(os.path.join(repo_name, '*.md'))
-            >>> len(md_files)
-            1
-            >>> yaml_files = glob.glob(os.path.join(repo_name, '*.yaml'))
-            >>> len(yaml_files)
-            0
-            >>> f.close()
-            >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree(basepath)
-        """
-        if self.result is False:
-            return False
-        path = repo.repo.path
-        shutil.copy(os.path.join(self.filepro.markdown_path, self.filepro.name.md),
-                    os.path.join(path, self.filepro.name.md))
-        repo.add_files([self.filepro.name.md],
-                       committer=committer)
-        return True 

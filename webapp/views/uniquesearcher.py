@@ -5,38 +5,37 @@ import utils.builtin
 
 
 class UniqueSearcher(object):
-    def __init__(self, repo):
+    def __init__(self, path):
         """
             >>> import shutil
             >>> import webapp.views.cv
             >>> import webapp.views.uniquesearcher
             >>> import repointerface.gitinterface
-            >>> repo_name = 'core/test_repo'
-            >>> basepath = 'core/test_output'
+            >>> repo_name = 'webapp/views/test_repo'
+            >>> test_path = "webapp/views/test_output"
             >>> interface = repointerface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f1, basepath)
+            >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f1, test_path)
+            >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
             >>> cv1.result
             True
-            >>> us = webapp.views.uniquesearcher.UniqueSearcher(interface)
+            >>> us = webapp.views.uniquesearcher.UniqueSearcher(repocv.repo_path)
             >>> us.unique(cv1.filepro.yamlinfo)
             True
-            >>> cv1.confirm(interface)
+            >>> repocv.add(cv1)
             True
             >>> us.unique(cv1.filepro.yamlinfo)
             True
             >>> us.reload()
             >>> us.unique(cv1.filepro.yamlinfo)
             False
-            >>> cv1.storage(interface)  # doctest: +ELLIPSIS
-            Traceback (most recent call last):
-            ...
-            DuplicateException: Duplicate files: cv_1
+            >>> repocv.add(cv1)
+            False
             >>> f1.close()
             >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree(basepath)
+            >>> shutil.rmtree(test_path)
         """
-        self.yaml_path = repo.repo.path
+        self.yaml_path = path
         self.yaml_datas = {}
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
             data = utils.builtin.load_yaml("", f)

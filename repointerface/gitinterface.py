@@ -80,7 +80,7 @@ class GitInterface(object):
         commit_id = self.repo.do_commit(message, committer=committer)
         return commit_id
 
-    def grep(self, restrings):
+    def grep(self, restrings, path):
         grep_list = []
         keywords = restrings.split()
         if keywords:
@@ -91,14 +91,14 @@ class GitInterface(object):
             p = subprocess.Popen(command,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,
-                                 cwd=self.repo.path)
+                                 cwd=os.path.join(self.repo.path, path))
             returncode = p.communicate()[0]
             for each in returncode.split('\n'):
                 if each:
                     grep_list.append(each)
         return grep_list
 
-    def grep_yaml(self, restrings):
+    def grep_yaml(self, restrings, path):
         """
             >>> import yaml
             >>> import shutil
@@ -111,7 +111,7 @@ class GitInterface(object):
             ...     file.write(yaml.dump(data))
             >>> commit_id = interface.add_files(['test_file.yaml'],
             ... b'Test commit', b'test<test@test.com>')
-            >>> interface.grep_yaml('name')
+            >>> interface.grep_yaml('name', '.')
             ['test_file.yaml']
             >>> shutil.rmtree(repo_name)
         """
@@ -129,7 +129,7 @@ class GitInterface(object):
             p = subprocess.Popen(command,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,
-                                 cwd=self.repo.path)
+                                 cwd=os.path.join(self.repo.path, path))
             returncode = p.communicate()[0]
             for each in returncode.split('\n'):
                 if each:

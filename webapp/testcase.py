@@ -8,7 +8,10 @@ import jinja2.ext
 import flask.ext.testing
 
 import ext.views
+import webapp.views.cv
+import webapp.views.company
 import webapp.views.account
+import webapp.views.jobdescription
 import repointerface.gitinterface
 
 
@@ -33,7 +36,12 @@ class Test(flask.ext.testing.TestCase):
         self.app.config['SECRET_KEY'] = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
         self.app.config['TESTING'] = True
         self.app.config['DATA_DB'] = self.data_db
+        self.app.config['REPO_CV'] = webapp.views.cv.RepoCurriculumVitae(self.data_db)
         self.app.config['REPO_ACCOUNT'] = webapp.views.account.RepoAccount(self.account_db)
+        REPO_CO = webapp.views.company.RepoCompany(self.data_db)
+        self.app.config['REPO_CO'] = REPO_CO
+        REPO_JD = webapp.views.jobdescription.RepoJobDescription(self.data_db, REPO_CO)
+        self.app.config['REPO_JD'] = REPO_JD
         self.app.config['UPLOAD_TEMP'] = self.upload_tmp
 
         ext.views.configure(self.app)

@@ -1,19 +1,19 @@
 require.config({
-	baseUrl: "../static/js",
-	paths: {
-		jquery: 'lib/jquery',
-		bootstrap: 'lib/bootstrap',
-		header: 'src/header',
-		formvalidate: 'src/formvalidate',
-		Upload: 'src/upload',
-		Cookies: 'src/cookies'
-	},
-	shim: {
-		bootstrap: {
-			deps: ['jquery'],
-			exports: 'bootstrap'
-		}
-	}
+  baseUrl: "../static/js",
+  paths: {
+    jquery: 'lib/jquery',
+    bootstrap: 'lib/bootstrap',
+    header: 'src/header',
+    formvalidate: 'src/formvalidate',
+    Upload: 'src/upload',
+    Cookies: 'src/cookies'
+  },
+  shim: {
+    bootstrap: {
+      deps: ['jquery'],
+      exports: 'bootstrap'
+    }
+  }
 });
 
 require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'Cookies'], function($, bootstrap, header, formvalidate, Upload, Cookies){
@@ -34,7 +34,7 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'Cookies'], 
         $(item[i]).find('p').html(strMsg);
     }
 
-		var cookie = new Cookies();
+    var cookie = new Cookies();
     var lists = cookie.readCookie();
 
     if ( typeof lists === 'undefined' ) {
@@ -48,4 +48,14 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'Cookies'], 
         $('#browing-wrap').append("<div class='list-item'><span>"+ lists[i].time +"</span><a href='/show/"+ lists[i].fileName +"'>"+ lists[i].name +"</a></div>");
       }
     }
+
+    $("#search").on("click", function(){
+      $("#search-form").attr("action", "/search").submit();
+    });
+    $("#check").on("click", function(){
+      $("#search-form").attr({
+        action: "/analysis/lsi",
+        method: "post"
+      }).submit();
+    });
 });

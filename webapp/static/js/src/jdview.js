@@ -1,7 +1,5 @@
 require.config({
-
   baseUrl: "../static/js",
-
   paths: {
     'jquery': 'lib/jquery',
     'bootstrap': 'lib/bootstrap',
@@ -11,7 +9,6 @@ require.config({
     'Upload': 'src/upload',
     'radarcharts': 'src/charts/radarcharts'
   },
-
   shim: {
     bootstrap: {
       deps: ['jquery'],
@@ -22,7 +19,6 @@ require.config({
       exports: 'bootstraptable'
     }
   }
-
 });
 
 require(
@@ -34,8 +30,7 @@ require(
     'header',
     'formvalidate',
     'Upload'
-  ],
-  function($, radarcharts){
+  ],function($, radarcharts){
     $('#match').on('click', function(e){
       e.stopPropagation();
     });
@@ -56,10 +51,12 @@ require(
         },
         success: function(response){
           if (response.result){
-            $('#jd-madal-body').append("<div class=\"alert alert-success\" role=\"alert\"><strong>Well done!<\/strong>You successfully save this job description.<\/div>");
+            $('#jd-madal-body').append("<div class=\"alert alert-success\" role=\"alert\">"+
+              "<strong>Well done!<\/strong>You successfully save this job description.<\/div>");
             window.location.reload();
           }else{
-            $('#jd-madal-body').append("<div class=\"alert alert-danger\" role=\"alert\"><strong>Fail!<\/strong>You failed save this job description.<\/div>");
+            $('#jd-madal-body').append("<div class=\"alert alert-danger\" role=\"alert\">"+
+              "<strong>Fail!<\/strong>You failed save this job description.<\/div>");
           }
         }
       });
@@ -67,8 +64,8 @@ require(
 
     function replaceName(datas){
         for( var i = 0, datasLen = datas.length; i < datasLen; i++){
-            for ( var j = 0, valuesLen = datas[i]['value'].length; j < valuesLen; j++){
-                var name = datas[i]['value'][j]['name'];
+            for ( var j = 0, valuesLen = datas[i].value.length; j < valuesLen; j++){
+                var name = datas[i].value[j].name;
                 name = name.split('');
                 if ( name.length === 2) {
                     name[1] = '*';
@@ -89,45 +86,43 @@ require(
                     name[2] = '*';
                 }
                 name = name.join('');
-                datas[i]['value'][j]['name'] = name;
+                datas[i].value[j].name = name;
             }
         }
         return datas;
     }
 
-    
-
+    //Edit JD button click function
     function bindEditJDEvent(){
       $('.edit-jd').on('click', function(){
         if ($(this).parent().prev().text() === $('#name').text().trim()){
           var jdTd = $(this).parent().parent().find('.jd-td');
-          var id = jdTd.attr('title');
+          var id = jdTd.attr('data-id');
           $('#change-jd').val(jdTd.text());
-          $('#change-jd').attr('title', id);
+          $('#change-jd').attr('data-id', id);
           $('#modifyJDModal').modal('show');
         }else{
           $('#message').text('You can\'t change this job description!');
           $('#messageModal').modal('show');
         }
-
       });
     }
-    //Edit job description Event
+    //Call Edit JD click function
     bindEditJDEvent();
 
-
+    //Draw charts button click function
     function bindCVJDEvent(){
       $('.cv-jd-match').on('click', function(){
         $('#chart-wrapper').html('');
         var That = $(this);
 
-        //闭包传递this对象
+        //Closure: send this object
         (function(That){
           setTimeout(function(){
 
             var radar = radarcharts('chart-wrapper'),
-                jd_id = That.parent().parent().find('.jd-td').attr('title'),
-                title = That.attr('title');
+                jd_id = That.parent().parent().find('.jd-td').attr('data-id'),
+                title = That.attr('data-filename');
 
             var name_list = [];
             name_list.push(title);
@@ -148,10 +143,10 @@ require(
           }, 500);
 
         })(That);
-      
+
       });
     }
-    //CV JD Match Event
+    //Call Draw charts click function
     bindCVJDEvent();
 
     //bootstrap-table search event
@@ -167,7 +162,7 @@ require(
         url: '/modifyjd',
         type: 'POST',
         data: {
-          'id': $('#change-jd').attr('title'),
+          'id': $('#change-jd').attr('data-id'),
           'description': $('#change-jd').val()
         },
         success: function(response){
@@ -184,7 +179,7 @@ require(
             $('#messageModal').modal('show');
           }
         }
-      })
+      });
     });
   }
-)
+);

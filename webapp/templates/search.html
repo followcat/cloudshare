@@ -1,14 +1,15 @@
 {% extends "share/layout.html" %}
 {% block content %}
 	<div class="search-box">
-	  <form action="/search" method="GET">
-        <div class="input-group">
-          <input type="text" name="search_text" id='search_text' class="form-control" placeholder="Search for...">
-          <span class="input-group-btn">
-            <button class="btn btn-primary" type="submit">Search</button>
-          </span>
-        </div><!-- /input-group -->
-      </form>
+	  <form action="/search" method="GET" id="search-form">
+      <div class="input-group">
+        <input type="text" name="search_text" id="search_text" class="form-control" placeholder="Search for...">
+        <span class="input-group-btn">
+          <button class="btn btn-primary" type="button" name="search" id="search">Search</button>
+					<button class="btn btn-success" type="button" name="check" id="check">Check</button>
+        </span>
+      </div><!-- /input-group -->
+    </form>
 	</div><!-- /search-->
 {% endblock %}
 {% block script %}

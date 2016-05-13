@@ -27,6 +27,7 @@ class Search(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         if 'search_text' in flask.request.args:
+            print flask.request
             repo = flask.current_app.config['DATA_DB']
             search_text = flask.request.args['search_text']
             result = repo.grep(search_text)

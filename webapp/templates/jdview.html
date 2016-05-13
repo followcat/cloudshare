@@ -6,9 +6,9 @@
 {% endblock %}
 
 {% block content %}
-<div class='container main-wrapper'>
-  <div class='row'>
-    <div class='col-md-10 col-md-offset-1'>
+<div class="container main-wrapper">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
       <ul class="nav nav-tabs">
         <li role="presentation"><a href="/listcompany">Company</a></li>
         <li role="presentation" class="active"><a href="/listjd">Job Description</a></li>
@@ -20,10 +20,15 @@
               <i class="glyphicon glyphicon-plus"></i>
           </button>
         </div>
-        <table id='jd-table' data-toggle="table"  data-url="/listjd" data-search="true" data-click-to-select="true" data-toolbar="#toolbar" data-height='500'>
+        <table id="jd-table" data-toggle="table"
+               data-url="/listjd"
+               data-search="true"
+               data-click-to-select="true"
+               data-toolbar="#toolbar"
+               data-height="530"
+               data-pagination="true">
           <thead>
             <tr>
-              <th data-field="state" data-checkbox="true"></th>
               <th>Company Name</th>
               <th>Project Name for JDs</th>
               <th>Job Description</th>
@@ -34,18 +39,17 @@
           <tbody>
             {% for item in result %}
             <tr>
-              <td data-field="state" data-checkbox="true"></td>
-              <td class='company-td'>{{ item.company }}</td>
-              <td class='name-td'>{{ item.name }}</td>
-              <td class='jd-td' title='{{ item.id }}'>{{ item.description }}</td>
-              <td class='committer-td'>{{ item.committer }}</td>
+              <td class="company-td">{{ item.company }}</td>
+              <td class="name-td">{{ item.name }}</td>
+              <td class="jd-td" title="{{ item.description }}" data-id="{{ item.id }}">{{ item.description }}</td>
+              <td class="committer-td">{{ item.committer }}</td>
               <td>
-                <a class='btn btn-primary btn-xs match' href='/lsipage?jd_id={{ item.id }}' target='_blank'> CV Fast Matching</a>
-                <button type='button' class='btn btn-success btn-xs edit-jd'>
+                <a class="btn btn-primary btn-xs match" href="/lsipage?jd_id={{ item.id }}" target="_blank"> CV Fast Matching</a>
+                <button type="button" class="btn btn-success btn-xs edit-jd">
                   <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>Edit JD
                 </button>
                 {% if filename %}
-                  <button type='button' class='btn btn-success btn-xs cv-jd-match' title='{{ filename }}' data-toggle="modal" data-target=".bs-example-modal-lg">Draw a Chart</button>
+                  <button type="button" class="btn btn-success btn-xs cv-jd-match" data-filename="{{ filename }}" data-toggle="modal" data-target=".bs-example-modal-lg">Draw a Chart</button>
                 {% endif %}
               </td>
             </tr>
@@ -64,7 +68,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="AddJobDescription">Add Job Description</h4>
       </div><!-- modal-header end -->
-      <div class="modal-body" id='jd-madal-body'>
+      <div class="modal-body" id="jd-madal-body">
         <div class="form-group">
           <label for="company-name" class="control-label">Company Name:</label>
           <select class="form-control" id="company-name">
@@ -79,12 +83,12 @@
         </div>
         <div class="form-group">
           <label for="introduction" class="control-label">Job Description:</label>
-          <textarea class="form-control" id="jd" rows='4'></textarea>
+          <textarea class="form-control" id="jd" rows="4"></textarea>
         </div>
       </div><!-- modal-body end -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id='save-jd'>Save</button>
+        <button type="button" class="btn btn-primary" id="save-jd">Save</button>
       </div><!-- modal-footer end -->
     </div><!-- modal-content end -->
   </div><!-- modal-dialog end -->
@@ -97,15 +101,15 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="ModifyJobDescription">Change Job Description</h4>
       </div><!-- modal-header end -->
-      <div class="modal-body" id='mjd-madal-body'>
+      <div class="modal-body" id="mjd-madal-body">
         <div class="form-group">
           <label for="introduction" class="control-label">Job Description:</label>
-          <textarea class="form-control" id="change-jd" rows='8'></textarea>
+          <textarea class="form-control" id="change-jd" rows="8"></textarea>
         </div>
       </div><!-- modal-body end -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id='change-jd-btn'>Change</button>
+        <button type="button" class="btn btn-primary" id="change-jd-btn">Change</button>
       </div><!-- modal-footer end -->
     </div><!-- modal-content end -->
   </div><!-- modal-dialog end -->
@@ -119,8 +123,8 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="Message">Reminder</h4>
       </div><!-- modal-header end -->
-      <div class="modal-body" id='message-madal-body'>
-        <p id="message">You can't change this job description!</p>
+      <div class="modal-body" id="message-madal-body">
+        <p class="message-font" id="message">You can't change this job description!</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -138,8 +142,7 @@
         <h4 class="modal-title" id="myModalLabel">Radar Charts</h4>
       </div>
       <div class="modal-body">
-        <div id='chart-wrapper'>
-        
+        <div class="chart-wrapper" id="chart-wrapper">
         </div>
       </div>
       <div class="modal-footer">
@@ -154,5 +157,5 @@
 {% endblock %}
 
 {% block script %}
-<script data-main="{{ url_for('static', filename='js/src/jdview.js') }}" src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
+<script data-main="{{ url_for('static', filename='js/src/jdview.js') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
 {% endblock %}

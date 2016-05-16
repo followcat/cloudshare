@@ -13,8 +13,8 @@ require.config({
   },
   shim: {
     bootstrap: {
-        deps: ['jquery'],
-        exports: 'bootstrap'
+      deps: ['jquery'],
+      exports: 'bootstrap'
     }
   }
 });
@@ -35,13 +35,13 @@ require(
   function($, radarcharts, barcharts, scattercharts, ColorGrad) {
     //Echarts - visualized data
     function isExist(array, value) {
-        for (var i = 0, len = array.length; i < len; i++) {
-            if (array[i].name === value) {
-                return i;
-            }
+      for (var i = 0, len = array.length; i < len; i++) {
+        if (array[i].name === value) {
+          return i;
         }
+      }
 
-        return false;
+      return false;
     }
 
     //Show position region on the map
@@ -87,14 +87,14 @@ require(
       return {
         regionDataArr: regionDataArr,
         geoObj: geoObj
-      }
+      };
     }
 
 
     //Get the md_ids lists
     function GetMdLists() {
-      var mdList = []，
-          titleList = $('.item-title');
+      var mdList = [];
+      var titleList = $('.item-title');
       $.each(titleList, function(index, data) {
         var mdId = $(data).attr('href').split('/')[2];
         mdList.push(mdId);
@@ -111,11 +111,11 @@ require(
           $('#data-main').css('display', 'block');
           var positionCharts = echarts.init(document.getElementById('echarts-wrap'));
           positionCharts.showLoading({
-              text: '数据加载中...',
-              effect: 'whirling',
-              textStyle: {
-                  fontSize: 20
-              }
+            text: '数据加载中...',
+            effect: 'whirling',
+            textStyle: {
+                fontSize: 20
+            }
           });
           //Get the md_ids lists
           var mdList = GetMdLists();
@@ -249,10 +249,10 @@ require(
         var formdata = {};
         //check search textarea element exist
         if ($('#search_textarea').length > 0) {
-          formdata['search_text'] = '公司';
-          formdata['md_ids'] = JSON.stringify(GetMdLists());
+          formdata.search_text = '公司';
+          formdata.md_ids = JSON.stringify(GetMdLists());
         } else {
-          formdata['search_text'] = $('#search_text').val();
+          formdata.search_text = $('#search_text').val();
         }
         $.ajax({
           url: '/mining/position',
@@ -314,7 +314,7 @@ require(
         });
         var actDoc = getCapacityDataArr(doclen, actpoint);
         dataArr.push(actDoc);
-      };
+      }
       return dataArr;
     }
 
@@ -327,7 +327,7 @@ require(
             capacity = personObj.capacity,
             scatterData = getScatterData(capacity),
             pro = (scatterData.actpointSum / scatterData.doclenSum) * 100,
-            actdocPro = Math.pow(pro, 3),
+            actdocPro = Math.pow(pro, 3);
 
         dataObj.fileName = personObj.md;
         dataObj.data = getCapacityDataArr(scatterData.workTime, pro);

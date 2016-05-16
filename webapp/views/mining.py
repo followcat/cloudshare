@@ -93,7 +93,7 @@ class LSI(flask.views.MethodView):
                 'match': str(each[1])
             }
             datas.append([name, yaml_info, info])
-        return flask.render_template('lsipage.html',result=datas)
+        return flask.render_template('lsipage.html',result=datas, button_bar=True)
 
     def post(self):
         repo_cv = flask.current_app.config['REPO_CV']
@@ -113,7 +113,7 @@ class LSI(flask.views.MethodView):
             }
             datas.append([name, yaml_info, info])
         # return flask.jsonify(result=datas)
-        return flask.render_template('lsipage.html',result=datas)
+        return flask.render_template('lsipage.html',result=datas, button_bar=False)
 
 
 class Valuable(flask.views.MethodView):

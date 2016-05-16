@@ -38,12 +38,12 @@ def build_lsimodel(lsimodel, lsipath):
     def elt(s):
         return s
     count = 0
-    for pathfile in glob.glob(os.path.join(DATA_DB_NAME, '*.yaml')):
+    for pathfile in glob.glob(os.path.join(REPO_CV.repo_path, '*.yaml')):
         mdfile = pathfile.replace('.yaml', '.md')
         if os.path.isfile(mdfile):
             data = open(mdfile, 'rb').read()
             data = re.sub(ur'[\n- /]+' ,' ' , data)
-            path, name = mdfile.split('/')
+            path, name = os.path.split(mdfile)
             names.append(name)
             text = [word.word for word in jieba.posseg.cut(data) if word.flag != 'x']
             texts.append(text)

@@ -42,7 +42,7 @@ def rate(lsi, doc, top=10, selected=5, name_list=None):
 def extract(datas):
     result = []
     for i, d in enumerate(datas):
-        result.append((i, d[0].split('.')[0], d[-1]['match']))
+        result.append((i, d[0].split('.')[0], d[1]))
     return result
 
 def next(lsi, doc, top, name_list=None):
@@ -69,13 +69,8 @@ def minetop(lsi, doc, top):
     datas = []
     for each in result[:top]:
         name = core.outputstorage.ConvertName(lsi.names[each[0]])
-        yaml_info = utils.builtin.load_yaml('repo', name.yaml)
-        info = {
-            'author': yaml_info['committer'],
-            'time': utils.builtin.strftime(yaml_info['date']),
-            'match': str(each[1])
-        }
-        datas.append([name, yaml_info, info])
+        match = str(each[1])
+        datas.append([name, match])
     return datas
 
 def minelist(lsi, doc, lists):
@@ -85,11 +80,6 @@ def minelist(lsi, doc, lists):
         for each in result:
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
             if ( name == e ):
-                yaml_info = utils.builtin.load_yaml('repo', name.yaml)
-                info = {
-                    'author': yaml_info['committer'],
-                    'time': utils.builtin.strftime(yaml_info['date']),
-                    'match': str(each[1])
-                }
-                datas.append([name, yaml_info, info])
+                match = str(each[1])
+                datas.append([name, match])
     return datas

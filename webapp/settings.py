@@ -32,23 +32,14 @@ ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 REPO_ACCOUNT = webapp.views.account.RepoAccount(ACCOUNT_DB)
 
 def build_lsimodel(lsimodel, lsipath):
-    global DATA_DB_NAME
     names = []
     texts = []
-    def elt(s):
-        return s
-    count = 0
-    for pathfile in glob.glob(os.path.join(REPO_CV.repo_path, '*.yaml')):
-        mdfile = pathfile.replace('.yaml', '.md')
-        if os.path.isfile(mdfile):
-            data = open(mdfile, 'rb').read()
-            data = re.sub(ur'[\n- /]+' ,' ' , data)
-            path, name = os.path.split(mdfile)
-            names.append(name)
-            text = [word.word for word in jieba.posseg.cut(data) if word.flag != 'x']
-            texts.append(text)
-            count += 1
-    if count > 0:
+    for data in REPO_CV.datas():
+        name, doc = data
+        names.append(name.md)
+        text = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
+        texts.append(text)
+    if len(names) > 0:
         lsimodel.setup(names, texts)
         lsimodel.save(lsipath)
 

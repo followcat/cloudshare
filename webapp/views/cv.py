@@ -119,7 +119,7 @@ class RepoCurriculumVitae(object):
             name = core.outputstorage.ConvertName(yaml)
             with open(os.path.join(self.repo_path, name.md)) as fp:
                 text = fp.read()
-            yield yaml, text
+            yield name, text
 
     def search(self, keyword):
         results = self.repo.grep(keyword, self.path)

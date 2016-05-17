@@ -72,8 +72,8 @@ libreoffice --invisible "--accept=socket,host=localhost,port=8100;urp;"
 
 ``` python
 >>> import tools.batching
->>> import repointerface.gitinterface
->>> repo = repointerface.gitinterface.GitInterface("repo")
+>>> import interface.gitinterface
+>>> repo = interface.gitinterface.GitInterface("repo")
 >>> tools.batching.convert_folder(YOUR_DIR, repo, TEMP_DIR)
 ```
 

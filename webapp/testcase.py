@@ -12,7 +12,7 @@ import webapp.views.cv
 import webapp.views.company
 import webapp.views.account
 import webapp.views.jobdescription
-import repointerface.gitinterface
+import interface.gitinterface
 
 
 class Test(flask.ext.testing.TestCase):
@@ -28,8 +28,8 @@ class Test(flask.ext.testing.TestCase):
         self.app.config.from_object('webapp.settings')
         self.app.jinja_env.add_extension(jinja2.ext.loopcontrols)
 
-        self.data_db = repointerface.gitinterface.GitInterface('testcase_data')
-        self.account_db = repointerface.gitinterface.GitInterface('testcase_account')
+        self.data_db = interface.gitinterface.GitInterface('testcase_data')
+        self.account_db = interface.gitinterface.GitInterface('testcase_account')
         self.upload_tmp = 'testcase_output'
         os.mkdir(self.upload_tmp)
 

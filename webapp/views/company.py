@@ -11,9 +11,9 @@ class RepoCompany(object):
     """
         >>> import shutil
         >>> import webapp.views.company
-        >>> import repointerface.gitinterface
+        >>> import interface.gitinterface
         >>> repo_name = 'webapp/views/test_repo'
-        >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+        >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> repocompany = webapp.views.company.RepoCompany(interface)
         >>> repocompany.COMPANYS
         []

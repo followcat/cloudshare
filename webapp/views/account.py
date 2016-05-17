@@ -11,9 +11,9 @@ class RepoAccount(object):
     """
         >>> import shutil
         >>> import webapp.views.account
-        >>> import repointerface.gitinterface
+        >>> import interface.gitinterface
         >>> repo_name = 'webapp/views/test_repo'
-        >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+        >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> repoaccount = webapp.views.account.RepoAccount(interface)
         >>> repoaccount.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
@@ -117,9 +117,9 @@ class User(flask.ext.login.UserMixin):
         """
             >>> import shutil
             >>> import webapp.views.account
-            >>> import repointerface.gitinterface
+            >>> import interface.gitinterface
             >>> repo_name = 'webapp/views/test_repo'
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> repoaccount = webapp.views.account.RepoAccount(interface)
             >>> user = webapp.views.account.User.get('root', repoaccount)
             >>> user.id

@@ -9,7 +9,7 @@ import webapp.views.account
 import webapp.views.company
 import webapp.views.jobdescription
 import core.mining.lsimodel
-import repointerface.gitinterface
+import interface.gitinterface
 
 
 UPLOAD_TEMP = 'output'
@@ -21,14 +21,14 @@ BACKUP_DIRS = [os.path.join(USER_HOME, BACKUP_FOLDER),
                os.path.join('/data_center/backup', BACKUP_FOLDER)]
 
 DATA_DB_NAME = 'repo'
-DATA_DB = repointerface.gitinterface.GitInterface(DATA_DB_NAME)
+DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
 REPO_CV = webapp.views.cv.RepoCurriculumVitae(DATA_DB)
 
 REPO_CO = webapp.views.company.RepoCompany(DATA_DB)
 REPO_JD = webapp.views.jobdescription.RepoJobDescription(DATA_DB, REPO_CO)
 
 ACCOUNT_DB_NAME = 'account'
-ACCOUNT_DB = repointerface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
+ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 REPO_ACCOUNT = webapp.views.account.RepoAccount(ACCOUNT_DB)
 
 def build_lsimodel(lsimodel, lsipath):

@@ -27,10 +27,10 @@ class RepoCurriculumVitae(object):
             >>> import shutil
             >>> import os.path
             >>> import webapp.views.cv
-            >>> import repointerface.gitinterface
+            >>> import interface.gitinterface
             >>> repo_name = 'webapp/views/test_repo'
             >>> test_path = "webapp/views/test_output"
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
@@ -79,12 +79,12 @@ class RepoCurriculumVitae(object):
             >>> import shutil
             >>> import os.path
             >>> import webapp.views.cv
-            >>> import repointerface.gitinterface
+            >>> import interface.gitinterface
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> test_path = "webapp/views/test_output"
             >>> repo_name = 'webapp/views/test_repo'
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)

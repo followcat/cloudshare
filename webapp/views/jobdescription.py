@@ -16,10 +16,10 @@ class RepoJobDescription(object):
         >>> import utils.builtin
         >>> import webapp.views.company
         >>> import webapp.views.jobdescription
-        >>> import repointerface.gitinterface
+        >>> import interface.gitinterface
         
         >>> repo_name = 'webapp/views/test_repo'
-        >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+        >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> repocompany = webapp.views.company.RepoCompany(interface)
         >>> repocompany.add('CompanyA', 'This is Co.A', 'Dever')
         True

@@ -10,10 +10,10 @@ class UniqueSearcher(object):
             >>> import shutil
             >>> import webapp.views.cv
             >>> import webapp.views.uniquesearcher
-            >>> import repointerface.gitinterface
+            >>> import interface.gitinterface
             >>> repo_name = 'webapp/views/test_repo'
             >>> test_path = "webapp/views/test_output"
-            >>> interface = repointerface.gitinterface.GitInterface(repo_name)
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f1, test_path)
             >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)

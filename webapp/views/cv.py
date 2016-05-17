@@ -109,6 +109,18 @@ class RepoCurriculumVitae(object):
                        committer=committer)
         return True
 
+    def yamls(self):
+        yamls = self.repo.lsfiles(self.path, '*.yaml')
+        results = [os.path.split(each)[-1] for each in yamls]
+        return results
+
+    def datas(self):
+        for yaml in self.yamls():
+            name = core.outputstorage.ConvertName(yaml)
+            with open(os.path.join(self.repo_path, name.md)) as fp:
+                text = fp.read()
+            yield yaml, text
+
     def search(self, keyword):
         results = self.repo.grep(keyword, self.path)
         return results

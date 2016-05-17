@@ -98,6 +98,20 @@ class GitInterface(object):
                     grep_list.append(each)
         return grep_list
 
+    def lsfiles(self, prefix, filtefile):
+        lsfiles = []
+        selected = os.path.join(prefix, filtefile)
+        command = ['git', 'ls-files', '--with-tree=HEAD', selected]
+        p = subprocess.Popen(command,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT,
+                             cwd=self.repo.path)
+        returncode = p.communicate()[0]
+        for each in returncode.split('\n'):
+            if each:
+                lsfiles.append(each)
+        return lsfiles
+
     def grep_yaml(self, restrings, path):
         """
             >>> import yaml

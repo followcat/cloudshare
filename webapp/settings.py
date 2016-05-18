@@ -4,8 +4,8 @@ import glob
 
 import jieba.posseg
 
+import services.account
 import webapp.views.cv
-import webapp.views.account
 import webapp.views.company
 import webapp.views.jobdescription
 import core.mining.lsimodel
@@ -29,7 +29,7 @@ REPO_JD = webapp.views.jobdescription.RepoJobDescription(DATA_DB, REPO_CO)
 
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
-REPO_ACCOUNT = webapp.views.account.RepoAccount(ACCOUNT_DB)
+REPO_ACCOUNT = services.account.Account(ACCOUNT_DB)
 
 def build_lsimodel(lsimodel, lsipath):
     names = []

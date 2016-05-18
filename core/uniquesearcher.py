@@ -9,7 +9,7 @@ class UniqueSearcher(object):
         """
             >>> import shutil
             >>> import webapp.views.cv
-            >>> import webapp.views.uniquesearcher
+            >>> import core.uniquesearcher
             >>> import interface.gitinterface
             >>> repo_name = 'webapp/views/test_repo'
             >>> test_path = "webapp/views/test_output"
@@ -19,7 +19,7 @@ class UniqueSearcher(object):
             >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
             >>> cv1.result
             True
-            >>> us = webapp.views.uniquesearcher.UniqueSearcher(repocv.repo_path)
+            >>> us = core.uniquesearcher.UniqueSearcher(repocv.repo_path)
             >>> us.unique(cv1.filepro.yamlinfo)
             True
             >>> repocv.add(cv1)

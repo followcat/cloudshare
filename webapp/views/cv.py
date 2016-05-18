@@ -7,7 +7,7 @@ import utils.builtin
 import core.exception
 import core.outputstorage
 import core.converterutils
-import webapp.views.uniquesearcher
+import core.uniquesearcher
 
 
 class RepoCurriculumVitae(object):
@@ -57,7 +57,7 @@ class RepoCurriculumVitae(object):
         """
         if cvobj.result is False:
             return False
-        unique_checker = webapp.views.uniquesearcher.UniqueSearcher(self.repo_path)
+        unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
         if unique_checker.unique(cvobj.filepro.yamlinfo) is False:
             self.info = "Exists File"
             return False

@@ -4,7 +4,7 @@ import yaml
 import flask.views
 import flask.ext.login
 
-import webapp.views.exception
+import services.exception
 
 
 class RepoCompany(object):
@@ -68,7 +68,7 @@ class RepoCompany(object):
         companys = self.COMPANYS
         for company in companys:
             if company['name'] == name:
-                raise webapp.views.exception.ExistsCompany(name)
+                raise services.exception.ExistsCompany(name)
         data = {
             'name': name,
             'committer': committer,
@@ -90,7 +90,7 @@ class RepoCompany(object):
                 result = company
                 break
         else:
-            raise webapp.views.exception.NotExistsCompany
+            raise services.exception.NotExistsCompany
         return result
 
     def names(self):

@@ -12,7 +12,7 @@ import tools.batching
 import webapp.views.cv
 import core.outputstorage
 import webapp.views.account
-import webapp.views.exception
+import services.exception
 
 import json
 
@@ -341,7 +341,7 @@ class AddUser(flask.views.MethodView):
         try:
             repoaccount = flask.current_app.config['REPO_ACCOUNT']
             result = repoaccount.add(user.id, id, password)
-        except webapp.views.exception.ExistsUser:
+        except services.exception.ExistsUser:
             pass
         return flask.jsonify(result=result)
 
@@ -361,7 +361,7 @@ class ChangePassword(flask.views.MethodView):
                 result = True
             else:
                 result = False
-        except webapp.views.exception.ExistsUser:
+        except services.exception.ExistsUser:
             pass
         return flask.jsonify(result=result)
 

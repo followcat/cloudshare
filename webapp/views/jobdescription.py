@@ -7,7 +7,7 @@ import flask.views
 import flask.ext.login
 
 import utils.builtin
-import webapp.views.exception
+import services.exception
 
 
 class RepoJobDescription(object):
@@ -54,7 +54,7 @@ class RepoJobDescription(object):
     def add(self, company, name, description, committer):
         try:
             self.repo_co.company(company)
-        except webapp.views.exception.NotExistsCompany:
+        except services.exception.NotExistsCompany:
             self.info = "NotExistsCompany."
             return False
 

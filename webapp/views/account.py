@@ -4,7 +4,7 @@ import yaml
 import flask.ext.login
 
 import utils.builtin
-import webapp.views.exception
+import services.exception
 
 
 class RepoAccount(object):
@@ -55,7 +55,7 @@ class RepoAccount(object):
         uid = unicode(id)
         upw = utils.builtin.md5(password)
         if uid in data:
-            raise webapp.views.exception.ExistsUser(uid)
+            raise services.exception.ExistsUser(uid)
         data[uid] = upw
         dump_data = yaml.dump(data)
         self.repo.modify_file(self.account_filename, dump_data,
@@ -106,7 +106,7 @@ class User(flask.ext.login.UserMixin):
         self.id = id
         self.repoaccount = repoaccount
         if id not in repoaccount.USERS:
-            raise webapp.views.exception.UserNotFoundError()
+            raise services.exception.UserNotFoundError()
         self.password = repoaccount.USERS[unicode(id)]
 
     def changepassword(self, password):
@@ -132,5 +132,5 @@ class User(flask.ext.login.UserMixin):
         """
         try:
             return self_class(id, repoaccount)
-        except webapp.views.exception.UserNotFoundError:
+        except services.exception.UserNotFoundError:
             return None

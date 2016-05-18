@@ -16,19 +16,8 @@ import core.outputstorage
 import core.information_explorer
 
 
-converter = utils.unoconverter.DocumentConverter()
 logging.config.fileConfig("core/logger.conf")
 logger = logging.getLogger("converterinfo")
-
-
-def convert_docfile(input, filename, output, outputname):
-    returncode = True
-    try:
-        converter.convert(os.path.join(input, filename), os.path.join(output, outputname))
-    except Exception as e:
-        logger.info(e)
-        returncode = False
-    return returncode
 
 def md_to_html(stream):
     new_stream = stream
@@ -44,7 +33,12 @@ def md_to_html(stream):
 
 class FileProcesser():
 
+    converter = None
+
     def __init__(self, fileobj, name, output_base):
+        if self.converter is None:
+            self.__class__.converter = utils.unoconverter.DocumentConverter()
+
         self.yamlinfo = {}
         self.markdown_stream = ''
 
@@ -103,6 +97,16 @@ class FileProcesser():
             f.write(self.stream)
         return location
 
+    def convert_docfile(self, input, filename, output, outputname):
+        returncode = True
+        try:
+            self.converter.convert(os.path.join(input, filename),
+                                   os.path.join(output, outputname))
+        except Exception as e:
+            logger.info(e)
+            returncode = False
+        return returncode
+
     def process_mht(self):
         message = email.message_from_string(self.stream)
         for part in message.walk():
@@ -110,8 +114,8 @@ class FileProcesser():
                 part.set_param('charset', 'utf-8')
         html_src = emaildata.text.Text.html(message)
         core.outputstorage.save_stream(self.html_path, self.name.html, html_src)
-        returncode = convert_docfile(self.html_path, self.name.html,
-                                     self.docx_path, self.name.docx)
+        returncode = self.convert_docfile(self.html_path, self.name.html,
+                                          self.docx_path, self.name.docx)
         return returncode
 
     def remove_note(self):
@@ -166,16 +170,16 @@ class FileProcesser():
                              ".wordprocessingml.document"]:
             if 'multipart/related' in self.stream:
                 self.process_mht()
-                returncode = convert_docfile(self.docx_path, self.name.docx,
-                                             self.docbook_path, self.name.xml)
+                returncode = self.convert_docfile(self.docx_path, self.name.docx,
+                                                  self.docbook_path, self.name.xml)
             else:
-                returncode = convert_docfile(self.source_path, self.name,
-                                             self.docbook_path, self.name.xml)
+                returncode = self.convert_docfile(self.source_path, self.name,
+                                                  self.docbook_path, self.name.xml)
             if returncode is False:
-                returncode = convert_docfile(self.source_path, self.name,
-                                             self.docx_path, self.name.docx)
-                returncode = convert_docfile(self.docx_path, self.name.docx,
-                                             self.docbook_path, self.name.xml)
+                returncode = self.convert_docfile(self.source_path, self.name,
+                                                  self.docx_path, self.name.docx)
+                returncode = self.convert_docfile(self.docx_path, self.name.docx,
+                                                  self.docbook_path, self.name.xml)
             if not os.path.exists(os.path.join(
                                   self.docbook_path, self.name.xml)):
                 logger.info('Not exists')

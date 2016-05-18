@@ -14,17 +14,17 @@ class RepoJobDescription(object):
     """
         >>> import shutil
         >>> import utils.builtin
-        >>> import webapp.views.company
+        >>> import services.company
         >>> import webapp.views.jobdescription
         >>> import interface.gitinterface
         
         >>> repo_name = 'webapp/views/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> repocompany = webapp.views.company.RepoCompany(interface)
-        >>> repocompany.add('CompanyA', 'This is Co.A', 'Dever')
+        >>> company_ser = services.company.Company(interface)
+        >>> company_ser.add('CompanyA', 'This is Co.A', 'Dever')
         True
 
-        >>> repojd = webapp.views.jobdescription.RepoJobDescription(interface, repocompany)
+        >>> repojd = webapp.views.jobdescription.RepoJobDescription(interface, company_ser)
         >>> repojd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
         >>> results = repojd.search('JD-A')

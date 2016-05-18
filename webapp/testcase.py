@@ -9,8 +9,8 @@ import flask.ext.testing
 
 import ext.views
 import services.account
+import services.company
 import webapp.views.cv
-import webapp.views.company
 import webapp.views.jobdescription
 import interface.gitinterface
 
@@ -38,7 +38,7 @@ class Test(flask.ext.testing.TestCase):
         self.app.config['DATA_DB'] = self.data_db
         self.app.config['REPO_CV'] = webapp.views.cv.RepoCurriculumVitae(self.data_db)
         self.app.config['REPO_ACCOUNT'] = services.account.Account(self.account_db)
-        REPO_CO = webapp.views.company.RepoCompany(self.data_db)
+        REPO_CO = services.company.Company(self.data_db)
         self.app.config['REPO_CO'] = REPO_CO
         REPO_JD = webapp.views.jobdescription.RepoJobDescription(self.data_db, REPO_CO)
         self.app.config['REPO_JD'] = REPO_JD

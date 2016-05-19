@@ -2,8 +2,6 @@ import os
 import re
 import glob
 
-import jieba.posseg
-
 import services.account
 import services.company
 import services.curriculumvitae
@@ -31,24 +29,13 @@ ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 REPO_ACCOUNT = services.account.Account(ACCOUNT_DB)
 
-def build_lsimodel(lsimodel, lsipath):
-    names = []
-    texts = []
-    for data in REPO_CV.datas():
-        name, doc = data
-        names.append(name.md)
-        text = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
-        texts.append(text)
-    if len(names) > 0:
-        lsimodel.setup(names, texts)
-        lsimodel.save(lsipath)
-
-def init_lsimodel(lsi, lsipath):
+def init_lsimodel(lsi, lsipath, svc_cv):
     try:
         lsi.load(lsipath)
     except IOError:
-        build_lsimodel(lsi, lsipath)
+        lsi.build(svc_cv)
+        lsi.save(lsipath)
 
 LSI_SAVE_PATH = 'lsimodel'
 LSI_MODEL = core.mining.lsimodel.LSImodel()
-init_lsimodel(LSI_MODEL, LSI_SAVE_PATH)
+init_lsimodel(LSI_MODEL, LSI_SAVE_PATH, REPO_CV)

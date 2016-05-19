@@ -30,6 +30,16 @@ class LSImodel(object):
         self.dictionary = None
         self.corpus_tfidf = None
 
+    def build(self, svc_cv):
+        names = []
+        texts = []
+        for data in svc_cv.datas():
+            name, doc = data
+            names.append(name.md)
+            text = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
+            texts.append(text)
+        self.setup(names, texts)
+
     def setup(self, names, texts):
         self.names = names
         self.texts = texts

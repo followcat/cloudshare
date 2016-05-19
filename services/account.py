@@ -42,10 +42,8 @@ class Account(object):
     def create(self):
         upassword = utils.builtin.md5(self.default_root_password)
         empty_dict = {self.default_root_name: upassword}
-        with open(os.path.join(self.repo.repo.path, self.account_filename),
-                  'w') as f:
-            f.write(yaml.dump(empty_dict))
-        self.repo.add_files(self.account_filename, "Add account file.")
+        self.repo.add(self.account_filename, yaml.dump(empty_dict),
+                      "Add account file.")
 
     def add(self, mender, id, password):
         if mender != u'root':

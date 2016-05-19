@@ -67,10 +67,8 @@ class JobDescription(object):
         }
         filename = self.filename(hex_id)
         file_path = os.path.join(self.repo_path, filename)
-        with open(file_path, 'w') as f:
-            f.write(yaml.dump(data))
-        self.repo.add_files(os.path.join(self.path, filename),
-                            "Add job description file: " + filename)
+        self.repo.add(os.path.join(self.path, filename), yaml.dump(data),
+                      "Add job description file: " + filename)
         return True
 
     def modify(self, hex_id, description, committer):

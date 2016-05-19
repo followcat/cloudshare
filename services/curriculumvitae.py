@@ -1,10 +1,7 @@
 import time
-import shutil
-import codecs
+import yaml
 import os.path
 
-import utils.builtin
-import core.exception
 import core.outputstorage
 import core.converterutils
 import core.uniquesearcher
@@ -61,16 +58,12 @@ class CurriculumVitae(object):
         if unique_checker.unique(cvobj.filepro.yamlinfo) is False:
             self.info = "Exists File"
             return False
-        shutil.copy(os.path.join(cvobj.filepro.markdown_path, cvobj.filepro.name.md),
-                    os.path.join(self.repo_path, cvobj.filepro.name.md))
         cvobj.filepro.yamlinfo['committer'] = committer
         cvobj.filepro.yamlinfo['date'] = time.time()
-        utils.builtin.save_yaml(cvobj.filepro.yamlinfo,
-                                self.repo_path, cvobj.filepro.name.yaml)
-        self.repo.add_files([
-                       os.path.join(self.repo_path, cvobj.filepro.name.md),
-                       os.path.join(self.repo_path, cvobj.filepro.name.yaml)],
-                       committer=committer)
+        self.repo.add(os.path.join(self.path, cvobj.filepro.name.md),
+                      cvobj.markdown(), committer=committer)
+        self.repo.add(os.path.join(self.path, cvobj.filepro.name.yaml),
+                      yaml.dump(cvobj.yaml()), committer=committer)
         return True
 
     def add_md(self, cvobj, committer=None):
@@ -103,10 +96,8 @@ class CurriculumVitae(object):
         """
         if cvobj.result is False:
             return False
-        shutil.copy(os.path.join(cvobj.filepro.markdown_path, cvobj.filepro.name.md),
-                    os.path.join(self.repo_path, cvobj.filepro.name.md))
-        self.repo.add_files([os.path.join(self.repo_path, cvobj.filepro.name.md)],
-                       committer=committer)
+        self.repo.add(os.path.join(self.path, cvobj.filepro.name.md),
+                      cvobj.markdown(), committer=committer)
         return True
 
     def yamls(self):
@@ -161,6 +152,12 @@ class CurriculumVitaeObject(object):
             self.information = 'Can not Convert'
         else:
             self.information = 'Sucess'
+
+    def markdown(self):
+        return self.filepro.markdown_stream
+
+    def yaml(self):
+        return self.filepro.yamlinfo
 
     def preview_markdown(self):
         output = core.converterutils.md_to_html(self.filepro.markdown_stream)

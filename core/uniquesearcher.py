@@ -38,8 +38,9 @@ class UniqueSearcher(object):
         self.yaml_path = path
         self.yaml_datas = {}
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
-            data = utils.builtin.load_yaml("", f)
-            base, suffix = os.path.splitext(f)
+            path, name = os.path.split(f)
+            data = utils.builtin.load_yaml(path, name)
+            base, suffix = os.path.splitext(name)
             self.yaml_datas[base] = data
 
     def unique(self, yamldict):
@@ -57,7 +58,8 @@ class UniqueSearcher(object):
     def reload(self):
         self.yaml_datas = {}
         for f in glob.glob(os.path.join(self.yaml_path, '*.yaml')):
-            base, suffix = os.path.splitext(f)
+            path, name = os.path.split(f)
+            base, suffix = os.path.splitext(name)
             if base not in self.yaml_datas:
-                data = utils.builtin.load_yaml("", f)
+                data = utils.builtin.load_yaml(path, name)
                 self.yaml_datas[base] = data

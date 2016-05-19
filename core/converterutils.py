@@ -136,8 +136,9 @@ class FileProcesser():
             with open(output_file, 'w') as f:
                 for line in output.split('\n'):
                     data = line.lstrip(' ')+'\n'
-                    f.write(data.encode('utf-8'))
-                    self.markdown_stream += data
+                    encoded_data = data.encode('utf-8')
+                    f.write(encoded_data)
+                    self.markdown_stream += encoded_data
         except RuntimeError as e:
             pass
 

@@ -58,9 +58,7 @@ class Company(object):
 
     def create(self):
         empty_list = []
-        with open(self.file_path, 'w') as f:
-            f.write(yaml.dump(empty_list))
-        self.repo.add_files(self.file_path, "Add company file.")
+        self.repo.add(self.file_path, yaml.dump(empty_list), "Add company file.")
 
     def add(self, name, introduction, committer):
         companys = self.COMPANYS

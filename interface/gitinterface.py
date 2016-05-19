@@ -29,13 +29,36 @@ class GitInterface(interface.base.Interface):
         except OSError:
             self.repo = dulwich.repo.Repo(path)
 
+    def add(self, filename, filedata, message=None, committer=None):
+        """
+            >>> import shutil
+            >>> import interface.gitinterface
+            >>> repo_name = 'interface/test_repo'
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
+            >>> commit_id = interface.add('test_file', 'text',
+            ... b'Test commit', b'test<test@test.com>')
+            >>> commit_id == interface.repo.head()
+            True
+            >>> shutil.rmtree(repo_name)
+        """
+        full_path = os.path.join(self.path, filename)
+        path, name = os.path.split(full_path)
+        with open(full_path, 'w') as fp:
+            fp.write(filedata)
+        self.repo.stage(filename)
+        if committer is None:
+            committer = self.author
+        if message is None:
+            message = "Add file: " + filename + ".\n"
+        commit_id = self.repo.do_commit(message, committer=committer)
+        return commit_id
+
     def add_files(self, filenames, message=None, committer=None):
         """
             >>> import shutil
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> path = interface.repo.path
             >>> with open('interface/test_repo/test_file', 'w') as file:
             ...     file.write('test')
             >>> commit_id = interface.add_files(['test_file'],
@@ -60,10 +83,7 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> path = interface.repo.path
-            >>> with open('interface/test_repo/test_file', 'w') as file:
-            ...     file.write('test')
-            >>> commit_id = interface.add_files(['test_file'],
+            >>> commit_id = interface.add('test_file', 'test',
             ... b'Test commit', b'test<test@test.com>')
             >>> commit_id = interface.modify('test_file', b'Modify test')
             >>> with open('interface/test_repo/test_file') as file:
@@ -121,11 +141,8 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> path = interface.repo.path
             >>> data = {'name': u'中文名字'}
-            >>> with open('interface/test_repo/test_file.yaml', 'w') as file:
-            ...     file.write(yaml.dump(data))
-            >>> commit_id = interface.add_files(['test_file.yaml'],
+            >>> commit_id = interface.add('test_file.yaml', yaml.dump(data),
             ... b'Test commit', b'test<test@test.com>')
             >>> interface.grep_yaml('name', '.')
             ['test_file.yaml']
@@ -158,10 +175,7 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> path = interface.repo.path
-            >>> with open('interface/test_repo/test_file', 'w') as file:
-            ...     file.write('test')
-            >>> commit_id = interface.add_files(['test_file'],
+            >>> commit_id = interface.add('test_file', 'test',
             ... b'Test commit', b'test<test@test.com>')
             >>> info = interface.get_file_create_info('test_file')
             >>> info['author']

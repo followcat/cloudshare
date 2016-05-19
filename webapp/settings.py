@@ -20,7 +20,7 @@ BACKUP_DIRS = [os.path.join(USER_HOME, BACKUP_FOLDER),
 
 DATA_DB_NAME = 'repo'
 DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
-REPO_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
+SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
 
 REPO_CO = services.company.Company(DATA_DB)
 REPO_JD = services.jobdescription.JobDescription(DATA_DB, REPO_CO)
@@ -38,4 +38,4 @@ def init_lsimodel(lsi, lsipath, svc_cv):
 
 LSI_SAVE_PATH = 'lsimodel'
 LSI_MODEL = core.mining.lsimodel.LSImodel()
-init_lsimodel(LSI_MODEL, LSI_SAVE_PATH, REPO_CV)
+init_lsimodel(LSI_MODEL, LSI_SAVE_PATH, SVC_CV)

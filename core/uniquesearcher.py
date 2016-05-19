@@ -16,20 +16,20 @@ class UniqueSearcher(object):
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> cv1 = services.curriculumvitae.CurriculumVitaeObject('cv_1.doc', f1, test_path)
-            >>> repocv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
             >>> cv1.result
             True
-            >>> us = core.uniquesearcher.UniqueSearcher(repocv.repo_path)
+            >>> us = core.uniquesearcher.UniqueSearcher(svc_cv.repo_path)
             >>> us.unique(cv1.filepro.yamlinfo)
             True
-            >>> repocv.add(cv1)
+            >>> svc_cv.add(cv1)
             True
             >>> us.unique(cv1.filepro.yamlinfo)
             True
             >>> us.reload()
             >>> us.unique(cv1.filepro.yamlinfo)
             False
-            >>> repocv.add(cv1)
+            >>> svc_cv.add(cv1)
             False
             >>> f1.close()
             >>> shutil.rmtree(repo_name)

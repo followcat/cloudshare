@@ -27,10 +27,10 @@ class Search(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         if 'search_text' in flask.request.args:
-            repo_cv = flask.current_app.config['REPO_CV']
+            svc_cv = flask.current_app.config['SVC_CV']
             search_text = flask.request.args['search_text']
-            result = repo_cv.search(search_text)
-            yaml_result = repo_cv.search_yaml(search_text)
+            result = svc_cv.search(search_text)
+            yaml_result = svc_cv.search_yaml(search_text)
             datas = []
             names = []
             for each in result+yaml_result:
@@ -41,7 +41,7 @@ class Search(flask.views.MethodView):
                 else:
                     continue
                 try:
-                    yaml_data = utils.builtin.load_yaml(repo_cv.repo_path, name.yaml)
+                    yaml_data = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
                 except IOError:
                     names.remove(name)
                     continue
@@ -88,14 +88,14 @@ class BatchConfirm(flask.views.MethodView):
     def post(self):
         results = dict()
         user = flask.ext.login.current_user
-        repo_cv = flask.current_app.config['REPO_CV']
+        svc_cv = flask.current_app.config['SVC_CV']
         updates = json.loads(flask.request.form['updates'])
         for filename, upobj in flask.session[user.id]['batchupload'].iteritems():
             if filename in updates:
                 for key, value in updates[filename].iteritems():
                     if key in upobj.filepro.yamlinfo:
                         upobj.filepro.yamlinfo[key] = value
-            result = repo_cv.add(upobj, user.id)
+            result = svc_cv.add(upobj, user.id)
             results[filename] = result
         flask.session[user.id]['batchupload'] = dict()
         return flask.jsonify(result=results)
@@ -139,10 +139,10 @@ class Confirm(flask.views.MethodView):
             'origin': flask.request.form['origin']
         }
         user = flask.ext.login.current_user
-        repo_cv = flask.current_app.config['REPO_CV']
+        svc_cv = flask.current_app.config['SVC_CV']
         upobj = pickle.loads(flask.session[user.id]['upload'])
         upobj.filepro.yamlinfo.update(info)
-        result = repo_cv.add(upobj, user.id)
+        result = svc_cv.add(upobj, user.id)
         return flask.jsonify(result=result, filename=upobj.filepro.name.md)
 
 
@@ -152,13 +152,13 @@ class ConfirmEnglish(flask.views.MethodView):
     def post(self):
         user = flask.ext.login.current_user
         repo = flask.current_app.config['DATA_DB']
-        repo_cv = flask.current_app.config['REPO_CV']
+        svc_cv = flask.current_app.config['SVC_CV']
         yaml_name = core.outputstorage.ConvertName(flask.request.form['name']).yaml
-        yaml_data = utils.builtin.load_yaml(repo_cv.repo_path, yaml_name)
+        yaml_data = utils.builtin.load_yaml(svc_cv.repo_path, yaml_name)
         upobj = pickle.loads(flask.session[user.id]['upload'])
-        result = repo_cv.add_md(upobj, user.id)
+        result = svc_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
-        repo.modify(bytes(os.path.join(repo_cv.repo_path, yaml_name)),
+        repo.modify(bytes(os.path.join(svc_cv.repo_path, yaml_name)),
                     yaml.dump(yaml_data), committer=user.id)
         return flask.jsonify(result=result)
 
@@ -167,13 +167,13 @@ class Show(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self, filename):
-        repo_cv = flask.current_app.config['REPO_CV']
+        svc_cv = flask.current_app.config['SVC_CV']
         name = core.outputstorage.ConvertName(filename)
-        with codecs.open(os.path.join(repo_cv.repo_path, name.md),
+        with codecs.open(os.path.join(svc_cv.repo_path, name.md),
                          'r', encoding='utf-8') as file:
             md_data = file.read()
         md = core.converterutils.md_to_html(md_data)
-        yaml_info = utils.builtin.load_yaml(repo_cv.repo_path, name.yaml)
+        yaml_info = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
 
@@ -206,9 +206,9 @@ class Modify(flask.views.MethodView):
         user = flask.ext.login.current_user
         md_data = flask.request.form['mddata']
         repo = flask.current_app.config['DATA_DB']
-        repo_cv = flask.current_app.config['REPO_CV']
+        svc_cv = flask.current_app.config['SVC_CV']
         name = core.outputstorage.ConvertName(filename)
-        repo.modify(bytes(os.path.join(repo_cv.repo_path, name.md)),
+        repo.modify(bytes(os.path.join(svc_cv.repo_path, name.md)),
                     md_data.encode('utf-8'), committer=user.id)
         return "True"
 
@@ -236,7 +236,7 @@ class UpdateInfo(flask.views.MethodView):
         result = True
         user = flask.ext.login.current_user
         repo = flask.current_app.config['DATA_DB']
-        repo_cv = flask.current_app.config['REPO_CV']
+        svc_cv = flask.current_app.config['SVC_CV']
         filename = flask.request.json['filename']
         updateinfo = flask.request.json['yamlinfo']
         name = core.outputstorage.ConvertName(filename)
@@ -254,7 +254,7 @@ class UpdateInfo(flask.views.MethodView):
                 result = False
                 break
         else:
-            repo.modify(bytes(os.path.join(repo_cv.repo_path, name.yaml)),
+            repo.modify(bytes(os.path.join(svc_cv.repo_path, name.yaml)),
                         yaml.dump(yaml_info),
                         commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)

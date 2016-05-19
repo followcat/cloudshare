@@ -31,24 +31,24 @@ class CurriculumVitae(object):
             >>> repo_name = 'webapp/views/test_repo'
             >>> test_path = "webapp/views/test_output"
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> repocv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> cv1 = services.curriculumvitae.CurriculumVitaeObject('cv_1.doc', f1, test_path)
             >>> cv2 = services.curriculumvitae.CurriculumVitaeObject('cv_2.doc', f2, test_path)
-            >>> repocv.add(cv1)
+            >>> svc_cv.add(cv1)
             True
-            >>> repocv.add(cv2)
+            >>> svc_cv.add(cv2)
             True
-            >>> md_files = glob.glob(os.path.join(repocv.repo_path, '*.md'))
+            >>> md_files = glob.glob(os.path.join(svc_cv.repo_path, '*.md'))
             >>> len(md_files)
             2
-            >>> yaml_files = glob.glob(os.path.join(repocv.repo_path, '*.yaml'))
+            >>> yaml_files = glob.glob(os.path.join(svc_cv.repo_path, '*.yaml'))
             >>> len(yaml_files)
             2
-            >>> repocv.add(cv1)
+            >>> svc_cv.add(cv1)
             False
-            >>> repocv.info
+            >>> svc_cv.info
             'Exists File'
             >>> f1.close()
             >>> f2.close()
@@ -85,16 +85,16 @@ class CurriculumVitae(object):
             >>> test_path = "webapp/views/test_output"
             >>> repo_name = 'webapp/views/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> repocv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
             >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(name, obj, test_path)
-            >>> repocv.add_md(cv1)
+            >>> svc_cv.add_md(cv1)
             True
-            >>> md_files = glob.glob(os.path.join(repocv.repo_path, '*.md'))
+            >>> md_files = glob.glob(os.path.join(svc_cv.repo_path, '*.md'))
             >>> len(md_files)
             1
-            >>> yaml_files = glob.glob(os.path.join(repocv.repo_path, '*.yaml'))
+            >>> yaml_files = glob.glob(os.path.join(svc_cv.repo_path, '*.yaml'))
             >>> len(yaml_files)
             0
             >>> obj.close()

@@ -151,15 +151,13 @@ class ConfirmEnglish(flask.views.MethodView):
     @flask.ext.login.login_required
     def post(self):
         user = flask.ext.login.current_user
-        repo = flask.current_app.config['DATA_DB']
         svc_cv = flask.current_app.config['SVC_CV']
-        yaml_name = core.outputstorage.ConvertName(flask.request.form['name']).yaml
-        yaml_data = utils.builtin.load_yaml(svc_cv.repo_path, yaml_name)
+        name = core.outputstorage.ConvertName(flask.request.form['name'])
+        yaml_data = svc_cv.getyaml(name)
         upobj = pickle.loads(flask.session[user.id]['upload'])
         result = svc_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
-        repo.modify(bytes(os.path.join(svc_cv.repo_path, yaml_name)),
-                    yaml.dump(yaml_data), committer=user.id)
+        svc_cv.modify(yaml_name, yaml.dump(yaml_data), committer=user.id)
         return flask.jsonify(result=result)
 
 
@@ -168,12 +166,9 @@ class Show(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self, filename):
         svc_cv = flask.current_app.config['SVC_CV']
-        name = core.outputstorage.ConvertName(filename)
-        with codecs.open(os.path.join(svc_cv.repo_path, name.md),
-                         'r', encoding='utf-8') as file:
-            md_data = file.read()
+        md_data = svc_cv.getmd(filename)
         md = core.converterutils.md_to_html(md_data)
-        yaml_info = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
+        yaml_info = svc_cv.getyaml(filename)
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
 
@@ -181,11 +176,8 @@ class Edit(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self, filename):
-        repo = flask.current_app.config['DATA_DB']
-        name = core.outputstorage.ConvertName(filename)
-        with codecs.open(os.path.join(repo.repo.path, name.md),
-                         'r', encoding='utf-8') as file:
-            md_data = file.read()
+        svc_cv = flask.current_app.config['SVC_CV']
+        md_data = svc_cv.getmd(filename)
         md = core.converterutils.md_to_html(md_data)
         return flask.render_template('edit.html', markdown=md)
 
@@ -194,22 +186,17 @@ class Modify(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self, filename):
-        repo = flask.current_app.config['DATA_DB']
-        name = core.outputstorage.ConvertName(filename)
-        with codecs.open(os.path.join(repo.repo.path, name.md),
-                         'r', encoding='utf-8') as file:
-            md_data = file.read()
-        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+        svc_cv = flask.current_app.config['SVC_CV']
+        md_data = svc_cv.getmd(filename)
+        yaml_info = svc_cv.getyaml(filename)
         return flask.render_template('modify.html', markdown=md_data, yaml=yaml_info)
 
     def post(self, filename):
         user = flask.ext.login.current_user
         md_data = flask.request.form['mddata']
-        repo = flask.current_app.config['DATA_DB']
         svc_cv = flask.current_app.config['SVC_CV']
         name = core.outputstorage.ConvertName(filename)
-        repo.modify(bytes(os.path.join(svc_cv.repo_path, name.md)),
-                    md_data.encode('utf-8'), committer=user.id)
+        svc_cv.modify(name.md, md_data.encode('utf-8'), committer=user.id)
         return "True"
 
 
@@ -235,12 +222,11 @@ class UpdateInfo(flask.views.MethodView):
     def post(self):
         result = True
         user = flask.ext.login.current_user
-        repo = flask.current_app.config['DATA_DB']
         svc_cv = flask.current_app.config['SVC_CV']
         filename = flask.request.json['filename']
         updateinfo = flask.request.json['yamlinfo']
         name = core.outputstorage.ConvertName(filename)
-        yaml_info = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+        yaml_info = svc_cv.getyaml(filename)
         commit_string = "File %s: " % (name.yaml)
         for key, value in updateinfo.iteritems():
             if key in yaml_info:
@@ -254,9 +240,8 @@ class UpdateInfo(flask.views.MethodView):
                 result = False
                 break
         else:
-            repo.modify(bytes(os.path.join(svc_cv.repo_path, name.yaml)),
-                        yaml.dump(yaml_info),
-                        commit_string.encode('utf-8'), user.id)
+            svc_cv.modify(name.yaml, yaml.dump(yaml_info),
+                          commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)
 
 

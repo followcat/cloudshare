@@ -100,6 +100,11 @@ class CurriculumVitae(object):
                            cvobj.markdown(), committer=committer)
         return True
 
+    def modify(self, filename, stream, message=None, committer=None):
+        path_filename = os.path.join(self.path, filename)
+        self.interface.modify(path_filename, stream, message, committer)
+        return True
+
     def yamls(self):
         yamls = self.interface.lsfiles(self.path, '*.yaml')
         results = [os.path.split(each)[-1] for each in yamls]
@@ -119,6 +124,17 @@ class CurriculumVitae(object):
     def search_yaml(self, keyword):
         results = self.interface.grep_yaml(keyword, self.path)
         return results
+
+    def getmd(self, id):
+        name = core.outputstorage.ConvertName(id).md
+        path_name = os.path.join(self.path, name)
+        return self.interface.get(path_name)
+
+    def getyaml(self, id):
+        name = core.outputstorage.ConvertName(id).yaml
+        path_name = os.path.join(self.path, name)
+        yaml_str = self.interface.get(path_name)
+        return yaml.load(yaml_str)
 
 
 class CurriculumVitaeObject(object):

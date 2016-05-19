@@ -29,6 +29,9 @@ class GitInterface(interface.base.Interface):
         except OSError:
             self.repo = dulwich.repo.Repo(path)
 
+    def get(self, filename):
+        return self.repo.get_named_file(filename)
+
     def add(self, filename, filedata, message=None, committer=None):
         """
             >>> import shutil
@@ -98,7 +101,7 @@ class GitInterface(interface.base.Interface):
             committer = self.author
         with open(os.path.join(self.repo.path, filename), 'w') as f:
             f.write(stream)
-        self.repo.stage([filename])
+        self.repo.stage([bytes(filename)])
         commit_id = self.repo.do_commit(message, committer=committer)
         return commit_id
 

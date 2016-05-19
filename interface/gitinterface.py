@@ -6,9 +6,10 @@ import subprocess
 import dulwich.repo
 
 import utils.builtin
+import interface.base
 
 
-class GitInterface(object):
+class GitInterface(interface.base.Interface):
     author = b'developer'
     encoding = b'UTF-8'
 
@@ -22,6 +23,7 @@ class GitInterface(object):
             <Repo at ...
             >>> shutil.rmtree(repo_name)
         """
+        super(GitInterface, self).__init__(path)
         try:
             self.repo = dulwich.repo.Repo.init(path, mkdir=True)
         except OSError:

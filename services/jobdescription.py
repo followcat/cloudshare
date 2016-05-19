@@ -16,7 +16,7 @@ class JobDescription(object):
         >>> import services.jobdescription
         >>> import interface.gitinterface
         
-        >>> repo_name = 'webapp/views/test_repo'
+        >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> company_ser = services.company.Company(interface)
         >>> company_ser.add('CompanyA', 'This is Co.A', 'Dever')

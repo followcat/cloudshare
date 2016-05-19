@@ -10,7 +10,7 @@ class Company(object):
         >>> import shutil
         >>> import services.company
         >>> import interface.gitinterface
-        >>> repo_name = 'webapp/views/test_repo'
+        >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> svc_co = services.company.Company(interface)
         >>> svc_co.COMPANYS

@@ -25,8 +25,8 @@ class CurriculumVitae(object):
             >>> import os.path
             >>> import services.curriculumvitae
             >>> import interface.gitinterface
-            >>> repo_name = 'webapp/views/test_repo'
-            >>> test_path = "webapp/views/test_output"
+            >>> repo_name = 'services/test_repo'
+            >>> test_path = 'services/test_output'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
             >>> f1 = open('core/test/cv_1.doc', 'r')

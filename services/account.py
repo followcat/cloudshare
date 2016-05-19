@@ -11,7 +11,7 @@ class Account(object):
         >>> import shutil
         >>> import services.account
         >>> import interface.gitinterface
-        >>> repo_name = 'webapp/views/test_repo'
+        >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> svc_account = services.account.Account(interface)
         >>> svc_account.USERS

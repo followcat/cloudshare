@@ -8,15 +8,15 @@ class UniqueSearcher(object):
     def __init__(self, path):
         """
             >>> import shutil
-            >>> import webapp.views.cv
+            >>> import services.curriculumvitae
             >>> import core.uniquesearcher
             >>> import interface.gitinterface
             >>> repo_name = 'webapp/views/test_repo'
             >>> test_path = "webapp/views/test_output"
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f1, test_path)
-            >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
+            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject('cv_1.doc', f1, test_path)
+            >>> repocv = services.curriculumvitae.CurriculumVitae(interface)
             >>> cv1.result
             True
             >>> us = core.uniquesearcher.UniqueSearcher(repocv.repo_path)

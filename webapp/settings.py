@@ -6,7 +6,7 @@ import jieba.posseg
 
 import services.account
 import services.company
-import webapp.views.cv
+import services.curriculumvitae
 import services.jobdescription
 import core.mining.lsimodel
 import interface.gitinterface
@@ -22,7 +22,7 @@ BACKUP_DIRS = [os.path.join(USER_HOME, BACKUP_FOLDER),
 
 DATA_DB_NAME = 'repo'
 DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
-REPO_CV = webapp.views.cv.RepoCurriculumVitae(DATA_DB)
+REPO_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
 
 REPO_CO = services.company.Company(DATA_DB)
 REPO_JD = services.jobdescription.JobDescription(DATA_DB, REPO_CO)

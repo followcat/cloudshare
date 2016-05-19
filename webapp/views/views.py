@@ -9,7 +9,7 @@ import flask.ext.login
 
 import utils.builtin
 import tools.batching
-import webapp.views.cv
+import services.curriculumvitae
 import core.outputstorage
 import webapp.views.account
 import services.exception
@@ -71,7 +71,7 @@ class BatchUpload(flask.views.MethodView):
         user = flask.ext.login.current_user
         netword_file = flask.request.files['files']
         filename = netword_file.filename
-        upobj = webapp.views.cv.CurriculumVitaeObject(filename,
+        upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
                                                 netword_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
         if not upobj.filepro.yamlinfo['name']:
@@ -107,7 +107,7 @@ class Upload(flask.views.MethodView):
     def post(self):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
-        upobj = webapp.views.cv.CurriculumVitaeObject(network_file.filename,
+        upobj = services.curriculumvitae.CurriculumVitaeObject(network_file.filename,
                                                 network_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
         flask.session[user.id]['upload'] = pickle.dumps(upobj)

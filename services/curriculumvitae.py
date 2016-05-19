@@ -10,7 +10,7 @@ import core.converterutils
 import core.uniquesearcher
 
 
-class RepoCurriculumVitae(object):
+class CurriculumVitae(object):
 
     path = 'CV'
 
@@ -26,16 +26,16 @@ class RepoCurriculumVitae(object):
             >>> import glob
             >>> import shutil
             >>> import os.path
-            >>> import webapp.views.cv
+            >>> import services.curriculumvitae
             >>> import interface.gitinterface
             >>> repo_name = 'webapp/views/test_repo'
             >>> test_path = "webapp/views/test_output"
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
+            >>> repocv = services.curriculumvitae.CurriculumVitae(interface)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
-            >>> cv1 = webapp.views.cv.CurriculumVitaeObject('cv_1.doc', f1, test_path)
-            >>> cv2 = webapp.views.cv.CurriculumVitaeObject('cv_2.doc', f2, test_path)
+            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject('cv_1.doc', f1, test_path)
+            >>> cv2 = services.curriculumvitae.CurriculumVitaeObject('cv_2.doc', f2, test_path)
             >>> repocv.add(cv1)
             True
             >>> repocv.add(cv2)
@@ -78,17 +78,17 @@ class RepoCurriculumVitae(object):
             >>> import glob
             >>> import shutil
             >>> import os.path
-            >>> import webapp.views.cv
+            >>> import services.curriculumvitae
             >>> import interface.gitinterface
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> test_path = "webapp/views/test_output"
             >>> repo_name = 'webapp/views/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> repocv = webapp.views.cv.RepoCurriculumVitae(interface)
+            >>> repocv = services.curriculumvitae.CurriculumVitae(interface)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
-            >>> cv1 = webapp.views.cv.CurriculumVitaeObject(name, obj, test_path)
+            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(name, obj, test_path)
             >>> repocv.add_md(cv1)
             True
             >>> md_files = glob.glob(os.path.join(repocv.repo_path, '*.md'))
@@ -137,13 +137,13 @@ class CurriculumVitaeObject(object):
             >>> import os
             >>> import shutil
             >>> import os.path
-            >>> import webapp.views.cv
+            >>> import services.curriculumvitae
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> obj = open(os.path.join(root, name))
             >>> test_path = "webapp/views/test_output"
             >>> os.makedirs(test_path)
-            >>> up = webapp.views.cv.CurriculumVitaeObject(name, obj, test_path)
+            >>> up = services.curriculumvitae.CurriculumVitaeObject(name, obj, test_path)
             >>> up.result
             True
             >>> up.remove()
@@ -171,13 +171,13 @@ class CurriculumVitaeObject(object):
             >>> import os
             >>> import shutil
             >>> import os.path
-            >>> import webapp.views.cv
+            >>> import services.curriculumvitae
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> obj = open(os.path.join(root, name))
             >>> test_path = "webapp/views/test_output"
             >>> os.makedirs(test_path)
-            >>> up = webapp.views.cv.CurriculumVitaeObject(name, obj, test_path)
+            >>> up = services.curriculumvitae.CurriculumVitaeObject(name, obj, test_path)
             >>> fn = os.path.join(up.filepro.markdown_path, up.filepro.name.md)
             >>> os.path.exists(fn)
             True

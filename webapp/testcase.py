@@ -11,7 +11,7 @@ import ext.views
 import services.account
 import services.company
 import services.jobdescription
-import webapp.views.cv
+import services.curriculumvitae
 import interface.gitinterface
 
 
@@ -36,7 +36,7 @@ class Test(flask.ext.testing.TestCase):
         self.app.config['SECRET_KEY'] = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
         self.app.config['TESTING'] = True
         self.app.config['DATA_DB'] = self.data_db
-        self.app.config['REPO_CV'] = webapp.views.cv.RepoCurriculumVitae(self.data_db)
+        self.app.config['REPO_CV'] = services.curriculumvitae.CurriculumVitae(self.data_db)
         self.app.config['REPO_ACCOUNT'] = services.account.Account(self.account_db)
         REPO_CO = services.company.Company(self.data_db)
         self.app.config['REPO_CO'] = REPO_CO

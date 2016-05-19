@@ -10,8 +10,8 @@ import flask.ext.testing
 import ext.views
 import services.account
 import services.company
+import services.jobdescription
 import webapp.views.cv
-import webapp.views.jobdescription
 import interface.gitinterface
 
 
@@ -40,7 +40,7 @@ class Test(flask.ext.testing.TestCase):
         self.app.config['REPO_ACCOUNT'] = services.account.Account(self.account_db)
         REPO_CO = services.company.Company(self.data_db)
         self.app.config['REPO_CO'] = REPO_CO
-        REPO_JD = webapp.views.jobdescription.RepoJobDescription(self.data_db, REPO_CO)
+        REPO_JD = services.jobdescription.JobDescription(self.data_db, REPO_CO)
         self.app.config['REPO_JD'] = REPO_JD
         self.app.config['UPLOAD_TEMP'] = self.upload_tmp
 

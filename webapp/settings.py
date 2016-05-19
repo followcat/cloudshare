@@ -7,7 +7,7 @@ import jieba.posseg
 import services.account
 import services.company
 import webapp.views.cv
-import webapp.views.jobdescription
+import services.jobdescription
 import core.mining.lsimodel
 import interface.gitinterface
 
@@ -25,7 +25,7 @@ DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
 REPO_CV = webapp.views.cv.RepoCurriculumVitae(DATA_DB)
 
 REPO_CO = services.company.Company(DATA_DB)
-REPO_JD = webapp.views.jobdescription.RepoJobDescription(DATA_DB, REPO_CO)
+REPO_JD = services.jobdescription.JobDescription(DATA_DB, REPO_CO)
 
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)

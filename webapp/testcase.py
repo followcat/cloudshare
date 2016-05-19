@@ -38,9 +38,9 @@ class Test(flask.ext.testing.TestCase):
         self.app.config['DATA_DB'] = self.data_db
         self.app.config['SVC_CV'] = services.curriculumvitae.CurriculumVitae(self.data_db)
         self.app.config['SVC_ACCOUNT'] = services.account.Account(self.account_db)
-        REPO_CO = services.company.Company(self.data_db)
-        self.app.config['REPO_CO'] = REPO_CO
-        REPO_JD = services.jobdescription.JobDescription(self.data_db, REPO_CO)
+        SVC_CO = services.company.Company(self.data_db)
+        self.app.config['SVC_CO'] = SVC_CO
+        REPO_JD = services.jobdescription.JobDescription(self.data_db, SVC_CO)
         self.app.config['REPO_JD'] = REPO_JD
         self.app.config['UPLOAD_TEMP'] = self.upload_tmp
 

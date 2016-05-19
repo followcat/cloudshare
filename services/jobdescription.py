@@ -41,17 +41,17 @@ class JobDescription(object):
     """
     path = 'JD'
 
-    def __init__(self, repo, repo_co):
+    def __init__(self, repo, svc_co):
         self.repo = repo
         self.repo_path = self.repo.repo.path + "/" + self.path
-        self.repo_co = repo_co
+        self.svc_co = svc_co
         self.info = ""
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
     def add(self, company, name, description, committer):
         try:
-            self.repo_co.company(company)
+            self.svc_co.company(company)
         except services.exception.NotExistsCompany:
             self.info = "NotExistsCompany."
             return False

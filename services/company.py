@@ -12,23 +12,23 @@ class Company(object):
         >>> import interface.gitinterface
         >>> repo_name = 'webapp/views/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> company_ser = services.company.Company(interface)
-        >>> company_ser.COMPANYS
+        >>> svc_co = services.company.Company(interface)
+        >>> svc_co.COMPANYS
         []
-        >>> company_ser.add('CompanyA', 'This is Co.A', 'Dever')
+        >>> svc_co.add('CompanyA', 'This is Co.A', 'Dever')
         True
-        >>> co = company_ser.company('CompanyA')
+        >>> co = svc_co.company('CompanyA')
         >>> co['name']
         'CompanyA'
         >>> co['introduction']
         'This is Co.A'
-        >>> company_ser.add('CompanyA', 'This is Co.A', 'Dever') # doctest: +ELLIPSIS
+        >>> svc_co.add('CompanyA', 'This is Co.A', 'Dever') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ExistsCompany: CompanyA
-        >>> company_ser.names()
+        >>> svc_co.names()
         ['CompanyA']
-        >>> company_ser.company('CompanyB') # doctest: +ELLIPSIS
+        >>> svc_co.company('CompanyB') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         NotExistsCompany

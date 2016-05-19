@@ -270,8 +270,8 @@ class LoginCheck(flask.views.MethodView):
     def post(self):
         username = flask.request.form['username']
         password = flask.request.form['password']
-        repoaccount = flask.current_app.config['SVC_ACCOUNT']
-        user = webapp.views.account.User.get(username, repoaccount)
+        svcaccount = flask.current_app.config['SVC_ACCOUNT']
+        user = webapp.views.account.User.get(username, svcaccount)
         upassword = utils.builtin.md5(password)
         error = None
         if (user and user.password == upassword):
@@ -324,8 +324,8 @@ class AddUser(flask.views.MethodView):
         password = flask.request.form['password']
         user = flask.ext.login.current_user
         try:
-            repoaccount = flask.current_app.config['SVC_ACCOUNT']
-            result = repoaccount.add(user.id, id, password)
+            svcaccount = flask.current_app.config['SVC_ACCOUNT']
+            result = svcaccount.add(user.id, id, password)
         except services.exception.ExistsUser:
             pass
         return flask.jsonify(result=result)
@@ -355,8 +355,8 @@ class Urm(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        repoaccount = flask.current_app.config['SVC_ACCOUNT']
-        userlist = repoaccount.get_user_list()
+        svcaccount = flask.current_app.config['SVC_ACCOUNT']
+        userlist = svcaccount.get_user_list()
         return flask.render_template('urm.html', userlist=userlist)
 
 
@@ -373,8 +373,8 @@ class DeleteUser(flask.views.MethodView):
     def post(self):
         name = flask.request.form['name']
         user = flask.ext.login.current_user
-        repoaccount = flask.current_app.config['SVC_ACCOUNT']
-        result = repoaccount.delete(user.id, name)
+        svcaccount = flask.current_app.config['SVC_ACCOUNT']
+        result = svcaccount.delete(user.id, name)
         return flask.jsonify(result=result)
 
 

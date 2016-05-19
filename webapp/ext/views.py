@@ -14,7 +14,7 @@ def init_login(app):
 
     @login_manager.user_loader
     def load_user(id):
-        return webapp.views.account.User.get(id, app.config['REPO_ACCOUNT'])
+        return webapp.views.account.User.get(id, app.config['SVC_ACCOUNT'])
 
 
 def configure(app):

@@ -5,18 +5,18 @@ import services.exception
 
 class User(flask.ext.login.UserMixin):
 
-    def __init__(self, id, account_ser):
+    def __init__(self, id, svc_account):
         self.id = id
-        self.account_ser = account_ser
-        if id not in account_ser.USERS:
+        self.svc_account = svc_account
+        if id not in svc_account.USERS:
             raise services.exception.UserNotFoundError()
-        self.password = account_ser.USERS[unicode(id)]
+        self.password = svc_account.USERS[unicode(id)]
 
     def changepassword(self, password):
-        self.account_ser.modify(self.id, password)
+        self.svc_account.modify(self.id, password)
 
     @classmethod
-    def get(self_class, id, account_ser):
+    def get(self_class, id, svc_account):
         """
             >>> import shutil
             >>> import services.account
@@ -24,17 +24,17 @@ class User(flask.ext.login.UserMixin):
             >>> import interface.gitinterface
             >>> repo_name = 'webapp/views/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> account_ser = services.account.Account(interface)
-            >>> user = webapp.views.account.User.get('root', account_ser)
+            >>> svc_account = services.account.Account(interface)
+            >>> user = webapp.views.account.User.get('root', svc_account)
             >>> user.id
             'root'
             >>> user.password
             u'5f4dcc3b5aa765d61d8327deb882cf99'
-            >>> type(webapp.views.account.User.get('None', account_ser))
+            >>> type(webapp.views.account.User.get('None', svc_account))
             <type 'NoneType'>
             >>> shutil.rmtree(repo_name)
         """
         try:
-            return self_class(id, account_ser)
+            return self_class(id, svc_account)
         except services.exception.UserNotFoundError:
             return None

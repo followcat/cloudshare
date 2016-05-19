@@ -27,7 +27,7 @@ REPO_JD = services.jobdescription.JobDescription(DATA_DB, REPO_CO)
 
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
-REPO_ACCOUNT = services.account.Account(ACCOUNT_DB)
+SVC_ACCOUNT = services.account.Account(ACCOUNT_DB)
 
 def init_lsimodel(lsi, lsipath, svc_cv):
     try:

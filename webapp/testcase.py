@@ -37,7 +37,7 @@ class Test(flask.ext.testing.TestCase):
         self.app.config['TESTING'] = True
         self.app.config['DATA_DB'] = self.data_db
         self.app.config['SVC_CV'] = services.curriculumvitae.CurriculumVitae(self.data_db)
-        self.app.config['REPO_ACCOUNT'] = services.account.Account(self.account_db)
+        self.app.config['SVC_ACCOUNT'] = services.account.Account(self.account_db)
         REPO_CO = services.company.Company(self.data_db)
         self.app.config['REPO_CO'] = REPO_CO
         REPO_JD = services.jobdescription.JobDescription(self.data_db, REPO_CO)
@@ -111,9 +111,9 @@ class LoginoutSuperAdminTest(Test):
     def test_superadmin_add_delete_user(self):
         self.login('root', 'password')
         self.adduser('addname', 'addpassword')
-        assert('addname' in self.app.config['REPO_ACCOUNT'].USERS)
+        assert('addname' in self.app.config['SVC_ACCOUNT'].USERS)
         self.deleteuser('addname')
-        assert('addname' not in self.app.config['REPO_ACCOUNT'].USERS)
+        assert('addname' not in self.app.config['SVC_ACCOUNT'].USERS)
         self.logout()
 
 
@@ -141,9 +141,9 @@ class LoginoutUser(User):
         self.init_user()
         self.login(self.user_name, self.user_password)
         self.adduser('addname', 'addpassword')
-        assert('addname' not in self.app.config['REPO_ACCOUNT'].USERS)
+        assert('addname' not in self.app.config['SVC_ACCOUNT'].USERS)
         self.deleteuser(self.user_name)
-        assert(self.user_name in self.app.config['REPO_ACCOUNT'].USERS)
+        assert(self.user_name in self.app.config['SVC_ACCOUNT'].USERS)
         self.logout()
 
     def test_user_modify_password(self):

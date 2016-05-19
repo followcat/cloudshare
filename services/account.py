@@ -13,20 +13,20 @@ class Account(object):
         >>> import interface.gitinterface
         >>> repo_name = 'webapp/views/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> account = services.account.Account(interface)
-        >>> account.USERS
+        >>> svc_account = services.account.Account(interface)
+        >>> svc_account.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
-        >>> account.add('root', 'admin', 'password')
+        >>> svc_account.add('root', 'admin', 'password')
         True
-        >>> account.USERS['admin']
+        >>> svc_account.USERS['admin']
         u'5f4dcc3b5aa765d61d8327deb882cf99'
-        >>> account.get_user_list()
+        >>> svc_account.get_user_list()
         [u'admin']
-        >>> account.add('root', 'admin', 'password') # doctest: +ELLIPSIS
+        >>> svc_account.add('root', 'admin', 'password') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ExistsUser: admin
-        >>> account.delete('root', 'admin')
+        >>> svc_account.delete('root', 'admin')
         True
         >>> account.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}

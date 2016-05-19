@@ -22,19 +22,19 @@ class JobDescription(object):
         >>> company_ser.add('CompanyA', 'This is Co.A', 'Dever')
         True
 
-        >>> repo_ser = services.jobdescription.JobDescription(interface, company_ser)
-        >>> repo_ser.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
+        >>> svc_jd = services.jobdescription.JobDescription(interface, company_ser)
+        >>> svc_jd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
-        >>> results = repo_ser.search('JD-A')
-        >>> data = utils.builtin.load_yaml(repo_ser.repo_path, results[0])
+        >>> results = svc_jd.search('JD-A')
+        >>> data = utils.builtin.load_yaml(svc_jd.repo_path, results[0])
         >>> data['description']
         'JD-A description'
-        >>> repo_ser.modify(data['id'], 'JD-B description', 'Dever')
+        >>> svc_jd.modify(data['id'], 'JD-B description', 'Dever')
         True
-        >>> data = utils.builtin.load_yaml(repo_ser.repo_path, results[0])
+        >>> data = utils.builtin.load_yaml(svc_jd.repo_path, results[0])
         >>> data['description']
         'JD-B description'
-        >>> lists = repo_ser.lists()
+        >>> lists = svc_jd.lists()
         >>> lists[0]['company'], lists[0]['description']
         ('CompanyA', 'JD-B description')
         >>> shutil.rmtree(repo_name)

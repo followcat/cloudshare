@@ -23,7 +23,7 @@ DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
 SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
 
 SVC_CO = services.company.Company(DATA_DB)
-REPO_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
+SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
 
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)

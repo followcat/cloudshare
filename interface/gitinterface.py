@@ -54,7 +54,7 @@ class GitInterface(interface.base.Interface):
         commit_id = self.repo.do_commit(message, committer=committer)
         return commit_id
 
-    def modify_file(self, filename, stream, message=None, committer=None):
+    def modify(self, filename, stream, message=None, committer=None):
         """
             >>> import shutil
             >>> import interface.gitinterface
@@ -65,7 +65,7 @@ class GitInterface(interface.base.Interface):
             ...     file.write('test')
             >>> commit_id = interface.add_files(['test_file'],
             ... b'Test commit', b'test<test@test.com>')
-            >>> commit_id = interface.modify_file('test_file', b'Modify test')
+            >>> commit_id = interface.modify('test_file', b'Modify test')
             >>> with open('interface/test_repo/test_file') as file:
             ...     data = file.read()
             >>> data

@@ -158,8 +158,8 @@ class ConfirmEnglish(flask.views.MethodView):
         upobj = pickle.loads(flask.session[user.id]['upload'])
         result = repo_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
-        repo.modify_file(bytes(os.path.join(repo_cv.repo_path, yaml_name)),
-                         yaml.dump(yaml_data), committer=user.id)
+        repo.modify(bytes(os.path.join(repo_cv.repo_path, yaml_name)),
+                    yaml.dump(yaml_data), committer=user.id)
         return flask.jsonify(result=result)
 
 
@@ -208,8 +208,8 @@ class Modify(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         repo_cv = flask.current_app.config['REPO_CV']
         name = core.outputstorage.ConvertName(filename)
-        repo.modify_file(bytes(os.path.join(repo_cv.repo_path, name.md)),
-                         md_data.encode('utf-8'), committer=user.id)
+        repo.modify(bytes(os.path.join(repo_cv.repo_path, name.md)),
+                    md_data.encode('utf-8'), committer=user.id)
         return "True"
 
 
@@ -254,9 +254,9 @@ class UpdateInfo(flask.views.MethodView):
                 result = False
                 break
         else:
-            repo.modify_file(bytes(os.path.join(repo_cv.repo_path, name.yaml)),
-                             yaml.dump(yaml_info),
-                             commit_string.encode('utf-8'), user.id)
+            repo.modify(bytes(os.path.join(repo_cv.repo_path, name.yaml)),
+                        yaml.dump(yaml_info),
+                        commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)
 
 

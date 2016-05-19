@@ -80,9 +80,9 @@ class JobDescription(object):
             return False
         data['description'] = description
         dump_data = yaml.dump(data)
-        self.repo.modify_file(os.path.join(self.path, filename), dump_data,
-                              message="Modify job description: " + filename,
-                              committer=committer)
+        self.repo.modify(os.path.join(self.path, filename), dump_data,
+                         message="Modify job description: " + filename,
+                         committer=committer)
         return True
 
     def filename(self, hex_id):

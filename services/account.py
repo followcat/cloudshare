@@ -57,8 +57,8 @@ class Account(object):
             raise services.exception.ExistsUser(uid)
         data[uid] = upw
         dump_data = yaml.dump(data)
-        self.repo.modify_file(self.account_filename, dump_data,
-                              self.default_root_name)
+        self.repo.modify(self.account_filename, dump_data,
+                         self.default_root_name)
         return True
 
     def modify(self, id, password):
@@ -67,8 +67,8 @@ class Account(object):
         upw = utils.builtin.md5(password)
         data[uid] = upw
         dump_data = yaml.dump(data)
-        self.repo.modify_file(self.account_filename, dump_data,
-                              "Modify %s password." % id, self.default_root_name)
+        self.repo.modify(self.account_filename, dump_data,
+                         "Modify %s password." % id, self.default_root_name)
 
     def delete(self, mender, id):
         if mender != u'root':
@@ -76,8 +76,8 @@ class Account(object):
         data = self.USERS
         data.pop(unicode(id))
         dump_data = yaml.dump(data)
-        self.repo.modify_file(self.account_filename, dump_data,
-                              self.default_root_name)
+        self.repo.modify(self.account_filename, dump_data,
+                         self.default_root_name)
         return True
 
     @property

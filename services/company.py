@@ -37,20 +37,20 @@ class Company(object):
     company_filename = 'company.yaml'
     path = 'CO'
 
-    def __init__(self, repo):
-        self.repo = repo
-        self.repo_path = self.repo.repo.path + "/" + self.path
+    def __init__(self, interface):
+        self.interface = interface
+        self.repo_path = self.interface.repo.path + "/" + self.path
         self.file_path = os.path.join(self.repo_path, self.company_filename)
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
     @property
     def COMPANYS(self):
-        company_file = self.repo.repo.get_named_file(
+        company_file = self.interface.repo.get_named_file(
             os.path.join('..', self.path, self.company_filename))
         if company_file is None:
             self.create()
-            company_file = self.repo.repo.get_named_file(
+            company_file = self.interface.repo.get_named_file(
                 os.path.join('..', self.path, self.company_filename))
         data = yaml.load(company_file.read())
         company_file.close()
@@ -58,7 +58,7 @@ class Company(object):
 
     def create(self):
         empty_list = []
-        self.repo.add(self.file_path, yaml.dump(empty_list), "Add company file.")
+        self.interface.add(self.file_path, yaml.dump(empty_list), "Add company file.")
 
     def add(self, name, introduction, committer):
         companys = self.COMPANYS
@@ -73,9 +73,9 @@ class Company(object):
         companys.append(data)
         dump_data = yaml.dump(companys)
         message = "Add company: " + name
-        self.repo.modify(os.path.join(self.path, self.company_filename),
-                         dump_data, message=message.encode('utf-8'),
-                         committer=committer)
+        self.interface.modify(os.path.join(self.path, self.company_filename),
+                              dump_data, message=message.encode('utf-8'),
+                              committer=committer)
         return True
 
     def company(self, name):

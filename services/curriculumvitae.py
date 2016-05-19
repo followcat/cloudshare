@@ -11,9 +11,9 @@ class CurriculumVitae(object):
 
     path = 'CV'
 
-    def __init__(self, repo):
-        self.repo = repo
-        self.repo_path = self.repo.repo.path + "/" + self.path
+    def __init__(self, interface):
+        self.interface = interface
+        self.repo_path = self.interface.repo.path + "/" + self.path
         self.info = ""
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
@@ -60,10 +60,10 @@ class CurriculumVitae(object):
             return False
         cvobj.filepro.yamlinfo['committer'] = committer
         cvobj.filepro.yamlinfo['date'] = time.time()
-        self.repo.add(os.path.join(self.path, cvobj.filepro.name.md),
-                      cvobj.markdown(), committer=committer)
-        self.repo.add(os.path.join(self.path, cvobj.filepro.name.yaml),
-                      yaml.dump(cvobj.yaml()), committer=committer)
+        self.interface.add(os.path.join(self.path, cvobj.filepro.name.md),
+                           cvobj.markdown(), committer=committer)
+        self.interface.add(os.path.join(self.path, cvobj.filepro.name.yaml),
+                           yaml.dump(cvobj.yaml()), committer=committer)
         return True
 
     def add_md(self, cvobj, committer=None):
@@ -96,12 +96,12 @@ class CurriculumVitae(object):
         """
         if cvobj.result is False:
             return False
-        self.repo.add(os.path.join(self.path, cvobj.filepro.name.md),
-                      cvobj.markdown(), committer=committer)
+        self.interface.add(os.path.join(self.path, cvobj.filepro.name.md),
+                           cvobj.markdown(), committer=committer)
         return True
 
     def yamls(self):
-        yamls = self.repo.lsfiles(self.path, '*.yaml')
+        yamls = self.interface.lsfiles(self.path, '*.yaml')
         results = [os.path.split(each)[-1] for each in yamls]
         return results
 
@@ -113,11 +113,11 @@ class CurriculumVitae(object):
             yield name, text
 
     def search(self, keyword):
-        results = self.repo.grep(keyword, self.path)
+        results = self.interface.grep(keyword, self.path)
         return results
 
     def search_yaml(self, keyword):
-        results = self.repo.grep_yaml(keyword, self.path)
+        results = self.interface.grep_yaml(keyword, self.path)
         return results
 
 

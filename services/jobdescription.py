@@ -41,9 +41,9 @@ class JobDescription(object):
     """
     path = 'JD'
 
-    def __init__(self, repo, svc_co):
-        self.repo = repo
-        self.repo_path = self.repo.repo.path + "/" + self.path
+    def __init__(self, interface, svc_co):
+        self.interface = interface
+        self.repo_path = self.interface.repo.path + "/" + self.path
         self.svc_co = svc_co
         self.info = ""
         if not os.path.exists(self.repo_path):
@@ -67,8 +67,8 @@ class JobDescription(object):
         }
         filename = self.filename(hex_id)
         file_path = os.path.join(self.repo_path, filename)
-        self.repo.add(os.path.join(self.path, filename), yaml.dump(data),
-                      "Add job description file: " + filename)
+        self.interface.add(os.path.join(self.path, filename), yaml.dump(data),
+                           "Add job description file: " + filename)
         return True
 
     def modify(self, hex_id, description, committer):
@@ -78,16 +78,16 @@ class JobDescription(object):
             return False
         data['description'] = description
         dump_data = yaml.dump(data)
-        self.repo.modify(os.path.join(self.path, filename), dump_data,
-                         message="Modify job description: " + filename,
-                         committer=committer)
+        self.interface.modify(os.path.join(self.path, filename), dump_data,
+                              message="Modify job description: " + filename,
+                              committer=committer)
         return True
 
     def filename(self, hex_id):
         return hex_id + '.yaml'
 
     def search(self, keyword):
-        return self.repo.grep_yaml(keyword, self.path)
+        return self.interface.grep_yaml(keyword, self.path)
 
     def lists(self):
         results = []

@@ -10,8 +10,8 @@ import interface.base
 
 
 class GitInterface(interface.base.Interface):
-    author = b'developer'
-    encoding = b'UTF-8'
+    author = 'developer'
+    encoding = 'UTF-8'
 
     def __init__(self, path):
         """
@@ -39,7 +39,7 @@ class GitInterface(interface.base.Interface):
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> commit_id = interface.add('test_file', 'text',
-            ... b'Test commit', b'test<test@test.com>')
+            ... 'Test commit', 'test<test@test.com>')
             >>> commit_id == interface.repo.head()
             True
             >>> shutil.rmtree(repo_name)
@@ -53,7 +53,7 @@ class GitInterface(interface.base.Interface):
             committer = self.author
         if message is None:
             message = "Add file: " + filename + ".\n"
-        commit_id = self.repo.do_commit(message, committer=committer)
+        commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
         return commit_id
 
     def add_files(self, filenames, message=None, committer=None):
@@ -65,7 +65,7 @@ class GitInterface(interface.base.Interface):
             >>> with open('interface/test_repo/test_file', 'w') as file:
             ...     file.write('test')
             >>> commit_id = interface.add_files(['test_file'],
-            ... b'Test commit', b'test<test@test.com>')
+            ... 'Test commit', 'test<test@test.com>')
             >>> commit_id == interface.repo.head()
             True
             >>> shutil.rmtree(repo_name)
@@ -77,7 +77,7 @@ class GitInterface(interface.base.Interface):
             message = ""
             for each in filenames:
                 message += "Add file: " + each + ".\n"
-        commit_id = self.repo.do_commit(message, committer=committer)
+        commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
         return commit_id
 
     def modify(self, filename, stream, message=None, committer=None):
@@ -102,7 +102,7 @@ class GitInterface(interface.base.Interface):
         with open(os.path.join(self.repo.path, filename), 'w') as f:
             f.write(stream)
         self.repo.stage([bytes(filename)])
-        commit_id = self.repo.do_commit(message, committer=committer)
+        commit_id = self.repo.do_commit(message, committer=bytes(committer))
         return commit_id
 
     def grep(self, restrings, path):

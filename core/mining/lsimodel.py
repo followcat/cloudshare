@@ -38,7 +38,10 @@ class LSImodel(object):
             names.append(name.md)
             text = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
             texts.append(text)
-        self.setup(names, texts)
+        if len(names) > 0:
+            self.setup(names, texts)
+            return True
+        return False
 
     def setup(self, names, texts):
         self.names = names

@@ -33,8 +33,8 @@ def init_lsimodel(lsi, lsipath, svc_cv):
     try:
         lsi.load(lsipath)
     except IOError:
-        lsi.build(svc_cv)
-        lsi.save(lsipath)
+        if lsi.build(svc_cv):
+            lsi.save(lsipath)
 
 LSI_SAVE_PATH = 'lsimodel'
 LSI_MODEL = core.mining.lsimodel.LSImodel()

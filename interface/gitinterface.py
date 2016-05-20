@@ -30,7 +30,21 @@ class GitInterface(interface.base.Interface):
             self.repo = dulwich.repo.Repo(path)
 
     def get(self, filename):
-        return self.repo.get_named_file(filename)
+        """
+            >>> import shutil
+            >>> import interface.gitinterface
+            >>> repo_name = 'interface/test_repo'
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
+            >>> commit_id = interface.add('test_file', 'text',
+            ... 'Test commit', 'test<test@test.com>')
+            >>> interface.get('test_file')
+            'text'
+        """
+        data = None
+        result = self.repo.get_named_file(os.path.join('../', filename))
+        if result is not None:
+            data = result.read()
+        return data
 
     def add(self, filename, filedata, message=None, committer=None):
         """

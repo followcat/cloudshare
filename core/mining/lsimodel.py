@@ -34,8 +34,8 @@ class LSImodel(object):
         added = False
         for data in svc_cv.datas():
             name, doc = data
-            if name not in self.names:
-                self.add(name, doc)
+            if name.md not in self.names:
+                self.add(name.md, doc)
                 added = True
         if added:
             self.save(save_path)

@@ -37,7 +37,8 @@ class LSImodel(object):
             if name not in self.names:
                 self.add(name, doc)
                 added = True
-        self.save(save_path)
+        if added:
+            self.save(save_path)
 
     def build(self, svc_cv):
         names = []

@@ -46,8 +46,7 @@ class LSImodel(object):
         for data in svc_cv.datas():
             name, doc = data
             names.append(name.md)
-            text = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
-            texts.append(text)
+            texts.append(doc)
         if len(names) > 0:
             self.setup(names, texts)
             return True
@@ -55,8 +54,7 @@ class LSImodel(object):
 
     def setup(self, names, texts):
         self.names = names
-        self.texts = texts
-        self.silencer()
+        self.texts = self.silencer(texts)
         self.set_dictionary()
         self.set_corpus()
         self.set_tfidf()
@@ -93,13 +91,11 @@ class LSImodel(object):
                                                         self.matrix_save_name))
 
     def add(self, name, document):
+        text = self.silencer([document])[0]
         self.names.append(name)
-        data = re.sub(ur'[\n- /]+' ,' ' , document)
-        seg = [word.word for word in jieba.posseg.cut(data) if word.flag != 'x']
-        text = [word for word in seg if word not in self.token_most]
         self.texts.append(text)
         if self.dictionary is None:
-            self.dictionary = corpora.Dictionary(self.texts)
+            self.set_dictionary()
         corpu = self.dictionary.doc2bow(text)
         self.corpus.append(corpu)
         tfidf = models.TfidfModel(self.corpus)
@@ -113,6 +109,7 @@ class LSImodel(object):
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
+        self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005), no_above=1./8)
         
     def set_corpus(self):
         for text in self.texts:
@@ -127,25 +124,37 @@ class LSImodel(object):
                                    num_topics=self.topics, power_iters=6, extra_samples=300)
         self.index = similarities.Similarity("similarity", self.lsi[self.corpus], self.topics)
 
-    def silencer(self):
-        count_dict = {}
-        count_all = 0
-        for text in self.texts:
-            for word in text:
-                if word not in count_dict:
-                    count_dict[word] = 1
-                else:
-                    count_dict[word] += 1
-                count_all += 1
-        for word in count_dict:
-            if count_dict[word] > count_all*0.2:
-                self.token_most[word] = count_dict[word]
-        self.texts = [[word for word in text if word not in self.token_most]
-                        for text in self.texts]
+    def silencer(self, texts):
+        FLAGS = ['x', # spaces
+                 'm', # number and date
+                 'ns', # city and country
+                ]
+        LINE = re.compile(ur'[\n- /]+')
+        BHTTP = re.compile(ur'\(https?:\S*\)')
+        HTTP = re.compile(ur'https?:\S*(?=\s)')
+        WWW = re.compile('www\.[\.\w]+')
+        EMAIL = re.compile('\w+@[\.\w]+')
+        SHORT = re.compile('(([A-Z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
+        selected_texts = []
+        for text in texts:
+            text = HTTP.sub('\n', BHTTP.sub('\n', LINE.sub(' ', text)))
+            text = WWW.sub('', EMAIL.sub('', text))
+            doc = [word.word for word in jieba.posseg.cut(text) if word.flag not in FLAGS]
+            out = []
+            for d in doc:
+                if d.istitle():
+                    # Can make it match SHORT later for skip (eg 'Ltd' ...)
+                    d = d.lower()
+                if not SHORT.match(d):
+                    # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
+                    d = d.lower()
+                    out.append(d)
+            selected_texts.append(out)
+        return selected_texts
 
     def probability(self, doc):
-        texts = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
+        texts = self.silencer([doc])[0]
         vec_bow = self.dictionary.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
-        sims = sorted(enumerate(self.index[vec_lsi]), key=lambda item: -item[1])
+        sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
         return sims

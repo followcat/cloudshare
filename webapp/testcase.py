@@ -1,6 +1,4 @@
-import os
 import json
-import shutil
 import tempfile
 
 import flask
@@ -8,42 +6,24 @@ import jinja2.ext
 import flask.ext.testing
 
 import ext.views
-import services.account
-import services.company
-import services.jobdescription
-import services.curriculumvitae
-import interface.gitinterface
 
 
 class Test(flask.ext.testing.TestCase):
 
+    def setUp(self):
+        self.config['REBUILD']()
+
     def tearDown(self):
-        shutil.rmtree(self.data_db.repo.path)
-        shutil.rmtree(self.account_db.repo.path)
-        shutil.rmtree(self.upload_tmp)
+        self.config['DESTORY']()
 
     def create_app(self):
-
         self.app = flask.Flask(__name__)
-        self.app.config.from_object('webapp.settings')
+        self.app.config.from_object('tests.settings.config')
+        self.config = self.app.config
+        self.data_db = self.app.config['DATA_DB']
+        self.account_db = self.app.config['ACCOUNT_DB']
+        self.upload_tmp = self.app.config['UPLOAD_TEMP']
         self.app.jinja_env.add_extension(jinja2.ext.loopcontrols)
-
-        self.data_db = interface.gitinterface.GitInterface('testcase_data')
-        self.account_db = interface.gitinterface.GitInterface('testcase_account')
-        self.upload_tmp = 'testcase_output'
-        os.mkdir(self.upload_tmp)
-
-        self.app.config['SECRET_KEY'] = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
-        self.app.config['TESTING'] = True
-        self.app.config['DATA_DB'] = self.data_db
-        self.app.config['SVC_CV'] = services.curriculumvitae.CurriculumVitae(self.data_db)
-        self.app.config['SVC_ACCOUNT'] = services.account.Account(self.account_db)
-        SVC_CO = services.company.Company(self.data_db)
-        self.app.config['SVC_CO'] = SVC_CO
-        SVC_JD = services.jobdescription.JobDescription(self.data_db, SVC_CO)
-        self.app.config['SVC_JD'] = SVC_JD
-        self.app.config['UPLOAD_TEMP'] = self.upload_tmp
-
         ext.views.configure(self.app)
         return self.app
 

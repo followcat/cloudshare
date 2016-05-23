@@ -30,6 +30,15 @@ class LSImodel(object):
         self.dictionary = None
         self.corpus_tfidf = None
 
+    def update(self, svc_cv, save_path):
+        added = False
+        for data in svc_cv.datas():
+            name, doc = data
+            if name not in self.names:
+                self.add(name, doc)
+                added = True
+        self.save(save_path)
+
     def build(self, svc_cv):
         names = []
         texts = []

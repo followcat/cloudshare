@@ -1,6 +1,6 @@
 var gulp = require('gulp');
 var Server = require('karma').Server;
-var jshint = require('gulp-jshint')
+var jshint = require('gulp-jshint');
 var browserSync = require('browser-sync').create();
 
 
@@ -21,7 +21,7 @@ gulp.task('browser-sync', function(){
 gulp.task('test', function (done) {
   var server = new Server({
   	             configFile: __dirname + '/karma.conf.js',
-                 singleRun: true  
+                 singleRun: true
              }, function(){ done(); });
   server.start();
 });
@@ -31,5 +31,5 @@ gulp.task('default', function(){
 
 	gulp.watch('./src/*.js', function(){
 		gulp.run('lint');
-	})
-})
+	});
+});

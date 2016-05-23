@@ -93,12 +93,12 @@ class LSI(flask.views.MethodView):
                 'match': str(each[1])
             }
             datas.append([name, yaml_info, info])
-        return flask.render_template('lsipage.html',result=datas)
+        return flask.render_template('lsipage.html',result=datas, button_bar=True)
 
     def post(self):
         svc_cv = flask.current_app.config['SVC_CV']
         lsi = flask.current_app.config['LSI_MODEL']
-        doc = flask.request.form['doc']
+        doc = flask.request.form['search_text']
         result = lsi.probability(doc)
         kv = dict()
         datas = []
@@ -112,7 +112,8 @@ class LSI(flask.views.MethodView):
                 'match': str(each[1])
             }
             datas.append([name, yaml_info, info])
-        return flask.jsonify(result=datas)
+        # return flask.jsonify(result=datas)
+        return flask.render_template('lsipage.html',result=datas, button_bar=False)
 
 
 class Valuable(flask.views.MethodView):

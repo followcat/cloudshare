@@ -71,7 +71,7 @@
 }
 .triangle-up{
   position: absolute;
-  width: 0;  
+  width: 0;
   height: 0;
   border-color: transparent transparent #c2c2c2;
   border-style: dashed dashed solid;
@@ -81,13 +81,13 @@
 }
 .triangle-up-z{
   position: absolute;
-  width: 0;  
+  width: 0;
   height: 0;
   border-color: transparent transparent #fff;
   border-style: dashed dashed solid;
   border-width: 0 8px 8px;
   top: -7px;
-  left: 10px;  
+  left: 10px;
 }
 .tracking-info ul, .comment-info ul{
   margin-bottom: 0;
@@ -98,7 +98,7 @@
 .comment-info ul li .author{
   display: block;
   float: right;
-  margin-right: 14px;  
+  margin-right: 14px;
 }
 .comment-info ul li p{
   margin: 0;
@@ -146,7 +146,7 @@
 }
 #data-main{
   width:100%;
-  
+
   margin-bottom: 40px;
 }
 #echarts-wrap{

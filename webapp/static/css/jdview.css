@@ -4,22 +4,19 @@
 .cv-jd-match{
   margin-top: 8px;
 }
-#chart-wrapper{
+.chart-wrapper{
   width: 100%;
   height: 460px;
 }
 .edit-jd{
   margin-top: 8px;
 }
-#message{
+.message-font{
   text-align: center;
   font-size: 1.25em;
 }
-// .jd-td{
-//   width: 42%;
-//   overflow : hidden;
-//   text-overflow: ellipsis;
-//   display: -webkit-box;
-//   -webkit-line-clamp: 2;
-//   -webkit-box-orient: vertical;
-// }
+.jd-td{
+  display: block;
+  height: 90px;
+  overflow: hidden;
+}

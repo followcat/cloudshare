@@ -32,33 +32,36 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="col-md-10 col-md-offset-1 result-list">
-  <div class='tool-bar'>
-    <button class='btn btn-default btn-xs' id='vd-position'>Show No. of Positions</button>
-    <button class='btn btn-default btn-xs' id='vd-capacity-pro'>Show Competency</button>
-    <button class='btn btn-default btn-xs' id='vd-capacity'>Show Work experience</button>
-    <button class='btn btn-default btn-xs' id='vd-valuable'>Show Radar Chart</button>
+  {% if button_bar %}
+  <div class="tool-bar">
+    <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
+    <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency</button>
+    <button class="btn btn-default btn-xs" id="vd-capacity">Show Work experience</button>
+    <button class="btn btn-default btn-xs" id="vd-valuable">Show Radar Chart</button>
     <div class="checkbox anonymous">
       <label>
-        <input type="checkbox" id='anonymous-checkbox'>Anonymous
+        <input type="checkbox" id="anonymous-checkbox">Anonymous
       </label>
     </div>
-    <div id='data-main' style='display: none;'>
-      <div id='echarts-wrap'></div>
-      <div id='action-msg'></div>
+    <div id="data-main" style="display: none;">
+      <div id="echarts-wrap"></div>
+      <div id="action-msg"></div>
     </div>
   </div>
+  {% endif %}
   {% if result %}
   {% for item in result %}
   <div class="result-list-item">
     <div class="item-link">
-      <input type='checkbox' class='checkbox-name'></input>
+      <input type="checkbox" class="checkbox-name" />
       <a href="/show/{{ item[0] }}" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
       <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
       </em>
-      <p style='display: none;'>{{ item[2].match }}</p>
+      <p style="display: none;">{{ item[2].match }}</p>
       {% if item[1].enversion %}
-      <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>English CV</a>
+      <a href="/edit/{{ item[1].enversion }}" target="_blank" class="check-en">English CV</a>
       {% endif %}
     </div>
     <div class="container-fluid">
@@ -72,17 +75,17 @@
       </ul>
     </div>
     <div class="work-experience">
-      <a href="javascript:;" class='show-more'>Unfold</a>
+      <a href="javascript:;" class="show-more">Unfold</a>
         {% for e in item[1].experience %}
           {% if loop.index > 2 %}
-            <div class='experience-hide'>
-              <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
-              <div class='experience-company'>{{ e[2] }}</div> 
+            <div class="experience-hide">
+              <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+              <div class="experience-company">{{ e[2] }}</div>
             </div>
           {% else %}
             <div>
-              <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
-              <div class='experience-company'>{{ e[2] }}</div> 
+              <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+              <div class="experience-company">{{ e[2] }}</div>
             </div>
           {% endif %}
         {% endfor %}
@@ -130,5 +133,5 @@
 {% endblock %}
 
 {% block script%}
-<script data-main="{{ url_for('static', filename='js/src/search_result') }}" src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
+<script data-main="{{ url_for('static', filename='js/src/search_result') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
 {% endblock%}

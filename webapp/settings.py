@@ -1,6 +1,4 @@
 import os
-import re
-import glob
 
 import services.account
 import services.company

@@ -134,7 +134,7 @@ class LSImodel(object):
         HTTP = re.compile(ur'https?:\S*(?=\s)')
         WWW = re.compile('www\.[\.\w]+')
         EMAIL = re.compile('\w+@[\.\w]+')
-        SHORT = re.compile('(([A-Z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
+        SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
         selected_texts = []
         for text in texts:
             text = HTTP.sub('\n', BHTTP.sub('\n', LINE.sub(' ', text)))

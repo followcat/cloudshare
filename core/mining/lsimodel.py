@@ -17,7 +17,8 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, topics=100):
+    def __init__(self, savepath, topics=100):
+        self.path = savepath
         self.topics = topics
         self.names = []
         self.texts = []
@@ -30,7 +31,7 @@ class LSImodel(object):
         self.dictionary = None
         self.corpus_tfidf = None
 
-    def update(self, svc_cv, save_path):
+    def update(self, svc_cv):
         added = False
         for data in svc_cv.datas():
             name, doc = data
@@ -38,7 +39,7 @@ class LSImodel(object):
                 self.add(name.md, doc)
                 added = True
         if added:
-            self.save(save_path)
+            self.save()
 
     def build(self, svc_cv):
         names = []
@@ -62,34 +63,34 @@ class LSImodel(object):
         self.set_tfidf()
         self.set_lsimodel()
 
-    def save(self, path):
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(os.path.join(path, self.names_save_name), 'w') as f:
+    def save(self):
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+        with open(os.path.join(self.path, self.names_save_name), 'w') as f:
             pickle.dump(self.names, f)
-        with open(os.path.join(path, self.corpus_save_name), 'w') as f:
+        with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
             pickle.dump(self.corpus, f)
-        with open(os.path.join(path, self.texts_save_name), 'w') as f:
+        with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
             pickle.dump(self.texts, f)
-        with open(os.path.join(path, self.most_save_name), 'w') as f:
+        with open(os.path.join(self.path, self.most_save_name), 'w') as f:
             pickle.dump(self.token_most, f)
-        self.lsi.save(os.path.join(path, self.model_save_name))
-        self.dictionary.save(os.path.join(path, self.corpu_dict_save_name))
-        self.index.save(os.path.join(path, self.matrix_save_name))
+        self.lsi.save(os.path.join(self.path, self.model_save_name))
+        self.dictionary.save(os.path.join(self.path, self.corpu_dict_save_name))
+        self.index.save(os.path.join(self.path, self.matrix_save_name))
 
-    def load(self, path):
-        with open(os.path.join(path, self.names_save_name), 'r') as f:
+    def load(self):
+        with open(os.path.join(self.path, self.names_save_name), 'r') as f:
             self.names = pickle.load(f)
-        with open(os.path.join(path, self.corpus_save_name), 'r') as f:
+        with open(os.path.join(self.path, self.corpus_save_name), 'r') as f:
             self.corpus = pickle.load(f)
-        with open(os.path.join(path, self.texts_save_name), 'r') as f:
+        with open(os.path.join(self.path, self.texts_save_name), 'r') as f:
             self.texts = pickle.load(f)
-        with open(os.path.join(path, self.most_save_name), 'r') as f:
+        with open(os.path.join(self.path, self.most_save_name), 'r') as f:
             self.token_most = pickle.load(f)
-        self.lsi = models.LsiModel.load(os.path.join(path, self.model_save_name))
-        self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(path,
+        self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
+        self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
                                                              self.corpu_dict_save_name))
-        self.index = similarities.Similarity.load(os.path.join(path,
+        self.index = similarities.Similarity.load(os.path.join(self.path,
                                                         self.matrix_save_name))
 
     def add(self, name, document):
@@ -109,7 +110,8 @@ class LSImodel(object):
                             num_topics=self.topics, power_iters=6, extra_samples=300)
         else:
             self.lsi.add_documents(corpu_tfidf)
-        self.index = similarities.Similarity("similarity", self.lsi[self.corpus], self.topics)
+        self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
+                                             self.lsi[self.corpus], self.topics)
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
@@ -125,7 +127,8 @@ class LSImodel(object):
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
                                    num_topics=self.topics, power_iters=6, extra_samples=300)
-        self.index = similarities.Similarity("similarity", self.lsi[self.corpus], self.topics)
+        self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
+                                             self.lsi[self.corpus], self.topics)
 
     def silencer(self):
         count_dict = {}

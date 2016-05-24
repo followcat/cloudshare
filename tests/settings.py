@@ -35,7 +35,7 @@ class Config(object):
         self.ACCOUNT_DB = interface.gitinterface.GitInterface(self.ACCOUNT_DB_NAME)
         self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB)
 
-        self.LSI_MODEL = core.mining.lsimodel.LSImodel()
+        self.LSI_MODEL = core.mining.lsimodel.LSImodel(self.LSI_SAVE_PATH)
 
     def rebuild(self):
         self.destory()

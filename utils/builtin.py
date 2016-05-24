@@ -11,10 +11,12 @@ def md5(text):
     m.update(text)
     return unicode(m.hexdigest())
 
+def dump_yaml(obj):
+    return yaml.dump(obj, Dumper=utils._yaml.Dumper)
 
 def save_yaml(infodict, path, filename):
     with open(os.path.join(path, filename), 'w') as f:
-        f.write(yaml.dump(infodict))
+        f.write(yaml.dump(infodict, Dumper=utils._yaml.Dumper))
 
 
 def load_yaml(path, filename):

@@ -27,13 +27,13 @@ ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 SVC_ACCOUNT = services.account.Account(ACCOUNT_DB)
 
-def init_lsimodel(lsi, lsipath, svc_cv):
+def init_lsimodel(lsi, svc_cv):
     try:
-        lsi.load(lsipath)
+        lsi.load()
     except IOError:
         if lsi.build(svc_cv):
-            lsi.save(lsipath)
+            lsi.save()
 
 LSI_SAVE_PATH = 'lsimodel'
-LSI_MODEL = core.mining.lsimodel.LSImodel()
-init_lsimodel(LSI_MODEL, LSI_SAVE_PATH, SVC_CV)
+LSI_MODEL = core.mining.lsimodel.LSImodel(LSI_SAVE_PATH)
+init_lsimodel(LSI_MODEL, SVC_CV)

@@ -13,7 +13,7 @@ class CurriculumVitae(object):
 
     def __init__(self, interface):
         self.interface = interface
-        self.repo_path = self.interface.repo.path + "/" + self.path
+        self.repo_path = self.interface.path + "/" + self.path
         self.info = ""
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
@@ -113,8 +113,7 @@ class CurriculumVitae(object):
     def datas(self):
         for yaml in self.yamls():
             name = core.outputstorage.ConvertName(yaml)
-            with open(os.path.join(self.repo_path, name.md)) as fp:
-                text = fp.read()
+            text = self.interface.get(name.md)
             yield name, text
 
     def search(self, keyword):
@@ -134,6 +133,8 @@ class CurriculumVitae(object):
         name = core.outputstorage.ConvertName(id).yaml
         path_name = os.path.join(self.path, name)
         yaml_str = self.interface.get(path_name)
+        if yaml_str is None:
+            raise IOError
         return yaml.load(yaml_str)
 
 

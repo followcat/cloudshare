@@ -86,7 +86,7 @@ class LSI(flask.views.MethodView):
         for each in result[:20]:
             kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
+            yaml_info = svc_cv.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
@@ -105,7 +105,7 @@ class LSI(flask.views.MethodView):
         for each in result[2:10]:
             kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
+            yaml_info = svc_cv.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),

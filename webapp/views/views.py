@@ -41,7 +41,7 @@ class Search(flask.views.MethodView):
                 else:
                     continue
                 try:
-                    yaml_data = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
+                    yaml_data = svc_cv.getyaml(base)
                 except IOError:
                     names.remove(name)
                     continue

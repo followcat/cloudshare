@@ -83,7 +83,7 @@ def info_by_re_iter(stream, restr):
     return result
 
 
-def catch(path, convertname, basename):
+def catch(stream, basename):
     info_dict = {
         "filename":     '',
         "name":         '',
@@ -126,38 +126,35 @@ def catch(path, convertname, basename):
 
     email_restr = u'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'
 
-    with open(os.path.join(path, convertname.md), 'r') as f:
-        stream = f.read()
+    name = getTagFromString('姓名', stream)
+    namelist = getInfoFromRestr(name.encode('utf-8'), u'^[\u4E00-\u9FA5\w]*$')
+    if not namelist:
+        name = ''
+    info_dict["name"] = name
 
-        name = getTagFromString('姓名', stream)
-        namelist = getInfoFromRestr(name.encode('utf-8'), u'^[\u4E00-\u9FA5\w]*$')
-        if not namelist:
-            name = ''
-        info_dict["name"] = name
-
-        age = info_by_re_iter(stream, age_restr)
-        phone = info_by_re_iter(stream, phone_restr)
-        email = info_by_re_iter(stream, email_restr)
-        company = info_by_re_iter(stream, organization_restr)
-        school_iter = iter(getInfoFromRestr(stream, school_restr))
-        try:
+    age = info_by_re_iter(stream, age_restr)
+    phone = info_by_re_iter(stream, phone_restr)
+    email = info_by_re_iter(stream, email_restr)
+    company = info_by_re_iter(stream, organization_restr)
+    school_iter = iter(getInfoFromRestr(stream, school_restr))
+    try:
+        school = ''.join(school_iter.next())
+        while len(school) > 10:
             school = ''.join(school_iter.next())
-            while len(school) > 10:
-                school = ''.join(school_iter.next())
-        except StopIteration:
-            school = ''
+    except StopIteration:
+        school = ''
 
-        info_dict["school"] = school
-        info_dict["company"] = company
-        info_dict["filename"] = basename.decode('utf-8')
-        info_dict["position"] = getTagFromString('所任职位', stream)[:25] or\
-            getTagFromString('职位', stream)[:25]
-        info_dict["education"] = getTagFromString('学历', stream) or\
-            info_by_re_iter(stream, education_restr)
-        info_dict["id"] = getTagFromString('ID', stream, rule='a-zA-Z0-9')
-        info_dict["age"] = getTagFromString('年龄', stream) or age
-        info_dict["phone"] = getTagFromString('电话', stream, ur'\d\-－()（）') or phone
-        info_dict["email"] = getTagFromString('邮件', stream, email_restr) or \
-            getTagFromString('邮箱', stream) or email
-        info_dict["experience"] = getExperience(stream)
+    info_dict["school"] = school
+    info_dict["company"] = company
+    info_dict["filename"] = basename.decode('utf-8')
+    info_dict["position"] = getTagFromString('所任职位', stream)[:25] or\
+        getTagFromString('职位', stream)[:25]
+    info_dict["education"] = getTagFromString('学历', stream) or\
+        info_by_re_iter(stream, education_restr)
+    info_dict["id"] = getTagFromString('ID', stream, rule='a-zA-Z0-9')
+    info_dict["age"] = getTagFromString('年龄', stream) or age
+    info_dict["phone"] = getTagFromString('电话', stream, ur'\d\-－()（）') or phone
+    info_dict["email"] = getTagFromString('邮件', stream, email_restr) or \
+        getTagFromString('邮箱', stream) or email
+    info_dict["experience"] = getExperience(stream)
     return info_dict

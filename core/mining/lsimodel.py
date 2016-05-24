@@ -17,13 +17,13 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, topics=100):
+    def __init__(self, savepath, no_above=1./8, topics=100):
         self.path = savepath
         self.topics = topics
+        self.no_above = no_above
         self.names = []
         self.texts = []
         self.corpus = []
-        self.token_most = {}
 
         self.lsi = None
         self.index = None
@@ -70,8 +70,6 @@ class LSImodel(object):
             pickle.dump(self.corpus, f)
         with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
             pickle.dump(self.texts, f)
-        with open(os.path.join(self.path, self.most_save_name), 'w') as f:
-            pickle.dump(self.token_most, f)
         self.lsi.save(os.path.join(self.path, self.model_save_name))
         self.dictionary.save(os.path.join(self.path, self.corpu_dict_save_name))
         self.index.save(os.path.join(self.path, self.matrix_save_name))
@@ -83,8 +81,6 @@ class LSImodel(object):
             self.corpus = pickle.load(f)
         with open(os.path.join(self.path, self.texts_save_name), 'r') as f:
             self.texts = pickle.load(f)
-        with open(os.path.join(self.path, self.most_save_name), 'r') as f:
-            self.token_most = pickle.load(f)
         self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
                                                              self.corpu_dict_save_name))
@@ -111,8 +107,9 @@ class LSImodel(object):
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
-        self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005), no_above=1./8)
-        
+        self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
+                                        no_above=self.no_above)
+
     def set_corpus(self):
         for text in self.texts:
             self.corpus.append(self.dictionary.doc2bow(text))

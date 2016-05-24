@@ -18,11 +18,11 @@ class Config(object):
     LSI_SAVE_PATH = 'tests/lsimodel'
 
     def __init__(self):
-        self.rebuild()
+        self.build()
         self.REBUILD = self.rebuild
         self.DESTORY = self.destory
 
-    def rebuild(self):
+    def build(self):
         if not os.path.exists(self.UPLOAD_TEMP):
             os.mkdir(self.UPLOAD_TEMP)
 
@@ -36,6 +36,10 @@ class Config(object):
         self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB)
 
         self.LSI_MODEL = core.mining.lsimodel.LSImodel()
+
+    def rebuild(self):
+        self.destory()
+        self.build()
 
     def destory(self):
         if os.path.exists(self.UPLOAD_TEMP):

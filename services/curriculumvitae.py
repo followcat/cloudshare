@@ -113,7 +113,7 @@ class CurriculumVitae(object):
     def datas(self):
         for yaml in self.yamls():
             name = core.outputstorage.ConvertName(yaml)
-            text = self.interface.get(name.md)
+            text = self.getmd(name)
             yield name, text
 
     def search(self, keyword):

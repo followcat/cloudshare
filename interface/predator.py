@@ -23,7 +23,7 @@ def cloudshare_yaml_template():
         'filename': "",
         'id': '',
         'name': "",
-        'origin': '',
+        'origin': u'猎聘爬取',
         'phone': "",
         'position': "",
         'school': "",
@@ -41,7 +41,8 @@ def extract_details(uploaded_details):
     details = cloudshare_yaml_template()
 
     details['date'] = 0
-    details['id'] = uploaded_details['id']
+    details['name'] = uploaded_details['name']
+    details['id'] = uploaded_details['data-id']
     details['company'] = uploaded_details['peo'][7]
     details['position'] = uploaded_details['peo'][6]
     details['filename'] = uploaded_details['href']

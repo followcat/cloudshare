@@ -13,7 +13,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>(cd $CLOUDSHARE_CI_HOME; nosetests --with-doctest webapp/views/*.py core/*.py interface/*.py)</command>
+      <command>(cd $CLOUDSHARE_CI_HOME; nosetests --with-doctest webapp/views/*.py core/*.py interface/*.py services/*.py)</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

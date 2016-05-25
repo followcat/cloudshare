@@ -37,7 +37,7 @@ class Config(object):
 
 
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, [self.SVC_CV], self.SVC_CV)
-        self.LSI_MODEL = SVC_MIN.lsi['default']
+        self.LSI_MODEL = self.SVC_MIN.lsi['default']
 
     def rebuild(self):
         self.destory()

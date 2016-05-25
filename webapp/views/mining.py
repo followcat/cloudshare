@@ -75,7 +75,7 @@ class LSI(flask.views.MethodView):
         lsi = flask.current_app.config['LSI_MODEL']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.args['jd_id']
-        jd_yaml = utils.builtin.load_yaml(svc_jd.repo_path, jd_id + '.yaml')
+        jd_yaml = svc_jd.get(jd_id+'.yaml')
         doc = jd_yaml['description']
         result = lsi.probability(doc)
         kv = dict()
@@ -119,7 +119,7 @@ class Valuable(flask.views.MethodView):
         lsi = flask.current_app.config['LSI_MODEL']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.form['jd_id']
-        jd_yaml = utils.builtin.load_yaml(svc_jd.repo_path, jd_id + '.yaml')
+        jd_yaml = svc_jd.get(jd_id + '.yaml')
         doc = jd_yaml['description']
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
@@ -136,7 +136,7 @@ class Valuable(flask.views.MethodView):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = utils.builtin.load_yaml(svc_cv.repo_path, name + '.yaml')
+                yaml_data = svc_cv.getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
                 values.append(yaml_data)
             item['value'] = values

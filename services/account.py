@@ -28,7 +28,7 @@ class Account(object):
         ExistsUser: admin
         >>> svc_account.delete('root', 'admin')
         True
-        >>> account.USERS
+        >>> svc_account.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> shutil.rmtree(repo_name)
     """

@@ -22,20 +22,17 @@ class Position(flask.views.MethodView):
         else:
             searches = svc_cv.search(search_text)
         result = dict()
-        for search in searches:
-            name = core.outputstorage.ConvertName(search)
-            with codecs.open(os.path.join(svc_cv.repo_path, name.md),
-                             'r', encoding='utf-8') as file:
-                md_data = file.read()
+        for name in searches:
+            md_data = svc_cv.getmd(name)
             positions = core.mining.info.position(md_data, search_text)
             try:
-                yaml_data = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
+                yaml_data = svc_cv.getyaml(name)
             except IOError:
                 continue
             for position in positions:
                 if position not in result:
                     result[position] = []
-                result[position].append({search: yaml_data})
+                result[position].append({name: yaml_data})
         return flask.jsonify(result=result)
 
 

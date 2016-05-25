@@ -301,16 +301,16 @@ class UserInfo(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         repo = flask.current_app.config['DATA_DB']
+        svc_cv = flask.current_app.config['SVC_CV']
         user = flask.ext.login.current_user
         info_list = repo.history(user.id, max_commits=10)
         for info in info_list:
             for md5 in info['filenames']:
-                name = core.outputstorage.ConvertName(md5)
                 try:
-                    info['filenames'] = utils.builtin.load_yaml(repo.repo.path, name.yaml)
+                    info['filenames'] = svc_cv.getyaml(md5)
                 except IOError:
-                    info['filenames'] = name
-                info['name'] = name
+                    info['filenames'] = md5
+                info['name'] = md5
             info['message'] = info['message'].decode('utf-8')
         return flask.render_template('userinfo.html', info=info_list)
 

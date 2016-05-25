@@ -5,6 +5,11 @@ body{
 a{
   text-decoration: none;
 }
+.logo-box{
+  display: inline-block;
+  position: absolute;
+  line-height: 50px;
+}
 .header-box{
   position: relative;
   width: 100%;
@@ -12,29 +17,34 @@ a{
   background-color: #337ab7;
 }
 .logo{
-  position: absolute;
+  display: inline-block;
   width: 174px;
   height: 36px;
-  top: 50%;
-  margin-top: -18px;
-}
-@media (max-width: 768px){
-  .logo{
-    width: 20%;
-  }
 }
 .nav-list{
   position: absolute;
   top: 0;
   right: 20px;
 }
+.nav-list > li{
+  display: inline-block;
+  float: left;
+  width: 100px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+}
 .nav-list > li > a{
+  display: block;
+  width: 100%;
+  height: 100%;
   color:#fff;
   font-size: 1.05em;
   font-weight: bold;
 }
 .nav-list .open > a, .nav-list .open > a:hover, .nav-list .open > a:focus, .nav-list > li > a:hover, .nav-list > li > a:focus{
   background-color: #004B97;
+  text-decoration: none;
 }
 .nav-list > li > .dropdown-menu{
   font-size: 1.05em;
@@ -97,6 +107,11 @@ a{
   vertical-align: top;
   left: 28px;
   bottom: 6px;
+}
+@media (max-width: 991px) {
+  .type-check{
+    bottom: -30px;
+  }
 }
 .type-check label{
   position: relative;

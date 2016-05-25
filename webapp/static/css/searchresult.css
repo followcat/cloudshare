@@ -33,10 +33,15 @@
 .info .company{
   width: 24%;
 }
-
+.info-wrapper{
+  width: 100%;
+  overflow: hidden;
+}
 .label-box, .tracking-box, .comment-box{
   margin-top: 2px;
+  margin-left: 8px;
   font-size: 0.875em;
+  float: left;
 }
 .label-box .label-title{
   color: #000;
@@ -59,7 +64,6 @@
   -ms-box-shadow: 0 0 8px #ccc;
   -o-box-shadow: 0 0 8px #ccc;
   box-shadow: 0 0 8px #ccc;
-
 }
 .tracking-info{
   max-width: 300px;
@@ -121,15 +125,37 @@
   font-size: 0.875em;
 }
 .work-experience .experience-time{
-  width: 14%;
+  width: 20%;
   float: left;
 }
 .work-experience .experience-company{
-  width: 85%;
+  width: 79%;
   float: left;
+}
+@media (max-width: 991px) {
+  .work-experience .experience-time{
+    width: 30%;
+  }
+  .work-experience .experience-company{
+    width: 69%;
+  }
+}
+@media (max-width: 767px) {
+  .work-experience .experience-time{
+    width: 38%;
+  }
+  .work-experience .experience-company{
+    width: 61%;
+  }
+}
+.experience-show{
+  width: 100%;
+  overflow: hidden;
 }
 .experience-hide{
   display: none;
+  width: 100%;
+  overflow: hidden;
 }
 .show-more{
   position: absolute;
@@ -146,7 +172,6 @@
 }
 #data-main{
   width:100%;
-
   margin-bottom: 40px;
 }
 #echarts-wrap{
@@ -162,4 +187,9 @@
 }
 .vd-region{
   margin-left: 20px;
+}
+@media (max-width: 767px) {
+  .header-search{
+    display: none;
+  }
 }

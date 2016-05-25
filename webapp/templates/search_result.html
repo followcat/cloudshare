@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block search %}
-<form action="/search" method="GET">
+<form action="/search" method="GET" class="header-search">
   <div class="input-group search-item">
-    <input type="text" class="form-control" name="search_text" id='search_text' placeholder="Search for ..." value="{{ search_key }}" required="required">
+    <input type="text" class="form-control" name="search_text" id="search_text" placeholder="Search for ..." value="{{ search_key }}" required="required">
     <div class="input-group-btn">
       <button type="submit" class="btn btn-default">Search</button>
     </div>
@@ -17,14 +17,14 @@
 
 {% block content %}
   <div class="col-md-10 col-md-offset-1 result-list">
-    <div class='tool-bar'>
-      <button class='btn btn-default btn-xs' id='vd-position'>Show No. of Positions</button>
+    <div class="tool-bar">
+      <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
 <!--       <button class='btn btn-default btn-xs' id='vd-position-region'>显示职业分布结果</button> -->
-      <button class='btn btn-default btn-xs' id='vd-capacity-pro'>Show Competency </button>
-      <button class='btn btn-default btn-xs' id='vd-capacity'>Show Work Experience</button>
-      <div id='data-main' style='display: none;'>
-        <div id='echarts-wrap'></div>
-        <div id='action-msg'></div>
+      <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency </button>
+      <button class="btn btn-default btn-xs" id="vd-capacity">Show Work Experience</button>
+      <div id="data-main" style="display: none;">
+        <div id="echarts-wrap"></div>
+        <div id="action-msg"></div>
       </div>
     </div>
     {% if result %}
@@ -36,7 +36,7 @@
         <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
         </em>
         {% if item[1].enversion %}
-        <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>English CV</a>
+        <a href="/edit/{{ item[1].enversion }}" target="_blank" class="check-en">English CV</a>
         {% endif %}
       </div>
       <div class="container-fluid">
@@ -50,57 +50,57 @@
         </ul>
       </div>
       <div class="work-experience">
-        <a href="javascript:;" class='show-more'>Unfold</a>
+        <a href="javascript:;" class="show-more">Unfold</a>
           {% for e in item[1].experience %}
             {% if loop.index > 2 %}
-              <div class='experience-hide'>
-                <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
-                <div class='experience-company'>{{ e[2] }}</div> 
+              <div class="experience-hide">
+                <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+                <div class="experience-company">{{ e[2] }}</div>
               </div>
             {% else %}
-              <div>
-                <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
-                <div class='experience-company'>{{ e[2] }}</div> 
+              <div class="experience-show">
+                <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+                <div class="experience-company">{{ e[2] }}</div>
               </div>
             {% endif %}
           {% endfor %}
-<!--           <a href="javascript:;" class='show-more'>+显示更多</a> -->
       </div>
-      <div class="label-box">
-        <span class="label-title">Tags:</span>
-        {% for tags in item[1].tag %}
-          <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
-        {% endfor %}
-      </div>
-      <div class="tracking-box">
-        <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
-        <div class="tracking-info">
-          <span class="triangle-up"></span>
-          <span class="triangle-up-z"></span>
-          <ul class="list-inline clearfix">
-            {% for tracking in item[1].tracking %}
-              <li>{{ tracking.author }}</li>
-            {% endfor %}
-          </ul>
+      <div class="info-wrapper">
+        <div class="tracking-box">
+          <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
+          <div class="tracking-info">
+            <span class="triangle-up"></span>
+            <span class="triangle-up-z"></span>
+            <ul class="list-inline clearfix">
+              {% for tracking in item[1].tracking %}
+                <li>{{ tracking.author }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        <div class="comment-box">
+          <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
+          <div class="comment-info">
+            <span class="triangle-up"></span>
+            <span class="triangle-up-z"></span>
+            <ul class="list-unstyled clearfix">
+              {% for comments in item[1].comment %}
+                {%- if loop.index > 3 %}{% break %}{% endif %}
+                <li class="comment-item">
+                  <p>{{ comments.content }}</p>
+                  <em class="author">{{ comments.author }}</em>
+                </li>
+              {%- endfor %}
+            </ul>
+          </div>
+        </div>
+        <div class="label-box">
+          <span class="label-title">Tags:</span>
+          {% for tags in item[1].tag %}
+            <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
+          {% endfor %}
         </div>
       </div>
-      <div class="comment-box">
-        <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
-        <div class="comment-info">
-          <span class="triangle-up"></span>
-          <span class="triangle-up-z"></span>
-          <ul class="list-unstyled clearfix">
-            {% for comments in item[1].comment %}
-              {%- if loop.index > 3 %}{% break %}{% endif %}
-              <li class="comment-item">
-                <p>{{ comments.content }}</p>
-                <em class="author">{{ comments.author }}</em>
-              </li>
-            {%- endfor %}
-          </ul>
-        </div>
-      </div>
-
     </div>
     {% endfor %}
     {% else %}
@@ -110,5 +110,5 @@
 {% endblock %}
 
 {% block script%}
-<script data-main='{{ url_for("static", filename="js/src/search_result.js") }}' src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
+<script data-main="{{ url_for('static', filename='js/src/search_result.js') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
 {% endblock%}

@@ -13,6 +13,6 @@ atexit.register(lambda: sched.shutdown(wait=True))
 
 if __name__ == '__main__':
     sched.add_job(app.config['LSI_MODEL'].update, 'interval', seconds=300,
-                  args=[app.config['SVC_CV']])
+                  args=[[app.config['SVC_CV']]])
     sched.start()
     app.run(debug=True, host='0.0.0.0', port=4888, threaded=True)

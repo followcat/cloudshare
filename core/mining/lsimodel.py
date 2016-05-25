@@ -31,24 +31,26 @@ class LSImodel(object):
         self.dictionary = None
         self.corpus_tfidf = None
 
-    def update(self, svc_cv):
+    def update(self, svccv_list):
         added = False
-        for data in svc_cv.datas():
-            name, doc = data
-            if name.md not in self.names:
-                self.add(name.md, doc)
-                added = True
+        for svc_cv in svccv_list:
+            for data in svc_cv.datas():
+                name, doc = data
+                if name.md not in self.names:
+                    self.add(name.md, doc)
+                    added = True
         if added:
             self.save()
 
-    def build(self, svc_cv):
+    def build(self, svccv_list):
         names = []
         texts = []
-        for data in svc_cv.datas():
-            name, doc = data
-            names.append(name.md)
-            text = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
-            texts.append(text)
+        for svc_cv in svccv_list:
+            for data in svc_cv.datas():
+                name, doc = data
+                names.append(name.md)
+                text = [word.word for word in jieba.posseg.cut(doc) if word.flag != 'x']
+                texts.append(text)
         if len(names) > 0:
             self.setup(names, texts)
             return True

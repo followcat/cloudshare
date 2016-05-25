@@ -4,10 +4,11 @@ import os.path
 
 import yaml
 
+import services.base
 import services.exception
 
 
-class JobDescription(object):
+class JobDescription(services.base.Service):
     """
         >>> import shutil
         >>> import services.company
@@ -39,8 +40,8 @@ class JobDescription(object):
     """
     path = 'JD'
 
-    def __init__(self, interface, svc_co):
-        self.interface = interface
+    def __init__(self, interface, svc_co, name=None):
+        super(JobDescription, self).__init__(interface, name)
         self.repo_path = self.interface.repo.path + "/" + self.path
         self.svc_co = svc_co
         self.info = ""

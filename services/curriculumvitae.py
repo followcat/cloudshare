@@ -2,17 +2,18 @@ import time
 import yaml
 import os.path
 
+import services.base
 import core.outputstorage
 import core.converterutils
 import core.uniquesearcher
 
 
-class CurriculumVitae(object):
+class CurriculumVitae(services.base.Service):
 
     path = 'CV'
 
-    def __init__(self, interface):
-        self.interface = interface
+    def __init__(self, interface, name=None):
+        super(CurriculumVitae, self).__init__(interface, name)
         self.repo_path = self.interface.path + "/" + self.path
         self.info = ""
         if not os.path.exists(self.repo_path):

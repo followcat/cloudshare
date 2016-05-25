@@ -3,10 +3,11 @@ import os.path
 import yaml
 
 import utils.builtin
+import services.base
 import services.exception
 
 
-class Account(object):
+class Account(services.base.Service):
     """
         >>> import shutil
         >>> import services.account
@@ -36,8 +37,8 @@ class Account(object):
     default_root_password = 'password'
     account_filename = 'account.yaml'
 
-    def __init__(self, interface):
-        self.interface = interface
+    def __init__(self, interface, name=None):
+        super(Account, self).__init__(interface, name)
 
     def create(self):
         upassword = utils.builtin.md5(self.default_root_password)

@@ -6,6 +6,18 @@ import jieba.posseg
 
 from gensim import corpora, models, similarities
 
+REJECT = re.compile('(('+'|'.join([
+    u'\xe4\xb8\xad\xe6\x96\x87', #zhongwen
+    u'\xe6\x97\xa5\xe6\x9c\x9f', #riqi
+    u'\xe6\xb1\xbd\xe8\xbd\xa6', #qiche
+    #u'\xe4\xb8\xaa\xe4\xba\xba', #geren
+    #u'\xe6\x9c\xaa\xe5\xa1\xab\xe5\x86\x99', #weizhenxie
+    u'\xe8\xb4\xa2\xe5\x8a\xa1', #caifu
+    #u'\xe6\x8b\x9b\xe8\x81\x98', #zhaopin
+    #u'\xe8\x8b\xb1\xe6\x89\x8d\xe7\xbd\x91', #yingcaiwang
+    #u'\xe4\xba\xba\xe5\x8a\x9b', #renli
+    u'\xe4\xba\x92\xe8\x81\x94\xe7\xbd\x91', #huxiangwang
+    ])+'))')
 
 class LSImodel(object):
 
@@ -18,6 +30,7 @@ class LSImodel(object):
     most_save_name = 'lsi.most'
 
     def __init__(self, savepath, no_above=1./8, topics=100):
+        self.corpus = []
         self.path = savepath
         self.topics = topics
         self.no_above = no_above
@@ -129,21 +142,32 @@ class LSImodel(object):
     def silencer(self, texts):
         FLAGS = ['x', # spaces
                  'm', # number and date
+                 'a', # adverb
+                 'i', 'j',
+                 'nrt', 'nr', 'ns', #'nz', fails on myjnoee7.md
+                 'u', # unclassified (eg. etc)
+                 'f', # time and place
+                 'q', # quantifier
+                 'p', # preposition
+                 'v', # vernicular expression
                  'ns', # city and country
                 ]
         LINE = re.compile(ur'[\n- /]+')
-        BHTTP = re.compile(ur'\(https?:\S*\)')
+        SBHTTP = re.compile(ur'\(https?:.*\)(?=\s)')
+        BHTTP = re.compile(ur'\(https?:.*?\)')
         HTTP = re.compile(ur'https?:\S*(?=\s)')
         WWW = re.compile('www\.[\.\w]+')
         EMAIL = re.compile('\w+@[\.\w]+')
         SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
         selected_texts = []
         for text in texts:
-            text = HTTP.sub('\n', BHTTP.sub('\n', LINE.sub(' ', text)))
+            text = HTTP.sub('\n', BHTTP.sub('\n', SBHTTP.sub('\n', LINE.sub(' ', text))))
             text = WWW.sub('', EMAIL.sub('', text))
             doc = [word.word for word in jieba.posseg.cut(text) if word.flag not in FLAGS]
             out = []
             for d in doc:
+                if REJECT.match(d.encode('utf8')):
+                    continue
                 if d.istitle():
                     # Can make it match SHORT later for skip (eg 'Ltd' ...)
                     d = d.lower()

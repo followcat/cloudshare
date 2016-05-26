@@ -3,9 +3,9 @@ import shutil
 
 import services.account
 import services.company
+import services.multicv
 import services.curriculumvitae
 import services.jobdescription
-import core.mining.lsimodel
 import interface.gitinterface
 
 class Config(object):
@@ -15,7 +15,7 @@ class Config(object):
     UPLOAD_TEMP = 'tests/testcase_output'
     DATA_DB_NAME = 'tests/testcase_data'
     ACCOUNT_DB_NAME = 'tests/testcase_account'
-    LSI_SAVE_PATH = 'tests/lsimodel'
+    LSI_PATH = 'tests/lsimodel'
 
     def __init__(self):
         self.build()
@@ -26,16 +26,19 @@ class Config(object):
         if not os.path.exists(self.UPLOAD_TEMP):
             os.mkdir(self.UPLOAD_TEMP)
 
+        self.ACCOUNT_DB = interface.gitinterface.GitInterface(self.ACCOUNT_DB_NAME)
+        self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB)
+
         self.DATA_DB = interface.gitinterface.GitInterface(self.DATA_DB_NAME)
-        self.SVC_CV = services.curriculumvitae.CurriculumVitae(self.DATA_DB)
 
         self.SVC_CO = services.company.Company(self.DATA_DB)
         self.SVC_JD = services.jobdescription.JobDescription(self.DATA_DB, self.SVC_CO)
 
-        self.ACCOUNT_DB = interface.gitinterface.GitInterface(self.ACCOUNT_DB_NAME)
-        self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB)
+        self.DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(self.DATA_DB)
+        self.SVC_CV = services.multicv.MultiCV(self.DEF_SVC_CV, [])
 
-        self.LSI_MODEL = core.mining.lsimodel.LSImodel(self.LSI_SAVE_PATH)
+        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, [self.DEF_SVC_CV], self.DEF_SVC_CV)
+        self.LSI_MODEL = self.SVC_MIN.lsi['default']
 
     def rebuild(self):
         self.destory()
@@ -48,7 +51,7 @@ class Config(object):
             shutil.rmtree(self.DATA_DB_NAME)
         if os.path.exists(self.ACCOUNT_DB_NAME):
             shutil.rmtree(self.ACCOUNT_DB_NAME)
-        if os.path.exists(self.LSI_SAVE_PATH):
-            shutil.rmtree(self.LSI_SAVE_PATH)
+        if os.path.exists(self.LSI_PATH):
+            shutil.rmtree(self.LSI_PATH)
 
 config = Config()

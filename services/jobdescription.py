@@ -4,34 +4,33 @@ import os.path
 
 import yaml
 
-import utils.builtin
+import services.base
 import services.exception
 
 
-class JobDescription(object):
+class JobDescription(services.base.Service):
     """
         >>> import shutil
-        >>> import utils.builtin
         >>> import services.company
         >>> import services.jobdescription
         >>> import interface.gitinterface
         
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> company_ser = services.company.Company(interface)
-        >>> company_ser.add('CompanyA', 'This is Co.A', 'Dever')
+        >>> svc_co = services.company.Company(interface)
+        >>> svc_co.add('CompanyA', 'This is Co.A', 'Dever')
         True
 
-        >>> svc_jd = services.jobdescription.JobDescription(interface, company_ser)
+        >>> svc_jd = services.jobdescription.JobDescription(interface, svc_co)
         >>> svc_jd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
         >>> results = svc_jd.search('JD-A')
-        >>> data = utils.builtin.load_yaml(svc_jd.repo_path, results[0])
+        >>> data = svc_jd.get(results[0])
         >>> data['description']
         'JD-A description'
         >>> svc_jd.modify(data['id'], 'JD-B description', 'Dever')
         True
-        >>> data = utils.builtin.load_yaml(svc_jd.repo_path, results[0])
+        >>> data = svc_jd.get(results[0])
         >>> data['description']
         'JD-B description'
         >>> lists = svc_jd.lists()
@@ -41,13 +40,18 @@ class JobDescription(object):
     """
     path = 'JD'
 
-    def __init__(self, interface, svc_co):
-        self.interface = interface
+    def __init__(self, interface, svc_co, name=None):
+        super(JobDescription, self).__init__(interface, name)
         self.repo_path = self.interface.repo.path + "/" + self.path
         self.svc_co = svc_co
         self.info = ""
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
+
+    def get(self, name):
+        path_name = os.path.join(self.path, name)
+        yaml_str = self.interface.get(path_name)
+        return yaml.load(yaml_str)
 
     def add(self, company, name, description, committer):
         try:
@@ -73,7 +77,7 @@ class JobDescription(object):
 
     def modify(self, hex_id, description, committer):
         filename = self.filename(hex_id)
-        data = utils.builtin.load_yaml(self.repo_path, filename)
+        data = self.get(filename)
         if data['committer'] != committer:
             return False
         data['description'] = description
@@ -93,6 +97,6 @@ class JobDescription(object):
         results = []
         for pathfile in glob.glob(os.path.join(self.repo_path, '*.yaml')):
             filename = pathfile.split('/')[-1]
-            data = utils.builtin.load_yaml(self.repo_path, filename)
+            data = self.get(filename)
             results.append(data)
         return results

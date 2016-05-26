@@ -1,10 +1,11 @@
 import os
 
+import services.mining
 import services.account
 import services.company
+import services.multicv
 import services.curriculumvitae
 import services.jobdescription
-import core.mining.lsimodel
 import interface.gitinterface
 
 
@@ -16,24 +17,19 @@ BACKUP_FOLDER = 'cloudshare_repodb'
 BACKUP_DIRS = [os.path.join(USER_HOME, BACKUP_FOLDER),
                os.path.join('/data_center/backup', BACKUP_FOLDER)]
 
-DATA_DB_NAME = 'repo'
-DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
-SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
-
-SVC_CO = services.company.Company(DATA_DB)
-SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
-
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 SVC_ACCOUNT = services.account.Account(ACCOUNT_DB)
 
-def init_lsimodel(lsi, svc_cv):
-    try:
-        lsi.load()
-    except IOError:
-        if lsi.build(svc_cv):
-            lsi.save()
+DATA_DB_NAME = 'repo'
+DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
 
-LSI_SAVE_PATH = 'lsimodel'
-LSI_MODEL = core.mining.lsimodel.LSImodel(LSI_SAVE_PATH)
-init_lsimodel(LSI_MODEL, SVC_CV)
+SVC_CO = services.company.Company(DATA_DB)
+SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
+
+DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
+SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, [])
+
+LSI_PATH = 'lsimodel'
+SVC_MIN = services.mining.Mining(LSI_PATH, [DEF_SVC_CV], DEF_SVC_CV)
+LSI_MODEL = SVC_MIN.lsi['default']

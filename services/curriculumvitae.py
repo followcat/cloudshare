@@ -2,21 +2,27 @@ import time
 import yaml
 import os.path
 
+import services.base
 import core.outputstorage
 import core.converterutils
 import core.uniquesearcher
 
 
-class CurriculumVitae(object):
+class CurriculumVitae(services.base.Service):
 
     path = 'CV'
 
-    def __init__(self, interface):
-        self.interface = interface
-        self.repo_path = self.interface.repo.path + "/" + self.path
+    def __init__(self, interface, name=None):
+        super(CurriculumVitae, self).__init__(interface, name)
+        self.repo_path = self.interface.path + "/" + self.path
         self.info = ""
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
+
+    def exists(self, filename):
+        path_name = os.path.join(self.path, filename)
+        result = self.interface.exists(path_name)
+        return result
 
     def add(self, cvobj, committer=None):
         """
@@ -113,8 +119,7 @@ class CurriculumVitae(object):
     def datas(self):
         for yaml in self.yamls():
             name = core.outputstorage.ConvertName(yaml)
-            with open(os.path.join(self.repo_path, name.md)) as fp:
-                text = fp.read()
+            text = self.getmd(name)
             yield name, text
 
     def search(self, keyword):
@@ -134,6 +139,8 @@ class CurriculumVitae(object):
         name = core.outputstorage.ConvertName(id).yaml
         path_name = os.path.join(self.path, name)
         yaml_str = self.interface.get(path_name)
+        if yaml_str is None:
+            raise IOError
         return yaml.load(yaml_str)
 
 

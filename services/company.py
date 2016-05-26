@@ -2,10 +2,11 @@ import os
 
 import yaml
 
+import services.base
 import services.exception
 
 
-class Company(object):
+class Company(services.base.Service):
     """
         >>> import shutil
         >>> import services.company
@@ -37,24 +38,20 @@ class Company(object):
     company_filename = 'company.yaml'
     path = 'CO'
 
-    def __init__(self, interface):
-        self.interface = interface
+    def __init__(self, interface, name=None):
+        super(Company, self).__init__(interface, name)
         self.repo_path = self.interface.repo.path + "/" + self.path
-        self.file_path = os.path.join(self.repo_path, self.company_filename)
+        self.file_path = os.path.join(self.path, self.company_filename)
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
     @property
     def COMPANYS(self):
-        company_file = self.interface.repo.get_named_file(
-            os.path.join('..', self.path, self.company_filename))
-        if company_file is None:
+        data = self.interface.get(self.file_path)
+        if data is None:
             self.create()
-            company_file = self.interface.repo.get_named_file(
-                os.path.join('..', self.path, self.company_filename))
-        data = yaml.load(company_file.read())
-        company_file.close()
-        return data
+            data = self.interface.get(self.file_path)
+        return yaml.load(data)
 
     def create(self):
         empty_list = []

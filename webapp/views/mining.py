@@ -22,20 +22,17 @@ class Position(flask.views.MethodView):
         else:
             searches = svc_cv.search(search_text)
         result = dict()
-        for search in searches:
-            name = core.outputstorage.ConvertName(search)
-            with codecs.open(os.path.join(svc_cv.repo_path, name.md),
-                             'r', encoding='utf-8') as file:
-                md_data = file.read()
+        for name in searches:
+            md_data = svc_cv.getmd(name)
             positions = core.mining.info.position(md_data, search_text)
             try:
-                yaml_data = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
+                yaml_data = svc_cv.getyaml(name)
             except IOError:
                 continue
             for position in positions:
                 if position not in result:
                     result[position] = []
-                result[position].append({search: yaml_data})
+                result[position].append({name: yaml_data})
         return flask.jsonify(result=result)
 
 
@@ -78,7 +75,7 @@ class LSI(flask.views.MethodView):
         lsi = flask.current_app.config['LSI_MODEL']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.args['jd_id']
-        jd_yaml = utils.builtin.load_yaml(svc_jd.repo_path, jd_id + '.yaml')
+        jd_yaml = svc_jd.get(jd_id+'.yaml')
         doc = jd_yaml['description']
         result = lsi.probability(doc)
         kv = dict()
@@ -86,7 +83,7 @@ class LSI(flask.views.MethodView):
         for each in result[:20]:
             kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
+            yaml_info = svc_cv.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
@@ -105,7 +102,7 @@ class LSI(flask.views.MethodView):
         for each in result[2:10]:
             kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = utils.builtin.load_yaml(svc_cv.repo_path, name.yaml)
+            yaml_info = svc_cv.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
@@ -122,7 +119,7 @@ class Valuable(flask.views.MethodView):
         lsi = flask.current_app.config['LSI_MODEL']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.form['jd_id']
-        jd_yaml = utils.builtin.load_yaml(svc_jd.repo_path, jd_id + '.yaml')
+        jd_yaml = svc_jd.get(jd_id + '.yaml')
         doc = jd_yaml['description']
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
@@ -139,7 +136,7 @@ class Valuable(flask.views.MethodView):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = utils.builtin.load_yaml(svc_cv.repo_path, name + '.yaml')
+                yaml_data = svc_cv.getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
                 values.append(yaml_data)
             item['value'] = values

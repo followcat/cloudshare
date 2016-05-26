@@ -19,6 +19,11 @@ class CurriculumVitae(services.base.Service):
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
+    def exists(self, filename):
+        path_name = os.path.join(self.path, filename)
+        result = self.interface.exists(path_name)
+        return result
+
     def add(self, cvobj, committer=None):
         """
             >>> import glob

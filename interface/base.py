@@ -12,6 +12,9 @@ class Interface(object):
     def add(self, filename, filedata):
         raise NotImplementedInterface
 
+    def exists(self, filename):
+        raise NotImplementedInterface
+
     def modify(self, filename, filedata):
         raise NotImplementedInterface
 

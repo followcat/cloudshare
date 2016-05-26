@@ -86,6 +86,15 @@ class PredatorInterface(interface.base.Interface):
             result = self._yamldata
         return self._yamldata
 
+    def exists(self, filename):
+        result = False
+        name, extension = os.path.splitext(filename)
+        filename = filename.replace(extension, self.extension)
+        path_file = os.path.join(self.path, filename)
+        if os.path.exists(path_file):
+            result = True
+        return result
+
     def get(self, filename):
         name, extension = os.path.splitext(filename)
         if extension == '.yaml':

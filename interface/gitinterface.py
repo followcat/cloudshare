@@ -29,6 +29,13 @@ class GitInterface(interface.base.Interface):
         except OSError:
             self.repo = dulwich.repo.Repo(path)
 
+    def exists(self, filename):
+        result = True
+        data = self.repo.get_named_file(os.path.join('../', filename))
+        if data is None:
+            result = False
+        return result
+
     def get(self, filename):
         """
             >>> import shutil
@@ -109,6 +116,8 @@ class GitInterface(interface.base.Interface):
             'Modify test'
             >>> shutil.rmtree(repo_name)
         """
+        if not self.exists(filename):
+            raise Exception('Not exists file:', filename)
         if message is None:
             message = "Change %s." % filename
         if committer is None:

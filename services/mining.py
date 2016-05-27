@@ -1,31 +1,50 @@
 import os
 import core.mining.lsimodel
+import core.mining.lsisimilarity
 
 
 class Mining(object):
 
     def __init__(self, path, svc_list, default_svc):
-        self.lsi = {}
+        self.sim = {}
         self.path = path
-        self.lssvc = svc_list
-        self.defaultsvc = default_svc
+        self.lsi_model = None
+        self.services = {
+                'default': [default_svc],
+                'all': svc_list
+            }
         if not os.path.exists(self.path):
             os.makedirs(self.path)
-        self.add_default()
-        self.add_all()
+        self.make_lsi(self.services['default'])
 
-    def add_default(self):
-        self.add([self.defaultsvc], 'default')
+    def setup(self, name):
+        assert name in self.services
+        self.add(self.services[name], name)
+        return self.sim[name]
 
-    def add_all(self):
-        self.add(self.lssvc, 'all')
-
-    def add(self, svc_list, name):
-        lsi_path = os.path.join(self.path, name)
+    def make_lsi(self, service):
+        self.lsi_model = None
+        lsi_path = os.path.join(self.path, 'model')
         lsi = core.mining.lsimodel.LSImodel(lsi_path)
         try:
             lsi.load()
         except IOError:
-            if lsi.build(svc_list):
+            if lsi.build(service):
                 lsi.save()
-        self.lsi[name] = lsi
+        self.lsi_model = lsi
+
+    def add(self, svc_list, name):
+        assert self.lsi_model
+        save_path = os.path.join(self.path, name)
+        index = core.mining.lsisimilarity.LSIsimilarity(save_path, self.lsi_model)
+        try:
+            index.load()
+        except IOError:
+            if index.build(svc_list):
+                index.save()
+        self.sim[name] = index
+
+    def update(self):
+        self.lsi_model.update(self.services['default'])
+        for name in self.sim:
+            self.sim[name].update(self.services[name])

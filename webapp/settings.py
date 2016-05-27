@@ -32,4 +32,4 @@ SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, [])
 
 LSI_PATH = 'lsimodel'
 SVC_MIN = services.mining.Mining(LSI_PATH, [DEF_SVC_CV], DEF_SVC_CV)
-LSI_MODEL = SVC_MIN.lsi['default']
+LSI_SIM = SVC_MIN.setup('default')

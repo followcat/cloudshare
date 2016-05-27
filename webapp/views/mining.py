@@ -72,51 +72,38 @@ class LSI(flask.views.MethodView):
 
     def get(self):
         svc_cv = flask.current_app.config['SVC_CV']
-        lsi = flask.current_app.config['LSI_MODEL']
+        sim = flask.current_app.config['LSI_SIM']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.args['jd_id']
         jd_yaml = svc_jd.get(jd_id+'.yaml')
         doc = jd_yaml['description']
-        result = lsi.probability(doc)
-        kv = dict()
-        datas = []
-        for each in result[:20]:
-            kv[each[0]] = str(each[1])
-            name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = svc_cv.getyaml(name)
-            info = {
-                'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
-                'match': str(each[1])
-            }
-            datas.append([name, yaml_info, info])
+        datas = self.process(sim, svc_cv, doc)
         return flask.render_template('lsipage.html',result=datas, button_bar=True)
 
     def post(self):
         svc_cv = flask.current_app.config['SVC_CV']
-        lsi = flask.current_app.config['LSI_MODEL']
+        sim = flask.current_app.config['LSI_SIM']
         doc = flask.request.form['search_text']
-        result = lsi.probability(doc)
-        kv = dict()
+        datas = self.process(sim, svc_cv, doc)
+        return flask.render_template('lsipage.html',result=datas, button_bar=True)
+
+    def process(self, sim, svc, doc):
         datas = []
-        for each in result[2:10]:
-            kv[each[0]] = str(each[1])
-            name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = svc_cv.getyaml(name)
+        for name, score in sim.probability(doc)[:50]:
+            yaml_info = svc.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
-                'match': str(each[1])
+                'match': score
             }
             datas.append([name, yaml_info, info])
-        # return flask.jsonify(result=datas)
-        return flask.render_template('lsipage.html',result=datas, button_bar=False)
+        return datas
 
 
 class Valuable(flask.views.MethodView):
 
     def post(self):
-        lsi = flask.current_app.config['LSI_MODEL']
+        sim = flask.current_app.config['LSI_SIM']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.form['jd_id']
         jd_yaml = svc_jd.get(jd_id + '.yaml')
@@ -124,9 +111,9 @@ class Valuable(flask.views.MethodView):
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(lsi, doc)
+            result = core.mining.valuable.rate(sim, doc)
         else:
-            result = core.mining.valuable.rate(lsi, doc, name_list=name_list)
+            result = core.mining.valuable.rate(sim, doc, name_list=name_list)
         svc_cv = flask.current_app.config['SVC_CV']
         response = dict()
         datas = []

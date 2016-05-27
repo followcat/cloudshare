@@ -10,7 +10,7 @@ import core.mining.valuable
 import core.outputstorage
 
 import json
-
+from flask.ext.paginate import Pagination
 
 class Position(flask.views.MethodView):
 
@@ -71,6 +71,7 @@ class Capacity(flask.views.MethodView):
 class LSI(flask.views.MethodView):
 
     def get(self):
+        search = False
         svc_cv = flask.current_app.config['SVC_CV']
         lsi = flask.current_app.config['LSI_MODEL']
         svc_jd = flask.current_app.config['SVC_JD']
@@ -80,7 +81,17 @@ class LSI(flask.views.MethodView):
         result = lsi.probability(doc)
         kv = dict()
         datas = []
-        for each in result[:20]:
+        cur_page = flask.request.args.get('page', '1')
+        if not cur_page:
+            cur_page = 1
+        count = 10
+        sum = len(result)
+        if sum%count != 0:
+            pages = sum/count + 1
+        else:
+            pages = sum/count
+        num_page = int(cur_page)
+        for each in result[(num_page-1)*count:num_page*count]:
             kv[each[0]] = str(each[1])
             name = core.outputstorage.ConvertName(lsi.names[each[0]])
             yaml_info = svc_cv.getyaml(name)
@@ -90,7 +101,7 @@ class LSI(flask.views.MethodView):
                 'match': str(each[1])
             }
             datas.append([name, yaml_info, info])
-        return flask.render_template('lsipage.html',result=datas, button_bar=True)
+        return flask.render_template('lsipage.html',result=datas, button_bar=True, cur_page=num_page, pages=pages, jd_id=jd_id)
 
     def post(self):
         svc_cv = flask.current_app.config['SVC_CV']

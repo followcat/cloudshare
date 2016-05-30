@@ -6,9 +6,9 @@ import core.mining.lsimodel
 import core.outputstorage
 
 
-def rate(lsi, doc, top=10, selected=5, name_list=None):
+def rate(sim, doc, top=10, selected=5, name_list=None):
     result = []
-    rating = next(lsi, doc, top, name_list)
+    rating = next(sim, doc, top, name_list)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]
     for text, rate in rating:
@@ -45,12 +45,12 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(lsi, doc, top, name_list=None):
+def next(sim, doc, top, name_list=None):
     rating = []
-    top_data_full = minetop(lsi, doc, top)
+    top_data_full = minetop(sim, doc, top)
     extract_data_full = extract(top_data_full)
     if name_list is not None:
-        names_data_full = minelist(lsi, doc, name_list)
+        names_data_full = minelist(sim, doc, name_list)
         extract_data_full.extend(extract(names_data_full))
     else:
         name_list = []
@@ -60,26 +60,12 @@ def next(lsi, doc, top, name_list=None):
     for text in doc.split('\n'):
         if not text:
             continue
-        new_data = minelist(lsi, text, name_list)
+        new_data = minelist(sim, text, name_list)
         rating.append((text, extract(new_data)))
     return rating
 
-def minetop(lsi, doc, top):
-    result = lsi.probability(doc)
-    datas = []
-    for each in result[:top]:
-        name = core.outputstorage.ConvertName(lsi.names[each[0]])
-        match = str(each[1])
-        datas.append([name, match])
-    return datas
+def minetop(sim, doc, top):
+    return sim.probability(doc)[:top]
 
-def minelist(lsi, doc, lists):
-    result = lsi.probability(doc)
-    datas = []
-    for e in lists:
-        for each in result:
-            name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            if ( name == e ):
-                match = str(each[1])
-                datas.append([name, match])
-    return datas
+def minelist(sim, doc, lists):
+    return filter(lambda x: x[0] in lists, sim.probability(doc))

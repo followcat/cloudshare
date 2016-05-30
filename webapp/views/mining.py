@@ -73,61 +73,49 @@ class LSI(flask.views.MethodView):
     def get(self):
         search = False
         svc_cv = flask.current_app.config['SVC_CV']
-        lsi = flask.current_app.config['LSI_MODEL']
+        sim = flask.current_app.config['LSI_SIM']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.args['jd_id']
         jd_yaml = svc_jd.get(jd_id+'.yaml')
         doc = jd_yaml['description']
-        result = lsi.probability(doc)
-        kv = dict()
-        datas = []
         cur_page = flask.request.args.get('page', '1')
         if not cur_page:
             cur_page = 1
+        cur_page = int(cur_page)
         count = 10
-        sum = len(result)
-        if sum%count != 0:
-            pages = sum/count + 1
-        else:
-            pages = sum/count
-        num_page = int(cur_page)
-        for each in result[(num_page-1)*count:num_page*count]:
-            kv[each[0]] = str(each[1])
-            name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = svc_cv.getyaml(name)
-            info = {
-                'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
-                'match': str(each[1])
-            }
-            datas.append([name, yaml_info, info])
-        return flask.render_template('lsipage.html',result=datas, button_bar=True, cur_page=num_page, pages=pages, jd_id=jd_id)
+        datas, pages = self.process(sim, svc_cv, doc, cur_page, count)
+        return flask.render_template('lsipage.html',result=datas, button_bar=True, cur_page=cur_page, pages=pages, jd_id=jd_id)
 
     def post(self):
         svc_cv = flask.current_app.config['SVC_CV']
-        lsi = flask.current_app.config['LSI_MODEL']
+        sim = flask.current_app.config['LSI_SIM']
         doc = flask.request.form['search_text']
-        result = lsi.probability(doc)
-        kv = dict()
+        datas = self.process(sim, svc_cv, doc)
+        return flask.render_template('lsipage.html',result=datas, button_bar=True)
+
+    def process(self, sim, svc, doc, cur_page, eve_count):
         datas = []
-        for each in result[2:10]:
-            kv[each[0]] = str(each[1])
-            name = core.outputstorage.ConvertName(lsi.names[each[0]])
-            yaml_info = svc_cv.getyaml(name)
+        result = sim.probability(doc)
+        sum = len(result)
+        if sum%eve_count != 0:
+            pages = sum/eve_count + 1
+        else:
+            pages = sum/eve_count
+        for name, score in sim.probability(doc)[(cur_page-1)*eve_count:cur_page*eve_count]:
+            yaml_info = svc.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
-                'match': str(each[1])
+                'match': score
             }
             datas.append([name, yaml_info, info])
-        # return flask.jsonify(result=datas)
-        return flask.render_template('lsipage.html',result=datas, button_bar=False)
+        return datas, pages
 
 
 class Valuable(flask.views.MethodView):
 
     def post(self):
-        lsi = flask.current_app.config['LSI_MODEL']
+        sim = flask.current_app.config['LSI_SIM']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.form['jd_id']
         jd_yaml = svc_jd.get(jd_id + '.yaml')
@@ -135,9 +123,9 @@ class Valuable(flask.views.MethodView):
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(lsi, doc)
+            result = core.mining.valuable.rate(sim, doc)
         else:
-            result = core.mining.valuable.rate(lsi, doc, name_list=name_list)
+            result = core.mining.valuable.rate(sim, doc, name_list=name_list)
         svc_cv = flask.current_app.config['SVC_CV']
         response = dict()
         datas = []

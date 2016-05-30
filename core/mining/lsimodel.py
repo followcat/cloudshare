@@ -4,7 +4,8 @@ import pickle
 
 import jieba.posseg
 
-from gensim import corpora, models, similarities
+from gensim import corpora, models
+
 
 REJECT = re.compile('(('+'|'.join([
     u'\xe4\xb8\xad\xe6\x96\x87', #zhongwen
@@ -23,7 +24,6 @@ class LSImodel(object):
 
     names_save_name = 'lsi.names'
     model_save_name = 'lsi.model'
-    matrix_save_name = 'lsi.matrix'
     corpu_dict_save_name = 'lsi.dict'
     corpus_save_name = 'lsi.corpus'
     texts_save_name = 'lsi.texts'
@@ -39,7 +39,6 @@ class LSImodel(object):
         self.corpus = []
 
         self.lsi = None
-        self.index = None
         self.tfidf = None
         self.dictionary = None
         self.corpus_tfidf = None
@@ -87,7 +86,6 @@ class LSImodel(object):
             pickle.dump(self.texts, f)
         self.lsi.save(os.path.join(self.path, self.model_save_name))
         self.dictionary.save(os.path.join(self.path, self.corpu_dict_save_name))
-        self.index.save(os.path.join(self.path, self.matrix_save_name))
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
@@ -99,8 +97,6 @@ class LSImodel(object):
         self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
                                                              self.corpu_dict_save_name))
-        self.index = similarities.Similarity.load(os.path.join(self.path,
-                                                        self.matrix_save_name))
 
     def add(self, name, document):
         text = self.silencer([document])[0]
@@ -117,8 +113,6 @@ class LSImodel(object):
                             num_topics=self.topics, power_iters=6, extra_samples=300)
         else:
             self.lsi.add_documents(corpu_tfidf)
-        self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
-                                             self.lsi[self.corpus], self.topics)
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
@@ -136,8 +130,6 @@ class LSImodel(object):
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
                                    num_topics=self.topics, power_iters=6, extra_samples=300)
-        self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
-                                             self.lsi[self.corpus], self.topics)
 
     def silencer(self, texts):
         FLAGS = ['x', # spaces
@@ -182,5 +174,4 @@ class LSImodel(object):
         texts = self.silencer([doc])[0]
         vec_bow = self.dictionary.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
-        sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
-        return sims
+        return vec_lsi

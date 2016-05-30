@@ -24,7 +24,7 @@ class Position(flask.views.MethodView):
         result = dict()
         for name in searches:
             md_data = svc_cv.getmd(name)
-            positions = core.mining.info.position(md_data, search_text)
+            positions = core.mining.info.position(md_data, search_text.encode('utf-8'))
             try:
                 yaml_data = svc_cv.getyaml(name)
             except IOError:

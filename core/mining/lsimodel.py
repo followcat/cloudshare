@@ -1,24 +1,8 @@
-import re
 import os
 import pickle
 
-import jieba.posseg
-
 from gensim import corpora, models
 
-
-REJECT = re.compile('(('+'|'.join([
-    u'\xe4\xb8\xad\xe6\x96\x87', #zhongwen
-    u'\xe6\x97\xa5\xe6\x9c\x9f', #riqi
-    u'\xe6\xb1\xbd\xe8\xbd\xa6', #qiche
-    #u'\xe4\xb8\xaa\xe4\xba\xba', #geren
-    #u'\xe6\x9c\xaa\xe5\xa1\xab\xe5\x86\x99', #weizhenxie
-    u'\xe8\xb4\xa2\xe5\x8a\xa1', #caifu
-    #u'\xe6\x8b\x9b\xe8\x81\x98', #zhaopin
-    #u'\xe8\x8b\xb1\xe6\x89\x8d\xe7\xbd\x91', #yingcaiwang
-    #u'\xe4\xba\xba\xe5\x8a\x9b', #renli
-    u'\xe4\xba\x92\xe8\x81\x94\xe7\xbd\x91', #huxiangwang
-    ])+'))')
 
 class LSImodel(object):
 
@@ -29,11 +13,15 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, no_above=1./8, topics=100):
+    def __init__(self, savepath, no_above=1./8, topics=100, slicer=None):
         self.corpus = []
         self.path = savepath
         self.topics = topics
         self.no_above = no_above
+        if slicer:
+            self.slicer = slicer
+        else:
+            self.slicer = lambda x:x.split('\n')
         self.names = []
         self.texts = []
         self.corpus = []
@@ -69,7 +57,7 @@ class LSImodel(object):
 
     def setup(self, names, texts):
         self.names = names
-        self.texts = self.silencer(texts)
+        self.texts = self.slicer(texts)
         self.set_dictionary()
         self.set_corpus()
         self.set_tfidf()
@@ -99,7 +87,7 @@ class LSImodel(object):
                                                              self.corpu_dict_save_name))
 
     def add(self, name, document):
-        text = self.silencer([document])[0]
+        text = self.slicer(document)
         self.names.append(name)
         self.texts.append(text)
         if self.dictionary is None:
@@ -131,47 +119,8 @@ class LSImodel(object):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
                                    num_topics=self.topics, power_iters=6, extra_samples=300)
 
-    def silencer(self, texts):
-        FLAGS = ['x', # spaces
-                 'm', # number and date
-                 'a', # adverb
-                 'i', 'j',
-                 'nrt', 'nr', 'ns', #'nz', fails on myjnoee7.md
-                 'u', # unclassified (eg. etc)
-                 'f', # time and place
-                 'q', # quantifier
-                 'p', # preposition
-                 'v', # vernicular expression
-                 'ns', # city and country
-                ]
-        LINE = re.compile(ur'[\n- /]+')
-        SBHTTP = re.compile(ur'\(https?:.*\)(?=\s)')
-        BHTTP = re.compile(ur'\(https?:.*?\)')
-        HTTP = re.compile(ur'https?:\S*(?=\s)')
-        WWW = re.compile('www\.[\.\w]+')
-        EMAIL = re.compile('\w+@[\.\w]+')
-        SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
-        selected_texts = []
-        for text in texts:
-            text = HTTP.sub('\n', BHTTP.sub('\n', SBHTTP.sub('\n', LINE.sub(' ', text))))
-            text = WWW.sub('', EMAIL.sub('', text))
-            doc = [word.word for word in jieba.posseg.cut(text) if word.flag not in FLAGS]
-            out = []
-            for d in doc:
-                if REJECT.match(d.encode('utf8')):
-                    continue
-                if d.istitle():
-                    # Can make it match SHORT later for skip (eg 'Ltd' ...)
-                    d = d.lower()
-                if not SHORT.match(d):
-                    # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
-                    d = d.lower()
-                    out.append(d)
-            selected_texts.append(out)
-        return selected_texts
-
     def probability(self, doc):
-        texts = self.silencer([doc])[0]
+        texts = self.slicer(doc)
         vec_bow = self.dictionary.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
         return vec_lsi

@@ -58,10 +58,11 @@ def next(sim, doc, top, name_list=None):
                           for each in extract_data_full])
     rating.append((doc, extract_data_full))
     for text in doc.split('\n'):
-        if not text:
+        if not text.strip():
             continue
         new_data = minelist(sim, text, name_list)
-        rating.append((text, extract(new_data)))
+        if len(filter(lambda x: float(x[1])> 0., new_data)) > 0:
+            rating.append((text, extract(new_data)))
     return rating
 
 def minetop(sim, doc, top):

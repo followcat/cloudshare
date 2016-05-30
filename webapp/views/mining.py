@@ -60,10 +60,7 @@ class Capacity(flask.views.MethodView):
         markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
-            name = core.outputstorage.ConvertName(id)
-            with codecs.open(os.path.join(svc_cv.repo_path, name.md),
-                             'r', encoding='utf-8') as file:
-                stream = file.read()
+            stream = svc_cv.getmd(id).decode('utf-8')
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return flask.jsonify(result=result)
 

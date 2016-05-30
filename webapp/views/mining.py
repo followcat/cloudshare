@@ -104,6 +104,7 @@ class Valuable(flask.views.MethodView):
 
     def post(self):
         sim = flask.current_app.config['LSI_SIM']
+        svc_cv = flask.current_app.config['SVC_CV']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.form['jd_id']
         jd_yaml = svc_jd.get(jd_id + '.yaml')
@@ -111,9 +112,9 @@ class Valuable(flask.views.MethodView):
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(sim, doc)
+            result = core.mining.valuable.rate(sim, svc_cv, doc)
         else:
-            result = core.mining.valuable.rate(sim, doc, name_list=name_list)
+            result = core.mining.valuable.rate(sim, svc_cv, doc, name_list=name_list)
         svc_cv = flask.current_app.config['SVC_CV']
         response = dict()
         datas = []

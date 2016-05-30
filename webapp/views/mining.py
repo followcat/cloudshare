@@ -24,7 +24,7 @@ class Position(flask.views.MethodView):
         result = dict()
         for name in searches:
             md_data = svc_cv.getmd(name)
-            positions = core.mining.info.position(md_data, search_text)
+            positions = core.mining.info.position(md_data, search_text.encode('utf-8'))
             try:
                 yaml_data = svc_cv.getyaml(name)
             except IOError:
@@ -60,10 +60,7 @@ class Capacity(flask.views.MethodView):
         markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
-            name = core.outputstorage.ConvertName(id)
-            with codecs.open(os.path.join(svc_cv.repo_path, name.md),
-                             'r', encoding='utf-8') as file:
-                stream = file.read()
+            stream = svc_cv.getmd(id).decode('utf-8')
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return flask.jsonify(result=result)
 
@@ -116,6 +113,7 @@ class Valuable(flask.views.MethodView):
 
     def post(self):
         sim = flask.current_app.config['LSI_SIM']
+        svc_cv = flask.current_app.config['SVC_CV']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.form['jd_id']
         jd_yaml = svc_jd.get(jd_id + '.yaml')
@@ -123,9 +121,9 @@ class Valuable(flask.views.MethodView):
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(sim, doc)
+            result = core.mining.valuable.rate(sim, svc_cv, doc)
         else:
-            result = core.mining.valuable.rate(sim, doc, name_list=name_list)
+            result = core.mining.valuable.rate(sim, svc_cv, doc, name_list=name_list)
         svc_cv = flask.current_app.config['SVC_CV']
         response = dict()
         datas = []

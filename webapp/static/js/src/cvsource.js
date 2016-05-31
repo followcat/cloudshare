@@ -274,7 +274,7 @@ require([
 
   //Get similar person data.
   $.ajax({
-    url: '/analysis/lsi',
+    url: '/analysis/similar',
     type: 'post',
     data: {
       'doc': document.getElementById("cv-content").innerText

@@ -106,6 +106,24 @@ class LSI(flask.views.MethodView):
         return datas, pages
 
 
+class Similar(flask.views.MethodView):
+
+    def post(self):
+        svc_cv = flask.current_app.config['SVC_CV']
+        sim = flask.current_app.config['LSI_SIM']
+        doc = flask.request.form['doc']
+        datas = []
+        for name, score in sim.probability(doc)[:7]:
+            yaml_info = svc_cv.getyaml(name)
+            info = {
+                'author': yaml_info['committer'],
+                'time': utils.builtin.strftime(yaml_info['date']),
+                'match': score
+            }
+            datas.append([name, yaml_info, info])
+        return flask.jsonify({'result': datas})
+
+
 class Valuable(flask.views.MethodView):
 
     def post(self):

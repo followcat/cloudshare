@@ -87,6 +87,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/analysis/similar',
+        view_func=webapp.views.mining.Similar.as_view('similar'),
+        )
+
+    app.add_url_rule(
         '/analysis/valuable',
         view_func=webapp.views.mining.Valuable.as_view('valuable'),
         )
@@ -210,4 +215,3 @@ def configure(app):
         '/resumetojd/<path:filename>',
         view_func=webapp.views.jobdescription.ResumeToJobDescription.as_view('resumetojd'),
         )
-

@@ -60,7 +60,7 @@ class Capacity(flask.views.MethodView):
         markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
-            stream = svc_cv.getmd(id).decode('utf-8')
+            stream = svc_cv.getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return flask.jsonify(result=result)
 
@@ -76,8 +76,6 @@ class LSI(flask.views.MethodView):
         jd_yaml = svc_jd.get(jd_id+'.yaml')
         doc = jd_yaml['description']
         cur_page = flask.request.args.get('page', '1')
-        if not cur_page:
-            cur_page = 1
         cur_page = int(cur_page)
         count = 10
         datas, pages = self.process(sim, svc_cv, doc, cur_page, count)
@@ -91,6 +89,8 @@ class LSI(flask.views.MethodView):
         return flask.render_template('lsipage.html',result=datas, button_bar=True)
 
     def process(self, sim, svc, doc, cur_page, eve_count):
+        if not cur_page:
+            cur_page = 1
         datas = []
         result = sim.probability(doc)
         sum = len(result)

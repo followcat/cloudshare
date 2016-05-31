@@ -24,7 +24,7 @@ class Position(flask.views.MethodView):
         result = dict()
         for name in searches:
             md_data = svc_cv.getmd(name)
-            positions = core.mining.info.position(md_data, search_text.encode('utf-8'))
+            positions = core.mining.info.position(md_data, search_text)
             try:
                 yaml_data = svc_cv.getyaml(name)
             except IOError:
@@ -44,10 +44,7 @@ class Region(flask.views.MethodView):
         markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
-            name = core.outputstorage.ConvertName(id)
-            with codecs.open(os.path.join(svc_cv.repo_path, name.md),
-                             'r', encoding='utf-8') as file:
-                stream = file.read()
+            stream = svc_cv.getmd(id)
             result.append(core.mining.info.region(stream))
         return flask.jsonify(result=result)
 
@@ -60,7 +57,7 @@ class Capacity(flask.views.MethodView):
         markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
-            stream = svc_cv.getmd(id).decode('utf-8')
+            stream = svc_cv.getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return flask.jsonify(result=result)
 

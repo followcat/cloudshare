@@ -34,9 +34,11 @@ def cloudshare_yaml_template():
 
 
 def extract_details(uploaded_details):
-    DATE = '(([0-9]{4,4}[\./][0-9]{2,2})|(\\\\u81F3\\\\u4ECA))'
-    WORKXP = ur"(\d{4}[/.\\年 ]+\d{1,2}[月]*)[-– —]*(\d{4}[/.\\年 ]+\d{1,2}[月]*|至今)[：: ]*([^\n,，.。（（:]*)"
-    STUDIES = u'\s*'+DATE+' - '+DATE+'(?P<expe>[^\(].+?)(?='+DATE+'|$)'
+    DATE = ur'((?:\d{4}[\.．/年]\d{1,2}(?:月)?)|(?:(?:至)?今)|(?:目前)|(?:[Pp]resent))'
+    PERIOD = DATE + ur'[-– —至\\\\~]+' + DATE
+    DURATION = ur'[（\(]((?:\d{1,2}年(?:\d{1,2}个月)?)|(?:\d{1,2}个月))[\)）]'
+    WORKXP = PERIOD + '\s*' + DURATION + ur'[：:\| ]*([^,，.。:]*)(?='+DATE+'|$)'
+    STUDIES = '\s*'+DATE+' - '+DATE+'\s*:?\s*(?P<expe>[^\(].+?)(?='+DATE+'|$)'
 
     details = cloudshare_yaml_template()
 
@@ -51,12 +53,18 @@ def extract_details(uploaded_details):
         education = re.compile(STUDIES, re.M).search(uploaded_details['info'][0]).group('expe')
     except:
         education = ''
-    details['school'] = education.split('|')[0]
-    details['education'] = education.split('|')[-1]
+    details['school'] = education.split('|')[0].strip()
+    details['education'] = education.split('|')[-1].strip()
     for expe in uploaded_details['info']:
-        work = re.compile(WORKXP).findall(expe)
-        for w in work:
-            details['experience'].append(list(w))
+        for w in re.compile(WORKXP).finditer(expe):
+            details['experience'].append((w.group(1), w.group(2), w.group(4)+'('+w.group(3)+')'))
+    if u'…' in details['company']:
+        no_braket = lambda x:x.replace('(','').replace(')','')
+        RE = re.compile(no_braket(details['company'])[:-1])
+        for xp in details['experience']:
+            if RE.match(no_braket(xp[2])):
+                details['company'] = xp[2].split('|')[0]
+                break
     return details
 
 class PredatorInterface(interface.base.Interface):

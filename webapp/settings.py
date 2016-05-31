@@ -6,6 +6,7 @@ import services.company
 import services.multicv
 import services.curriculumvitae
 import services.jobdescription
+import interface.predator
 import interface.gitinterface
 
 
@@ -28,8 +29,13 @@ SVC_CO = services.company.Company(DATA_DB)
 SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
 
 DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
-SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, [])
+
+PREDATOR_DB = interface.predator.PredatorInterface(
+    'addtional/JOBTITLES',
+    'addtional/CV')
+PRE_SVC_CV = services.curriculumvitae.CurriculumVitae(PREDATOR_DB)
+SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, [DEF_SVC_CV, PRE_SVC_CV])
 
 LSI_PATH = 'lsimodel'
-SVC_MIN = services.mining.Mining(LSI_PATH, [DEF_SVC_CV], DEF_SVC_CV)
-LSI_SIM = SVC_MIN.setup('default')
+SVC_MIN = services.mining.Mining(LSI_PATH, [DEF_SVC_CV, PRE_SVC_CV], DEF_SVC_CV)
+LSI_SIM = SVC_MIN.setup('all')

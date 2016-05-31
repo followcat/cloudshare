@@ -29,34 +29,49 @@ class Search(flask.views.MethodView):
         if 'search_text' in flask.request.args:
             svc_cv = flask.current_app.config['SVC_CV']
             search_text = flask.request.args['search_text']
+            cur_page = flask.request.args.get('page', '1')
+            cur_page = int(cur_page)
             result = svc_cv.search(search_text)
             yaml_result = svc_cv.search_yaml(search_text)
-            datas = []
-            names = []
-            for each in result+yaml_result:
-                base, suffix = os.path.splitext(each)
-                name = core.outputstorage.ConvertName(base)
-                if name not in names:
-                    names.append(name)
-                else:
-                    continue
-                try:
-                    yaml_data = svc_cv.getyaml(base)
-                except IOError:
-                    names.remove(name)
-                    continue
-                info = {
-                    'author': yaml_data['committer'],
-                    'time': utils.builtin.strftime(yaml_data['date']),
-                }
-                datas.append([name, yaml_data, info])
+            count = 10
+            datas, pages = self.paginate(svc_cv, result, yaml_result, cur_page, count)
             return flask.render_template('search_result.html',
                                          search_key=search_text,
                                          result=datas,
-                                         nums=len(datas))
+                                         cur_page = cur_page,
+                                         pages = pages,
+                                         nums=len(result))
         else:
             return flask.render_template('search.html')
 
+    def paginate(self, svc_cv, result, yaml_result, cur_page, eve_count):
+        if not cur_page:
+            cur_page = 1
+        sum = len(result)
+        if sum%eve_count != 0:
+            pages = sum/eve_count + 1
+        else:
+            pages = sum/eve_count
+        datas = []
+        names = []
+        for each in (result+yaml_result)[(cur_page-1)*eve_count:cur_page*eve_count]:
+            base, suffix = os.path.splitext(each)
+            name = core.outputstorage.ConvertName(base)
+            if name not in names:
+                names.append(name)
+            else:
+                continue
+            try:
+                yaml_data = svc_cv.getyaml(base)
+            except IOError:
+                names.remove(name)
+                continue
+            info = {
+                'author': yaml_data['committer'],
+                'time': utils.builtin.strftime(yaml_data['date']),
+            }
+            datas.append([name, yaml_data, info])
+        return datas, pages
 
 class BatchUpload(flask.views.MethodView):
 

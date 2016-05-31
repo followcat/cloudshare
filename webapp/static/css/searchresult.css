@@ -141,8 +141,7 @@
   font-size: 0.875em;
 }
 .tool-bar{
-  margin-top: 6px;
-  margin-bottom: 26px;
+  margin: 10px auto;
 }
 #data-main{
   width:100%;
@@ -162,4 +161,85 @@
 }
 .vd-region{
   margin-left: 20px;
+}
+.sidebar-wrap .tool-bar > button{
+  width: 80%;
+  margin-top: 6px;
+  margin-left: 10%;
+}
+.anonymous{
+  display: inline-block;
+  font-weight: bold;
+  margin-left: 10%;
+}
+.sidebar-wrap{
+  width: 260px;
+  height:480px;
+  position: fixed;
+  top:50%;
+  margin-top: -240px;
+  right:0;
+  z-index: 999;
+  right: -220px;
+}
+.operate-menu{
+  width: 40px;
+  height: 40px;
+  background-color: #337ab7;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  margin-top: -20px;
+  cursor: pointer;
+}
+.operate-menu:hover{
+  background-color: #004B97;
+}
+.operate-menu > span{
+  font-size: 2em;
+  line-height: 40px;
+  color: #fff;
+}
+.operate-list{
+  width:218px;
+  height: 478px;
+  margin-left: 40px;
+  background-color: #fff;
+  border: 1px solid #c2c2c2;
+  border-radius: 8px;
+}
+.line{
+  border-top: 1px dashed #ccc;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+.sel-list{
+  width: 100%;
+  height: 180px;
+  margin-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.sel-item{
+  display: inline-block;
+  background-color: #c2c2c2;
+  padding: 2px;
+  border-radius: 4px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+.sel-item > .sel-item-name{
+  font-weight: bold;
+}
+.sel-item > .sel-item-remove{
+  font-size: 0.75em;
+  cursor: pointer;
+}
+.database-box{
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.operate-list .title{
+  margin-top: 6px;
+  font-weight: bold;
 }

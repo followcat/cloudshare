@@ -131,9 +131,16 @@ class CurriculumVitae(services.base.Service):
         return results
 
     def getmd(self, id):
+        result = unicode()
         name = core.outputstorage.ConvertName(id).md
         path_name = os.path.join(self.path, name)
-        return self.interface.get(path_name)
+        markdown = self.interface.get(path_name)
+        if isinstance(markdown, unicode):
+            result = markdown
+        else:
+            result = unicode(markdown, 'utf-8')
+        return result
+
 
     def getyaml(self, id):
         name = core.outputstorage.ConvertName(id).yaml

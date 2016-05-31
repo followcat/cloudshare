@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import glob
 import os.path
 import subprocess
 
@@ -63,27 +64,27 @@ class PredatorInterface(interface.base.Interface):
 
     extension = '.html'
     
-    def __init__(self, yamlpath, yamlfile, path):
+    def __init__(self, yamlpath, path):
         super(PredatorInterface, self).__init__(path)
         self.path = path
         self.yamlpath = yamlpath
-        self.yamlfile = yamlfile
-        self._yamldata = None
-        self.yamlstat = None
+        self.yamlfile = list()
+        self.yamlstat = dict()
+        self._yamldata = dict()
+        self.yamlfiles = glob.glob(os.path.join(self.yamlpath, '*.yaml'))
 
     @property
     def yamldata(self):
-        result = {}
-        if self.yamlstat == os.stat(os.path.join(self.yamlpath, self.yamlfile)):
-            result = self._yamldata
-        else:
-            mdpath = os.path.join(self.path, 'CV')
-            self._yamldata = {}
-            for name, data in utils.builtin.load_yaml(self.yamlpath, self.yamlfile).iteritems():
-                if os.path.exists(os.path.join(mdpath, name+self.extension)):
-                    self._yamldata[name] = data
-            self.yamlstat = os.stat(os.path.join(self.yamlpath, self.yamlfile))
-            result = self._yamldata
+        for yamlfile in self.yamlfiles:
+            if (yamlfile in self.yamlstat and
+                self.yamlstat[yamlfile] == os.stat(yamlfile)):
+                continue
+            else:
+                path, file = os.path.split(yamlfile)
+                for name, data in utils.builtin.load_yaml(path, file).iteritems():
+                    if os.path.exists(os.path.join(self.path, name+self.extension)):
+                        self._yamldata[name] = data
+                self.yamlstat[yamlfile] = os.stat(yamlfile)
         return self._yamldata
 
     def exists(self, filename):
@@ -100,7 +101,8 @@ class PredatorInterface(interface.base.Interface):
         if extension == '.yaml':
             return self._get_yaml(name)
         elif extension == '.md':
-            input_file = os.path.join(self.path, name+self.extension)
+            cv_path, cv_name = os.path.split(name)
+            input_file = os.path.join(self.path, cv_name+self.extension)
             return pypandoc.convert(input_file, 'markdown', format='docbook')
         else:
             return self._get_file(filename)

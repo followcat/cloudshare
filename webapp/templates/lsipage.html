@@ -3,56 +3,96 @@
 {% block style %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/searchresult.css') }}">
 <style type="text/css">
-	.wrap-left, #result{
-	  width: 50%;
-	  display: block;
-	  float: left;
-	}
-	textarea{
-		 margin-top: 2px;
-		 width: 100%;
-	}
-	#result{
-		 overflow-y: auto;
-		 border: 1px solid #e2e2e2;
-		 background-color: #fff;
-	}
-	.result-item:nth-child(even){
-		 background-color: #eee;
-	}
-	.result-item ul li{
-		 float: left;
-		 width: 16.66%;
-	}
-  .anonymous{
-     display: inline-block;
-     font-weight: bold;
+  .result-list{
+    margin-top: 20px;
+  }
+  .wrap-left, #result{
+    width: 50%;
+    display: block;
+    float: left;
+  }
+  textarea{
+    margin-top: 2px;
+    width: 100%;
+  }
+  #result{
+    overflow-y: auto;
+    border: 1px solid #e2e2e2;
+    background-color: #fff;
+  }
+  .result-item:nth-child(even){
+    background-color: #eee;
+  }
+  .result-item ul li{
+    float: left;
+    width: 16.66%;
+  }
+  .crawl-item{
+    background-color: #f2f2f2;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="col-md-10 col-md-offset-1 result-list">
-  {% if button_bar %}
-  <div class="tool-bar">
-    <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
-    <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency</button>
-    <button class="btn btn-default btn-xs" id="vd-capacity">Show Work experience</button>
-    <button class="btn btn-default btn-xs" id="vd-valuable">Show Radar Chart</button>
-    <div class="checkbox anonymous">
-      <label>
-        <input type="checkbox" id="anonymous-checkbox">Anonymous
-      </label>
+{% if button_bar %}
+<div class="sidebar-wrap">
+  <div class="operate-menu" id="operateMenu">
+    <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+  </div>
+  <div class="operate-list">
+    <div class="database-box">
+      <div class="title">Database</div>
+      <div class="database-list">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" class="database-item" value="Cloudshare" />Cloudshare
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" class="database-item" value="Liepin" />Liepin
+          </label>
+        </div>
+      </div>
     </div>
-    <div id="data-main" style="display: none;">
-      <div id="echarts-wrap"></div>
-      <div id="action-msg"></div>
+    <div class="line"></div>
+    <div class="tool-bar">
+      <button class="btn btn-primary" id="competency-btn">Show Competency</button>
+      <button class="btn btn-primary" id="experience-btn">Show Work experience</button>
+      <button class="btn btn-primary" id="vd-valuable">Show Radar Chart</button>
+      <div class="checkbox anonymous">
+        <label>
+          <input type="checkbox" id="anonymous-checkbox" />Anonymous
+        </label>
+      </div>
+    </div>
+    <div class="line"></div>
+    <div class="sel-list" id="sel-list">
     </div>
   </div>
-  {% endif %}
+</div>
+<div class="modal fade bs-example-modal-lg" id="chartsModal" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Charts View</h4>
+      </div>
+      <div class="modal-body">
+        <div class="chart-wrapper" id="echarts-wrap"></div>
+        <div id="action-msg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div><!-- Charts modal end -->
+{% endif %}
+<div class="col-md-10 col-md-offset-1 result-list">
   {% if result %}
   {% for item in result %}
-  <div class="result-list-item">
+  <div class="result-list-item {% if item[2].author == 'SCRAPPY'%}crawl-item{% endif %}">
     <div class="item-link">
       <input type="checkbox" class="checkbox-name" />
       <a href="/show/{{ item[0] }}" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>

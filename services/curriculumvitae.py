@@ -135,7 +135,9 @@ class CurriculumVitae(services.base.Service):
         name = core.outputstorage.ConvertName(id).md
         path_name = os.path.join(self.path, name)
         markdown = self.interface.get(path_name)
-        if isinstance(markdown, unicode):
+        if markdown is None:
+            result = None
+        elif isinstance(markdown, unicode):
             result = markdown
         else:
             result = unicode(markdown, 'utf-8')

@@ -31,8 +31,8 @@ SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
 DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
 
 PREDATOR_DB = interface.predator.PredatorInterface(
-    'addtional/JOBTITLES',
-    'addtional/CV')
+    'additional/JOBTITLES',
+    'additional/CV')
 PRE_SVC_CV = services.curriculumvitae.CurriculumVitae(PREDATOR_DB)
 SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, [DEF_SVC_CV, PRE_SVC_CV])
 

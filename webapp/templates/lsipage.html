@@ -165,32 +165,32 @@
   <nav>
     <ul class="pagination">
       <li>
-        <a href="/lsipage?jd_id={{ jd_id }}&page=1">first</a>
+        <a href="/lsipage?{{ param }}&page=1">first</a>
       </li>
       <li class="{% if cur_page <= 1%}disabled{% endif %}">
-        <a href="/lsipage?jd_id={{ jd_id }}&page={{ cur_page-1 }}" aria-label="Previous">
+        <a href="/lsipage?{{ param }}&page={{ cur_page-1 }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
       {% if cur_page < pages - 2 %}
-      <li class="active"><a href="/lsipage?jd_id={{ jd_id }}&page={{ cur_page }}">{{ cur_page }}</a></li>
-      <li><a href="/lsipage?jd_id={{ jd_id }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
-      <li><a href="/lsipage?jd_id={{ jd_id }}&page={{ cur_page+2 }}">{{ cur_page+2}}</a></li>
+      <li class="active"><a href="/lsipage?{{ param }}&page={{ cur_page }}">{{ cur_page }}</a></li>
+      <li><a href="/lsipage?{{ param }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
+      <li><a href="/lsipage?{{ param }}&page={{ cur_page+2 }}">{{ cur_page+2}}</a></li>
       <li class="disabled"><a href="#">...</a></li>
-      <li><a href="/lsipage?jd_id={{ jd_id }}&page={{ pages }}">{{ pages }}</a></li>
+      <li><a href="/lsipage?{{ param }}&page={{ pages }}">{{ pages }}</a></li>
       {% else %}
       <li class="disabled"><a href="#">...</a></li>
       {% for num in range(2,-1,-1) %}
-      <li class="{% if cur_page == pages-num %} active {% endif %}"><a href="/lsipage?jd_id={{ jd_id }}&page={{ pages-num }}">{{ pages-num }}</a></li>
+      <li class="{% if cur_page == pages-num %} active {% endif %}"><a href="/lsipage?{{ param }}&page={{ pages-num }}">{{ pages-num }}</a></li>
       {% endfor %}
       {% endif %}
       <li class="{% if cur_page >= pages %}disabled{% endif %}">
-        <a href="/lsipage?jd_id={{ jd_id }}&page={{ cur_page+1 }}" aria-label="Next">
+        <a href="/lsipage?{{ param }}&page={{ cur_page+1 }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
         </a>
       </li>
       <li>
-        <a href="/lsipage?jd_id={{ jd_id }}&page={{ pages }}">last</a>
+        <a href="/lsipage?{{ param }}&page={{ pages }}">last</a>
       </li>
     </ul>
   </nav>

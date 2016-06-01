@@ -466,7 +466,6 @@ require(
       setTimeout(function(){
         var mdList = GetMdLists(),
             scatter = scattercharts('echarts-wrap');
-        console.log(mdList)
         $.ajax({
           url: '/mining/capacity',
           type: 'post',
@@ -490,7 +489,6 @@ require(
       setTimeout(function(){
         var scatter = scattercharts('echarts-wrap');
         var mdList = GetMdLists();
-        console.log(mdList)
         $.ajax({
           url: '/mining/capacity',
           type: 'post',
@@ -514,14 +512,25 @@ require(
       //定时器，等待modal渲染
       setTimeout(function(){
         var radar = radarcharts('echarts-wrap'),
-            jd_id = window.location.href.split(/(jd_id)=([\w]+)/)[2];
+            jdId = window.location.href.split(/(jd_id)=([\w]+)/)[2],
+            reqData = null;
+        if ( jdId ) {
+          reqData = {
+            'jd_id': jdId,
+            'name_list': JSON.stringify(nameLists)
+          };
+        } else {
+          var jdDoc = window.location.href.split(/(jd_doc)=/)[2];
+          jdDoc = decodeURIComponent(jdDoc);
+          reqData = {
+            'jd_doc': jdDoc,
+            'name_list': JSON.stringify(nameLists)
+          };
+        }
         $.ajax({
           url: '/analysis/valuable',
           type: 'post',
-          data: {
-            'jd_id': jd_id,
-            'name_list': JSON.stringify(nameLists)
-          },
+          data: reqData,
           success: function(response) {
             var datas;
             if ($('#anonymous-checkbox').is(':checked')){

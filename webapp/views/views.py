@@ -33,7 +33,7 @@ class Search(flask.views.MethodView):
             cur_page = int(cur_page)
             result = svc_cv.search(search_text)
             yaml_result = svc_cv.search_yaml(search_text)
-            count = 10
+            count = 20
             datas, pages = self.paginate(svc_cv, result, yaml_result, cur_page, count)
             return flask.render_template('search_result.html',
                                          search_key=search_text,

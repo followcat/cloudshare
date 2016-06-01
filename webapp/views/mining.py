@@ -78,11 +78,11 @@ class LSI(flask.views.MethodView):
             param = 'jd_doc='+doc
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
-        count = 10
+        count = 20
         datas, pages = self.process(sim, svc_cv, doc, cur_page, count)
         return flask.render_template('lsipage.html',result=datas,
                                      button_bar=True, cur_page=cur_page,
-                                     pages=pages, jd_id=jd_id)
+                                     pages=pages, param=param)
 
     def post(self):
         svc_cv = flask.current_app.config['SVC_CV']
@@ -136,9 +136,12 @@ class Valuable(flask.views.MethodView):
         sim = flask.current_app.config['LSI_SIM']
         svc_cv = flask.current_app.config['SVC_CV']
         svc_jd = flask.current_app.config['SVC_JD']
-        jd_id = flask.request.form['jd_id']
-        jd_yaml = svc_jd.get(jd_id + '.yaml')
-        doc = jd_yaml['description']
+        if 'jd_id' in flask.request.form:
+            jd_id = flask.request.form['jd_id']
+            jd_yaml = svc_jd.get(jd_id+'.yaml')
+            doc = jd_yaml['description']
+        elif 'jd_doc' in flask.request.form:
+            doc = flask.request.form['jd_doc']
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
         if len(name_list) == 0:

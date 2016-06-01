@@ -64,13 +64,13 @@ def silencer(document):
 
 class Mining(object):
 
-    def __init__(self, path, svc_list, default_svc, slicer=None):
+    def __init__(self, path, cvsvc, slicer=None):
         self.sim = {}
         self.path = path
         self.lsi_model = None
         self.services = {
-                'default': [default_svc],
-                'all': svc_list
+                'default': [cvsvc.default],
+                'all': cvsvc.svcls
             }
         if not os.path.exists(self.path):
             os.makedirs(self.path)

@@ -1,6 +1,7 @@
 import codecs
 import os.path
 
+import json
 import flask
 import flask.views
 
@@ -9,8 +10,6 @@ import core.mining.info
 import core.mining.valuable
 import core.outputstorage
 
-import json
-from flask.ext.paginate import Pagination
 
 class Position(flask.views.MethodView):
 
@@ -69,14 +68,21 @@ class LSI(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         sim = flask.current_app.config['LSI_SIM']
         svc_jd = flask.current_app.config['SVC_JD']
-        jd_id = flask.request.args['jd_id']
-        jd_yaml = svc_jd.get(jd_id+'.yaml')
-        doc = jd_yaml['description']
+        if 'jd_id' in flask.request.args:
+            jd_id = flask.request.args['jd_id']
+            jd_yaml = svc_jd.get(jd_id+'.yaml')
+            doc = jd_yaml['description']
+            param = 'jd_id='+jd_id
+        elif 'jd_doc' in flask.request.args:
+            doc = flask.request.args['jd_doc']
+            param = 'jd_doc='+doc
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 10
         datas, pages = self.process(sim, svc_cv, doc, cur_page, count)
-        return flask.render_template('lsipage.html',result=datas, button_bar=True, cur_page=cur_page, pages=pages, jd_id=jd_id)
+        return flask.render_template('lsipage.html',result=datas,
+                                     button_bar=True, cur_page=cur_page,
+                                     pages=pages, jd_id=jd_id)
 
     def post(self):
         svc_cv = flask.current_app.config['SVC_CV']

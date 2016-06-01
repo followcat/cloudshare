@@ -1,5 +1,3 @@
-import os
-import glob
 import atexit
 
 from apscheduler.schedulers.background import BackgroundScheduler

@@ -24,9 +24,10 @@ class LSIsimilarity(object):
     def update(self, svccv_list):
         added = False
         for svc_cv in svccv_list:
-            for data in svc_cv.datas():
-                name, doc = data
+            for yamlname in svc_cv.yamls():
+                name = core.outputstorage.ConvertName(yamlname)
                 if name.md not in self.names:
+                    doc = svc_cv.getmd(name)
                     self.add(name.md, doc)
                     added = True
         if added:

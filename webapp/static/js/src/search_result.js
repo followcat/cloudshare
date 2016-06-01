@@ -559,7 +559,7 @@ require(
     }
 
     //将item名字和对应的文件名加入localStorage中
-    function addStorage(name, mdFileName){
+    function addStorage(name, mdFileName, flag){
       var nameLists = null,
           lsNameLists = localStorage.nameLists;
       if ( lsNameLists ) {
@@ -567,15 +567,15 @@ require(
       } else {
         nameLists = new Array();
       }
-      nameLists.push( { name: name, mdFileName: mdFileName });
+      nameLists.push( { name: name, mdFileName: mdFileName, flag: flag });
       localStorage.setItem("nameLists", JSON.stringify(nameLists));
     }
 
     //将item名字和对应的文件名从localStorage中删除
-    function deleteStorage(name, mdFileName){
+    function deleteStorage(name, mdFileName, flag){
       var nameLists = JSON.parse(localStorage.getItem("nameLists"));
       nameLists.forEach(function(obj, index) {
-        if ( obj.name === name && obj.mdFileName === mdFileName ) {
+        if ( obj.name === name && obj.mdFileName === mdFileName && obj.flag === flag ) {
           nameLists.splice(index, 1);  //remove
           localStorage.nameLists = JSON.stringify(nameLists);  //replace locaolStorage
         }
@@ -586,32 +586,54 @@ require(
     $(".checkbox-name").on("click", function() {
       var nameLink = $(this).next();
       var name = $(nameLink).text().split("-")[0],
-          mdFileName = $(nameLink).attr("href").split("/")[2];
-      if ( $(this).is(":checked") ) {
+          mdFileName = $(nameLink).attr("href").split("/")[2],
+          flag = window.location.href.split("=")[1];
+      if ( $(this).is(":checked") ) {  //如果勾选，加入侧边栏
         $("#sel-list").append("<div class=\"sel-item\">" +
           "<span class=\"sel-item-name\" data-filename=\""+ mdFileName +"\">" + name + "</span>" +
           "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
+          addStorage(name, mdFileName, flag);
+      } else {  //取消勾选，从侧边栏删除
+        var selItem = $(".sel-item-name");
+        for ( var i = 0, len = selItem.length; i < len; i++) {
+          var self = $(selItem[i]);
+          if ( mdFileName === self.attr("data-filename") ) {
+            self.parent().remove();
+            deleteStorage(name, mdFileName, flag);  //同时删除localStorage中对应的数据
+          }
+        }
       }
-      addStorage(name, mdFileName);
     });
 
     //选择列表中的item删除事件
     $("#sel-list").on("click", ".sel-item-remove", function() {
       var name = $(this).prev().text(),
-          mdFileName = $(this).prev().attr("data-filename");
-      deleteStorage(name, mdFileName);
+          mdFileName = $(this).prev().attr("data-filename"),
+          flag = window.location.href.split("=")[1];
+      deleteStorage(name, mdFileName, flag);
+      var itemTitle = $(".item-title");
+      for ( var i = 0, len = itemTitle.length; i < len; i++) {
+        var self = $(itemTitle[i]);
+        console.log(self.text().indexOf(name))
+        if ( self.text().indexOf(name) !== -1 ) {
+          self.prev().removeAttr("checked");
+        }
+      }
       $(this).parent().remove();
     });
 
     //从localStorage读取nameLists
     function readNameLists(){
       if ( localStorage.nameLists ) {
-        var nameLists = JSON.parse(localStorage.nameLists);
+        var nameLists = JSON.parse(localStorage.nameLists),
+            flag = window.location.href.split("=")[1];
         if ( nameLists.length > 0 ) {
           nameLists.forEach( function( obj ) {
-            $("#sel-list").append("<div class=\"sel-item\">" +
-              "<span class=\"sel-item-name\" data-filename=\""+ obj.mdFileName +"\">" + obj.name + "</span>" +
-              "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
+            if ( obj.flag === flag ) {
+              $("#sel-list").append("<div class=\"sel-item\">" +
+                "<span class=\"sel-item-name\" data-filename=\""+ obj.mdFileName +"\">" + obj.name + "</span>" +
+                "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
+            }
           });
         }
       }
@@ -633,6 +655,7 @@ require(
     });
 
 
+    //控制抓取的数据的显示状态
     function crawlItemShow(val) {
       if ( val === "Liepin" ) {
         $(".crawl-item").css("display", "block");
@@ -647,18 +670,24 @@ require(
           lsDatabaseList = localStorage.databaseList;
       if ( lsDatabaseList ) {
         databaseList = JSON.parse(lsDatabaseList);
+        for ( var i = 0, len = $(".database-item").length; i < len; i++) {
+          var ele = $(".database-item")[i];
+          var val = $(ele).val();
+          if ( databaseList.indexOf(val) !== -1 ) {
+            $(ele).attr("checked", "true");
+          } else {
+            if ( val === "Liepin" ) {
+              $(".crawl-item").css("display", "none");
+            }
+          }
+        }
       } else {
         databaseList = [];
-      }
-      for ( var i = 0, len = $(".database-item").length; i < len; i++) {
-        var ele = $(".database-item")[i];
-        var val = $(ele).val();
-        if ( databaseList.indexOf(val) !== -1 ) {
+        for ( var i = 0, len = $(".database-item").length; i < len; i++) {
+          var ele = $(".database-item")[i];
+          var val = $(ele).val();
           $(ele).attr("checked", "true");
-        } else {
-          if ( val === "Liepin" ) {
-            $(".crawl-item").css("display", "none");
-          }
+          $(".crawl-item").css("display", "block");
         }
       }
     }
@@ -683,4 +712,23 @@ require(
       localStorage.databaseList = JSON.stringify(databaseList);
     });
 
+    //页面加载初始化
+    //根据侧边栏选择结果，修改item的checkbox状态
+    function initCheckStatus(){
+      var selItem = $(".sel-item-name");
+      if ( selItem.length > 0 ) {
+        var resultItemTitle = $(".item-title");
+        for ( var i = 0, len = resultItemTitle.length; i < len; i++ ) {
+          var self = $(resultItemTitle[i]);
+          for ( var j = 0, selItemLen = selItem.length; j < selItemLen; j++ ) {
+            var selItemName = $(selItem[j]).text(),
+                selItemMdFileName = $(selItem[j]).attr("data-filename");
+            if ( self.text().indexOf(selItemName) !== -1 && self.attr("href").indexOf(selItemMdFileName) !== -1 ) {
+              self.prev().attr("checked", true);
+            }
+          }
+        }
+      }
+    }
+    initCheckStatus();
   });

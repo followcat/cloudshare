@@ -10,7 +10,7 @@ import core.mining.valuable
 import core.outputstorage
 
 import json
-
+from flask.ext.paginate import Pagination
 
 class Position(flask.views.MethodView):
 
@@ -65,14 +65,18 @@ class Capacity(flask.views.MethodView):
 class LSI(flask.views.MethodView):
 
     def get(self):
+        search = False
         svc_cv = flask.current_app.config['SVC_CV']
         sim = flask.current_app.config['LSI_SIM']
         svc_jd = flask.current_app.config['SVC_JD']
         jd_id = flask.request.args['jd_id']
         jd_yaml = svc_jd.get(jd_id+'.yaml')
         doc = jd_yaml['description']
-        datas = self.process(sim, svc_cv, doc)
-        return flask.render_template('lsipage.html',result=datas, button_bar=True)
+        cur_page = flask.request.args.get('page', '1')
+        cur_page = int(cur_page)
+        count = 10
+        datas, pages = self.process(sim, svc_cv, doc, cur_page, count)
+        return flask.render_template('lsipage.html',result=datas, button_bar=True, cur_page=cur_page, pages=pages, jd_id=jd_id)
 
     def post(self):
         svc_cv = flask.current_app.config['SVC_CV']
@@ -81,9 +85,17 @@ class LSI(flask.views.MethodView):
         datas = self.process(sim, svc_cv, doc)
         return flask.render_template('lsipage.html',result=datas, button_bar=True)
 
-    def process(self, sim, svc, doc):
+    def process(self, sim, svc, doc, cur_page, eve_count):
+        if not cur_page:
+            cur_page = 1
         datas = []
-        for name, score in sim.probability(doc)[:50]:
+        result = sim.probability(doc)
+        sum = len(result)
+        if sum%eve_count != 0:
+            pages = sum/eve_count + 1
+        else:
+            pages = sum/eve_count
+        for name, score in sim.probability(doc)[(cur_page-1)*eve_count:cur_page*eve_count]:
             yaml_info = svc.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
@@ -91,7 +103,25 @@ class LSI(flask.views.MethodView):
                 'match': score
             }
             datas.append([name, yaml_info, info])
-        return datas
+        return datas, pages
+
+
+class Similar(flask.views.MethodView):
+
+    def post(self):
+        svc_cv = flask.current_app.config['SVC_CV']
+        sim = flask.current_app.config['LSI_SIM']
+        doc = flask.request.form['doc']
+        datas = []
+        for name, score in sim.probability(doc)[:7]:
+            yaml_info = svc_cv.getyaml(name)
+            info = {
+                'author': yaml_info['committer'],
+                'time': utils.builtin.strftime(yaml_info['date']),
+                'match': score
+            }
+            datas.append([name, yaml_info, info])
+        return flask.jsonify({'result': datas})
 
 
 class Valuable(flask.views.MethodView):

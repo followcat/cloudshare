@@ -140,7 +140,7 @@ class CurriculumVitae(services.base.Service):
         elif isinstance(markdown, unicode):
             result = markdown
         else:
-            result = unicode(markdown, 'utf-8')
+            result = unicode(str(markdown), 'utf-8')
         return result
 
 

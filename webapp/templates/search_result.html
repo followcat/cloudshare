@@ -7,7 +7,7 @@
 {% block search %}
 <form action="/search" method="GET">
   <div class="input-group search-item">
-    <input type="text" class="form-control" name="search_text" id='search_text' placeholder="Search for ..." value="{{ search_key }}" required="required">
+    <input type="text" class="form-control" name="search_text" id="search_text" placeholder="Search for ..." value="{{ search_key }}" required="required">
     <div class="input-group-btn">
       <button type="submit" class="btn btn-default">Search</button>
     </div>
@@ -17,14 +17,13 @@
 
 {% block content %}
   <div class="col-md-10 col-md-offset-1 result-list">
-    <div class='tool-bar'>
-      <button class='btn btn-default btn-xs' id='vd-position'>Show No. of Positions</button>
-<!--       <button class='btn btn-default btn-xs' id='vd-position-region'>显示职业分布结果</button> -->
-      <button class='btn btn-default btn-xs' id='vd-capacity-pro'>Show Competency </button>
-      <button class='btn btn-default btn-xs' id='vd-capacity'>Show Work Experience</button>
-      <div id='data-main' style='display: none;'>
-        <div id='echarts-wrap'></div>
-        <div id='action-msg'></div>
+    <div class="tool-bar">
+      <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
+      <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency </button>
+      <button class="btn btn-default btn-xs" id="vd-capacity">Show Work Experience</button>
+      <div id="data-main" style="display: none;">
+        <div id="echarts-wrap"></div>
+        <div id="action-msg"></div>
       </div>
     </div>
     {% if result %}
@@ -36,7 +35,7 @@
         <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
         </em>
         {% if item[1].enversion %}
-        <a href="/edit/{{ item[1].enversion }}" target="_blank" class='check-en'>English CV</a>
+        <a href="/edit/{{ item[1].enversion }}" target="_blank" class="check-en">English CV</a>
         {% endif %}
       </div>
       <div class="container-fluid">
@@ -50,17 +49,17 @@
         </ul>
       </div>
       <div class="work-experience">
-        <a href="javascript:;" class='show-more'>Unfold</a>
+        <a href="javascript:;" class="show-more">Unfold</a>
           {% for e in item[1].experience %}
             {% if loop.index > 2 %}
-              <div class='experience-hide'>
-                <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
-                <div class='experience-company'>{{ e[2] }}</div> 
+              <div class="experience-hide">
+                <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+                <div class="experience-company">{{ e[2] }}</div>
               </div>
             {% else %}
               <div>
-                <div class='experience-time'>{{ e[0] }} - {{ e[1] }}</div>    
-                <div class='experience-company'>{{ e[2] }}</div> 
+                <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+                <div class="experience-company">{{ e[2] }}</div>
               </div>
             {% endif %}
           {% endfor %}
@@ -106,9 +105,41 @@
     {% else %}
     <p>Your search - {{ search_key }} - did not match any documents.</p>
     {% endif %}
+    <nav>
+      <ul class="pagination">
+        <li>
+          <a href="/search?search_text={{ search_key }}&page=1">first</a>
+        </li>
+        <li class="{% if cur_page <= 1%}disabled{% endif %}">
+          <a href="/search?search_text={{ search_key }}&page={{ cur_page-1 }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        {% if cur_page < pages - 2 %}
+        <li class="active"><a href="/search?search_text={{ search_key }}&page={{ cur_page }}">{{ cur_page }}</a></li>
+        <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
+        <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+2 }}">{{ cur_page+2}}</a></li>
+        <li class="disabled"><a href="#">...</a></li>
+        <li><a href="/search?search_text={{ search_key }}&page={{ pages }}">{{ pages }}</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">...</a></li>
+        {% for num in range(2,-1,-1) %}
+        <li class="{% if cur_page == pages-num %} active {% endif %}"><a href="/search?search_text={{ search_key }}&page={{ pages-num }}">{{ pages-num }}</a></li>
+        {% endfor %}
+        {% endif %}
+        <li class="{% if cur_page >= pages %}disabled{% endif %}">
+          <a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        <li>
+          <a href="/lsipage?jd_id={{ jd_id }}&page={{ pages }}">last</a>
+        </li>
+      </ul>
+    </nav>
   </div>
 {% endblock %}
 
 {% block script%}
-<script data-main='{{ url_for("static", filename="js/src/search_result.js") }}' src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
+<script data-main="{{ url_for('static', filename='js/src/search_result.js') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
 {% endblock%}

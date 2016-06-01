@@ -18,8 +18,6 @@ require.config({
     }
   }
 });
-
-
 require(
   [
     'jquery',
@@ -40,56 +38,8 @@ require(
           return i;
         }
       }
-
       return false;
     }
-
-    //Show position region on the map
-
-    //Deal with Md lists and its region source
-    function GetRegionList(resultArr) {
-      var regionDataArr = new Array();
-      var geoObj = new Object();
-
-      for (var i = 0, iLen = resultArr.length; i < iLen; i++) {
-        var subArr = resultArr[i];
-        for (var j = 0, jLen = subArr.length; j < jLen; j++) {
-          var obj = subArr[j];
-          //init regionDataArr
-          if (obj.name) {
-            if (regionDataArr.length === 0) {
-              var regionObj = new Object();
-
-              regionObj.name = obj.name;
-              regionObj.value = 1;
-
-              geoObj[obj.name] = [obj.coord[0], obj.coord[1]];
-              regionDataArr.push(regionObj);
-              regionObj = null;
-            } else {
-              var index = isExist(regionDataArr, obj.name);
-              if (index || index === 0) {
-                regionDataArr[index].value += 1;
-              } else {
-                var regionObj = new Object();
-                regionObj.name = obj.name;
-                regionObj.value = 1;
-
-                geoObj[obj.name] = [obj.coord[0], obj.coord[1]];
-                regionDataArr.push(regionObj);
-                regionObj = null;
-              }
-            }
-          }
-        }
-      }
-
-      return {
-        regionDataArr: regionDataArr,
-        geoObj: geoObj
-      };
-    }
-
 
     //Get the md_ids lists
     function GetMdLists() {
@@ -102,117 +52,6 @@ require(
 
       return mdList;
     }
-
-
-    //Show position region button handle
-    $('#vd-position-region').on('click', function() {
-      $('#action-msg').text('');
-        if ($('#data-main').css('display') === 'none') {
-          $('#data-main').css('display', 'block');
-          var positionCharts = echarts.init(document.getElementById('echarts-wrap'));
-          positionCharts.showLoading({
-            text: '数据加载中...',
-            effect: 'whirling',
-            textStyle: {
-                fontSize: 20
-            }
-          });
-          //Get the md_ids lists
-          var mdList = GetMdLists();
-
-            $.ajax({
-              url: '/mining/region',
-              type: 'post',
-              data: {
-                  'md_ids': JSON.stringify(mdList)
-              },
-              success: function(response) {
-                var regionObj = GetRegionList(response.result);
-                positionCharts.hideLoading();
-
-                var option = {
-                  title: {
-                    text: '职业分布情况',
-                    x: 'center'
-                  },
-                  tooltip: {
-                    trigger: 'item'
-                  },
-                  dataRange: {
-                    min: 0,
-                    max: 500,
-                    calculable: true,
-                    color: ['#191970', '#4D4D4D', '#551A8B', '#CD0000']
-                  },
-                  toolbox: {
-                    show: true,
-                    orient: 'vertical',
-                    x: 'right',
-                    y: 'center',
-                    feature: {
-                      mark: {
-                        show: true
-                      },
-                      dataView: {
-                        show: true,
-                        readOnly: false
-                      },
-                      restore: {
-                        show: true
-                      },
-                      saveAsImage: {
-                        show: true
-                      }
-                    }
-                  },
-                  series: [{
-                    name: 'region',
-                    type: 'map',
-                    mapType: 'china',
-                    hoverable: false,
-                    roam: true,
-                    data: [],
-                    markPoint: {
-                      symbolSize: 10, // 标注大小，半宽（半径）参数，当图形为方向或菱形则总宽度为symbolSize * 2
-                      itemStyle: {
-                        normal: {
-                          borderColor: '#87cefa',
-                          borderWidth: 1, // 标注边线线宽，单位px，默认为1
-                          label: {
-                            show: true
-                          }
-                        },
-                        emphasis: {
-                          borderColor: '#1e90ff',
-                          borderWidth: 5,
-                          label: {
-                            show: false
-                          }
-                        }
-                      },
-                      data: function() {
-                        var list = [];
-                        for (var i = regionObj.regionDataArr.length - 1; i >= 0; i--) {
-                          if (regionObj.regionDataArr[i].value > 2) {
-                            list.push(regionObj.regionDataArr[i]);
-                          } else {
-                            continue;
-                          }
-                        }
-                        return list;
-                      }()
-                    },
-                    geoCoord: regionObj.geoObj
-                  }]
-                };
-                /*end option*/
-                positionCharts.setOption(option);
-              }
-            });
-        } else {
-          $('#data-main').css('display', 'none');
-        }
-    });
 
     //Echarts - visualized data
 
@@ -257,7 +96,7 @@ require(
         $.ajax({
           url: '/mining/position',
           type: 'post',
-          data: formdata,
+          data: { "search_text": $('#search_text').val()},
           success: function(response) {
             if (response.result !== '') {
               var dataArr = dealPosition(response.result);
@@ -361,6 +200,8 @@ require(
         $('#data-main').css('display', 'none');
       }
     });
+
+
 
     function changeTwoDecimal(x) {
       var f_x = parseFloat(x);
@@ -570,19 +411,7 @@ require(
       }
     });
 
-
-    function getNameLists(checkboxLists){
-      var nameLists = [];
-      for(var i = 0, len = checkboxLists.length; i < len; i++){
-        if ( $(checkboxLists[i]).is(':checked') ){
-          nameLists.push($(checkboxLists[i]).next().attr('href').split('/')[2]);
-        }else{
-          continue;
-        }
-      }
-      return nameLists;
-    }
-
+    //匿名处理
     function replaceName(datas){
       for( var i = 0, datasLen = datas.length; i < datasLen; i++){
         for ( var j = 0, valuesLen = datas[i]['value'].length; j < valuesLen; j++){
@@ -613,16 +442,79 @@ require(
       return datas;
     }
 
+    //清空图表绘制容器的内容
+    function removeContent(){
+      $("#echarts-wrap").html("");
+      $("#action-msg").html("");
+    }
+
+    //获取选择列表中item
+    function getFileNameList(obj){
+      var nameLists = [];
+      obj.each(function(){
+        nameLists.push($(this).attr("data-filename"));
+      });
+      return nameLists;
+    }
+
+    //侧边栏 能力分布 按钮事件，显示图表
+    $("#competency-btn").on("click", function() {
+      $("#chartsModal").modal("show");
+      removeContent();  //清空绘制容器
+
+      //定时器，等待modal渲染
+      setTimeout(function(){
+        var mdList = GetMdLists(),
+            scatter = scattercharts('echarts-wrap');
+        console.log(mdList)
+        $.ajax({
+          url: '/mining/capacity',
+          type: 'post',
+          data: {
+            'md_ids': JSON.stringify(mdList)
+          },
+          success: function(response) {
+            var data = getProPointData(response.result);
+            scatter.makeScatter(data);
+          }
+        });
+      }, 500);
+
+    });
+
+    //侧边栏 经验分布 按钮事件，显示图表
+    $("#experience-btn").on("click", function(){
+      $("#chartsModal").modal("show");
+      removeContent();  //清空绘制容器
+
+      setTimeout(function(){
+        var scatter = scattercharts('echarts-wrap');
+        var mdList = GetMdLists();
+        console.log(mdList)
+        $.ajax({
+          url: '/mining/capacity',
+          type: 'post',
+          data: {
+            'md_ids': JSON.stringify(mdList)
+          },
+          success: function(response) {
+            var dataArr = getPointData(response.result);
+            scatter.makeScatter(dataArr);
+          }
+        });
+      }, 500);
+    });
+
+    //根据选择的候选人绘制雷达图
     $('#vd-valuable').on('click', function() {
-      if ($('#data-main').css('display') === 'none') {
-        $('#data-main').css('display', 'block');
+      $("#chartsModal").modal("show");
+      removeContent();  //清空绘制容器
+      var nameLists = getFileNameList($(".sel-item-name"));
 
-        var checkboxLists = $('.checkbox-name');
-        var nameLists = getNameLists(checkboxLists);
-
+      //定时器，等待modal渲染
+      setTimeout(function(){
         var radar = radarcharts('echarts-wrap'),
-            jd_id = window.location.href.split('=')[1];
-
+            jd_id = window.location.href.split(/(jd_id)=([\w]+)/)[2];
         $.ajax({
           url: '/analysis/valuable',
           type: 'post',
@@ -640,14 +532,12 @@ require(
             radar.makeRadar(datas, response.max);
           }
         });
-      }else{
-        $('#data-main').css('display', 'none');
-      }
+      }, 500);
     });
 
-    //Color Gradient according the score
+    //根据匹配值大小描绘不同强度颜色
     var itemLink = $('.item-link');
-    var colorgrad = ColorGrad();
+    var colorgrad = ColorGrad();  //创建渐变颜色实例
     for(var i = 0, len = itemLink.length; i < len; i++){
       var match = $(itemLink[i]).children('p').text();
       if (match === ''){
@@ -658,4 +548,130 @@ require(
       var grad = colorgrad.gradient(parseInt(matchToNum*100));
       $(itemLink[i]).children('a').css({'color': grad});
     }
+
+    //将item名字和对应的文件名加入localStorage中
+    function addStorage(name, mdFileName){
+      var nameLists = null,
+          lsNameLists = localStorage.nameLists;
+      if ( lsNameLists ) {
+        nameLists = JSON.parse(lsNameLists);
+      } else {
+        nameLists = new Array();
+      }
+      nameLists.push( { name: name, mdFileName: mdFileName });
+      localStorage.setItem("nameLists", JSON.stringify(nameLists));
+    }
+
+    //将item名字和对应的文件名从localStorage中删除
+    function deleteStorage(name, mdFileName){
+      var nameLists = JSON.parse(localStorage.getItem("nameLists"));
+      nameLists.forEach(function(obj, index) {
+        if ( obj.name === name && obj.mdFileName === mdFileName ) {
+          nameLists.splice(index, 1);  //remove
+          localStorage.nameLists = JSON.stringify(nameLists);  //replace locaolStorage
+        }
+      });
+    }
+
+    //Checkbox勾选加入侧边栏中的选择列表
+    $(".checkbox-name").on("click", function() {
+      var nameLink = $(this).next();
+      var name = $(nameLink).text().split("-")[0],
+          mdFileName = $(nameLink).attr("href").split("/")[2];
+      if ( $(this).is(":checked") ) {
+        $("#sel-list").append("<div class=\"sel-item\">" +
+          "<span class=\"sel-item-name\" data-filename=\""+ mdFileName +"\">" + name + "</span>" +
+          "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
+      }
+      addStorage(name, mdFileName);
+    });
+
+    //选择列表中的item删除事件
+    $("#sel-list").on("click", ".sel-item-remove", function() {
+      var name = $(this).prev().text(),
+          mdFileName = $(this).prev().attr("data-filename");
+      deleteStorage(name, mdFileName);
+      $(this).parent().remove();
+    });
+
+    //从localStorage读取nameLists
+    function readNameLists(){
+      if ( localStorage.nameLists ) {
+        var nameLists = JSON.parse(localStorage.nameLists);
+        if ( nameLists.length > 0 ) {
+          nameLists.forEach( function( obj ) {
+            $("#sel-list").append("<div class=\"sel-item\">" +
+              "<span class=\"sel-item-name\" data-filename=\""+ obj.mdFileName +"\">" + obj.name + "</span>" +
+              "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
+          });
+        }
+      }
+    }
+    readNameLists();
+
+    //侧边栏按钮
+    $("#operateMenu").on("click", function() {
+      var sideWidth = $(".sidebar-wrap").width(),
+          operateWidth = $("#operateMenu").width(),
+          sideRight = $(".sidebar-wrap").css("right");
+      var moveLength = parseInt(sideWidth) - parseInt(operateWidth);
+      //侧边栏动画
+      if ( parseInt(sideRight) < 0){
+        $(".sidebar-wrap").animate({right: "0"});
+      } else {
+        $(".sidebar-wrap").animate({right: "-" + moveLength.toString() + "px"});
+      }
+    });
+
+
+    function crawlItemShow(val) {
+      if ( val === "Liepin" ) {
+        $(".crawl-item").css("display", "block");
+      } else {
+        $(".crawl-item").css("display", "none");
+      }
+    }
+
+    //初始化数据库选择
+    function initDatabase(){
+      var databaseList = null,
+          lsDatabaseList = localStorage.databaseList;
+      if ( lsDatabaseList ) {
+        databaseList = JSON.parse(lsDatabaseList);
+      } else {
+        databaseList = [];
+      }
+      for ( var i = 0, len = $(".database-item").length; i < len; i++) {
+        var ele = $(".database-item")[i];
+        var val = $(ele).val();
+        if ( databaseList.indexOf(val) !== -1 ) {
+          $(ele).attr("checked", "true");
+        } else {
+          if ( val === "Liepin" ) {
+            $(".crawl-item").css("display", "none");
+          }
+        }
+      }
+    }
+    initDatabase();
+
+    //简历数据库选择
+    $(".database-item").on("change", function(){
+      var databaseList = null,
+          lsDatabaseList = localStorage.databaseList;
+      if ( lsDatabaseList ) {
+        databaseList = JSON.parse(lsDatabaseList);
+      } else {
+        databaseList = [];
+      }
+      if ( $(this).is(":checked") ) {
+        var val = $(this).val();
+        databaseList.push(val);
+      } else {
+        databaseList.splice(databaseList.indexOf($(this).val()), 1);
+      }
+      crawlItemShow(val);
+      localStorage.databaseList = JSON.stringify(databaseList);
+    });
+
   });

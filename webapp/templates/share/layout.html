@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
+  <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Seach-Willendare</title>
+  <title>Seach-Willendare</title>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/layout.css') }}">
-  
+
   {% block style %}{% endblock %}
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -18,8 +18,8 @@
   <![endif]-->
 </head>
 <body>
-	<header class="header-box">
-	  <a href="/search">
+  <header class="header-box">
+    <a href="/search">
       <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
     </a>
     {% block search %}{% endblock %}
@@ -42,9 +42,9 @@
       </li>
       <li><a href="/listjd">Select a JD</a></li>
     </ul>
-	</header>
-	<!-- upload modal begin-->
-	<div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
+  </header>
+  <!-- upload modal begin-->
+  <div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
     <div class="modal-dialog modal-sm">
       <div class="modal-content">
         <div class="modal-header">
@@ -55,7 +55,7 @@
           <form id="file-form" action="/upload" method="POST" enctype="multipart/form-data">
             <input type="file" name="file" id="file" />
             <p id="progressmsg"></p>
-          </form>  
+          </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -65,8 +65,8 @@
     </div>
   </div>
   <!-- upload modal end-->
-	<!--quit modal begin-->
-	<div class="modal fade quit-modal" tabindex="-1" role="dialog" aria-labelledby="myQuitModalLabel">
+  <!--quit modal begin-->
+  <div class="modal fade quit-modal" tabindex="-1" role="dialog" aria-labelledby="myQuitModalLabel">
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
           <div class="modal-header">
@@ -93,7 +93,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="pwdModalLabel">Change password</h4>
           </div>
-          <form id="cpwd-form" action="/changepassword" method="POST">          
+          <form id="cpwd-form" action="/changepassword" method="POST">
           <div class="modal-body">
             <div class="form-group">
               <label for="oldpassword">Old Password</label>

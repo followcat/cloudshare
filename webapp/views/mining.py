@@ -84,13 +84,6 @@ class LSI(flask.views.MethodView):
                                      button_bar=True, cur_page=cur_page,
                                      pages=pages, param=param)
 
-    def post(self):
-        svc_cv = flask.current_app.config['SVC_CV']
-        sim = flask.current_app.config['LSI_SIM']
-        doc = flask.request.form['search_text']
-        datas = self.process(sim, svc_cv, doc)
-        return flask.render_template('lsipage.html',result=datas, button_bar=True)
-
     def process(self, sim, svc, doc, cur_page, eve_count):
         if not cur_page:
             cur_page = 1

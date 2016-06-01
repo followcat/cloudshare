@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block search %}
-<form action="/search" method="GET">
+<form action="/search" method="GET" class="header-search">
   <div class="input-group search-item">
     <input type="text" class="form-control" name="search_text" id="search_text" placeholder="Search for ..." value="{{ search_key }}" required="required">
     <div class="input-group-btn">
@@ -57,49 +57,49 @@
                 <div class="experience-company">{{ e[2] }}</div>
               </div>
             {% else %}
-              <div>
+              <div class="experience-show">
                 <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
                 <div class="experience-company">{{ e[2] }}</div>
               </div>
             {% endif %}
           {% endfor %}
-<!--           <a href="javascript:;" class='show-more'>+显示更多</a> -->
       </div>
-      <div class="label-box">
-        <span class="label-title">Tags:</span>
-        {% for tags in item[1].tag %}
-          <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
-        {% endfor %}
-      </div>
-      <div class="tracking-box">
-        <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
-        <div class="tracking-info">
-          <span class="triangle-up"></span>
-          <span class="triangle-up-z"></span>
-          <ul class="list-inline clearfix">
-            {% for tracking in item[1].tracking %}
-              <li>{{ tracking.author }}</li>
-            {% endfor %}
-          </ul>
+      <div class="info-wrapper">
+        <div class="tracking-box">
+          <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
+          <div class="tracking-info">
+            <span class="triangle-up"></span>
+            <span class="triangle-up-z"></span>
+            <ul class="list-inline clearfix">
+              {% for tracking in item[1].tracking %}
+                <li>{{ tracking.author }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        <div class="comment-box">
+          <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
+          <div class="comment-info">
+            <span class="triangle-up"></span>
+            <span class="triangle-up-z"></span>
+            <ul class="list-unstyled clearfix">
+              {% for comments in item[1].comment %}
+                {%- if loop.index > 3 %}{% break %}{% endif %}
+                <li class="comment-item">
+                  <p>{{ comments.content }}</p>
+                  <em class="author">{{ comments.author }}</em>
+                </li>
+              {%- endfor %}
+            </ul>
+          </div>
+        </div>
+        <div class="label-box">
+          <span class="label-title">Tags:</span>
+          {% for tags in item[1].tag %}
+            <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
+          {% endfor %}
         </div>
       </div>
-      <div class="comment-box">
-        <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
-        <div class="comment-info">
-          <span class="triangle-up"></span>
-          <span class="triangle-up-z"></span>
-          <ul class="list-unstyled clearfix">
-            {% for comments in item[1].comment %}
-              {%- if loop.index > 3 %}{% break %}{% endif %}
-              <li class="comment-item">
-                <p>{{ comments.content }}</p>
-                <em class="author">{{ comments.author }}</em>
-              </li>
-            {%- endfor %}
-          </ul>
-        </div>
-      </div>
-
     </div>
     {% endfor %}
     {% else %}

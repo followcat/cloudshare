@@ -19,13 +19,13 @@
 </head>
 <body>
   <header class="header-box">
-    <a href="/search">
+    <a href="/search" class="logo-box">
       <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
     </a>
     {% block search %}{% endblock %}
-    <ul class="nav navbar-nav navbar-right nav-list">
+    <ul class="navbar-right nav-list list-unstyled">
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id='name'><span class="glyphicon glyphicon-user"></span>{{ current_user.id }} <span class="caret"></span></a>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="name"><span class="glyphicon glyphicon-user"></span>{{ current_user.id }} <span class="caret"></span></a>
         <ul class="dropdown-menu">
           <li><a href="/userinfo">Individual Center</a></li>
           <li><a href="#" data-toggle="modal" data-target=".setting-modal">Change Password</a></li>
@@ -37,7 +37,7 @@
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-upload"></span>Tools <span class="caret"></span></a>
         <ul class="dropdown-menu">
           <li><a href="#" data-toggle="modal" data-target=".upload-modal">Upload</a></li>
-          <li><a href="/batchupload" target='_blank'>Bulk Upload</a></li>
+          <li><a href="/batchupload" target="_blank">Bulk Upload</a></li>
         </ul>
       </li>
       <li><a href="/listjd">Select a JD</a></li>
@@ -105,7 +105,7 @@
             </div>
             <div class="form-group">
               <label for="confirmpassword">Confirm New Password</label>
-              <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" data-compare="#newpassword"placeholder="Confirm New Password" required="required">
+              <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" data-compare="#newpassword" placeholder="Confirm New Password" required="required" />
             </div>
             <strong id="error-msg"></strong>
           </div>

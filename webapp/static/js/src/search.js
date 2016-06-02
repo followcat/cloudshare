@@ -49,25 +49,6 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'Cookies'], 
     }
   }
 
-  // $(".type-check label").on("click", function(){
-  //   if( !$("#check").is(":checked") ) {
-  //     $("#search-form input").remove();
-  //     $("#search-form").attr({
-  //       action: "/analysis/lsi",
-  //       method: "POST"
-  //     });
-  //     $("#search-form").prepend("<textarea class=\"form-control\" rows=\"4\" name=\"search_text\"></textarea>");
-  //     $(".search-btn").text("Search by sentence");
-  //   }else {
-  //     $("#search-form textarea").remove();
-  //     $("#search-form").attr({
-  //       action: "search",
-  //       method: "GET"
-  //     });
-  //     $("#search-form").prepend("<input type=\"text\" class=\"form-control\" name=\"search_text\" />");
-  //     $(".search-btn").text("Search by keyword");
-  //   }
-  // });
   $(".type-check label").on("click", function(){
     if( !$("#check").is(":checked") ) {
       $("#serachbykey").css("display", "none");

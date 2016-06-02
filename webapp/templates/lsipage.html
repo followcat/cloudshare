@@ -1,6 +1,8 @@
 {% extends "share/layout.html" %}
 
 {% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-table.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/jdview.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/searchresult.css') }}">
 <style type="text/css">
   .result-list{
@@ -64,18 +66,49 @@
     <div class="line"></div>
     <div class="sel-list" id="sel-list">
     </div>
+    <div class="line"></div>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary history-btn" id="hisBtnTrigger">
+      Choose by history
+    </button>
   </div>
 </div>
-<div class="modal fade bs-example-modal-lg" id="chartsModal" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
+<div class="modal fade charts-view-modal" id="chartsModal" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Charts View</h4>
+        <h4 class="modal-title" id="chartsViewLabel">Charts View</h4>
       </div>
       <div class="modal-body">
         <div class="chart-wrapper" id="echarts-wrap"></div>
         <div id="action-msg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div><!-- Charts modal end -->
+
+<div class="modal fade history-view-modal" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="HistoryModalLabel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="historyViewLabel">History View</h4>
+      </div>
+      <div class="modal-body" id="historyModalBody">
+        <table id="historyTable" data-show-refresh="true" data-click-to-select="true" data-pagination="true" data-search="true" data-height="400">
+          <thead>
+            <tr>
+              <th data-field="state" data-checkbox="true"></th>
+              <th data-field="name">Name</th>
+              <th data-field="fileName">File Name</th>
+              <th data-field="time">Time</th>
+            </tr>
+          </thead>
+        </table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -123,7 +156,6 @@
             </div>
           {% endif %}
         {% endfor %}
-<!--           <a href="javascript:;" class='show-more'>+显示更多</a> -->
     </div>
     <div class="label-box">
       <span class="label-title">Tags:</span>

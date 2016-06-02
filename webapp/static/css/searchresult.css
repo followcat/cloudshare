@@ -188,7 +188,7 @@
 .vd-region{
   margin-left: 20px;
 }
-.sidebar-wrap .tool-bar > button{
+.sidebar-wrap .operate-list button{
   width: 80%;
   margin-top: 6px;
   margin-left: 10%;
@@ -228,7 +228,7 @@
 }
 .operate-list{
   width:218px;
-  height: 478px;
+  height: 488px;
   margin-left: 40px;
   background-color: #fff;
   border: 1px solid #c2c2c2;

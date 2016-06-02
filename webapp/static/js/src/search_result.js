@@ -9,7 +9,9 @@ require.config({
     'radarcharts': 'src/charts/radarcharts',
     'barcharts': 'src/charts/barcharts',
     'scatters': "src/charts/scattercharts",
-    'colorgrad': 'src/color/colorgrad'
+    'colorgrad': 'src/color/colorgrad',
+    Cookies: 'src/cookies',
+    'bootstraptable': 'lib/bootstrap-table.min',
   },
   shim: {
     bootstrap: {
@@ -25,12 +27,14 @@ require(
     'barcharts',
     'scatters',
     'colorgrad',
+    'Cookies',
     'bootstrap',
     'header',
     'formvalidate',
-    'Upload'
+    'Upload',
+    'bootstraptable'
   ],
-  function($, radarcharts, barcharts, scattercharts, ColorGrad) {
+  function($, radarcharts, barcharts, scattercharts, ColorGrad, Cookies) {
     //Echarts - visualized data
     function isExist(array, value) {
       for (var i = 0, len = array.length; i < len; i++) {
@@ -614,7 +618,6 @@ require(
       var itemTitle = $(".item-title");
       for ( var i = 0, len = itemTitle.length; i < len; i++) {
         var self = $(itemTitle[i]);
-        console.log(self.text().indexOf(name))
         if ( self.text().indexOf(name) !== -1 ) {
           self.prev().removeAttr("checked");
         }
@@ -731,4 +734,59 @@ require(
       }
     }
     initCheckStatus();
+
+    //历史记录选择事件绑定
+    function bindHistorySelect(eleId) {
+      $(eleId).on('check.bs.table', function (e, row) {  //checked 事件监听
+        var selName = row.name,
+            selFileName = row.fileName;
+        $("#sel-list").append("<div class=\"sel-item\">" +
+          "<span class=\"sel-item-name\" data-filename=\""+ selFileName +"\">" + selName + "</span>" +
+          "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
+      })
+      .on('uncheck.bs.table', function (e, row) {  //unchecked 事件监听
+          var selItemLists = $(".sel-item-name");
+          for ( var i = 0, len = selItemLists.length; i < len; i++ ) {
+            var self = $(selItemLists[i]);
+            if ( row.name === self.text() && row.fileName === self.attr("data-filename") ) {
+              self.parent().remove();
+            }
+          }
+      });
+    }
+
+    //历史记录按钮事件
+    //在模态框展示历史记录
+    $("#hisBtnTrigger").on("click", function(){
+      $("#historyModal").modal("show");
+      var cookie = new Cookies();
+      var lists = cookie.readCookie();
+      if ( $("#historyTable tbody").length === 0 ) {
+        setTimeout(function(){
+          $("#historyTable").bootstrapTable({
+            data: lists.reverse()
+          });
+          bindHistorySelect("#historyTable");
+        }, 500);
+      } else {
+        $("#historyModalBody").html("");  //清楚更新前的表格
+        $("#historyModalBody").append("<table id=\"historyTable\" data-show-refresh=\"true\" " +
+          "data-click-to-select=\"true\" data-pagination=\"true\" data-search=\"true\" data-height=\"400\">" +
+          "<thead>" +
+            "<tr>" +
+              "<th data-field=\"state\" data-checkbox=\"true\"></th>" +
+              "<th data-field=\"name\">Name</th>" +
+              "<th data-field=\"fileName\">File Name</th>" +
+              "<th data-field=\"time\">Time</th>" +
+            "</tr>" +
+          "</thead>" +
+        "</table>");  //重新插入表结构
+        setTimeout(function(){
+          $("#historyTable").bootstrapTable({
+            data: lists.reverse()
+          });  //读取赋值
+          bindHistorySelect("#historyTable");  //对新表格进行事件绑定
+        }, 500);
+      }
+    });
   });

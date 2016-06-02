@@ -10,7 +10,7 @@ import jieba.posseg
 REJECT = re.compile('(('+')|('.join([
     u'中文', u'日期', u'汽车',
     #u'个人', u'未填写',
-    u'财务',
+    #u'财务',
     #u'招聘', u'英才网', u'人力',
     u'互联网',
     ])+'))')

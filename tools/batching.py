@@ -118,3 +118,22 @@ def readd_experience(repo_path):
             continue
         yamldata['experience'] = experience
         utils.builtin.save_yaml(yamldata, '', yamlname)
+
+
+import yaml
+import utils._yaml
+import utils.builtin
+
+yaml.SafeDumper = utils._yaml.SafeDumper
+
+def safeyaml(svc_cv, yamlname):
+    yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
+    yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
+    obj = utils.builtin.load_yaml(yamlpath, yamlname)
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
+
+def yamlaction(svc_cv, action):
+    for yamlname in svc_cv.yamls():
+        action(svc_cv, yamlname)

@@ -10,7 +10,7 @@ require.config({
     'barcharts': 'src/charts/barcharts',
     'scatters': "src/charts/scattercharts",
     'colorgrad': 'src/color/colorgrad',
-    Cookies: 'src/cookies',
+    'History': 'src/history',
     'bootstraptable': 'lib/bootstrap-table.min',
   },
   shim: {
@@ -27,14 +27,14 @@ require(
     'barcharts',
     'scatters',
     'colorgrad',
-    'Cookies',
+    'History',
     'bootstrap',
     'header',
     'formvalidate',
     'Upload',
     'bootstraptable'
   ],
-  function($, radarcharts, barcharts, scattercharts, ColorGrad, Cookies) {
+  function($, radarcharts, barcharts, scattercharts, ColorGrad, History) {
     //Echarts - visualized data
     function isExist(array, value) {
       for (var i = 0, len = array.length; i < len; i++) {
@@ -759,8 +759,8 @@ require(
     //在模态框展示历史记录
     $("#hisBtnTrigger").on("click", function(){
       $("#historyModal").modal("show");
-      var cookie = new Cookies();
-      var lists = cookie.readCookie();
+      var history = new History();
+      var lists = history.readHistory();
       if ( $("#historyTable tbody").length === 0 ) {
         setTimeout(function(){
           $("#historyTable").bootstrapTable({

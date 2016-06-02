@@ -8,7 +8,7 @@ require.config({
     cvdeal: 'src/cvdeal',
     Upload: 'src/upload',
     colorgrad: 'src/color/colorgrad',
-    Cookies: 'src/cookies'
+    History: 'src/history'
   },
   shim: {
     bootstrap: {
@@ -38,8 +38,8 @@ require([
   'cvdeal',
   'Upload',
   'colorgrad',
-  'Cookies'
-],function($, bootstrap, datetimepicker, datetimepickerCN, cvdeal, Upload, ColorGrad, Cookies) {
+  'History'
+],function($, bootstrap, datetimepicker, datetimepickerCN, cvdeal, Upload, ColorGrad, History) {
 
   window.onload = cvdeal.CVdeal();
 
@@ -295,9 +295,9 @@ require([
     }
   });
 
-  //Write Cookie
-  var cookie = new Cookies(),
+  //Write history
+  var history = new History(),
       name = $('#name').val();
-  cookie.writeCookie(name, filename);
+  history.writeHistory(name, filename);
 
 });

@@ -6,7 +6,7 @@ require.config({
     header: 'src/header',
     formvalidate: 'src/formvalidate',
     Upload: 'src/upload',
-    Cookies: 'src/cookies'
+    History: 'src/history'
   },
   shim: {
     bootstrap: {
@@ -16,7 +16,7 @@ require.config({
   }
 });
 
-require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'Cookies'], function($, bootstrap, header, formvalidate, Upload, Cookies){
+require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], function($, bootstrap, header, formvalidate, Upload, History){
   var item = $('.operate-list-item');
 
   for(var i = 0, len = item.length; i < len; i++){
@@ -33,9 +33,9 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'Cookies'], 
     $(item[i]).find('p').html(strMsg);
   }
 
-  //User info page - read cookies
-  var cookie = new Cookies();
-  var lists = cookie.readCookie();
+  //User info page - read history
+  var history = new History();
+  var lists = history.readHistory();
 
   if ( typeof lists === 'undefined' ) {
     $('#browing-wrap').append('<p>You have no browsing history.</p>');

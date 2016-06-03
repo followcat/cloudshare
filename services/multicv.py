@@ -10,7 +10,7 @@ class MultiCV(object):
     def add(self, *args, **kwargs):
         return self.default.add(*args, **kwargs)
 
-    def add_md(self, cvobj, committer=None):
+    def add_md(self, *args, **kwargs):
         return self.default.add_md(*args, **kwargs)
 
     def modify(self, *args, **kwargs):

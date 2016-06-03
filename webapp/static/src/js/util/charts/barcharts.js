@@ -1,4 +1,4 @@
-define(['./lib/echarts'], function(echarts){
+define(['./lib/js/echarts'], function(echarts){
 
     //Define BarChart object
     function BarChart(elementId){

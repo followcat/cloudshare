@@ -1,8 +1,8 @@
 require.config({
   baseUrl: '/static/',
   paths: {
-    jquery: 'lib/jquery',
-    marked: 'lib/marked'
+    jquery: 'lib/js/jquery',
+    marked: 'lib/js/marked'
   },
   shim: {
     marked: {

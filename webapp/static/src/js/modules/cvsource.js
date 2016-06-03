@@ -1,10 +1,10 @@
 require.config({
   baseUrl: '/static/',
   paths: {
-    jquery: 'lib/jquery',
-    bootstrap: 'lib/bootstrap',
-    datetimepicker: 'lib/bootstrap-datetimepicker.min',
-    datetimepickerCN: 'lib/bootstrap-datetimepicker.zh-CN',
+    jquery: 'lib/js/jquery',
+    bootstrap: 'lib/js/bootstrap',
+    datetimepicker: 'lib/js/bootstrap-datetimepicker.min',
+    datetimepickerCN: 'lib/js/bootstrap-datetimepicker.zh-CN',
     cvdeal: 'src/js/util/cvdeal',
     Upload: 'src/js/util/upload',
     colorgrad: 'src/js/util/colorgrad',

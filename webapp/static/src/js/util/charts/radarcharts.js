@@ -1,4 +1,4 @@
-define(['./lib/echarts'], function(echarts) {
+define(['./lib/js/echarts'], function(echarts) {
 /*JSON data format:
     {
         "arg": [

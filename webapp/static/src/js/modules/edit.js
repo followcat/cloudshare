@@ -1,7 +1,7 @@
 require.config({
   baseUrl: '/static/',
   paths: {
-    jquery: 'lib/jquery',
+    jquery: 'lib/js/jquery',
     cvdeal: 'src/js/util/cvdeal'
   },
   shim: {

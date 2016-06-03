@@ -1,8 +1,9 @@
 require.config({
   baseUrl: "/static/",
   paths: {
-    'jquery': 'lib/jquery',
-    'bootstrap': 'lib/bootstrap',
+    'jquery': 'lib/js/jquery',
+    'bootstrap': 'lib/js/bootstrap',
+    'bootstraptable': 'lib/js/bootstrap-table.min',
     'header': 'src/js/util/header',
     'formvalidate': 'src/js/util/formvalidate',
     'Upload': 'src/js/util/upload',
@@ -10,8 +11,7 @@ require.config({
     'barcharts': 'src/js/util/charts/barcharts',
     'scatters': "src/js/util/charts/scattercharts",
     'colorgrad': 'src/js/util/colorgrad',
-    'History': 'src/js/util/history',
-    'bootstraptable': 'lib/bootstrap-table.min'
+    'History': 'src/js/util/history'
   },
   shim: {
     bootstrap: {

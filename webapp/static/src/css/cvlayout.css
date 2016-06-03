@@ -1,0 +1,92 @@
+body{
+  background-color: #F8F8FF;
+}
+.header-box{
+  position: relative;
+  width: 100%;
+  height: 50px;
+  background-color: #337ab7;
+}
+.header-box #current-id{
+  display: none;
+}
+.logo{
+  position: absolute;
+  width: 174px;
+  height: 36px;
+  top: 50%;
+  margin-top: -18px;
+}
+@media (max-width: 768px){
+  .logo{
+    width: 20%;
+  }
+}
+/*CV Style*/
+#cv-box{
+  display: block;
+  position: relative;
+  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 20px;
+  padding: 8px 10px;
+  border: 1px solid #D9D9D9;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 14px #A3A3A3;
+}
+#cv-box .cv-box-top{
+  top: 0;
+  width: 100%;
+  height: 28px;
+  line-height: 28px;
+  margin-bottom: 2px;
+}
+#cv-box .cv-box-top span{
+  font-size: 1.375em;
+  font-weight: bold;
+}
+#cv-box p{
+  display: table;
+  margin: 0;
+  width: 100%;
+  padding: 6px 12px;
+  border: 1px solid #c2c2c2;
+  line-height: 22px;
+  font-size: 1em;
+}
+#cv-box h1,h2,h3{
+  display: table;
+  width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 1.125em;
+  font-weight: bold;
+  border: 1px solid #c2c2c2;
+}
+#cv-box table{
+  width: 100%;
+  font-size: 1em;
+}
+#cv-box table thead{
+  border: 1px solid #c2c2c2;
+}
+#cv-box table thead tr th{
+  padding-top: 4px;
+  padding-bottom: 4px; 
+  font-size: 1.125em;
+  font-weight: bold;
+  text-align: center;
+}
+#cv-box table tr:nth-child(odd) {
+  background-color: #EBEBEB;
+}
+#cv-box table tbody{
+  border:1px solid #c2c2c2;
+}
+#cv-box table tbody tr td{
+  padding-top: 2px;
+  padding-bottom: 2px;
+  border: 1px solid #c2c2c2;
+  line-height: 22px;
+}

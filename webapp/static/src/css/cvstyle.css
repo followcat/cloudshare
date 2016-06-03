@@ -1,0 +1,70 @@
+.wrap{
+  width: 90%;
+  margin: 0 auto;
+}
+.wrap-top{
+  position: relative;
+  width: 100%;
+}
+.wrap-top .confirm-box{;
+  margin-top: 20px; 
+  margin-bottom: 20px;
+  margin-left: 16px;
+}
+#cv-confirm-form .form-group{
+  float: left;
+  width: 30%;
+}
+#cv-confirm-form .form-group .form-control{
+  display: inline-block;
+  width: 80%;
+}
+#cv-confirm-form .form-btn{
+  display: inline-block;
+  width: 26%;
+}
+#cv-confirm-form .form-btn #goback-btn{
+  margin-left: 10%;
+}
+.form-group .btn-group{
+  width: 80%;
+}
+.form-group .btn-group .origin{
+  width: 82%;
+}
+.form-group .btn-group .dropdown-menu{
+  width: 82%;
+}
+@media (max-width: 970px){
+  #cv-confirm-form .form-group label{
+    display: block;
+  }
+  #cv-confirm-form .form-group .form-control{
+    width: 96%;
+
+  }
+  #cv-confirm-form .form-group{
+    float: left;
+    width: 33.33333%;
+  }
+  #cv-confirm-form .form-btn{
+    display: block;
+  }
+}
+@media (max-width: 750px){
+  #cv-confirm-form .form-group{
+    float: left;
+    width: 100%;
+  }
+  #cv-confirm-form .form-group .form-control{
+    width: 100%;
+  }
+  #cv-confirm-form .form-btn{
+    display: block;
+    width: 100%;
+  }
+}
+#edit{
+  display: block;
+  float: right;
+}

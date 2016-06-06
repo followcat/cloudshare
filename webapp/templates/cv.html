@@ -1,209 +1,205 @@
 {% extends "share/cv_layout.html" %}
 {% block content%}
-      {% if info %}
-      {% block previewstyle %}
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvstyle.css') }}">
-      {% endblock %}
-      <div class="wrap">
-          <div class="wrap-top">
-            <div class="confirm-box">
-              <form id="cv-confirm-form">
-                <div class="form-group">
-                  <label for="name">Name:</label>
-                  <input type="text" name="name" placeholder="Please Input Name" class="form-control" value="{{ info.name }}" required="required" />
-                </div>
-                <div class="form-group">
-                  <label for="origin">Source:</label>
-                  <div class="btn-group">
-                    <button type="text" name="origin" class="btn btn-default origin" disabled="true"></button>
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <span class="caret"></span>
-                      <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <ul class="dropdown-menu" id="origin-menu">
-                    </ul>
-                  </div>
-                </div>
-                <div class="form-btn">  
-                  <button type="button" class="btn btn-primary" id="confirm-btn">Confirm</button>
-                  <button type="button" class="btn btn-default" id="goback-btn">Go back</button>
-                </div>
-                
-              </form>
-            </div> 
-          </div>   
+{% if info %}
+{% block previewstyle %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/cvstyle.css') }}">
+{% endblock %}
+<div class="wrap">
+  <div class="wrap-top">
+    <div class="confirm-box">
+      <form id="cv-confirm-form">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" name="name" placeholder="Please Input Name" class="form-control" value="{{ info.name }}" required="required" />
+        </div>
+        <div class="form-group">
+          <label for="origin">Source:</label>
+          <div class="btn-group">
+            <button type="text" name="origin" class="btn btn-default origin" disabled="true"></button>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" id="origin-menu">
+            </ul>
+          </div>
+        </div>
+        <div class="form-btn">
+          <button type="button" class="btn btn-primary" id="confirm-btn">Confirm</button>
+          <button type="button" class="btn btn-default" id="goback-btn">Go back</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-        <div id="cv-box">
-          <div class="cv-box-top">
-            <span>简历情况：</span>
-          </div>
-          <div id="cv-content">
-            <div class="content">
-              <img id="loding-img" src="{{  url_for('static', filename='images/loading.gif') }}">
-              {{ markdown|safe }}
-            </div>
-          </div>
+  <div id="cv-box">
+    <div class="cv-box-top">
+      <span>简历情况：</span>
+    </div>
+    <div id="cv-content">
+      <div class="content">
+        <img id="loding-img" src="{{  url_for('static', filename='images/loading.gif') }}">
+        {{ markdown|safe }}
+      </div>
+    </div>
+  </div>
+</div>
+<script data-main="{{ url_for('static', filename='js/src/preview') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+{% else %}<!-- cv preview end  -->
+{% block sourcestyle %}    <!-- cv page start -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap-datetimepicker.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/cvsourcestyle.css') }}">
+{% endblock %}
+<div class="container-fluid clearfix">
+  <div class="wrap-right">
+    <div class="label-box">
+      <div class="label-item">
+        {% for key, value in yaml.iteritems() %}
+        {% if key=='tag' %}
+        {% for item in value %}
+        <span class="label label-primary" title="{{ item.author }}">{{ item.content }}</span>
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+        <a href="javascript:;" id="add-label">Add a Tag</a>
+      </div>
+      <div class="input-group add-label-box">
+        <input type="text" class="form-control" id="label-text" required="required" placeholder="Add a Tag" />
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-primary" id="add-label-btn">Submit</button>
         </div>
       </div>
-      <script data-main="{{ url_for('static', filename='js/src/preview') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
-      {% else %}<!-- cv preview end  -->
-      {% block sourcestyle %}    <!-- cv page start -->
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-datetimepicker.min.css') }}">
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cvsourcestyle.css') }}">
-      {% endblock %}
-      <div class="container-fluid clearfix">
-          <div class="wrap-right">
-            <div class="label-box">
-              <div class="label-item">
-                {% for key, value in yaml.iteritems() %}
-                  {% if key=='tag' %}
-                    {% for item in value %}
-                      <span class="label label-primary" title="{{ item.author }}">{{ item.content }}</span>
-                    {% endfor %}
-                  {% endif %}
-                {% endfor %}
-                <a href="javascript:;" id="add-label">Add a Tag</a>
-              </div>
-              <div class="input-group add-label-box">
-                <input type="text" class="form-control" id="label-text" required="required" placeholder="Add a Tag" />
-                <div class="input-group-btn">
-                  <button type="button" class="btn btn-primary" id="add-label-btn">Submit</button>
-                </div>               
-              </div>
-              
-            </div>
-            <div class="tracking-box">
-              <div class="title">
-                <span>Follow up</span>
-              </div>
-              <div class="form-input">
-                <input type="text" class="form-control" placeholder="Write down your follow up situation..." id="tracking-text" required="required" />
-                <div class="btn-box">
-                  <div class="form-group">
-                    <label for="date" class="col-md-2 control-label" style="padding:4px;">Date</label>
-                    <div class="input-group date form_date col-md-9" data-date="" data-date-format="dd MM yyyy" data-link-field="date" data-link-format="yyyy-mm-dd">
-                        <input class="form-control" size="16" type="text" value="" readonly>
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    </div>
-                    <input type="hidden" id="date" value="" />
-                  </div>
-                  <a href="javascript:;" class="collapse">Fold</a>
-                  <button type="button" class="btn btn-primary" id="tracking-btn">Submit</button>
-                </div>
-              </div>
-              <div class="tracking-content" id="tracking-content">
-                {% for key, value in yaml.iteritems() %}
-                  {% if key=='tracking' %}
-                    {% for item in value %}
-                      <div class="tracking-item">
-                        <p class="content">{{ item.content.text }}</p>
-                        <em class="commit-info">
-                          {{ item.author }}
-                          {{ item.content.date }}
-                        </em>
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                {% endfor %}
-              </div>        
-            </div>
-            <div class="comment-box">
-              <div class="title">
-                <span>Comments</span>
-              </div>
-              <div class="form-input">
-                <input type="text" class="form-control" placeholder="Write down your comments..." id="comment-text" required="required" />
-                <div class="btn-box">
-                  <a href="javascript:;" class="collapse">Fold</a>
-                  <button type="button" class="btn btn-primary" id="comment-btn">Submit</button>
-                </div>
-              </div>
-              <div class="comment-content" id="comment-content">
-                {% for key, value in yaml.iteritems() %}
-                  {% if key=='comment' %}
-                    {% for item in value %}
-                      <div class="comment-item">
-                        <em class="commit-info">
-                          {{ item.author }}
-                        </em>
-                        <p class="content">{{ item.content }}</p>
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                {% endfor %}
-              </div>
-            </div>
-            <div class='similar-box'>
-              <div class='title'>
-                <span>Similar Profiles</span>
-              </div>
-              <div id='similar-person'></div>
-            </div>
-          </div>
-          <div class="wrap-left">
-            <div id="cv-box">
-              <div class="cv-box-top clearfix">
-                <span class='cv-box-title'>简历情况：</span>
-                <div class="tool-bar">
-                  <span class='check-box'><input type='checkbox' id='tranform-check'>Switch to Modify Title</span>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">Modify</a>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">Add English CV</a>
-                  <a type="button" class="btn btn-default btn-xs" target="_blank" id="match">Show JD</a>
-                  {% if yaml.enversion %}
-                  <a href="/edit/{{ yaml.enversion }}" target='_blank'>English CV</a>
-                  {% endif %}
-                </div>
-                <table class='table table-bordered table-condensed' id='title-table'>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Source</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><input type='text' class='form-control input-sm' id='Id' value='{{ yaml.id }}' disabled='disabled'></td>
-                      <td><input type='text' class='form-control input-sm' id='name' value='{{ yaml.name }}' disabled='disabled'></td>
-                      <td><input type='text' class='form-control input-sm' id='origin' value='{{ yaml.origin }}' disabled='disabled'></td>
-                    </tr>
-                  </tbody>
-                </table>
-                <button type='button' class='btn btn-primary col-md-2 col-md-offset-5' id='title-submit-btn'>Submit</button>
-              </div>
-              <div id="cv-content">
-                <div class="content">
-                  {{ markdown|safe }}
-                </div>
-              </div>
-            </div>
-          </div>
+    </div>
+    <div class="tracking-box">
+      <div class="title">
+        <span>Follow up</span>
       </div>
-      <!-- upload modal begin-->
-      <div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
-        <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Upload File</h4>
+      <div class="form-input">
+        <input type="text" class="form-control" placeholder="Write down your follow up situation..." id="tracking-text" required="required" />
+        <div class="btn-box">
+          <div class="form-group">
+            <label for="date" class="col-md-2 control-label" style="padding:4px;">Date</label>
+            <div class="input-group date form_date col-md-9" data-date="" data-date-format="dd MM yyyy" data-link-field="date" data-link-format="yyyy-mm-dd">
+              <input class="form-control" size="16" type="text" value="" readonly />
+              <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
             </div>
-            <div class="modal-body">
-              <form id="file-form" action="/upload" method="POST" enctype="multipart/form-data">
-                <input type="file" name="file" id="file" />
-                <p id="progressmsg"></p>
-              </form>  
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
-            </div>
+            <input type="hidden" id="date" value="" />
           </div>
+          <a href="javascript:;" class="collapse">Fold</a>
+          <button type="button" class="btn btn-primary" id="tracking-btn">Submit</button>
         </div>
       </div>
-      <div>
+      <div class="tracking-content" id="tracking-content">
+        {% for key, value in yaml.iteritems() %}
+        {% if key=='tracking' %}
+        {% for item in value %}
+        <div class="tracking-item">
+          <p class="content">{{ item.content.text }}</p>
+          <em class="commit-info">
+          {{ item.author }}
+          {{ item.content.date }}
+          </em>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
       </div>
-      <!-- upload modal end-->
-      <script data-main="{{ url_for('static', filename='js/src/cvsource') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+    </div>
+    <div class="comment-box">
+      <div class="title">
+        <span>Comments</span>
+      </div>
+      <div class="form-input">
+        <input type="text" class="form-control" placeholder="Write down your comments..." id="comment-text" required="required" />
+        <div class="btn-box">
+          <a href="javascript:;" class="collapse">Fold</a>
+          <button type="button" class="btn btn-primary" id="comment-btn">Submit</button>
+        </div>
+      </div>
+      <div class="comment-content" id="comment-content">
+      {% for key, value in yaml.iteritems() %}
+      {% if key=='comment' %}
+      {% for item in value %}
+      <div class="comment-item">
+        <em class="commit-info">{{ item.author }}</em>
+        <p class="content">{{ item.content }}</p>
+      </div>
+      {% endfor %}
       {% endif %}
+      {% endfor %}
+      </div>
+    </div>
+    <div class="similar-box">
+      <div class="title">
+        <span>Similar Profiles</span>
+      </div>
+      <div id="similar-person"></div>
+    </div>
+  </div>
+  <div class="wrap-left">
+    <div id="cv-box">
+      <div class="cv-box-top clearfix">
+        <span class="cv-box-title">简历情况：</span>
+        <div class="tool-bar">
+          <span class="check-box"><input type="checkbox" id="tranform-check">Switch to Modify Title</span>
+          <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">Modify</a>
+          <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
+          <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">Add English CV</a>
+          <a type="button" class="btn btn-default btn-xs" target="_blank" id="match">Show JD</a>
+          {% if yaml.enversion %}
+          <a href="/edit/{{ yaml.enversion }}" target="_blank">English CV</a>
+          {% endif %}
+        </div>
+        <table class="table table-bordered table-condensed" id="title-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" class="form-control input-sm" id="Id" value="{{ yaml.id }}" disabled="disabled"></td>
+              <td><input type="text" class="form-control input-sm" id="name" value="{{ yaml.name }}" disabled="disabled"></td>
+              <td><input type="text" class="form-control input-sm" id="origin" value="{{ yaml.origin }}" disabled="disabled"></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary col-md-2 col-md-offset-5" id="title-submit-btn">Submit</button>
+      </div>
+      <div id="cv-content">
+        <div class="content">
+          {{ markdown|safe }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- upload modal begin-->
+<div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Upload File</h4>
+      </div>
+      <div class="modal-body">
+        <form id="file-form" action="/upload" method="POST" enctype="multipart/form-data">
+          <input type="file" name="file" id="file" />
+          <p id="progressmsg"></p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div>
+</div>
+<!-- upload modal end-->
+<script data-main="{{ url_for('static', filename='src/js/modules/cvsource.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
+{% endif %}
 {% endblock %}

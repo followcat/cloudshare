@@ -5,8 +5,7 @@ require.config({
     'bootstrap': 'lib/js/bootstrap',
     'header': 'src/js/util/header',
     'formvalidate': 'src/js/util/formvalidate',
-    'Upload': 'src/js/util/upload',
-    'echarts': 'lib/js/echarts'
+    'Upload': 'src/js/util/upload'
   },
   shim: {
     bootstrap: {
@@ -19,12 +18,11 @@ require.config({
 require(
   [
     'jquery',
-    'echarts',
     'bootstrap',
     'header',
     'formvalidate',
     'Upload',
-  ], function($, echarts){
+  ], function($){
     //set params input disabled
     $('.open-btn').on('click', function(){
       if($(this).text() === '开启' && $(this).prev().attr('disabled')){

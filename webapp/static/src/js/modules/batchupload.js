@@ -1,4 +1,23 @@
-(function(){
+require.config({
+  baseUrl: "/static/",
+  paths: {
+    'jquery': 'lib/js/jquery',
+    'fileuploader': 'lib/js/jquery.uploadfile.min'
+  },
+  shim: {
+    fileuploader: {
+      deps: ['jquery'],
+      exports: 'fileuploader'
+    }
+  }
+});
+
+require(
+  [
+    'jquery',
+    'fileuploader'
+  ],function($){
+
   function checkFileObj(fileName){
     var fileObjs = $('.ajax-file-upload-filename');
     for(var i = 0, len = fileObjs.length; i < len; i++){
@@ -91,4 +110,4 @@
       });
     }
   });
-}());
+});

@@ -1,7 +1,7 @@
 require.config({
-  baseUrl: "../static/js",
+  baseUrl: "/static/js",
   paths: {
-  jquery: 'lib/jquery',
+    jquery: 'lib/jquery',
     formvalidate: 'src/formvalidate',
     bootstrap: 'lib/bootstrap',
     marked: 'lib/marked'

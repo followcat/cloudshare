@@ -7,11 +7,12 @@ var requirejsOptimize = require('gulp-requirejs-optimize'), //requirejs压缩
     revCollector = require('gulp-rev-collector'), //路径替换
     rev = require('gulp-rev'),  //文件名加md5后缀
     minifyHTML = require('gulp-minify-html'),  //html压缩优化
+    minifyCSS = require('gulp-minify-css'),
     clean = require('gulp-clean');  //文件夹清空
 
 //清除构建文件夹
 gulp.task("clean", function(){
-  return gulp.src("./dist/js/")
+  return gulp.src(["./dist/js/", "./dist/css/"])
     .pipe(clean());
 })
 
@@ -64,24 +65,34 @@ gulp.task('scripts', ['clean'], function(){
     .pipe(gulp.dest("rev/js"))
 });
 
+//css打包任务
+gulp.task("style", ['clean'], function(){
+  return gulp.src("src/css/*.css")
+    .pipe(minifyCSS())
+    .pipe(rev())
+    .pipe(gulp.dest("dist/css"))
+    .pipe(rev.manifest())
+    .pipe(gulp.dest("rev/css"))
+});
 
 //路径替换
-gulp.task("rev", function(){
-  return gulp.src(["./rev/js/*.json", "../templates/*.html"])
+gulp.task("rev", ["scripts", "style"], function(){
+  return gulp.src(["./rev/**/*.json", "../templates/**/*.html"])
     .pipe(revCollector({
       replaceReved: true,
       dirReplacements: {
-        "src/js/modules": "dist/js"
+        "src/js/modules": "dist/js",
+        "src/css": "dist/css"
       }
     }))
-    // .pipe(minifyHTML({
-    //   empty: true,
-    //   spare: true
-    // }))
+    .pipe(minifyHTML({
+      empty: true,
+      spare: true
+    }))
     .pipe(gulp.dest("../templates/"))
 });
 
-
+gulp.task("build", ["scripts", "style", "rev"]);
 
 //js错误检测任务
 gulp.task('lint', function() {

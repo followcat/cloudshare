@@ -1,13 +1,13 @@
 require.config({
-  baseUrl: "/static/",
+  baseUrl: "../static/js",
   paths: {
-    'jquery': 'lib/js/jquery',
-    'bootstrap': 'lib/js/bootstrap',
-    'bootstraptable': 'lib/js/bootstrap-table.min',
-    'header': 'src/js/util/header',
-    'formvalidate': 'src/js/util/formvalidate',
-    'Upload': 'src/js/util/upload',
-    'radarcharts': 'src/js/util/charts/radarcharts'
+    'jquery': 'lib/jquery',
+    'bootstrap': 'lib/bootstrap',
+    'bootstraptable': 'lib/bootstrap-table.min',
+    'header': 'src/header',
+    'formvalidate': 'src/formvalidate',
+    'Upload': 'src/upload',
+    'radarcharts': 'src/charts/radarcharts'
   },
   shim: {
     bootstrap: {
@@ -142,15 +142,49 @@ require(
         })(That);
       });
     }
-    //Call Draw charts click function
     bindCVJDEvent();
 
-    //bootstrap-table search event
-    $('#jd-table').on('search.bs.table', function(e){
-      bindEditJDEvent();
-      bindCVJDEvent();
-    });
+    //Bootstrap-table events re-binding
+    window.actionEvents = {
+      //Draw a charts button events
+      "click .cv-jd-match": function(e, value, row, index) {
+        $('#chart-wrapper').html('');  //clean
+        setTimeout(function(){
+          var radar = radarcharts('chart-wrapper'),
+              jdId = row["_2_data"].id,
+              fileName = $(e.target).attr("data-filename");
+          var nameList = [];
+          nameList.push(fileName);
+          $.ajax({
+            url: "/analysis/valuable",
+            type: "POST",
+            data: {
+              "jd_id": jdId,
+              "name_list": JSON.stringify(nameList)
+            },
+            success: function(response){
+              var datas = replaceName(response.data);
+              radar.makeRadar(datas, response.max);
+            }
+          });
+        }, 500);
+      },
+      //edit-id button events
+      "click .edit-jd": function(e, value, row, index) {
+        var creator = row[3];
 
+        if ( creator === $('#name').text().trim() ) {
+          var jdContent = row[2],
+              jdId = row["_2_data"].id;
+          $('#change-jd').val(jdContent);
+          $('#change-jd').attr('data-id', jdId);
+          $('#modifyJDModal').modal('show');
+        } else {
+          $('#message').text('You can\'t change this job description!');
+          $('#messageModal').modal('show');
+        }
+      }
+    };
 
     //Change job description button Event
     $('#change-jd-btn').on('click', function(){

@@ -13,3 +13,6 @@ lsimodel/
 celerybeat-schedule
 similarity.*
 additional/
+webapp/static/node_modules/
+webapp/static/dist/
+webapp/static/rev/

@@ -1,7 +1,10 @@
 {% extends "share/layout.html" %}
+{% block title %}
+<title>Search Result-Willendare</title>
+{% endblock %}
 
 {% block style %}
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/searchresult.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/searchresult.css') }}">
 {% endblock %}
 
 {% block search %}
@@ -16,130 +19,131 @@
 {% endblock%}
 
 {% block content %}
-  <div class="col-md-10 col-md-offset-1 result-list">
-    <div class="tool-bar">
-      <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
-      <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency </button>
-      <button class="btn btn-default btn-xs" id="vd-capacity">Show Work Experience</button>
-      <div id="data-main" style="display: none;">
-        <div id="echarts-wrap"></div>
-        <div id="action-msg"></div>
-      </div>
+<div class="col-md-10 col-md-offset-1 result-list">
+  <div class="tool-bar">
+    <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
+    <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency </button>
+    <button class="btn btn-default btn-xs" id="vd-capacity">Show Work Experience</button>
+    <div id="data-main" style="display: none;">
+      <div id="echarts-wrap"></div>
+      <div id="action-msg"></div>
     </div>
-    {% if result %}
-    <p>About {{ nums }} results</p>
-    {% for item in result %}
-    <div class="result-list-item">
-      <div class="item-link">
-        <a href="/show/{{ item[0] }}.md" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
-        <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
-        </em>
-        {% if item[1].enversion %}
-        <a href="/edit/{{ item[1].enversion }}" target="_blank" class="check-en">English CV</a>
-        {% endif %}
-      </div>
-      <div class="container-fluid">
-        <ul class="list-unstyled info">
-          <li class="name"><strong>Name: </strong><span>{{ item[1].name }}</span></li>
-          <li class="age"><strong>Age: </strong><span>{{ item[1].age }}</span></li>
-          <li class="education"><strong>Education: </strong><span>{{ item[1].education }}</span></li>
-          <li class="school"><strong>University: </strong><span>{{ item[1].school }}</span></li>
-          <li class="position"><strong>Position: </strong><span>{{ item[1].position }}</span></li>
-          <li class="company"><strong>Company: </strong><span>{{ item[1].company }}</span></li>
-        </ul>
-      </div>
-      <div class="work-experience">
-        <a href="javascript:;" class="show-more">Unfold</a>
-          {% for e in item[1].experience %}
-            {% if loop.index > 2 %}
-              <div class="experience-hide">
-                <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-                <div class="experience-company">{{ e[2] }}</div>
-              </div>
-            {% else %}
-              <div class="experience-show">
-                <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-                <div class="experience-company">{{ e[2] }}</div>
-              </div>
-            {% endif %}
-          {% endfor %}
-      </div>
-      <div class="info-wrapper">
-        <div class="tracking-box">
-          <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
-          <div class="tracking-info">
-            <span class="triangle-up"></span>
-            <span class="triangle-up-z"></span>
-            <ul class="list-inline clearfix">
-              {% for tracking in item[1].tracking %}
-                <li>{{ tracking.author }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-        <div class="comment-box">
-          <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
-          <div class="comment-info">
-            <span class="triangle-up"></span>
-            <span class="triangle-up-z"></span>
-            <ul class="list-unstyled clearfix">
-              {% for comments in item[1].comment %}
-                {%- if loop.index > 3 %}{% break %}{% endif %}
-                <li class="comment-item">
-                  <p>{{ comments.content }}</p>
-                  <em class="author">{{ comments.author }}</em>
-                </li>
-              {%- endfor %}
-            </ul>
-          </div>
-        </div>
-        <div class="label-box">
-          <span class="label-title">Tags:</span>
-          {% for tags in item[1].tag %}
-            <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-    {% else %}
-    <p>Your search - {{ search_key }} - did not match any documents.</p>
-    {% endif %}
-    <nav>
-      <ul class="pagination">
-        <li>
-          <a href="/search?search_text={{ search_key }}&page=1">first</a>
-        </li>
-        <li class="{% if cur_page <= 1%}disabled{% endif %}">
-          <a href="/search?search_text={{ search_key }}&page={{ cur_page-1 }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        {% if cur_page < pages - 2 %}
-        <li class="active"><a href="/search?search_text={{ search_key }}&page={{ cur_page }}">{{ cur_page }}</a></li>
-        <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
-        <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+2 }}">{{ cur_page+2}}</a></li>
-        <li class="disabled"><a href="#">...</a></li>
-        <li><a href="/search?search_text={{ search_key }}&page={{ pages }}">{{ pages }}</a></li>
-        {% else %}
-        <li class="disabled"><a href="#">...</a></li>
-        {% for num in range(2,-1,-1) %}
-        <li class="{% if cur_page == pages-num %} active {% endif %}"><a href="/search?search_text={{ search_key }}&page={{ pages-num }}">{{ pages-num }}</a></li>
-        {% endfor %}
-        {% endif %}
-        <li class="{% if cur_page >= pages %}disabled{% endif %}">
-          <a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-        <li>
-          <a href="/lsipage?jd_id={{ jd_id }}&page={{ pages }}">last</a>
-        </li>
-      </ul>
-    </nav>
   </div>
+  {% if result %}
+  <p>About {{ nums }} results</p>
+  {% for item in result %}
+  <div class="result-list-item">
+    <div class="item-link">
+      <a href="/show/{{ item[0] }}.md" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
+      <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
+      </em>
+      {% if item[1].enversion %}
+      <a href="/edit/{{ item[1].enversion }}" target="_blank" class="check-en">English CV</a>
+      {% endif %}
+    </div>
+    <div class="container-fluid">
+      <ul class="list-unstyled info">
+        <li class="name"><strong>Name: </strong><span>{{ item[1].name }}</span></li>
+        <li class="age"><strong>Age: </strong><span>{{ item[1].age }}</span></li>
+        <li class="education"><strong>Education: </strong><span>{{ item[1].education }}</span></li>
+        <li class="school"><strong>University: </strong><span>{{ item[1].school }}</span></li>
+        <li class="position"><strong>Position: </strong><span>{{ item[1].position }}</span></li>
+        <li class="company"><strong>Company: </strong><span>{{ item[1].company }}</span></li>
+      </ul>
+    </div>
+    <div class="work-experience">
+      <a href="javascript:;" class="show-more">Unfold</a>
+      {% for e in item[1].experience %}
+      {% if loop.index > 2 %}
+      <div class="experience-hide">
+        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+        <div class="experience-company">{{ e[2] }}</div>
+      </div>
+      {% else %}
+      <div class="experience-show">
+        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+        <div class="experience-company">{{ e[2] }}</div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    <div class="info-wrapper">
+      <div class="tracking-box">
+        <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
+        <div class="tracking-info">
+          <span class="triangle-up"></span>
+          <span class="triangle-up-z"></span>
+          <ul class="list-inline clearfix">
+            {% for tracking in item[1].tracking %}
+            <li>{{ tracking.author }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="comment-box">
+        <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
+        <div class="comment-info">
+          <span class="triangle-up"></span>
+          <span class="triangle-up-z"></span>
+          <ul class="list-unstyled clearfix">
+            {% for comments in item[1].comment %}
+            {%- if loop.index > 3 %}{% break %}{% endif %}
+            <li class="comment-item">
+              <p>{{ comments.content }}</p>
+              <em class="author">{{ comments.author }}</em>
+            </li>
+            {%- endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="label-box">
+        <span class="label-title">Tags:</span>
+        {% for tags in item[1].tag %}
+        <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p>Your search - {{ search_key }} - did not match any documents.</p>
+  {% endif %}
+  <nav>
+    <ul class="pagination">
+      <li>
+        <a href="/search?search_text={{ search_key }}&page=1">first</a>
+      </li>
+      <li class="{% if cur_page <= 1%}disabled{% endif %}">
+        <a href="/search?search_text={{ search_key }}&page={{ cur_page-1 }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% if cur_page < pages - 2 %}
+      <li class="active"><a href="/search?search_text={{ search_key }}&page={{ cur_page }}">{{ cur_page }}</a></li>
+      <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
+      <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+2 }}">{{ cur_page+2}}</a></li>
+      <li class="disabled"><a href="#">...</a></li>
+      <li><a href="/search?search_text={{ search_key }}&page={{ pages }}">{{ pages }}</a></li>
+      {% else %}
+      <li class="disabled"><a href="#">...</a></li>
+      {% for num in range(2,-1,-1) %}
+      <li class="{% if cur_page == pages-num %} active {% endif %}"><a href="/search?search_text={{ search_key }}&page={{ pages-num }}">{{ pages-num }}</a></li>
+      {% endfor %}
+      {% endif %}
+      <li class="{% if cur_page >= pages %}disabled{% endif %}">
+        <a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li>
+        <a href="/lsipage?jd_id={{ jd_id }}&page={{ pages }}">last</a>
+      </li>
+    </ul>
+  </nav>
+</div>
 {% endblock %}
 
 {% block script%}
-<script data-main="{{ url_for('static', filename='js/src/search_result.js') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/js/echarts.min.js') }}"></script>
+<script data-main="{{ url_for('static', filename='src/js/modules/search_result.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock%}

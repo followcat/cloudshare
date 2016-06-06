@@ -1,8 +1,11 @@
 {% extends "share/layout.html" %}
+{% block title %}
+<title>Job Description-Willendare</title>
+{% endblock %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-table.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/jdview.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap-table.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/jdview.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -14,7 +17,6 @@
         <li role="presentation" class="active"><a href="/listjd">Job Description</a></li>
       </ul>
       <div class="panel panel-default">
-<!--         <div class='panel-heading'>Company Lists</div> -->
         <div id="toolbar" class="btn-group">
           <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addJDModal">
               <i class="glyphicon glyphicon-plus"></i>
@@ -33,7 +35,7 @@
               <th>Project Name for JDs</th>
               <th>Job Description</th>
               <th>Creator</th>
-              <th>Action</th>
+              <th data-events="actionEvents">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -152,10 +154,8 @@
   </div>
 </div><!-- Charts modal end -->
 {% endif %}
-
-
 {% endblock %}
 
 {% block script %}
-<script data-main="{{ url_for('static', filename='js/src/jdview.js') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+<script data-main="{{ url_for('static', filename='src/js/modules/jdview.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,22 @@
+.main-wrapper{
+  margin-top: 20px;
+}
+.cv-jd-match{
+  margin-top: 8px;
+}
+.chart-wrapper{
+  width: 100%;
+  height: 460px;
+}
+.edit-jd{
+  margin-top: 8px;
+}
+.message-font{
+  text-align: center;
+  font-size: 1.25em;
+}
+.jd-td{
+  display: block;
+  height: 90px;
+  overflow: hidden;
+}

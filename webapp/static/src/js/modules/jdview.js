@@ -1,13 +1,13 @@
 require.config({
-  baseUrl: "../static/js",
+  baseUrl: "/static/",
   paths: {
-    'jquery': 'lib/jquery',
-    'bootstrap': 'lib/bootstrap',
-    'bootstraptable': 'lib/bootstrap-table.min',
-    'header': 'src/header',
-    'formvalidate': 'src/formvalidate',
-    'Upload': 'src/upload',
-    'radarcharts': 'src/charts/radarcharts'
+    'jquery': 'lib/js/jquery',
+    'bootstrap': 'lib/js/bootstrap',
+    'bootstraptable': 'lib/js/bootstrap-table.min',
+    'header': 'src/js/util/header',
+    'formvalidate': 'src/js/util/formvalidate',
+    'Upload': 'src/js/util/upload',
+    'radarcharts': 'src/js/util/charts/radarcharts'
   },
   shim: {
     bootstrap: {

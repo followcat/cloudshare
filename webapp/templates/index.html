@@ -19,7 +19,7 @@
 <body>
   <header class="header-box">
     <div class="logo-box">
-      <img src="../static/images/logo.png">
+      <img src="{{ url_for('static',filename='images/logo.png') }}">
     </div>
     <div class="feature-info" data-toggle="modal" data-target="#featureModal" id="feature-btn">
       <span>Feature</span>

@@ -92,19 +92,41 @@ require(
       return datas;
     }
 
+    //编辑JD模块封装
+    function EditJD(jdId, jdContent, companyName, creator, userName) {
+      this.jdId = jdId,
+      this.jdContent = jdContent,
+      this.companyName = companyName,
+      this.userName = userName,
+      this.creator = creator
+    }
+
+    EditJD.prototype.setValue = function(){
+      $("input[name='companyName']").val(this.companyName);
+      $("input[name='jdId']").val(this.jdId);
+      $("textarea[name='jdContent']").val(this.jdContent);
+      if( this.userName === this.creator ) {
+        $("#changeJDBtn").removeAttr("disabled");
+      } else {
+        $("#changeJDBtn").attr("disabled", "disabled");
+      }
+    }
+
     //Edit JD button click function
     function bindEditJDEvent(){
       $('.edit-jd').on('click', function(){
-        if ($(this).parent().prev().text() === $('#name').text().trim()){
-          var jdTd = $(this).parent().parent().find('.jd-td');
-          var id = jdTd.attr('data-id');
-          $('#change-jd').val(jdTd.text());
-          $('#change-jd').attr('data-id', id);
-          $('#modifyJDModal').modal('show');
-        }else{
-          $('#message').text('You can\'t change this job description!');
-          $('#messageModal').modal('show');
-        }
+        var selfParentTR = $(this).parent().parent();
+        var tdElements = selfParentTR.find("td");
+
+        var companyName = $(tdElements[0]).text(),
+            jdId = $(tdElements[2]).attr("data-id"),
+            jdContent = $(tdElements[2]).attr("title"),
+            creator = $(tdElements[3]).text(),
+            userName = $("#name").text().trim();
+
+        var editJdObj = new EditJD(jdId, jdContent, companyName, creator, userName);
+        editJdObj.setValue();
+        $('#modifyJDModal').modal('show');
       });
     }
     //Call Edit JD click function
@@ -171,29 +193,27 @@ require(
       },
       //edit-id button events
       "click .edit-jd": function(e, value, row, index) {
-        var creator = row[3];
-
-        if ( creator === $('#name').text().trim() ) {
-          var jdContent = row[2],
-              jdId = row["_2_data"].id;
-          $('#change-jd').val(jdContent);
-          $('#change-jd').attr('data-id', jdId);
-          $('#modifyJDModal').modal('show');
-        } else {
-          $('#message').text('You can\'t change this job description!');
-          $('#messageModal').modal('show');
-        }
+        var companyName = row[0],
+            jdId = row["_2_data"].id,
+            jdContent = row[2],
+            creator = row[3],
+            userName = $("#name").text().trim();
+        var editJdObj = new EditJD(jdId, jdContent, companyName, creator, userName);
+        editJdObj.setValue();
+        $('#modifyJDModal').modal('show');
       }
     };
 
     //Change job description button Event
-    $('#change-jd-btn').on('click', function(){
+    $('#changeJDBtn').on('click', function(){
+
       $.ajax({
         url: '/modifyjd',
         type: 'POST',
         data: {
-          'id': $('#change-jd').attr('data-id'),
-          'description': $('#change-jd').val()
+          "id": $("input[name='jdId']").val(),
+          "description": $("textarea[name='jdContent']").val(),
+          "status": $("#statusSelect").val()
         },
         success: function(response){
           if ( response.result ) {
@@ -211,5 +231,5 @@ require(
         }
       });
     });
-  }
-);
+
+});

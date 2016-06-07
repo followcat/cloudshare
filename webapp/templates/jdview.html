@@ -35,6 +35,7 @@
               <th>Project Name for JDs</th>
               <th>Job Description</th>
               <th>Creator</th>
+              <th>Status</th>
               <th data-events="actionEvents">Action</th>
             </tr>
           </thead>
@@ -45,6 +46,7 @@
               <td class="name-td">{{ item.name }}</td>
               <td class="jd-td" title="{{ item.description }}" data-id="{{ item.id }}">{{ item.description }}</td>
               <td class="committer-td">{{ item.committer }}</td>
+              <td class="status-td">{% if item.status %}{{ item.status }}{% endif %}</td>
               <td>
                 <a class="btn btn-primary btn-xs match" href="/lsipage?jd_id={{ item.id }}" target="_blank"> CV Fast Matching</a>
                 <button type="button" class="btn btn-success btn-xs edit-jd">
@@ -105,13 +107,28 @@
       </div><!-- modal-header end -->
       <div class="modal-body" id="mjd-madal-body">
         <div class="form-group">
-          <label for="introduction" class="control-label">Job Description:</label>
-          <textarea class="form-control" id="change-jd" rows="8"></textarea>
+          <label for="companyName" class="control-label">Company Name:</label>
+          <input type="text" class="form-control" name="companyName" disabled>
+        </div>
+        <div class="form-group">
+          <label for="jdId" class="control-label">Job Description ID:</label>
+          <input type="text" class="form-control" name="jdId" disabled>
+        </div>
+        <div class="form-group">
+          <label for="jdContent" class="control-label">Job Description:</label>
+          <textarea class="form-control" name="jdContent" rows="8"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="status" class="control-label">Status:</label>
+          <select class="form-control select" id="statusSelect" name="status">
+            <option value="Opening">Opening</option>
+            <option value="Closed">Closed</option>
+          </select>
         </div>
       </div><!-- modal-body end -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="change-jd-btn">Change</button>
+        <button type="button" class="btn btn-primary" id="changeJDBtn">Change</button>
       </div><!-- modal-footer end -->
     </div><!-- modal-content end -->
   </div><!-- modal-dialog end -->

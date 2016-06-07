@@ -14,7 +14,7 @@ class JobDescription(services.base.Service):
         >>> import services.company
         >>> import services.jobdescription
         >>> import interface.gitinterface
-        
+
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> svc_co = services.company.Company(interface)
@@ -75,13 +75,15 @@ class JobDescription(services.base.Service):
                            "Add job description file: " + filename)
         return True
 
-    def modify(self, hex_id, description, committer):
+    def modify(self, hex_id, description, status, committer):
         filename = self.filename(hex_id)
         data = self.get(filename)
         if data['committer'] != committer:
             return False
         data['description'] = description
+        data['status'] = status
         dump_data = yaml.dump(data)
+        print dump_data
         self.interface.modify(os.path.join(self.path, filename), dump_data,
                               message="Modify job description: " + filename,
                               committer=committer)

@@ -1,6 +1,7 @@
 import os
 import shutil
 
+import services.mining
 import services.account
 import services.company
 import services.multicv

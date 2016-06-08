@@ -11,6 +11,28 @@ import core.information_explorer
 import utils.builtin
 import interface.base
 
+
+
+TODAY = u'((至今)|(目前)|(现在)|今|([Pp]resent)|([Nn]ow))'
+CHNUMBERS = u'一二三四五六七八九十'
+SP = u'\s '  # [\xa0]
+ASP = u'[' + SP + u']'
+SEP = u'\-–—―\\\\~～/'
+UNIBRALEFT = ur'[（\(\[【]'
+UNIBRARIGHT = ur'[）\)\]】]'
+DATESEP = u'['+SEP+SP+u'至]+'
+DATE = ur'((\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'?((\d{1,2}('+ASP+u'?月)?)|(['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
+PERIOD = u'(?P<from>' + DATE + ur')' + DATESEP + ASP+ u'*(?P<to>' + DATE + ')'
+DURATION = ur'(?P<duration>(\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个月)?)|(\d{1,2}'+ASP+u'?个月))'
+SENTENCESEP = ur'、，。：:\|'
+# Exclude date related characters to avoid eating duration
+COMPANYTAIL = UNIBRALEFT+u'[^年月（\(\[【]+?'+UNIBRARIGHT
+# use re.DOTALL for better results
+COMPANY = ur'[^' + SENTENCESEP + '=\n\*]+('+COMPANYTAIL+u')?'
+POSITION = ur'[^=\n\*：:\|]+'
+
+
+
 def cloudshare_yaml_template():
     template = {
         'age': 0,
@@ -35,11 +57,8 @@ def cloudshare_yaml_template():
 
 
 def extract_details(uploaded_details):
-    DATE = ur'((?:\d{4}[\.．/年]\d{1,2}(?:月)?)|(?:(?:至)?今)|(?:目前)|(?:[Pp]resent))'
-    PERIOD = DATE + ur'[-– —至\\\\~]+' + DATE
-    DURATION = ur'[（\(]((?:\d{1,2}年(?:\d{1,2}个月)?)|(?:\d{1,2}个月))[\)）]'
-    WORKXP = PERIOD + '\s*' + DURATION + ur'[：:\| ]*([^,，.。:]*)(?='+DATE+'|$)'
-    STUDIES = '\s*'+DATE+' - '+DATE+'\s*:?\s*(?P<expe>[^\(].+?)(?='+DATE+'|$)'
+    WORKXP = PERIOD + u'\s*[（\(]' + DURATION + ur'[\)）][：:\| ]*(?P<company>'+COMPANY+')(?='+DATE+'|$)'
+    STUDIES = '\s*'+DATE+' - '+DATE+u'\s*:?\s*(?P<expe>[^\(].+?)(?='+DATE+'|$)'
 
     details = cloudshare_yaml_template()
 
@@ -58,7 +77,8 @@ def extract_details(uploaded_details):
     details['education'] = education.split('|')[-1].strip()
     for expe in uploaded_details['info']:
         for w in re.compile(WORKXP).finditer(expe):
-            details['experience'].append((w.group(1), w.group(2), w.group(4)+'('+w.group(3)+')'))
+            details['experience'].append((w.group('from'), w.group('to'),
+                w.group('company')+'('+w.group('duration')+')'))
     if u'…' in details['company']:
         no_braket = lambda x:x.replace('(','').replace(')','')
         RE = re.compile(no_braket(details['company'])[:-1])

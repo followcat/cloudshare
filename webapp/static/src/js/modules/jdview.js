@@ -132,64 +132,56 @@ require(
     //Call Edit JD click function
     bindEditJDEvent();
 
+
     //Draw charts button click function
     function bindCVJDEvent(){
       $('.cv-jd-match').on('click', function(){
-        $('#chart-wrapper').html('');
-        var That = $(this);
+        var selfParentTR = $(this).parent().parent();
+        var tdElements = selfParentTR.find("td");
+        var jdContent = $(tdElements[2]).attr("title");
 
-        //Closure: send this object
-        (function(That){
-          setTimeout(function(){
-            var radar = radarcharts('chart-wrapper'),
-                jd_id = That.parent().parent().find('.jd-td').attr('data-id'),
-                title = That.attr('data-filename');
-
-            var name_list = [];
-            name_list.push(title);
-
-            $.ajax({
-                url: '/analysis/valuable',
-                type: 'post',
-                data: {
-                  'jd_id': jd_id,
-                  'name_list': JSON.stringify(name_list)
-                },
-                success: function(response) {
-                  var datas = replaceName(response.data);
-                  radar.makeRadar(datas, response.max);
-                }
-            });
-          }, 500);
-        })(That);
+        $("textarea[name='jdModalContent']").attr("data-filename", $(this).attr("data-filename"));
+        $("textarea[name='jdModalContent']").val(jdContent);
+        $("#JDModal").modal("show");
       });
     }
     bindCVJDEvent();
+
+    //CV JD Matching
+    $("#CVJDSubmit").on("click", function(){
+      $('#chart-wrapper').html('');
+      $("#radarModal").modal("show");
+      setTimeout(function(){
+        var radar = radarcharts('chart-wrapper'),
+            textareaObj = $("textarea[name='jdModalContent']");
+
+        var name_list = [],
+            jdContent = textareaObj.val(),
+            fileName = textareaObj.attr("data-filename");
+        name_list.push(fileName);
+
+        $.ajax({
+            url: '/analysis/valuable',
+            type: 'post',
+            data: {
+              'jd_doc': jdContent,
+              'name_list': JSON.stringify(name_list)
+            },
+            success: function(response) {
+              var datas = replaceName(response.data);
+              radar.makeRadar(datas, response.max);
+            }
+        });
+      }, 500);
+    });
 
     //Bootstrap-table events re-binding
     window.actionEvents = {
       //Draw a charts button events
       "click .cv-jd-match": function(e, value, row, index) {
-        $('#chart-wrapper').html('');  //clean
-        setTimeout(function(){
-          var radar = radarcharts('chart-wrapper'),
-              jdId = row["_2_data"].id,
-              fileName = $(e.target).attr("data-filename");
-          var nameList = [];
-          nameList.push(fileName);
-          $.ajax({
-            url: "/analysis/valuable",
-            type: "POST",
-            data: {
-              "jd_id": jdId,
-              "name_list": JSON.stringify(nameList)
-            },
-            success: function(response){
-              var datas = replaceName(response.data);
-              radar.makeRadar(datas, response.max);
-            }
-          });
-        }, 500);
+        $("textarea[name='jdModalContent']").val(row["_2_title"]);
+        $("textarea[name='jdModalContent']").attr("data-filename", e.currentTarget.attributes["data-filename"].value);
+        $("#JDModal").modal("show");
       },
       //edit-id button events
       "click .edit-jd": function(e, value, row, index) {

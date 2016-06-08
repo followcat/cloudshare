@@ -53,7 +53,7 @@
                   <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>Edit JD
                 </button>
                 {% if filename %}
-                  <button type="button" class="btn btn-success btn-xs cv-jd-match" data-filename="{{ filename }}" data-toggle="modal" data-target=".bs-example-modal-lg">Draw a Chart</button>
+                <button type="button" class="btn btn-success btn-xs cv-jd-match" data-filename="{{ filename }}">Draw a Chart</button>
                 {% endif %}
               </td>
             </tr>
@@ -153,12 +153,29 @@
 </div><!-- Message modal end -->
 
 {% if filename %}
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
+<div class="modal fade" id="JDModal" tabindex="-1" role="dialog" aria-labelledby="JDModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="JDModalLabel">Job Description</h4>
+      </div>
+      <div class="modal-body">
+        <textarea class="form-control" name="jdModalContent" rows="8"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="CVJDSubmit" data-dismiss="modal">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="radarModal" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Radar Charts</h4>
+        <h4 class="modal-title" id="radarModalLabel">Radar Charts</h4>
       </div>
       <div class="modal-body">
         <div class="chart-wrapper" id="chart-wrapper">
@@ -174,5 +191,6 @@
 {% endblock %}
 
 {% block script %}
+<script src="{{ url_for('static', filename='lib/js/echarts.js') }}"></script>
 <script data-main="{{ url_for('static', filename='src/js/modules/jdview.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock %}

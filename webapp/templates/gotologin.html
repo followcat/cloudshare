@@ -4,50 +4,48 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 	<meta http-equiv="X-UA-Compatible" content="IE-Edge">
-	<link rel="stylesheet" type="text/css" href="../static/css/gotologin.css">
-	
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/gotologin.css') }}">
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-    <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
-    <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
-  <![endif]-->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+		<script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
+	<![endif]-->
 
 </head>
 <body>
 	<div class="header-box">
 		<div class="img-box">
-			<img src="../static/images/logo.png">
+			<img src="{{ url_for('static',filename='images/logo.png') }}">
 		</div>
 	</div>
 	<div class="wrap">
-	  <div class="info-box">
-	  	<img src="../static/images/loginfail.png" height="126" width="359">
-	  	<p>Did not login, After <span id="time">5</span> s will skip to login page.</p>
-	  	<a href="/">click to skip now.</a>
-	  </div>
-	  
-	</div>
-	
-		<script type="text/javascript">
-			window.onload = function(){
-				var aTime = document.getElementById("time");
-				var time = aTime.innerHTML;
-				setTimeout(function(){
-					time = parseInt(time);
-					if(time != 0)
-					{
-						time--;
-						aTime.innerHTML = time;
-						setTimeout(arguments.callee,1000);
-					}
-					if(time == 0)
-					{
-						window.location.href = "/"
-					}
+		<div class="info-box">
 
-				},1000);
-			}
-		</script>   
+			<img src="{{ url_for('static',filename='images/loginfail.png') }}" height="126" width="359">
+			<p>Did not login, After <span id="time">5</span> s will skip to login page.</p>
+			<a href="/">click to skip now.</a>
+		</div>
+	</div>
+	<script type="text/javascript">
+		window.onload = function(){
+			var aTime = document.getElementById("time");
+			var time = aTime.innerHTML;
+			setTimeout(function(){
+				time = parseInt(time);
+				if(time != 0)
+				{
+					time--;
+					aTime.innerHTML = time;
+					setTimeout(arguments.callee,1000);
+				}
+				if(time == 0)
+				{
+					window.location.href = "/"
+				}
+
+			},1000);
+		}
+	</script>
 </body>
 </html>

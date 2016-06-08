@@ -172,7 +172,7 @@ class ConfirmEnglish(flask.views.MethodView):
         upobj = pickle.loads(flask.session[user.id]['upload'])
         result = svc_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
-        svc_cv.modify(yaml_name, yaml.dump(yaml_data), committer=user.id)
+        svc_cv.modify(name.yaml, yaml.dump(yaml_data), committer=user.id)
         return flask.jsonify(result=result)
 
 

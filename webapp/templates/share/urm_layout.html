@@ -5,8 +5,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>User Management</title>
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/style.css') }}">
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -39,7 +39,7 @@
 	  	    <nav class="nav nav-default">
 	  	      <h2 class="navbar-text navbar-title">Management System</h2>
 	  	    </nav>
-	  	  </div>	
+	  	  </div>
 		</div>
 		<!-- load the content-->
 		{% block content %}{% endblock %}

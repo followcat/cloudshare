@@ -22,9 +22,10 @@ class ModifyJobDescription(flask.views.MethodView):
     def post(self):
         id = flask.request.form['id']
         description = flask.request.form['description']
+        status = flask.request.form['status']
         user = flask.ext.login.current_user
         svcjd = flask.current_app.config['SVC_JD']
-        result = svcjd.modify(id, description, user.id)
+        result = svcjd.modify(id, description, status, user.id)
         return flask.jsonify(result=result)
 
 
@@ -50,7 +51,7 @@ class ListJobDescription(flask.views.MethodView):
 
 
 class ResumeToJobDescription(flask.views.MethodView):
-    
+
     @flask.ext.login.login_required
     def get(self, filename):
         svcjd = flask.current_app.config['SVC_JD']

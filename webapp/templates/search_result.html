@@ -113,11 +113,24 @@
       <li>
         <a href="/search?search_text={{ search_key }}&page=1">first</a>
       </li>
-      <li class="{% if cur_page <= 1%}disabled{% endif %}">
+      {% if cur_page <= 1%}
+      <li class="disabled">
+        <a href="javascript: void(0);" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li>
         <a href="/search?search_text={{ search_key }}&page={{ cur_page-1 }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
+      {% endif %}
+      {% if pages <= 3 %}
+      {% for p_num in range(pages) %}
+      <li class="{% if cur_page == p_num+1 %} active {% endif %}" id="{{p_num}}"><a href="/search?search_text={{ search_key }}&page={{ p_num+1 }}">{{ p_num+1 }}</a></li>
+      {% endfor %}
+      {% else %}
       {% if cur_page < pages - 2 %}
       <li class="active"><a href="/search?search_text={{ search_key }}&page={{ cur_page }}">{{ cur_page }}</a></li>
       <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
@@ -127,16 +140,25 @@
       {% else %}
       <li class="disabled"><a href="#">...</a></li>
       {% for num in range(2,-1,-1) %}
-      <li class="{% if cur_page == pages-num %} active {% endif %}"><a href="/search?search_text={{ search_key }}&page={{ pages-num }}">{{ pages-num }}</a></li>
+      <li class="{% if cur_page == pages-num %} active {% endif %}" id="{{num}}"><a href="/search?search_text={{ search_key }}&page={{ pages-num }}">{{ pages-num }}</a></li>
       {% endfor %}
       {% endif %}
-      <li class="{% if cur_page >= pages %}disabled{% endif %}">
+      {% endif %}
+      {% if cur_page >= pages %}
+      <li class="disabled">
+        <a href="javascript: void(0);" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li>
         <a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
         </a>
       </li>
+      {% endif %}
       <li>
-        <a href="/lsipage?jd_id={{ jd_id }}&page={{ pages }}">last</a>
+        <a href="/search?search_text={{ search_key }}&page={{ pages }}">last</a>
       </li>
     </ul>
   </nav>

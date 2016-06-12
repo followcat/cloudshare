@@ -12,7 +12,8 @@ class AddJobDescription(flask.views.MethodView):
         description = flask.request.form['description']
         user = flask.ext.login.current_user
         svcjd = flask.current_app.config['SVC_JD']
-        result = svcjd.add(co_name, jd_name, description, user.id)
+        status = 'Opening'
+        result = svcjd.add(co_name, jd_name, description, user.id, status)
         return flask.jsonify(result=result)
 
 
@@ -47,7 +48,17 @@ class ListJobDescription(flask.views.MethodView):
         repocompany = flask.current_app.config['SVC_CO']
         names = repocompany.names()
         results = svcjd.lists()
-        return flask.render_template('jdview.html', result=results, names=names)
+        datas = []
+        status = None
+        if 'status' in flask.request.args:
+            status = flask.request.args['status']
+            for e in results:
+                if 'status' in e and e['status'] == status:
+                    datas.append(e)
+        else:
+            datas = results
+
+        return flask.render_template('jdview.html', result=datas, status=status, names=names)
 
 
 class ResumeToJobDescription(flask.views.MethodView):

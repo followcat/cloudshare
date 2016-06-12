@@ -53,7 +53,7 @@ class JobDescription(services.base.Service):
         yaml_str = self.interface.get(path_name)
         return yaml.load(yaml_str)
 
-    def add(self, company, name, description, committer):
+    def add(self, company, name, description, committer, status):
         try:
             self.svc_co.company(company)
         except services.exception.NotExistsCompany:
@@ -67,7 +67,8 @@ class JobDescription(services.base.Service):
             'id': hex_id,
             'company': company,
             'description': description,
-            'committer': committer
+            'committer': committer,
+            'status': status
         }
         filename = self.filename(hex_id)
         file_path = os.path.join(self.repo_path, filename)
@@ -83,7 +84,6 @@ class JobDescription(services.base.Service):
         data['description'] = description
         data['status'] = status
         dump_data = yaml.dump(data)
-        print dump_data
         self.interface.modify(os.path.join(self.path, filename), dump_data,
                               message="Modify job description: " + filename,
                               committer=committer)

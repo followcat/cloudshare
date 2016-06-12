@@ -21,6 +21,12 @@
           <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addJDModal">
               <i class="glyphicon glyphicon-plus"></i>
           </button>
+          <div class="btn-group">
+            <select class="form-control" id="toolsStatusSelect">
+              <option value="/listjd?status=Opening" {% if status=='Opening' %}selected{% endif %}>Opening</option>
+              <option value="/listjd?status=Closed" {% if status=='Closed' %}selected{% endif %}>Closed</option>
+            </select>
+          </div>
         </div>
         <table id="jd-table" data-toggle="table"
                data-url="/listjd"

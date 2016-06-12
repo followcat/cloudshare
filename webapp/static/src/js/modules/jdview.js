@@ -224,4 +224,9 @@ require(
       });
     });
 
+    //JD 状态选择事件
+    $("#toolsStatusSelect").on("change", function(){
+      var link = $(this).val();
+      window.location.href = link;
+    });
 });

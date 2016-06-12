@@ -49,15 +49,17 @@ class ListJobDescription(flask.views.MethodView):
         names = repocompany.names()
         results = svcjd.lists()
         datas = []
-        status = None
-        if 'status' in flask.request.args:
-            status = flask.request.args['status']
+        status = flask.request.args['status']
+        if status == 'Closed':
             for e in results:
-                if 'status' in e and e['status'] == status:
+                if 'status' in e and e['status'] == 'Closed':
                     datas.append(e)
         else:
-            datas = results
-
+            for e in results:
+                if 'status' in e and e['status'] == 'Closed':
+                    continue
+                else:
+                    datas.append(e)
         return flask.render_template('jdview.html', result=datas, status=status, names=names)
 
 

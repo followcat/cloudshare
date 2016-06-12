@@ -12,7 +12,8 @@ class AddJobDescription(flask.views.MethodView):
         description = flask.request.form['description']
         user = flask.ext.login.current_user
         svcjd = flask.current_app.config['SVC_JD']
-        result = svcjd.add(co_name, jd_name, description, user.id)
+        status = 'Opening'
+        result = svcjd.add(co_name, jd_name, description, user.id, status)
         return flask.jsonify(result=result)
 
 
@@ -22,9 +23,10 @@ class ModifyJobDescription(flask.views.MethodView):
     def post(self):
         id = flask.request.form['id']
         description = flask.request.form['description']
+        status = flask.request.form['status']
         user = flask.ext.login.current_user
         svcjd = flask.current_app.config['SVC_JD']
-        result = svcjd.modify(id, description, user.id)
+        result = svcjd.modify(id, description, status, user.id)
         return flask.jsonify(result=result)
 
 
@@ -46,11 +48,23 @@ class ListJobDescription(flask.views.MethodView):
         repocompany = flask.current_app.config['SVC_CO']
         names = repocompany.names()
         results = svcjd.lists()
-        return flask.render_template('jdview.html', result=results, names=names)
+        datas = []
+        status = flask.request.args['status']
+        if status == 'Closed':
+            for e in results:
+                if 'status' in e and e['status'] == 'Closed':
+                    datas.append(e)
+        else:
+            for e in results:
+                if 'status' in e and e['status'] == 'Closed':
+                    continue
+                else:
+                    datas.append(e)
+        return flask.render_template('jdview.html', result=datas, status=status, names=names)
 
 
 class ResumeToJobDescription(flask.views.MethodView):
-    
+
     @flask.ext.login.login_required
     def get(self, filename):
         svcjd = flask.current_app.config['SVC_JD']

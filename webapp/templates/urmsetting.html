@@ -6,7 +6,7 @@
 <div class="container_fluid">
   <div class="col-md-4 col-md-offset-2 clearfix">
     <form id="settin-form" method="POST" action="/changepassword">
-  	  <div class="form-group">
+      <div class="form-group">
         <label for="oldpassword">Old Password</label>
         <input type="password" class="form-control" name="oldpassword" id="oldpassword" placeholder="Old Password" required="required">
       </div>
@@ -25,5 +25,5 @@
 </div>
 {% endblock%}
 {% block script %}
-<script type="text/javascript" data-main="{{ url_for('static', filename='js/src/urm_setting') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+<script type="text/javascript" data-main="{{ url_for('static', filename='src/js/modules/urm_setting.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock %}

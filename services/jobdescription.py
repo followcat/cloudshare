@@ -28,7 +28,7 @@ class JobDescription(services.base.Service):
         >>> data = svc_jd.get(results[0])
         >>> data['description']
         'JD-A description'
-        >>> svc_jd.modify(data['id'], 'JD-B description', 'Dever')
+        >>> svc_jd.modify(data['id'], 'JD-B description', 'Closed', 'Dever')
         True
         >>> data = svc_jd.get(results[0])
         >>> data['description']
@@ -53,12 +53,14 @@ class JobDescription(services.base.Service):
         yaml_str = self.interface.get(path_name)
         return yaml.load(yaml_str)
 
-    def add(self, company, name, description, committer, status):
+    def add(self, company, name, description, committer, status=None):
         try:
             self.svc_co.company(company)
         except services.exception.NotExistsCompany:
             self.info = "NotExistsCompany."
             return False
+        if status is None:
+            status = 'Opening'
 
         id = uuid.uuid1()
         hex_id = id.get_hex()

@@ -113,12 +113,15 @@ class CurriculumVitae(services.base.Service):
 
     def yamls(self):
         yamls = self.interface.lsfiles(self.path, '*.yaml')
-        results = [os.path.split(each)[-1] for each in yamls]
-        return results
+        for each in yamls:
+            yield os.path.split(each)[-1]
+
+    def names(self):
+        for each in self.yamls():
+            yield core.outputstorage.ConvertName(each).md
 
     def datas(self):
-        for yaml in self.yamls():
-            name = core.outputstorage.ConvertName(yaml)
+        for name in self.names():
             text = self.getmd(name)
             yield name, text
 
@@ -130,10 +133,10 @@ class CurriculumVitae(services.base.Service):
         results = self.interface.grep_yaml(keyword, self.path)
         return results
 
-    def getmd(self, id):
+    def getmd(self, name):
         result = unicode()
-        name = core.outputstorage.ConvertName(id).md
-        path_name = os.path.join(self.path, name)
+        md = core.outputstorage.ConvertName(name).md
+        path_name = os.path.join(self.path, md)
         markdown = self.interface.get(path_name)
         if markdown is None:
             result = None

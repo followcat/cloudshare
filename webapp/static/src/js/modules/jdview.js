@@ -150,31 +150,41 @@ require(
     //CV JD Matching
     $("#CVJDSubmit").on("click", function(){
       $('#chart-wrapper').html('');
-      $("#radarModal").modal("show");
+      //$("#JDModal").modal("hide");
       setTimeout(function(){
-        var radar = radarcharts('chart-wrapper'),
-            textareaObj = $("textarea[name='jdModalContent']");
+        $("#radarModal").modal("show");
 
-        var name_list = [],
-            jdContent = textareaObj.val(),
-            fileName = textareaObj.attr("data-filename");
-        name_list.push(fileName);
+        setTimeout(function(){
+          var radar = radarcharts('chart-wrapper'),
+              textareaObj = $("textarea[name='jdModalContent']");
 
-        $.ajax({
-            url: '/analysis/valuable',
-            type: 'post',
-            data: {
-              'jd_doc': jdContent,
-              'name_list': JSON.stringify(name_list)
-            },
-            success: function(response) {
-              var datas = replaceName(response.data);
-              radar.makeRadar(datas, response.max);
-            }
-        });
+          var name_list = [],
+              jdContent = textareaObj.val(),
+              fileName = textareaObj.attr("data-filename");
+          name_list.push(fileName);
+
+          $.ajax({
+              url: '/analysis/valuable',
+              type: 'post',
+              data: {
+                'jd_doc': jdContent,
+                'name_list': JSON.stringify(name_list)
+              },
+              success: function(response) {
+                var datas = replaceName(response.data);
+                radar.makeRadar(datas, response.max);
+              }
+          });
+        }, 500);
+        
       }, 500);
+
+
     });
 
+    // $('#radarModal').on('hidden.bs.modal', function (e) {
+    //   $("body").css("padding", "0");
+    // });
     //Bootstrap-table events re-binding
     window.actionEvents = {
       //Draw a charts button events

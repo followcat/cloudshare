@@ -48,16 +48,14 @@ def extract_details(uploaded_details):
     details['position'] = uploaded_details['peo'][6]
     details['filename'] = uploaded_details['href']
     details['age']= re.compile('[0-9]*').match(uploaded_details['peo'][2]).group()
-    try:
-        education = re.compile(STUDIES, re.M).search(uploaded_details['info'][0]).group('expe')
-    except:
-        education = ''
-    details['school'] = education.split('|')[0].strip()
-    details['education'] = education.split('|')[-1].strip()
-
     add_cr = lambda x:'\n'+x.group()
+    for education in re.compile(STUDIES, re.M).finditer(re.compile(PERIOD).sub(add_cr, uploaded_details['info'][0])):
+        details['school'] = education.group('school')
+        details['major'] = education.group('major')
+        details['education'] = education.group('education')
+
     for expe in uploaded_details['info']:
-        for w in re.compile(WORKXP).finditer(re.compile(PERIOD).sub(add_cr, expe)):
+        for w in re.compile(WORKXP, re.M).finditer(re.compile(PERIOD).sub(add_cr, expe)):
             details['experience'].append((fix_date(w.group('from')), fix_date(w.group('to')),
                 fix_name(w.group('company'))+'|'+fix_name(w.group('position'))+'('+fix_duration(w.group('duration'))+')'))
     if u'…' in details['company']:

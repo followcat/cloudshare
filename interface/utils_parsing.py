@@ -20,6 +20,23 @@ COMPANYTAIL = UNIBRALEFT+u'[^年月（\(\[【]+?'+UNIBRARIGHT
 COMPANY = ur'[^' + SENTENCESEP + '=\n\*]+('+COMPANYTAIL+u')?'
 POSITION = ur'[^=\n\*：:\|]+'
 
+education_list = {
+    1: (u'中技', u'中专', u'高中'),
+    2: (u'大专', ),
+    #3: Show clearly step before graduate
+    4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科'),
+    5: (u'在职硕士'),
+    6: (u'硕士', u'硕士研究生', u'MBA', u'MBA/EMBA'),
+    7: (u'博士', u'博士研究生'),
+    8: (u'博士后', )
+    }
+
+LIST_SEPARATOR = ASP+u'*)|(?:'+ASP+u'*'
+EDUCATION_LIST = {}
+for k,v in education_list.items():
+    EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ASP+u'*'+ LIST_SEPARATOR.join(v) +ASP+u'*))')
+EDUCATION = u'(?:(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +ASP+u'*))' for v in education_list.values()]) +ASP+u'*))'
+    
 
 fix_today = lambda x: re.compile('^'+TODAY+'$').sub(u'至今', x)
 fix_sep = lambda x: re.compile(u'['+SP+SEP+u'\.．年]+').sub('.', x)
@@ -34,7 +51,7 @@ fix_name = lambda x: re.compile(ASP+'+').sub(' ', fix_escape(x)).strip()
 fix_duration = lambda x: re.compile(ASP+'+').sub('', x).strip()
 
 
-WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)((?='+DATE+u')|('+ASP+ ur'*$))'
-STUDIES = '\s*'+DATE+' - '+DATE+u'\s*:?\s*(?P<expe>[^\(].+?)(?='+DATE+'|$)'
+WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)$'
+STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P<major>'+POSITION+u'?)[：:\| ]*(?P<education>'+EDUCATION+u'?)$'
 
 

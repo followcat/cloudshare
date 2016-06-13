@@ -21,9 +21,14 @@
           <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addJDModal">
               <i class="glyphicon glyphicon-plus"></i>
           </button>
+          <div class="btn-group">
+            <select class="form-control" id="toolsStatusSelect">
+              <option value="/listjd?status=Opening" {% if status=='Opening' %}selected{% endif %}>Opening</option>
+              <option value="/listjd?status=Closed" {% if status=='Closed' %}selected{% endif %}>Closed</option>
+            </select>
+          </div>
         </div>
         <table id="jd-table" data-toggle="table"
-               data-url="/listjd"
                data-search="true"
                data-click-to-select="true"
                data-toolbar="#toolbar"
@@ -135,7 +140,7 @@
 </div><!-- Add company modal end -->
 
 <!-- Message modal -->
-<div class="modal fade bs-example-modal-sm" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="Message">
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="Message">
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -170,7 +175,7 @@
     </div>
   </div>
 </div>
-<div class="modal fade bs-example-modal-lg" id="radarModal" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
+<div class="modal fade" id="radarModal" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">

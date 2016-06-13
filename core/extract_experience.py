@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
-from interface.predator import *
+from interface.utils_parsing import *
 
 
 SALARY = u'\d[\- \d\|]*(月/月)?元/月(以[上下])?'
@@ -52,19 +52,6 @@ TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：\ufffd]?'+ASP+u'*\*?
 BPO = re.compile(u'^((?P<aposition>'+POSITION+u')'+ASP+u'*\|)?((?P<second>.+?)\|)?'+ASP+u'*('+SALARY+u')', re.M)
 
 EMP = re.compile(BEMPLOYEES)
-
-
-fix_today = lambda x: re.compile('^'+TODAY+'$').sub(u'至今', x)
-fix_sep = lambda x: re.compile(u'['+SP+SEP+u'\.．年]+').sub('.', x)
-fix_trail = lambda x: x.replace(u'月', '').strip()
-zero_date = lambda x: str.zfill(str(x.group()), 2)
-fix_trailing = lambda x: re.compile(ur'\d+$').sub(zero_date, x)
-fix_date = lambda x: fix_trailing(fix_sep(fix_trail(fix_today(x))))
-
-remove_escape = lambda x: x.group(1)
-fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, x)
-fix_name = lambda x: re.compile(ASP+'+').sub(' ', fix_escape(x)).strip()
-fix_duration = lambda x: re.compile(ASP+'+').sub('', x).strip()
 
 
 def format_output(output, begin, end, name, duration=None, _id=0):

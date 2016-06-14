@@ -43,7 +43,7 @@ def extract_details(uploaded_details):
 
     details = cloudshare_yaml_template()
 
-    details['date'] = 0
+    details['date'] = uploaded_details['date']
     details['name'] = uploaded_details['name']
     details['id'] = uploaded_details['data-id']
     details['company'] = uploaded_details['peo'][7]

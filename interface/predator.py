@@ -68,19 +68,82 @@ def extract_details(uploaded_details):
                 break
     return details
 
-class PredatorInterface(interface.base.Interface):
 
-    extension = '.html'
+class PredatotLiteInterface(interface.base.Interface):
     
-    def __init__(self, yamlpath, htmlpath):
-        self.path, self.htmldir = os.path.split(htmlpath)
-        super(PredatorInterface, self).__init__(self.path)
-        self.htmlpath = htmlpath
+    def __init__(self, yamlpath):
+        self.path = os.path.split(yamlpath)[0]
+        super(PredatotLiteInterface, self).__init__(self.path)
         self.yamlpath = yamlpath
         self.yamlfile = list()
         self.yamlstat = dict()
         self._yamldata = dict()
         self.yamlfiles = glob.glob(os.path.join(self.yamlpath, '*.yaml'))
+
+    @property
+    def yamldata(self):
+        for yamlfile in self.yamlfiles:
+            if (yamlfile in self.yamlstat and
+                self.yamlstat[yamlfile] == os.stat(yamlfile)):
+                continue
+            else:
+                path, file = os.path.split(yamlfile)
+                for name, data in utils.builtin.load_yaml(path, file).iteritems():
+                    self._yamldata[name] = data
+                self.yamlstat[yamlfile] = os.stat(yamlfile)
+        return self._yamldata
+
+    def exists(self, filename):
+        return filename in self.lsfiles()
+
+    def get(self, filename):
+        name, extension = os.path.splitext(filename)
+        if extension == '.yaml':
+            return self._get_yaml(name)
+        else:
+            return None
+
+    def _get_yaml(self, name):
+        data = None
+        path, id_str = os.path.split(name)
+        if id_str in self.yamldata:
+            data = extract_details(self.yamldata[id_str])
+        return utils.builtin.dump_yaml(data)
+
+    def lsfiles(self, *args, **kwargs):
+        return [name+'.yaml' for name in self.yamldata]
+
+    def grep(self, restrings, path):
+        grep_list = []
+        keywords = restrings.split()
+        if keywords:
+            command = 'grep -l '
+            command += keywords[0].encode('utf-8')
+            command += ' *'
+            for each in keywords[1:]:
+                command += ' | grep '
+                command += each.encode('utf-8')
+            p = subprocess.Popen(command,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT,
+                                 cwd=os.path.join(self.path, path), shell=True)
+            returncode = p.communicate()[0]
+            for each in returncode.split('\n'):
+                if each:
+                    grep_list.append(each)
+        return grep_list
+
+    def grep_yaml(self, restrings, path):
+        return []
+
+
+class PredatorInterface(PredatotLiteInterface):
+
+    extension = '.html'
+
+    def __init__(self, yamlpath, htmlpath):
+        super(PredatorInterface, self).__init__(yamlpath)
+        self.htmlpath = htmlpath
 
     @property
     def yamldata(self):
@@ -123,36 +186,3 @@ class PredatorInterface(interface.base.Interface):
             with open(path_file) as fp:
                 data = fp.read()
         return data
-
-    def _get_yaml(self, name):
-        data = None
-        path, id_str = os.path.split(name)
-        if id_str in self.yamldata:
-            data = extract_details(self.yamldata[id_str])
-        return utils.builtin.dump_yaml(data)
-
-    def lsfiles(self, *args, **kwargs):
-        return [name+'.yaml' for name in self.yamldata]
-
-    def grep(self, restrings, path):
-        grep_list = []
-        keywords = restrings.split()
-        if keywords:
-            command = 'grep -l '
-            command += keywords[0].encode('utf-8')
-            command += ' *'
-            for each in keywords[1:]:
-                command += ' | grep '
-                command += each.encode('utf-8')
-            p = subprocess.Popen(command,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT,
-                                 cwd=os.path.join(self.path, path), shell=True)
-            returncode = p.communicate()[0]
-            for each in returncode.split('\n'):
-                if each:
-                    grep_list.append(each)
-        return grep_list
-
-    def grep_yaml(self, restrings, path):
-        return []

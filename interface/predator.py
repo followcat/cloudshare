@@ -69,11 +69,11 @@ def extract_details(uploaded_details):
     return details
 
 
-class PredatotLiteInterface(interface.base.Interface):
+class PredatorLiteInterface(interface.base.Interface):
     
     def __init__(self, yamlpath):
         self.path = os.path.split(yamlpath)[0]
-        super(PredatotLiteInterface, self).__init__(self.path)
+        super(PredatorLiteInterface, self).__init__(self.path)
         self.yamlpath = yamlpath
         self.yamlfile = list()
         self.yamlstat = dict()
@@ -137,7 +137,7 @@ class PredatotLiteInterface(interface.base.Interface):
         return []
 
 
-class PredatorInterface(PredatotLiteInterface):
+class PredatorInterface(PredatorLiteInterface):
 
     extension = '.html'
 

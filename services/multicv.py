@@ -50,6 +50,6 @@ class MultiCV(object):
                 except IOError:
                     result = None
         if result is None:
-            raise IOError
+            raise IOError("No yaml file found for id: %s" % id)
         else:
             return result

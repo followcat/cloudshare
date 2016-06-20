@@ -16,8 +16,6 @@ class CurriculumVitae(services.base.Service):
         super(CurriculumVitae, self).__init__(interface, name)
         self.repo_path = self.interface.path + "/" + self.path
         self.info = ""
-        if not os.path.exists(self.repo_path):
-            os.makedirs(self.repo_path)
 
     def exists(self, filename):
         path_name = os.path.join(self.path, filename)
@@ -148,6 +146,17 @@ class CurriculumVitae(services.base.Service):
 
 
     def getyaml(self, id):
+        """
+        MultiCV expects an IOError exception if file not found.
+            >>> import interface.predator
+            >>> import services.curriculumvitae
+            >>> P = interface.predator.PredatorInterface('/tmp', '/tmp')
+            >>> PS = services.curriculumvitae.CurriculumVitae(P)
+            >>> PS.getyaml('CV.md')
+            Traceback (most recent call last):
+            ...
+            IOError
+        """
         name = core.outputstorage.ConvertName(id).yaml
         path_name = os.path.join(self.path, name)
         yaml_str = self.interface.get(path_name)

@@ -67,6 +67,8 @@ class GitInterface(interface.base.Interface):
         """
         full_path = os.path.join(self.path, filename)
         path, name = os.path.split(full_path)
+        if not os.path.exists(path):
+            os.makedirs(path)
         with open(full_path, 'w') as fp:
             fp.write(filedata)
         self.repo.stage(filename)

@@ -44,10 +44,15 @@ def extract_details(uploaded_details):
     details['date'] = uploaded_details['date']
     details['name'] = uploaded_details['name']
     details['id'] = uploaded_details['data-id']
-    details['company'] = uploaded_details['peo'][7]
-    details['position'] = uploaded_details['peo'][6]
+    try:
+        details['age']= re.compile('[0-9]*').match(uploaded_details['peo'][2]).group()
+        details['company'] = uploaded_details['peo'][7]
+        details['position'] = uploaded_details['peo'][6]
+    except IndexError:
+        details['age']= 0
+        details['company'] = uploaded_details['peo'][2]
+        details['position'] = uploaded_details['peo'][1]
     details['filename'] = uploaded_details['href']
-    details['age']= re.compile('[0-9]*').match(uploaded_details['peo'][2]).group()
     add_cr = lambda x:'\n'+x.group()
     for education in re.compile(STUDIES, re.M).finditer(re.compile(PERIOD).sub(add_cr, uploaded_details['info'][0])):
         details['school'] = education.group('school')
@@ -108,7 +113,8 @@ class PredatorLiteInterface(interface.base.Interface):
         path, id_str = os.path.split(name)
         if id_str in self.yamldata:
             data = extract_details(self.yamldata[id_str])
-        return utils.builtin.dump_yaml(data)
+            return utils.builtin.dump_yaml(data)
+        return data
 
     def lsfiles(self, *args, **kwargs):
         return [name+'.yaml' for name in self.yamldata]

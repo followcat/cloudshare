@@ -43,4 +43,4 @@ SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, [DEF_SVC_CV, PRE_SVC_CV, JGYG_SVC_
 
 LSI_PATH = 'lsimodel'
 SVC_MIN = services.mining.Mining(LSI_PATH, SVC_CV)
-LSI_SIM = SVC_MIN.setup('all')
+SVC_MIN.setup('all')

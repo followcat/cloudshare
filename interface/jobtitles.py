@@ -5,7 +5,6 @@ import os.path
 import subprocess
 
 import yaml
-import pypandoc
 
 import core.information_explorer
 import utils.builtin
@@ -41,7 +40,7 @@ def cloudshare_yaml_template():
 def extract_details(uploaded_details):
     details = cloudshare_yaml_template()
 
-    details['date'] = uploaded_details['date']
+    details['date'] = 0
     details['name'] = uploaded_details['name']
     details['id'] = uploaded_details['data-id']
     details['company'] = uploaded_details['peo'][7]
@@ -68,14 +67,11 @@ def extract_details(uploaded_details):
                 break
     return details
 
-class PredatorInterface(interface.base.Interface):
-
-    extension = '.html'
+class JobTitles(interface.base.Interface):
     
-    def __init__(self, yamlpath, htmlpath):
-        self.path, self.htmldir = os.path.split(htmlpath)
-        super(PredatorInterface, self).__init__(self.path)
-        self.htmlpath = htmlpath
+    def __init__(self, yamlpath):
+        self.path = os.path.split(yamlpath)[0]
+        super(JobTitles, self).__init__(self.path)
         self.yamlpath = yamlpath
         self.yamlfile = list()
         self.yamlstat = dict()
@@ -91,37 +87,22 @@ class PredatorInterface(interface.base.Interface):
             else:
                 path, file = os.path.split(yamlfile)
                 for name, data in utils.builtin.load_yaml(path, file).iteritems():
-                    if os.path.exists(os.path.join(self.htmlpath, name+self.extension)):
-                        self._yamldata[name] = data
+                    self._yamldata[name] = data
                 self.yamlstat[yamlfile] = os.stat(yamlfile)
         return self._yamldata
 
     def exists(self, filename):
-        result = False
-        name, extension = os.path.splitext(filename)
-        filename = filename.replace(extension, self.extension)
-        path_file = os.path.join(self.htmlpath, filename)
-        if os.path.exists(path_file):
-            result = True
-        return result
+        return filename in self.lsfiles()
 
     def get(self, filename):
         name, extension = os.path.splitext(filename)
         if extension == '.yaml':
             return self._get_yaml(name)
-        elif extension == '.md':
-            cv_path, cv_name = os.path.split(name)
-            input_file = os.path.join(self.htmlpath, cv_name+self.extension)
-            return pypandoc.convert(input_file, 'markdown', format='docbook')
         else:
             return self._get_file(filename)
 
     def _get_file(self, filename):
         data = None
-        path_file = os.path.join(self.path, filename)
-        if os.path.exists(path_file):
-            with open(path_file) as fp:
-                data = fp.read()
         return data
 
     def _get_yaml(self, name):

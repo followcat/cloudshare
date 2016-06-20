@@ -197,7 +197,7 @@ class ShowCV(UploadFile):
 
     def init_showcv(self):
         self.init_upload()
-        self.yamlname = self.app.config['SVC_CV'].yamls()[0]
+        self.yamlname = [yaml for yaml in self.app.config['SVC_CV'].yamls()][0]
         self.name = self.yamlname.replace('yaml', 'md')
 
 

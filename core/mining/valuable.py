@@ -7,7 +7,10 @@ import core.mining.info
 import core.mining.lsimodel
 import core.outputstorage
 
-EDUCATION = re.compile(ur'(?P<education>.+)[及或]?以上学历')
+from interface.utils_parsing import *
+
+
+EDUCATION_REQUIREMENT = re.compile(ur'(?P<education>.+)[及或]?以上学历')
 
 
 def rate(sim, svc_cv, doc, top=10, selected=5, name_list=None):
@@ -64,7 +67,7 @@ def next(sim, svc_cv, doc, top, name_list=None):
     for text in doc.split('\n'):
         if not text.strip():
             continue
-        education_requirement = EDUCATION.match(text)
+        education_requirement = EDUCATION_REQUIREMENT.match(text)
         if education_requirement:
             new_data = mine_education(svc_cv,
                 education_requirement.group('education'), name_list)
@@ -75,20 +78,8 @@ def next(sim, svc_cv, doc, top, name_list=None):
     return rating
 
 def mine_education(svc_cv, text, name_list):
-    education_list = {
-        1: (u'中技', u'中专', u'高中'),
-        2: (u'大专', ),
-        #3: Show clearly step before graduate
-        4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科'),
-        5: (u'在职硕士'),
-        6: (u'硕士', u'硕士研究生', u'MBA', u'MBA/EMBA'),
-        7: (u'博士', u'博士研究生'),
-        8: (u'博士后', )
-        }
-
     def education_rate(education):
-        for k,v in education_list.items():
-            RE = re.compile(u'(((\s|(\xc2\xa0))*'+ u'(\s|(\xc2\xa0))*)|((\s|(\xc2\xa0))*'.join(v) + u'(\s|(\xc2\xa0))*))')
+        for (k, RE) in EDUCATION_LIST.items():
             if RE.match(education):
                 return k
         else:

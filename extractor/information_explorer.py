@@ -5,16 +5,15 @@ import os.path
 
 def getTagFromString(tag, stream, rule=None):
     """
-        >>> import core.information_explorer
-        >>> core.information_explorer.getTagFromString('姓名', '姓名:followcat ')
+        >>> getTagFromString('姓名', '姓名:followcat ')
         u'followcat'
-        >>> core.information_explorer.getTagFromString('姓名', '姓    名:followcat ')
+        >>> getTagFromString('姓名', '姓    名:followcat ')
         u'followcat'
-        >>> core.information_explorer.getTagFromString('姓名', '姓名:    followcat ')
+        >>> getTagFromString('姓名', '姓名:    followcat ')
         u'followcat'
-        >>> core.information_explorer.getTagFromString('姓名', '姓    名:    followcat ')
+        >>> getTagFromString('姓名', '姓    名:    followcat ')
         u'followcat'
-        >>> core.information_explorer.getTagFromString('姓名', '  姓    名:    followcat ')
+        >>> getTagFromString('姓名', '  姓    名:    followcat ')
         u'followcat'
     """
     if rule is None:
@@ -33,19 +32,15 @@ def getTagFromString(tag, stream, rule=None):
 
 def getInfoFromRestr(stream, restring):
     """
-        >>> import core.information_explorer
         >>> email_restr = ur"[a-zA-Z0-9._\\%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}"
-        >>> core.information_explorer.getInfoFromRestr(
-        ... 'Mail followcat@gmail.com', email_restr)
+        >>> getInfoFromRestr('Mail followcat@gmail.com', email_restr)
         [u'followcat@gmail.com']
         >>> phone_restr = r'1\d{10}'
-        >>> core.information_explorer.getInfoFromRestr(
-        ... 'phone: 13123456789', phone_restr)
+        >>> getInfoFromRestr('phone: 13123456789', phone_restr)
         [u'13123456789']
         >>> company_restr = ur'[ \u3000:\uff1a]*([\S]*\u6709\u9650\u516c\u53f8)'
-        >>> core.information_explorer.getInfoFromRestr(
-        ... 'company: cat有限公司', company_restr)
-        [u'cat\u6709\u9650\u516c\u53f8']
+        >>> getInfoFromRestr('company: cat有限公司', company_restr)
+        ... [u'cat\u6709\u9650\u516c\u53f8']
     """
     regex = re.compile(restring, re.IGNORECASE)
     search_string = stream.decode('utf8').replace(u'\xa0', ' ')
@@ -55,14 +50,13 @@ def getInfoFromRestr(stream, restring):
 
 def getExperience(stream):
     """
-        >>> import core.information_explorer
-        >>> core.information_explorer.getExperience("2015.03 - 2015.05   XXCOM")
+        >>> getExperience("2015.03 - 2015.05   XXCOM")
         [(u'2015.03', u'2015.05', u'XXCOM')]
-        >>> core.information_explorer.getExperience("2015/03 - 2015/05   XXCOM")
+        >>> getExperience("2015/03 - 2015/05   XXCOM")
         [(u'2015/03', u'2015/05', u'XXCOM')]
-        >>> core.information_explorer.getExperience("2015/03 - 至今   XXCOM")
+        >>> getExperience("2015/03 - 至今   XXCOM")
         [(u'2015/03', u'\u81f3\u4eca', u'XXCOM')]
-        >>> core.information_explorer.getExperience("2015/03 - 至今   XXCOM XXX")
+        >>> getExperience("2015/03 - 至今   XXCOM XXX")
         [(u'2015/03', u'\u81f3\u4eca', u'XXCOM XXX')]
     """
     output = []

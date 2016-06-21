@@ -7,7 +7,7 @@ import core.mining.info
 import core.mining.lsimodel
 import core.outputstorage
 
-from interface.utils_parsing import *
+from extractor.utils_parsing import *
 
 
 EDUCATION_REQUIREMENT = re.compile(ur'(?P<education>.+)[及或]?以上学历')

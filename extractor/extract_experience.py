@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
-from interface.utils_parsing import *
+from extractor.utils_parsing import *
 
 
 SALARY = u'\d[\- \d\|]*(月/月)?元/月(以[上下])?'

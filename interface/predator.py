@@ -11,7 +11,7 @@ import core.information_explorer
 import utils.builtin
 import interface.base
 
-from interface.utils_parsing import *
+from extractor.utils_parsing import *
 
 
 

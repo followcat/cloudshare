@@ -127,13 +127,13 @@ import utils.builtin
 yaml.SafeDumper = utils._yaml.SafeDumper
 
 import re
-import core.extract_experience
-RE = re.compile(core.extract_experience.DURATION)
+import extractor.extract_experience
+RE = re.compile(extractor.extract_experience.DURATION)
 
 def update_xp(svc_cv, yamlname):
     yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
     yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
-    extracted_data = core.extract_experience.fix(svc_cv.getmd(yamlname))
+    extracted_data = extractor.extract_experience.fix(svc_cv.getmd(yamlname))
     if not extracted_data[1]:
         (company, position) = extracted_data[0]
         obj = utils.builtin.load_yaml(yamlpath, yamlname)

@@ -4,7 +4,7 @@ import re
 
 TODAY = u'((至今)|(目前)|(现在)|今|([Pp]resent)|([Nn]ow))'
 CHNUMBERS = u'一二三四五六七八九十'
-SP = u'\s '  # [\xa0]
+SP = u'\s \ufffd'  # [\xc2\xa0]
 ASP = u'[' + SP + u']'
 SEP = u'\-–—―\\\\~～/'
 UNIBRALEFT = ur'[（\(\[【]'
@@ -14,6 +14,8 @@ DATE = ur'((\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'?((\d{1,2}('+ASP+u'?月)?)|(
 PERIOD = u'(?P<from>' + DATE + ur')' + DATESEP + ASP+ u'*(?P<to>' + DATE + ')'
 DURATION = ur'(?P<duration>(\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个月)?)|(\d{1,2}'+ASP+u'?个月))'
 SENTENCESEP = ur'、，。：:\|'
+PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|('+UNIBRALEFT+u'[^年月（\(\[【'+CHNUMBERS+u']+?'+UNIBRARIGHT+u')|([◆\?]+))?'
+
 # Exclude date related characters to avoid eating duration
 COMPANYTAIL = UNIBRALEFT+u'[^年月（\(\[【]+?'+UNIBRARIGHT
 # use re.DOTALL for better results
@@ -37,6 +39,12 @@ for k,v in education_list.items():
     EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ASP+u'*'+ LIST_SEPARATOR.join(v) +ASP+u'*))')
 EDUCATION = u'(?:(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +ASP+u'*))' for v in education_list.values()]) +ASP+u'*))'
     
+
+SALARY = u'\d[\- \d\|]*(月/月)?元/月(以[上下])?'
+EMPLOYEES = u'((?P<employees>(少于)?\d[\d '+SEP+u']*人(以[上下])?)([' + SENTENCESEP + u'].*?)?)'
+BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + UNIBRARIGHT +u')'
+BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + DURATION + u'(?(br)[\n'+SP+u']*' +UNIBRARIGHT + u'(?(dit)\*)))'
+
 
 fix_today = lambda x: re.compile('^'+TODAY+'$').sub(u'至今', x)
 fix_sep = lambda x: re.compile(u'['+SP+SEP+u'\.．年]+').sub('.', x)

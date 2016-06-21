@@ -7,7 +7,6 @@ import subprocess
 import yaml
 import pypandoc
 
-import core.information_explorer
 import utils.builtin
 import interface.base
 

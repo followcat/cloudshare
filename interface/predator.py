@@ -175,13 +175,26 @@ class PredatorInterface(PredatorLiteInterface):
         return result
 
     def get(self, filename):
+        """
+        For an invalid filename, pandoc output back the filename
+            >>> import random
+            >>> import interface.predator
+            >>> invalid = '/tmp/'+''.join(map(lambda x:str(random.randrange(10)), range(30)))+'.md'
+            >>> pypandoc.convert(invalid, 'markdown', format='docbook')[:5]
+            u'/tmp/'
+
+        The interface is expected to return None
+            >>> pred = interface.predator.PredatorInterface('/tmp', '/tmp')
+            >>> assert pred.get(invalid) is None
+        """
         name, extension = os.path.splitext(filename)
         if extension == '.yaml':
             return self._get_yaml(name)
         elif extension == '.md':
             cv_path, cv_name = os.path.split(name)
             input_file = os.path.join(self.htmlpath, cv_name+self.extension)
-            return pypandoc.convert(input_file, 'markdown', format='docbook')
+            if os.path.exists(input_file):
+                return pypandoc.convert(input_file, 'markdown', format='docbook')
         else:
             return self._get_file(filename)
 

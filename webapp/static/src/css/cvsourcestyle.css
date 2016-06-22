@@ -9,6 +9,10 @@
 .wrap-left{
 	width: 68%;
 }
+.wrap-left img{
+	width: 80px;
+	height: 100px;
+}
 .tracking-box, .comment-box, .similar-box{
 	width: 100%;
 	height: auto;
@@ -52,7 +56,7 @@
 	text-indent: 2px;
 }
 .form-input{
-	margin-top: 2px; 
+	margin-top: 2px;
 	background-color: #fbfbfb;
 }
 .form-input .form-group{
@@ -65,7 +69,7 @@
 	margin-bottom: 2px;
 }
 #comment-btn{
-	margin-top: 2px; 
+	margin-top: 2px;
 }
 .btn-box{
 	display: none;
@@ -73,12 +77,12 @@
 }
 .tracking-content, .comment-content{
 	width: 100%;
-	margin-bottom: 4px; 
-	margin-top: 2px; 
+	margin-bottom: 4px;
+	margin-top: 2px;
 	border-top: 1px solid #eee;
 	border-bottom: 1px solid #eee;
 	border-top: 1px solid #eee;
-	overflow-y: auto; 
+	overflow-y: auto;
 }
 .tracking-content{
 	max-height: 100px;
@@ -93,7 +97,7 @@
 }
 .tracking-item, .comment-item{
 	padding: 6px 8px;
-	border-bottom: 1px dotted #e1e1e1; 
+	border-bottom: 1px dotted #e1e1e1;
 }
 .tracking-item p, .comment-item p{
 	margin: 0;
@@ -101,7 +105,7 @@
 }
 .commit-info{
 	display: block;
-	padding-top:2px; 
+	padding-top:2px;
 	font-size: 1.075em;
 }
 .comment-item .content{

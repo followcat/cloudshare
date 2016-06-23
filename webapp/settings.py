@@ -30,14 +30,10 @@ SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
 
 DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB, 'cloudshare')
 
-PREDATOR_DB = interface.predator.PredatorInterface(
-    'additional/liepin/JOBTITLES',
-    'additional/liepin/CV')
+PREDATOR_DB = interface.predator.PredatorInterface('additional/liepin')
 PRE_SVC_CV = services.curriculumvitae.CurriculumVitae(PREDATOR_DB, 'liepin')
 
-JINGYING_DB = interface.predator.PredatorInterface(
-    'additional/jingying/JOBTITLES',
-    'additional/jingying/CV')
+JINGYING_DB = interface.predator.PredatorInterface('additional/jingying')
 JGYG_SVC_CV = services.curriculumvitae.CurriculumVitae(JINGYING_DB, 'jingying')
 SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, [DEF_SVC_CV, PRE_SVC_CV, JGYG_SVC_CV])
 

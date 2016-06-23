@@ -12,49 +12,45 @@ import interface.base
 
 
 class PredatorLiteInterface(interface.base.Interface):
-    
-    def __init__(self, yamlpath):
-        self.path = os.path.split(yamlpath)[0]
-        super(PredatorLiteInterface, self).__init__(self.path)
-        self.yamlpath = yamlpath
-        self.yamlfile = list()
-        self.yamlstat = dict()
-        self._yamldata = dict()
-        self.yamlfiles = glob.glob(os.path.join(self.yamlpath, '*.yaml'))
 
-    @property
-    def yamldata(self):
-        for yamlfile in self.yamlfiles:
-            if (yamlfile in self.yamlstat and
-                self.yamlstat[yamlfile] == os.stat(yamlfile)):
-                continue
-            else:
-                path, file = os.path.split(yamlfile)
-                for name, data in utils.builtin.load_yaml(path, file).iteritems():
-                    self._yamldata[name] = data
-                self.yamlstat[yamlfile] = os.stat(yamlfile)
-        return self._yamldata
+    yamldir = 'JOBTITLES'
+    extension = '.yaml'
+    
+    def __init__(self, path):
+        self.path = path
+        self.yamlpath = os.path.join(self.path, self.yamldir)
+        super(PredatorLiteInterface, self).__init__(path)
 
     def exists(self, filename):
-        return filename in self.lsfiles()
+        result = False
+        name, extension = os.path.splitext(filename)
+        path, str_id = os.path.split(name)
+        yamlname = str_id + self.extension
+        path_file = os.path.join(self.yamlpath, yamlname)
+        if os.path.exists(path_file):
+            result = True
+        return result
 
     def get(self, filename):
         name, extension = os.path.splitext(filename)
         if extension == '.yaml':
-            return self._get_yaml(name)
+            path, name = os.path.split(filename)
+            yamlname = os.path.join(self.yamldir, name)
+            return self._get_file(yamlname)
         else:
             return None
 
-    def _get_yaml(self, name):
+    def _get_file(self, filename):
         data = None
-        path, id_str = os.path.split(name)
-        if id_str in self.yamldata:
-            data = self.yamldata[id_str]
-            return utils.builtin.dump_yaml(data)
+        path_file = os.path.join(self.path, filename)
+        if os.path.exists(path_file):
+            with open(path_file) as fp:
+                data = fp.read()
         return data
 
     def lsfiles(self, *args, **kwargs):
-        return [name+'.yaml' for name in self.yamldata]
+        return [os.path.split(f)[1] for f in glob.glob(
+                os.path.join(self.yamlpath, '*.yaml'))]
 
     def grep(self, restrings, path):
         grep_list = []
@@ -82,31 +78,18 @@ class PredatorLiteInterface(interface.base.Interface):
 
 class PredatorInterface(PredatorLiteInterface):
 
+    cvdir = 'CV'
     extension = '.html'
 
-    def __init__(self, yamlpath, htmlpath):
-        super(PredatorInterface, self).__init__(yamlpath)
-        self.htmlpath = htmlpath
-
-    @property
-    def yamldata(self):
-        for yamlfile in self.yamlfiles:
-            if (yamlfile in self.yamlstat and
-                self.yamlstat[yamlfile] == os.stat(yamlfile)):
-                continue
-            else:
-                path, file = os.path.split(yamlfile)
-                for name, data in utils.builtin.load_yaml(path, file).iteritems():
-                    if os.path.exists(os.path.join(self.htmlpath, name+self.extension)):
-                        self._yamldata[name] = data
-                self.yamlstat[yamlfile] = os.stat(yamlfile)
-        return self._yamldata
+    def __init__(self, path):
+        super(PredatorInterface, self).__init__(path)
+        self.cvpath = os.path.join(path, self.cvdir)
 
     def exists(self, filename):
         result = False
         name, extension = os.path.splitext(filename)
-        filename = filename.replace(extension, self.extension)
-        path_file = os.path.join(self.htmlpath, filename)
+        cvname = filename.replace(extension, self.extension)
+        path_file = os.path.join(self.cvpath, cvname)
         if os.path.exists(path_file):
             result = True
         return result
@@ -121,24 +104,18 @@ class PredatorInterface(PredatorLiteInterface):
             u'/tmp/'
 
         The interface is expected to return None
-            >>> pred = interface.predator.PredatorInterface('/tmp', '/tmp')
+            >>> pred = interface.predator.PredatorInterface('/tmp')
             >>> assert pred.get(invalid) is None
         """
         name, extension = os.path.splitext(filename)
         if extension == '.yaml':
-            return self._get_yaml(name)
+            path, name = os.path.split(filename)
+            yamlname = os.path.join(self.yamldir, name)
+            return self._get_file(yamlname)
         elif extension == '.md':
-            cv_path, cv_name = os.path.split(name)
-            input_file = os.path.join(self.htmlpath, cv_name+self.extension)
+            cvname = filename.replace(extension, self.extension)
+            input_file = os.path.join(self.path, cvname)
             if os.path.exists(input_file):
                 return pypandoc.convert(input_file, 'markdown', format='docbook')
         else:
             return self._get_file(filename)
-
-    def _get_file(self, filename):
-        data = None
-        path_file = os.path.join(self.path, filename)
-        if os.path.exists(path_file):
-            with open(path_file) as fp:
-                data = fp.read()
-        return data

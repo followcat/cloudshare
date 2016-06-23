@@ -150,7 +150,7 @@ class CurriculumVitae(services.base.Service):
         MultiCV expects an IOError exception if file not found.
             >>> import interface.predator
             >>> import services.curriculumvitae
-            >>> P = interface.predator.PredatorInterface('/tmp', '/tmp')
+            >>> P = interface.predator.PredatorInterface('/tmp')
             >>> PS = services.curriculumvitae.CurriculumVitae(P)
             >>> PS.getyaml('CV.md')
             Traceback (most recent call last):

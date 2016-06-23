@@ -14,7 +14,7 @@ class JobDescription(services.base.Service):
         >>> import services.company
         >>> import services.jobdescription
         >>> import interface.gitinterface
-        
+
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> svc_co = services.company.Company(interface)
@@ -28,7 +28,7 @@ class JobDescription(services.base.Service):
         >>> data = svc_jd.get(results[0])
         >>> data['description']
         'JD-A description'
-        >>> svc_jd.modify(data['id'], 'JD-B description', 'Dever')
+        >>> svc_jd.modify(data['id'], 'JD-B description', 'Closed', 'Dever')
         True
         >>> data = svc_jd.get(results[0])
         >>> data['description']
@@ -53,12 +53,14 @@ class JobDescription(services.base.Service):
         yaml_str = self.interface.get(path_name)
         return yaml.load(yaml_str)
 
-    def add(self, company, name, description, committer):
+    def add(self, company, name, description, committer, status=None):
         try:
             self.svc_co.company(company)
         except services.exception.NotExistsCompany:
             self.info = "NotExistsCompany."
             return False
+        if status is None:
+            status = 'Opening'
 
         id = uuid.uuid1()
         hex_id = id.get_hex()
@@ -67,21 +69,23 @@ class JobDescription(services.base.Service):
             'id': hex_id,
             'company': company,
             'description': description,
-            'committer': committer
+            'committer': committer,
+            'status': status
         }
         filename = self.filename(hex_id)
         file_path = os.path.join(self.repo_path, filename)
-        self.interface.add(os.path.join(self.path, filename), yaml.dump(data),
+        self.interface.add(os.path.join(self.path, filename), yaml.safe_dump(data),
                            "Add job description file: " + filename)
         return True
 
-    def modify(self, hex_id, description, committer):
+    def modify(self, hex_id, description, status, committer):
         filename = self.filename(hex_id)
         data = self.get(filename)
         if data['committer'] != committer:
             return False
         data['description'] = description
-        dump_data = yaml.dump(data)
+        data['status'] = status
+        dump_data = yaml.safe_dump(data)
         self.interface.modify(os.path.join(self.path, filename), dump_data,
                               message="Modify job description: " + filename,
                               committer=committer)

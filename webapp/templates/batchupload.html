@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>批量上传文件</title>
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/uploadfile.css') }}">
+  <title>批量上传文件</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/uploadfile.css') }}">
 
-	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
     <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
@@ -16,44 +16,44 @@
   <![endif]-->
 </head>
 <body>
-	<header class="header-box">
+  <header class="header-box">
     <a href="/search">
       <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
-    </a> 
+    </a>
     <span id="current-id">{{ current_user.id }}</span>
   </header>
-  <div class='container'>
-  	
-  	<div class='col-md-5 col-md-offset-1'>
-  		
-  		<div id='fileuploader'>
-				<div class='ajax-upload-dragdrop'>
-					<div class='ajax-file-upload'>
-						添加文件
-						<form method='POST' enctype='multipart/form-data' >
-							<input type='file' name='files[]' id='ajax-file-input' multiple >
-						</form>
-					</div>
-					<span>
-						<b>Drag & Drop Files</b>
-					</span>
-				</div>
-			</div>
-  	</div>
-  	<div class='col-md-2 clearfix btn-bar'>
-  		<button class='btn btn-sm btn-success' id='start-upload'>提交</button>
-  		<button class='btn btn-sm btn-primary' id='confirm-btn'>确认</button>
-  	</div>
-  	<div class='col-md-4'>
-  		<h5>上传信息:</h5>
-  		<div id='message'>
-				
-			</div>
-  	</div>
-  	
+  <div class="container">
+
+    <div class="col-md-5 col-md-offset-1">
+
+      <div id="fileuploader">
+        <div class="ajax-upload-dragdrop">
+          <div class="ajax-file-upload">
+          添加文件
+            <form method="POST" enctype="multipart/form-data" >
+              <input type="file" name="files[]" id="ajax-file-input" multiple >
+            </form>
+          </div>
+          <span>
+            <b>Drag & Drop Files</b>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 clearfix btn-bar">
+      <button class="btn btn-sm btn-success" id="start-upload">提交</button>
+      <button class="btn btn-sm btn-primary" id="confirm-btn">确认</button>
+    </div>
+    <div class="col-md-4">
+      <h5>上传信息:</h5>
+      <div id="message">
+
+      </div>
+    </div>
+
   </div>
-  <script src="{{ url_for('static',filename='js/lib/jquery.js') }}"></script>
-	 <script src="{{ url_for('static',filename='js/lib/jquery.uploadfile.min.js') }}"></script>
-	 <script src="{{ url_for('static',filename='js/src/batchupload.js') }}"></script>
+  <script src="{{ url_for('static', filename='lib/js/jquery.js')}}"></script>
+  <script src="{{ url_for('static', filename='lib/js/jquery.uploadfile.min.js')}}"></script>
+  <script src="{{ url_for('static', filename='src/js/modules/batchupload.js')}}"></script>
 </body>
 </html>

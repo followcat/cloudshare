@@ -1,17 +1,19 @@
 {% extends "share/layout.html" %}
-
+{% block title %}
+<title>Company-Willendare</title>
+{% endblock %}
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-table.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/jdview.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap-table.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/jdview.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class='container main-wrapper'>
-  <div class='row'>
-    <div class='col-md-10 col-md-offset-1'>
+<div class="container main-wrapper">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
       <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="/listcompany">Company</a></li>
-        <li role="presentation"><a href="/listjd">Job Description</a></li>
+        <li role="presentation"><a href="/listjd?status=Opening">Job Description</a></li>
       </ul>
       <div class="panel panel-default">
 <!--         <div class='panel-heading'>Company Lists</div> -->
@@ -20,7 +22,7 @@
               <i class="glyphicon glyphicon-plus"></i>
           </button>
         </div>
-        <table id='company-table' data-toggle="table" data-url="/listcompany" data-search="true" data-click-to-select="true" data-toolbar="#toolbar" data-height='500'>
+        <table id='company-table' data-toggle="table" data-url="/listcompany" data-search="true" data-click-to-select="true" data-toolbar="#toolbar" data-height="500">
           <thead>
             <tr>
               <th data-field="state" data-checkbox="true"></th>
@@ -36,7 +38,7 @@
               <td>{{item}}</td>
               <td></td>
               <td>
-                <button class='btn btn-primary btn-xs' data-toggle="modal" data-target="#addJobDescriptionModal" data-whatever="{{ item }}">Add JD</button>
+                <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#addJobDescriptionModal" data-whatever="{{ item }}">Add JD</button>
               </td>
             </tr>
             {% endfor %}
@@ -54,7 +56,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="AddCompany">Add Company</h4>
       </div><!-- modal-header end -->
-      <div class="modal-body" id='company-madal-body'>
+      <div class="modal-body" id="company-madal-body">
         <div class="form-group">
           <label for="company-name" class="control-label">Company Name:</label>
           <input type="text" class="form-control" id="company-name">
@@ -66,7 +68,7 @@
       </div><!-- modal-body end -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id='save-company'>Save</button>
+        <button type="button" class="btn btn-primary" id="save-company">Save</button>
       </div><!-- modal-footer end -->
     </div><!-- modal-content end -->
   </div><!-- modal-dialog end -->
@@ -79,23 +81,23 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="AddJobDescription">Add Job Description</h4>
       </div><!-- modal-header end -->
-      <div class="modal-body" id='jd-madal-body'>
+      <div class="modal-body" id="jd-madal-body">
         <div class="form-group">
           <label for="jd-company-name" class="control-label">Company Name:</label>
-          <input type='text' class="form-control" id="jd-company-name" disabled="true"></input>
+          <input type="text" class="form-control" id="jd-company-name" disabled="true" />
         </div>
         <div class="form-group">
           <label for="job-description-name" class="control-label">Job Description Name:</label>
-          <input type='text' class="form-control" id="job-description-name"></input>
+          <input type="text" class="form-control" id="job-description-name" />
         </div>
         <div class="form-group">
           <label for="job-description" class="control-label">Job Description:</label>
-          <textarea class="form-control" id="job-description" rows='4'></textarea>
+          <textarea class="form-control" id="job-description" rows="4"></textarea>
         </div>
       </div><!-- modal-body end -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id='save-jd'>Save</button>
+        <button type="button" class="btn btn-primary" id="save-jd">Save</button>
       </div><!-- modal-footer end -->
     </div><!-- modal-content end -->
   </div><!-- modal-dialog end -->
@@ -109,7 +111,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="Message">Message</h4>
       </div><!-- modal-header end -->
-      <div class="modal-body" id='message-madal-body'>
+      <div class="modal-body" id="message-madal-body">
         <p id="message">You can't change this job description!</p>
       </div>
       <div class="modal-footer">
@@ -121,5 +123,5 @@
 {% endblock %}
 
 {% block script %}
-<script data-main="{{ url_for('static', filename='js/src/companyview.js') }}" src='{{ url_for("static", filename="js/lib/require.js") }}'></script>
+<script data-main="{{ url_for('static', filename='src/js/modules/companyview.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock %}

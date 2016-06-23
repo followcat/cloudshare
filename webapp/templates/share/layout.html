@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Seach-Willendare</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/layout.css') }}">
+  {% block title %}{% endblock %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/layout.css') }}">
 
   {% block style %}{% endblock %}
 
@@ -17,7 +17,7 @@
     <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
   <![endif]-->
 </head>
-<body>
+<body class="clearfix">
   <header class="header-box">
     <a href="/search" class="logo-box">
       <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
@@ -40,7 +40,7 @@
           <li><a href="/batchupload" target="_blank">Bulk Upload</a></li>
         </ul>
       </li>
-      <li><a href="/listjd">Select a JD</a></li>
+      <li><a href="/listjd?status=Opening">Select a JD</a></li>
     </ul>
   </header>
   <!-- upload modal begin-->

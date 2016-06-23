@@ -75,12 +75,32 @@ class Test(flask.ext.testing.TestCase):
             id=id,
         ), follow_redirects=True)
 
+    def confirmenglish(self, name):
+        return self.client.post('/confirmenglish', data=dict(
+            name=name))
+
     def search(self, keyword):
         return self.client.get('/search?search_text=%s' % keyword,
                                follow_redirects=True)
 
+    def show(self, filename):
+        return self.client.get('/show/%s' % filename,
+                               follow_redirects=True)
 
-class LoginoutSuperAdminTest(Test):
+    def updateinfo(self, filename, info):
+        return self.client.post('/updateinfo', data=json.dumps(dict(
+            filename=filename,
+            yamlinfo=info,
+        )), follow_redirects=True, content_type = 'application/json')
+
+    def addcompany(self, name, introduction):
+        return self.client.post('/addcompany', data=dict(
+            name=name,
+            introduction=introduction
+        ))
+
+
+class TestLoginoutSuperAdminTest(Test):
 
     def test_superadmin_login_logout(self):
         rv = self.login('root', 'password')
@@ -108,7 +128,7 @@ class User(Test):
         self.logout()
 
 
-class LoginoutUser(User):
+class TestLoginoutUser(User):
 
     def test_login_user(self):
         self.init_user()
@@ -137,6 +157,19 @@ class LoginoutUser(User):
 
 class UploadFile(User):
 
+    def init_upload(self):
+        self.init_user()
+        self.login(self.user_name, self.user_password)
+        rv = self.upload('core/test/cv_1.doc')
+        assert(rv.data == 'True')
+        rv = self.uppreview()
+        assert('13888888888' in rv.data)
+        rv = self.confirm('name', 'origin', 'id')
+        assert(json.loads(rv.data)['result'] is True)
+
+
+class TestUploadFile(UploadFile):
+
     def test_upload(self):
         self.init_user()
         self.login(self.user_name, self.user_password)
@@ -151,20 +184,90 @@ class UploadFile(User):
         assert('username' == commit.author)
 
 
-class Search(User):
-
-    def init_search(self):
-        self.init_user()
-        self.login(self.user_name, self.user_password)
-        rv = self.upload('core/test/cv_1.doc')
-        assert(rv.data == 'True')
-        rv = self.uppreview()
-        assert('13888888888' in rv.data)
-        rv = self.confirm('name', 'origin', 'id')
-        assert(json.loads(rv.data)['result'] is True)
+class TestSearch(UploadFile):
 
     def test_searchresult(self):
-        self.init_search()
+        self.init_upload()
         keyword = '2005.9'
         rv = self.search(keyword)
         assert('position' in rv.data)
+
+
+class ShowCV(UploadFile):
+
+    def init_showcv(self):
+        self.init_upload()
+        self.yamlname = [yaml for yaml in self.app.config['SVC_CV'].yamls()][0]
+        self.name = self.yamlname.replace('yaml', 'md')
+
+
+class TestShowCV(ShowCV):
+
+    def test_showcv(self):
+        self.init_showcv()
+        rv = self.show(self.name)
+        assert('160 cm' in rv.data)
+
+    def test_addtag(self):
+        self.init_showcv()
+        tag_text = 'AddedTAG'
+        info = {'tag': tag_text}
+        self.updateinfo(self.name, info)
+        search_keyword = '2005.9'
+        rv = self.search(search_keyword)
+        assert (tag_text in rv.data)
+        rv = self.show(self.name)
+        assert (tag_text in rv.data)
+
+    def test_addtracking(self):
+        self.init_showcv()
+        tracking_text = 'AddedTRACK'
+        info = {'tracking': {
+            "data": "2009-12-31",
+            "text": tracking_text
+            }
+        }
+        self.updateinfo(self.name, info)
+        search_keyword = '2005.9'
+        rv = self.search(search_keyword)
+        assert (self.user_name in rv.data)
+        rv = self.show(self.name)
+        assert (tracking_text in rv.data)
+
+    def test_addcomment(self):
+        self.init_showcv()
+        comment_text = 'AddedCOMMENT'
+        info = {'comment': comment_text}
+        self.updateinfo(self.name, info)
+        search_keyword = '2005.9'
+        rv = self.search(search_keyword)
+        assert (comment_text in rv.data)
+        rv = self.show(self.name)
+        assert (comment_text in rv.data)
+
+    def test_addenglish(self):
+        self.init_showcv()
+        rv = self.upload('core/test/cv_2.doc')
+        assert (rv.data == 'True')
+        rv = self.uppreview()
+        assert ('13777777777' in rv.data)
+        self.confirmenglish(self.name)
+        yamldata = self.app.config['SVC_CV'].getyaml(self.yamlname)
+        assert ('enversion' in yamldata)
+
+class SVCCompany(User):
+
+    def init_svccompany(self):
+        self.name = 'AddedCompany'
+        self.introduction = 'Company Introduce'
+        self.init_user()
+        self.login(self.user_name, self.user_password)
+
+class TestSVCCompany(SVCCompany):
+
+    def test_addcompany(self):
+        self.init_svccompany()
+        rv = self.addcompany(self.name, self.introduction)
+        assert (json.loads(rv.data)['result'] is True)
+        SVC_CO = self.app.config['SVC_CO']
+        assert ('Company Introduce' in SVC_CO.company(self.name)['introduction'])

@@ -104,6 +104,7 @@ class BatchConfirm(flask.views.MethodView):
         results = dict()
         user = flask.ext.login.current_user
         svc_cv = flask.current_app.config['SVC_CV']
+        svc_min = flask.current_app.config['SVC_MIN']
         updates = json.loads(flask.request.form['updates'])
         for filename, upobj in flask.session[user.id]['batchupload'].iteritems():
             if filename in updates:
@@ -111,6 +112,8 @@ class BatchConfirm(flask.views.MethodView):
                     if key in upobj.filepro.yamlinfo:
                         upobj.filepro.yamlinfo[key] = value
             result = svc_cv.add(upobj, user.id)
+            if result is True:
+                svc_min.lsi_model.add(upobj.filepro.name.md, upobj.markdown())
             results[filename] = result
         flask.session[user.id]['batchupload'] = dict()
         return flask.jsonify(result=results)
@@ -155,9 +158,12 @@ class Confirm(flask.views.MethodView):
         }
         user = flask.ext.login.current_user
         svc_cv = flask.current_app.config['SVC_CV']
+        svc_min = flask.current_app.config['SVC_MIN']
         upobj = pickle.loads(flask.session[user.id]['upload'])
         upobj.filepro.yamlinfo.update(info)
         result = svc_cv.add(upobj, user.id)
+        if result is True:
+            svc_min.lsi_model.add(upobj.filepro.name.md, upobj.markdown())
         return flask.jsonify(result=result, filename=upobj.filepro.name.md)
 
 
@@ -172,7 +178,7 @@ class ConfirmEnglish(flask.views.MethodView):
         upobj = pickle.loads(flask.session[user.id]['upload'])
         result = svc_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
-        svc_cv.modify(name.yaml, yaml.dump(yaml_data), committer=user.id)
+        svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data), committer=user.id)
         return flask.jsonify(result=result)
 
 
@@ -255,7 +261,7 @@ class UpdateInfo(flask.views.MethodView):
                 result = False
                 break
         else:
-            svc_cv.modify(name.yaml, yaml.dump(yaml_info),
+            svc_cv.modify(name.yaml, yaml.safe_dump(yaml_info),
                           commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)
 

@@ -1,8 +1,11 @@
 {% extends "share/layout.html" %}
+{% block title %}
+<title>Job Description-Willendare</title>
+{% endblock %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap-table.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/jdview.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap-table.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/jdview.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -14,14 +17,23 @@
         <li role="presentation" class="active"><a href="/listjd">Job Description</a></li>
       </ul>
       <div class="panel panel-default">
-<!--         <div class='panel-heading'>Company Lists</div> -->
         <div id="toolbar" class="btn-group">
           <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addJDModal">
               <i class="glyphicon glyphicon-plus"></i>
           </button>
+          <div class="btn-group">
+            <select class="form-control" id="toolsStatusSelect">
+              {% if filename %}
+              <option value="/resumetojd/{{ filename }}/Opening" {% if status=='Opening' %}selected{% endif %}>Opening</option>
+              <option value="/resumetojd/{{ filename }}/Closed" {% if status=='Closed' %}selected{% endif %}>Closed</option>
+              {% else %}
+              <option value="/listjd?status=Opening" {% if status=='Opening' %}selected{% endif %}>Opening</option>
+              <option value="/listjd?status=Closed" {% if status=='Closed' %}selected{% endif %}>Closed</option>
+              {% endif %}
+            </select>
+          </div>
         </div>
         <table id="jd-table" data-toggle="table"
-               data-url="/listjd"
                data-search="true"
                data-click-to-select="true"
                data-toolbar="#toolbar"
@@ -33,7 +45,8 @@
               <th>Project Name for JDs</th>
               <th>Job Description</th>
               <th>Creator</th>
-              <th>Action</th>
+              <th>Status</th>
+              <th data-events="actionEvents">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -43,13 +56,14 @@
               <td class="name-td">{{ item.name }}</td>
               <td class="jd-td" title="{{ item.description }}" data-id="{{ item.id }}">{{ item.description }}</td>
               <td class="committer-td">{{ item.committer }}</td>
+              <td class="status-td">{% if item.status %}{{ item.status }}{% endif %}</td>
               <td>
                 <a class="btn btn-primary btn-xs match" href="/lsipage?jd_id={{ item.id }}" target="_blank"> CV Fast Matching</a>
                 <button type="button" class="btn btn-success btn-xs edit-jd">
                   <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>Edit JD
                 </button>
                 {% if filename %}
-                  <button type="button" class="btn btn-success btn-xs cv-jd-match" data-filename="{{ filename }}" data-toggle="modal" data-target=".bs-example-modal-lg">Draw a Chart</button>
+                <button type="button" class="btn btn-success btn-xs cv-jd-match" data-filename="{{ filename }}">Draw a Chart</button>
                 {% endif %}
               </td>
             </tr>
@@ -103,20 +117,35 @@
       </div><!-- modal-header end -->
       <div class="modal-body" id="mjd-madal-body">
         <div class="form-group">
-          <label for="introduction" class="control-label">Job Description:</label>
-          <textarea class="form-control" id="change-jd" rows="8"></textarea>
+          <label for="companyName" class="control-label">Company Name:</label>
+          <input type="text" class="form-control" name="companyName" disabled>
+        </div>
+        <div class="form-group">
+          <label for="jdId" class="control-label">Job Description ID:</label>
+          <input type="text" class="form-control" name="jdId" disabled>
+        </div>
+        <div class="form-group">
+          <label for="jdContent" class="control-label">Job Description:</label>
+          <textarea class="form-control" name="jdContent" rows="8"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="status" class="control-label">Status:</label>
+          <select class="form-control select" id="statusSelect" name="status">
+            <option value="Opening">Opening</option>
+            <option value="Closed">Closed</option>
+          </select>
         </div>
       </div><!-- modal-body end -->
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="change-jd-btn">Change</button>
+        <button type="button" class="btn btn-primary" id="changeJDBtn">Change</button>
       </div><!-- modal-footer end -->
     </div><!-- modal-content end -->
   </div><!-- modal-dialog end -->
 </div><!-- Add company modal end -->
 
 <!-- Message modal -->
-<div class="modal fade bs-example-modal-sm" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="Message">
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="Message">
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -134,12 +163,29 @@
 </div><!-- Message modal end -->
 
 {% if filename %}
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
+<div class="modal fade" id="JDModal" tabindex="-1" role="dialog" aria-labelledby="JDModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="JDModalLabel">Job Description</h4>
+      </div>
+      <div class="modal-body">
+        <textarea class="form-control" name="jdModalContent" rows="8"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="CVJDSubmit" data-dismiss="modal">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="radarModal" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Radar Charts</h4>
+        <h4 class="modal-title" id="radarModalLabel">Radar Charts</h4>
       </div>
       <div class="modal-body">
         <div class="chart-wrapper" id="chart-wrapper">
@@ -152,10 +198,9 @@
   </div>
 </div><!-- Charts modal end -->
 {% endif %}
-
-
 {% endblock %}
 
 {% block script %}
-<script data-main="{{ url_for('static', filename='js/src/jdview.js') }}" src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/js/echarts.js') }}"></script>
+<script data-main="{{ url_for('static', filename='src/js/modules/jdview.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock %}

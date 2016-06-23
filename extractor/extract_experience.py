@@ -4,33 +4,25 @@ import re
 from extractor.utils_parsing import *
 
 
-SALARY = u'\d[\- \d\|]*(月/月)?元/月(以[上下])?'
-EMPLOYEES = u'((?P<employees>(少于)?\d[\d '+SEP+u']*人(以[上下])?)([' + SENTENCESEP + u'].*?)?)'
-BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + UNIBRARIGHT +u')'
-BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))' + ASP+u'*' + DURATION + u'(?(br)' +UNIBRARIGHT + u'(?(dit)\*)))'
-
-
-XP = re.compile(ur'^'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?(?P<expe>.*?)^(?='+ UNIBRALEFT +u'?(((项'+ASP+u'?目)|(教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|(培训)))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
-AXP = re.compile(ur'^'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?[:：\ufffd]?'+ASP+u'*'+DURATION+'?'+ASP+u'*?\n(?P<expe>.*)', re.DOTALL+re.M)
+XP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?(?P<expe>.*?)^(?='+ UNIBRALEFT +u'?(((项'+ASP+u'?目)|(教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|(培训)))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+AXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?[:：]?'+ASP+u'*'+DURATION+'?'+ASP+u'*?\n(?P<expe>.*)', re.DOTALL+re.M)
 TXP = re.compile(ur'-{9}[\-'+SP+u']*(?P<expe>'+PERIOD+ur'.*?)(?=-{9}[\-'+SP+u']*)', re.DOTALL)
 
-
-PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|('+UNIBRALEFT+u'[^年月（\(\[【'+CHNUMBERS+u']+?'+UNIBRARIGHT+u')|([◆\?]+))?'
 
 # Allow multiline once in company name when duration is present
 # As company has at least one char, need to handle break just as company tail
 # Catching all employees is too expensive on parenthesis repetition, some will be post processed
 ECO = re.compile(u'^(?P<position>(\S[\S ]+\n)*)\n+(?P<company>(\S[\S ]+\n)*)\n+' + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
-CO = re.compile(PERIOD+ur'[:：\ufffd]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
-PCO = re.compile(PERIOD+ur'[:：\ufffd]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
-TCO = re.compile(u'^'+PREFIX+ASP+u'*'+PERIOD+ur'[:：\ufffd]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')(?(cit)\*)?'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
+CO = re.compile(PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
+PCO = re.compile(PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
+TCO = re.compile(u'^'+PREFIX+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')(?(cit)\*)?'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
 
 # Avoid conflict in group names when combining *CO and *PO
 APERIOD = PERIOD.replace('from', 'afrom').replace('to', 'ato')
 ABDURATION = BDURATION.replace('duration', 'aduration').replace('br', 'abr').replace('dit', 'adit')
 
 # TACO related grammar
-TACOMODEL = ur'[:：\ufffd]?'+ASP+u'*(?P<company>__COMPANY__)'+ASP+u'*__SEP__(__ITEM__'+ASP+u'*__SEP__)?'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'
+TACOMODEL = ur'[:：]?'+ASP+u'*(?P<company>__COMPANY__)'+ASP+u'*__SEP__(__ITEM__'+ASP+u'*__SEP__)?'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'
 PATTERN = PREFIX+ASP+u'*'+PERIOD+TACOMODEL+BDURATION+u'?$'
 TACO = re.compile(PATTERN.replace('__COMPANY__', COMPANY+u'?').replace('__SEP__', '\|').replace('__ITEM__', '.+?'), re.M)
 TACOMODELCOPY = TACOMODEL.replace('company', 'ccompany').replace('position', 'cposition')
@@ -45,10 +37,10 @@ RCO = re.compile(u'^'+PREFIX+u'■?'+ASP+u'*(?P<company>\S+)'+ASP+u'+(?P<positio
 HCO = re.compile(u'公司名称[:：]?'+ASP+u'*\*?(?P<company>'+COMPANY+u')\*?'+ASP+u'*(起止)?时间[:：]?'+ASP+u'*\*?'+PERIOD+'\*?$', re.M)
 
 
-PO = re.compile(u'所属行业[:：\ufffd]'+ASP+u'+.*?'+ASP+u'*?\n(.*?[\t ]+)?(?P<aposition>'+POSITION+u'?)'+ASP+u'*$', re.M)
+PO = re.compile(u'所属行业[:：]'+ASP+u'+.*?'+ASP+u'*?\n(.*?[\t ]+)?(?P<aposition>'+POSITION+u'?)'+ASP+u'*$', re.M)
 APO = re.compile(u'^(其中)?'+APERIOD+ur''+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
 TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*'+APERIOD+''+ASP+u'*$', re.M)
-TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：\ufffd]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?'+ASP+u'*$', re.M)
+TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?'+ASP+u'*$', re.M)
 BPO = re.compile(u'^((?P<aposition>'+POSITION+u')'+ASP+u'*\|)?((?P<second>.+?)\|)?'+ASP+u'*('+SALARY+u')', re.M)
 
 EMP = re.compile(BEMPLOYEES)

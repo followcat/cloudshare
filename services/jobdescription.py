@@ -74,7 +74,7 @@ class JobDescription(services.base.Service):
         }
         filename = self.filename(hex_id)
         file_path = os.path.join(self.repo_path, filename)
-        self.interface.add(os.path.join(self.path, filename), yaml.dump(data),
+        self.interface.add(os.path.join(self.path, filename), yaml.safe_dump(data),
                            "Add job description file: " + filename)
         return True
 
@@ -85,7 +85,7 @@ class JobDescription(services.base.Service):
             return False
         data['description'] = description
         data['status'] = status
-        dump_data = yaml.dump(data)
+        dump_data = yaml.safe_dump(data)
         self.interface.modify(os.path.join(self.path, filename), dump_data,
                               message="Modify job description: " + filename,
                               committer=committer)

@@ -55,7 +55,7 @@ class Company(services.base.Service):
 
     def create(self):
         empty_list = []
-        self.interface.add(self.file_path, yaml.dump(empty_list), "Add company file.")
+        self.interface.add(self.file_path, yaml.safe_dump(empty_list), "Add company file.")
 
     def add(self, name, introduction, committer):
         companys = self.COMPANYS
@@ -68,7 +68,7 @@ class Company(services.base.Service):
             'introduction': introduction,
         }
         companys.append(data)
-        dump_data = yaml.dump(companys)
+        dump_data = yaml.safe_dump(companys)
         message = "Add company: " + name
         self.interface.modify(os.path.join(self.path, self.company_filename),
                               dump_data, message=message.encode('utf-8'),

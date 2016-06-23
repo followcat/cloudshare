@@ -14,7 +14,7 @@ def md5(text):
 
 def save_yaml(infodict, path, filename):
     with open(os.path.join(path, filename), 'w') as f:
-        f.write(yaml.dump(infodict, Dumper=utils._yaml.Dumper))
+        f.write(yaml.dump(infodict, Dumper=utils._yaml.SafeDumper))
 
 
 def load_yaml(path, filename):

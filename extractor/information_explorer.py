@@ -40,7 +40,7 @@ def get_infofromrestr(stream, restring):
         [u'13123456789']
         >>> company_restr = ur'[ \u3000:\uff1a]*([\S]*\u6709\u9650\u516c\u53f8)'
         >>> get_infofromrestr('company: cat有限公司', company_restr)
-        ... [u'cat\u6709\u9650\u516c\u53f8']
+        [u'cat\u6709\u9650\u516c\u53f8']
     """
     regex = re.compile(restring, re.IGNORECASE)
     search_string = stream.decode('utf8').replace(u'\xa0', ' ')

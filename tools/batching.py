@@ -101,25 +101,6 @@ def classify(path, temp_output):
             filter(processfile, root, name)
 
 
-def readd_experience(repo_path):
-    import glob
-    import utils.builtin
-    import core.outputstorage
-    for position in glob.glob(os.path.join(repo_path, '*.md')):
-        name = core.outputstorage.ConvertName(position)
-        yamlname = name.yaml
-        with open(position) as f:
-            stream = f.read()
-            experience = extractor.information_explorer.get_experience(stream)
-        try:
-            yamldata = utils.builtin.load_yaml('', yamlname)
-        except IOError:
-            print(yamlname, "not here.")
-            continue
-        yamldata['experience'] = experience
-        utils.builtin.save_yaml(yamldata, '', yamlname)
-
-
 import yaml
 import utils._yaml
 import utils.builtin

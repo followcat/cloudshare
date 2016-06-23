@@ -7,7 +7,7 @@
 }
 .item-link .item-title{
   display: inline-block;
-  width: 340px;
+  min-width: 52%;
   font-size: 1.25em;
 }
 .item-link .item-operate{

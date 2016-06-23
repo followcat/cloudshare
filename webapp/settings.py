@@ -28,14 +28,20 @@ DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
 SVC_CO = services.company.Company(DATA_DB)
 SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
 
-DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB)
+DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB, 'cloudshare')
 
-PREDATOR_DB = interface.predator.PredatorInterface(
-    'additional/JOBTITLES',
-    'additional/CV')
-PRE_SVC_CV = services.curriculumvitae.CurriculumVitae(PREDATOR_DB)
-SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, [DEF_SVC_CV, PRE_SVC_CV])
+PREDATOR_DB = interface.predator.PredatorInterface('additional/liepin')
+PRE_SVC_CV = services.curriculumvitae.CurriculumVitae(PREDATOR_DB, 'liepin')
+
+JINGYING_DB = interface.predator.PredatorInterface('additional/jingying')
+JGYG_SVC_CV = services.curriculumvitae.CurriculumVitae(JINGYING_DB, 'jingying')
+
+ZHILIAN_DB = interface.predator.PredatorInterface('additional/zhilian')
+ZILN_SVC_CV = services.curriculumvitae.CurriculumVitae(ZHILIAN_DB, 'zhilian')
+
+SVC_CV = services.multicv.MultiCV(DEF_SVC_CV,
+                                  [DEF_SVC_CV, PRE_SVC_CV, JGYG_SVC_CV, ZILN_SVC_CV])
 
 LSI_PATH = 'lsimodel'
 SVC_MIN = services.mining.Mining(LSI_PATH, SVC_CV)
-LSI_SIM = SVC_MIN.setup('all')
+SVC_MIN.setup('all')

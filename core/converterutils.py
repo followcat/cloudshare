@@ -13,7 +13,7 @@ import utils.builtin
 import utils.unoconverter
 import core.exception
 import core.outputstorage
-import core.information_explorer
+import extractor.information_explorer
 
 
 logging.config.fileConfig("core/logger.conf")
@@ -187,8 +187,8 @@ class FileProcesser():
                 return False
             self.remove_note()
             self.file_docbook_to_markdown()
-            self.yamlinfo = core.information_explorer.catch(self.markdown_stream,
-                                                            self.base.base)
+            self.yamlinfo = extractor.information_explorer.catch(self.markdown_stream,
+                                                                 self.base.base)
             utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)
             logger.info('Success')
             return True

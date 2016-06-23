@@ -18,7 +18,7 @@ gulp.task("clean", function(){
 
 //js打包任务
 gulp.task('scripts', ['clean'], function(){
-  return gulp.src("src/js/modules/*.js")
+  return gulp.src(["src/js/modules/*.js", "!src/js/modules/batchupload.js"])
     .pipe(requirejsOptimize({
       paths: {
         jquery: __dirname + '/lib/js/jquery',

@@ -7,12 +7,15 @@ import core.mining.info
 import core.mining.lsimodel
 import core.outputstorage
 
-EDUCATION = re.compile(ur'(?P<education>.+)[及或]?以上学历')
+from extractor.utils_parsing import *
 
 
-def rate(sim, svc_cv, doc, top=10, selected=5, name_list=None):
+EDUCATION_REQUIREMENT = re.compile(ur'(?P<education>.+)[及或]?以上学历')
+
+
+def rate(miner, svc_cv, doc, top=10, selected=5, name_list=None):
     result = []
-    rating = next(sim, svc_cv, doc, top, name_list)
+    rating = next(miner, svc_cv, doc, top, name_list)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]
     for text, rate in rating:
@@ -49,12 +52,12 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(sim, svc_cv, doc, top, name_list=None):
+def next(miner, svc_cv, doc, top, name_list=None):
     rating = []
-    top_data_full = minetop(sim, doc, top)
+    top_data_full = miner.minetop(doc, top)
     extract_data_full = extract(top_data_full)
     if name_list is not None:
-        names_data_full = minelist(sim, doc, name_list)
+        names_data_full = miner.minelist(doc, name_list)
         extract_data_full.extend(extract(names_data_full))
     else:
         name_list = []
@@ -64,31 +67,19 @@ def next(sim, svc_cv, doc, top, name_list=None):
     for text in doc.split('\n'):
         if not text.strip():
             continue
-        education_requirement = EDUCATION.match(text)
+        education_requirement = EDUCATION_REQUIREMENT.match(text)
         if education_requirement:
             new_data = mine_education(svc_cv,
                 education_requirement.group('education'), name_list)
         else:
-            new_data = minelist(sim, text, name_list)
+            new_data = miner.minelist(text, name_list)
         if len(filter(lambda x: float(x[1])> 0., new_data)) > 0:
             rating.append((text, extract(new_data)))
     return rating
 
 def mine_education(svc_cv, text, name_list):
-    education_list = {
-        1: (u'中技', u'中专', u'高中'),
-        2: (u'大专', ),
-        #3: Show clearly step before graduate
-        4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科'),
-        5: (u'在职硕士'),
-        6: (u'硕士', u'硕士研究生', u'MBA', u'MBA/EMBA'),
-        7: (u'博士', u'博士研究生'),
-        8: (u'博士后', )
-        }
-
     def education_rate(education):
-        for k,v in education_list.items():
-            RE = re.compile(u'(((\s|(\xc2\xa0))*'+ u'(\s|(\xc2\xa0))*)|((\s|(\xc2\xa0))*'.join(v) + u'(\s|(\xc2\xa0))*))')
+        for (k, RE) in EDUCATION_LIST.items():
             if RE.match(education):
                 return k
         else:
@@ -103,9 +94,3 @@ def mine_education(svc_cv, text, name_list):
         if education and req:
             datas.append((name, str((5 + education - req)*0.1)))
     return datas
-
-def minetop(sim, doc, top):
-    return sim.probability(doc)[:top]
-
-def minelist(sim, doc, lists):
-    return filter(lambda x: x[0] in lists, sim.probability(doc))

@@ -660,7 +660,7 @@ require(
 
     //控制抓取的数据的显示状态
     function crawlItemShow(val) {
-      if ( val === "Liepin" ) {
+      if ( val === "Additional" ) {
         $(".crawl-item").css("display", "block");
       } else {
         $(".crawl-item").css("display", "none");
@@ -679,7 +679,7 @@ require(
           if ( databaseList.indexOf(val) !== -1 ) {
             $(ele).attr("checked", "true");
           } else {
-            if ( val === "Liepin" ) {
+            if ( val === "Additional" ) {
               $(".crawl-item").css("display", "none");
             }
           }

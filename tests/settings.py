@@ -39,7 +39,8 @@ class Config(object):
         self.SVC_CV = services.multicv.MultiCV(self.DEF_SVC_CV, [self.DEF_SVC_CV])
 
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_CV)
-        self.LSI_SIM = self.SVC_MIN.setup('default')
+        self.SVC_MIN.lsi_model.no_above = 1
+        self.SVC_MIN.setup('default')
 
     def rebuild(self):
         self.destory()

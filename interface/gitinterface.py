@@ -67,6 +67,8 @@ class GitInterface(interface.base.Interface):
         """
         full_path = os.path.join(self.path, filename)
         path, name = os.path.split(full_path)
+        if not os.path.exists(path):
+            os.makedirs(path)
         with open(full_path, 'w') as fp:
             fp.write(filedata)
         self.repo.stage(filename)
@@ -170,7 +172,7 @@ class GitInterface(interface.base.Interface):
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> data = {'name': u'中文名字'}
-            >>> commit_id = interface.add('test_file.yaml', yaml.dump(data),
+            >>> commit_id = interface.add('test_file.yaml', yaml.safe_dump(data),
             ... b'Test commit', b'test<test@test.com>')
             >>> interface.grep_yaml('name', '.')
             ['test_file.yaml']

@@ -66,7 +66,7 @@ class LSI(flask.views.MethodView):
     def get(self):
         search = False
         svc_cv = flask.current_app.config['SVC_CV']
-        sim = flask.current_app.config['LSI_SIM']
+        miner = flask.current_app.config['SVC_MIN']
         svc_jd = flask.current_app.config['SVC_JD']
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
@@ -79,22 +79,22 @@ class LSI(flask.views.MethodView):
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
-        datas, pages = self.process(sim, svc_cv, doc, cur_page, count)
+        datas, pages = self.process(miner, svc_cv, doc, cur_page, count)
         return flask.render_template('lsipage.html',result=datas,
                                      button_bar=True, cur_page=cur_page,
                                      pages=pages, param=param)
 
-    def process(self, sim, svc, doc, cur_page, eve_count):
+    def process(self, miner, svc, doc, cur_page, eve_count):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = sim.probability(doc)
+        result = miner.probability(doc)
         sum = len(result)
         if sum%eve_count != 0:
             pages = sum/eve_count + 1
         else:
             pages = sum/eve_count
-        for name, score in sim.probability(doc)[(cur_page-1)*eve_count:cur_page*eve_count]:
+        for name, score in miner.probability(doc)[(cur_page-1)*eve_count:cur_page*eve_count]:
             yaml_info = svc.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
@@ -109,10 +109,10 @@ class Similar(flask.views.MethodView):
 
     def post(self):
         svc_cv = flask.current_app.config['SVC_CV']
-        sim = flask.current_app.config['LSI_SIM']
+        miner = flask.current_app.config['SVC_MIN']
         doc = flask.request.form['doc']
         datas = []
-        for name, score in sim.probability(doc)[:7]:
+        for name, score in miner.probability(doc)[:7]:
             yaml_info = svc_cv.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
@@ -126,7 +126,7 @@ class Similar(flask.views.MethodView):
 class Valuable(flask.views.MethodView):
 
     def post(self):
-        sim = flask.current_app.config['LSI_SIM']
+        miner = flask.current_app.config['SVC_MIN']
         svc_cv = flask.current_app.config['SVC_CV']
         svc_jd = flask.current_app.config['SVC_JD']
         if 'jd_id' in flask.request.form:
@@ -138,9 +138,9 @@ class Valuable(flask.views.MethodView):
         name_list = flask.request.form['name_list']
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(sim, svc_cv, doc)
+            result = core.mining.valuable.rate(miner, svc_cv, doc)
         else:
-            result = core.mining.valuable.rate(sim, svc_cv, doc, name_list=name_list)
+            result = core.mining.valuable.rate(miner, svc_cv, doc, name_list=name_list)
         svc_cv = flask.current_app.config['SVC_CV']
         response = dict()
         datas = []

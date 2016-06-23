@@ -83,7 +83,6 @@ class Mining(object):
     def setup(self, name):
         assert name in self.services
         self.add(self.services[name], name)
-        return self.sim[name]
 
     def make_lsi(self, service):
         self.lsi_model = None
@@ -99,15 +98,31 @@ class Mining(object):
     def add(self, svc_list, name):
         assert self.lsi_model
         save_path = os.path.join(self.path, name)
-        index = core.mining.lsisimilarity.LSIsimilarity(save_path, self.lsi_model)
-        try:
-            index.load()
-        except IOError:
-            if index.build(svc_list):
-                index.save()
-        self.sim[name] = index
+        for svc in svc_list:
+            assert svc.name
+            index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path, svc.name), self.lsi_model)
+            try:
+                index.load()
+            except IOError:
+                if index.build([svc]):
+                    index.save()
+            self.sim[svc.name] = index
 
     def update(self):
         self.lsi_model.update(self.services['default'])
-        for name in self.sim:
-            self.sim[name].update(self.services[name])
+        for name in self.services:
+            for svc in self.services[name]:
+                self.sim[svc.name].update([svc])
+
+    def probability(self, doc):
+        result = []
+        for sim in self.sim.values():
+            result.extend(sim.probability(doc))
+        return sorted(result, key=lambda x:float(x[1]), reverse=True)
+
+    def minetop(self, doc, top):
+        return self.probability(doc)[:top]
+
+    def minelist(self, doc, lists):
+        return filter(lambda x: x[0] in lists, self.probability(doc))
+

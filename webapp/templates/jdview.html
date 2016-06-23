@@ -23,8 +23,13 @@
           </button>
           <div class="btn-group">
             <select class="form-control" id="toolsStatusSelect">
+              {% if filename %}
+              <option value="/resumetojd/{{ filename }}/Opening" {% if status=='Opening' %}selected{% endif %}>Opening</option>
+              <option value="/resumetojd/{{ filename }}/Closed" {% if status=='Closed' %}selected{% endif %}>Closed</option>
+              {% else %}
               <option value="/listjd?status=Opening" {% if status=='Opening' %}selected{% endif %}>Opening</option>
               <option value="/listjd?status=Closed" {% if status=='Closed' %}selected{% endif %}>Closed</option>
+              {% endif %}
             </select>
           </div>
         </div>

@@ -114,9 +114,12 @@ class Mining(object):
             for svc in self.services[name]:
                 self.sim[svc.name].update([svc])
 
-    def probability(self, doc):
+    def probability(self, doc, uses=None):
+        if uses is None:
+            uses = self.sim.keys()
         result = []
-        for sim in self.sim.values():
+        for name in uses:
+            sim = self.sim[name]
             result.extend(sim.probability(doc))
         return sorted(result, key=lambda x:float(x[1]), reverse=True)
 

@@ -48,11 +48,13 @@
     <div class="database-box">
       <div class="title">Database</div>
       <div class="database-list">
+        {% for e in sim_names %}
         <div class="checkbox">
           <label>
-            <input type="checkbox" class="database-item" value="Additional" />Additional
+            <input type="checkbox" class="database-item" value="{{ e }}" />{{ e }}
           </label>
         </div>
+        {% endfor %}
       </div>
     </div>
     <div class="line"></div>
@@ -145,20 +147,22 @@
       </ul>
     </div>
     <div class="work-experience">
+      {% if item[1].experience | length > 4 %}
       <a href="javascript:;" class="show-more">Unfold</a>
-        {% for e in item[1].experience %}
-        {% if loop.index > 2 %}
-        <div class="experience-hide">
-          <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-          <div class="experience-company">{{ e[2] }}</div>
-        </div>
-        {% else %}
-        <div>
-          <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-          <div class="experience-company">{{ e[2] }}</div>
-        </div>
-        {% endif %}
-        {% endfor %}
+      {% endif %}
+      {% for e in item[1].experience %}
+      {% if loop.index > 4 %}
+      <div class="experience-hide">
+        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+        <div class="experience-company">{{ e[2] }}</div>
+      </div>
+      {% else %}
+      <div>
+        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+        <div class="experience-company">{{ e[2] }}</div>
+      </div>
+      {% endif %}
+      {% endfor %}
     </div>
     <div class="label-box">
       <span class="label-title">Tags:</span>

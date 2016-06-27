@@ -686,15 +686,6 @@ require(
             $(ele).attr("checked", "true");
           }
         }
-      } else {
-        databaseList = [];
-        for ( var i = 0, len = $(".database-item").length; i < len; i++) {
-          var ele = $(".database-item")[i];
-          var val = $(ele).val();
-          $(ele).attr("checked", "true");
-          databaseList.push(val);
-        }
-        localStorage.databaseList = JSON.stringify(databaseList);
       }
     }
     initDatabase();

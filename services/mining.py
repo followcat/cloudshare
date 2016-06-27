@@ -116,7 +116,7 @@ class Mining(object):
 
     def probability(self, doc, uses=None):
         if uses is None:
-            uses = self.sim.keys()
+            uses = []
         result = []
         for name in uses:
             sim = self.sim[name]

@@ -73,7 +73,7 @@ class LSI(flask.views.MethodView):
         if len(uses_list) > 0:
             uses = uses_list
         else:
-            uses = None
+            uses = []
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
             jd_yaml = svc_jd.get(jd_id+'.yaml')

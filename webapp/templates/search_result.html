@@ -52,9 +52,11 @@
       </ul>
     </div>
     <div class="work-experience">
+      {% if item[1].experience | length > 4 %}
       <a href="javascript:;" class="show-more">Unfold</a>
+      {% endif %}
       {% for e in item[1].experience %}
-      {% if loop.index > 2 %}
+      {% if loop.index > 4 %}
       <div class="experience-hide">
         <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
         <div class="experience-company">{{ e[2] }}</div>

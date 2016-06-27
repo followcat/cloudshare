@@ -657,14 +657,20 @@ require(
       }
     });
 
-
-    //控制抓取的数据的显示状态
-    function crawlItemShow(val) {
-      if ( val === "Additional" ) {
-        $(".crawl-item").css("display", "block");
-      } else {
-        $(".crawl-item").css("display", "none");
+    //url参数截取，返回参数对象
+    function queryString(str) {
+      var arr = [],
+          jsonObj = {};
+      if (str.indexOf("?") > 0) {
+        arr = str.slice(str.indexOf("?")+1);
       }
+      if (arr.indexOf("&") > 0) {
+        arr = str.slice(str.indexOf("?")+1).split("&");
+        for (var i = 0, len = arr.length; i < len; i++) {
+          jsonObj[arr[i].split("=")[0]] = arr[i].split("=")[1];
+        }
+      }
+      return jsonObj;
     }
 
     //初始化数据库选择
@@ -678,10 +684,6 @@ require(
           var val = $(ele).val();
           if ( databaseList.indexOf(val) !== -1 ) {
             $(ele).attr("checked", "true");
-          } else {
-            if ( val === "Additional" ) {
-              $(".crawl-item").css("display", "none");
-            }
           }
         }
       } else {
@@ -690,14 +692,15 @@ require(
           var ele = $(".database-item")[i];
           var val = $(ele).val();
           $(ele).attr("checked", "true");
-          $(".crawl-item").css("display", "block");
+          databaseList.push(val);
         }
+        localStorage.databaseList = JSON.stringify(databaseList);
       }
     }
     initDatabase();
 
-    //简历数据库选择
-    $(".database-item").on("change", function(){
+    //datalist保存至localstorage
+    function saveInLocalStorage(checkedObj) {
       var databaseList = null,
           lsDatabaseList = localStorage.databaseList;
       if ( lsDatabaseList ) {
@@ -705,15 +708,59 @@ require(
       } else {
         databaseList = [];
       }
-      if ( $(this).is(":checked") ) {
-        var val = $(this).val();
-        databaseList.push(val);
+      if ( checkedObj.is(":checked") ) {
+        databaseList.push(checkedObj.val());
       } else {
-        databaseList.splice(databaseList.indexOf($(this).val()), 1);
+        databaseList.splice(databaseList.indexOf(checkedObj.val()), 1);
       }
-      crawlItemShow(val);
       localStorage.databaseList = JSON.stringify(databaseList);
+      return databaseList;
+    }
+
+    //修改分页url
+    function changePaginationUrl() {
+      var linkHref = "",
+          paramObj = "",
+          dbParam = [],
+          databaseList = localStorage.databaseList;
+      if (databaseList) {
+        dbParam = JSON.parse(databaseList);
+      } else {
+        dbParam = null;
+      }
+
+      //遍历所有a标签
+      $(".pagination a").map(function(){
+        linkHref = $(this).attr("href");
+        paramObj = queryString(linkHref);
+        var newParams = {};
+        newParams.jd_id = paramObj.jd_id;
+        newParams.page = paramObj.page;
+        newParams.uses = dbParam;
+        var newUrl = "/lsipage?" + $.param(newParams);
+        $(this).attr("href", newUrl);
+      });
+    }
+    //加载完后直接调用
+    changePaginationUrl();
+
+    //简历数据库选择
+    $(".database-item").on("change", function(){
+      var checkedObj = $(this);
+      var databaseList = saveInLocalStorage(checkedObj),
+          paramObj = queryString(location.href);
+
+      var newParams = {},
+          newUrl = "";
+      newParams.jd_id = paramObj.jd_id;
+      newParams.page = paramObj.page;
+      newParams.uses = databaseList;
+
+      newUrl = "/lsipage?" + $.param(newParams);
+      changePaginationUrl();
+      window.location.href = newUrl;
     });
+
 
     //页面加载初始化
     //根据侧边栏选择结果，修改item的checkbox状态
@@ -789,4 +836,6 @@ require(
         }, 500);
       }
     });
+
+
   });

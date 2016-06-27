@@ -113,7 +113,8 @@ class BatchConfirm(flask.views.MethodView):
                         upobj.filepro.yamlinfo[key] = value
             result = svc_cv.add(upobj, user.id)
             if result is True:
-                svc_min.lsi_model.add(upobj.filepro.name.md, upobj.markdown())
+                def_cv_name = svc_cv.default.name
+                svc_min.sim[def_cv_name].add(upobj.filepro.name.md, upobj.markdown())
             results[filename] = result
         flask.session[user.id]['batchupload'] = dict()
         return flask.jsonify(result=results)
@@ -163,7 +164,8 @@ class Confirm(flask.views.MethodView):
         upobj.filepro.yamlinfo.update(info)
         result = svc_cv.add(upobj, user.id)
         if result is True:
-            svc_min.lsi_model.add(upobj.filepro.name.md, upobj.markdown())
+            def_cv_name = svc_cv.default.name
+            svc_min.sim[def_cv_name].add(upobj.filepro.name.md, upobj.markdown())
         return flask.jsonify(result=result, filename=upobj.filepro.name.md)
 
 

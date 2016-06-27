@@ -35,11 +35,12 @@ class Config(object):
         self.SVC_CO = services.company.Company(self.DATA_DB)
         self.SVC_JD = services.jobdescription.JobDescription(self.DATA_DB, self.SVC_CO)
 
-        self.DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(self.DATA_DB)
+        self.DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(self.DATA_DB, 'cloudshare')
         self.SVC_CV = services.multicv.MultiCV(self.DEF_SVC_CV, [self.DEF_SVC_CV])
 
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_CV)
         self.SVC_MIN.lsi_model.no_above = 1
+        self.SVC_MIN.lsi_model.setup('first.md', ['here is a text for testing.'])
         self.SVC_MIN.setup('default')
 
     def rebuild(self):

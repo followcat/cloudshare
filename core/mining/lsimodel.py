@@ -43,6 +43,7 @@ class LSImodel(object):
                     added = True
         if added:
             self.save()
+        return added
 
     def build(self, svccv_list):
         names = []

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
 import os.path
+import extractor.utils_parsing
+import extractor.extract_experience
 
 
 def get_tagfromstring(tag, stream, rule=None):
@@ -56,13 +58,30 @@ def get_experience(stream):
         >>> assert get_experience(u"2015/03 - 至今   XXCOM")
         >>> assert get_experience(u"2015/03 - 至今   XXCOM XXX")
     """
-    output = []
-    restr = ur"(\d{4}[/.\\年 ]+\d{1,2}[月]*)[-– —]*(\d{4}[/.\\年 ]+\d{1,2}[月]*|至今)[：: ]*([^\n,，.。（（:]*)"
-    result = get_infofromrestr(stream, restr)
-    for each in result:
-        if each[0] and each[1] and len(each[2]) > 1:
-            output.append(each)
-    return output
+    experiences = []
+    extracted_data = extractor.extract_experience.fix(stream)
+    RE = re.compile(extractor.utils_parsing.DURATION)
+    if not extracted_data[1]:
+        (company, position) = extracted_data[0]
+        for (i,c) in enumerate(company):
+            current_positions = [p for p in position if p[4] == i]
+            for p in current_positions:
+                if c[3] and len(current_positions) == 1 and not RE.search(p[2]):
+                    experiences.append((p[0], p[1], c[2]+'|'+p[2]+'('+c[3]+')'))
+                elif c[3]:
+                    experiences.append((p[0], p[1], c[2]+'('+c[3]+')'+'|'+p[2]))
+                else:
+                    experiences.append((p[0], p[1], c[2]+'|'+p[2]))
+            else:
+                if not len(current_positions):
+                    experiences.append((c[0], c[1], c[2]))
+    if not experiences:
+        restr = ur"(\d{4}[/.\\年 ]+\d{1,2}[月]*)[-– —]*(\d{4}[/.\\年 ]+\d{1,2}[月]*|至今)[：: ]*([^\n,，.。（（:]*)"
+        result = get_infofromrestr(stream, restr)
+        for each in result:
+            if each[0] and each[1] and len(each[2]) > 1:
+                experiences.append(each)
+    return experiences
 
 
 def info_by_re_iter(stream, restr):

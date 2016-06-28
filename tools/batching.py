@@ -107,33 +107,18 @@ import utils.builtin
 
 yaml.SafeDumper = utils._yaml.SafeDumper
 
-import re
-import extractor.extract_experience
-RE = re.compile(extractor.extract_experience.DURATION)
+
+import extractor.information_explorer
 
 def update_xp(svc_cv, yamlname):
     yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
     yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
-    extracted_data = extractor.extract_experience.fix(svc_cv.getmd(yamlname))
-    if not extracted_data[1]:
-        (company, position) = extracted_data[0]
-        obj = utils.builtin.load_yaml(yamlpath, yamlname)
-        obj['experience'] = []
-        for (i,c) in enumerate(company):
-            current_positions = [p for p in position if p[4] == i]
-            for p in current_positions:
-                if c[3] and len(current_positions) == 1 and not RE.search(p[2]):
-                    obj['experience'].append((p[0], p[1], c[2]+'|'+p[2]+'('+c[3]+')'))
-                elif c[3]:
-                    obj['experience'].append((p[0], p[1], c[2]+'('+c[3]+')'+'|'+p[2]))
-                else:
-                    obj['experience'].append((p[0], p[1], c[2]+'|'+p[2]))
-            else:
-                if not len(current_positions):
-                    obj['experience'].append((c[0], c[1], c[2]))
-        yamlstream = yaml.safe_dump(obj, allow_unicode=True)
-        with open(yamlpathfile, 'w') as fp:
-            fp.write(yamlstream)
+    extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname))
+    obj = utils.builtin.load_yaml(yamlpath, yamlname)
+    obj['experience'] = extracted_data
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
 
 def safeyaml(svc_cv, yamlname):
     yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)

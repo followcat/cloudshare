@@ -40,8 +40,6 @@ def get_infofromrestr(stream, restring):
         >>> phone_restr = ur'1\d{10}'
         >>> get_infofromrestr(u'phone: 13123456789', phone_restr)
         [u'13123456789']
-        >>> company_restr = ur'[ \u3000:\uff1a]*([\S]*有限公司)'
-        >>> assert get_infofromrestr(u'company: cat有限公司', company_restr)
     """
     regex = re.compile(restring, re.IGNORECASE)
     search_string = stream.replace(u'\xa0', ' ')
@@ -51,14 +49,17 @@ def get_infofromrestr(stream, restring):
 
 def get_experience(stream):
     u"""
-        >>> get_experience(u"2015.03 - 2015.05   XXCOM")
+        >>> get_experience(u"2015.03 - 2015.05   XXCOM")['experience']
         [(u'2015.03', u'2015.05', u'XXCOM')]
-        >>> get_experience(u"2015/03 - 2015/05   XXCOM")
+        >>> get_experience(u"2015/03 - 2015/05   XXCOM")['experience']
         [(u'2015/03', u'2015/05', u'XXCOM')]
         >>> assert get_experience(u"2015/03 - 至今   XXCOM")
         >>> assert get_experience(u"2015/03 - 至今   XXCOM XXX")
     """
     experiences = []
+    current_company = None
+    current_position = None
+
     extracted_data = extractor.extract_experience.fix(stream)
     RE = re.compile(extractor.utils_parsing.DURATION)
     if not extracted_data[1]:
@@ -66,6 +67,11 @@ def get_experience(stream):
         for (i,c) in enumerate(company):
             current_positions = [p for p in position if p[4] == i]
             for p in current_positions:
+                if re.match(extractor.utils_parsing.TODAY, p[1]) is not None:
+                    if current_company is None:
+                        current_company = c[2]
+                    if current_position is None:
+                        current_position = p[2]
                 if c[3] and len(current_positions) == 1 and not RE.search(p[2]):
                     experiences.append((p[0], p[1], c[2]+'|'+p[2]+'('+c[3]+')'))
                 elif c[3]:
@@ -81,7 +87,14 @@ def get_experience(stream):
         for each in result:
             if each[0] and each[1] and len(each[2]) > 1:
                 experiences.append(each)
-    return experiences
+    result = dict(experience=experiences,
+                  company=current_company,
+                  position=current_position)
+    if result['company'] is None:
+        result['company'] = ''
+    if result['position'] is None:
+        result['position'] = ''
+    return result
 
 
 def info_by_re_iter(stream, restr):
@@ -111,11 +124,6 @@ def catch(stream, basename):
         "tag":          [],
         "tracking":     [],
         }
-    organization = (u'有限公司', U'公司', u'集团', u'院')
-    organization_restr = u'[ \u3000:\uff1a]*([（）()a-zA-Z0-9\u4E00-\u9FA5]+)('
-    for each in organization:
-        organization_restr += each + '|'
-    organization_restr = organization_restr[:-1] + ')'
 
     school = (u'大学', u'学院', u'学校')
     school_restr = u'[ \u3000]*([a-zA-Z0-9\u4E00-\u9FA5]+)('
@@ -145,7 +153,6 @@ def catch(stream, basename):
     age = info_by_re_iter(stream, age_restr)
     phone = info_by_re_iter(stream, phone_restr)
     email = info_by_re_iter(stream, email_restr)
-    company = info_by_re_iter(stream, organization_restr)
     school_iter = iter(get_infofromrestr(stream, school_restr))
     try:
         school = ''.join(school_iter.next())
@@ -155,10 +162,7 @@ def catch(stream, basename):
         school = ''
 
     info_dict["school"] = school
-    info_dict["company"] = company
     info_dict["filename"] = basename
-    info_dict["position"] = get_tagfromstring(u'所任职位', stream)[:25] or\
-        get_tagfromstring(u'职位', stream)[:25]
     info_dict["education"] = get_tagfromstring(u'学历', stream) or\
         info_by_re_iter(stream, education_restr)
     info_dict["originid"] = get_tagfromstring(u'ID', stream, rule='a-zA-Z0-9')
@@ -166,5 +170,5 @@ def catch(stream, basename):
     info_dict["phone"] = get_tagfromstring(u'电话', stream, ur'\d\-－()（）') or phone
     info_dict["email"] = get_tagfromstring(u'邮件', stream, email_restr) or \
         get_tagfromstring(u'邮箱', stream) or email
-    info_dict["experience"] = get_experience(stream)
+    info_dict.update(get_experience(stream))
     return info_dict

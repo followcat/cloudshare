@@ -4,60 +4,57 @@ import os.path
 
 
 def get_tagfromstring(tag, stream, rule=None):
-    """
-        >>> get_tagfromstring('姓名', '姓名:followcat ')
+    u"""
+        >>> get_tagfromstring(u'姓名', u'姓名:followcat ')
         u'followcat'
-        >>> get_tagfromstring('姓名', '姓    名:followcat ')
+        >>> get_tagfromstring(u'姓名', u'姓    名:followcat ')
         u'followcat'
-        >>> get_tagfromstring('姓名', '姓名:    followcat ')
+        >>> get_tagfromstring(u'姓名', u'姓名:    followcat ')
         u'followcat'
-        >>> get_tagfromstring('姓名', '姓    名:    followcat ')
+        >>> get_tagfromstring(u'姓名', u'姓    名:    followcat ')
         u'followcat'
-        >>> get_tagfromstring('姓名', '  姓    名:    followcat ')
+        >>> get_tagfromstring(u'姓名', u'  姓    名:    followcat ')
         u'followcat'
     """
     if rule is None:
         rule = '\S'
     name = ""
     re_string = ""
-    for each in tag.decode('utf-8').replace(u'\xa0', ' '):
+    for each in tag.replace(u'\xa0', ' '):
         re_string += each
         re_string += ur"[ \u3000]*"
     re_string += ur"[ \u3000:\uff1a]+(?P<tag>[%s]+)\W" % rule
-    re_words = re.search(re_string, stream.decode('utf8'))
+    re_words = re.search(re_string, stream)
     if re_words is not None:
         name = re_words.group('tag')
     return name
 
 
 def get_infofromrestr(stream, restring):
-    """
+    u"""
         >>> email_restr = ur"[a-zA-Z0-9._\\%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}"
         >>> get_infofromrestr('Mail followcat@gmail.com', email_restr)
         [u'followcat@gmail.com']
-        >>> phone_restr = r'1\d{10}'
-        >>> get_infofromrestr('phone: 13123456789', phone_restr)
+        >>> phone_restr = ur'1\d{10}'
+        >>> get_infofromrestr(u'phone: 13123456789', phone_restr)
         [u'13123456789']
-        >>> company_restr = ur'[ \u3000:\uff1a]*([\S]*\u6709\u9650\u516c\u53f8)'
-        >>> get_infofromrestr('company: cat有限公司', company_restr)
-        [u'cat\u6709\u9650\u516c\u53f8']
+        >>> company_restr = ur'[ \u3000:\uff1a]*([\S]*有限公司)'
+        >>> assert get_infofromrestr(u'company: cat有限公司', company_restr)
     """
     regex = re.compile(restring, re.IGNORECASE)
-    search_string = stream.decode('utf8').replace(u'\xa0', ' ')
+    search_string = stream.replace(u'\xa0', ' ')
     result = re.findall(regex, search_string)
     return result
 
 
 def get_experience(stream):
-    """
-        >>> get_experience("2015.03 - 2015.05   XXCOM")
+    u"""
+        >>> get_experience(u"2015.03 - 2015.05   XXCOM")
         [(u'2015.03', u'2015.05', u'XXCOM')]
-        >>> get_experience("2015/03 - 2015/05   XXCOM")
+        >>> get_experience(u"2015/03 - 2015/05   XXCOM")
         [(u'2015/03', u'2015/05', u'XXCOM')]
-        >>> get_experience("2015/03 - 至今   XXCOM")
-        [(u'2015/03', u'\u81f3\u4eca', u'XXCOM')]
-        >>> get_experience("2015/03 - 至今   XXCOM XXX")
-        [(u'2015/03', u'\u81f3\u4eca', u'XXCOM XXX')]
+        >>> assert get_experience(u"2015/03 - 至今   XXCOM")
+        >>> assert get_experience(u"2015/03 - 至今   XXCOM XXX")
     """
     output = []
     restr = ur"(\d{4}[/.\\年 ]+\d{1,2}[月]*)[-– —]*(\d{4}[/.\\年 ]+\d{1,2}[月]*|至今)[：: ]*([^\n,，.。（（:]*)"
@@ -120,8 +117,8 @@ def catch(stream, basename):
 
     email_restr = u'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'
 
-    name = get_tagfromstring('姓名', stream)
-    namelist = get_infofromrestr(name.encode('utf-8'), u'^[\u4E00-\u9FA5\w]*$')
+    name = get_tagfromstring(u'姓名', stream)
+    namelist = get_infofromrestr(name, u'^[\u4E00-\u9FA5\w]*$')
     if not namelist:
         name = ''
     info_dict["name"] = name
@@ -140,15 +137,15 @@ def catch(stream, basename):
 
     info_dict["school"] = school
     info_dict["company"] = company
-    info_dict["filename"] = basename.decode('utf-8')
-    info_dict["position"] = get_tagfromstring('所任职位', stream)[:25] or\
-        get_tagfromstring('职位', stream)[:25]
-    info_dict["education"] = get_tagfromstring('学历', stream) or\
+    info_dict["filename"] = basename
+    info_dict["position"] = get_tagfromstring(u'所任职位', stream)[:25] or\
+        get_tagfromstring(u'职位', stream)[:25]
+    info_dict["education"] = get_tagfromstring(u'学历', stream) or\
         info_by_re_iter(stream, education_restr)
-    info_dict["originid"] = get_tagfromstring('ID', stream, rule='a-zA-Z0-9')
-    info_dict["age"] = get_tagfromstring('年龄', stream) or age
-    info_dict["phone"] = get_tagfromstring('电话', stream, ur'\d\-－()（）') or phone
-    info_dict["email"] = get_tagfromstring('邮件', stream, email_restr) or \
-        get_tagfromstring('邮箱', stream) or email
+    info_dict["originid"] = get_tagfromstring(u'ID', stream, rule='a-zA-Z0-9')
+    info_dict["age"] = get_tagfromstring(u'年龄', stream) or age
+    info_dict["phone"] = get_tagfromstring(u'电话', stream, ur'\d\-－()（）') or phone
+    info_dict["email"] = get_tagfromstring(u'邮件', stream, email_restr) or \
+        get_tagfromstring(u'邮箱', stream) or email
     info_dict["experience"] = get_experience(stream)
     return info_dict

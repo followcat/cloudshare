@@ -143,6 +143,19 @@ def safeyaml(svc_cv, yamlname):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
+def originid(svc_cv, yamlname):
+    yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
+    yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
+    obj = utils.builtin.load_yaml(yamlpath, yamlname)
+    if 'originid' not in obj:
+        id_str, suffix = os.path.splitext(yamlname)
+        obj['originid'] = obj['id']
+        obj['id'] = id_str
+
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
+
 def yamlaction(svc_cv, action):
     for yamlname in svc_cv.yamls():
         action(svc_cv, yamlname)

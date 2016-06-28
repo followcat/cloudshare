@@ -144,7 +144,7 @@ class UploadPreview(flask.views.MethodView):
         info = {
             "name": upobj.filepro.yamlinfo['name'],
             "origin": upobj.filepro.yamlinfo['origin'],
-            "id": upobj.filepro.yamlinfo['id']
+            "id": upobj.filepro.yamlinfo['originid']
         }
         return flask.render_template('cv.html', markdown=output, info=info)
 

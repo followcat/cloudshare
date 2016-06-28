@@ -145,7 +145,7 @@ def catch(stream, basename):
         get_tagfromstring('职位', stream)[:25]
     info_dict["education"] = get_tagfromstring('学历', stream) or\
         info_by_re_iter(stream, education_restr)
-    info_dict["id"] = get_tagfromstring('ID', stream, rule='a-zA-Z0-9')
+    info_dict["originid"] = get_tagfromstring('ID', stream, rule='a-zA-Z0-9')
     info_dict["age"] = get_tagfromstring('年龄', stream) or age
     info_dict["phone"] = get_tagfromstring('电话', stream, ur'\d\-－()（）') or phone
     info_dict["email"] = get_tagfromstring('邮件', stream, email_restr) or \

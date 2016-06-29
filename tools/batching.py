@@ -111,32 +111,28 @@ yaml.SafeDumper = utils._yaml.SafeDumper
 import extractor.information_explorer
 
 def update_xp(svc_cv, yamlname):
-    yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
-    yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.interface.yamlpath, yamlname)
     extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname))
-    obj = utils.builtin.load_yaml(yamlpath, yamlname)
     obj.update(extracted_data)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
 def safeyaml(svc_cv, yamlname):
-    yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
-    yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
-    obj = utils.builtin.load_yaml(yamlpath, yamlname)
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.interface.yamlpath, yamlname)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
 def originid(svc_cv, yamlname):
-    yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
-    yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
-    obj = utils.builtin.load_yaml(yamlpath, yamlname)
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.interface.yamlpath, yamlname)
     if 'originid' not in obj:
         id_str, suffix = os.path.splitext(yamlname)
         obj['originid'] = obj['id']
         obj['id'] = id_str
-
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)

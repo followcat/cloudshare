@@ -187,8 +187,10 @@ class FileProcesser():
                 return False
             self.remove_note()
             self.file_docbook_to_markdown()
-            self.yamlinfo = extractor.information_explorer.catch(self.markdown_stream,
-                                                                 self.base.base)
+            self.yamlinfo = extractor.information_explorer.catch(
+                                self.markdown_stream.decode('utf8'),
+                                self.base.base)
+            self.yamlinfo['id'] = self.name.base
             utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)
             logger.info('Success')
             return True

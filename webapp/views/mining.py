@@ -68,12 +68,9 @@ class LSI(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         miner = flask.current_app.config['SVC_MIN']
         svc_jd = flask.current_app.config['SVC_JD']
-        sim_names = miner.sim.keys()
-        uses_list =  flask.request.args.getlist('uses[]')
-        if len(uses_list) > 0:
-            uses = uses_list
-        else:
-            uses = []
+        sim_names = miner.addition_names()
+        uses = miner.default_names()
+        uses.extend(flask.request.args.getlist('uses[]'))
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
             jd_yaml = svc_jd.get(jd_id+'.yaml')

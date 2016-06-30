@@ -136,3 +136,11 @@ class Mining(object):
     def minelist(self, doc, lists):
         return filter(lambda x: x[0] in lists, self.probability(doc))
 
+    def default_names(self):
+        return [n.name for n in self.services['default'] if n.name in self.sim.keys()]
+
+    def addition_names(self):
+        names = self.sim.keys()
+        for n in self.default_names():
+            names.remove(n)
+        return names

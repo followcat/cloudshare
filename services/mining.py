@@ -108,8 +108,15 @@ class Mining(object):
                     index.save()
             self.sim[svc.name] = index
 
-    def update(self):
-        self.lsi_model.update(self.services['default'])
+    def update_model(self):
+        updated = self.lsi_model.update(self.services['default'])
+        if updated:
+            for name in self.services:
+                for svc in self.services[name]:
+                    self.sim[svc.name].set_index()
+                    self.sim[svc.name].save()
+
+    def update_sims(self):
         for name in self.services:
             for svc in self.services[name]:
                 self.sim[svc.name].update([svc])

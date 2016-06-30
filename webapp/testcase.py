@@ -1,4 +1,5 @@
 import json
+import yaml
 import tempfile
 
 import flask
@@ -23,6 +24,7 @@ class Test(flask.ext.testing.TestCase):
         self.data_db = self.app.config['DATA_DB']
         self.account_db = self.app.config['ACCOUNT_DB']
         self.upload_tmp = self.app.config['UPLOAD_TEMP']
+        self.svc_cv = self.app.config['SVC_CV']
         self.app.jinja_env.add_extension(jinja2.ext.loopcontrols)
         ext.views.configure(self.app)
         return self.app
@@ -171,17 +173,14 @@ class UploadFile(User):
 class TestUploadFile(UploadFile):
 
     def test_upload(self):
-        self.init_user()
-        self.login(self.user_name, self.user_password)
-        rv = self.upload('core/test/cv_1.doc')
-        assert(rv.data == 'True')
-        rv = self.uppreview()
-        assert('13888888888' in rv.data)
-        rv = self.confirm('name', 'origin', 'id')
-        assert(json.loads(rv.data)['result'] is True)
+        self.init_upload()
         commit = self.data_db.repo.get_object(self.data_db.repo.head())
         assert('Add file' in commit.message)
         assert('username' == commit.author)
+        yamlname = list(self.svc_cv.yamls())[0]
+        yaml_obj = self.svc_cv.getyaml(yamlname)
+        assert(yaml_obj['originid'] == '')
+        assert(yaml_obj['id'] in yamlname)
 
 
 class TestSearch(UploadFile):

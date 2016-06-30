@@ -4,20 +4,25 @@ import re
 
 TODAY = u'((至今)|(目前)|(现在)|今|([Pp]resent)|([Nn]ow))'
 CHNUMBERS = u'一二三四五六七八九十'
-SP = u'\s \ufffd'  # [\xc2\xa0]
+SP = u'\s\xa0\ufffd\u2028\u3000'
 ASP = u'[' + SP + u']'
-SEP = u'\-–—―\\\\~～/'
+SEP = u'\-–—―\\\\·,~～/'
 UNIBRALEFT = ur'[（\(\[【]'
 UNIBRARIGHT = ur'[）\)\]】]'
 DATESEP = u'['+SEP+SP+u'至]+'
-DATE = ur'((\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'?((\d{1,2}('+ASP+u'?月)?)|(['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
+DATE = ur'(?:(?:\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))('+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
 PERIOD = u'(?P<from>' + DATE + ur')' + DATESEP + ASP+ u'*(?P<to>' + DATE + ')'
 DURATION = ur'(?P<duration>(\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个月)?)|(\d{1,2}'+ASP+u'?个月))'
-SENTENCESEP = ur'、，。：:\|'
-PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|('+UNIBRALEFT+u'[^年月（\(\[【'+CHNUMBERS+u']+?'+UNIBRARIGHT+u')|([◆\?]+))?'
+FIELDSEP = ur'、：:\|'
+SENTENCESEP = FIELDSEP+ur'，。'
+
+exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
+
+CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
+PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|([◆·\?]+)|(\uf0d8\xa0))'
 
 # Exclude date related characters to avoid eating duration
-COMPANYTAIL = UNIBRALEFT+u'[^年月（\(\[【]+?'+UNIBRARIGHT
+COMPANYTAIL = exclude_with_parenthesis(u'年月')
 # use re.DOTALL for better results
 COMPANY = ur'[^' + SENTENCESEP + '=\n\*]+('+COMPANYTAIL+u')?'
 POSITION = ur'[^=\n\*：:\|]+'
@@ -26,18 +31,18 @@ education_list = {
     1: (u'中技', u'中专', u'高中'),
     2: (u'大专', ),
     #3: Show clearly step before graduate
-    4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科'),
-    5: (u'在职硕士'),
-    6: (u'硕士', u'硕士研究生', u'MBA', u'MBA/EMBA'),
+    4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科', u'学士'),
+    5: (u'在职硕士', ),
+    6: (u'硕士', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA'),
     7: (u'博士', u'博士研究生'),
     8: (u'博士后', )
     }
 
-LIST_SEPARATOR = ASP+u'*)|(?:'+ASP+u'*'
+LIST_SEPARATOR = u')|(?:'
 EDUCATION_LIST = {}
 for k,v in education_list.items():
-    EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ASP+u'*'+ LIST_SEPARATOR.join(v) +ASP+u'*))')
-EDUCATION = u'(?:(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +ASP+u'*))' for v in education_list.values()]) +ASP+u'*))'
+    EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))')
+EDUCATION = u'(?:(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))' for v in education_list.values()]) +u'))'
     
 
 SALARY = u'\d[\- \d\|]*(月/月)?元/月(以[上下])?'

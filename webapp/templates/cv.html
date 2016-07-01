@@ -150,6 +150,7 @@
           <a href="/edit/{{ yaml.enversion }}" target="_blank">English CV</a>
           {% endif %}
         </div>
+
         <table class="table table-bordered table-condensed" id="title-table">
           <thead>
             <tr>
@@ -167,6 +168,27 @@
           </tbody>
         </table>
         <button type="button" class="btn btn-primary col-md-2 col-md-offset-5" id="title-submit-btn">Submit</button>
+      </div>
+      <div class="summary">
+        <div class="name"><strong>Name:</strong>{{ yaml.name }}</div>
+        <div class="age"><strong>Age:</strong>{{ yaml.age }}</div>
+        <div class="education"><strong>Education:</strong>{{yaml.education }}</div>
+        <div class="school"><strong>University:</strong>{{ yaml.school }}</div>
+        <div class="position"><strong>Position:</strong>{{ yaml.position }}</div>
+        <div class="company"><strong>Company:</strong>{{ yaml.company }}</div>
+        <div class="work-experience">
+          <strong>Work Experiences:</strong>
+          <ul class="list-unstyled">
+            {% for item in yaml.experience %}
+            <li>
+              <span class="experience-time">
+                {{ item[0] }} - {{ item[1] }}
+              </span>
+              <span class="experience-company">{{ item[2] }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
       <div id="cv-content">
         <div class="content">

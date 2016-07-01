@@ -147,7 +147,7 @@
       </ul>
     </div>
     <div class="work-experience">
-      {% if item[1].experience | length - 2 > 2 %}
+      {% if item[1].experience | length - 2 >= 2 %}
       <a href="javascript:;" class="show-more">Unfold</a>
       {% for e in item[1].experience %}
       {% if loop.index > 2 %}

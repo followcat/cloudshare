@@ -42,10 +42,12 @@ POFIELD = u'(?(nl)(([^\n:：'+SP+u'](\n+/)?)+)|([^\n'+SP+u']|('+POASP+u'[^\n'+SP
 PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*'+POFIELD+POASP+u'*\n+'+POASP+u'*('+PODEPARTMENT+u'(?(nl)()|('+POASP+u'+)))?(?(nl)('+POASP+u'*\n+'+POASP+u'*))(?P<aposition>'+POSITION+u'?)'+POASP+u'*$', re.M)
 
 IXPO = re.compile(u'所属行业[:：].*\n+'+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+'+ASP+u'*职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*$', re.M)
-APO = re.compile(u'^(其中)?'+APERIOD+ur''+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
+APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
 TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*'+APERIOD+''+ASP+u'*$', re.M)
 TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?'+ASP+u'*$', re.M)
 BPO = re.compile(u'^((?P<aposition>'+POSITION+u')'+ASP+u'*\|)?((?P<second>.+?)\|)?'+ASP+u'*('+SALARY+u')', re.M)
+# Force use of ascii space to avoid matching new line and step over TCO in predator results
+LIEPPO = re.compile(u'^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*$', re.M)
 
 EMP = re.compile(BEMPLOYEES)
 
@@ -166,6 +168,15 @@ def find_xp(RE, text):
             else:
                 pos +=1
                 position_output(out, r.groupdict())
+    if not pos:
+        out = {'company': [], 'position': []}
+        MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+LIEPPO.pattern+u'))', re.M)
+        for r in MA.finditer(text):
+            if r.group('co'):
+                company_output(out, r.groupdict())
+            else:
+                pos +=1
+                position_output(out, r.groupdict())
     return pos, out
 
 
@@ -244,6 +255,9 @@ def work_xp(text):
         >>> assert not work_xp(u'就职时间 : 2012-06 ～至今\\n\\n受聘公司 : 有限公司\\n\\n职位名称 : 质量工程师')[0]   #FIXME
         >>> assert work_xp(u'2014.02 - 至今 有限公司\\n\\n职位： 电气工程师  ')[0]
         >>> assert not work_xp(u'2015/03\\~\\n\\n有限公司\\n\\n职位：质量经理')[0]    #FIXME
+
+    Test for LIEPPO
+        >>> assert position_1(work_xp(u'''2014.06 - 2015.01\\n上海分公司\\n(7个月)\\n  2014.06 - 2015.01 研发工程师'''))
     """
     RE = None
     pos = 0

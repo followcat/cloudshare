@@ -7,7 +7,7 @@
   width: 100%;
 }
 .wrap-top .confirm-box{;
-  margin-top: 20px; 
+  margin-top: 20px;
   margin-bottom: 20px;
   margin-left: 16px;
 }
@@ -67,4 +67,42 @@
 #edit{
   display: block;
   float: right;
+}
+.summary {
+  padding: 4px 6px;
+  border: 1px dashed #e2e2e2;
+  margin-bottom: 10px;
+}
+.name, .age, .education, .school, .position, .company {
+  display: inline-block;
+  line-height: 1.5em;
+}
+.summary > .name {
+  width: 12%;
+}
+.summary > .age {
+  width: 10%;
+}
+.summary > .education {
+  width: 16%;
+}
+.summary > .school {
+  width: 26%;
+}
+.summary > .position {
+  width: 34%;
+}
+.work-experience li{
+  line-height: 1.375em;
+  overflow: hidden;
+}
+.summary .experience-time {
+  display: block;
+  width: 20%;
+  float: left;
+}
+.summary .experience-company {
+  display: block;
+  width: 79%;
+  float: left;
 }

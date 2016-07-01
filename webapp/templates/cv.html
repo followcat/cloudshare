@@ -1,6 +1,6 @@
 {% extends "share/cv_layout.html" %}
 {% block content%}
-{% if info %}
+{% if yaml %}
 {% block previewstyle %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/cvstyle.css') }}">
 {% endblock %}
@@ -10,7 +10,7 @@
       <form id="cv-confirm-form">
         <div class="form-group">
           <label for="name">Name:</label>
-          <input type="text" name="name" placeholder="Please Input Name" class="form-control" value="{{ info.name }}" required="required" />
+          <input type="text" name="name" placeholder="Please Input Name" class="form-control" value="{{ yaml.name }}" required="required" />
         </div>
         <div class="form-group">
           <label for="origin">Source:</label>
@@ -29,6 +29,27 @@
           <button type="button" class="btn btn-default" id="goback-btn">Go back</button>
         </div>
       </form>
+    </div>
+    <div class="summary">
+      <div class="name"><strong>Name:</strong>{{ yaml.name }}</div>
+      <div class="age"><strong>Age:</strong>{{ yaml.age }}</div>
+      <div class="education"><strong>Education:</strong>{{yaml.education }}</div>
+      <div class="school"><strong>University:</strong>{{ yaml.school }}</div>
+      <div class="position"><strong>Position:</strong>{{ yaml.position }}</div>
+      <div class="company"><strong>Company:</strong>{{ yaml.company }}</div>
+      <div class="work-experience">
+        <strong>Work Experiences:</strong>
+        <ul class="list-unstyled">
+          {% for item in yaml.experience %}
+          <li>
+            <span class="experience-time">
+              {{ item[0] }} - {{ item[1] }}
+            </span>
+            <span class="experience-company">{{ item[2] }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
   </div>
 

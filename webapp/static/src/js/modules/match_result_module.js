@@ -39,7 +39,32 @@ require(
     "ProcessInfo"
   ],
   function($, radarcharts, barcharts, scattercharts, ColorGrad, History, ChartsCommon) {
+
     var chartsCommon = new ChartsCommon();
+
+    //url参数截取，返回参数对象
+    function queryString(str) {
+      var arr = [],
+          paramStr = "",
+          jsonObj = {};
+      if (str.indexOf("?") > 0) {
+        paramStr = str.slice(str.indexOf("?")+1);
+      }
+      if (paramStr.indexOf("&") > 0) {
+        arr = paramStr.split("&");
+        for (var i = 0, len = arr.length; i < len; i++) {
+          jsonObj[arr[i].split("=")[0]] = arr[i].split("=")[1];
+        }
+      } else {
+        jsonObj[paramStr.split("=")[0]] = paramStr.split("=")[1];
+      }
+      return jsonObj;
+    }
+
+    var currentURL = window.location.href;
+
+    var requestParam = queryString(currentURL);
+
     //匿名处理
     function replaceName(datas){
       for( var i = 0, datasLen = datas.length; i < datasLen; i++){
@@ -141,18 +166,15 @@ require(
       //定时器，等待modal渲染
       setTimeout(function(){
         var radar = radarcharts("echarts-wrap"),
-            jdId = window.location.href.split(/(jd_id)=([\w]+)/)[2],
             reqData = null;
-        if ( jdId ) {
+        if ( requestParam.jd_id ) {
           reqData = {
-            "jd_id": jdId,
+            "jd_id": requestParam.jd_id,
             "name_list": JSON.stringify(nameLists)
           };
         } else {
-          var jdDoc = window.location.href.split(/(jd_doc)=/)[2];
-          jdDoc = decodeURIComponent(jdDoc);
           reqData = {
-            "jd_doc": jdDoc,
+            "jd_doc": decodeURIComponent(requestParam.jd_doc),
             "name_list": JSON.stringify(nameLists)
           };
         }
@@ -282,21 +304,7 @@ require(
       }
     });
 
-    //url参数截取，返回参数对象
-    function queryString(str) {
-      var arr = [],
-          jsonObj = {};
-      if (str.indexOf("?") > 0) {
-        arr = str.slice(str.indexOf("?")+1);
-      }
-      if (arr.indexOf("&") > 0) {
-        arr = str.slice(str.indexOf("?")+1).split("&");
-        for (var i = 0, len = arr.length; i < len; i++) {
-          jsonObj[arr[i].split("=")[0]] = arr[i].split("=")[1];
-        }
-      }
-      return jsonObj;
-    }
+
 
     //初始化数据库选择
     function initDatabase(){
@@ -336,7 +344,7 @@ require(
     //修改分页url
     function changePaginationUrl() {
       var linkHref = "",
-          paramObj = "",
+          paramObj = {},
           dbParam = [],
           databaseList = localStorage.databaseList;
       if (databaseList) {
@@ -350,7 +358,11 @@ require(
         linkHref = $(this).attr("href");
         paramObj = queryString(linkHref);
         var newParams = {};
-        newParams.jd_id = paramObj.jd_id;
+        if (requestParam.jd_id) {
+          newParams.jd_id = requestParam.jd_id;
+        } else {
+          newParams.jd_doc = requestParam.jd_doc;
+        }
         newParams.page = paramObj.page;
         newParams.uses = dbParam;
         var newUrl = "/lsipage?" + $.param(newParams);
@@ -363,13 +375,21 @@ require(
     //简历数据库选择
     $(".database-item").on("change", function(){
       var checkedObj = $(this);
-      var databaseList = saveInLocalStorage(checkedObj),
-          paramObj = queryString(location.href);
+      var databaseList = saveInLocalStorage(checkedObj);
 
       var newParams = {},
           newUrl = "";
-      newParams.jd_id = paramObj.jd_id;
-      newParams.page = paramObj.page;
+      if (requestParam.jd_id) {
+        newParams.jd_id = requestParam.jd_id;
+      } else {
+        newParams.jd_doc = requestParam.jd_doc;
+      }
+      if (requestParam.page) {
+        newParams.page = requestParam.page;
+      } else {
+        newParams.page = "1";
+      }
+
       newParams.uses = databaseList;
 
       newUrl = "/lsipage?" + $.param(newParams);

@@ -170,3 +170,6 @@ a{
 #serachbysentence{
   display: none;
 }
+.hide-param {
+  display: none;
+}

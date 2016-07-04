@@ -141,13 +141,13 @@ class UploadPreview(flask.views.MethodView):
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
-        yaml = upobj.filepro.yamlinfo
+        yaml_info = upobj.filepro.yamlinfo
         # info = {
         #     "name": upobj.filepro.yamlinfo['name'],
         #     "origin": upobj.filepro.yamlinfo['origin'],
         #     "id": upobj.filepro.yamlinfo['originid']
         # }
-        return flask.render_template('cv.html', markdown=output, yaml=yaml)
+        return flask.render_template('cv.html', markdown=output, yaml_info=yaml_info)
 
 
 class Confirm(flask.views.MethodView):

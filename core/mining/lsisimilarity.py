@@ -80,6 +80,8 @@ class LSIsimilarity(object):
             self.corpus.append(self.lsi_model.dictionary.doc2bow(text))
 
     def set_index(self):
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 

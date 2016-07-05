@@ -37,7 +37,9 @@ gulp.task('scripts', ['clean'], function(){
         barcharts: __dirname + '/src/js/util/charts/barcharts',
         scatters: __dirname + '/src/js/util/charts/scattercharts',
         colorgrad: __dirname + '/src/js/util/colorgrad',
-        urmmain: __dirname + '/src/js/util/urm_main'
+        urmmain: __dirname + '/src/js/util/urm_main',
+        ChartsCommon: __dirname + '/src/js/util/charts/charts_common',
+        ProcessInfo: __dirname + '/src/js/util/process_info'
       },
       shim: {
         bootstrap: {

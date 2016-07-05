@@ -142,6 +142,10 @@
       {% endfor %}
       {% else %}
       {% if cur_page < pages - 2 %}
+      {% if cur_page -2 > 0 %}
+      <li><a href="/search?search_text={{ search_key }}&page={{ cur_page-2 }}">{{ cur_page-2 }}</a></li>
+      <li><a href="/search?search_text={{ search_key }}&page={{ cur_page-1 }}">{{ cur_page-1 }}</a></li>
+      {% endif %}
       <li class="active"><a href="/search?search_text={{ search_key }}&page={{ cur_page }}">{{ cur_page }}</a></li>
       <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
       <li><a href="/search?search_text={{ search_key }}&page={{ cur_page+2 }}">{{ cur_page+2}}</a></li>

@@ -140,7 +140,7 @@
 	border: 1px dashed #e2e2e2;
 	margin-bottom: 10px;
 }
-.name, .age, .education, .school, .position, .company {
+.uploader, .name, .age, .education, .school, .position, .company {
 	display: inline-block;
 	line-height: 1.5em;
 }

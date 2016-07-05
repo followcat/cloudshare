@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import os.path
+import extractor.education
 import extractor.utils_parsing
 import extractor.extract_experience
 
@@ -46,6 +47,8 @@ def get_infofromrestr(stream, restring):
     result = re.findall(regex, search_string)
     return result
 
+def get_education(stream):
+    return extractor.education.fix(stream)
 
 def get_experience(stream):
     u"""
@@ -106,7 +109,7 @@ def info_by_re_iter(stream, restr):
     return result
 
 
-def catch(stream, basename):
+def catch(stream, basename=None):
     info_dict = {
         "filename":     '',
         "name":         '',
@@ -118,6 +121,7 @@ def catch(stream, basename):
         "phone":        '',
         "email":        '',
         "origin":       '',
+        "originid":     '',
         "id":           '',
         "experience":   [],
         "comment":      [],
@@ -130,12 +134,6 @@ def catch(stream, basename):
     for each in school:
         school_restr += each + '|'
     school_restr = school_restr[:-1] + ')'
-
-    education = (u'博士', u'硕士', u'本科', u'大专')
-    education_restr = u'('
-    for each in education:
-        education_restr += each + '|'
-    education_restr = education_restr[:-1] + ')'
 
     age_chinese = u'岁'
     age_restr = u'[ \u3000]*(\d{2})' + age_chinese
@@ -162,12 +160,12 @@ def catch(stream, basename):
         school = ''
 
     info_dict["school"] = school
-    info_dict["filename"] = basename
-    info_dict["education"] = get_tagfromstring(u'学历', stream) or\
-        info_by_re_iter(stream, education_restr)
+    if basename is not None:
+        info_dict["filename"] = basename
+    info_dict["education"] = get_education(stream)
     info_dict["originid"] = get_tagfromstring(u'ID', stream, rule='a-zA-Z0-9')
     info_dict["age"] = get_tagfromstring(u'年龄', stream) or age
-    info_dict["phone"] = get_tagfromstring(u'电话', stream, ur'\d\-－()（）') or phone
+    info_dict["phone"] = get_tagfromstring(u'电话', stream, ur'\d\-－()') or phone
     info_dict["email"] = get_tagfromstring(u'邮件', stream, email_restr) or \
         get_tagfromstring(u'邮箱', stream) or email
     info_dict.update(get_experience(stream))

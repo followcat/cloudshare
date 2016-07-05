@@ -180,7 +180,8 @@ class ConfirmEnglish(flask.views.MethodView):
         upobj = pickle.loads(flask.session[user.id]['upload'])
         result = svc_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
-        svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data), committer=user.id)
+        svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
+                      committer=user.id)
         return flask.jsonify(result=result)
 
 
@@ -263,7 +264,7 @@ class UpdateInfo(flask.views.MethodView):
                 result = False
                 break
         else:
-            svc_cv.modify(name.yaml, yaml.safe_dump(yaml_info),
+            svc_cv.modify(name.yaml, yaml.safe_dump(yaml_info, allow_unicode=True),
                           commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)
 

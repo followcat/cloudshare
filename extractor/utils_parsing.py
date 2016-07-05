@@ -22,9 +22,9 @@ CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
 PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|([◆·\?]+)|(\uf0d8\xa0))'
 
 # Exclude date related characters to avoid eating duration
-COMPANYTAIL = exclude_with_parenthesis(u'年月')
+COMPANYTAIL = exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
-COMPANY = ur'[^' + SENTENCESEP + '=\n\*]+('+COMPANYTAIL+u')?'
+COMPANY = ur'[^' + SENTENCESEP + '=\n\*]+?('+COMPANYTAIL+u')?'
 POSITION = ur'[^=\n\*：:\|]+'
 
 education_list = {
@@ -45,7 +45,7 @@ for k,v in education_list.items():
 EDUCATION = u'(?:(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))' for v in education_list.values()]) +u'))'
     
 
-SALARY = u'\d[\- \d\|]*(月/月)?元/月(以[上下])?'
+SALARY = u'((月薪(（税前）)?[:：]?)?'+ASP+u'*((?P<salary>\d[\- \d\|]*(月/月)?((元/月)|元|(/月))(以[上下])?)'+ASP+u'*(\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?)|((年薪(（税前）)?[:：]?)?'+ASP+u'*(?P<yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
 EMPLOYEES = u'((?P<employees>(少于)?\d[\d '+SEP+u']*人(以[上下])?)([' + SENTENCESEP + u'].*?)?)'
 BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + UNIBRARIGHT +u')'
 BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + DURATION + u'(?(br)[\n'+SP+u']*' +UNIBRARIGHT + u'(?(dit)\*)))'
@@ -62,6 +62,10 @@ remove_escape = lambda x: x.group(1)
 fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, x)
 fix_name = lambda x: re.compile(ASP+'+').sub(' ', fix_escape(x)).strip()
 fix_duration = lambda x: re.compile(ASP+'+').sub('', x).strip()
+
+ten_thousands = lambda x: re.compile(u'(?<=\d)'+ASP+u'*W').sub(u'万', x)
+salary_unit = lambda x: re.compile(u'(?<=\d)/(?=[年月])').sub(u'元/', x)
+fix_salary = lambda x: salary_unit(ten_thousands(re.compile(ASP+'+').sub('', x)))
 
 
 WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)$'

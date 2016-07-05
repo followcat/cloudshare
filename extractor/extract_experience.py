@@ -42,12 +42,17 @@ POFIELD = u'(?(nl)(([^\n:：'+SP+u'](\n+/)?)+)|([^\n'+SP+u']|('+POASP+u'[^\n'+SP
 PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*'+POFIELD+POASP+u'*\n+'+POASP+u'*('+PODEPARTMENT+u'(?(nl)()|('+POASP+u'+)))?(?(nl)('+POASP+u'*\n+'+POASP+u'*))(?P<aposition>'+POSITION+u'?)'+POASP+u'*$', re.M)
 
 IXPO = re.compile(u'所属行业[:：].*\n+'+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+'+ASP+u'*职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*$', re.M)
-APO = re.compile(u'^(其中)?'+APERIOD+ur''+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
+APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
 TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*'+APERIOD+''+ASP+u'*$', re.M)
 TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?'+ASP+u'*$', re.M)
 BPO = re.compile(u'^((?P<aposition>'+POSITION+u')'+ASP+u'*\|)?((?P<second>.+?)\|)?'+ASP+u'*('+SALARY+u')', re.M)
+# Force use of ascii space to avoid matching new line and step over TCO in predator results
+LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*$', re.M)
 
 EMP = re.compile(BEMPLOYEES)
+
+EXPECTATION = re.compile(u'期望((薪资)|([年月]薪))(（税前）)?[:：]'+ASP+u'*(?P<salary_expectation>'+SALARY+u')', re.M)
+SALARYCURRENT = re.compile(u'目前((薪资)|([年月]薪))(（税前）)?[:：]'+ASP+u'*(?P<salary_current>'+SALARY+u')', re.M)
 
 
 def output_cleanup(groupdict):
@@ -67,11 +72,11 @@ def company_output(output, groupdict, begin='', end='', company=''):
         result = {}
         output_cleanup(groupdict)
         if 'from' in groupdict and groupdict['from']:
-            result['from_date'] = fix_date(groupdict['from'])
-            result['to_date'] = fix_date(groupdict['to'])
+            result['date_from'] = fix_date(groupdict['from'])
+            result['date_to'] = fix_date(groupdict['to'])
         else:
-            result['from_date'] = fix_date(groupdict['afrom'])
-            result['to_date'] = fix_date(groupdict['ato'])
+            result['date_from'] = fix_date(groupdict['afrom'])
+            result['date_to'] = fix_date(groupdict['ato'])
         if 'ccompany' in groupdict and groupdict['ccompany']:
             result['name'] = fix_name(EMP.sub('', groupdict['ccompany']))
         else:
@@ -80,23 +85,34 @@ def company_output(output, groupdict, begin='', end='', company=''):
             result['duration'] = fix_duration(groupdict['duration'])
         else:
             result['duration'] = ''
-        result['at_company'] = -1
+        if 'employees' in groupdict and groupdict['employees']:
+            result['total_employees'] = groupdict['employees']
         output['company'].append(result)
+
+def format_salary(result, groupdict):
+    if 'salary_months' in groupdict and groupdict['salary_months']:
+        result['salary'] = fix_salary(groupdict['salary'])
+        result['salary_months'] = groupdict['salary_months']
+    elif 'salary' in groupdict and groupdict['salary']:
+        result['salary'] = fix_salary(groupdict['salary'])
+    elif 'yearly' in groupdict and groupdict['yearly']:
+        result['yearly'] = fix_salary(groupdict['yearly']+u'/年')
+    return result
 
 def position_output(output, groupdict, begin='', end='', company=''):
     if 'position' in groupdict or 'aposition' in groupdict:
         result = {}
         output_cleanup(groupdict)
         if 'from' in groupdict and groupdict['from']:
-            result['from_date'] = fix_date(groupdict['from'])
-            result['to_date'] = fix_date(groupdict['to'])
+            result['date_from'] = fix_date(groupdict['from'])
+            result['date_to'] = fix_date(groupdict['to'])
         else:
             if 'afrom' in groupdict and groupdict['afrom']:
-                result['from_date'] = fix_date(groupdict['afrom'])
-                result['to_date'] = fix_date(groupdict['ato'])
+                result['date_from'] = fix_date(groupdict['afrom'])
+                result['date_to'] = fix_date(groupdict['ato'])
             else:
-                result['from_date'] = fix_date(begin)
-                result['to_date'] = fix_date(end)
+                result['date_from'] = fix_date(begin)
+                result['date_to'] = fix_date(end)
         if 'cposition' in groupdict and groupdict['cposition']:
             result['name'] = fix_name(groupdict['cposition'])
         else:
@@ -118,6 +134,7 @@ def position_output(output, groupdict, begin='', end='', company=''):
             result['at_company'] = len(output['company'])-1
         except:
             result['at_company'] = output['company'].index(company)
+        format_salary(result, groupdict)
         output['position'].append(result)
 
 name = lambda company: company['name']
@@ -166,13 +183,22 @@ def find_xp(RE, text):
             else:
                 pos +=1
                 position_output(out, r.groupdict())
+    if not pos:
+        out = {'company': [], 'position': []}
+        MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+LIEPPO.pattern+u'))', re.M)
+        for r in MA.finditer(text):
+            if r.group('co'):
+                company_output(out, r.groupdict())
+            else:
+                pos +=1
+                position_output(out, r.groupdict())
     return pos, out
 
 
 def work_xp(text):
     u"""
         >>> assert work_xp(u'2014年4月 -- 至今 公司 | 客户服务经理、CT临床支持经理 （2年1个月）')[0]
-        >>> assert not not u'年' in name(company_1(work_xp(u'2011.01-至今 集团 （4年）\\n2009.04-2011.01 集团 （1年9个月）')))    #FIXME
+        >>> assert not u'年' in name(company_1(work_xp(u'2011.01-至今 集团 （4年）\\n2009.04-2011.01 集团 （1年9个月）')))
         >>> assert not work_xp(u'\\n03/2013 – 现在 Consulting\\n\\n高级咨询师')[0] #FIXME
         >>> assert positions(work_xp(u'有限公司 招聘主管 2009/03 至 2013/03 （ 4\\n年） 保密'))
         >>> assert not work_xp(u'有限公司  加速器工程师  2013/07\~2014/08  广州\\n\\n公司  技术研发工程师  2014/08至今  上海')[0] == 2 #FIXME
@@ -244,6 +270,12 @@ def work_xp(text):
         >>> assert not work_xp(u'就职时间 : 2012-06 ～至今\\n\\n受聘公司 : 有限公司\\n\\n职位名称 : 质量工程师')[0]   #FIXME
         >>> assert work_xp(u'2014.02 - 至今 有限公司\\n\\n职位： 电气工程师  ')[0]
         >>> assert not work_xp(u'2015/03\\~\\n\\n有限公司\\n\\n职位：质量经理')[0]    #FIXME
+
+    Test for LIEPPO
+        >>> assert position_1(work_xp(u'''2014.06 - 2015.01\\n上海分公司\\n(7个月)\\n  2014.06 - 2015.01 研发工程师'''))
+
+        >>> assert company_1(work_xp(u'2014 /4--至今：有限公司(5000-10000人) [ 2 年]\\n所属行业：计算机软件\\n开发部 软件工程师'))['total_employees']
+        >>> assert position_1(work_xp(u'2011.05 - 至今 GE医疗 (4年8个月\\n2011.05 - 至今研发主管、电气工程师15000元/月'))['salary']
     """
     RE = None
     pos = 0
@@ -344,12 +376,37 @@ def fix(d, as_dict=False):
         >>> assert fix(u'工作经历\\n音视频可靠光传输系统项目背景')[1] == 3   #项目背景 stop inside text
         >>> assert fix(u'工作经验：1年\\n公司名称 深圳x有限公司\\n 时间 2013.06 ——2014.04\\n职务 硬件工程师')[0][1]
         >>> assert fix(u'工作经历\\n1.  公司名称：有限公司\\n起止时间：2013年5月-至今\\n\\n担任职位：总账高级会计师')[0][1]
+        >>> assert u'元' in fix(u'期望月薪： 8000/月', True)['salary_expectation']['salary']
+        >>> assert u'年' in fix(u'目前薪资： 年薪 30-40万 人民币', True)['salary_current']['yearly']
+        >>> assert u'万' in fix(u'目前薪资： 15-30W人民币', True)['salary_current']['yearly']
+        >>> assert u'元' in fix(u'目前薪资：月薪（税前）：25000 元 \* 15 个月', True)['salary_current']['salary']
     """
     def fix_output(processed, reject):
         if as_dict:
-            return {'experience': processed}, reject
+            result = {}
+            for (index, company) in enumerate(processed['company']):
+                positions = [p for p in processed['position'] if p['at_company'] == index]
+                if len(positions) <= 1:
+                    try:
+                        positions[0]['duration'] = company['duration']
+                        del company['duration']
+                    except IndexError:
+                        continue
+                    except KeyError:
+                        continue
+            if processed['company']:
+                result['experience'] = processed
+            if EXPECTATION.search(d):
+                salary = {}
+                result['salary_expectation'] = format_salary(salary, EXPECTATION.search(d).groupdict())
+            if SALARYCURRENT.search(d):
+                salary = {}
+                result['salary_current'] = format_salary(salary, SALARYCURRENT.search(d).groupdict())
+            return result
         else:
-            tuple_format = lambda x: tuple([x[k] for k in ['from_date', 'to_date', 'name', 'duration', 'at_company']])
+            for company in processed['company']:
+                company['at_company'] = -1
+            tuple_format = lambda x: tuple([x[k] for k in ['date_from', 'date_to', 'name', 'duration', 'at_company']])
             return ([tuple_format(p) for p in processed['company']], [tuple_format(p) for p in processed['position']]), reject
 
     reject = 0

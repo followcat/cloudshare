@@ -110,6 +110,15 @@ yaml.SafeDumper = utils._yaml.SafeDumper
 
 import extractor.information_explorer
 
+def update_education(svc_cv, yamlname):
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    education = extractor.information_explorer.get_education(svc_cv.getmd(yamlname))
+    obj['education'] = education
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
+
 def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)

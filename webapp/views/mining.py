@@ -68,6 +68,9 @@ class LSI(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         miner = flask.current_app.config['SVC_MIN']
         svc_jd = flask.current_app.config['SVC_JD']
+        sim_names = miner.addition_names()
+        uses = miner.default_names()
+        uses.extend(flask.request.args.getlist('uses[]'))
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
             jd_yaml = svc_jd.get(jd_id+'.yaml')
@@ -79,22 +82,23 @@ class LSI(flask.views.MethodView):
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
-        datas, pages = self.process(miner, svc_cv, doc, cur_page, count)
+        datas, pages = self.process(miner, uses, svc_cv, doc, cur_page, count)
         return flask.render_template('lsipage.html',result=datas,
-                                     button_bar=True, cur_page=cur_page,
+                                     button_bar=True, sim_names=sim_names,
+                                     cur_page=cur_page,
                                      pages=pages, param=param)
 
-    def process(self, miner, svc, doc, cur_page, eve_count):
+    def process(self, miner, uses, svc, doc, cur_page, eve_count):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = miner.probability(doc)
-        sum = len(result)
-        if sum%eve_count != 0:
-            pages = sum/eve_count + 1
+        result = miner.probability(doc, uses=uses)
+        totals = len(result)
+        if totals%eve_count != 0:
+            pages = totals/eve_count + 1
         else:
-            pages = sum/eve_count
-        for name, score in miner.probability(doc)[(cur_page-1)*eve_count:cur_page*eve_count]:
+            pages = totals/eve_count
+        for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
             yaml_info = svc.getyaml(name)
             info = {
                 'author': yaml_info['committer'],

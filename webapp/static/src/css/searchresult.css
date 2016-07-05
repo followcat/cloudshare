@@ -188,6 +188,24 @@
 .vd-region{
   margin-left: 20px;
 }
+.sidebar-wrap{
+  width: 260px;
+  max-height:480px;
+  position: fixed;
+  top:50%;
+  margin-top: -240px;
+  right:0;
+  z-index: 999;
+  right: -220px;
+}
+.operate-list{
+  width:218px;
+  margin-left: 40px;
+  background-color: #fff;
+  border: 1px solid #c2c2c2;
+  border-radius: 8px;
+  padding-bottom: 4px;
+}
 .sidebar-wrap .operate-list button{
   width: 80%;
   margin-top: 6px;
@@ -198,16 +216,7 @@
   font-weight: bold;
   margin-left: 10%;
 }
-.sidebar-wrap{
-  width: 260px;
-  height:480px;
-  position: fixed;
-  top:50%;
-  margin-top: -240px;
-  right:0;
-  z-index: 999;
-  right: -220px;
-}
+
 .operate-menu{
   width: 40px;
   height: 40px;
@@ -226,14 +235,7 @@
   line-height: 40px;
   color: #fff;
 }
-.operate-list{
-  width:218px;
-  height: 488px;
-  margin-left: 40px;
-  background-color: #fff;
-  border: 1px solid #c2c2c2;
-  border-radius: 8px;
-}
+
 .line{
   border-top: 1px dashed #ccc;
   margin-left: 4px;
@@ -241,7 +243,7 @@
 }
 .sel-list{
   width: 100%;
-  height: 180px;
+  height: 134px;
   margin-top: 10px;
   padding-left: 10px;
   padding-right: 10px;
@@ -273,4 +275,9 @@
   .header-search{
     display: none;
   }
+}
+.name, .age, .education, .school, .position, .company {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

@@ -48,11 +48,13 @@
     <div class="database-box">
       <div class="title">Database</div>
       <div class="database-list">
+        {% for e in sim_names %}
         <div class="checkbox">
           <label>
-            <input type="checkbox" class="database-item" value="Additional" />Additional
+            <input type="checkbox" class="database-item" value="{{ e }}" />{{ e }}
           </label>
         </div>
+        {% endfor %}
       </div>
     </div>
     <div class="line"></div>
@@ -136,29 +138,39 @@
     </div>
     <div class="container-fluid">
       <ul class="list-unstyled info">
-        <li class="name"><strong>Name: </strong><span>{{ item[1].name }}</span></li>
-        <li class="age"><strong>Age: </strong><span>{{ item[1].age }}</span></li>
-        <li class="education"><strong>Education: </strong><span>{{ item[1].education }}</span></li>
-        <li class="school"><strong>University: </strong><span>{{ item[1].school }}</span></li>
-        <li class="position"><strong>Position: </strong><span>{{ item[1].position }}</span></li>
-        <li class="company"><strong>Company: </strong><span>{{ item[1].company }}</span></li>
+        <li class="name"><strong>Name: </strong><span title="{{ item[1].name }}">{{ item[1].name }}</span></li>
+        <li class="age"><strong>Age: </strong><span title="{{ item[1].age }}">{{ item[1].age }}</span></li>
+        <li class="education"><strong>Education: </strong><span title="{{ item[1].education }}">{{ item[1].education }}</span></li>
+        <li class="school"><strong>University: </strong><span title="{{ item[1].school }}">{{ item[1].school }}</span></li>
+        <li class="position"><strong>Position: </strong><span title="{{ item[1].position }}">{{ item[1].position }}</span></li>
+        <li class="company"><strong>Company: </strong><span title="{{ item[1].company }}">{{ item[1].company }}</span></li>
       </ul>
     </div>
     <div class="work-experience">
+      {% if item[1].experience | length - 2 >= 2 %}
       <a href="javascript:;" class="show-more">Unfold</a>
-        {% for e in item[1].experience %}
-        {% if loop.index > 2 %}
-        <div class="experience-hide">
-          <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-          <div class="experience-company">{{ e[2] }}</div>
-        </div>
-        {% else %}
-        <div>
-          <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-          <div class="experience-company">{{ e[2] }}</div>
-        </div>
-        {% endif %}
-        {% endfor %}
+      {% for e in item[1].experience %}
+      {% if loop.index > 2 %}
+      <div class="experience-hide">
+        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+        <div class="experience-company">{{ e[2] }}</div>
+      </div>
+      {% else %}
+      <div>
+        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+        <div class="experience-company">{{ e[2] }}</div>
+      </div>
+      {% endif %}
+      {% endfor %}
+
+      {% else %}
+      {% for e in item[1].experience %}
+      <div>
+        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
+        <div class="experience-company">{{ e[2] }}</div>
+      </div>
+      {% endfor %}
+      {% endif %}
     </div>
     <div class="label-box">
       <span class="label-title">Tags:</span>
@@ -221,6 +233,10 @@
       {% endfor %}
       {% else %}
       {% if cur_page < pages - 2 %}
+      {% if cur_page -2 > 0 %}
+      <li><a href="/lsipage?{{ param }}&page={{ cur_page-2 }}">{{ cur_page-2 }}</a></li>
+      <li><a href="/lsipage?{{ param }}&page={{ cur_page-1 }}">{{ cur_page-1 }}</a></li>
+      {% endif %}
       <li class="active"><a href="/lsipage?{{ param }}&page={{ cur_page }}">{{ cur_page }}</a></li>
       <li><a href="/lsipage?{{ param }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
       <li><a href="/lsipage?{{ param }}&page={{ cur_page+2 }}">{{ cur_page+2}}</a></li>
@@ -256,5 +272,5 @@
 
 {% block script%}
 <script src="{{ url_for('static', filename='lib/js/echarts.min.js') }}"></script>
-<script data-main="{{ url_for('static', filename='src/js/modules/search_result.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
+<script data-main="{{ url_for('static', filename='src/js/modules/match_result_module.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock%}

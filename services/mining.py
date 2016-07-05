@@ -119,9 +119,12 @@ class Mining(object):
                 self.sim[svc.name].update([svc])
                 self.sim[svc.name].save()
 
-    def probability(self, doc):
+    def probability(self, doc, uses=None):
+        if uses is None:
+            uses = self.sim.keys()
         result = []
-        for sim in self.sim.values():
+        for name in uses:
+            sim = self.sim[name]
             result.extend(sim.probability(doc))
         return sorted(result, key=lambda x:float(x[1]), reverse=True)
 
@@ -131,3 +134,11 @@ class Mining(object):
     def minelist(self, doc, lists):
         return filter(lambda x: x[0] in lists, self.probability(doc))
 
+    def default_names(self):
+        return [n.name for n in self.services['default'] if n.name in self.sim.keys()]
+
+    def addition_names(self):
+        names = self.sim.keys()
+        for n in self.default_names():
+            names.remove(n)
+        return names

@@ -160,10 +160,8 @@ def get_age(stream):
     return result
 
 
-def catch(stream, basename=None):
+def catch(stream):
     info_dict = dict()
-    if basename is not None:
-        info_dict["filename"] = basename
     info_dict["name"] = get_name(stream)
     info_dict["originid"] = get_originid(stream)
     info_dict["age"] = get_age(stream)

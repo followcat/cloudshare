@@ -110,11 +110,11 @@ yaml.SafeDumper = utils._yaml.SafeDumper
 
 import extractor.information_explorer
 
-def update_education(svc_cv, yamlname):
+def update_selected(svc_cv, yamlname, selected):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
-    education = extractor.information_explorer.get_education(svc_cv.getmd(yamlname))
-    obj['education'] = education
+    info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname), selected)
+    obj.update(info)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
@@ -146,6 +146,6 @@ def originid(svc_cv, yamlname):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
-def yamlaction(svc_cv, action):
+def yamlaction(svc_cv, action, *args, **kwargs):
     for yamlname in svc_cv.yamls():
-        action(svc_cv, yamlname)
+        action(svc_cv, yamlname, *args, **kwargs)

@@ -172,3 +172,23 @@ def catch(stream):
     info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                 # age
     return info_dict
+
+def catch_selected(stream, selected):
+    info_dict = dict()
+    if 'name' in selected:
+        info_dict["name"] = get_name(stream)
+    if 'originid' in selected:
+        info_dict["originid"] = get_originid(stream)
+    if 'age' in selected:
+        info_dict["age"] = get_age(stream)
+    if 'phone' in selected:
+        info_dict["phone"] = get_phone(stream)
+    if 'email' in selected:
+        info_dict["email"] = get_email(stream)
+    if 'education' in selected:
+        info_dict.update(get_education(stream))
+    if 'experience' in selected:
+        info_dict.update(get_experience(stream))
+    if 'expectation' in selected:
+        info_dict.update(get_expectation(stream))
+    return info_dict

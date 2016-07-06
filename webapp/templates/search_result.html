@@ -45,8 +45,13 @@
       <ul class="list-unstyled info">
         <li class="name"><strong>Name: </strong><span title="{{ item[1].name }}">{{ item[1].name }}</span></li>
         <li class="age"><strong>Age: </strong><span title="{{ item[1].age }}">{{ item[1].age }}</span></li>
-        <li class="education"><strong>Education: </strong><span title="{{ item[1].education }}">{{ item[1].education }}</span></li>
-        <li class="school"><strong>University: </strong><span title="{{ item[1].school }}">{{ item[1].school }}</span></li>
+        {% if item[1].education.education_history %}
+        <li class="education"><strong>Education: </strong><span title="{{ item[1].education.education_history[0].education }}">{{ item[1].education.education_history[0].education }}</span></li>
+        <li class="school"><strong>University: </strong><span title="{{ item[1].education.education_history[0].school }}">{{ item[1].education.education_history[0].school }}</span></li>
+        {% else %}
+        <li class="education"><strong>Education: </strong><span title=""></span></li>
+        <li class="school"><strong>University: </strong><span title=""></span></li>
+        {% endif %}
         <li class="position"><strong>Position: </strong><span title="{{ item[1].position }}">{{ item[1].position }}</span></li>
         <li class="company"><strong>Company: </strong><span title="{{ item[1].company }}">{{ item[1].company }}</span></li>
       </ul>

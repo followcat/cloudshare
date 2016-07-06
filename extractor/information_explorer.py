@@ -154,24 +154,7 @@ def get_age(stream):
 
 
 def catch(stream, basename=None):
-    info_dict = {
-        "filename":     '',
-        "name":         '',
-        "education":    '',
-        "age":          '',
-        "position":     '',
-        "company":      '',
-        "school":       '',
-        "phone":        '',
-        "email":        '',
-        "origin":       '',
-        "originid":     '',
-        "id":           '',
-        "experience":   [],
-        "comment":      [],
-        "tag":          [],
-        "tracking":     [],
-        }
+    info_dict = dict()
     if basename is not None:
         info_dict["filename"] = basename
     info_dict["name"] = get_name(stream)

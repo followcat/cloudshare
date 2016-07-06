@@ -58,7 +58,13 @@ def info_by_re_iter(stream, restr):
 
 
 def get_education(stream):
-    return extractor.education.fix(stream)
+    result = dict(education='', school='')
+    result['education'] = extractor.education.fix(stream)
+    if 'education_history' in result['education']:
+        for edu in result['education']['education_history']:
+            result['school'] = edu['school']
+            break
+    return result
 
 
 def get_experience(stream):
@@ -139,22 +145,6 @@ def get_phone(stream):
     return result
 
 
-def get_school(stream):
-    school = (u'大学', u'学院', u'学校')
-    school_restr = u'[ \u3000]*([a-zA-Z0-9\u4E00-\u9FA5]+)('
-    for each in school:
-        school_restr += each + '|'
-    school_restr = school_restr[:-1] + ')'
-    school_iter = iter(get_infofromrestr(stream, school_restr))
-    try:
-        school = ''.join(school_iter.next())
-        while len(school) > 10:
-            school = ''.join(school_iter.next())
-    except StopIteration:
-        school = ''
-    return school
-
-
 def get_age(stream):
     age_chinese = u'岁'
     age_restr = u'[ \u3000]*(\d{2})' + age_chinese
@@ -185,11 +175,10 @@ def catch(stream, basename=None):
     if basename is not None:
         info_dict["filename"] = basename
     info_dict["name"] = get_name(stream)
-    info_dict["school"] = get_school(stream)
-    info_dict["education"] = get_education(stream)
     info_dict["originid"] = get_originid(stream)
     info_dict["age"] = get_age(stream)
     info_dict["phone"] = get_phone(stream)
     info_dict["email"] = get_email(stream)
-    info_dict.update(get_experience(stream))
+    info_dict.update(get_education(stream)) # experience, company, position
+    info_dict.update(get_experience(stream)) # education, school
     return info_dict

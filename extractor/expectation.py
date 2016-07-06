@@ -6,22 +6,20 @@ import jieba
 from extractor.utils_parsing import *
 
 
-WORKEXPE =  u'((((\d{1,2}(\-\d{1,2})?)|(['+CHNUMBERS+u']{1,3})) *年(以上)?)|无)'+u'工作经验'
+WORKEXPE =  u'((((((\d{1,2}((\-\d{1,2})|(\.\d))?)|(['+CHNUMBERS+u']{1,3})) *年(以[上下])?)|无)'+u'工作经验)|(应届毕'+ASP+u'*((业生)|(经验))))'
 GEN = re.compile(u'^'+ASP+u'*-{3}[\- ]*\n+(?P<general>姓名[:：].+?性别[:：].*?)(?=\n+-{3}[\- ]*)$', re.DOTALL+re.M)
 REVGEN = re.compile(u'^'+ASP+u'*(?P<general>姓名[:：].+?性别[:：].*?'+ASP+u'*-{3}[\- ]*\n+((联系电话)|(电子邮件)|(年龄))[:：].*?)(?=\n+-{3}[\- ]*)$', re.DOTALL+re.M)
 
-GENFIELDS = (WORKEXPE, GENDER, AGEANDBIRTH, u'('+MARITALSTATUS+u')?')
-PIPEGENSEP = ASP+u'*\|?'+ASP+u'*'
-PIPEGEN = re.compile(u'^(?P<general>'+PIPEGENSEP.join(GENFIELDS)+u')', re.M)
-
-REVGENFIELDS = (GENDER, AGEANDBIRTH, u'('+EDUCATION+u')?', WORKEXPE, u'(\d{3}cm)?', u'('+MARITALSTATUS+u')?')
-REVPIPEGEN = re.compile(u'^(?P<general>'+PIPEGENSEP.join(REVGENFIELDS)+u')', re.M)
+GENFIELDS = (WORKEXPE, GENDER, AGEANDBIRTH, MARITALSTATUS, u'\d{3}cm', EDUCATION)
+PIPEGENSEP = ASP+u'*\|?'+ASP+u'*)|('
+PIPEGEN = re.compile(u'^(?P<general>(('+PIPEGENSEP.join(GENFIELDS)+ASP+u'*\|?'+ASP+u'*)){3,6})', re.M)
 
 SPGENSEP = ASP+u'{3}'+ASP+u'*'
 SPGENFIELDS = (GENDER, AGEANDBIRTH, WORKEXPE, EDUCATION, u'('+MARITALSTATUS+u')?')
 SPACEGEN = re.compile(u'^(?P<general>'+SPGENSEP.join(SPGENFIELDS)+u')', re.M)
 
-LBLPIPEGEN = re.compile(u'^'+PREFIX+u'?'+ASP+u'*(?P<general>姓名[:：]'+ASP+u'*.*?\|'+ASP+u'*'+PIPEGENSEP.join(
+LBLPIPEGENSEP = ASP+u'*\|?'+ASP+u'*'
+LBLPIPEGEN = re.compile(u'^'+PREFIX+u'?'+ASP+u'*(?P<general>姓名[:：]'+ASP+u'*.*?\|'+ASP+u'*'+LBLPIPEGENSEP.join(
     [GENDER, WORKEXPE, EDUCATION])+u')', re.M)
 
 EXPECTATION = re.compile(u'期望((薪资)|([年月]薪))(（税前）)?[:：]'+ASP+u'*(?P<salary_expectation>'+SALARY+u')', re.M)
@@ -129,6 +127,7 @@ def fix(d):
         >>> assert gender(fix(u'5-7年工作经验 | 女 |  28岁（1988年1月4日）')) == u'女'
         >>> assert gender(fix(u'三年以上工作经验 | 女 |  28岁（1986年3月15日）')) == u'女'
         >>> assert marital_status(fix(u'10年以上工作经验 | 男 |  39岁（1976年4月4日） |  已婚 |  170cm |  无党派人士')) == u'已婚'
+        >>> assert marital_status(fix(u'应届毕业生 | 男 |  22岁（1992年9月25日） |  未婚 |  170cm |  中共党员')) == u'未婚'
         >>> assert gender(fix(u'男    33岁(1983年12月)    9年工作经验    本科   ')) == u'男'
         >>> assert marital_status(fix(u'女    26岁(1990年7月)    4年工作经验    本科    未婚')) == u'未婚'
         >>> assert gender(fix(u'姓名： 徐   |  男  |  15 年工作经验   | 硕士')) == u'男'
@@ -137,6 +136,7 @@ def fix(d):
     Tests for REVPIPEGEN:
         >>> assert gender(fix(u'男 | 24岁(1990年6月17日) | 1年工作经验 | 173cm')) == u'男'
         >>> assert gender(fix(u'男 | 23岁(1991年2月14日) | 本科| 1年工作经验')) == u'男'
+        >>> assert marital_status(fix(u'男 | 28岁(1986年10月5日) | 硕士| 一年以下工作经验 | 176cm | 未婚')) == u'未婚'
         >>> assert gender(fix(u'男 | 23岁(1991年7月12日) | 1年工作经验 | 未婚 |  O型')) == u'男'
     """
     def fix_output(processed):
@@ -187,6 +187,4 @@ def fix(d):
         processed.update(extract_general(PIPEGEN.search(d).groupdict()))
     elif SPACEGEN.search(d):
         processed.update(extract_general(SPACEGEN.search(d).groupdict()))
-    elif REVPIPEGEN.search(d):
-        processed.update(extract_general(REVPIPEGEN.search(d).groupdict()))
     return fix_output(processed)

@@ -59,13 +59,14 @@ def info_by_re_iter(stream, restr):
 
 
 def get_education(stream):
-    result = dict(education='', school='')
-    education_history = extractor.education.fix(stream)
-    result.update(education_history)
-    for edu in education_history:
-        result['education'] = edu
-        result['school'] = edu['school']
-        break
+    result = dict(education={}, school='', education_history=[])
+    education_result = extractor.education.fix(stream)
+    result.update(education_result)
+    if 'education_history' in education_result:
+        for edu in education_result['education_history']:
+            result['education'] = edu['education']
+            result['school'] = edu['school']
+            break
     return result
 
 

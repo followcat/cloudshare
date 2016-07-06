@@ -47,8 +47,19 @@ def get_infofromrestr(stream, restring):
     result = re.findall(regex, search_string)
     return result
 
+
+def info_by_re_iter(stream, restr):
+    result_iter = iter(get_infofromrestr(stream, restr))
+    try:
+        result = ''.join(result_iter.next())
+    except StopIteration:
+        result = ''
+    return result
+
+
 def get_education(stream):
     return extractor.education.fix(stream)
+
 
 def get_experience(stream):
     u"""
@@ -100,12 +111,55 @@ def get_experience(stream):
     return result
 
 
-def info_by_re_iter(stream, restr):
-    result_iter = iter(get_infofromrestr(stream, restr))
+def get_name(stream):
+    name = get_tagfromstring(u'姓名', stream)
+    namelist = get_infofromrestr(name, u'^[\u4E00-\u9FA5\w]*$')
+    if not namelist:
+        name = ''
+    return name
+
+
+def get_email(stream):
+    email_restr = u'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'
+    email = info_by_re_iter(stream, email_restr)
+    result = get_tagfromstring(u'邮件', stream, email_restr) or \
+        get_tagfromstring(u'邮箱', stream) or email
+    return result
+
+
+def get_originid(stream):
+    result = get_tagfromstring(u'ID', stream, rule='a-zA-Z0-9')
+    return result
+
+
+def get_phone(stream):
+    phone_restr = u'1\d{10}'
+    phone = info_by_re_iter(stream, phone_restr)
+    result = get_tagfromstring(u'电话', stream, ur'\d\-－()') or phone
+    return result
+
+
+def get_school(stream):
+    school = (u'大学', u'学院', u'学校')
+    school_restr = u'[ \u3000]*([a-zA-Z0-9\u4E00-\u9FA5]+)('
+    for each in school:
+        school_restr += each + '|'
+    school_restr = school_restr[:-1] + ')'
+    school_iter = iter(get_infofromrestr(stream, school_restr))
     try:
-        result = ''.join(result_iter.next())
+        school = ''.join(school_iter.next())
+        while len(school) > 10:
+            school = ''.join(school_iter.next())
     except StopIteration:
-        result = ''
+        school = ''
+    return school
+
+
+def get_age(stream):
+    age_chinese = u'岁'
+    age_restr = u'[ \u3000]*(\d{2})' + age_chinese
+    age = info_by_re_iter(stream, age_restr)
+    result = get_tagfromstring(u'年龄', stream) or age
     return result
 
 
@@ -128,45 +182,14 @@ def catch(stream, basename=None):
         "tag":          [],
         "tracking":     [],
         }
-
-    school = (u'大学', u'学院', u'学校')
-    school_restr = u'[ \u3000]*([a-zA-Z0-9\u4E00-\u9FA5]+)('
-    for each in school:
-        school_restr += each + '|'
-    school_restr = school_restr[:-1] + ')'
-
-    age_chinese = u'岁'
-    age_restr = u'[ \u3000]*(\d{2})' + age_chinese
-
-    phone_restr = u'1\d{10}'
-
-    email_restr = u'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'
-
-    name = get_tagfromstring(u'姓名', stream)
-    namelist = get_infofromrestr(name, u'^[\u4E00-\u9FA5\w]*$')
-    if not namelist:
-        name = ''
-    info_dict["name"] = name
-
-    age = info_by_re_iter(stream, age_restr)
-    phone = info_by_re_iter(stream, phone_restr)
-    email = info_by_re_iter(stream, email_restr)
-    school_iter = iter(get_infofromrestr(stream, school_restr))
-    try:
-        school = ''.join(school_iter.next())
-        while len(school) > 10:
-            school = ''.join(school_iter.next())
-    except StopIteration:
-        school = ''
-
-    info_dict["school"] = school
     if basename is not None:
         info_dict["filename"] = basename
+    info_dict["name"] = get_name(stream)
+    info_dict["school"] = get_school(stream)
     info_dict["education"] = get_education(stream)
-    info_dict["originid"] = get_tagfromstring(u'ID', stream, rule='a-zA-Z0-9')
-    info_dict["age"] = get_tagfromstring(u'年龄', stream) or age
-    info_dict["phone"] = get_tagfromstring(u'电话', stream, ur'\d\-－()') or phone
-    info_dict["email"] = get_tagfromstring(u'邮件', stream, email_restr) or \
-        get_tagfromstring(u'邮箱', stream) or email
+    info_dict["originid"] = get_originid(stream)
+    info_dict["age"] = get_age(stream)
+    info_dict["phone"] = get_phone(stream)
+    info_dict["email"] = get_email(stream)
     info_dict.update(get_experience(stream))
     return info_dict

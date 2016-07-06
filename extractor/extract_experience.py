@@ -51,9 +51,6 @@ LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITI
 
 EMP = re.compile(BEMPLOYEES)
 
-EXPECTATION = re.compile(u'期望((薪资)|([年月]薪))(（税前）)?[:：]'+ASP+u'*(?P<salary_expectation>'+SALARY+u')', re.M)
-SALARYCURRENT = re.compile(u'目前((薪资)|([年月]薪))(（税前）)?[:：]'+ASP+u'*(?P<salary_current>'+SALARY+u')', re.M)
-
 
 def output_cleanup(groupdict):
     for item in ['company', 'position']:
@@ -376,10 +373,6 @@ def fix(d, as_dict=False):
         >>> assert fix(u'工作经历\\n音视频可靠光传输系统项目背景')[1] == 3   #项目背景 stop inside text
         >>> assert fix(u'工作经验：1年\\n公司名称 深圳x有限公司\\n 时间 2013.06 ——2014.04\\n职务 硬件工程师')[0][1]
         >>> assert fix(u'工作经历\\n1.  公司名称：有限公司\\n起止时间：2013年5月-至今\\n\\n担任职位：总账高级会计师')[0][1]
-        >>> assert u'元' in fix(u'期望月薪： 8000/月', True)['salary_expectation']['salary']
-        >>> assert u'年' in fix(u'目前薪资： 年薪 30-40万 人民币', True)['salary_current']['yearly']
-        >>> assert u'万' in fix(u'目前薪资： 15-30W人民币', True)['salary_current']['yearly']
-        >>> assert u'元' in fix(u'目前薪资：月薪（税前）：25000 元 \* 15 个月', True)['salary_current']['salary']
     """
     def fix_output(processed, reject):
         if as_dict:
@@ -396,12 +389,6 @@ def fix(d, as_dict=False):
                         continue
             if processed['company']:
                 result['experience'] = processed
-            if EXPECTATION.search(d):
-                salary = {}
-                result['salary_expectation'] = format_salary(salary, EXPECTATION.search(d).groupdict())
-            if SALARYCURRENT.search(d):
-                salary = {}
-                result['salary_current'] = format_salary(salary, SALARYCURRENT.search(d).groupdict())
             return result
         else:
             for company in processed['company']:

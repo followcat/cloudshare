@@ -60,11 +60,12 @@ def info_by_re_iter(stream, restr):
 
 def get_education(stream):
     result = dict(education='', school='')
-    result['education'] = extractor.education.fix(stream)
-    if 'education_history' in result['education']:
-        for edu in result['education']['education_history']:
-            result['school'] = edu['school']
-            break
+    education_history = extractor.education.fix(stream)
+    result.update(education_history)
+    for edu in education_history:
+        result['education'] = edu
+        result['school'] = edu['school']
+        break
     return result
 
 
@@ -169,7 +170,7 @@ def catch(stream, basename=None):
     info_dict["phone"] = get_phone(stream)
     info_dict["email"] = get_email(stream)
     info_dict.update(get_education(stream))     # experience, company, position
-    info_dict.update(get_experience(stream))    # education, school
+    info_dict.update(get_experience(stream))    # education_history, education, school
     info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                 # age
     return info_dict

@@ -13,31 +13,31 @@ PFXED = re.compile(with_prefix(ED), re.DOTALL+re.M)
 PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
 
 
-SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+ASP+u'*[\n'+SP+SENTENCESEP+u']*(?P<school>[^'+SP+u'\n]+)[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+u'\n]+)[\n'+SP+SENTENCESEP+u']+(?P<education>'+EDUCATION+u')'+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
-MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+(?P<school>\S+)'+ASP+u'+(?P<education>'+EDUCATION+u')'+ASP+u'*$', re.M)
+SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+ASP+u'*[\n'+SP+SENTENCESEP+u']*'+SCHOOL+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
+MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
-SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*(?P<school>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+(([^'+SP+FIELDSEP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+))?(?P<education>'+EDUCATION+u')'+ASP+u'*', re.M)
-UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*(?P<school>[^\ufffd\xa0'+FIELDSEP+u'\n]+)( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+FIELDSEP+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?(?P<education>'+EDUCATION+u')', re.M)
+SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+FIELDSEP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
+UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+FIELDSEP+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
 
 PFXSENSEMA = re.compile(with_prefix(SENSEMA), re.M)
 PFXSPSOLMA = re.compile(with_prefix(SPSOLMA), re.M)
 PFXUCSOLMA = re.compile(with_prefix(UCSOLMA), re.M)
 
 SEPLIST = u'[\n'+SP+u']*)|(?:(\d\.)?'+ASP+u'*'
-VRT = (u'(毕业)?[院学]校(名称)?[:：]'+ASP+u'*(?P<school>\S+)', u'((就读)|(入学))?时间[:：]'+ASP+u'*'+PERIOD, u'专业(名称)?[:：]'+ASP+u'*(?P<major>.+?)', u'学[位历][:：]'+ASP+u'*(?P<education>'+EDUCATION+u')'+ASP)
+VRT = (u'(毕业)?[院学]校(名称)?[:：]'+ASP+u'*'+SCHOOL, u'((就读)|(入学))?时间[:：]'+ASP+u'*'+PERIOD, u'专业(名称)?[:：]'+ASP+u'*(?P<major>.+?)', u'学[位历][:：]'+ASP+u'*'+EDUCATION+ASP)
 HDVRTMA = re.compile(u'^'+ASP+u'*(?:(?:(\d\.)?'+ASP+u'*'+ SEPLIST.join(VRT) +u')){4}'+ASP+u'*$', re.M)
 
 SEPLIST = u''
 CTL = (u'(?P<school>.+?)', u'(?P<br>'+UNIBRALEFT+')?'+ASP+u'*'+PERIOD+ASP+u'*(?(br)'+UNIBRARIGHT+')')
-HDCTLMA = re.compile(u'^'+CONTEXT+u'?'+ SEPLIST.join(CTL)+ASP+u'*\n+('+ASP+u'*专业(名称)?[:：])?'+ASP+u'*(?P<major>.+?)\n*(学院名称[:：]\n*\S+'+ASP+u'+\n*)?学(历/学)?[历位][:：]'+ASP+u'*(?P<education>'+EDUCATION+u')('+ASP+u'+((是否)|(全日制))统招[:：]?'+ASP+u'*[是否])?', re.M)
-RVHDCTLMA = re.compile(u'^'+CONTEXT+u'?'+ SEPLIST.join(reversed(CTL))+ASP+u'*\n+('+ASP+u'*专业(名称)?[:：])?'+ASP+u'*(?P<major>.+?)\n*(学院名称[:：]\n*\S+'+ASP+u'+\n*)?学(历/学)?[历位][:：]'+ASP+u'*(?P<education>'+EDUCATION+u')('+ASP+u'+((是否)|(全日制))统招[:：]?'+ASP+u'*[是否])?', re.M)
+HDCTLMA = re.compile(u'^'+CONTEXT+u'?'+ SEPLIST.join(CTL)+ASP+u'*\n+('+ASP+u'*专业(名称)?[:：])?'+ASP+u'*(?P<major>.+?)\n*(学院名称[:：]\n*\S+'+ASP+u'+\n*)?学(历/学)?[历位][:：]'+ASP+u'*'+EDUCATION+u'('+ASP+u'+((是否)|(全日制))统招[:：]?'+ASP+u'*[是否])?', re.M)
+RVHDCTLMA = re.compile(u'^'+CONTEXT+u'?'+ SEPLIST.join(reversed(CTL))+ASP+u'*\n+('+ASP+u'*专业(名称)?[:：])?'+ASP+u'*(?P<major>.+?)\n*(学院名称[:：]\n*\S+'+ASP+u'+\n*)?学(历/学)?[历位][:：]'+ASP+u'*'+EDUCATION+u'('+ASP+u'+((是否)|(全日制))统招[:：]?'+ASP+u'*[是否])?', re.M)
 
 PFXHDCTLMA = re.compile(with_prefix(HDCTLMA), re.M)
 PFXRVHDCTLMA = re.compile(with_prefix(RVHDCTLMA), re.M)
 
-NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*(?P<school>\S+)\n{2}'+ASP+u'*(?P<education>'+EDUCATION+u')\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
+NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
 SENSEDROP = u'((\S+)[\n'+SP+SENTENCESEP+u']*)?'
-RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'?'+ASP+u'*(?P<school>[^'+SP+SENTENCESEP+u'\n]+)'+ASP+u'*'+PERIOD+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+SENTENCESEP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u'(?P<education>'+EDUCATION+u')[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u'$', re.M)
+RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'?'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+SENTENCESEP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u''+EDUCATION+u'[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u'$', re.M)
 
 TABHDRMAJ = u'^'+ASP+u'*时'+ASP+u'*间段?'+ASP+u'+[院学]'+ASP+u'*校('+ASP+u'*名'+ASP+u'*称)?'+ASP+u'+专'+ASP+u'*业'+ASP+u'+(获得证书/)?学'+ASP+u'*历(/学位)?('+ASP+u'+证'+ASP+u'*书)?('+ASP+u'+是否统招)?(?P<edu>.+)'
 
@@ -47,7 +47,7 @@ THED = re.compile(u'^'+ASP+u'*(-{3}[\-'+SP+u']*\n+)?'+TABHDRMAJ+'+-{3}[\-'+SP+u'
 
 SUMMARYEDU = re.compile(u'学'+ASP+u'*[历位][:：]'+ASP+u'*(?P<education>\S+)', re.M)
 SUMMARYMAJOR = re.compile(u'专'+ASP+u'*业[:：]'+ASP+u'*(?P<major>\S+)', re.M)
-SUMMARYSCHOOL = re.compile(u'((毕业院)|(学))'+ASP+u'*校[:：]'+ASP+u'*(?P<school>\S+)', re.M)
+SUMMARYSCHOOL = re.compile(u'((毕业院)|(学))'+ASP+u'*校[:：]'+ASP+u'*'+SCHOOL, re.M)
 
 def format_output(output, groupdict, summary=None):
     result = {
@@ -84,6 +84,7 @@ def education_xp(text, summary=None):
         >>> assert education_xp(u'（海外） 2015 /9 --至今  南京大学 人力资源管理 MBA')[0]
         >>> assert education_xp(u'1995 /9--1998 /7  衡阳医学院（现名“南华大学”）   临床医学与医学技术   大专')[0]
         >>> assert education_xp(u'2009.01 - 2010.06  印度大学(India University)  软件工程  硕士')[0]
+        >>> assert education_xp(u'2001.03 - 2002.11  悉尼科技大学 (University of Technology, Sydney)  其他  本科')[0]
         >>> assert education_xp(u'1999.02 - 2000.11  商业学院，悉尼大学  商业全科学 (Business Studies)  大专')[0]
         >>> assert education_xp(u'教育背景及培训：\\n\\n   1996.09-2000.07  西南学院 (西南科技大学)\\n 自动化  本科。')[0] == 1
         >>> assert education_xp(u'（海外） 2015/9-至今 南京大学 管理 MBA\\n双证班；\\n2007/1-2010/1 南京大学 资源管理 本科\\n管理')[0] == 2
@@ -198,7 +199,8 @@ def education_xp(text, summary=None):
                 format_output(out, r.groupdict(), summary={'major': ''})
         out = sorted(out, key=lambda x: x['date_from'], reverse=True)
     if not maj and summary:
-        RE = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'+(?P<school>%s)' % summary['school'].strip()+ASP+u'+(?P<major>%s)' % summary['major'].strip(), re.M)
+        RE = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'+(?P<school>%s)' %
+                summary['school'].replace('(', '\(').replace(')', '\)').strip()+ASP+u'+(?P<major>%s)' % summary['major'].strip(), re.M)
         if RE.search(text):
             out = []
         for r in RE.finditer(text):
@@ -237,6 +239,8 @@ def fix(d):
         >>> assert fix(u'教育背景及培训：\\n\\n   1996.09-2000.07  西南学院 (西南科技大学)\\n 自动化  本科。')
         >>> assert fix(u'学历： 本科专业： 公共事业管理学校： 湖南师范大学\\n\\n教育经历 \\n\\n'
         ...         u'2011-09 ～ 2015-06 | 湖南师范大学 | 公共事业管理 | 本科 \\n\\n语言能力')
+        >>> assert not fix(u'学　历：   硕士\\n专　业：   电子信息工程\\n学校： 谢菲尔德大学(University of Sheffield)\\n'
+        ...         u'教育经历\\n2011 /8--2012 /10 谢菲尔德大学(University of Sheffield)   电子信息工程\\n所获奖项')    #FIXME
         >>> assert len(fix(u'教育背景\\n2001.09-2004.06        广东省广宁中学                           高中\\n\\n'
         ...         u'2004.09-2008.07        华南理工大学           自动化            本科')['education_history']) == 2
         >>> assert fix(u'教 育 经 历2006/9--2010/7        湛江师范学院   计算机科学与技术（软件工程）    本科    在校获奖经历：')

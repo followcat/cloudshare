@@ -13,7 +13,9 @@ DATESEP = u'['+SEP+SP+u'至]+'
 DATE = ur'(?:(?:\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))('+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
 PERIOD = u'(?P<from>' + DATE + ur')' + DATESEP + ASP+ u'*(?P<to>' + DATE + ')'
 DURATION = ur'(?P<duration>(\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个月)?)|(\d{1,2}'+ASP+u'?个月))'
-FIELDSEP = ur'、：:\|'
+AGE = u'(?P<age>\d{2})岁'
+FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
+FIELDSEP = ur'、：:；;\|'
 SENTENCESEP = FIELDSEP+ur'，。'
 
 exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
@@ -42,14 +44,19 @@ LIST_SEPARATOR = u')|(?:'
 EDUCATION_LIST = {}
 for k,v in education_list.items():
     EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))')
-EDUCATION = u'(?:(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))' for v in education_list.values()]) +u'))'
-    
+EDUCATION = u'(?P<education>(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))' for v in education_list.values()]) +u'))'
+SCHOOL = u'(?P<school>(\s?\w)+|([^'+SP+FIELDSEP+u']+'+ASP+u'*'+exclude_with_parenthesis('')+u'?))'
+
+GENDER = u'(?P<gender>男|女)'
+MARITALSTATUS = u'(?P<marital_status>(未婚)|(已婚))'
+AGEANDBIRTH = AGE+ u'('+UNIBRALEFT+u'(?P<birthdate>' +FULLDATE+ u'|'+DATE+u')' +UNIBRARIGHT + u')?'
 
 SALARY = u'((月薪(（税前）)?[:：]?)?'+ASP+u'*((?P<salary>\d[\- \d\|]*(月/月)?((元/月)|元|(/月))(以[上下])?)'+ASP+u'*(\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?)|((年薪(（税前）)?[:：]?)?'+ASP+u'*(?P<yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
 EMPLOYEES = u'((?P<employees>(少于)?\d[\d '+SEP+u']*人(以[上下])?)([' + SENTENCESEP + u'].*?)?)'
 BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + UNIBRARIGHT +u')'
 BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + DURATION + u'(?(br)[\n'+SP+u']*' +UNIBRARIGHT + u'(?(dit)\*)))'
 
+PLACES = u'(?:(\S+)['+SENTENCESEP+SEP+']?)+'
 
 fix_today = lambda x: re.compile('^'+TODAY+'$').sub(u'至今', x)
 fix_sep = lambda x: re.compile(u'['+SP+SEP+u'\.．年]+').sub('.', x)
@@ -69,6 +76,6 @@ fix_salary = lambda x: salary_unit(ten_thousands(re.compile(ASP+'+').sub('', x))
 
 
 WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)$'
-STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P<major>'+POSITION+u'?)[：:\| ]*(?P<education>'+EDUCATION+u'?)$'
+STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P<major>'+POSITION+u'?)[：:\| ]*'+EDUCATION+u'?$'
 
 

@@ -2,6 +2,7 @@
 import re
 import os.path
 import extractor.education
+import extractor.expectation
 import extractor.utils_parsing
 import extractor.extract_experience
 
@@ -64,6 +65,11 @@ def get_education(stream):
         for edu in result['education']['education_history']:
             result['school'] = edu['school']
             break
+    return result
+
+
+def get_expectation(stream):
+    result = extractor.expectation.fix(stream)
     return result
 
 
@@ -162,6 +168,8 @@ def catch(stream, basename=None):
     info_dict["age"] = get_age(stream)
     info_dict["phone"] = get_phone(stream)
     info_dict["email"] = get_email(stream)
-    info_dict.update(get_education(stream)) # experience, company, position
-    info_dict.update(get_experience(stream)) # education, school
+    info_dict.update(get_education(stream))     # experience, company, position
+    info_dict.update(get_experience(stream))    # education, school
+    info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
+                                                # age
     return info_dict

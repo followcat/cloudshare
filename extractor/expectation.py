@@ -6,20 +6,20 @@ import jieba
 from extractor.utils_parsing import *
 
 
-WORKEXPE =  u'((((((\d{1,2}((\-\d{1,2})|(\.\d))?)|(['+CHNUMBERS+u']{1,3})) *年(以[上下])?)|无)'+u'工作经验)|(应届毕'+ASP+u'*((业生)|(经验))))'
+WORKEXPE =  u'((((((\d{1,2}((\-\d{1,2})|(\.\d))?)|(['+CHNUMBERS+u']{1,3})) *(年|(个月))(以[上下])?)|无)'+u'工作经验)|(应届(毕业)?生('+ASP+u'*经验)?))'
 GEN = re.compile(u'^'+ASP+u'*-{3}[\- ]*\n+(?P<general>姓名[:：].+?性别[:：].*?)(?=\n+-{3}[\- ]*)$', re.DOTALL+re.M)
 REVGEN = re.compile(u'^'+ASP+u'*(?P<general>姓名[:：].+?性别[:：].*?'+ASP+u'*-{3}[\- ]*\n+((联系电话)|(电子邮件)|(年龄))[:：].*?)(?=\n+-{3}[\- ]*)$', re.DOTALL+re.M)
 
 GENFIELDS = (WORKEXPE, GENDER, AGEANDBIRTH, MARITALSTATUS, u'\d{3}cm', EDUCATION)
 PIPEGENSEP = ASP+u'*\|?'+ASP+u'*)|('
-PIPEGEN = re.compile(u'^(?P<general>(('+PIPEGENSEP.join(GENFIELDS)+ASP+u'*\|?'+ASP+u'*)){3,6})', re.M)
+PIPEGEN = re.compile(u'^'+ASP+u'*(?P<general>(('+PIPEGENSEP.join(GENFIELDS)+ASP+u'*\|?'+ASP+u'*)){3,6})', re.M)
 
 SPGENSEP = ASP+u'{3}'+ASP+u'*'
 SPGENFIELDS = (GENDER, AGEANDBIRTH, WORKEXPE, EDUCATION, u'('+MARITALSTATUS+u')?')
 SPACEGEN = re.compile(u'^(?P<general>'+SPGENSEP.join(SPGENFIELDS)+u')', re.M)
 
 LBLPIPEGENSEP = ASP+u'*\|?'+ASP+u'*'
-LBLPIPEGEN = re.compile(u'^'+PREFIX+u'?'+ASP+u'*(?P<general>姓名[:：]'+ASP+u'*.*?\|'+ASP+u'*'+LBLPIPEGENSEP.join(
+LBLPIPEGEN = re.compile(u'^'+ASP+u'*'+PREFIX+u'*'+ASP+u'*(?P<general>姓名[:：]'+ASP+u'*.*?\|'+ASP+u'*'+LBLPIPEGENSEP.join(
     [GENDER, WORKEXPE, EDUCATION])+u')', re.M)
 
 EXPECTATION = re.compile(u'期望((薪资)|([年月]薪))(（税前）)?[:：]'+ASP+u'*(?P<salary_expectation>'+SALARY+u')', re.M)
@@ -47,6 +47,7 @@ yearly = lambda salary: salary['yearly']
 salary = lambda salary: salary['salary']
 expectation = lambda general: general['expectation']
 current = lambda general: general['current']
+age = lambda general: int(general['age'])
 gender = lambda general: general['gender']
 marital_status = lambda general: general['marital_status']
 
@@ -125,15 +126,20 @@ def fix(d):
         >>> assert marital_status(fix(u'''姓名：赵 性别：男\\n----\\n联系电话：\\n婚姻状况：已婚\\n----''')) == u'已婚'
         >>> assert marital_status(fix(u'''----\\n姓名：常 性别：女\\n联系电话： \\n婚姻状况：已婚\\n----''')) == u'已婚'
         >>> assert gender(fix(u'5-7年工作经验 | 女 |  28岁（1988年1月4日）')) == u'女'
+        >>> assert age(fix(u'16个月工作经验 | 女 |  24岁（1990年8月6日）')) == 24
         >>> assert gender(fix(u'三年以上工作经验 | 女 |  28岁（1986年3月15日）')) == u'女'
+        >>> assert gender(fix(u'女 | 已婚 | 1982 年10月生')) == u'女'
+        >>> assert marital_status(fix(u'女|6年工作经验|1989年8月|已婚')) == u'已婚'
         >>> assert marital_status(fix(u'10年以上工作经验 | 男 |  39岁（1976年4月4日） |  已婚 |  170cm |  无党派人士')) == u'已婚'
         >>> assert marital_status(fix(u'应届毕业生 | 男 |  22岁（1992年9月25日） |  未婚 |  170cm |  中共党员')) == u'未婚'
+        >>> assert age(fix(u'应届生 经验 | 本科 | 男 | 未婚 | 24 岁 | 170cm | 团员 | 汉 |')) == 24
         >>> assert gender(fix(u'男    33岁(1983年12月)    9年工作经验    本科   ')) == u'男'
         >>> assert marital_status(fix(u'女    26岁(1990年7月)    4年工作经验    本科    未婚')) == u'未婚'
+        >>> assert age(fix(u'  男    38岁(1977年6月)    12年工作经验    硕士    已婚')) == 38
         >>> assert gender(fix(u'姓名： 徐   |  男  |  15 年工作经验   | 硕士')) == u'男'
         >>> assert gender(fix(u'1.  姓名： 张   |  女  |  11 年工作经验   | MBA')) == u'女'
-
-    Tests for REVPIPEGEN:
+        >>> assert gender(fix(u'    1.  姓名： 蒋   |  女  |  7 年工作经验   | 硕士')) == u'女'
+        >>> assert gender(fix(u'2.  3.  姓名： 杨   |  男  |  11 年工作经验   | 大专')) == u'男'
         >>> assert gender(fix(u'男 | 24岁(1990年6月17日) | 1年工作经验 | 173cm')) == u'男'
         >>> assert gender(fix(u'男 | 23岁(1991年2月14日) | 本科| 1年工作经验')) == u'男'
         >>> assert marital_status(fix(u'男 | 28岁(1986年10月5日) | 硕士| 一年以下工作经验 | 176cm | 未婚')) == u'未婚'

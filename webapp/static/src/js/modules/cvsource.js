@@ -298,6 +298,12 @@ require([
   //Write history
   var history = new History(),
       name = $('#name').val();
-  history.writeHistory(name, filename);
+  history.writeHistory(
+    {
+      name: name,
+      filename: filename,
+      id: $("#Id").val()
+    }
+  );
 
 });

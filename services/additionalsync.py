@@ -38,8 +38,11 @@ class AdditionalSync(object):
     def upgrade_yaml(self, selected=None):
         for i in self.interfaces:
             for id in i.lsid_md():
-                raw_yaml = i.getraw(id+'.yaml')
+                if selected is None:
+                    origin_yaml = i.getraw(id+'.yaml')
+                else:
+                    origin_yaml = i.get(os.path.join(i.cvdir, id+'.yaml'))
                 md = i.get(os.path.join(i.cvdir, id+'.md'))
-                info = self.generate_yaml(md.decode('utf-8'), raw_yaml, selected)
+                info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected)
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addyaml(id, infostream)

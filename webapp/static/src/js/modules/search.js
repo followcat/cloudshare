@@ -35,7 +35,7 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
 
   //User info page - read history
   var history = new History();
-  var lists = history.readHistory();
+  var lists = history.readHistory() ? history.readHistory() : [];
 
   if ( typeof lists === 'undefined' ) {
     $('#browing-wrap').append('<p>You have no browsing history.</p>');

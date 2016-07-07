@@ -17,7 +17,12 @@ class AdditionalSync(object):
                 raw_html = i.getraw(id+'.html')
                 raw_yaml = i.getraw(id+'.yaml')
                 md = self.generate_md(raw_html)
-                info = self.generate_yaml(md, raw_yaml)
+                if len(md) < 100:
+                    continue
+                try:
+                    info = self.generate_yaml(md, raw_yaml)
+                except:
+                    continue
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addcv(id, md.encode('utf-8'), infostream)
 

@@ -19,6 +19,9 @@
 .info .name{
   width: 10%;
 }
+.info .gender{
+  width: 8%;
+}
 .info .age{
   width: 6%;
 }
@@ -26,13 +29,13 @@
   width: 12%;
 }
 .info .school{
-  width: 20%;
-}
-.info .position{
   width: 18%;
 }
+.info .position{
+  width: 16%;
+}
 .info .company{
-  width: 34%;
+  width: 30%;
 }
 .info-wrapper{
   width: 100%;
@@ -276,8 +279,17 @@
     display: none;
   }
 }
-.name, .age, .education, .school, .position, .company {
+.info > .name,
+.info > .gender,
+.info > .age,
+.info > .education,
+.info > .school,
+.info > .position,
+.info > .company {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.work-status-current, .work-status-expectation {
+  margin-left: 20px;
 }

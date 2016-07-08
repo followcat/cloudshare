@@ -21,7 +21,7 @@ SENTENCESEP = FIELDSEP+ur'，。'
 exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
-PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|([◆·\?]+)|(\uf0d8\xa0))'
+PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|([◆·\?]+)|(\uf0d8\xa0)|\uf0b7)'
 
 # Exclude date related characters to avoid eating duration
 COMPANYTAIL = exclude_with_parenthesis(u'人年月')
@@ -49,7 +49,7 @@ SCHOOL = u'(?P<school>(\s?\w)+|([^'+SP+FIELDSEP+u']+'+ASP+u'*'+exclude_with_pare
 
 GENDER = u'(?P<gender>男|女)'
 MARITALSTATUS = u'(?P<marital_status>(未婚)|(已婚))'
-AGEANDBIRTH = AGE+ u'('+UNIBRALEFT+u'(?P<birthdate>' +FULLDATE+ u'|'+DATE+u')' +UNIBRARIGHT + u')?'
+AGEANDBIRTH = u'('+AGE+ u'|((?P<abbr>'+UNIBRALEFT+u')?(?P<birthdate>' +FULLDATE+ u'|'+DATE+u')生?(?(abbr)' +UNIBRARIGHT + u')))+'
 
 SALARY = u'((月薪(（税前）)?[:：]?)?'+ASP+u'*((?P<salary>\d[\- \d\|]*(月/月)?((元/月)|元|(/月))(以[上下])?)'+ASP+u'*(\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?)|((年薪(（税前）)?[:：]?)?'+ASP+u'*(?P<yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
 EMPLOYEES = u'((?P<employees>(少于)?\d[\d '+SEP+u']*人(以[上下])?)([' + SENTENCESEP + u'].*?)?)'

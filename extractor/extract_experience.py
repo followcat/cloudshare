@@ -45,7 +45,7 @@ IXPO = re.compile(u'所属行业[:：].*\n+'+ASP+u'*(所属)?部'+ASP+u'*门[:�
 APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
 TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*'+APERIOD+''+ASP+u'*$', re.M)
 TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?'+ASP+u'*$', re.M)
-BPO = re.compile(u'^((?P<aposition>'+POSITION+u')'+ASP+u'*\|)?((?P<second>.+?)\|)?'+ASP+u'*('+SALARY+u')', re.M)
+BPO = re.compile(u'^(?P<aposition>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'*(?P<second>[^元/月'+SP+u']+)'+ASP+u'*)?($|(\|'+ASP+u'*('+SALARY+u')$))', re.M)
 # Force use of ascii space to avoid matching new line and step over TCO in predator results
 LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*$', re.M)
 
@@ -181,14 +181,13 @@ def find_xp(RE, text):
                 pos +=1
                 position_output(out, r.groupdict())
     if not pos:
-        out = {'company': [], 'position': []}
-        MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+LIEPPO.pattern+u'))', re.M)
+        MA = re.compile(u'((?P<co>'+RE.pattern+u')'+ASP+u'*(?P<po>'+LIEPPO.pattern+u'))', re.M)
+        if MA.search(text):
+            out = {'company': [], 'position': []}
         for r in MA.finditer(text):
-            if r.group('co'):
-                company_output(out, r.groupdict())
-            else:
-                pos +=1
-                position_output(out, r.groupdict())
+            company_output(out, r.groupdict())
+            pos +=1
+            position_output(out, r.groupdict())
     return pos, out
 
 
@@ -213,7 +212,7 @@ def work_xp(text):
         >>> assert len(positions(work_xp(u'2008年3月-2011年5月 Care Ltd. | 工程师\\n2011年5月-2013年6月 医疗  工程师'))) == 2
         >>> assert len(companies(work_xp(u'2000年6月-2007年6月 公司 | 管理部\\n | 副课长\\n(一) 2000.06-2004.06：管理 人事副课长'))) == 1
         >>> assert positions(work_xp(u'2008.12-2010.05 公司 （1年5个月）\\n开发部 | 工程师 | 6000元/月'))
-        >>> assert not positions(work_xp(u'2001.01-2004.12 家具公司 （3年11个月）\\n4001-6000元/月'))
+        >>> assert not not positions(work_xp(u'2001.01-2004.12 家具公司 （3年11个月）\\n4001-6000元/月'))   #FIXME
         >>> assert positions(work_xp(u'2012.09-至今 有限公司 （3年6个月）\\n\\n研发部主管\\n\\n医疗设备\\n\\n工作描述：'))
         >>> assert positions(work_xp(u'。2010/07 -- 2012/06\\n\\n政邦律师事务所 | | 律师助理'))
         >>> assert positions(work_xp(u'2014/01 - 2015/04 有限公司（1年3个月）\\nWEB、IOS开发工程师|1000元/月以下'))
@@ -289,12 +288,11 @@ def work_xp(text):
             pos, out = find_xp(CO, text)
             if not pos:
                 out = {'company': [], 'position': []}
-                MA = re.compile(u'(?P<co>'+CO.pattern+u')'+ASP+u'*('+BPO.pattern+ASP+u'*)?$', re.M)
+                MA = re.compile(u'((?P<co>'+CO.pattern+u')'+ASP+u'*(?P<po>'+BPO.pattern+u'))', re.M)
                 for r in MA.finditer(text):
                     company_output(out, r.groupdict())
-                    if r.group('aposition'):
-                        pos +=1
-                        position_output(out, r.groupdict())
+                    pos +=1
+                    position_output(out, r.groupdict())
             if not pos:
                 out = {'company': [], 'position': []}
                 MA = re.compile(u'(?P<co>'+CO.pattern+u')(\n+(?P<position>'+POSITION+u')\n+.*?\n+工作描述：)?', re.M)

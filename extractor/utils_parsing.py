@@ -16,7 +16,7 @@ DURATION = ur'(?P<duration>(\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个月)
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
 FIELDSEP = ur'、：:；;\|'
-SENTENCESEP = FIELDSEP+ur'，。'
+SENTENCESEP = FIELDSEP+ur'。'
 
 exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
@@ -27,6 +27,7 @@ PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|([◆·\?]+)|(\uf0d8\xa0)|\uf0b7
 COMPANYTAIL = exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
 COMPANY = ur'[^' + SENTENCESEP + '=\n\*]+?('+COMPANYTAIL+u')?'
+SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|]+'
 
 education_list = {

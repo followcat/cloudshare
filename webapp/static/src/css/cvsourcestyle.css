@@ -32,8 +32,9 @@
 .comment-box, .similar-box{
 	margin-top: 8px;
 }
-#similar-person{
-	padding: 6px;
+.similar a{
+	display: inline-block;
+	margin-left: 4px;
 }
 #similar-person a{
 	margin-right: 6px;

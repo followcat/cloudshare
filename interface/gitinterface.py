@@ -172,7 +172,8 @@ class GitInterface(interface.base.Interface):
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> data = {'name': u'中文名字'}
-            >>> commit_id = interface.add('test_file.yaml', yaml.safe_dump(data),
+            >>> commit_id = interface.add('test_file.yaml',
+            ... yaml.safe_dump(data, allow_unicode=True),
             ... b'Test commit', b'test<test@test.com>')
             >>> interface.grep_yaml('name', '.')
             ['test_file.yaml']

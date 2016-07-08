@@ -35,7 +35,7 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
 
   //User info page - read history
   var history = new History();
-  var lists = history.readHistory();
+  var lists = history.readHistory() ? history.readHistory() : [];
 
   if ( typeof lists === 'undefined' ) {
     $('#browing-wrap').append('<p>You have no browsing history.</p>');
@@ -49,6 +49,16 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     }
   }
 
+  function formDisplay() {
+    if( $("#check").is(":checked") ) {
+      $("#serachbykey").css("display", "none");
+      $("#serachbysentence").css("display", "block");
+    }else {
+      $("#serachbykey").css("display", "block");
+      $("#serachbysentence").css("display", "none");
+    }
+  }
+  formDisplay();
   $(".type-check label").on("click", function(){
     if( !$("#check").is(":checked") ) {
       $("#serachbykey").css("display", "none");
@@ -58,4 +68,17 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
       $("#serachbysentence").css("display", "none");
     }
   });
+
+  var databaseList = localStorage.databaseList;
+  if (databaseList) {
+    dbParam = JSON.parse(databaseList);
+  } else {
+    dbParam = null;
+  }
+
+  if (dbParam) {
+    for (var i = dbParam.length - 1; i >= 0; i--) {
+      $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses[]\" value=\""+ dbParam[i] +"\" />");
+    }
+  }
 });

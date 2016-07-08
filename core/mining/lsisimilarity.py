@@ -30,7 +30,8 @@ class LSIsimilarity(object):
                     self.add(name, doc)
                     added = True
         if added:
-            self.save()
+            self.set_index()
+        return added
 
     def build(self, svccv_list):
         names = []
@@ -73,14 +74,14 @@ class LSIsimilarity(object):
         self.names.append(name)
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
-        self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
-                                             self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 
     def set_corpus(self, texts):
         for text in self.lsi_model.slicer(texts):
             self.corpus.append(self.lsi_model.dictionary.doc2bow(text))
 
     def set_index(self):
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 

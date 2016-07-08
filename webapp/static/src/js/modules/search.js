@@ -49,6 +49,16 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     }
   }
 
+  function formDisplay() {
+    if( $("#check").is(":checked") ) {
+      $("#serachbykey").css("display", "none");
+      $("#serachbysentence").css("display", "block");
+    }else {
+      $("#serachbykey").css("display", "block");
+      $("#serachbysentence").css("display", "none");
+    }
+  }
+  formDisplay();
   $(".type-check label").on("click", function(){
     if( !$("#check").is(":checked") ) {
       $("#serachbykey").css("display", "none");

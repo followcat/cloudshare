@@ -69,6 +69,14 @@
           <span>{% if item[1].expectation.salary %}{{ item[1].expectation.salary.yearly }}{% endif %}</span>
         </li>
         {% endif %}
+        {% if item[1].marital_status %}
+        <li class="marital-status">
+          <strong>Marital Status:</strong>
+          <span>
+            {{ item[1].marital_status }}
+          </span>
+        </li>
+        {% endif %}
       </ul>
       <ul class="list-unstyled info clearfix">
         <li class="name"><strong>Name: </strong><span title="{{ item[1].name }}">{{ item[1].name }}</span></li>

@@ -279,17 +279,27 @@
     display: none;
   }
 }
+.work-status-current {
+  width: 33%;
+}
+.work-status-expectation {
+  width: 33%;
+}
+.marital-status {
+  width: 33%;
+}
 .info > .name,
 .info > .gender,
 .info > .age,
 .info > .education,
 .info > .school,
 .info > .position,
-.info > .company {
+.info > .company,
+.work-status-current,
+.work-status-expectation,
+.marital-status
+ {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-.work-status-current, .work-status-expectation {
-  margin-left: 20px;
 }

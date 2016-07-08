@@ -69,9 +69,9 @@ define(["jquery"], function() {
     var processInfo = new ProcessInfo();
 
     var $elementName = $(".name"),
-        $elementName = $(".age");
+        $elementAge = $(".age");
     processInfo.addName($elementName);
-    processInfo.deleteSquareBrackets($elementName);
+    processInfo.deleteSquareBrackets($elementAge);
 
     //调用折叠函数
     processInfo.toggle($(".label-alink"));

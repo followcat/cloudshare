@@ -65,6 +65,7 @@ def next(miner, svc_cv, doc, top, uses=None, name_list=None):
         name_list.extend([core.outputstorage.ConvertName(each[1]).md
                           for each in extract_data_full])
     rating.append((doc, extract_data_full))
+    lenght = miner.lenght(uses=uses)
     for text in doc.split('\n'):
         if not text.strip():
             continue
@@ -73,7 +74,8 @@ def next(miner, svc_cv, doc, top, uses=None, name_list=None):
             new_data = mine_education(svc_cv,
                 education_requirement.group('education'), name_list)
         else:
-            new_data = miner.minelist(text, name_list, uses=uses)
+            result = miner.minelistrank(text, name_list, uses=uses)
+            new_data = zip(name_list, [float(lenght - each)/lenght for each in result])
         if len(filter(lambda x: float(x[1])> 0., new_data)) > 0:
             rating.append((text, extract(new_data)))
     return rating

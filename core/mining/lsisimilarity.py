@@ -29,8 +29,7 @@ class LSIsimilarity(object):
                     doc = svc_cv.getmd(name)
                     self.add(name, doc)
                     added = True
-        if added:
-            self.set_index()
+        self.set_index()
         return added
 
     def build(self, svccv_list):

@@ -54,13 +54,14 @@ def extract(datas):
 
 def next(miner, svc_cv, doc, top, uses=None, name_list=None):
     rating = []
-    top_data_full = miner.minetop(doc, top)
-    extract_data_full = extract(top_data_full)
+    extract_data_full = []
     if name_list is not None:
         names_data_full = miner.minelist(doc, name_list, uses=uses)
         extract_data_full.extend(extract(names_data_full))
     else:
         name_list = []
+        top_data_full = miner.minetop(doc, top, uses=uses)
+        extract_data_full = extract(top_data_full)
         name_list.extend([core.outputstorage.ConvertName(each[1]).md
                           for each in extract_data_full])
     rating.append((doc, extract_data_full))

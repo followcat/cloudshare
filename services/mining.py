@@ -138,13 +138,13 @@ class Mining(object):
         return result
 
     def minetop(self, doc, top, uses=None):
-        return self.probability(doc, uses)[:top]
+        return self.probability(doc, uses=uses)[:top]
 
     def minelist(self, doc, lists, uses=None):
-        return filter(lambda x: x[0] in lists, self.probability(doc, uses))
+        return filter(lambda x: x[0] in lists, self.probability(doc, uses=uses))
 
     def minelistrank(self, doc, lists, uses=None):
-        ranklist = map(lambda x: x[0], self.probability(doc, uses))
+        ranklist = map(lambda x: x[0], self.probability(doc, uses=uses))
         return map(lambda x: ranklist.index(x), lists)
 
     def default_names(self):

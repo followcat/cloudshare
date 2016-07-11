@@ -140,11 +140,16 @@ class Valuable(flask.views.MethodView):
         elif 'jd_doc' in flask.request.form:
             doc = flask.request.form['jd_doc']
         name_list = flask.request.form['name_list']
+        if 'uses' not in flask.request.form:
+            uses = miner.default_names()
+        else:
+            uses = flask.request.form['uses']
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(miner, svc_cv, doc)
+            result = core.mining.valuable.rate(miner, svc_cv, doc, uses=uses)
         else:
-            result = core.mining.valuable.rate(miner, svc_cv, doc, name_list=name_list)
+            result = core.mining.valuable.rate(miner, svc_cv, doc,
+                                               uses=uses, name_list=name_list)
         svc_cv = flask.current_app.config['SVC_CV']
         response = dict()
         datas = []

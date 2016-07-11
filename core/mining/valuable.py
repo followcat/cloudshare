@@ -13,9 +13,9 @@ from extractor.utils_parsing import *
 EDUCATION_REQUIREMENT = re.compile(ur'(?P<education>.+)[及或]?以上学历')
 
 
-def rate(miner, svc_cv, doc, top=10, selected=5, name_list=None):
+def rate(miner, svc_cv, doc, top=10, selected=5, uses=None, name_list=None):
     result = []
-    rating = next(miner, svc_cv, doc, top, name_list)
+    rating = next(miner, svc_cv, doc, top, uses=uses, name_list=name_list)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]
     for text, rate in rating:
@@ -26,7 +26,6 @@ def rate(miner, svc_cv, doc, top=10, selected=5, name_list=None):
                 score.append(0.)
             else:
                 score.append(float(rate[high.index(n)][2]))
-        best = max(score)
         precent = [(float(each))*100 for each in score]
         if name_list is not None:
             namelist_candidate = []
@@ -52,18 +51,20 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(miner, svc_cv, doc, top, name_list=None):
+def next(miner, svc_cv, doc, top, uses=None, name_list=None):
     rating = []
-    top_data_full = miner.minetop(doc, top)
-    extract_data_full = extract(top_data_full)
+    extract_data_full = []
     if name_list is not None:
-        names_data_full = miner.minelist(doc, name_list)
+        names_data_full = miner.minelist(doc, name_list, uses=uses)
         extract_data_full.extend(extract(names_data_full))
     else:
         name_list = []
+        top_data_full = miner.minetop(doc, top, uses=uses)
+        extract_data_full = extract(top_data_full)
         name_list.extend([core.outputstorage.ConvertName(each[1]).md
                           for each in extract_data_full])
     rating.append((doc, extract_data_full))
+    total = miner.lenght(uses=uses)
     for text in doc.split('\n'):
         if not text.strip():
             continue
@@ -72,10 +73,20 @@ def next(miner, svc_cv, doc, top, name_list=None):
             new_data = mine_education(svc_cv,
                 education_requirement.group('education'), name_list)
         else:
-            new_data = miner.minelist(text, name_list)
+            result = miner.minelistrank(text, name_list, uses=uses)
+            new_data = zip(name_list, map(lambda x: rankvalue(x, total), result))
         if len(filter(lambda x: float(x[1])> 0., new_data)) > 0:
             rating.append((text, extract(new_data)))
     return rating
+
+def rankvalue(rank, total):
+    rankvalue = float(total-rank)/total
+    #rankstandard = total*0.2
+    #if rank < rankstandard:
+    #    rankvalue = 0.2 + float(rank)/rankstandard*0.8
+    #else:
+    #    rankvalue = float(total-rank)/(total*0.8)*0.2
+    return rankvalue
 
 def mine_education(svc_cv, text, name_list):
     def education_rate(education):

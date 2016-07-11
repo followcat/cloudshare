@@ -26,7 +26,6 @@ def rate(miner, svc_cv, doc, top=10, selected=5, uses=None, name_list=None):
                 score.append(0.)
             else:
                 score.append(float(rate[high.index(n)][2]))
-        best = max(score)
         precent = [(float(each))*100 for each in score]
         if name_list is not None:
             namelist_candidate = []

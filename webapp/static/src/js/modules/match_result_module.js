@@ -197,7 +197,7 @@ require(
           reqData.jd_doc = decodeURIComponent(m.requestParam.jd_doc);
         }
         reqData.name_list = JSON.stringify(nameLists);
-        reqData.uses = uses;
+        reqData.uses = JSON.stringify(uses);
 
         $.ajax({
           url: "/analysis/valuable",

@@ -13,7 +13,7 @@ from extractor.utils_parsing import *
 EDUCATION_REQUIREMENT = re.compile(ur'(?P<education>.+)[及或]?以上学历')
 
 
-def rate(miner, svc_cv, doc, top=10, selected=5, name_list=None):
+def rate(miner, svc_cv, doc, top=10, selected=5, uses=None, name_list=None):
     result = []
     rating = next(miner, svc_cv, doc, top, name_list)
     blank, reference = rating.pop(0)
@@ -52,12 +52,12 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(miner, svc_cv, doc, top, name_list=None):
+def next(miner, svc_cv, doc, top, uses=None, name_list=None):
     rating = []
     top_data_full = miner.minetop(doc, top)
     extract_data_full = extract(top_data_full)
     if name_list is not None:
-        names_data_full = miner.minelist(doc, name_list)
+        names_data_full = miner.minelist(doc, name_list, uses=uses)
         extract_data_full.extend(extract(names_data_full))
     else:
         name_list = []
@@ -72,7 +72,7 @@ def next(miner, svc_cv, doc, top, name_list=None):
             new_data = mine_education(svc_cv,
                 education_requirement.group('education'), name_list)
         else:
-            new_data = miner.minelist(text, name_list)
+            new_data = miner.minelist(text, name_list, uses=uses)
         if len(filter(lambda x: float(x[1])> 0., new_data)) > 0:
             rating.append((text, extract(new_data)))
     return rating

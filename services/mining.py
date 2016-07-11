@@ -128,11 +128,11 @@ class Mining(object):
             result.extend(sim.probability(doc))
         return sorted(result, key=lambda x:float(x[1]), reverse=True)
 
-    def minetop(self, doc, top):
-        return self.probability(doc)[:top]
+    def minetop(self, doc, top, uses=None):
+        return self.probability(doc, uses)[:top]
 
-    def minelist(self, doc, lists):
-        return filter(lambda x: x[0] in lists, self.probability(doc))
+    def minelist(self, doc, lists, uses=None):
+        return filter(lambda x: x[0] in lists, self.probability(doc, uses))
 
     def default_names(self):
         return [n.name for n in self.services['default'] if n.name in self.sim.keys()]

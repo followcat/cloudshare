@@ -178,23 +178,27 @@ require(
     $("#vd-valuable").on("click", function() {
       $("#chartsModal").modal("show");
       m.removeContent("echarts-wrap", "action-msg");  //清空绘制容器
-      var nameLists = m.getSelectedFileNameList($(".sel-item-name"));
+      var nameLists = m.getSelectedFileNameList($(".sel-item-name")),
+          $databaseObj = $(".database-item"),
+          uses = [];
+      for (var i = $databaseObj.length; i > 0; i--) {
+        if ($($databaseObj[i]).is(":checked")) {
+          uses.push($($databaseObj[i]).val());
+        }
+      }
 
       //定时器，等待modal渲染
       setTimeout(function(){
         var radar = radarcharts("echarts-wrap"),
-            reqData = null;
+            reqData = {};
         if ( m.requestParam.jd_id ) {
-          reqData = {
-            "jd_id": m.requestParam.jd_id,
-            "name_list": JSON.stringify(nameLists)
-          };
+          reqData.jd_id = m.requestParam.jd_id;
         } else {
-          reqData = {
-            "jd_doc": decodeURIComponent(m.requestParam.jd_doc),
-            "name_list": JSON.stringify(nameLists)
-          };
+          reqData.jd_doc = decodeURIComponent(m.requestParam.jd_doc);
         }
+        reqData.name_list = JSON.stringify(nameLists);
+        reqData.uses = uses;
+
         $.ajax({
           url: "/analysis/valuable",
           type: "post",

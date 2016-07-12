@@ -160,7 +160,7 @@ class GitInterface(interface.base.Interface):
         for each in returncode.split('\n'):
             if each:
                 lsfiles.append(each)
-        if 'not found' in lsfiles[0]:
+        if  lsfiles and 'not found' in lsfiles[0]:
             lsfiles = []
         return lsfiles
 

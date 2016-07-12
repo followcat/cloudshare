@@ -79,20 +79,27 @@ class LSI(flask.views.MethodView):
         elif 'jd_doc' in flask.request.args:
             doc = flask.request.args['jd_doc']
             param = 'jd_doc='+doc
+        filterdict = None
+        if 'filter' in flask.request.args:
+            filterdict = flask.request.args['filter']
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
-        datas, pages = self.process(miner, uses, svc_cv, doc, cur_page, count)
+        datas, pages = self.process(miner, uses, svc_cv, doc, cur_page, count, filterdict)
         return flask.render_template('lsipage.html',result=datas,
                                      button_bar=True, sim_names=sim_names,
                                      cur_page=cur_page,
                                      pages=pages, param=param)
 
-    def process(self, miner, uses, svc, doc, cur_page, eve_count):
+    def process(self, miner, uses, svc, doc, cur_page, eve_count, filterdict=None):
+        index = flask.current_app.config['SVC_INDEX']
         if not cur_page:
             cur_page = 1
         datas = []
         result = miner.probability(doc, uses=uses)
+        if filterdict is not None:
+            filteset = index.get(filterdict, uses=uses)
+            result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

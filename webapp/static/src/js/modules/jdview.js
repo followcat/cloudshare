@@ -64,7 +64,7 @@ require(
       var newUrl = "/lsipage?" + $.param(newParams);
       $(this).attr("href", newUrl);
     });
-    
+
     //Add JD
     $('#save-jd').on('click', function(){
       var companyName = $('#company-name').val(),
@@ -190,15 +190,16 @@ require(
 
           var name_list = [],
               jdContent = textareaObj.val(),
-              fileName = textareaObj.attr("data-filename");
+              fileName = textareaObj.attr("data-filename"),
+              uses = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
           name_list.push(fileName);
-
           $.ajax({
               url: '/analysis/valuable',
               type: 'post',
               data: {
                 'jd_doc': jdContent,
-                'name_list': JSON.stringify(name_list)
+                'name_list': JSON.stringify(name_list),
+                'uses': JSON.stringify(uses)
               },
               success: function(response) {
                 var datas = replaceName(response.data);

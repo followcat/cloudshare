@@ -181,7 +181,7 @@ require(
       var nameLists = m.getSelectedFileNameList($(".sel-item-name")),
           $databaseObj = $(".database-item"),
           uses = [];
-      for (var i = $databaseObj.length; i > 0; i--) {
+      for (var i = $databaseObj.length; i >= 0; i--) {
         if ($($databaseObj[i]).is(":checked")) {
           uses.push($($databaseObj[i]).val());
         }

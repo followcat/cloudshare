@@ -80,12 +80,15 @@ def next(miner, svc_cv, doc, top, uses=None, name_list=None):
     return rating
 
 def rankvalue(rank, total):
-    rankvalue = float(total-rank)/total
-    #rankstandard = total*0.2
-    #if rank < rankstandard:
-    #    rankvalue = 0.2 + float(rank)/rankstandard*0.8
-    #else:
-    #    rankvalue = float(total-rank)/(total*0.8)*0.2
+    # top 20% use 50% point, top 20% ~ 80% use 30% point, the last 20% use 20% point,
+    rankvalue = 0 # float(total-rank)/total
+    rankstandard = total*0.2
+    if rank < rankstandard:
+        rankvalue = 0.5 + float(total*0.2 - rank)/rankstandard*0.5
+    elif rank > rankstandard and rank < total*0.8:
+        rankvalue = 0.2 + float(total*0.8 - rank)/(total*0.6)*0.3
+    else:
+        rankvalue = float(total - rank)/(total*0.2)*0.2
     return rankvalue
 
 def mine_education(svc_cv, text, name_list):

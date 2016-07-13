@@ -1,0 +1,198 @@
+.mg-center {
+  margin: 0 auto;
+}
+
+.wd-56 {
+  width: 56px;
+}
+
+.wd-60 {
+  width: 60px;
+}
+
+.wd-80 {
+  width: 80px;
+}
+
+.wd-100 {
+  width: 100px;
+}
+
+.wd-120 {
+  width: 120px;
+}
+
+.wd-180 {
+  width: 180px;
+}
+
+.wd-200 {
+  width: 200px;
+}
+
+.wd-240 {
+  width: 240px;
+}
+
+.wd-360 {
+  width: 360px;
+}
+
+.pd-l-10 {
+  padding-left: 10px;
+}
+
+.pd-r-10 {
+  padding-right: 10px;
+}
+
+.pd-lr-10 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.pd-l-15 {
+  padding-left: 15px;
+}
+
+.pd-lr-15 {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.bd-l-1 {
+  border-left: 1px solid #eee;
+}
+
+.bd-r-1 {
+  border-right: 1px solid #eee;
+}
+
+header {
+  width: 100%;
+  height: 50px;
+
+  background-color: #337ab7;
+}
+
+.header-wrap {
+  position: relative;
+  width: 1060px;
+}
+
+.logo-wrap {
+  position: absolute;
+  width: 220px;
+}
+
+.sf {
+  padding-top: 8px;
+}
+
+.header-search {
+  width: 300px;
+
+}
+
+.tool-bar-wrap {
+  border: 1px solid #eee;
+  padding: 10px 15px;
+  width: 1024px;
+  height: 78px;
+  margin-top: 20px;
+  background-color: #f5f5f5;
+  font-size: .875em;
+  color: #555;
+}
+
+.tool-bar-wrap .cw,
+.tool-bar-wrap .aw {
+  width: 490px;
+  float: left;
+}
+
+.tool-bar-wrap .cw .r-amount {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.as-btn-group {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.rl {
+  margin-top: 10px;
+  width: 1024px;
+}
+
+.ls {
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+}
+
+.field{
+  border-bottom: 1px solid #eee;
+  background-color: #337AB7;
+}
+
+.blank-line {
+  height: 4px;
+}
+
+.field > .field-item {
+  height: 42px;
+  line-height: 42px;
+  color: #f5f5f5;
+}
+
+.ls-item {
+  margin-bottom: 4px;
+  color: #555;
+  font-size: .857em;
+}
+
+.basic-info {
+  background-color: #f5f5f5;
+}
+
+.basic-info > .bs-info-item {
+  heigth: 32px;
+  line-height: 32px;
+}
+
+.extend-info {
+  position: relative;
+  padding: 10px 15px;
+  background-color: #eee;
+}
+
+.extend-info .wk-ex,
+.extend-info .ed-ex,
+.extend-info .wk-status {
+  float: left;
+}
+
+.extend-info > .bd-r-1 {
+  border-right: 1px dotted #ccc;
+}
+
+.wk-ex span,
+.ed-ex span,
+.wk-status span {
+  display: inline-block;
+}
+
+.omit {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.top-fixed {
+  position: fixed;
+  width: 1024px;
+  top: 0;
+  z-index: 999;
+}

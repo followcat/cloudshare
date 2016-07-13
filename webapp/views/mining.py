@@ -80,8 +80,23 @@ class LSI(flask.views.MethodView):
             doc = flask.request.args['jd_doc']
             param = 'jd_doc='+doc
         filterdict = None
-        if 'filter' in flask.request.args:
-            filterdict = flask.request.args['filter']
+        name = ""
+        current_places = ""
+        expectation_places = ""
+        education = ""
+        gender = ""
+        marital_status = ""
+        filterdict = dict()
+        if 'currentPlaces' in flask.request.args and flask.request.args['currentPlaces']:
+            filterdict['current_places'] = [flask.request.args['currentPlaces']]
+        if 'expectationPlaces' in flask.request.args and flask.request.args['expectationPlaces']:
+            filterdict['expectation_places'] = [flask.request.args['expectationPlaces']]
+        if 'education' in flask.request.args and flask.request.args['education']:
+            filterdict['education'] = [flask.request.args['education']]
+        if 'gender' in flask.request.args and flask.request.args['gender']:
+            filterdict['gender'] = [flask.request.args['gender']]
+        if 'marriedStatus' in flask.request.args and flask.request.args['marriedStatus']:
+            filterdict['marital_status'] = [flask.request.args['marriedStatus']]
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
@@ -97,7 +112,7 @@ class LSI(flask.views.MethodView):
             cur_page = 1
         datas = []
         result = miner.probability(doc, uses=uses)
-        if filterdict is not None:
+        if filterdict:
             filteset = index.get(filterdict, uses=uses)
             result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
         totals = len(result)

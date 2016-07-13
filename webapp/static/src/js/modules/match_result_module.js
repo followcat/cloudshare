@@ -495,4 +495,20 @@ require(
       window.location.href = newUrl;
     });
 
+    /*
+      条件过滤按钮点击事件
+    */
+    $("#filterBtn").on("click", function() {
+      var str = "",
+          databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
+      if ( m.requestParam.jd_id ) {
+        str = "<input type=\"text\" name=\"jd_id\" value=\""+ m.requestParam.jd_id +"\" style=\"display: none\">";
+      } else {
+        str  = "<input type=\"text\" name=\"jd_id\" value=\""+ decodeURIComponent(m.requestParam.jd_doc) +"\" style=\"display: none\">";
+      }
+      $("#filterForm").append(str);
+      str = "<input type=\"text\" name=\"uses\" value=\""+ JSON.stringify(databaseList).replace(/"/g, "\'") +"\" style=\"display: none\">";
+      $("#filterForm").append(str);
+      $("#filterForm").submit();
+    });
   });

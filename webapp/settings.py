@@ -43,7 +43,7 @@ ZILN_SVC_CV = services.curriculumvitae.CurriculumVitae(ZHILIAN_DB, 'zhilian')
 
 SVC_ADD_SYNC = services.additionalsync.AdditionalSync([PREDATOR_DB, JINGYING_DB, ZHILIAN_DB])
 SVC_CV = services.multicv.MultiCV(DEF_SVC_CV,
-                                  [DEF_SVC_CV, PRE_SVC_CV, JGYG_SVC_CV, ZILN_SVC_CV])
+                                  [DEF_SVC_CV])
 
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)
 SVC_INDEX.setup()

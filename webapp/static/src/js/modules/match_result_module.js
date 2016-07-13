@@ -129,14 +129,14 @@ require(
     };
 
     //侧边栏 能力分布 按钮事件，显示图表
-    $("#competency-btn").on("click", function() {
+    $("#competencyBtn").on("click", function() {
       $("#chartsModal").modal("show");
-      m.removeContent("echarts-wrap", "action-msg");  //清空绘制容器
+      m.removeContent("echartWrap", "actionMsg");  //清空绘制容器
 
       //定时器，等待modal渲染
       setTimeout(function(){
         var mdList = chartsCommon.getMdList($(".item-title")),
-            scatter = scattercharts("echarts-wrap");
+            scatter = scattercharts("echartWrap");
         $.ajax({
           url: "/mining/capacity",
           type: "post",
@@ -153,12 +153,12 @@ require(
     });
 
     //侧边栏 经验分布 按钮事件，显示图表
-    $("#experience-btn").on("click", function(){
+    $("#experienceBtn").on("click", function(){
       $("#chartsModal").modal("show");
-      m.removeContent("echarts-wrap", "action-msg");  //清空绘制容器
+      m.removeContent("echartWrap", "actionMsg");  //清空绘制容器
 
       setTimeout(function(){
-        var scatter = scattercharts("echarts-wrap");
+        var scatter = scattercharts("echartWrap");
         var mdList = chartsCommon.getMdList($(".item-title"));
         $.ajax({
           url: "/mining/capacity",
@@ -175,9 +175,9 @@ require(
     });
 
     //根据选择的候选人绘制雷达图
-    $("#vd-valuable").on("click", function() {
+    $("#vdValuable").on("click", function() {
       $("#chartsModal").modal("show");
-      m.removeContent("echarts-wrap", "action-msg");  //清空绘制容器
+      m.removeContent("echartWrap", "actionMsg");  //清空绘制容器
       var nameLists = m.getSelectedFileNameList($(".sel-item-name")),
           $databaseObj = $(".database-item"),
           uses = [];
@@ -189,7 +189,7 @@ require(
 
       //定时器，等待modal渲染
       setTimeout(function(){
-        var radar = radarcharts("echarts-wrap"),
+        var radar = radarcharts("echartWrap"),
             reqData = {};
         if ( m.requestParam.jd_id ) {
           reqData.jd_id = m.requestParam.jd_id;
@@ -217,29 +217,22 @@ require(
     });
 
     //根据匹配值大小描绘不同强度颜色
-    var itemLink = $(".item-link");
+    var itemLink = $(".item-title");
     var colorgrad = ColorGrad();  //创建渐变颜色实例
     for(var i = 0, len = itemLink.length; i < len; i++){
-      var match = $(itemLink[i]).children("p").text();
+      var match = $(itemLink[i]).attr("data-match");
       if (match === ""){
           break;
       }
 
       var matchToNum = parseFloat(match);
       var grad = colorgrad.gradient(parseInt(matchToNum*100));
-      $(itemLink[i]).children("a").css({"color": grad});
+      $(itemLink[i]).css({"color": grad});
     }
 
     //将item名字和对应的文件名加入localStorage中
     function addStorage(seletedObject){
       var nameLists = localStorage.nameLists ? JSON.parse(localStorage.nameLists) : [];
-      // var nameLists = null,
-      //     lsNameLists = localStorage.nameLists;
-      // if ( lsNameLists ) {
-      //   nameLists = JSON.parse(lsNameLists);
-      // } else {
-      //   nameLists = new Array();
-      // }
       nameLists.push(seletedObject);
       localStorage.setItem("nameLists", JSON.stringify(nameLists));
     }
@@ -265,7 +258,7 @@ require(
           seletedName = $name !== "" ? $name : $id;
 
       if ($(this).is(":checked")) {  //如果勾选，加入侧边栏
-        $("#sel-list").append("<div class=\"sel-item\">" +
+        $("#seletedList").append("<div class=\"sel-item\">" +
           "<span class=\"sel-item-name\" data-filename=\"" + $mdFileName +"\" data-id=\"" + $id + "\">" + seletedName + "</span>" +
           "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
         addStorage({
@@ -287,7 +280,7 @@ require(
     });
 
     //选择列表中的item删除事件
-    $("#sel-list").on("click", ".sel-item-remove", function() {
+    $("#seletedList").on("click", ".sel-item-remove", function() {
       var targetElement = $(this).prev();
       var $name = targetElement.text(),
           $mdFileName = targetElement.attr("data-filename"),
@@ -312,7 +305,7 @@ require(
       if (nameLists.length > 0) {
         nameLists.forEach(function(obj) {
           if (obj.jd === jd) {
-            $("#sel-list").append("<div class=\"sel-item\">" +
+            $("#seletedList").append("<div class=\"sel-item\">" +
               "<span class=\"sel-item-name\" data-filename=\"" + obj.mdFileName +"\" data-id=\"" + obj.id + "\">" + obj.name + "</span>" +
               "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
           }
@@ -361,7 +354,7 @@ require(
             selectedName = row.name !== "" ? row.name : selectedId,
             selectedFileName = row.filename;
 
-        $("#sel-list").append("<div class=\"sel-item\">" +
+        $("#seletedList").append("<div class=\"sel-item\">" +
           "<span class=\"sel-item-name\" data-filename=\"" + selectedFileName +"\" data-id=\"" + selectedId + "\">" + selectedName + "</span>" +
           "<span class=\"glyphicon glyphicon-remove sel-item-remove\" aria-hidden=\"true\"></span> </div>");
       })

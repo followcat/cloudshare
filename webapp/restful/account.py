@@ -84,3 +84,30 @@ class AccountListAPI(Resource):
     def get(self):
         userlist = self.svc_account.get_user_list()
         return { 'result': userlist }
+
+
+class AccountHistoryAPI(Resource):
+    """
+        AccountHistory RESTful API
+        GET     Get Accout commit history.
+    """
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.repo = flask.current_app.config['DATA_DB']
+        self.svc_cv = flask.current_app.config['SVC_CV']
+        super(AccountHistoryAPI, self).__init__()
+
+    def get(self):
+        user = flask.ext.login.current_user
+        info_list = self.repo.history(user.id, max_commits=10)
+        for info in info_list:
+            for md5 in info['filenames']:
+                try:
+                    info['filenames'] = self.svc_cv.getyaml(md5)
+                except IOError:
+                    info['filenames'] = md5
+                info['name'] = md5
+            info['message'] = info['message'].decode('utf-8')
+        return { 'result': info_list }

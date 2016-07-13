@@ -8,3 +8,4 @@ def initialize(app):
     api = flask.ext.restful.Api(app)
     api.add_resource(AccountAPI, '/api/account/<string:id>', endpoint = 'account')
     api.add_resource(AccountListAPI, '/api/accountlist', endpoint = 'accountlist')
+    api.add_resource(AccountHistoryAPI, '/api/accounthistory', endpoint = 'accounthistory')

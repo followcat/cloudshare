@@ -34,8 +34,8 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
   }
 
   //User info page - read history
-  var history = new History();
-  var lists = history.readHistory() ? history.readHistory() : [];
+  var history = new History(),
+      lists = history.readHistory() ? history.readHistory() : [];
 
   if ( typeof lists === 'undefined' ) {
     $('#browing-wrap').append('<p>You have no browsing history.</p>');
@@ -45,7 +45,7 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
       if( i === 10 ) {
         break;
       }
-      $('#browing-wrap').append("<div class='list-item'><span>"+ lists[i].time +"</span><a href='/show/"+ lists[i].fileName +"'>"+ lists[i].name +"</a></div>");
+      $('#browing-wrap').append("<div class='list-item'><span>"+ lists[i].time +"</span><a href='/show/"+ lists[i].filename +"'>"+ lists[i].name +"</a></div>");
     }
   }
 

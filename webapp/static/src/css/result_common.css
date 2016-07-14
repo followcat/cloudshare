@@ -105,3 +105,10 @@
 .ex-fold {
   display: none;
 }
+
+/*eCharts wrap*/
+.chart-wrapper {
+  width: 84%;
+  height:500px;
+  margin: 0 auto;
+}

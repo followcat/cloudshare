@@ -38,9 +38,9 @@
   <div class="aw">
     <label>Analysis tools:</label>
     <div class="as-btn-group">
-      <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
-      <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency </button>
-      <button class="btn btn-default btn-xs" id="vd-capacity">Show Work Experience</button>
+      <button class="btn btn-default btn-xs" id="vdPosition">Show No. of Positions</button>
+      <button class="btn btn-default btn-xs" id="vdCapacityPro">Show Competency </button>
+      <button class="btn btn-default btn-xs" id="vdCapacity">Show Work Experience</button>
     </div>
   </div>
 </div>
@@ -213,6 +213,23 @@
     </ul>
   </nav>
 </div>
+<div class="modal fade charts-view-modal" id="chartsModal" tabindex="-1" role="dialog" aria-labelledby="ChartsModalLabel">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="chartsViewLabel">Charts View</h4>
+      </div>
+      <div class="modal-body">
+        <div class="chart-wrapper" id="echartWrap"></div>
+        <div class="ac-msg" id="actionMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div><!-- Charts modal end -->
 {% endblock %}
 
 {% block script%}

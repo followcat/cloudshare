@@ -98,19 +98,79 @@
 
 <div class="tool-bar-wrap mg-center clearfix">
   <div class="cw">
-    <div class="r-amount">About <span class="num">1232</span> results</div>
+    {% if result %}
+    <div class="r-amount">About <span class="num">{{ nums }}</span> results</div>
+    {% else %}
+    <div class="r-amount">Your did not match any documents.</div>
+    {% endif %}
     <div class="s-st">
-      <label>Search Keyword: </label>
-      <span>高级软件工程师</span>
+      <label>Conditions: </label>
+      <span id="conditionList"></span>
     </div>
   </div>
   <div class="aw">
-    <label>Analysis tools:</label>
-    <div class="as-btn-group">
-      <button type="button" class="btn btn-default btn-xs">analysis-1</button>
-      <button type="button" class="btn btn-default btn-xs">analysis-2</button>
-      <button type="button" class="btn btn-default btn-xs">analysis-3</button>
-    </div>
+    <form class="form-horizontal" id="filterForm" action="/lsipage" method="GET">
+      <div class="form-group">
+        <label class="control-label filter-control-label" for="currentPlaces">Current Places</label>
+        <input class="form-control filter-form-control" id="currentPlaces" type="text" name="currentPlaces"  placeholder="Current Places" />
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label" for="expectationPlaces">Expectation Places</label>
+        <input class="form-control filter-form-control" id="expectationPlaces" type="text" name="expectationPlaces"  placeholder="Expectation Places" />
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label">Gender</label>
+        <div class="filter-form-control">
+          <label class="radio-inline">
+            <input type="radio" name="gender" id="allGenderRadio" value=""> All
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="gender" id="maleRadio" value="男"> Male
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="gender" id="femalRadio" value="女"> Female
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label">Education</label>
+        <div class="filter-form-control education-form-control">
+          <label class="radio-inline">
+            <input type="radio" name="education" id="alleducationRadio" value=""> All
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="education" id="collegeRadio" value="大专"> College
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="education" id="undergraduateRadio" value="本科"> Undergraduate
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="education" id="masterRadio" value="硕士"> Master
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="education" id="doctorRadio" value="博士"> Doctor
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label">Marital Status</label>
+        <div class="filter-form-control">
+          <label class="radio-inline">
+            <input type="radio" name="marriedStatus" id="allmarriedRadio" value=""> All
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="marriedStatus" id="unmarriedRadio" value="未婚"> Unmarried
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="marriedStatus" id="marriedRadio" value="已婚"> Married
+          </label>
+        </div>
+      </div>
+      <button type="button" id="filterBtn" class="btn btn-primary filter-btn">Search</button>
+    </form>
+  </div>
+  <div class="up-down-box" id="toolWrapUpDown" data-flag="true">
+    <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
   </div>
 </div>
 

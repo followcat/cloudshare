@@ -1,6 +1,7 @@
 .tool-bar-wrap {
+  position: relative;
   border: 1px solid #eee;
-  padding: 10px 15px;
+  padding: 10px 20px;
   width: 1024px;
   height: auto;
   margin-top: 20px;
@@ -9,9 +10,13 @@
   color: #555;
 }
 
-.tool-bar-wrap .cw,
+.tool-bar-wrap .cw {
+  width: 400px;
+  float: left;
+}
+
 .tool-bar-wrap .aw {
-  width: 490px;
+  width: 560px;
   float: left;
 }
 
@@ -111,4 +116,28 @@
   width: 84%;
   height:500px;
   margin: 0 auto;
+}
+.up-down-box {
+  position: absolute;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  width: 120px;
+  height: 14px;
+  background-color: #fff;
+  left: 50%;
+  margin-left: -60px;
+  bottom: 0;
+}
+
+.up-down-box span {
+  margin-left: 57px;
+}
+
+.up-down-box:hover {
+  background-color: #337AB7;
+  cursor: pointer;
+}
+
+.up-down-box:hover span{
+  color: #fff;
 }

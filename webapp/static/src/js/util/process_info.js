@@ -111,5 +111,28 @@ define(["jquery"], function() {
         $(".field").removeClass("top-fixed");
       }
     });
+
+    //顶部工具容器折叠事件
+    var initToolWrapHeight = $(".tool-bar-wrap").outerHeight();
+    $("#toolWrapUpDown").on("click", function() {
+      var $iconElement = $(this).children("span");
+      if ($(this).attr("data-flag") === "true") {
+        $iconElement.removeClass("glyphicon-chevron-down");
+        $iconElement.addClass("glyphicon-chevron-up");
+        $(".tool-bar-wrap").css({
+          'height': 'auto',
+          'overflow': 'inherit'
+        });
+        $(this).attr("data-flag", "false");
+      } else {
+        $iconElement.removeClass("glyphicon-chevron-up");
+        $iconElement.addClass("glyphicon-chevron-down");
+        $(".tool-bar-wrap").css({
+          'height': initToolWrapHeight + 'px',
+          'overflow': 'hidden'
+        });
+        $(this).attr("data-flag", "true");
+      }
+    });
   }();
 });

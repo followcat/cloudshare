@@ -100,11 +100,11 @@ class LSI(flask.views.MethodView):
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
-        datas, pages = self.process(miner, uses, svc_cv, doc, cur_page, count, filterdict)
+        datas, pages, totals = self.process(miner, uses, svc_cv, doc, cur_page, count, filterdict)
         return flask.render_template('lsipage.html',result=datas,
                                      button_bar=True, sim_names=sim_names,
                                      cur_page=cur_page,
-                                     pages=pages, param=param)
+                                     pages=pages, param=param, nums=totals)
 
     def process(self, miner, uses, svc, doc, cur_page, eve_count, filterdict=None):
         index = flask.current_app.config['SVC_INDEX']
@@ -128,7 +128,7 @@ class LSI(flask.views.MethodView):
                 'match': score
             }
             datas.append([name, yaml_info, info])
-        return datas, pages
+        return datas, pages, totals
 
 
 class Similar(flask.views.MethodView):

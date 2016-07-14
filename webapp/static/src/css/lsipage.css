@@ -1,3 +1,8 @@
+.tool-bar-wrap {
+  height: 116px;
+  overflow: hidden;
+}
+
 .ac-msg {
   overflow: hidden;
 }
@@ -103,4 +108,28 @@
 
 .crawl-item {
   border: 1px solid #1d1b1b;
+}
+
+.aw form {
+  margin-left: 80px;
+}
+
+.filter-control-label {
+  display: inline-block;
+  width: 120px;
+}
+
+.filter-form-control {
+  display: inline-block;
+  width: 260px;
+  vertical-align: top;
+}
+
+.education-form-control {
+  width: 370px;
+}
+
+.filter-btn {
+  margin-left: 140px;
+  width: 200px;
 }

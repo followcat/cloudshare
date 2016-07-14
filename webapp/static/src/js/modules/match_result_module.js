@@ -69,6 +69,7 @@ require(
     var m  = {
       currentURL: window.location.href,
       requestParam: queryString(window.location.href),
+      conditions: ['currentPlaces', 'education', 'expectationPlaces', 'gender', 'marriedStatus'],
       /*
         @function: 匿名处理
         @params: array
@@ -504,4 +505,20 @@ require(
       $("#filterForm").append(str);
       $("#filterForm").submit();
     });
+
+    //过滤条件
+    function setFilterCondition(elementId) {
+      elementId = '#' + elementId;
+      var conditionStr = "";
+      for (var i = m.conditions.length; i >= 0; i--) {
+        conditionStr = m.requestParam[m.conditions[i]] ? m.requestParam[m.conditions[i]] : "";
+        if (conditionStr !== "") {
+          $(elementId).append(decodeURIComponent(conditionStr) + ' ');
+        } else {
+          $(elementId).append(decodeURIComponent(conditionStr));
+        }
+      }
+    }
+    setFilterCondition("conditionList");
+
   });

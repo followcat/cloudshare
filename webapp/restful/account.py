@@ -2,7 +2,7 @@ import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
-
+import json
 import utils.builtin
 
 class AccountAPI(Resource):
@@ -20,7 +20,7 @@ class AccountAPI(Resource):
     """
 
     decorators = [flask.ext.login.login_required]
-    
+
     def __init__(self):
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         self.reqparse = reqparse.RequestParser()
@@ -35,7 +35,7 @@ class AccountAPI(Resource):
         info = ''
         args = self.reqparse.parse_args()
         if 'oldpassword' not in args or 'newpassword' not in args:
-            result = False 
+            result = False
         else:
             oldpassword = args['oldpassword']
             newpassword = args['newpassword']
@@ -49,7 +49,7 @@ class AccountAPI(Resource):
                 result = False
         except services.exception.ExistsUser:
             pass
-        return  { 'result': result }
+        return  { 'data': result }
 
     def post(self, id):
         result = False
@@ -60,12 +60,12 @@ class AccountAPI(Resource):
             result = self.svc_account.add(user.id, id, password)
         except services.exception.ExistsUser:
             pass
-        return { 'result': result }
+        return { 'data': result }
 
     def delete(self, id):
         user = flask.ext.login.current_user
         result = self.svc_account.delete(user.id, id)
-        return { 'result': result }
+        return { 'data': result }
 
 
 class AccountListAPI(Resource):
@@ -76,14 +76,14 @@ class AccountListAPI(Resource):
     """
 
     decorators = [flask.ext.login.login_required]
-    
+
     def __init__(self):
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         super(AccountListAPI, self).__init__()
 
     def get(self):
         userlist = self.svc_account.get_user_list()
-        return { 'result': userlist }
+        return { 'data': userlist }
 
 
 class AccountHistoryAPI(Resource):
@@ -105,9 +105,9 @@ class AccountHistoryAPI(Resource):
         for info in info_list:
             for md5 in info['filenames']:
                 try:
-                    info['filenames'] = self.svc_cv.getyaml(md5)
+                    info['information'] = self.svc_cv.getyaml(md5)
                 except IOError:
-                    info['filenames'] = md5
+                    info['information'] = md5
                 info['name'] = md5
             info['message'] = info['message'].decode('utf-8')
-        return { 'result': info_list }
+        return { 'data': info_list }

@@ -23,16 +23,7 @@
           <img src="{{ url_for('static',filename='images/logo.png') }}"  class="logo">
         </a>
       </div>
-      <!-- <div class="header-search mg-center">
-        <form class="sf">
-          <div class="input-group">
-            <input type="text" class="form-control" />
-            <div class="input-group-btn">
-              <button type="submit" class="btn btn-default">Search</button>
-            </div>
-          </div>
-        </form>
-      </div> -->
+      {% block search %}{% endblock %}
       <ul class="navbar-right nav-list list-unstyled">
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="name"><span class="glyphicon glyphicon-user"></span>{{ current_user.id }} <span class="caret"></span></a>

@@ -81,7 +81,7 @@ header {
 }
 
 .logo-wrap {
-  display: inline-block;
+  position: absolute;
   line-height: 50px;
 }
 

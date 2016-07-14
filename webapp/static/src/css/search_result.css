@@ -1,5 +1,6 @@
+
 /* Search result page */
-.result-list-item{
+/*.result-list-item{
   margin-bottom: 20px;
   padding-bottom: 8px;
   border-bottom: 1px dotted #c2c2c2;
@@ -297,9 +298,24 @@
 .info > .company,
 .work-status-current,
 .work-status-expectation,
-.marital-status
- {
+.marital-status {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+.filter-wrap {
+  margin-top: 10px;
+  padding: 15px 80px;
+  background-color: #fff;
+}
+
+.filter-title {
+  display: inline-block;
+  color: #555;
+  font-weight: bold;
+}
+
+.filter-wrap label {
+  color: #555;
+}*/

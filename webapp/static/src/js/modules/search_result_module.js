@@ -37,7 +37,7 @@ require(
     var chartsCommon = new ChartsCommon();
 
     var pageConstant = {
-      $searchTextValue: $("#search_text").val(),
+      $searchTextValue: $("#searchText").val(),
       getDataErrorMessage: "无法获取到数据......",
       $itemObjList: $(".item-title")
     };

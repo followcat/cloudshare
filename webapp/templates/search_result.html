@@ -4,156 +4,155 @@
 {% endblock %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/searchresult.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/result_common.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/search_result.css') }}">
 {% endblock %}
 
+
 {% block search %}
-<form action="/search" method="GET" class="header-search">
-  <div class="input-group search-item">
-    <input type="text" class="form-control" name="search_text" id="search_text" placeholder="Search for ..." value="{{ search_key }}" required="required">
-    <div class="input-group-btn">
-      <button type="submit" class="btn btn-default">Search</button>
+<div class="header-search mg-center">
+  <form class="sf" action="/search" method="GET">
+    <div class="input-group">
+      <input  class="form-control" id="searchText" name="search_text" type="text" placeholder="Search for ..." value="{{ search_key }}" required="required" />
+      <div class="input-group-btn">
+        <button class="btn btn-default" type="submit">Search</button>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+</div>
 {% endblock%}
 
 {% block content %}
-<div class="col-md-10 col-md-offset-1 result-list">
-  <div class="tool-bar">
-    <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
-    <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency </button>
-    <button class="btn btn-default btn-xs" id="vd-capacity">Show Work Experience</button>
-    <div id="data-main" style="display: none;">
-      <div id="echarts-wrap"></div>
-      <div id="action-msg"></div>
+<div class="tool-bar-wrap mg-center clearfix">
+  <div class="cw">
+    {% if result %}
+    <div class="r-amount">About <span class="num">{{ nums }}</span> results</div>
+    {% else %}
+    <div class="r-amount">Your search - {{ search_key }} - did not match any documents.</div>
+    {% endif %}
+    <div class="s-st">
+      <label>Search Keyword: </label>
+      <span>{{ search_key }}</span>
     </div>
   </div>
+  <div class="aw">
+    <label>Analysis tools:</label>
+    <div class="as-btn-group">
+      <button class="btn btn-default btn-xs" id="vd-position">Show No. of Positions</button>
+      <button class="btn btn-default btn-xs" id="vd-capacity-pro">Show Competency </button>
+      <button class="btn btn-default btn-xs" id="vd-capacity">Show Work Experience</button>
+    </div>
+  </div>
+</div>
+<div class="rl mg-center">
+  <div class="field">
+    <div class="ls field-item wd-200">Name</div>
+    <div class="ls field-item wd-60">Gender</div>
+    <div class="ls field-item wd-56">Age</div>
+    <div class="ls field-item wd-80">Marriage</div>
+    <div class="ls field-item wd-100">Education</div>
+    <div class="ls field-item wd-180">University</div>
+    <div class="ls field-item wd-120">Position</div>
+    <div class="ls field-item wd-200">Company</div>
+  </div>
+  <div class="blank-line"></div>
   {% if result %}
-  <p>About {{ nums }} results</p>
   {% for item in result %}
-  <div class="result-list-item">
-    <div class="item-link">
-      <a href="/show/{{ item[0] }}.md" class="item-title" target="_blank" data-id="{{ item[1].id }}">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
-      <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
-      </em>
-      {% if item[1].enversion %}
-      <a href="/edit/{{ item[1].enversion }}" target="_blank" class="check-en">English CV</a>
-      {% endif %}
-    </div>
-    <div class="container-fluid">
-      <ul class="list-unstyled info clearfix">
-        {% if item[1].current %}
-        <li class="work-status-current">
-          <strong>Curren:</strong>
-          <span>
-          {% if item[1].current.places %}
-          {% for e in item[1].current.places %}
-          {{ e }}&nbsp;
-          {% endfor %}
-          {% endif %}
-          </span>
-          <span>{% if item[1].current.salary %}{{ item[1].current.salary.yearly }}{% endif %}</span>
-        </li>
-        {% endif %}
-        {% if item[1].expectation %}
-        <li class="work-status-expectation">
-          <strong>Expectation:</strong>
-          <span>
-          {% if item[1].expectation.places %}
-          {% for e in item[1].expectation.places %}
-          {{ e }}&nbsp;
-          {% endfor %}
-          {% endif %}
-          </span>
-          <span>{% if item[1].expectation.salary %}{{ item[1].expectation.salary.yearly }}{% endif %}</span>
-        </li>
-        {% endif %}
-        {% if item[1].marital_status %}
-        <li class="marital-status">
-          <strong>Marital Status:</strong>
-          <span>
-            {{ item[1].marital_status }}
-          </span>
-        </li>
-        {% endif %}
-      </ul>
-      <ul class="list-unstyled info clearfix">
-        <li class="name"><strong>Name: </strong><span title="{{ item[1].name }}">{{ item[1].name }}</span></li>
-        <li class="gender"><strong>Gender: </strong><span title="{{ item[1].gender }}">{{ item[1].gender }}</span></li>
-        <li class="age"><strong>Age: </strong><span title="{{ item[1].age }}">{{ item[1].age }}</span></li>
-        <li class="education"><strong>Education: </strong><span title="{{ item[1].education }}">{{ item[1].education }}</span></li>
-        <li class="school"><strong>University: </strong><span title="{{ item[1].school }}">{{ item[1].school }}</span></li>
-        <li class="position"><strong>Position: </strong><span title="{{ item[1].position }}">{{ item[1].position }}</span></li>
-        <li class="company"><strong>Company: </strong><span title="{{ item[1].company }}">{{ item[1].company }}</span></li>
-      </ul>
-    </div>
-    <div class="work-experience">
-      {% if item[1].experience | length - 2 >= 2 %}
-      <a href="javascript:;" class="show-more">Unfold</a>
-      {% for e in item[1].experience %}
-      {% if loop.index > 2 %}
-      <div class="experience-hide">
-        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-        <div class="experience-company">{{ e[2] }}</div>
+  <div class="ls-item">
+    <div class="basic-info">
+      <div class="ls bs-info-item wd-200 pd-lr-10 omit">
+        <a class="item-title" href="/show/{{ item[0] }}" target="_blank" data-id="{{ item[1].id }}" data-match="{{ item[2].match }}" title="{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
       </div>
+      <div class="ls bs-info-item wd-60 pd-lr-10 omit" title="{{ item[1].gender }}">{{ item[1].gender }}</div>
+      <div class="ls bs-info-item wd-56 pd-lr-10 omit" title="{{ item[1].age }}">{{ item[1].age }}</div>
+      {% if item[1].marital_status %}
+      <div class="ls bs-info-item wd-80 pd-lr-10 omit" title="{{ item[1].marital_status }}">{{ item[1].marital_status }}</div>
       {% else %}
-      <div>
-        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-        <div class="experience-company">{{ e[2] }}</div>
-      </div>
+      <div class="ls bs-info-item wd-80 pd-lr-10 omit" title=""></div>
       {% endif %}
-      {% endfor %}
+      <div class="ls bs-info-item wd-100 pd-lr-10 omit" title="{{ item[1].education }}">{{ item[1].education }}</div>
+      <div class="ls bs-info-item wd-180 pd-lr-10 omit" title="{{ item[1].school }}">{{ item[1].school }}</div>
+      <div class="ls bs-info-item wd-120 pd-lr-10 omit" title="{{ item[1].position }}">{{ item[1].position }}</div>
+      <div class="ls bs-info-item wd-200 pd-lr-10 omit" title="{{ item[1].company }}">{{ item[1].company }}</div>
+    </div>
+    <div class="extend-info clearfix">
+      <div class="wk-ex wd-360 bd-r-1">
+        <label>Work Experience:</label>
+        <ul class="list-unstyled">
+          {% if item[1].experience | length - 2 >= 2 %}
+          {% for e in item[1].experience %}
+          {% if loop.index > 2 %}
+          <li class="ex-fold">
+            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
+            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
+          </li>
+          {% else %}
+          <li>
+            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
+            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
+          </li>
+          {% endif %}
+          {% endfor %}
+          <a href="javascript:;" class="show-more">Unfold</a>
+          {% else %}
 
-      {% else %}
-      {% for e in item[1].experience %}
-      <div>
-        <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-        <div class="experience-company">{{ e[2] }}</div>
+          {% for e in item[1].experience %}
+          <li>
+            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
+            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
+          </li>
+          {% endfor %}
+          {% endif %}
+        </ul>
       </div>
-      {% endfor %}
-      {% endif %}
-    </div>
-    <div class="info-wrapper">
-      <div class="tracking-box">
-        <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
-        <div class="tracking-info">
-          <span class="triangle-up"></span>
-          <span class="triangle-up-z"></span>
-          <ul class="list-inline clearfix">
-            {% for tracking in item[1].tracking %}
-            <li>{{ tracking.author }}</li>
+      <div class="ed-ex wd-360 pd-lr-15 bd-r-1">
+        <label>Education Experience:</label>
+        <ul class="list-unstyled">
+        </ul>
+      </div>
+      <div class="wk-status pd-l-15">
+        <div class="cur">
+          <label>Current:</label>
+          {% if item[1].current %}
+          <div class="money">
+            <span>Money:</span>
+            <span>{% if item[1].current.salary %}{{ item[1].current.salary.yearly }}{% endif %}</span>
+          </div>
+          <div class="position">
+            <span>Place:</span>
+            <span>
+            {% if item[1].current.places %}
+            {% for e in item[1].current.places %}
+            {{ e }}&nbsp;
             {% endfor %}
-          </ul>
+            {% endif %}
+            </span>
+          </div>
+          {% endif %}
         </div>
-      </div>
-      <div class="comment-box">
-        <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
-        <div class="comment-info">
-          <span class="triangle-up"></span>
-          <span class="triangle-up-z"></span>
-          <ul class="list-unstyled clearfix">
-            {% for comments in item[1].comment %}
-            {%- if loop.index > 3 %}{% break %}{% endif %}
-            <li class="comment-item">
-              <p>{{ comments.content }}</p>
-              <em class="author">{{ comments.author }}</em>
-            </li>
-            {%- endfor %}
-          </ul>
+        <div class="exp">
+          <label>Expectation:</label>
+          {% if item[1].expectation %}
+          <div class="money">
+            <span>Money:</span>
+            <span>{% if item[1].expectation.salary %}{{ item[1].expectation.salary.yearly }}{% endif %}</span>
+          </div>
+          <div class="position">
+            <span>Place:</span>
+            <span>
+            {% if item[1].expectation.places %}
+            {% for e in item[1].expectation.places %}
+            {{ e }}&nbsp;
+            {% endfor %}
+            {% endif %}
+            </span>
+          </div>
+          {% endif %}
         </div>
-      </div>
-      <div class="label-box">
-        <span class="label-title">Tags:</span>
-        {% for tags in item[1].tag %}
-        <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
-        {% endfor %}
       </div>
     </div>
   </div>
   {% endfor %}
-  {% else %}
-  <p>Your search - {{ search_key }} - did not match any documents.</p>
   {% endif %}
   <nav>
     <ul class="pagination">

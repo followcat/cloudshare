@@ -42,7 +42,7 @@ ZILN_SVC_CV = services.curriculumvitae.CurriculumVitae(ZHILIAN_DB, 'zhilian')
 
 SVC_ADD_SYNC = services.additionalsync.AdditionalSync([PREDATOR_DB, JINGYING_DB, ZHILIAN_DB])
 SVC_CV = services.multicv.MultiCV(DEF_SVC_CV,
-                                  [DEF_SVC_CV, PRE_SVC_CV, JGYG_SVC_CV, ZILN_SVC_CV])
+                                  [PRE_SVC_CV, JGYG_SVC_CV, ZILN_SVC_CV])
 
 LSI_PATH = 'lsimodel'
 SVC_MIN = services.mining.Mining(LSI_PATH, SVC_CV)

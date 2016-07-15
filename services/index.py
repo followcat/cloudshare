@@ -97,7 +97,7 @@ class ReverseIndexing(object):
         if uses is None:
             uses = self.index.keys()
         result = set()
-        parts = []
+        parts = list()
         for use in uses:
             assert use in self.index
             index = self.index[use]
@@ -107,7 +107,7 @@ class ReverseIndexing(object):
                     if value in index[key]:
                         parts.append(index[key][value])
         if parts:
-            result = parts[0]
+            result.update(parts[0])
             for part in parts[1:]:
                 result.intersection_update(part)
         return result

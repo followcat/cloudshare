@@ -8,8 +8,9 @@ import extractor.information_explorer
 
 class AdditionalSync(object):
 
-    def __init__(self, interfaces):
-        self.interfaces = interfaces
+    def __init__(self, multicv):
+        self.additionals = multicv.additionals
+        self.interfaces = [additional.interface for additional in self.additionals]
 
     def update(self):
         for i in self.interfaces:

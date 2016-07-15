@@ -97,6 +97,7 @@ class ReverseIndexing(object):
         if uses is None:
             uses = self.index.keys()
         result = set()
+        parts = []
         for use in uses:
             assert use in self.index
             index = self.index[use]
@@ -104,7 +105,11 @@ class ReverseIndexing(object):
                 assert key in index
                 for value in filtedict[key]:
                     if value in index[key]:
-                        result.update(index[key][value])
+                        parts.append(index[key][value])
+        if parts:
+            result = parts[0]
+            for part in parts[1:]:
+                result.intersection_update(part)
         return result
 
     def filte(self, filtedict, selected, uses=None):

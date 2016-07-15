@@ -92,11 +92,46 @@ define(["jquery"], function() {
           $text = _this.text();
 
       if ($text.indexOf('Unfold') !== -1) {
-        _this.parent().find('.experience-hide').css({'display': 'block'});
+        _this.parent().find('.ex-fold').css({'display': 'block'});
         _this.text('Fold');
       } else {
-        _this.parent().find('.experience-hide').css({'display': 'none'});
+        _this.parent().find('.ex-fold').css({'display': 'none'});
         _this.text('Unfold');
+      }
+    });
+
+    //结果列表字段定位
+    var headerHeigth = $("header").innerHeight(),
+        toolWrapHeight = $(".tool-bar-wrap").outerHeight() + parseInt($(".tool-bar-wrap").css("marginTop"));
+    $(document).scroll( function() {
+      var top = $(document).scrollTop();
+      if (top > headerHeigth + toolWrapHeight) {
+        $(".field").addClass("top-fixed");
+      } else {
+        $(".field").removeClass("top-fixed");
+      }
+    });
+
+    //顶部工具容器折叠事件
+    var initToolWrapHeight = $(".tool-bar-wrap").outerHeight();
+    $("#toolWrapUpDown").on("click", function() {
+      var $iconElement = $(this).children("span");
+      if ($(this).attr("data-flag") === "true") {
+        $iconElement.removeClass("glyphicon-chevron-down");
+        $iconElement.addClass("glyphicon-chevron-up");
+        $(".tool-bar-wrap").css({
+          'height': 'auto',
+          'overflow': 'inherit'
+        });
+        $(this).attr("data-flag", "false");
+      } else {
+        $iconElement.removeClass("glyphicon-chevron-up");
+        $iconElement.addClass("glyphicon-chevron-down");
+        $(".tool-bar-wrap").css({
+          'height': initToolWrapHeight + 'px',
+          'overflow': 'hidden'
+        });
+        $(this).attr("data-flag", "true");
       }
     });
   }();

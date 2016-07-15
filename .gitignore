@@ -16,3 +16,4 @@ additional/
 webapp/static/node_modules/
 webapp/static/dist/
 webapp/static/rev/
+webapp/app/node_modules/

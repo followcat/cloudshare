@@ -1,6 +1,12 @@
+import os
+
+import flask
+import flask.ext.login
+from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.builtin
+import core.outputstorage
 
 
 class SearchbyTextAPI(Resource):
@@ -10,6 +16,7 @@ class SearchbyTextAPI(Resource):
     def __init__(self):
         super(SearchbyTextAPI, self).__init__()
         self.svc_cv = flask.current_app.config['SVC_CV']
+        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('page', type = int, location = 'json')
 
     def get(self, text):

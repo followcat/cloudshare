@@ -35,6 +35,15 @@ const config = {
         exclude: /node_modules/,
         loader: 'babel',
         include: PATHS.APP_PATH
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader?modules',
+        include: PATHS.APP_PATH
+      },
+      {
+        test: /\.(png|jpg)$/,
+        loader: 'url?limit=40000'
       }
     ]
   },

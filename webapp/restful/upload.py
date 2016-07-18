@@ -55,7 +55,7 @@ class UploadCVAPI(Resource):
         return { 'result': upobj.result }
 
 
-class UploadEnglishCVAPI(Resource)
+class UploadEnglishCVAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 

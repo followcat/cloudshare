@@ -5,6 +5,7 @@ from webapp.restful.account import *
 from webapp.restful.company import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
+from webapp.restful.upload import *
 
 
 def initialize(app):
@@ -29,3 +30,10 @@ def initialize(app):
                      endpoint = 'curriculumvitaemd')
     api.add_resource(CurrivulumvitaeYAMLAPI, '/api/cvyaml/<string:id>',
                      endpoint = 'curriculumvitaeyaml')
+
+    api.add_resource(UploadCVAPI, '/api/uploadcv',
+                     endpoint = 'uploadcv')
+    api.add_resource(UploadBatchCVAPI, '/api/uploadbatchcv',
+                     endpoint = 'uploadbatchcv')
+    api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv',
+                     endpoint = 'uploadengcv')

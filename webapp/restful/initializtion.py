@@ -1,11 +1,12 @@
 import flask
 import flask.ext.restful
 
+from webapp.restful.search import *
+from webapp.restful.upload import *
 from webapp.restful.account import *
 from webapp.restful.company import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
-from webapp.restful.upload import *
 
 
 def initialize(app):
@@ -37,3 +38,6 @@ def initialize(app):
                      endpoint = 'uploadbatchcv')
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv',
                      endpoint = 'uploadengcv')
+
+    api.add_resource(SearchbyTextAPI, '/api/search/<string:text>',
+                     endpoint = 'searchbytext')

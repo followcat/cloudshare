@@ -4,6 +4,7 @@ import flask.ext.restful
 from webapp.restful.account import *
 from webapp.restful.company import *
 from webapp.restful.jobdescription import *
+from webapp.restful.curriculumvitae import *
 
 
 def initialize(app):
@@ -20,4 +21,11 @@ def initialize(app):
     api.add_resource(JobDescriptionByNameAPI, '/api/jdbyname/<string:name>',
                      endpoint = 'jobdescription')
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
-                     endpoint = 'cjobdescriptionlist')
+                     endpoint = 'jobdescriptionlist')
+
+    api.add_resource(CurrivulumvitaeAPI, '/api/cv/<string:id>',
+                     endpoint = 'curriculumvitae')
+    api.add_resource(CurrivulumvitaeMDAPI, '/api/cvmd/<string:id>',
+                     endpoint = 'curriculumvitaemd')
+    api.add_resource(CurrivulumvitaeYAMLAPI, '/api/cvyaml/<string:id>',
+                     endpoint = 'curriculumvitaeyaml')

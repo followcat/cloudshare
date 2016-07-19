@@ -111,25 +111,47 @@ class Mining(object):
     def update_model(self):
         updated = self.lsi_model.update(self.services['default'])
         if updated:
-            for name in self.services:
-                for svc in self.services[name]:
-                    self.sim[svc.name].set_index()
-                    self.sim[svc.name].save()
+            self.update_sims()
 
     def update_sims(self):
         for name in self.services:
             for svc in self.services[name]:
                 self.sim[svc.name].update([svc])
+                self.sim[svc.name].save()
 
-    def probability(self, doc):
+    def probability(self, doc, uses=None):
+        if uses is None:
+            uses = self.sim.keys()
         result = []
-        for sim in self.sim.values():
+        for name in uses:
+            sim = self.sim[name]
             result.extend(sim.probability(doc))
         return sorted(result, key=lambda x:float(x[1]), reverse=True)
 
-    def minetop(self, doc, top):
-        return self.probability(doc)[:top]
+    def lenght(self, uses=None):
+        if uses is None:
+            uses = self.sim.keys()
+        result = 0
+        for name in uses:
+            sim = self.sim[name]
+            result += len(sim.names)
+        return result
 
-    def minelist(self, doc, lists):
-        return filter(lambda x: x[0] in lists, self.probability(doc))
+    def minetop(self, doc, top, uses=None):
+        return self.probability(doc, uses=uses)[:top]
 
+    def minelist(self, doc, lists, uses=None):
+        return filter(lambda x: x[0] in lists, self.probability(doc, uses=uses))
+
+    def minelistrank(self, doc, lists, uses=None):
+        ranklist = map(lambda x: x[0], self.probability(doc, uses=uses))
+        return map(lambda x: ranklist.index(x), lists)
+
+    def default_names(self):
+        return [n.name for n in self.services['default'] if n.name in self.sim.keys()]
+
+    def addition_names(self):
+        names = self.sim.keys()
+        for n in self.default_names():
+            names.remove(n)
+        return names

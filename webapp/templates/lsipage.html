@@ -5,38 +5,10 @@
 
 {% block style %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap-table.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/jdview.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/searchresult.css') }}">
-<style type="text/css">
-  .result-list{
-    margin-top: 20px;
-  }
-  .wrap-left, #result{
-    width: 50%;
-    display: block;
-    float: left;
-  }
-  textarea{
-    margin-top: 2px;
-    width: 100%;
-  }
-  #result{
-    overflow-y: auto;
-    border: 1px solid #e2e2e2;
-    background-color: #fff;
-  }
-  .result-item:nth-child(even){
-    background-color: #eee;
-  }
-  .result-item ul li{
-    float: left;
-    width: 16.66%;
-  }
-  .crawl-item{
-    background-color: #f2f2f2;
-  }
-</style>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/result_common.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/lsipage.css') }}">
 {% endblock %}
+
 
 {% block content %}
 {% if button_bar %}
@@ -48,18 +20,20 @@
     <div class="database-box">
       <div class="title">Database</div>
       <div class="database-list">
+        {% for e in sim_names %}
         <div class="checkbox">
           <label>
-            <input type="checkbox" class="database-item" value="Additional" />Additional
+            <input type="checkbox" class="database-item" value="{{ e }}" />{{ e }}
           </label>
         </div>
+        {% endfor %}
       </div>
     </div>
     <div class="line"></div>
     <div class="tool-bar">
-      <button class="btn btn-primary" id="competency-btn">Show Competency</button>
-      <button class="btn btn-primary" id="experience-btn">Show Work experience</button>
-      <button class="btn btn-primary" id="vd-valuable">Show Radar Chart</button>
+      <button class="btn btn-primary" id="competencyBtn">Show Competency</button>
+      <button class="btn btn-primary" id="experienceBtn">Show Work experience</button>
+      <button class="btn btn-primary" id="vdValuable">Show Radar Chart</button>
       <div class="checkbox anonymous">
         <label>
           <input type="checkbox" id="anonymous-checkbox" />Anonymous
@@ -67,7 +41,7 @@
       </div>
     </div>
     <div class="line"></div>
-    <div class="sel-list" id="sel-list">
+    <div class="sel-list" id="seletedList">
     </div>
     <div class="line"></div>
     <!-- Button trigger modal -->
@@ -84,8 +58,8 @@
         <h4 class="modal-title" id="chartsViewLabel">Charts View</h4>
       </div>
       <div class="modal-body">
-        <div class="chart-wrapper" id="echarts-wrap"></div>
-        <div id="action-msg"></div>
+        <div class="chart-wrapper" id="echartWrap"></div>
+        <div class="ac-msg" id="actionMsg"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -106,8 +80,9 @@
           <thead>
             <tr>
               <th data-field="state" data-checkbox="true"></th>
+              <th data-field="id">Id</th>
               <th data-field="name">Name</th>
-              <th data-field="fileName">File Name</th>
+              <th data-field="filename">File Name</th>
               <th data-field="time">Time</th>
             </tr>
           </thead>
@@ -120,78 +95,191 @@
   </div>
 </div><!-- Charts modal end -->
 {% endif %}
-<div class="col-md-10 col-md-offset-1 result-list">
+
+<div class="tool-bar-wrap mg-center clearfix">
+  <div class="cw">
+    {% if result %}
+    <div class="r-amount">About <span class="num">{{ nums }}</span> results</div>
+    {% else %}
+    <div class="r-amount">Your did not match any documents.</div>
+    {% endif %}
+    <div class="s-st">
+      <label>Conditions: </label>
+      <span id="conditionList"></span>
+    </div>
+  </div>
+  <div class="aw">
+    <form class="form-horizontal" id="filterForm" action="/lsipage" method="GET">
+      <div class="form-group">
+        <label class="control-label filter-control-label" for="currentPlaces">Current Places</label>
+        <input class="form-control filter-form-control" id="currentPlaces" type="text" name="currentPlaces"  placeholder="Current Places" />
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label" for="expectationPlaces">Expectation Places</label>
+        <input class="form-control filter-form-control" id="expectationPlaces" type="text" name="expectationPlaces"  placeholder="Expectation Places" />
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label">Gender</label>
+        <div class="filter-form-control">
+          <label class="radio-inline">
+            <input type="radio" name="gender" id="allGenderRadio" value=""> All
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="gender" id="maleRadio" value="男"> Male
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="gender" id="femalRadio" value="女"> Female
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label">Education</label>
+        <div class="filter-form-control education-form-control">
+          <label class="radio-inline">
+            <input type="radio" name="education" id="alleducationRadio" value=""> All
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="education" id="collegeRadio" value="大专"> College
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="education" id="undergraduateRadio" value="本科"> Undergraduate
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="education" id="masterRadio" value="硕士"> Master
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="education" id="doctorRadio" value="博士"> Doctor
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label">Marital Status</label>
+        <div class="filter-form-control">
+          <label class="radio-inline">
+            <input type="radio" name="marriedStatus" id="allmarriedRadio" value=""> All
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="marriedStatus" id="unmarriedRadio" value="未婚"> Unmarried
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="marriedStatus" id="marriedRadio" value="已婚"> Married
+          </label>
+        </div>
+      </div>
+      <button type="button" id="filterBtn" class="btn btn-primary filter-btn">Search</button>
+    </form>
+  </div>
+  <div class="up-down-box" id="toolWrapUpDown" data-flag="true">
+    <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+  </div>
+</div>
+
+<div class="rl mg-center">
+  <div class="field">
+    <div class="ls field-item wd-200">Name</div>
+    <div class="ls field-item wd-60">Gender</div>
+    <div class="ls field-item wd-56">Age</div>
+    <div class="ls field-item wd-80">Marriage</div>
+    <div class="ls field-item wd-100">Education</div>
+    <div class="ls field-item wd-180">University</div>
+    <div class="ls field-item wd-120">Position</div>
+    <div class="ls field-item wd-200">Company</div>
+  </div>
+  <div class="blank-line"></div>
   {% if result %}
   {% for item in result %}
-  <div class="result-list-item {% if item[2].author == 'SCRAPPY'%}crawl-item{% endif %}">
-    <div class="item-link">
-      <input type="checkbox" class="checkbox-name" />
-      <a href="/show/{{ item[0] }}" class="item-title" target="_blank">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
-      <em class="item-operate">{{ item[2].author }}, {{ item[2].time }}
-      </em>
-      <p style="display: none;">{{ item[2].match }}</p>
-      {% if item[1].enversion %}
-      <a href="/edit/{{ item[1].enversion }}" target="_blank" class="check-en">English CV</a>
+  <div class="ls-item {% if item[2].author == 'SCRAPPY'%}crawl-item{% endif %}">
+    <div class="basic-info">
+      <div class="ls bs-info-item wd-200 pd-lr-10 omit">
+        <input type="checkbox" class="checkbox-name" />
+        <a class="item-title" href="/show/{{ item[0] }}" target="_blank" data-id="{{ item[1].id }}" data-match="{{ item[2].match }}" title="{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
+      </div>
+      <div class="ls bs-info-item wd-60 pd-lr-10 omit" title="{{ item[1].gender }}">{{ item[1].gender }}</div>
+      <div class="ls bs-info-item wd-56 pd-lr-10 omit" title="{{ item[1].age }}">{{ item[1].age }}</div>
+      {% if item[1].marital_status %}
+      <div class="ls bs-info-item wd-80 pd-lr-10 omit" title="{{ item[1].marital_status }}">{{ item[1].marital_status }}</div>
+      {% else %}
+      <div class="ls bs-info-item wd-80 pd-lr-10 omit" title=""></div>
       {% endif %}
+      <div class="ls bs-info-item wd-100 pd-lr-10 omit" title="{{ item[1].education }}">{{ item[1].education }}</div>
+      <div class="ls bs-info-item wd-180 pd-lr-10 omit" title="{{ item[1].school }}">{{ item[1].school }}</div>
+      <div class="ls bs-info-item wd-120 pd-lr-10 omit" title="{{ item[1].position }}">{{ item[1].position }}</div>
+      <div class="ls bs-info-item wd-200 pd-lr-10 omit" title="{{ item[1].company }}">{{ item[1].company }}</div>
     </div>
-    <div class="container-fluid">
-      <ul class="list-unstyled info">
-        <li class="name"><strong>Name: </strong><span>{{ item[1].name }}</span></li>
-        <li class="age"><strong>Age: </strong><span>{{ item[1].age }}</span></li>
-        <li class="education"><strong>Education: </strong><span>{{ item[1].education }}</span></li>
-        <li class="school"><strong>University: </strong><span>{{ item[1].school }}</span></li>
-        <li class="position"><strong>Position: </strong><span>{{ item[1].position }}</span></li>
-        <li class="company"><strong>Company: </strong><span>{{ item[1].company }}</span></li>
-      </ul>
-    </div>
-    <div class="work-experience">
-      <a href="javascript:;" class="show-more">Unfold</a>
-        {% for e in item[1].experience %}
-        {% if loop.index > 2 %}
-        <div class="experience-hide">
-          <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-          <div class="experience-company">{{ e[2] }}</div>
-        </div>
-        {% else %}
-        <div>
-          <div class="experience-time">{{ e[0] }} - {{ e[1] }}</div>
-          <div class="experience-company">{{ e[2] }}</div>
-        </div>
-        {% endif %}
-        {% endfor %}
-    </div>
-    <div class="label-box">
-      <span class="label-title">Tags:</span>
-      {% for tags in item[1].tag %}
-      <span class="label label-primary" title="{{ tags.author }}">{{ tags.content }}</span>
-      {% endfor %}
-    </div>
-    <div class="tracking-box">
-      <a href="javascript:;" class="tracking-link"><span>+</span>Follow up</a>
-      <div class="tracking-info">
-        <span class="triangle-up"></span>
-        <span class="triangle-up-z"></span>
-        <ul class="list-inline clearfix">
-          {% for tracking in item[1].tracking %}
-          <li>{{ tracking.author }}</li>
+    <div class="extend-info clearfix">
+      <div class="wk-ex wd-360 bd-r-1">
+        <label>Work Experience:</label>
+        <ul class="list-unstyled">
+          {% if item[1].experience | length - 2 >= 2 %}
+          {% for e in item[1].experience %}
+          {% if loop.index > 2 %}
+          <li class="ex-fold">
+            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
+            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
+          </li>
+          {% else %}
+          <li>
+            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
+            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
+          </li>
+          {% endif %}
           {% endfor %}
+          <a href="javascript:;" class="show-more">Unfold</a>
+          {% else %}
+
+          {% for e in item[1].experience %}
+          <li>
+            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
+            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
+          </li>
+          {% endfor %}
+          {% endif %}
         </ul>
       </div>
-    </div>
-    <div class="comment-box">
-      <a href="javascript:;" class="comment-link"><span>+</span>Comments</a>
-      <div class="comment-info">
-        <span class="triangle-up"></span>
-        <span class="triangle-up-z"></span>
-        <ul class="list-unstyled clearfix">
-          {% for comments in item[1].comment %}
-          {%- if loop.index > 3 %}{% break %}{% endif %}
-          <li class="comment-item">
-            <p>{{ comments.content }}</p>
-            <em class="author">{{ comments.author }}</em>
-          </li>
-          {%- endfor %}
+      <div class="ed-ex wd-360 pd-lr-15 bd-r-1">
+        <label>Education Experience:</label>
+        <ul class="list-unstyled">
         </ul>
+      </div>
+      <div class="wk-status pd-l-15">
+        <div class="cur">
+          <label>Current:</label>
+          {% if item[1].current %}
+          <div class="money">
+            <span>Money:</span>
+            <span>{% if item[1].current.salary %}{{ item[1].current.salary.yearly }}{% endif %}</span>
+          </div>
+          <div class="position">
+            <span>Place:</span>
+            <span>
+            {% if item[1].current.places %}
+            {% for e in item[1].current.places %}
+            {{ e }}&nbsp;
+            {% endfor %}
+            {% endif %}
+            </span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="exp">
+          <label>Expectation:</label>
+          {% if item[1].expectation %}
+          <div class="money">
+            <span>Money:</span>
+            <span>{% if item[1].expectation.salary %}{{ item[1].expectation.salary.yearly }}{% endif %}</span>
+          </div>
+          <div class="position">
+            <span>Place:</span>
+            <span>
+            {% if item[1].expectation.places %}
+            {% for e in item[1].expectation.places %}
+            {{ e }}&nbsp;
+            {% endfor %}
+            {% endif %}
+            </span>
+          </div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
@@ -221,6 +309,10 @@
       {% endfor %}
       {% else %}
       {% if cur_page < pages - 2 %}
+      {% if cur_page -2 > 0 %}
+      <li><a href="/lsipage?{{ param }}&page={{ cur_page-2 }}">{{ cur_page-2 }}</a></li>
+      <li><a href="/lsipage?{{ param }}&page={{ cur_page-1 }}">{{ cur_page-1 }}</a></li>
+      {% endif %}
       <li class="active"><a href="/lsipage?{{ param }}&page={{ cur_page }}">{{ cur_page }}</a></li>
       <li><a href="/lsipage?{{ param }}&page={{ cur_page+1 }}">{{ cur_page+1 }}</a></li>
       <li><a href="/lsipage?{{ param }}&page={{ cur_page+2 }}">{{ cur_page+2}}</a></li>
@@ -256,5 +348,5 @@
 
 {% block script%}
 <script src="{{ url_for('static', filename='lib/js/echarts.min.js') }}"></script>
-<script data-main="{{ url_for('static', filename='src/js/modules/search_result.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
+<script data-main="{{ url_for('static', filename='src/js/modules/match_result_module.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock%}

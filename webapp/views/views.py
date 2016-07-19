@@ -114,7 +114,7 @@ class BatchConfirm(flask.views.MethodView):
             result = svc_cv.add(upobj, user.id)
             if result is True:
                 def_cv_name = svc_cv.default.name
-                svc_min.sim[def_cv_name].add(upobj.filepro.name.md, upobj.markdown())
+                result = svc_min.sim[def_cv_name].update([svc_cv.default])
             results[filename] = result
         flask.session[user.id]['batchupload'] = dict()
         return flask.jsonify(result=results)
@@ -141,12 +141,13 @@ class UploadPreview(flask.views.MethodView):
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
-        info = {
-            "name": upobj.filepro.yamlinfo['name'],
-            "origin": upobj.filepro.yamlinfo['origin'],
-            "id": upobj.filepro.yamlinfo['id']
-        }
-        return flask.render_template('cv.html', markdown=output, info=info)
+        yaml_info = upobj.filepro.yamlinfo
+        # info = {
+        #     "name": upobj.filepro.yamlinfo['name'],
+        #     "origin": upobj.filepro.yamlinfo['origin'],
+        #     "id": upobj.filepro.yamlinfo['originid']
+        # }
+        return flask.render_template('cv.html', markdown=output, yaml_info=yaml_info)
 
 
 class Confirm(flask.views.MethodView):
@@ -165,7 +166,7 @@ class Confirm(flask.views.MethodView):
         result = svc_cv.add(upobj, user.id)
         if result is True:
             def_cv_name = svc_cv.default.name
-            svc_min.sim[def_cv_name].add(upobj.filepro.name.md, upobj.markdown())
+            result = svc_min.sim[def_cv_name].update([svc_cv.default])
         return flask.jsonify(result=result, filename=upobj.filepro.name.md)
 
 
@@ -180,7 +181,8 @@ class ConfirmEnglish(flask.views.MethodView):
         upobj = pickle.loads(flask.session[user.id]['upload'])
         result = svc_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
-        svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data), committer=user.id)
+        svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
+                      committer=user.id)
         return flask.jsonify(result=result)
 
 
@@ -192,6 +194,7 @@ class Show(flask.views.MethodView):
         md_data = svc_cv.getmd(filename)
         md = core.converterutils.md_to_html(md_data)
         yaml_info = svc_cv.getyaml(filename)
+        yaml_info['date'] = utils.builtin.strftime(yaml_info['date'])
         return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
 
 
@@ -263,7 +266,7 @@ class UpdateInfo(flask.views.MethodView):
                 result = False
                 break
         else:
-            svc_cv.modify(name.yaml, yaml.safe_dump(yaml_info),
+            svc_cv.modify(name.yaml, yaml.safe_dump(yaml_info, allow_unicode=True),
                           commit_string.encode('utf-8'), user.id)
         return flask.jsonify(result=result)
 

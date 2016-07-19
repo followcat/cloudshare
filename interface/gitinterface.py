@@ -160,7 +160,7 @@ class GitInterface(interface.base.Interface):
         for each in returncode.split('\n'):
             if each:
                 lsfiles.append(each)
-        if 'not found' in lsfiles[0]:
+        if  lsfiles and 'not found' in lsfiles[0]:
             lsfiles = []
         return lsfiles
 
@@ -172,7 +172,8 @@ class GitInterface(interface.base.Interface):
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> data = {'name': u'中文名字'}
-            >>> commit_id = interface.add('test_file.yaml', yaml.safe_dump(data),
+            >>> commit_id = interface.add('test_file.yaml',
+            ... yaml.safe_dump(data, allow_unicode=True),
             ... b'Test commit', b'test<test@test.com>')
             >>> interface.grep_yaml('name', '.')
             ['test_file.yaml']
@@ -235,7 +236,7 @@ class GitInterface(interface.base.Interface):
         except subprocess.CalledProcessError:
             return []
         sha1_sums = output.strip().split(b'\n')
-        return [self.commit_info(self.repo[sha1]) for sha1 in sha1_sums]
+        return [self.commit_info(self.repo[sha1]) for sha1 in sha1_sums if sha1]
 
     def commit_info(self, commit):
         info_dict = {}

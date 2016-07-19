@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block search %}
-<form action="/search" method="GET">
+<form action="/search" method="GET" class="header-search">
   <div class="input-group search-item">
-    <input type="text" class="form-control" name="search_text" placeholder="Search for ..." value="{{ search_key }}" required="required">
+    <input type="text" class="form-control" name="search_text" id="search_text" placeholder="Search for ..." value="{{ search_key }}" required="required">
     <div class="input-group-btn">
-      <button type="submit" class="btn btn-default" >Search</button>
+      <button type="submit" class="btn btn-default">Search</button>
     </div>
   </div>
 </form>

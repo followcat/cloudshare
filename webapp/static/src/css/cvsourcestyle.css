@@ -32,8 +32,9 @@
 .comment-box, .similar-box{
 	margin-top: 8px;
 }
-#similar-person{
-	padding: 6px;
+.similar a{
+	display: inline-block;
+	margin-left: 4px;
 }
 #similar-person a{
 	margin-right: 6px;
@@ -119,7 +120,7 @@
 	font-size: 0.85em;
 }
 .label-primary{
-  cursor: pointer;
+	cursor: pointer;
 }
 .tool-bar{
 	width: 55%;
@@ -134,4 +135,42 @@
 }
 #title-submit-btn{
 	display:none;
+}
+.summary {
+	padding: 4px 6px;
+	border: 1px dashed #e2e2e2;
+	margin-bottom: 10px;
+}
+.uploader, .name, .age, .education, .school, .position, .company {
+	display: inline-block;
+	line-height: 1.5em;
+}
+.summary > .name {
+	width: 12%;
+}
+.summary > .age {
+	width: 10%;
+}
+.summary > .education {
+	width: 16%;
+}
+.summary > .school {
+	width: 26%;
+}
+.summary > .position {
+	width: 34%;
+}
+.work-experience li{
+	line-height: 1.375em;
+	overflow: hidden;
+}
+.summary .experience-time {
+	display: block;
+	width: 20%;
+	float: left;
+}
+.summary .experience-company {
+	display: block;
+	width: 79%;
+	float: left;
 }

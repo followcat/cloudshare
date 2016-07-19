@@ -107,42 +107,45 @@ import utils.builtin
 
 yaml.SafeDumper = utils._yaml.SafeDumper
 
-import re
-import extractor.extract_experience
-RE = re.compile(extractor.extract_experience.DURATION)
 
-def update_xp(svc_cv, yamlname):
-    yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
-    yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
-    extracted_data = extractor.extract_experience.fix(svc_cv.getmd(yamlname))
-    if not extracted_data[1]:
-        (company, position) = extracted_data[0]
-        obj = utils.builtin.load_yaml(yamlpath, yamlname)
-        obj['experience'] = []
-        for (i,c) in enumerate(company):
-            current_positions = [p for p in position if p[4] == i]
-            for p in current_positions:
-                if c[3] and len(current_positions) == 1 and not RE.search(p[2]):
-                    obj['experience'].append((p[0], p[1], c[2]+'|'+p[2]+'('+c[3]+')'))
-                elif c[3]:
-                    obj['experience'].append((p[0], p[1], c[2]+'('+c[3]+')'+'|'+p[2]))
-                else:
-                    obj['experience'].append((p[0], p[1], c[2]+'|'+p[2]))
-            else:
-                if not len(current_positions):
-                    obj['experience'].append((c[0], c[1], c[2]))
-        yamlstream = yaml.safe_dump(obj, allow_unicode=True)
-        with open(yamlpathfile, 'w') as fp:
-            fp.write(yamlstream)
+import extractor.information_explorer
 
-def safeyaml(svc_cv, yamlname):
-    yamlpath = os.path.join(svc_cv.interface.path, svc_cv.path)
-    yamlpathfile = os.path.join(svc_cv.interface.path, svc_cv.path, yamlname)
-    obj = utils.builtin.load_yaml(yamlpath, yamlname)
+def update_selected(svc_cv, yamlname, selected):
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname), selected)
+    obj.update(info)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
-def yamlaction(svc_cv, action):
+def update_xp(svc_cv, yamlname):
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname))
+    obj.update(extracted_data)
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
+
+def safeyaml(svc_cv, yamlname):
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
+
+def originid(svc_cv, yamlname):
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    if 'originid' not in obj:
+        id_str, suffix = os.path.splitext(yamlname)
+        obj['originid'] = obj['id']
+        obj['id'] = id_str
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
+
+def yamlaction(svc_cv, action, *args, **kwargs):
     for yamlname in svc_cv.yamls():
-        action(svc_cv, yamlname)
+        action(svc_cv, yamlname, *args, **kwargs)

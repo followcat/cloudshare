@@ -68,6 +68,9 @@ class LSI(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         miner = flask.current_app.config['SVC_MIN']
         svc_jd = flask.current_app.config['SVC_JD']
+        sim_names = miner.addition_names()
+        uses = miner.default_names()
+        uses.extend(flask.request.args.getlist('uses[]'))
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
             jd_yaml = svc_jd.get(jd_id+'.yaml')
@@ -76,25 +79,48 @@ class LSI(flask.views.MethodView):
         elif 'jd_doc' in flask.request.args:
             doc = flask.request.args['jd_doc']
             param = 'jd_doc='+doc
+        filterdict = None
+        name = ""
+        current_places = ""
+        expectation_places = ""
+        education = ""
+        gender = ""
+        marital_status = ""
+        filterdict = dict()
+        if 'currentPlaces' in flask.request.args and flask.request.args['currentPlaces']:
+            filterdict['current_places'] = [flask.request.args['currentPlaces']]
+        if 'expectationPlaces' in flask.request.args and flask.request.args['expectationPlaces']:
+            filterdict['expectation_places'] = [flask.request.args['expectationPlaces']]
+        if 'education' in flask.request.args and flask.request.args['education']:
+            filterdict['education'] = [flask.request.args['education']]
+        if 'gender' in flask.request.args and flask.request.args['gender']:
+            filterdict['gender'] = [flask.request.args['gender']]
+        if 'marriedStatus' in flask.request.args and flask.request.args['marriedStatus']:
+            filterdict['marital_status'] = [flask.request.args['marriedStatus']]
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
-        datas, pages = self.process(miner, svc_cv, doc, cur_page, count)
+        datas, pages, totals = self.process(miner, uses, svc_cv, doc, cur_page, count, filterdict)
         return flask.render_template('lsipage.html',result=datas,
-                                     button_bar=True, cur_page=cur_page,
-                                     pages=pages, param=param)
+                                     button_bar=True, sim_names=sim_names,
+                                     cur_page=cur_page,
+                                     pages=pages, param=param, nums=totals)
 
-    def process(self, miner, svc, doc, cur_page, eve_count):
+    def process(self, miner, uses, svc, doc, cur_page, eve_count, filterdict=None):
+        index = flask.current_app.config['SVC_INDEX']
         if not cur_page:
             cur_page = 1
         datas = []
-        result = miner.probability(doc)
-        sum = len(result)
-        if sum%eve_count != 0:
-            pages = sum/eve_count + 1
+        result = miner.probability(doc, uses=uses)
+        if filterdict:
+            filteset = index.get(filterdict, uses=uses)
+            result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
+        totals = len(result)
+        if totals%eve_count != 0:
+            pages = totals/eve_count + 1
         else:
-            pages = sum/eve_count
-        for name, score in miner.probability(doc)[(cur_page-1)*eve_count:cur_page*eve_count]:
+            pages = totals/eve_count
+        for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
             yaml_info = svc.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
@@ -102,7 +128,7 @@ class LSI(flask.views.MethodView):
                 'match': score
             }
             datas.append([name, yaml_info, info])
-        return datas, pages
+        return datas, pages, totals
 
 
 class Similar(flask.views.MethodView):
@@ -136,11 +162,14 @@ class Valuable(flask.views.MethodView):
         elif 'jd_doc' in flask.request.form:
             doc = flask.request.form['jd_doc']
         name_list = flask.request.form['name_list']
+        uses = miner.default_names()
+        uses.extend(json.loads(flask.request.form['uses']))
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(miner, svc_cv, doc)
+            result = core.mining.valuable.rate(miner, svc_cv, doc, uses=uses)
         else:
-            result = core.mining.valuable.rate(miner, svc_cv, doc, name_list=name_list)
+            result = core.mining.valuable.rate(miner, svc_cv, doc,
+                                               uses=uses, name_list=name_list)
         svc_cv = flask.current_app.config['SVC_CV']
         response = dict()
         datas = []

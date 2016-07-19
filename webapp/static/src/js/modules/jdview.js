@@ -34,6 +34,36 @@ require(
     $('#match').on('click', function(e){
       e.stopPropagation();
     });
+    //url参数截取，返回参数对象
+    function queryString(str) {
+      var arr = [],
+          jsonObj = {};
+      if (str.indexOf("?") > 0) {
+        arr = str.slice(str.indexOf("?")+1);
+      }
+      if (arr.indexOf("&") > 0) {
+        arr = str.slice(str.indexOf("?")+1).split("&");
+        for (var i = 0, len = arr.length; i < len; i++) {
+          jsonObj[arr[i].split("=")[0]] = arr[i].split("=")[1];
+        }
+      }
+      return jsonObj;
+    }
+
+    $(".match").map(function(){
+      var linkHref = $(this).attr("href"),
+          newParams = {},
+          databaseList = [];
+      if ( localStorage.databaseList ) {
+        databaseList = JSON.parse(localStorage.databaseList);
+      }
+      var paramObj = queryString(linkHref);
+      newParams.jd_id = paramObj.jd_id;
+      newParams.page = paramObj.page;
+      newParams.uses = databaseList;
+      var newUrl = "/lsipage?" + $.param(newParams);
+      $(this).attr("href", newUrl);
+    });
 
     //Add JD
     $('#save-jd').on('click', function(){
@@ -160,15 +190,16 @@ require(
 
           var name_list = [],
               jdContent = textareaObj.val(),
-              fileName = textareaObj.attr("data-filename");
+              fileName = textareaObj.attr("data-filename"),
+              uses = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
           name_list.push(fileName);
-
           $.ajax({
               url: '/analysis/valuable',
               type: 'post',
               data: {
                 'jd_doc': jdContent,
-                'name_list': JSON.stringify(name_list)
+                'name_list': JSON.stringify(name_list),
+                'uses': JSON.stringify(uses)
               },
               success: function(response) {
                 var datas = replaceName(response.data);
@@ -176,7 +207,7 @@ require(
               }
           });
         }, 500);
-        
+
       }, 500);
 
 

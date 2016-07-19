@@ -21,11 +21,11 @@ const server = new WebpackDevServer(compiler, {
 
 });
 
-webpackConf.entry.unshift('webpack-dev-server/client?http://localhost:8080/', 'webpack/hot/dev-server');
+webpackConf.entry.unshift('webpack-dev-server/client?http://0.0.0.0:3000/', 'webpack/hot/only-dev-server');
 
-server.listen(8080, 'localhost', function(err) {
+server.listen(3000, '0.0.0.0', function(err) {
   if (err) {
     console.log(err);
   }
-  console.log('Listening at localhost:8080.');
+  console.log('Listening at http://0.0.0.0:3000.');
 });

@@ -33,7 +33,7 @@ const config = {
       {
         test: /\.js|jsx$/,
         exclude: /node_modules/,
-        loader: 'babel',
+        loaders: ['react-hot', 'babel'],
         include: PATHS.APP_PATH
       },
       {
@@ -62,7 +62,7 @@ const config = {
 }
 
 // module.exports = config;
-
+console.log(TARGET);
 if (TARGET === 'start' || !TARGET) {
   module.exports = merge(development, config);
 }

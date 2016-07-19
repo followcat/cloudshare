@@ -14,10 +14,12 @@ const PATHS = {
   ROOT_PATH: path.join(__dirname, '../'),
   APP_PATH: path.join(__dirname, '../src'),
   BUILD_PATH: path.join(__dirname, '../dist')
-}
+};
 
 const config = {
-  entry: [PATHS.APP_PATH],
+  entry: [
+    PATHS.APP_PATH
+  ],
 
   output: {
     path: PATHS.BUILD_PATH,
@@ -59,10 +61,9 @@ const config = {
       }
     })
   ]
-}
+};
 
 // module.exports = config;
-console.log(TARGET);
 if (TARGET === 'start' || !TARGET) {
   module.exports = merge(development, config);
 }

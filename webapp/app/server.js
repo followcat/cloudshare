@@ -2,6 +2,8 @@ const WebpackDevServer = require('webpack-dev-server');
 const webpack = require('webpack');
 const webpackConf = require('./webpack/webpack.config.js');
 
+webpackConf.entry.unshift('webpack-dev-server/client?http://0.0.0.0:3000/', 'webpack/hot/only-dev-server');
+
 const compiler = webpack(webpackConf);
 
 const server = new WebpackDevServer(compiler, {
@@ -21,7 +23,6 @@ const server = new WebpackDevServer(compiler, {
 
 });
 
-webpackConf.entry.unshift('webpack-dev-server/client?http://0.0.0.0:3000/', 'webpack/hot/only-dev-server');
 
 server.listen(3000, '0.0.0.0', function(err) {
   if (err) {

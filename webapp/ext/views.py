@@ -88,7 +88,7 @@ def configure(app):
 
     app.add_url_rule(
         '/analysis/similar',
-        view_func=webapp.views.mining.Similar.as_view('similar'),
+        view_func=webapp.views.mining.Similar.as_view('mining_similar'),
         )
 
     app.add_url_rule(

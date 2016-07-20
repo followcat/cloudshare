@@ -457,6 +457,11 @@ require(
         }
         newParams.page = paramObj.page;
         newParams.uses = dbParam;
+        newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces) : '';
+        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces) : '';
+        newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
+        newParams.education = m.requestParam.education ? decodeURIComponent(m.requestParam.education) : '';
+        newParams.marriedStatus = m.requestParam.marriedStatus ? decodeURIComponent(m.requestParam.marriedStatus) : '';
         var newUrl = "/lsipage?" + $.param(newParams);
         $(this).attr("href", newUrl);
       });

@@ -2,12 +2,20 @@
   margin: 0 auto;
 }
 
+.wd-30 {
+  width: 30px;
+}
+
 .wd-56 {
   width: 56px;
 }
 
 .wd-60 {
   width: 60px;
+}
+
+.wd-70 {
+  width: 70px;
 }
 
 .wd-80 {
@@ -20,6 +28,10 @@
 
 .wd-120 {
   width: 120px;
+}
+
+.wd-160 {
+  width: 160px;
 }
 
 .wd-180 {

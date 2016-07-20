@@ -239,6 +239,36 @@
       <div class="ed-ex wd-360 pd-lr-15 bd-r-1">
         <label>Education Experience:</label>
         <ul class="list-unstyled">
+          {% if item[1].education_history | length - 2 >= 2 %}
+          {% for e in item[1].education_history %}
+          {% if loop.index > 2 %}
+          <li class="ex-fold">
+            <span class="wd-120 omit" title="{{ e.date_from }} - {{ e.date_to }}">{{ e.date_from }} - {{ e.date_to }}</span>
+            <span class="wd-30 omit" title="{{ e.education }}">{{ e.education }}</span>
+            <span class="wd-70 omit" title="{{ e.major }}">{{ e.major }}</span>
+            <span class="wd-100 omit" title="{{ e.school }}">{{ e.school }}</span>
+          </li>
+          {% else %}
+          <li>
+            <span class="wd-120 omit" title="{{ e.date_from }} - {{ e.date_to }}">{{ e.date_from }} - {{ e.date_to }}</span>
+            <span class="wd-30 omit" title="{{ e.education }}">{{ e.education }}</span>
+            <span class="wd-70 omit" title="{{ e.major }}">{{ e.major }}</span>
+            <span class="wd-100 omit" title="{{ e.school }}">{{ e.school }}</span>
+          </li>
+          {% endif %}
+          {% endfor %}
+          <a href="javascript:;" class="show-more">Unfold</a>
+          {% else %}
+
+          {% for e in item[1].education_history %}
+          <li>
+            <span class="wd-120 omit" title="{{ e.date_from }} - {{ e.date_to }}">{{ e.date_from }} - {{ e.date_to }}</span>
+            <span class="wd-30 omit" title="{{ e.education }}">{{ e.education }}</span>
+            <span class="wd-70 omit" title="{{ e.major }}">{{ e.major }}</span>
+            <span class="wd-100 omit" title="{{ e.school }}">{{ e.school }}</span>
+          </li>
+          {% endfor %}
+          {% endif %}
         </ul>
       </div>
       <div class="wk-status pd-l-15">

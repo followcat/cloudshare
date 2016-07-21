@@ -17,19 +17,6 @@
     <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
   </div>
   <div class="operate-list">
-    <div class="database-box">
-      <div class="title">Database</div>
-      <div class="database-list">
-        {% for e in sim_names %}
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" class="database-item" value="{{ e }}" />{{ e }}
-          </label>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-    <div class="line"></div>
     <div class="tool-bar">
       <button class="btn btn-primary" id="competencyBtn">Show Competency</button>
       <button class="btn btn-primary" id="experienceBtn">Show Work experience</button>
@@ -96,28 +83,31 @@
 </div><!-- Charts modal end -->
 {% endif %}
 
-<div class="tool-bar-wrap mg-center clearfix">
-  <div class="cw">
+
+<div class="tool-bar-wrap mg-center">
+  <div class="s-st">
     {% if result %}
     <div class="r-amount">About <span class="num">{{ nums }}</span> results</div>
     {% else %}
     <div class="r-amount">Your did not match any documents.</div>
     {% endif %}
-    <div class="s-st">
-      <label>Conditions: </label>
-      <span id="conditionList"></span>
+    <label>Conditions: </label>
+    <span id="conditionList"></span>
+    <div class="database-box">
+      <label>Database Option:</label>
+      <div class="database-list">
+        {% for e in sim_names %}
+        <div class="checkbox">
+          <label class="checkbox-inline">
+            <input type="checkbox" class="database-item" value="{{ e }}" />{{ e }}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
-  <div class="aw">
-    <form class="form-horizontal" id="filterForm" action="/lsipage" method="GET">
-      <div class="form-group">
-        <label class="control-label filter-control-label" for="currentPlaces">Current Places</label>
-        <input class="form-control filter-form-control" id="currentPlaces" type="text" name="currentPlaces"  placeholder="Current Places" />
-      </div>
-      <div class="form-group">
-        <label class="control-label filter-control-label" for="expectationPlaces">Expectation Places</label>
-        <input class="form-control filter-form-control" id="expectationPlaces" type="text" name="expectationPlaces"  placeholder="Expectation Places" />
-      </div>
+  <form class="form-horizontal clearfix" id="filterForm" action="/lsipage" method="GET">
+    <div class="cw">
       <div class="form-group">
         <label class="control-label filter-control-label">Gender</label>
         <div class="filter-form-control">
@@ -166,9 +156,19 @@
           </label>
         </div>
       </div>
-      <button type="button" id="filterBtn" class="btn btn-primary filter-btn">Search</button>
-    </form>
-  </div>
+    </div>
+    <div class="aw">
+      <div class="form-group">
+        <label class="control-label filter-control-label" for="currentPlaces">Current Places</label>
+        <input class="form-control filter-form-control" id="currentPlaces" type="text" name="currentPlaces"  placeholder="Current Places" />
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label" for="expectationPlaces">Expectation Places</label>
+        <input class="form-control filter-form-control" id="expectationPlaces" type="text" name="expectationPlaces"  placeholder="Expectation Places" />
+      </div>
+    </div>
+    <button type="button" id="filterBtn" class="btn btn-primary filter-btn">Search</button>
+  </form>
   <div class="up-down-box" id="toolWrapUpDown" data-flag="true">
     <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
   </div>

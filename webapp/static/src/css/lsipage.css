@@ -1,5 +1,6 @@
 .tool-bar-wrap {
-  height: 116px;
+  height: 100px;
+  padding-bottom: 30px;
   overflow: hidden;
 }
 
@@ -97,8 +98,13 @@
 }
 
 .database-box {
-  padding-left: 10px;
-  padding-right: 10px;
+  display: inline-block;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.database-box .database-list {
+  display: inline-block;
 }
 
 .operate-list .title {
@@ -108,10 +114,6 @@
 
 .crawl-item {
   border: 1px solid #1d1b1b;
-}
-
-.aw form {
-  margin-left: 80px;
 }
 
 .filter-control-label {
@@ -130,6 +132,6 @@
 }
 
 .filter-btn {
-  margin-left: 140px;
-  width: 200px;
+  margin-left: 312px;
+  width: 400px;
 }

@@ -11,16 +11,18 @@
 }
 
 .tool-bar-wrap .cw {
-  width: 400px;
-  float: left;
-}
-
-.tool-bar-wrap .aw {
   width: 560px;
   float: left;
 }
 
-.tool-bar-wrap .cw .r-amount {
+.tool-bar-wrap .aw {
+  width: 400px;
+  float: left;
+}
+
+.tool-bar-wrap .s-st .r-amount {
+  display: inline-block;
+  margin-right: 32px;
   font-size: 1em;
   font-weight: bold;
 }

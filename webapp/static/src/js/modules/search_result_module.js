@@ -33,21 +33,34 @@ require(
     "Upload",
     "ProcessInfo"
   ], function($, Barcharts, Scatters, History, ChartsCommon) {
+    'use strict'
 
     var chartsCommon = new ChartsCommon();
 
     var pageConstant = {
-      $searchTextValue: $("#search_text").val(),
+      $searchTextValue: $("#searchText").val(),
       getDataErrorMessage: "无法获取到数据......",
-      $itemObjList: $(".item-title")
+      $itemObjList: $(".item-title"),
+      /*
+        @function: 清空容器内容
+        @params: string(element id)
+      */
+      removeContent: function() {
+        var $idStr = "";
+        for (var i = 0, len = arguments.length; i < len; i++) {
+          $idStr = "#" + arguments[i];
+          $($idStr).html("");
+        }
+      }
     };
 
     //职位情况-柱状图
-    $("#vd-position").on("click", function() {
-      if ( $("#data-main").css("display") === "none" ) {
-        $("#data-main").css("display", "block");
+    $("#vdPosition").on("click", function() {
+      $("#chartsModal").modal("show");
+      pageConstant.removeContent("echartWrap", "actionMsg");  //清空绘制容器
 
-        var barchart = Barcharts("echarts-wrap");
+      setTimeout(function() {
+        var barchart = Barcharts("echartWrap");
         $.ajax({
           url: "/mining/position",
           type: "POST",
@@ -59,7 +72,7 @@ require(
               var dataArray = chartsCommon.processPosition(response.result, pageConstant.$searchTextValue);
               barchart.makeBar(dataArray);
               barchart.charts.on("click", function(params) {
-                $("#action-msg").html("");
+                // $("#actionMsg").html("");
                 var name = params.name,
                     str = "";
                 for (var index in dataArray) {
@@ -77,27 +90,24 @@ require(
                     }
                   }
                 }
-                $("#action-msg").html(str);
+                $("#actionMsg").html(str);
               });
             } else {
-              $("#data-main").text(pageConstant.getDataErrorMessage);
+              $("#echartWrap").text(pageConstant.getDataErrorMessage);
             }
           }
         });
-      } else {
-        $("#data-main").css("display", "none");
-        $("#action-msg").text("");
-      }
+      }, 500);
     });
 
     //能力分布-散点图
-    $("#vd-capacity-pro").on("click", function() {
-      $("#action-msg").html("");
+    $("#vdCapacityPro").on("click", function() {
+      $("#chartsModal").modal("show");
+      pageConstant.removeContent("echartWrap", "actionMsg");  //清空绘制容器
 
-      if ($("#data-main").css("display") === "none") {
-        $("#data-main").css("display", "block");
+      setTimeout(function() {
         var mdList = chartsCommon.getMdList(pageConstant.$itemObjList),
-            scatter = Scatters("echarts-wrap");
+            scatter = Scatters("echartWrap");
 
         $.ajax({
           url: "/mining/capacity",
@@ -110,19 +120,17 @@ require(
             scatter.makeScatter(data);
           }
         });
-      } else {
-        $("#data-main").css("display", "none");
-      }
+      }, 500);
     });
 
     //工作经历-散点图
-    $("#vd-capacity").on("click", function() {
-      $("#action-msg").html("");
-      if ($("#data-main").css("display") === "none") {
-        $("#data-main").css("display", "block");
+    $("#vdCapacity").on("click", function() {
+      $("#chartsModal").modal("show");
+      pageConstant.removeContent("echartWrap", "actionMsg");  //清空绘制容器
 
+      setTimeout(function() {
         var mdList = chartsCommon.getMdList(pageConstant.$itemObjList),
-            scatter = Scatters("echarts-wrap");
+            scatter = Scatters("echartWrap");
 
         $.ajax({
           url: "/mining/capacity",
@@ -135,8 +143,6 @@ require(
             scatter.makeScatter(dataArr);
           }
         });
-      } else {
-        $("#data-main").css("display", "none");
-      }
+      }, 500);
     });
   });

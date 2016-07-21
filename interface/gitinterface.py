@@ -236,7 +236,7 @@ class GitInterface(interface.base.Interface):
         except subprocess.CalledProcessError:
             return []
         sha1_sums = output.strip().split(b'\n')
-        return [self.commit_info(self.repo[sha1]) for sha1 in sha1_sums]
+        return [self.commit_info(self.repo[sha1]) for sha1 in sha1_sums if sha1]
 
     def commit_info(self, commit):
         info_dict = {}

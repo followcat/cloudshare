@@ -73,10 +73,14 @@ def next(miner, svc_cv, doc, top, uses=None, name_list=None):
             new_data = mine_education(svc_cv,
                 education_requirement.group('education'), name_list)
         else:
-            result = miner.minelistrank(text, name_list, uses=uses)
-            new_data = zip(name_list, map(lambda x: rankvalue(x, total), result))
-        if len(filter(lambda x: float(x[1])> 0., new_data)) > 0:
-            rating.append((text, extract(new_data)))
+            value_res = miner.minelist(doc, name_list, uses=uses)
+            rank_res = miner.minelistrank(text, value_res, uses=uses)
+            value_point = zip(name_list, map(lambda x: float(x[1])/2, value_res))
+            rank_point = zip(name_list, map(lambda x: rankvalue(x, total), rank_res))
+            total_point = zip(name_list, map(lambda x: x[0][1]*0.5+x[1][1]*0.5,
+                                             zip(value_point, rank_point)))
+        if len(filter(lambda x: float(x[1])> 0., total_point)) > 0:
+            rating.append((text, extract(total_point)))
     return rating
 
 def rankvalue(rank, total):

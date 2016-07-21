@@ -189,7 +189,7 @@ class TestSearch(UploadFile):
         self.init_upload()
         keyword = '2005.9'
         rv = self.search(keyword)
-        assert('position' in rv.data)
+        assert('2007.11 - 2008.01' in rv.data)
 
 
 class ShowCV(UploadFile):
@@ -212,9 +212,6 @@ class TestShowCV(ShowCV):
         tag_text = 'AddedTAG'
         info = {'tag': tag_text}
         self.updateinfo(self.name, info)
-        search_keyword = '2005.9'
-        rv = self.search(search_keyword)
-        assert (tag_text in rv.data)
         rv = self.show(self.name)
         assert (tag_text in rv.data)
 
@@ -238,9 +235,6 @@ class TestShowCV(ShowCV):
         comment_text = 'AddedCOMMENT'
         info = {'comment': comment_text}
         self.updateinfo(self.name, info)
-        search_keyword = '2005.9'
-        rv = self.search(search_keyword)
-        assert (comment_text in rv.data)
         rv = self.show(self.name)
         assert (comment_text in rv.data)
 

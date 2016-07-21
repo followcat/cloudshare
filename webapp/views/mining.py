@@ -70,7 +70,8 @@ class LSI(flask.views.MethodView):
         svc_jd = flask.current_app.config['SVC_JD']
         sim_names = miner.addition_names()
         uses = miner.default_names()
-        uses.extend(flask.request.args.getlist('uses[]'))
+        if 'uses' in flask.request.args and flask.request.args['uses']:
+            uses.extend(flask.request.args['uses'].split(','))
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
             jd_yaml = svc_jd.get(jd_id+'.yaml')
@@ -97,8 +98,6 @@ class LSI(flask.views.MethodView):
             filterdict['gender'] = [flask.request.args['gender']]
         if 'marriedStatus' in flask.request.args and flask.request.args['marriedStatus']:
             filterdict['marital_status'] = [flask.request.args['marriedStatus']]
-        if 'uses' in flask.request.args and flask.request.args['uses']:
-            uses.extend(flask.request.args['uses'].split(','))
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20

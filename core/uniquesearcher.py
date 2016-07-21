@@ -49,7 +49,7 @@ class UniqueSearcher(object):
         if len(phone) == 0 and len(email) == 0:
             return False
         for each in self.yaml_datas.values():
-            if (phone == each['phone'].encode('utf-8') and
+            if (phone == each['phone'].encode('utf-8') or
                 email == each['email'].encode('utf-8')):
                 return False
         else:

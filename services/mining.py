@@ -128,6 +128,16 @@ class Mining(object):
             result.extend(sim.probability(doc))
         return sorted(result, key=lambda x:float(x[1]), reverse=True)
 
+    def probability_by_id(self, doc, id, uses=None):
+        if uses is None:
+            uses = self.sim.keys()
+        result = []
+        for name in uses:
+            sim = self.sim[name]
+            if id in sim.names:
+                result.extend(sim.probability(doc))
+        return sorted(result, key=lambda x:float(x[1]), reverse=True)
+
     def lenght(self, uses=None):
         if uses is None:
             uses = self.sim.keys()
@@ -150,7 +160,7 @@ class Mining(object):
         probalist = set(self.probability(doc, uses=uses))
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
-        return map(lambda x: ranklist.index(x), lists)
+        return map(lambda x: (x[0], ranklist.index(x)), lists)
 
     def default_names(self):
         return [n.name for n in self.services['default'] if n.name in self.sim.keys()]

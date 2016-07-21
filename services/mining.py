@@ -136,6 +136,7 @@ class Mining(object):
             sim = self.sim[name]
             if id in sim.names:
                 result.extend(sim.probability(doc))
+                break
         return sorted(result, key=lambda x:float(x[1]), reverse=True)
 
     def lenght(self, uses=None):

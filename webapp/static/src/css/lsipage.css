@@ -4,6 +4,10 @@
   overflow: hidden;
 }
 
+.tool-bar-wrap .database-list .checkbox{
+  display: inline-block;
+}
+
 .ac-msg {
   overflow: hidden;
 }

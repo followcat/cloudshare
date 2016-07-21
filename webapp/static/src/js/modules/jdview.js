@@ -60,7 +60,7 @@ require(
       var paramObj = queryString(linkHref);
       newParams.jd_id = paramObj.jd_id;
       newParams.page = paramObj.page;
-      newParams.uses = databaseList;
+      newParams.uses = databaseList.join(',');
       var newUrl = "/lsipage?" + $.param(newParams);
       $(this).attr("href", newUrl);
     });

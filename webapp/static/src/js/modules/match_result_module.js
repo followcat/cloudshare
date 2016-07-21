@@ -456,7 +456,7 @@ require(
           newParams.jd_doc = m.requestParam.jd_doc;
         }
         newParams.page = paramObj.page;
-        newParams.uses = dbParam;
+        newParams.uses = dbParam.join(',');
         newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces) : '';
         newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlace) : '';
         newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
@@ -487,7 +487,7 @@ require(
         newParams.page = "1";
       }
 
-      newParams.uses = databaseList;
+      newParams.uses = databaseList.join(',');
 
       newUrl = "/lsipage?" + $.param(newParams);
       changePaginationUrl();

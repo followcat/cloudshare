@@ -97,10 +97,13 @@ class LSI(flask.views.MethodView):
             filterdict['gender'] = [flask.request.args['gender']]
         if 'marriedStatus' in flask.request.args and flask.request.args['marriedStatus']:
             filterdict['marital_status'] = [flask.request.args['marriedStatus']]
+        if 'uses' in flask.request.args and flask.request.args['uses']:
+            uses.extend(flask.request.args['uses'].split(','))
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
         datas, pages, totals = self.process(miner, uses, svc_cv, doc, cur_page, count, filterdict)
+
         return flask.render_template('lsipage.html',result=datas,
                                      button_bar=True, sim_names=sim_names,
                                      cur_page=cur_page,

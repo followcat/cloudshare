@@ -458,7 +458,7 @@ require(
         newParams.page = paramObj.page;
         newParams.uses = dbParam;
         newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces) : '';
-        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces) : '';
+        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlace) : '';
         newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
         newParams.education = m.requestParam.education ? decodeURIComponent(m.requestParam.education) : '';
         newParams.marriedStatus = m.requestParam.marriedStatus ? decodeURIComponent(m.requestParam.marriedStatus) : '';
@@ -506,7 +506,7 @@ require(
         str  = "<input type=\"text\" name=\"jd_id\" value=\""+ decodeURIComponent(m.requestParam.jd_doc) +"\" style=\"display: none\">";
       }
       $("#filterForm").append(str);
-      str = "<input type=\"text\" name=\"uses\" value=\""+ JSON.stringify(databaseList).replace(/"/g, "\'") +"\" style=\"display: none\">";
+      str = "<input type=\"text\" name=\"uses\" value=\""+ databaseList.join(',') +"\" style=\"display: none\">";
       $("#filterForm").append(str);
       $("#filterForm").submit();
     });

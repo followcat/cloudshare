@@ -6,6 +6,7 @@ import jinja2.ext
 
 import ext.views
 import webapp.restful.initializtion
+from flask_cors import CORS, cross_origin
 
 
 app = flask.Flask(__name__)
@@ -17,6 +18,7 @@ app.secret_key = 'super secret key'
 app.config['SESSION_TYPE'] = 'filesystem'
 sess = flask.ext.session.Session()
 sess.init_app(app)
+CORS(app)
 webapp.restful.initializtion.initialize(app)
 
 @app.route("/download/<path:filename>")

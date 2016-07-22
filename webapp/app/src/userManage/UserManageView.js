@@ -17,6 +17,12 @@ export default class UserManageView extends React.Component {
     };
   }
 
+  componentDidMount() {
+    fetch('http://0.0.0.0:4888/api/accountlist')
+    .then(response => response.json())
+    .then(json => this.setState({data: json.data}));
+  }
+
   render() {
     return (
       <div>
@@ -30,7 +36,7 @@ export default class UserManageView extends React.Component {
             style={{ backgroundColor: '#eee' }}
           />
           <CardText>
-              <TableComponent options={ tableOptions } />
+              <TableComponent options={ tableOptions } data={ this.state.data } />
           </CardText>
         </Card>
       </div>

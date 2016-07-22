@@ -11,6 +11,18 @@ export default class TableComponent extends React.Component {
     super(props);
   }
 
+  _renderTableRow() {
+    this.props.data.map(function(user, index) {
+      return (
+        <TableRow>
+          <TableRowColumn>{index+1}</TableRowColumn>
+          <TableRowColumn>{user}</TableRowColumn>
+          <TableRowColumn><RaisedButton label="Delete" primary={true} /></TableRowColumn>
+        </TableRow>
+      )
+    });
+  }
+
   render() {
     return (
       <div>
@@ -18,7 +30,11 @@ export default class TableComponent extends React.Component {
           style={{ backgroundColor: '#fff' }}
         >
           <ToolbarGroup>
-            <RaisedButton label="Crate New User" primary={true}/>
+            <RaisedButton 
+              label="Crate New User" 
+              backgroundColor="#337ab7"
+              labelColor="#fff"
+            />
           </ToolbarGroup>
         </Toolbar>
         <Table>
@@ -30,26 +46,23 @@ export default class TableComponent extends React.Component {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableRowColumn>1</TableRowColumn>
-              <TableRowColumn>John Smith</TableRowColumn>
-              <TableRowColumn><RaisedButton label="Delete" primary={true} /></TableRowColumn>
-            </TableRow>
-            <TableRow>
-              <TableRowColumn>2</TableRowColumn>
-              <TableRowColumn>Randal White</TableRowColumn>
-              <TableRowColumn>Unemployed</TableRowColumn>
-            </TableRow>
-            <TableRow>
-              <TableRowColumn>3</TableRowColumn>
-              <TableRowColumn>Stephanie Sanders</TableRowColumn>
-              <TableRowColumn>Employed</TableRowColumn>
-            </TableRow>
-            <TableRow>
-              <TableRowColumn>4</TableRowColumn>
-              <TableRowColumn>Steve Brown</TableRowColumn>
-              <TableRowColumn>Employed</TableRowColumn>
-            </TableRow>
+            {
+              this.props.data.map(function(user, index) {
+                return (
+                  <TableRow key={index}>
+                    <TableRowColumn>{ index+1 }</TableRowColumn>
+                    <TableRowColumn>{ user }</TableRowColumn>
+                    <TableRowColumn>
+                      <RaisedButton 
+                        label="Delete" 
+                        backgroundColor="#337ab7"
+                        labelColor="#fff"
+                      />
+                    </TableRowColumn>
+                  </TableRow>
+                );
+              })
+            }
           </TableBody>
         </Table>
       </div>

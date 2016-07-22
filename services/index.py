@@ -112,7 +112,7 @@ class ReverseIndexing(object):
                 for part in parts[1:]:
                     result.intersection_update(part)
             results.extend(result)
-        return results
+        return set(results)
 
     def filte(self, filtedict, selected, uses=None):
         """

@@ -438,12 +438,7 @@ require(
       var linkHref = "",
           paramObj = {},
           dbParam = [],
-          databaseList = localStorage.databaseList;
-      if (databaseList) {
-        dbParam = JSON.parse(databaseList);
-      } else {
-        dbParam = null;
-      }
+          databaseList = localStorage.databaseList? JSON.parse(localStorage.databaseList) : [];
 
       //遍历所有a标签
       $(".pagination a").map(function(){
@@ -456,7 +451,7 @@ require(
           newParams.jd_doc = m.requestParam.jd_doc;
         }
         newParams.page = paramObj.page;
-        newParams.uses = dbParam.join(',');
+        newParams.uses = databaseList ? databaseList.join(',') : '';
         newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces) : '';
         newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlace) : '';
         newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
@@ -470,7 +465,7 @@ require(
     changePaginationUrl();
 
     //简历数据库选择
-    $(".database-item").on("change", function(){
+    $(".database-item").on("input change", function(){
       var checkedObj = $(this);
       var databaseList = saveInLocalStorage(checkedObj);
 

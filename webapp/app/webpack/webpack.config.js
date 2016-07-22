@@ -18,6 +18,7 @@ const PATHS = {
 
 const config = {
   entry: [
+    'whatwg-fetch',
     PATHS.APP_PATH
   ],
 

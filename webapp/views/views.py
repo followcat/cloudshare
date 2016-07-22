@@ -56,7 +56,7 @@ class Search(flask.views.MethodView):
         names = []
         for each in (result+yaml_result)[(cur_page-1)*eve_count:cur_page*eve_count]:
             base, suffix = os.path.splitext(each)
-            name = core.outputstorage.ConvertName(base)
+            name = core.outputstorage.ConvertName(base).md
             if name not in names:
                 names.append(name)
             else:

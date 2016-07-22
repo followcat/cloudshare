@@ -131,13 +131,13 @@ class Mining(object):
     def probability_by_id(self, doc, id, uses=None):
         if uses is None:
             uses = self.sim.keys()
-        result = []
+        results = list()
         for name in uses:
             sim = self.sim[name]
             if id in sim.names:
-                result.extend(sim.probability(doc))
+                results = filter(lambda x: x[0] == id, self.probability(doc, uses=[name]))
                 break
-        return sorted(result, key=lambda x:float(x[1]), reverse=True)
+        return results[0]
 
     def lenght(self, uses=None):
         if uses is None:
@@ -155,7 +155,7 @@ class Mining(object):
         return results[:top]
 
     def minelist(self, doc, lists, uses=None):
-        return filter(lambda x: x[0] in lists, self.probability(doc, uses=uses))
+        return map(lambda x: self.probability_by_id(doc, x, uses=uses), lists)
 
     def minelistrank(self, doc, lists, uses=None):
         probalist = set(self.probability(doc, uses=uses))

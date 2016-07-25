@@ -436,6 +436,7 @@ require(
     //修改分页url
     function changePaginationUrl() {
       var linkHref = "",
+          locationURL = "",
           paramObj = {},
           dbParam = [],
           databaseList = localStorage.databaseList? JSON.parse(localStorage.databaseList) : [];
@@ -443,7 +444,7 @@ require(
       //遍历所有a标签
       $(".pagination a").map(function(){
         linkHref = $(this).attr("href");
-        paramObj = queryString(linkHref);
+        paramObj = $.extend(queryString(m.currentURL), queryString(linkHref));
         var newParams = {};
         if (m.requestParam.jd_id) {
           newParams.jd_id = m.requestParam.jd_id;
@@ -453,7 +454,7 @@ require(
         newParams.page = paramObj.page;
         newParams.uses = databaseList ? databaseList.join(',') : '';
         newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces) : '';
-        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlace) : '';
+        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces) : '';
         newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
         newParams.education = m.requestParam.education ? decodeURIComponent(m.requestParam.education) : '';
         newParams.marriedStatus = m.requestParam.marriedStatus ? decodeURIComponent(m.requestParam.marriedStatus) : '';

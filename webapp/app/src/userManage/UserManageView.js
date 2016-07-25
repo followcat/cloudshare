@@ -19,8 +19,19 @@ export default class UserManageView extends React.Component {
 
   componentDidMount() {
     fetch('http://0.0.0.0:4888/api/accountlist')
-    .then(response => response.json())
-    .then(json => this.setState({data: json.data}));
+    .then(function(response){
+      return response.json();
+    })
+    .then(function(json) {
+      this.setState({data: json.data});
+    }.bind(this));
+  }
+
+  handleCreateUserSubmit(user) {
+    let users = this.state.data;
+
+    users.push(user.userName);
+    this.setState({data: users});
   }
 
   render() {
@@ -36,7 +47,11 @@ export default class UserManageView extends React.Component {
             style={{ backgroundColor: '#eee' }}
           />
           <CardText>
-              <TableComponent options={ tableOptions } data={ this.state.data } />
+              <TableComponent
+                options={ tableOptions }
+                data={ this.state.data }
+                onCreateUserSubmit= { this.handleCreateUserSubmit.bind(this) }
+              />
           </CardText>
         </Card>
       </div>

@@ -26,7 +26,7 @@ PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|([◆·\?]+)|(\uf0d8\xa0)|\uf0b7
 # Exclude date related characters to avoid eating duration
 COMPANYTAIL = exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
-COMPANY = ur'[^' + SENTENCESEP + '=\n\*]+?('+COMPANYTAIL+u')?'
+COMPANY = ur'([^' + SENTENCESEP + '=\n\*]+?(\\\\\*)+)?[^' + SENTENCESEP + '=\n\*]+?('+COMPANYTAIL+u')?'
 SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|]+'
 
@@ -66,8 +66,9 @@ zero_date = lambda x: str.zfill(str(x.group()), 2)
 fix_trailing = lambda x: re.compile(ur'\d+$').sub(zero_date, x)
 fix_date = lambda x: fix_trailing(fix_sep(fix_trail(fix_today(x))))
 
+fix_star = lambda x: x.replace('\*', '*')
 remove_escape = lambda x: x.group(1)
-fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, x)
+fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, fix_star(x))
 fix_name = lambda x: re.compile(ASP+'+').sub(' ', fix_escape(x)).strip()
 fix_duration = lambda x: re.compile(ASP+'+').sub('', x).strip()
 

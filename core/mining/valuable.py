@@ -70,7 +70,7 @@ def next(miner, svc_cv, doc, top, uses=None, name_list=None):
             continue
         education_requirement = EDUCATION_REQUIREMENT.match(text)
         if education_requirement:
-            new_data = mine_education(svc_cv,
+            total_point = mine_education(svc_cv,
                 education_requirement.group('education'), name_list)
         else:
             value_res = miner.minelist(text, name_list, uses=uses)

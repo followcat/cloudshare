@@ -123,13 +123,14 @@ class LSI(flask.views.MethodView):
         else:
             pages = totals/eve_count
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = svc.getyaml(name)
+            cname = core.outputstorage.ConvertName(name)
+            yaml_info = svc.getyaml(cname.yaml)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
                 'match': score
             }
-            datas.append([name, yaml_info, info])
+            datas.append([cname.md, yaml_info, info])
         return datas, pages, totals
 
 

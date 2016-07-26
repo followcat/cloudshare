@@ -96,6 +96,14 @@
   display: inline-block;
 }
 
+.ed-ex ul li {
+  overflow: hidden;
+}
+
+.ed-ex ul li span{
+  float: left;
+}
+
 .omit {
   overflow: hidden;
   white-space: nowrap;

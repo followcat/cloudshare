@@ -3,8 +3,6 @@ import pickle
 
 from gensim import similarities
 
-import core.outputstorage
-
 
 class LSIsimilarity(object):
 
@@ -87,4 +85,14 @@ class LSIsimilarity(object):
     def probability(self, doc):
         vec_lsi = self.lsi_model.probability(doc)
         sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
-        return map(lambda x: (core.outputstorage.ConvertName(self.names[x[0]]), str(x[1])), sims)
+        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims)
+        return results
+
+    def probability_by_id(self, doc, id):
+        if id not in self.names:
+            return None
+        index = self.names.index(id)
+        vec_lsi = self.lsi_model.probability(doc)
+        result = abs(self.index[vec_lsi][index])
+        return (id, str(result))
+

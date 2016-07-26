@@ -131,13 +131,14 @@ class Mining(object):
     def probability_by_id(self, doc, id, uses=None):
         if uses is None:
             uses = self.sim.keys()
-        results = list()
-        for name in uses:
-            sim = self.sim[name]
-            if id in sim.names:
-                results = filter(lambda x: x[0] == id, self.probability(doc, uses=[name]))
+        result = tuple()
+        for dbname in uses:
+            sim = self.sim[dbname]
+            probability = sim.probability_by_id(doc, id)
+            if probability is not None:
+                result = probability
                 break
-        return results[0]
+        return result
 
     def lenght(self, uses=None):
         if uses is None:

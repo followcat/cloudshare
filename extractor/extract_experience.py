@@ -8,6 +8,8 @@ XP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(�
 AXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?[:：]?'+ASP+u'*'+DURATION+'?'+ASP+u'*?\n(?P<expe>.*)', re.DOTALL+re.M)
 TXP = re.compile(ur'-{9}[\-'+SP+u']*(?P<expe>'+PERIOD+ur'.*?)(?=-{9}[\-'+SP+u']*)', re.DOTALL)
 
+PXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?项目经历'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?(((教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|(培训)))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+
 
 # Allow multiline once in company name when duration is present
 # As company has at least one char, need to handle break just as company tail
@@ -16,6 +18,8 @@ ECO = re.compile(u'^(?P<position>(\S[\S ]+\n)*)\n+(?P<company>(\S[\S ]+\n)*)\n+'
 CO = re.compile(PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
 PCO = re.compile(PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
 TCO = re.compile(u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')(?(cit)\*)?'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
+
+PJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<project>.+)\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')$', re.M)
 
 # Avoid conflict in group names when combining *CO and *PO
 APERIOD = PERIOD.replace('from', 'afrom').replace('to', 'ato')
@@ -48,6 +52,7 @@ TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<ap
 BPO = re.compile(u'^(?P<aposition>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'*(?P<second>[^元/月'+SP+u']+)'+ASP+u'*)?($|(\|'+ASP+u'*('+SALARY+u')$))', re.M)
 # Force use of ascii space to avoid matching new line and step over TCO in predator results
 LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*$', re.M)
+
 
 EMP = re.compile(BEMPLOYEES)
 
@@ -273,6 +278,7 @@ def work_xp(text):
 
         >>> assert company_1(work_xp(u'2014 /4--至今：有限公司(5000-10000人) [ 2 年]\\n所属行业：计算机软件\\n开发部 软件工程师'))['total_employees']
         >>> assert position_1(work_xp(u'2011.05 - 至今 GE医疗 (4年8个月\\n2011.05 - 至今研发主管、电气工程师15000元/月'))['salary']
+        >>> assert u'江' in company_1(work_xp(u'2013.09 - 至今\\n江苏\\*\\*医疗器械有限公司\\n(2年9个月)\\n2013.09 - 至今 质量负责人月'))['name']
     """
     RE = None
     pos = 0
@@ -372,6 +378,16 @@ def fix(d, as_dict=False):
         >>> assert fix(u'工作经历\\n音视频可靠光传输系统项目背景')[1] == 3   #项目背景 stop inside text
         >>> assert fix(u'工作经验：1年\\n公司名称 深圳x有限公司\\n 时间 2013.06 ——2014.04\\n职务 硬件工程师')[0][1]
         >>> assert fix(u'工作经历\\n1.  公司名称：有限公司\\n起止时间：2013年5月-至今\\n\\n担任职位：总账高级会计师')[0][1]
+
+    PJCO related tests
+        >>> assert u'美' in fix(u'项目经历\\n 2013.09-至今 手术器械\\n项目职务： 经理\\n\\n所在公司： 美国\\n教育经历',
+        ...         True)['experience']['company'][0]['name']
+        >>> assert u'设' in fix(u'项目经历\\n 2009.04 - 2010.03 飞机除冰车技术改进\\n所在公司： 设备有限公司\\n教育经历',
+        ...         True)['experience']['company'][0]['name']
+        >>> assert u'医' in fix(u'项目经历\\n 2012.12 - 至今 系统Coreload 3.x\\n项目职务： 高级工程师\\n所在公司： 医疗(中国)\\n教育经历',
+        ...         True)['experience']['company'][0]['name']
+        >>> assert u'苏' in fix(u'项目经历\\n   2011.01 - 2016.02 自研开发\\n项目职务：设备部经理\\n所在公司：苏州\*\*\*有限公司\\n教育经历',
+        ...         True)['experience']['company'][0]['name']
     """
     def fix_output(processed, reject):
         if as_dict:
@@ -414,6 +430,20 @@ def fix(d, as_dict=False):
                     reject = 3
                 else:
                     processed = out
+            else:
+                processed = out
+        elif PXP.search(d):
+            pos = 0
+            out = {'company': [], 'position': []}
+            res = PXP.search(d)
+            if PJCO.search(res.group('expe')):
+                for r in PJCO.finditer(res.group('expe')):
+                    company_output(out, r.groupdict())
+                    if r.group('position'):
+                        pos +=1
+                        position_output(out, r.groupdict())
+            if not pos and len(out['company']) == 0:
+                reject = 2
             else:
                 processed = out
         elif TXP.search(d):

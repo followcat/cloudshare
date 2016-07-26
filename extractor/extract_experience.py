@@ -181,13 +181,14 @@ def find_xp(RE, text):
                 pos +=1
                 position_output(out, r.groupdict())
     if not pos:
-        MA = re.compile(u'((?P<co>'+RE.pattern+u')'+ASP+u'*(?P<po>'+LIEPPO.pattern+u'))', re.M)
-        if MA.search(text):
-            out = {'company': [], 'position': []}
+        out = {'company': [], 'position': []}
+        MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+LIEPPO.pattern+u'))', re.M)
         for r in MA.finditer(text):
-            company_output(out, r.groupdict())
-            pos +=1
-            position_output(out, r.groupdict())
+            if r.group('co'):
+                company_output(out, r.groupdict())
+            else:
+                pos +=1
+                position_output(out, r.groupdict())
     return pos, out
 
 

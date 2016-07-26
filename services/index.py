@@ -1,6 +1,7 @@
 import os
 import glob
 import cPickle
+import collections
 
 
 class ReverseIndexing(object):
@@ -96,23 +97,23 @@ class ReverseIndexing(object):
         """
         if uses is None:
             uses = self.index.keys()
-        results = list()
+        results = set()
         for use in uses:
             assert use in self.index
-            parts = list()
+            parts = collections.defaultdict(set)
             result = set()
             index = self.index[use]
             for key in filtedict:
                 assert key in index
                 for value in filtedict[key]:
                     if value in index[key]:
-                        parts.append(index[key][value])
-            if parts:
-                result.update(parts[0])
-                for part in parts[1:]:
-                    result.intersection_update(part)
-            results.extend(result)
-        return set(results)
+                        parts[key].update(index[key][value])
+            for key in parts:
+                if not result:
+                    result.update(parts[key])
+                result.intersection_update(parts[key])
+            results.update(result)
+        return results
 
     def filte(self, filtedict, selected, uses=None):
         """

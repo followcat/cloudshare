@@ -89,15 +89,15 @@ class LSI(flask.views.MethodView):
         marital_status = ""
         filterdict = dict()
         if 'currentPlaces' in flask.request.args and flask.request.args['currentPlaces']:
-            filterdict['current_places'] = [flask.request.args['currentPlaces']]
+            filterdict['current_places'] = flask.request.args['currentPlaces'].split()
         if 'expectationPlaces' in flask.request.args and flask.request.args['expectationPlaces']:
-            filterdict['expectation_places'] = [flask.request.args['expectationPlaces']]
+            filterdict['expectation_places'] = flask.request.args['expectationPlaces'].split()
         if 'education' in flask.request.args and flask.request.args['education']:
-            filterdict['education'] = [flask.request.args['education']]
+            filterdict['education'] = flask.request.args['education'].split()
         if 'gender' in flask.request.args and flask.request.args['gender']:
-            filterdict['gender'] = [flask.request.args['gender']]
+            filterdict['gender'] = flask.request.args['gender'].split()
         if 'marriedStatus' in flask.request.args and flask.request.args['marriedStatus']:
-            filterdict['marital_status'] = [flask.request.args['marriedStatus']]
+            filterdict['marital_status'] = flask.request.args['marriedStatus'].split()
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20

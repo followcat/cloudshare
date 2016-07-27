@@ -10,7 +10,7 @@ import interface.base
 
 
 class GitInterface(interface.base.Interface):
-    author = 'developer'
+    author = 'developer<developer@email.com>'
     encoding = 'UTF-8'
 
     def __init__(self, path):
@@ -72,8 +72,7 @@ class GitInterface(interface.base.Interface):
         with open(full_path, 'w') as fp:
             fp.write(filedata)
         self.repo.stage(filename)
-        if committer is None:
-            committer = self.author
+        committer = self.committer(committer)
         if message is None:
             message = "Add file: " + filename + ".\n"
         commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
@@ -94,8 +93,7 @@ class GitInterface(interface.base.Interface):
             >>> shutil.rmtree(repo_name)
         """
         self.repo.stage(filenames)
-        if committer is None:
-            committer = self.author
+        committer = self.committer(committer)
         if message is None:
             message = ""
             for each in filenames:
@@ -122,8 +120,7 @@ class GitInterface(interface.base.Interface):
             raise Exception('Not exists file:', filename)
         if message is None:
             message = "Change %s." % filename
-        if committer is None:
-            committer = self.author
+        committer = self.committer(committer)
         with open(os.path.join(self.repo.path, filename), 'w') as f:
             f.write(stream)
         self.repo.stage([bytes(filename)])
@@ -248,3 +245,23 @@ class GitInterface(interface.base.Interface):
         for name in re.findall(ur' ([a-z0-9]{8}).[yaml|md]', commit.message):
             info_dict['filenames'][name] = None
         return info_dict
+
+    def committer(self, committer):
+        """
+            >>> import shutil
+            >>> import interface.gitinterface
+            >>> repo_name = 'interface/test_repo'
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
+            >>> commit_id = interface.add('test_file', 'test',
+            ... b'Test commit', 'followcat')
+            >>> info = interface.get_file_create_info('test_file')
+            >>> info['author']
+            'followcat<followcat@email.com>'
+            >>> shutil.rmtree(repo_name)
+        """
+        result = committer
+        if committer is None:
+            result = self.author
+        elif '@' not in committer:
+            result = committer+'<%s@email.com>'%committer
+        return result

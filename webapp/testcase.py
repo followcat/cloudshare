@@ -176,7 +176,7 @@ class TestUploadFile(UploadFile):
         self.init_upload()
         commit = self.data_db.repo.get_object(self.data_db.repo.head())
         assert('Add file' in commit.message)
-        assert('username' == commit.author)
+        assert('username' in commit.author)
         yamlname = list(self.svc_cv.yamls())[0]
         yaml_obj = self.svc_cv.getyaml(yamlname)
         assert(yaml_obj['originid'] == '')

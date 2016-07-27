@@ -7,6 +7,8 @@ share，edit your doc，pdf，md and so on...
     Flask==0.10.1
     Flask-Login==0.3.2
     Flask-Session==0.2.2
+    Flask-RESTful==0.3.5
+    Flask-Cors==2.1.2
     dulwich==0.10.2
     pypandoc==1.0.1
     emaildata==0.3.2

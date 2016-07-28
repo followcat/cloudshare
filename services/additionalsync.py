@@ -39,7 +39,7 @@ class AdditionalSync(object):
                     continue
                 t1 = time.time()
                 try:
-                    info = self.generate_yaml(md, raw_yaml)
+                    info = self.generate_yaml(md, raw_yaml, name=name)
                 except KeyboardInterrupt:
                     usetime = time.time() - t1
                     self.logger.info((' ').join(["KeyboardInterrupt", logidname,
@@ -56,12 +56,12 @@ class AdditionalSync(object):
     def generate_md(self, raw_html):
         return pypandoc.convert(raw_html, 'markdown', format='docbook')
 
-    def generate_yaml(self, md, raw_yaml, selected=None):
+    def generate_yaml(self, md, raw_yaml, selected=None, name=None):
         obj = yaml.load(raw_yaml)
         if selected is None:
-            catchinfo = extractor.information_explorer.catch(md)
+            catchinfo = extractor.information_explorer.catch(md, name)
         else:
-            catchinfo = extractor.information_explorer.catch_selected(md, selected)
+            catchinfo = extractor.information_explorer.catch_selected(md, selected, name)
         for key in catchinfo:
             if catchinfo[key]:
                 obj[key] = catchinfo[key]
@@ -75,6 +75,6 @@ class AdditionalSync(object):
                 else:
                     origin_yaml = i.get(os.path.join(i.cvdir, id+'.yaml'))
                 md = i.get(os.path.join(i.cvdir, id+'.md'))
-                info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected)
+                info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected, name)
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addyaml(id, infostream)

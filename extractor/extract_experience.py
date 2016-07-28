@@ -43,7 +43,7 @@ HCO = re.compile(u'公司名称[:：]?'+ASP+u'*\*?(?P<company>'+COMPANY+u')\*?'+
 POASP = ASP.replace('\s', ' ')
 PODEPARTMENT = u'([^\n:：'+SP+u']|('+POASP+u'[^\n'+SP+u']))+'
 POFIELD = u'(?(nl)(([^\n:：'+SP+u'](\n+/)?)+)|([^\n'+SP+u']|('+POASP+u'[^\n'+SP+u']))+)'
-PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*'+POFIELD+POASP+u'*\n+'+POASP+u'*('+PODEPARTMENT+u'(?(nl)()|('+POASP+u'+)))?(?(nl)('+POASP+u'*\n+'+POASP+u'*))(?P<aposition>'+POSITION+u'?)'+POASP+u'*$', re.M)
+PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*'+POFIELD+POASP+u'*\n+'+POASP+u'*('+PODEPARTMENT+u'(?(nl)()|('+POASP+u'+)))?(?(nl)('+POASP+u'*\n+'+POASP+u'*))(?P<aposition>[^=\n\*]+?)'+POASP+u'*$', re.M)
 
 IXPO = re.compile(u'所属行业[:：].*\n+'+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+'+ASP+u'*职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*$', re.M)
 APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
@@ -151,6 +151,12 @@ def find_xp(RE, text):
         >>> assert companies(find_xp(CO, u'2014 年 8 月 – 至今 company (1 年 6 个月)'))
         >>> assert companies(find_xp(CO, u'2010.03 - 至今*深圳市蓝韵实业有限公司* *(5年9个月)*'))
         >>> assert companies(find_xp(CO, u'2013-8 至 今  工作经历（IT服务行业）*---* 1年5个月'))
+        >>> assert positions(find_xp(CO, u'2001/1 -- 2004/3： 有限公司\\n所属行业：电子技术\\n生产部|工程部  组长|工程师'))
+
+    We should fail fast. In this case, the position is wrong,
+    but excluding ':' would make PO to take ages to fail.
+        >>> assert not not u'主' in name(position_1(find_xp(CO, u'2008/3 -- 2013/12： 上海分公司\\n所属行业：保险\\n收展一部  主管：人事，招聘')))
+        >>> assert not not u'职' in name(position_1(find_xp(CO, u'2012年12月—至今：有限公司\\n所属行业： 医疗电子\\n职责:\\n编写程序功能块实现方案')))
     """
     pos = 0
     out = {'company': [], 'position': []}
@@ -224,7 +230,6 @@ def work_xp(text):
         >>> assert positions(work_xp(u'2014/01 - 2015/04 有限公司（1年3个月）\\nWEB、IOS开发工程师|1000元/月以下'))
         >>> assert work_xp(u'2005 /1--2009 /11： 有限公司 （500-1000人）\\n\\n所属行业： 医疗\\n\\n部 门：系统部\\n\\n职位：工程师')[0]
         >>> assert u'发' in name(position_1(work_xp(u'2005/07—2007/05：科技集团\\n\\n所属行业:计算机软件 \\n\\n所属部门: 事业群 \\n\\n职位: 开发')))
-        >>> assert not work_xp(u'2012年12月—至今：有限公司[16个月]\\n所属行业： 医疗电子\\n职责:\\n编写程序功能块实现方案')[0]  # Do not FIXME
         >>>     # Different combinations of spaces and unicode spaces
         >>> assert work_xp(u'2010/7--2014/5：有限公司（150-500人）\\n所属行业： 计算机软件\\n研发中心    软件工程师')[0]
         >>> assert work_xp(u'2014 /10--至今： 有限公司\\n所属行业：\\n 互联网/电子商务\\n\\n管理顾问      高级咨询顾问')[0]

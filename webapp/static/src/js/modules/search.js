@@ -69,16 +69,9 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     }
   });
 
-  var databaseList = localStorage.databaseList;
-  if (databaseList) {
-    dbParam = JSON.parse(databaseList);
-  } else {
-    dbParam = null;
-  }
+  var databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
 
-  if (dbParam) {
-    for (var i = dbParam.length - 1; i >= 0; i--) {
-      $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses[]\" value=\""+ dbParam[i] +"\" />");
-    }
+  if (databaseList.length > 0) {
+    $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses\" value=\""+ databaseList.join(",") +"\" />");
   }
 });

@@ -447,9 +447,9 @@ require(
         paramObj = $.extend(queryString(m.currentURL), queryString(linkHref));
         var newParams = {};
         if (m.requestParam.jd_id) {
-          newParams.jd_id = m.requestParam.jd_id;
+          newParams.jd_id = decodeURIComponent(m.requestParam.jd_id);
         } else {
-          newParams.jd_doc = m.requestParam.jd_doc;
+          newParams.jd_doc = decodeURIComponent(m.requestParam.jd_doc);
         }
         newParams.page = paramObj.page;
         newParams.uses = databaseList ? databaseList.join(',') : '';
@@ -475,7 +475,7 @@ require(
       if (m.requestParam.jd_id) {
         newParams.jd_id = m.requestParam.jd_id;
       } else {
-        newParams.jd_doc = m.requestParam.jd_doc;
+        newParams.jd_doc = decodeURIComponent(m.requestParam.jd_doc);
       }
       if (m.requestParam.page) {
         newParams.page = m.requestParam.page;

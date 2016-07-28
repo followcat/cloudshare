@@ -1,13 +1,18 @@
 #ignore node_modules
+.hg/
 webapp/static/js/node_modules/
 webapp/static/js/PhantomJS*/
 flask_session/
+*.swp
+*.orig
+*.rej
 *.log
 *.dot
 *.pyc
 output/
 repo/
 default_repo/
+Index/
 account/
 lsimodel/
 celerybeat-schedule

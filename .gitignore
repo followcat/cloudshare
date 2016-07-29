@@ -9,6 +9,7 @@ flask_session/
 *.log
 *.dot
 *.pyc
+*.bak
 output/
 repo/
 default_repo/
@@ -18,6 +19,8 @@ lsimodel/
 celerybeat-schedule
 similarity.*
 additional/
+Index/
 webapp/static/node_modules/
 webapp/static/dist/
 webapp/static/rev/
+webapp/templates_dist/

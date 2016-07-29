@@ -78,25 +78,13 @@ export LD_LIBRARY_PATH=/usr/lib/libreoffice/program:$LD_LIBRARY_PATH
 libreoffice --invisible "--accept=socket,host=localhost,port=8100;urp;"
 ```
 
-1) Use method convert_folder in converterutils.py to convert your doc/docx/pdf.
-
-``` python
->>> import tools.batching
->>> import interface.gitinterface
->>> repo = interface.gitinterface.GitInterface("repo")
->>> tools.batching.convert_folder(YOUR_DIR, repo, TEMP_DIR)
-```
-
-    The generated docbook will save in folder docbook_output
-    and markdown will save in folder md_output.
-
-2) Front-end building: enter ```/static``` root folder, and run
+1) Front-end building: enter ```/static``` root folder, and run
 ```
 gulp build
 ```
 there were generate two folders ```/static/dist/``` and ```/templates_dist/```
 
-3) Run flask server and visit page http://localhost:4888/.
+2) Run flask server and visit page http://localhost:4888/.
 
 ```
 python run.py

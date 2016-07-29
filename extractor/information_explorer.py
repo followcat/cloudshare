@@ -91,7 +91,8 @@ def get_experience(stream, name=None):
         'cloudshare': functools.partial(extractor.extract_experience.fix, stream, True),
         'liepin': functools.partial(extractor.extract_experience.fix_liepin, stream),
         'jingying': functools.partial(extractor.extract_experience.fix_jingying, stream),
-        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream)
+        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream),
+        'yingcai': functools.partial(extractor.extract_experience.fix_yingcai, stream),
     }
     experiences = []
     current_company = None

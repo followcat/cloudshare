@@ -508,7 +508,7 @@ require(
       if ( m.requestParam.jd_id ) {
         str = "<input type=\"text\" name=\"jd_id\" value=\""+ m.requestParam.jd_id +"\" style=\"display: none\">";
       } else {
-        str  = "<input type=\"text\" name=\"jd_id\" value=\""+ decodeURIComponent(m.requestParam.jd_doc) +"\" style=\"display: none\">";
+        str  = "<input type=\"text\" name=\"jd_doc\" value=\""+ decodeURIComponent(m.requestParam.jd_doc) +"\" style=\"display: none\">";
       }
       str += "<input type=\"text\" name=\"uses\" value=\""+ databaseList.join(',') +"\" style=\"display: none\">";
       //遍历性别

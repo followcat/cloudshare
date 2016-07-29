@@ -447,9 +447,9 @@ require(
         paramObj = $.extend(queryString(m.currentURL), queryString(linkHref));
         var newParams = {};
         if (m.requestParam.jd_id) {
-          newParams.jd_id = m.requestParam.jd_id;
+          newParams.jd_id = decodeURIComponent(m.requestParam.jd_id);
         } else {
-          newParams.jd_doc = m.requestParam.jd_doc;
+          newParams.jd_doc = decodeURIComponent(m.requestParam.jd_doc);
         }
         newParams.page = paramObj.page;
         newParams.uses = databaseList ? databaseList.join(',') : '';
@@ -475,7 +475,7 @@ require(
       if (m.requestParam.jd_id) {
         newParams.jd_id = m.requestParam.jd_id;
       } else {
-        newParams.jd_doc = m.requestParam.jd_doc;
+        newParams.jd_doc = decodeURIComponent(m.requestParam.jd_doc);
       }
       if (m.requestParam.page) {
         newParams.page = m.requestParam.page;
@@ -490,6 +490,15 @@ require(
       window.location.href = newUrl;
     });
 
+    function inputMapping(className) {
+      var arr = [];
+      $(className).map(function(index, element){
+        if ($(element).is(":checked")) {
+          arr.push($(element).val());
+        }
+      });
+      return arr;
+    }
     /*
       条件过滤按钮点击事件
     */
@@ -501,8 +510,15 @@ require(
       } else {
         str  = "<input type=\"text\" name=\"jd_id\" value=\""+ decodeURIComponent(m.requestParam.jd_doc) +"\" style=\"display: none\">";
       }
-      $("#filterForm").append(str);
-      str = "<input type=\"text\" name=\"uses\" value=\""+ databaseList.join(',') +"\" style=\"display: none\">";
+      str += "<input type=\"text\" name=\"uses\" value=\""+ databaseList.join(',') +"\" style=\"display: none\">";
+      //遍历性别
+      var genderList = inputMapping('.genderCheckbox'),
+          educationList = inputMapping('.educationCheckbox'),
+          marriedStatusList = inputMapping('.maritalStatusCheckbox');
+      str += "<input type=\"text\" name=\"gender\" value=\""+ genderList.join(',') +"\" style=\"display: none\">";
+      str += "<input type=\"text\" name=\"education\" value=\""+ educationList.join(',') +"\" style=\"display: none\">";
+      str += "<input type=\"text\" name=\"marriedStatus\" value=\""+ marriedStatusList.join(',') +"\" style=\"display: none\">";
+      
       $("#filterForm").append(str);
       $("#filterForm").submit();
     });

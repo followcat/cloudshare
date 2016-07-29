@@ -68,7 +68,7 @@
             <tr>
               <th data-field="state" data-checkbox="true"></th>
               <th data-field="id">Id</th>
-              <th data-field="name">Name</th>
+              <th data-field="name">  Name</th>
               <th data-field="filename">File Name</th>
               <th data-field="time">Time</th>
             </tr>
@@ -111,48 +111,39 @@
       <div class="form-group">
         <label class="control-label filter-control-label">Gender</label>
         <div class="filter-form-control">
-          <label class="radio-inline">
-            <input type="radio" name="gender" id="allGenderRadio" value=""> All
+          <label class="checkbox-inline">
+            <input type="checkbox" class="genderCheckbox" value="男"> Male
           </label>
-          <label class="radio-inline">
-            <input type="radio" name="gender" id="maleRadio" value="男"> Male
-          </label>
-          <label class="radio-inline">
-            <input type="radio" name="gender" id="femalRadio" value="女"> Female
+          <label class="checkbox-inline">
+            <input type="checkbox" class="genderCheckbox" value="女"> Female
           </label>
         </div>
       </div>
       <div class="form-group">
         <label class="control-label filter-control-label">Education</label>
         <div class="filter-form-control education-form-control">
-          <label class="radio-inline">
-            <input type="radio" name="education" id="alleducationRadio" value=""> All
+          <label class="checkbox-inline">
+            <input type="checkbox" class="educationCheckbox" value="大专"> College
           </label>
-          <label class="radio-inline">
-            <input type="radio" name="education" id="collegeRadio" value="大专"> College
+          <label class="checkbox-inline">
+            <input type="checkbox" class="educationCheckbox" value="本科"> Undergraduate
           </label>
-          <label class="radio-inline">
-            <input type="radio" name="education" id="undergraduateRadio" value="本科"> Undergraduate
+          <label class="checkbox-inline">
+            <input type="checkbox" class="educationCheckbox" value="硕士"> Master
           </label>
-          <label class="radio-inline">
-            <input type="radio" name="education" id="masterRadio" value="硕士"> Master
-          </label>
-          <label class="radio-inline">
-            <input type="radio" name="education" id="doctorRadio" value="博士"> Doctor
+          <label class="checkbox-inline">
+            <input type="checkbox" class="educationCheckbox" value="博士"> PhD
           </label>
         </div>
       </div>
       <div class="form-group">
         <label class="control-label filter-control-label">Marital Status</label>
         <div class="filter-form-control">
-          <label class="radio-inline">
-            <input type="radio" name="marriedStatus" id="allmarriedRadio" value=""> All
+          <label class="checkbox-inline">
+            <input type="checkbox" class="maritalStatusCheckbox" value="未婚"> Unmarried
           </label>
-          <label class="radio-inline">
-            <input type="radio" name="marriedStatus" id="unmarriedRadio" value="未婚"> Unmarried
-          </label>
-          <label class="radio-inline">
-            <input type="radio" name="marriedStatus" id="marriedRadio" value="已婚"> Married
+          <label class="checkbox-inline">
+            <input type="checkbox" class="maritalStatusCheckbox" value="已婚"> Married
           </label>
         </div>
       </div>

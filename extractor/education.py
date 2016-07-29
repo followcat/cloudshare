@@ -44,6 +44,8 @@ TABHDRMAJ = u'^'+ASP+u'*时'+ASP+u'*间段?'+ASP+u'+[院学]'+ASP+u'*校('+ASP+u
 TED = re.compile(u'^'+ASP+u'*-{3}[\- ]*\n'+HDCTLMA.pattern+u'\n-{3}[\- ]*$', re.M)
 THED = re.compile(u'^'+ASP+u'*(-{3}[\-'+SP+u']*\n+)?'+TABHDRMAJ+'+-{3}[\-'+SP+u']*$', re.DOTALL+re.M)
 
+YIED = re.compile(u'^'+SCHOOL+ASP+u'+(('+PERIOD+u')|((?P<afrom>)(?P<ato>'+DATE+')))'+ASP+u'+'+EDUCATION+u'('+ASP+u'+(?P<major>[^=\n\*：:\|]+))?$', re.M)
+SINGLEYIED = re.compile(u'^教育经[历位]'+ASP+u'+'+SCHOOL+ASP+u'+'+PERIOD+ASP+u'+(?P<major>[^=\n\*：:\|]+)$', re.M)
 
 SUMMARYEDU = re.compile(u'学'+ASP+u'*[历位][:：]'+ASP+u'*(?P<education>\S+)', re.M)
 SUMMARYMAJOR = re.compile(u'专'+ASP+u'*业[:：]'+ASP+u'*(?P<major>\S+)', re.M)
@@ -53,10 +55,14 @@ def format_output(output, groupdict, summary=None):
     result = {
         'major': '',
         'education': '',
-        'date_from': fix_date(groupdict['from']),
-        'date_to': fix_date(groupdict['to']),
         'school': fix_name(groupdict['school'].replace('\n', ' ')),
         }
+    if groupdict['from']:
+        result['date_from'] = fix_date(groupdict['from'])
+        result['date_to'] = fix_date(groupdict['to'])
+    else:
+        result['date_from'] = fix_date(groupdict['afrom'])
+        result['date_to'] = fix_date(groupdict['ato'])
     try:
         result['education'] = groupdict['education'].strip()
     except KeyError:
@@ -66,7 +72,10 @@ def format_output(output, groupdict, summary=None):
     if summary and 'major' in summary:
         result['major'] = summary['major']
     else:
-        result['major'] = fix_name(groupdict['major'].replace('\n', ' '))
+        try:
+            result['major'] = fix_name(groupdict['major'].replace('\n', ' '))
+        except AttributeError:
+            pass
     output.append(result)
 
 schools = lambda output: output[1]
@@ -225,6 +234,48 @@ def education_xp(text, summary=None):
     return maj, out
 
 
+def fix_output(processed):
+    result = {}
+    if processed:
+        result['education_history'] = processed
+    return result
+
+def fix_yingcai(d):
+    u"""
+        >>> assert fix_yingcai(u'教育经历\\n燕山大学\\n2000.09 - 2004.07\\n本科\\n计算机科学与技术')['education_history']
+        >>> assert fix_yingcai(u'教育经历\\n武汉生物工程学院\\n2016.07\\n本科\\n土木工程') # Incomplete period
+        >>> assert fix_yingcai(u'本科\\n教育经历\\n 郑州科技学院\\n 1900.01 - 2016.07\\n 计算机科学与技术')
+        >>> assert u'本科' == fix_yingcai(u'男\\n 22岁\\n 未婚\\n 本科')['education_history'][0]['education']
+        >>> assert not fix_yingcai(u'教育经历\\n第一中学\\n1980.09 - 1983.07\\n高中\\n在校经历：我在')['education_history'][0]['major']
+    """
+    maj = 0
+    processed = []
+    summary = {}
+    for RE in [ED, AED]:
+        res = RE.search(d)
+        if res:
+            for r in YIED.finditer(res.group('edu')):
+                maj +=1
+                format_output(processed, r.groupdict())
+            break
+    if not maj:
+        r = SINGLEYIED.search(d)
+        edu = re.compile(u'^'+ASP+u'*'+EDUCATION+u'$', re.M).search(d)
+        if r:
+            res = r.groupdict()
+            try:
+                res['education'] = edu.group('education')
+            except AttributeError:
+                res['education'] = ''
+            maj +=1
+            format_output(processed, res)
+        else:
+            try:
+                processed.append(edu.groupdict())
+            except AttributeError:
+                pass
+    return fix_output(processed)
+
 def fix(d):
     u"""
         >>> assert u'大' in name(fix(u'''【教育/培训】1991-09\~1995-07  师范大学 汉语言文学 本科\\n【工作经验】''')['education_history'][0])
@@ -259,12 +310,6 @@ def fix(d):
         >>> assert fix(u'        教育经历\\n\\n        2004/9 -- 2007/7     东南大学    机械电子工程/机电一体化   本科')
         >>> assert not fix(u'教育:\\n\\n1982-1986        哈尔滨工业大学计算机科学，本科') #FIXME
     """
-    def fix_output(processed):
-        result = {}
-        if processed:
-            result['education_history'] = processed
-        return result
-
     maj = 0
     processed = []
     summary = {}

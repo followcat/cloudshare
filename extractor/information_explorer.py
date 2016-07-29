@@ -59,14 +59,25 @@ def info_by_re_iter(stream, restr):
     return result
 
 
-def get_education(stream):
+def get_education(stream, name=None):
+    fix_func = {
+        'default': extractor.education.fix,
+        'yingcai': extractor.education.fix_yingcai,
+    }
+    try:
+        assert name in fix_func
+    except AssertionError:
+        name = 'default'
     result = dict(education='', school='', education_history=[])
-    education_result = extractor.education.fix(stream)
+    education_result = fix_func[name](stream)
     result.update(education_result)
     if 'education_history' in education_result:
         for edu in education_result['education_history']:
             result['education'] = edu['education']
-            result['school'] = edu['school']
+            try:
+                result['school'] = edu['school']
+            except KeyError:
+                pass
             break
     return result
 
@@ -91,7 +102,8 @@ def get_experience(stream, name=None):
         'cloudshare': functools.partial(extractor.extract_experience.fix, stream, True),
         'liepin': functools.partial(extractor.extract_experience.fix_liepin, stream),
         'jingying': functools.partial(extractor.extract_experience.fix_jingying, stream),
-        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream)
+        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream),
+        'yingcai': functools.partial(extractor.extract_experience.fix_yingcai, stream),
     }
     experiences = []
     current_company = None
@@ -214,7 +226,7 @@ def catch_selected(stream, selected, name=None):
     if 'email' in selected:
         info_dict["email"] = get_email(stream)
     if 'education' in selected:
-        info_dict.update(get_education(stream))
+        info_dict.update(get_education(stream, name))
     if 'experience' in selected:
         info_dict.update(get_experience(stream, name))
     if 'expectation' in selected:

@@ -16,7 +16,8 @@ DURATION = ur'(?P<duration>(\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个�
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
 FIELDSEP = ur'、：:；;\|'
-SENTENCESEP = FIELDSEP+ur'。'
+ENDLINESEP = u'。'
+SENTENCESEP = FIELDSEP+ENDLINESEP
 
 exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
@@ -31,12 +32,13 @@ SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|]+'
 
 education_list = {
-    1: (u'中技', u'中专', u'高中'),
+    0: (u'初中', ),
+    1: (u'中技', u'中专', u'高中', u'高职'),
     2: (u'大专', ),
     #3: Show clearly step before graduate
     4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科', u'学士'),
     5: (u'在职硕士', ),
-    6: (u'硕士', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA'),
+    6: (u'硕士', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA'),
     7: (u'博士', u'博士研究生'),
     8: (u'博士后', )
     }

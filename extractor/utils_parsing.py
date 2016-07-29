@@ -32,12 +32,13 @@ SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|]+'
 
 education_list = {
-    1: (u'中技', u'中专', u'高中'),
+    0: (u'初中', ),
+    1: (u'中技', u'中专', u'高中', u'高职'),
     2: (u'大专', ),
     #3: Show clearly step before graduate
     4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科', u'学士'),
     5: (u'在职硕士', ),
-    6: (u'硕士', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA'),
+    6: (u'硕士', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA'),
     7: (u'博士', u'博士研究生'),
     8: (u'博士后', )
     }

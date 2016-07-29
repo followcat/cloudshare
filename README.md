@@ -96,15 +96,7 @@ gulp build
 ```
 there were generate two folders ```/static/dist/``` and ```/templates_dist/```
 
-3) Make sure the configuration of flask app template folder is ```templates_dist```.
-```
-vi server.py
-
-
-app = flask.Flask(__name__, template_folder="templates_dist")
-```
-
-4) Run flask server and visit page http://localhost:4888/.
+3) Run flask server and visit page http://localhost:4888/.
 
 ```
 python run.py

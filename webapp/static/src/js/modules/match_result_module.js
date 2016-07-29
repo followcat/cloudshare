@@ -453,8 +453,8 @@ require(
         }
         newParams.page = paramObj.page;
         newParams.uses = databaseList ? databaseList.join(',') : '';
-        newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces) : '';
-        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces) : '';
+        newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces).replace(/\+/g, ' ') : '';
+        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces).replace(/\+/g, ' ') : '';
         newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
         newParams.education = m.requestParam.education ? decodeURIComponent(m.requestParam.education) : '';
         newParams.marriedStatus = m.requestParam.marriedStatus ? decodeURIComponent(m.requestParam.marriedStatus) : '';

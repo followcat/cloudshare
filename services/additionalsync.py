@@ -23,12 +23,18 @@ class AdditionalSync(object):
 
     def __init__(self, multicv):
         self.additionals = multicv.additionals
-        self.interfaces = [(additional.name, additional.interface)
-                                for additional in self.additionals]
+        self.interfaces = dict([(additional.name, additional.interface)
+                                for additional in self.additionals])
         self.logger = logging.getLogger("AdditionalSyncLogger.UPDATE")
 
-    def update(self):
-        for name, i in self.interfaces.items:
+    def update(self, additionals=None):
+        if additionals is None:
+            interfaces = self.interfaces
+        else:
+            interfaces = dict([(additional.name, additional.interface)
+                                for additional in self.additionals
+                                if additional.name in additionals])
+        for name, i in interfaces.items():
             for id in set(i.lsid_raw()) - (set(i.lsid_yaml()) & set(i.lsid_md())):
                 raw_html = i.getraw(id+'.html')
                 raw_yaml = i.getraw(id+'.yaml')
@@ -67,8 +73,14 @@ class AdditionalSync(object):
                 obj[key] = catchinfo[key]
         return obj
 
-    def upgrade_yaml(self, selected=None):
-        for name, i in self.interfaces.items():
+    def upgrade_yaml(self, selected=None, additionals=None):
+        if additionals is None:
+            interfaces = self.interfaces
+        else:
+            interfaces = dict([(additional.name, additional.interface)
+                                for additional in self.additionals
+                                if additional.name in additionals])
+        for name, i in interfaces.items():
             for id in i.lsid_md():
                 if selected is None:
                     origin_yaml = i.getraw(id+'.yaml')

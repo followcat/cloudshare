@@ -458,7 +458,6 @@ require(
         newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
         newParams.education = m.requestParam.education ? decodeURIComponent(m.requestParam.education) : '';
         newParams.marriedStatus = m.requestParam.marriedStatus ? decodeURIComponent(m.requestParam.marriedStatus) : '';
-        console.log(newParams);
         var newUrl = "/lsipage?" + $.param(newParams);
         $(this).attr("href", newUrl);
       });

@@ -5,7 +5,7 @@ import jinja2.ext
 import ext.views
 import os
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, template_folder="templates_dist")
 app.config.from_object('webapp.settings')
 app.jinja_env.add_extension(jinja2.ext.loopcontrols)
 ext.views.configure(app)

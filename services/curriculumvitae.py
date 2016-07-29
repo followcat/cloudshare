@@ -132,6 +132,15 @@ class CurriculumVitae(services.base.Service):
         results = self.interface.grep_yaml(keyword, self.path)
         return results
 
+    def gethtml(self, name):
+        htmlname = core.outputstorage.ConvertName(name).html
+        result = self.interface.getraw(htmlname)
+        if result is None:
+            md = self.getmd(name)
+            if md is not None:
+                result = core.converterutils.md_to_html(md)
+        return result
+
     def getmd(self, name):
         result = unicode()
         md = core.outputstorage.ConvertName(name).md

@@ -8,6 +8,8 @@ XP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(�
 AXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?[:：]?'+ASP+u'*'+DURATION+'?'+ASP+u'*?\n(?P<expe>.*)', re.DOTALL+re.M)
 TXP = re.compile(ur'-{9}[\-'+SP+u']*(?P<expe>'+PERIOD+ur'.*?)(?=-{9}[\-'+SP+u']*)', re.DOTALL)
 
+PXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?项目经历'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?(((教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|(培训)))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+
 
 # Allow multiline once in company name when duration is present
 # As company has at least one char, need to handle break just as company tail
@@ -17,12 +19,14 @@ CO = re.compile(PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u'(\
 PCO = re.compile(PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
 TCO = re.compile(u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')(?(cit)\*)?'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
 
+PJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<project>.+)\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')$', re.M)
+
 # Avoid conflict in group names when combining *CO and *PO
 APERIOD = PERIOD.replace('from', 'afrom').replace('to', 'ato')
 ABDURATION = BDURATION.replace('duration', 'aduration').replace('br', 'abr').replace('dit', 'adit')
 
 # TACO related grammar
-TACOMODEL = ur'[:：]?'+ASP+u'*(?P<company>__COMPANY__)'+ASP+u'*__SEP__(__ITEM__'+ASP+u'*__SEP__)?'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'
+TACOMODEL = ur'[:：]?'+ASP+u'*(\\\\\*)*(?P<company>__COMPANY__)'+ASP+u'*__SEP__(__ITEM__'+ASP+u'*__SEP__)?'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'
 PATTERN = PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+TACOMODEL+BDURATION+u'?$'
 TACO = re.compile(PATTERN.replace('__COMPANY__', COMPANY+u'?').replace('__SEP__', '\|').replace('__ITEM__', '.+?'), re.M)
 TACOMODELCOPY = TACOMODEL.replace('company', 'ccompany').replace('position', 'cposition')
@@ -39,7 +43,7 @@ HCO = re.compile(u'公司名称[:：]?'+ASP+u'*\*?(?P<company>'+COMPANY+u')\*?'+
 POASP = ASP.replace('\s', ' ')
 PODEPARTMENT = u'([^\n:：'+SP+u']|('+POASP+u'[^\n'+SP+u']))+'
 POFIELD = u'(?(nl)(([^\n:：'+SP+u'](\n+/)?)+)|([^\n'+SP+u']|('+POASP+u'[^\n'+SP+u']))+)'
-PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*'+POFIELD+POASP+u'*\n+'+POASP+u'*('+PODEPARTMENT+u'(?(nl)()|('+POASP+u'+)))?(?(nl)('+POASP+u'*\n+'+POASP+u'*))(?P<aposition>'+POSITION+u'?)'+POASP+u'*$', re.M)
+PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*'+POFIELD+POASP+u'*\n+(?:(?:'+ASP+u'*(?='+APERIOD+u')|(?:\-{3})|(?:下属人数)|(?:所在地区)|(?:汇报对象)|(?:所在部门))|(?:'+POASP+u'*(?P<dpt>'+PODEPARTMENT+u'(（离职原因：.*?）)?(?(nl)()|(?:'+POASP+u'+)))?(?(nl)(?:'+POASP+u'*\n?'+POASP+u'*))(?P<aposition>(?(dpt)(?:[^=\n\*]+)|[^= \n:：\*]+)$)))', re.M)
 
 IXPO = re.compile(u'所属行业[:：].*\n+'+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+'+ASP+u'*职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*$', re.M)
 APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
@@ -47,7 +51,11 @@ TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'
 TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?'+ASP+u'*$', re.M)
 BPO = re.compile(u'^(?P<aposition>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'*(?P<second>[^元/月'+SP+u']+)'+ASP+u'*)?($|(\|'+ASP+u'*('+SALARY+u')$))', re.M)
 # Force use of ascii space to avoid matching new line and step over TCO in predator results
-LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*$', re.M)
+LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\n'+ASP+u'*((下属人数)|(所在地区)|(汇报对象)|(所在部门))：.*$', re.M)
+
+NOBRPOS = POSITION.replace(u'：', u'（）：'+ENDLINESEP)
+YIPOSITION = NOBRPOS+u'(?P<lbr>[\(（])?(?(lbr)'+NOBRPOS+u'[\)）]('+NOBRPOS+u')?)'
+YICO = re.compile(u'^((?P<position>'+YIPOSITION+u')'+ASP+u'+)?'+PERIOD+ASP+u'+(?P<company>'+COMPANY+u')('+ASP+u'+所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*(?P<type>.+)'+ASP+u'+(?P<dpt>'+PODEPARTMENT+u'))?('+ASP+u'+'+SALARY+u')?$', re.M)
 
 EMP = re.compile(BEMPLOYEES)
 
@@ -55,10 +63,9 @@ EMP = re.compile(BEMPLOYEES)
 def output_cleanup(groupdict):
     for item in ['company', 'position']:
         try:
-            if u'[' in groupdict[item]:
-                begin = groupdict[item].index(u'[')
+            if u'[' in groupdict[item] and groupdict[item][0] == u'[':
                 end = groupdict[item].index(u']')
-                groupdict[item] = groupdict[item][begin+1:end]
+                groupdict[item] = groupdict[item][1:end]
         except KeyError:
             continue
         except TypeError:
@@ -141,11 +148,18 @@ positions = lambda output: output[1]['position']
 company_1 = lambda x: companies(x)[0]
 position_1 = lambda x: positions(x)[0]
 
+
 def find_xp(RE, text):
     u"""
         >>> assert companies(find_xp(CO, u'2014 年 8 月 – 至今 company (1 年 6 个月)'))
         >>> assert companies(find_xp(CO, u'2010.03 - 至今*深圳市蓝韵实业有限公司* *(5年9个月)*'))
         >>> assert companies(find_xp(CO, u'2013-8 至 今  工作经历（IT服务行业）*---* 1年5个月'))
+        >>> assert positions(find_xp(CO, u'2001/1 -- 2004/3： 有限公司\\n所属行业：电子技术\\n生产部|工程部  组长|工程师'))
+
+    We should fail fast. In this case, the position is wrong,
+    but excluding ':' would make PO to take ages to fail.
+        >>> assert u'主' in name(position_1(find_xp(CO, u'2008/3 -- 2013/12： 上海分公司\\n所属行业：保险\\n收展一部  主管：人事，招聘')))
+        >>> assert len(positions(find_xp(CO, u'2012年12月—至今：有限公司\\n所属行业： 医疗电子\\n职责:\\n编写程序功能块实现方案'))) == 0
     """
     pos = 0
     out = {'company': [], 'position': []}
@@ -163,14 +177,15 @@ def find_xp(RE, text):
         dto = ''
         dfrom = ''
         out = {'company': [], 'position': []}
-        MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+PO.pattern+u'))', re.M)
+        MA = re.compile(u'((?P<co>'+RE.pattern+ASP+u'*(?(duration)()|(?=所属行业：)))|(?P<po>'+PO.pattern+u'))', re.M)
         for r in MA.finditer(text):
             if r.group('co'):
                 dfrom, dto = r.group('from'), r.group('to')
                 company_output(out, r.groupdict())
             else:
-                pos +=1
-                position_output(out, r.groupdict(), begin=dfrom, end=dto)
+                if r.group('aposition'):
+                    pos +=1
+                    position_output(out, r.groupdict(), begin=dfrom, end=dto)
     if not pos:
         out = {'company': [], 'position': []}
         MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+APO.pattern+u'))', re.M)
@@ -181,15 +196,113 @@ def find_xp(RE, text):
                 pos +=1
                 position_output(out, r.groupdict())
     if not pos:
-        MA = re.compile(u'((?P<co>'+RE.pattern+u')'+ASP+u'*(?P<po>'+LIEPPO.pattern+u'))', re.M)
-        if MA.search(text):
-            out = {'company': [], 'position': []}
+        out = {'company': [], 'position': []}
+        MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+LIEPPO.pattern+u'))', re.M)
         for r in MA.finditer(text):
-            company_output(out, r.groupdict())
+            if r.group('co'):
+                company_output(out, r.groupdict())
+            else:
+                pos +=1
+                position_output(out, r.groupdict())
+    return pos, out
+
+
+def work_xp_liepin(text):
+    u"""
+    Test for LIEPPO
+        >>> assert position_1(work_xp_liepin(u'''2014.06 - 2015.01\\n上海分公司\\n(7个月)\\n  2014.06 - 2015.01 研发工程师\\n下属人数：'''))
+        >>> assert company_1(work_xp_liepin(
+        ...     u'2014 /4--至今：有限公司(5000-10000人) [ 2 年]\\n所属行业：计算机软件\\n开发部 软件工程师\\n下属人数：'))['total_employees']
+        >>> assert u'江' in company_1(work_xp_liepin(
+        ...     u'2013.09 - 至今\\n江苏\\*\\*医疗器械有限公司\\n(2年9个月)\\n2013.09 - 至今 质量负责人月\\n下属人数：'))['name']
+        >>> assert positions(work_xp_liepin(u'''2006.07 - 至今\\n\*\*\*\\n(9年11个月)\\n2006.07 - 至今 质量管理\\n下属人数：'''))
+        >>> assert positions(work_xp_liepin(u'2016.06 - 2016.06\\n系统有限公司\\n 2016.06 - 2016.06 应届生\\n下属人数：'))
+        >>> assert positions(work_xp_liepin(u'''2016.06 - 至今\\n西门子中压开关技术(无锡)有限公司\\n2016.06 - 至今 项目经理\\n下属人数：'''))
+    """
+    pos = 0
+    out = {'company': [], 'position': []}
+    for RE in [CO, TCO]:
+        if RE.search(text):
+            MA = re.compile(u'((?P<po>'+LIEPPO.pattern+u')|(?P<co>'+RE.pattern+u'))', re.M)
+            for r in MA.finditer(text):
+                if r.group('co'):
+                    company_output(out, r.groupdict())
+                else:
+                    if not out['company']:
+                        continue
+                    pos +=1
+                    position_output(out, r.groupdict())
+        if pos:
+            break
+    return pos, out
+
+def work_xp_yingcai(text):
+    u"""
+        >>> assert u'监' in name(position_1(work_xp_yingcai(u'IT项目总监\\n2015.11 - 至今\\n有限责任公司\\n所属行业：贸易\\n信息建设\\n月薪：保密')))
+        >>> assert positions(work_xp_yingcai(u'电子工程师\\n2015.12 - 2016.01\\n有限公司 \\n月薪：2000以下'))
+        >>> assert companies(work_xp_yingcai(u'2013.01 - 2014.03\\n技术有限公司\\n其他\\n月薪：保密'))
+        >>> assert len(positions(work_xp_yingcai(u'客户需求。\\n2015.07 - 2015.09\\n长虹集团'))) == 0
+        >>> assert positions(work_xp_yingcai(u'2015.07 - 2015.09\\n长虹集团\\n所属行业：计算机软件\\n云服务移动部\\n'))
+        >>> assert u'设' in name(position_1(work_xp_yingcai(u'''用户界面（UI）设计\\n2014.03 - 2016.06\\n济南豪斯设计有限公司''')))
+        >>> assert len(companies(work_xp_yingcai(u'1） 2016年5月至今\\n公司首个MTK'))) == 0
+    """
+    pos = 0
+    out = {'company': [], 'position': []}
+    for r in YICO.finditer(text):
+        company_output(out, r.groupdict())
+        if r.group('position'):
             pos +=1
+            position_output(out, r.groupdict())
+        elif r.group('type'):
+            d = r.groupdict()
+            d['position'] = d['type']
+            pos +=1
+            position_output(out, d)
+    return pos, out
+
+def work_xp_zhilian(text):
+    u"""
+        >>> assert companies(work_xp_zhilian(u'2010年6月  --  2013年11月\\n\*\*电子材料有限公司\\n|  IT工程师\\n（3年5个月）\\n'
+        ...     u'所属行业：\\n加工制造\\n公司性质：\\n合资\\n公司规模：\\n100-499人\\n职位类别：\\n计算机/网络技术-网络工程师'))
+    """
+    pos = 0
+    out = {'company': [], 'position': []}
+    if TACO.search(text):
+        # Support missing pipe in company definition by using NOPIPETACO
+        for r in ALLTACO.finditer(text):
+            pos += 1
+            company_output(out, r.groupdict())
             position_output(out, r.groupdict())
     return pos, out
 
+def work_xp_jingying(text):
+    u"""
+        >>> assert u'鸡' in name(company_1(work_xp_jingying(u'2016/6 -- 至今： 随鸡 [一个月内]\\n 所属行业：计算机服务\\n 傻子 销售经理')))
+        >>> assert companies(work_xp_jingying(u'2016/7 -- 至今： 信息产品集团 [ -1年11个月 ]\\n所属行业：计算机硬件\\n销售  区域销售经理'))
+        >>> assert len(companies(work_xp_jingying(u'2013/3 -- 2015/7： 江苏有限公司\\n所属行业：交通/运输/物流\\n'
+        ...     u'2005/5 -- 2011/6： 南京分公司\\n所属行业：交通/运输/物流\\n市场部 市场'))) == 2
+        >>> assert len(positions(work_xp_jingying(u'2003/1 -- 2005/5： （ 50-150人） [ 2年4个月 ]\\n所属行业：餐饮业\\n-----'))) == 0
+        >>> assert positions(work_xp_jingying(u'2006/9 -- 2009/12： 开发公司 [3年3个月]\\n所属行业：电气\\n财务部（离职原因：调动） 会计'))
+    """
+    pos = 0
+    out = {'company': [], 'position': []}
+    for RE in [CO, TCO]:
+        if RE.search(text):
+            dto = ''
+            dfrom = ''
+            out = {'company': [], 'position': []}
+            MA = re.compile(u'((?P<co>'+RE.pattern+ASP+u'*(?(duration)()|(?=所属行业：)))|(?P<po>'+PO.pattern+u'))', re.M)
+            for r in MA.finditer(text):
+                if r.group('co'):
+                    dfrom, dto = r.group('from'), r.group('to')
+                    company_output(out, r.groupdict())
+                else:
+                    if r.group('aposition'):
+                        pos +=1
+                        position_output(out, r.groupdict(), begin=dfrom, end=dto)
+        if pos:
+            break
+    return pos, out
 
 def work_xp(text):
     u"""
@@ -218,7 +331,6 @@ def work_xp(text):
         >>> assert positions(work_xp(u'2014/01 - 2015/04 有限公司（1年3个月）\\nWEB、IOS开发工程师|1000元/月以下'))
         >>> assert work_xp(u'2005 /1--2009 /11： 有限公司 （500-1000人）\\n\\n所属行业： 医疗\\n\\n部 门：系统部\\n\\n职位：工程师')[0]
         >>> assert u'发' in name(position_1(work_xp(u'2005/07—2007/05：科技集团\\n\\n所属行业:计算机软件 \\n\\n所属部门: 事业群 \\n\\n职位: 开发')))
-        >>> assert not work_xp(u'2012年12月—至今：有限公司[16个月]\\n所属行业： 医疗电子\\n职责:\\n编写程序功能块实现方案')[0]  # Do not FIXME
         >>>     # Different combinations of spaces and unicode spaces
         >>> assert work_xp(u'2010/7--2014/5：有限公司（150-500人）\\n所属行业： 计算机软件\\n研发中心    软件工程师')[0]
         >>> assert work_xp(u'2014 /10--至今： 有限公司\\n所属行业：\\n 互联网/电子商务\\n\\n管理顾问      高级咨询顾问')[0]
@@ -266,11 +378,6 @@ def work_xp(text):
         >>> assert not work_xp(u'就职时间 : 2012-06 ～至今\\n\\n受聘公司 : 有限公司\\n\\n职位名称 : 质量工程师')[0]   #FIXME
         >>> assert work_xp(u'2014.02 - 至今 有限公司\\n\\n职位： 电气工程师  ')[0]
         >>> assert not work_xp(u'2015/03\\~\\n\\n有限公司\\n\\n职位：质量经理')[0]    #FIXME
-
-    Test for LIEPPO
-        >>> assert position_1(work_xp(u'''2014.06 - 2015.01\\n上海分公司\\n(7个月)\\n  2014.06 - 2015.01 研发工程师'''))
-
-        >>> assert company_1(work_xp(u'2014 /4--至今：有限公司(5000-10000人) [ 2 年]\\n所属行业：计算机软件\\n开发部 软件工程师'))['total_employees']
         >>> assert position_1(work_xp(u'2011.05 - 至今 GE医疗 (4年8个月\\n2011.05 - 至今研发主管、电气工程师15000元/月'))['salary']
     """
     RE = None
@@ -363,6 +470,116 @@ def table_based_xp(text):
     return pos, out
 
 
+def fix_output(processed):
+    result = {}
+    for (index, company) in enumerate(processed['company']):
+        positions = [p for p in processed['position'] if p['at_company'] == index]
+        if len(positions) <= 1:
+            try:
+                positions[0]['duration'] = company['duration']
+                del company['duration']
+            except IndexError:
+                continue
+            except KeyError:
+                continue
+    if processed['company']:
+        result['experience'] = processed
+    return result
+
+def fix_liepin(d):
+    u"""
+    PJCO related tests
+        >>> assert u'美' in fix_liepin(
+        ...     u'项目经历\\n 2013.09-至今 手术器械\\n项目职务： 经理\\n\\n所在公司： 美国\\n教育经历')['experience']['company'][0]['name']
+        >>> assert u'设' in fix_liepin(
+        ...     u'项目经历\\n 2009.04 - 2010.03 飞机除冰车技术改进\\n所在公司： 设备有限公司\\n教育经历')['experience']['company'][0]['name']
+        >>> assert u'医' in fix_liepin(u'项目经历\\n 2012.12 - 至今 系统Coreload 3.x\\n项目职务： 高级工程师\\n所在公司： 医疗(中国)\\n教育经历'
+        ...     )['experience']['company'][0]['name']
+        >>> assert u'苏' in fix_liepin(u'项目经历\\n   2011.01 - 2016.02 自研开发\\n项目职务：设备部经理\\n所在公司：苏州\*\*\*有限公司\\n教育经历'
+        ...     )['experience']['company'][0]['name']
+    """
+    processed = {'company': [], 'position': []}
+    res = XP.search(d)
+    if res:
+        pos, out = work_xp_liepin(res.group('expe'))
+        if not pos and len(out['company']) == 0:
+            pass
+        else:
+            processed = out
+    else:
+        res = AXP.search(d)
+        if res:
+            pos, out = work_xp_liepin(res.group('expe'))
+            if not pos and len(out['company']) == 0:
+                pass
+            else:
+                processed = out
+        elif PXP.search(d):
+            pos = 0
+            out = {'company': [], 'position': []}
+            res = PXP.search(d)
+            if PJCO.search(res.group('expe')):
+                for r in PJCO.finditer(res.group('expe')):
+                    company_output(out, r.groupdict())
+                    if r.group('position'):
+                        pos +=1
+                        position_output(out, r.groupdict())
+            if not pos and len(out['company']) == 0:
+                pass
+            else:
+                processed = out
+    return fix_output(processed)
+
+def fix_yingcai(d):
+    u"""
+    """
+    pos = 0
+    processed = {'company': [], 'position': []}
+    res = XP.search(d)
+    for RE in [XP, AXP]:
+        res = RE.search(d)
+        if res:
+            pos, out = work_xp_yingcai(res.group('expe'))
+            if not pos and len(out['company']) == 0:
+                pass
+            else:
+                processed = out
+            break
+    return fix_output(processed)
+
+def fix_zhilian(d):
+    u"""
+    """
+    pos = 0
+    processed = {'company': [], 'position': []}
+    res = XP.search(d)
+    for RE in [XP, AXP]:
+        res = RE.search(d)
+        if res:
+            pos, out = work_xp_zhilian(res.group('expe'))
+            if not pos and len(out['company']) == 0:
+                pass
+            else:
+                processed = out
+            break
+    return fix_output(processed)
+
+def fix_jingying(d):
+    u"""
+    """
+    pos = 0
+    processed = {'company': [], 'position': []}
+    for RE in [XP, AXP]:
+        res = RE.search(d)
+        if res:
+            pos, out = work_xp_jingying(res.group('expe'))
+            if not pos and len(out['company']) == 0:
+                pass
+            else:
+                processed = out
+            break
+    return fix_output(processed)
+
 def fix(d, as_dict=False):
     u"""
         >>> assert not fix("2014年7月\~  苹果采购运营管理（上海）有限公司")[0][0] #FIXME
@@ -371,23 +588,16 @@ def fix(d, as_dict=False):
         >>> assert fix(u'工作经历\\n音视频可靠光传输系统项目背景')[1] == 3   #项目背景 stop inside text
         >>> assert fix(u'工作经验：1年\\n公司名称 深圳x有限公司\\n 时间 2013.06 ——2014.04\\n职务 硬件工程师')[0][1]
         >>> assert fix(u'工作经历\\n1.  公司名称：有限公司\\n起止时间：2013年5月-至今\\n\\n担任职位：总账高级会计师')[0][1]
+
+    The next statement is that output (3) from PO in matching
+    the next string should not be overwritten by BPO (2),
+    regardless PO find no position.
+        >>> assert not len(fix(u'工作经历\\n2015-4 至 今       小队*---*2个月\\n带领队员\\n2014-7 至 2014-9  管理有限公司*---* 3个月\\n'
+        ...     u'所在部门：开发一部\\n2014-3 至 2014-6 东方学校*---* 4个月\\n----\\n教育经历', True)['experience']['company']) == 3    #FIXME
     """
-    def fix_output(processed, reject):
+    def fix_output_legacy(processed, reject):
         if as_dict:
-            result = {}
-            for (index, company) in enumerate(processed['company']):
-                positions = [p for p in processed['position'] if p['at_company'] == index]
-                if len(positions) <= 1:
-                    try:
-                        positions[0]['duration'] = company['duration']
-                        del company['duration']
-                    except IndexError:
-                        continue
-                    except KeyError:
-                        continue
-            if processed['company']:
-                result['experience'] = processed
-            return result
+            return fix_output(processed)
         else:
             for company in processed['company']:
                 company['at_company'] = -1
@@ -445,4 +655,4 @@ def fix(d, as_dict=False):
                 processed = out
         else:
             reject = 4
-    return fix_output(processed, reject)
+    return fix_output_legacy(processed, reject)

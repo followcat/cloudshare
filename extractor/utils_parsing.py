@@ -12,11 +12,12 @@ UNIBRARIGHT = ur'[）\)\]】]'
 DATESEP = u'['+SEP+SP+u'至]+'
 DATE = ur'(?:(?:\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))('+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
 PERIOD = u'(?P<from>' + DATE + ur')' + DATESEP + ASP+ u'*(?P<to>' + DATE + ')'
-DURATION = ur'(?P<duration>(\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个月)?)|(\d{1,2}'+ASP+u'?个月))'
+DURATION = ur'(?P<duration>(\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个月)?)|(((\d{1,2})|(['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
 FIELDSEP = ur'、：:；;\|'
-SENTENCESEP = FIELDSEP+ur'。'
+ENDLINESEP = u'。'
+SENTENCESEP = FIELDSEP+ENDLINESEP
 
 exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
@@ -26,17 +27,18 @@ PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|([◆·\?]+)|(\uf0d8\xa0)|\uf0b7
 # Exclude date related characters to avoid eating duration
 COMPANYTAIL = exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
-COMPANY = ur'[^' + SENTENCESEP + '=\n\*]+?('+COMPANYTAIL+u')?'
+COMPANY = ur'([^' + SENTENCESEP + '=\n\*]+?(\\\\\*)+)?(((\\\\\*){3})|([^' + SENTENCESEP + '=\n\*]+?))('+COMPANYTAIL+u')?'
 SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|]+'
 
 education_list = {
-    1: (u'中技', u'中专', u'高中'),
+    0: (u'初中', ),
+    1: (u'中技', u'中专', u'高中', u'高职'),
     2: (u'大专', ),
     #3: Show clearly step before graduate
     4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科', u'学士'),
     5: (u'在职硕士', ),
-    6: (u'硕士', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA'),
+    6: (u'硕士', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA'),
     7: (u'博士', u'博士研究生'),
     8: (u'博士后', )
     }
@@ -66,8 +68,9 @@ zero_date = lambda x: str.zfill(str(x.group()), 2)
 fix_trailing = lambda x: re.compile(ur'\d+$').sub(zero_date, x)
 fix_date = lambda x: fix_trailing(fix_sep(fix_trail(fix_today(x))))
 
+fix_star = lambda x: x.replace('\*', '*')
 remove_escape = lambda x: x.group(1)
-fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, x)
+fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, fix_star(x))
 fix_name = lambda x: re.compile(ASP+'+').sub(' ', fix_escape(x)).strip()
 fix_duration = lambda x: re.compile(ASP+'+').sub('', x).strip()
 

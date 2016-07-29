@@ -113,7 +113,8 @@ import extractor.information_explorer
 def update_selected(svc_cv, yamlname, selected):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
-    info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname), selected)
+    info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
+                                                         selected, svc_cv.name)
     obj.update(info)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
@@ -122,7 +123,8 @@ def update_selected(svc_cv, yamlname, selected):
 def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
-    extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname))
+    extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname),
+                                                                   svc_cv.name)
     obj.update(extracted_data)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:

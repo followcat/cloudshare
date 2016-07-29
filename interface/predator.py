@@ -89,7 +89,10 @@ class PredatorLiteInterface(interface.base.Interface):
 
     def getraw(self, filename):
         rawname = os.path.join(self.rawdir, filename)
-        return self._get_file(rawname)
+        result = self._get_file(rawname)
+        if result is not None:
+            result = result.decode('utf-8')
+        return result
 
     def addcv(self, id, data, yamldata):
         self.addmd(id, data)

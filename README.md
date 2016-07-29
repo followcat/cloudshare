@@ -25,10 +25,6 @@ share，edit your doc，pdf，md and so on...
     nose==1.3.7
     Flask-Testing==0.4.2
 
-    node.js 4.1.2
-    npm 2.14.4
-    gulp CLI 3.9.0
-
 ### draw && view router graph
 
     xdot 0.4
@@ -58,6 +54,20 @@ Here is a demo bash script to run Jenkins test:
     java -jar $JENKINS_ROOT/jenkins.war --httpPort=8001
 ```
 
+
+## Front-end Building
+
+### Dependencies
+
+    node@6.1.0
+    npm@3.8.6
+    gulp@3.9.1
+
+### Install
+
+Enter ```/static``` folder, run ```npm install``` to install the packages.
+
+
 ## How to
 
 0) Install libreoffice/Openoffice, add libreoffice uno env, and start service.
@@ -80,7 +90,21 @@ libreoffice --invisible "--accept=socket,host=localhost,port=8100;urp;"
     The generated docbook will save in folder docbook_output
     and markdown will save in folder md_output.
 
-2) Run flask server and visit page http://localhost:4888/.
+2) Front-end building: enter ```/static``` root folder, and run
+```
+gulp build
+```
+there were generate two folders ```/static/dist/``` and ```/templates_dist/```
+
+3) Make sure the configuration of flask app template folder is ```templates_dist```.
+```
+vi server.py
+
+
+app = flask.Flask(__name__, template_folder="templates_dist")
+```
+
+4) Run flask server and visit page http://localhost:4888/.
 
 ```
 python run.py

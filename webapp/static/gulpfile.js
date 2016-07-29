@@ -12,8 +12,8 @@ var requirejsOptimize = require('gulp-requirejs-optimize'), //requirejs压缩
 
 //清除构建文件夹
 gulp.task("clean", function(){
-  return gulp.src(["./dist/js/", "./dist/css/"])
-    .pipe(clean());
+  return gulp.src(["./dist/js/", "./dist/css/", "../templates_dist/"])
+    .pipe(clean({force: true}));
 })
 
 //js打包任务
@@ -87,13 +87,12 @@ gulp.task("rev", ["scripts", "style"], function(){
         "src/css": "dist/css"
       }
     }))
-    .pipe(minifyHTML({
-      empty: true,
-      spare: true
-    }))
-    .pipe(gulp.dest("../templates/"))
+    .pipe(gulp.dest("../templates_dist/"))
 });
-
+    // .pipe(minifyHTML({
+    //   empty: true,
+    //   spare: true
+    // }))
 gulp.task("build", ["scripts", "style", "rev"]);
 
 //js错误检测任务

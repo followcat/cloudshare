@@ -19,4 +19,4 @@ export CLOUDSHARE_VIRTUALENV_PATH=/home/$USER/Virtualenv/cloudshare
 python tools/repobackup.py
 
 cd $ReleaseCode/webapp/static
-gulp build
+node_modules/gulp/bin/gulp.js build

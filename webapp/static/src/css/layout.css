@@ -8,11 +8,6 @@
     width: 30px;
 }
 
-.wd-56
-{
-    width: 56px;
-}
-
 .wd-60
 {
     width: 60px;
@@ -26,6 +21,11 @@
 .wd-80
 {
     width: 80px;
+}
+
+.wd-88
+{
+    width: 88px;
 }
 
 .wd-100
@@ -71,6 +71,12 @@
 .pd-r-10
 {
     padding-right: 10px;
+}
+
+.pd-lr-5
+{
+    padding-right: 5px;
+    padding-left: 5px;
 }
 
 .pd-lr-10

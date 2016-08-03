@@ -68,7 +68,7 @@ class Search(flask.views.MethodView):
                 continue
             info = {
                 'author': yaml_data['committer'],
-                'time': utils.builtin.strftime(yaml_data['date']),
+                'time': utils.builtin.strftime(yaml_data['date'], '%Y-%m-%d'),
             }
             datas.append([name, yaml_data, info])
         return datas, pages

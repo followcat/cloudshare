@@ -1,0 +1,25 @@
+{% extends "share/layout.html" %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap-datetimepicker.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/cv_common.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/cv_style.css') }}">
+{% endblock %}
+
+{% block content%}
+<div class="wrapper mg-center">
+  <div class="main">
+    <div class="main-header pd-lr-15">
+      <span>Resume ID: 241242</span>
+      <span>Uploader: NONE 2012.12.12</span>
+    </div>
+  </div>
+  <div class="side">
+    
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script data-main="{{ url_for('static', filename='src/js/modules/cvsource.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
+{% endblock %}

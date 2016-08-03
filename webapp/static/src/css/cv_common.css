@@ -1,0 +1,117 @@
+#cv-box
+{
+  position: relative;
+
+  display: block;
+
+  width: 98%;
+  margin: 0 auto;
+  margin-top: 4px;
+  margin-bottom: 20px;
+  padding: 8px 10px;
+
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 0 14px;
+}
+
+#cv-box .cv-box-top
+{
+  line-height: 28px;
+
+  top: 0;
+
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+#cv-box .cv-box-top .cv-box-title
+{
+  font-size: 1.375em;
+  font-weight: bold;
+}
+
+.content p
+{
+  font-size: 1em;
+  line-height: 22px;
+
+  position: relative;
+
+  display: table;
+
+  width: 100%;
+  margin: 0;
+  padding: 6px 0;
+
+  text-indent: 12px;
+
+  border: 1px solid #c2c2c2;
+}
+
+.content h1,
+h2,
+h3
+{
+  font-size: 1.125em;
+  font-weight: bold;
+
+  display: table;
+
+  width: 100%;
+  margin: 0;
+  padding: 8px 0;
+
+  text-indent: 12px;
+
+  border: 1px solid #c2c2c2;
+}
+
+.content table
+{
+  font-size: 1em; 
+
+  width: 100%;
+}
+
+.content table thead
+{
+  border: 1px solid #c2c2c2;
+}
+
+.content table thead tr th
+{
+  font-size: 1.125em;
+  font-weight: bold;
+
+  padding-top: 4px;
+  padding-bottom: 4px;
+
+  text-align: center;
+}
+
+.content table tr:nth-child(odd)
+{
+  background-color: #ebebeb;
+}
+
+.content table tbody
+{
+  border: 1px solid #c2c2c2;
+}
+
+.content table tbody tr td
+{
+  line-height: 22px;
+
+  position: relative; 
+
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 12px;
+
+  text-align: left;
+
+  border: 1px solid #c2c2c2;
+}

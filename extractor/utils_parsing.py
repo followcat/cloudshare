@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 import re
+import time
 
 
 TODAY = u'((至今)|(目前)|(现在)|今|([Pp]resent)|([Nn]ow))'
 CHNUMBERS = u'一二三四五六七八九十'
 SP = u'\s\xa0\ufffd\u2028\u3000'
 ASP = u'[' + SP + u']'
-SEP = u'\-–—―\\\\·,~～/'
+SEP = u'\-\u2013\u2014\u2015\u4e00\\\\·,~～/'
 UNIBRALEFT = ur'[（\(\[【]'
 UNIBRARIGHT = ur'[）\)\]】]'
 DATESEP = u'['+SEP+SP+u'至]+'
-DATE = ur'(?:(?:\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))('+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
-PERIOD = u'(?P<from>' + DATE + ur')' + DATESEP + ASP+ u'*(?P<to>' + DATE + ')'
-DURATION = ur'(?P<duration>(\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(\d{1,2}'+ASP+u'?个月)?)|(((\d{1,2})|(['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
+DATE = ur'(?:(?:\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))(?:'+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
+PERIOD = u'(?P<from>' + DATE + ur')' + DATESEP + ASP+ u'*(?P<to>' + DATE + ')(?:'+UNIBRALEFT+u'含[^（\(\[【]+?期'+UNIBRARIGHT+u')?'
+DURATION = ur'(?P<duration>(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
 FIELDSEP = ur'、：:；;\|'
@@ -27,9 +28,10 @@ PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'*)|([◆·\?]+)|(\uf0d8\xa0)|\uf0b7
 # Exclude date related characters to avoid eating duration
 COMPANYTAIL = exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
-COMPANY = ur'([^' + SENTENCESEP + '=\n\*]+?(\\\\\*)+)?(((\\\\\*){3})|([^' + SENTENCESEP + '=\n\*]+?))('+COMPANYTAIL+u')?'
+# \u2014, \u2015 and \u4e00 are found in company
+COMPANY = ur'([^' + SENTENCESEP + u'=\n\*\u2013]+?(\\\\\*)+)?(((\\\\\*){3})|([^' + SENTENCESEP + u'=\n\*\u2013]+?))('+COMPANYTAIL+u')?'
 SENTENCESEP = SENTENCESEP+ur'，'
-POSITION = ur'[^=\n\*：:\|]+'
+POSITION = ur'[^=\n\*：:\|\u2013\u2015]+'
 
 education_list = {
     0: (u'初中', ),
@@ -82,4 +84,45 @@ fix_salary = lambda x: salary_unit(ten_thousands(re.compile(ASP+'+').sub('', x))
 WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)$'
 STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P<major>'+POSITION+u'?)[：:\| ]*'+EDUCATION+u'?$'
 
+def compute_duration(date_from, date_to):
+    u"""
+        >>> print(compute_duration('2002.08', '2006.10'))
+        4年2月
+        >>> print(compute_duration('2014.08', u'至今')) #doctest: +ELLIPSIS
+        2年...
+        >>> print(compute_duration('2011.09', '2014.08'))
+        2年11月
+        >>> print(compute_duration('2012.12', '2013.09'))
+        9个月
+        >>> print(compute_duration('2014.03', '2016.03'))
+        2年
+    """
+    break_date = lambda x: tuple([int(i) for i in x.split('.')])
+    time_from = time.mktime(break_date(date_from)+(1,0,0,0,0,0,0))
+    if date_to == u'至今':
+        time_to = time.time()
+    else:
+        time_to = time.mktime(break_date(date_to)+(1,0,0,0,0,0,0))
+    duration_tuple = time.gmtime(time_to - time_from)
+    zerotime_tuple = time.gmtime(0)
+    if zerotime_tuple[1] > duration_tuple[1]:
+        year_offset = 1
+        period_month = duration_tuple[1]+12 - zerotime_tuple[1]
+    else:
+        year_offset = 0
+        period_month = duration_tuple[1] - zerotime_tuple[1]
+    period_year = duration_tuple[0] -  zerotime_tuple[0] - year_offset
+    if period_year < 0:
+        duration = None
+    elif period_year == 0:
+        if period_month <= 0:
+            duration = u'一个月内'
+        else:
+            duration = u'%d个月' % period_month
+    else:
+        if period_month <= 0:
+            duration = u'%d年' % period_year
+        else:
+            duration = u'%d年%d个月' % (period_year, period_month)
+    return duration
 

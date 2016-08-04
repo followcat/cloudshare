@@ -220,6 +220,13 @@ header
     margin-left: -360px;
 }
 
+.wrapper .search-box textarea {
+    min-width: 720px;
+    max-width: 720px;
+    min-height: 60px;
+    max-height: 160px;
+}
+
 .search-btn
 {
     font-weight: bold;

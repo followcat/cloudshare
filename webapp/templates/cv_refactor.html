@@ -7,17 +7,151 @@
 {% endblock %}
 
 {% block content%}
+
 <div class="wrapper mg-center">
   <div class="main">
     <div class="main-header pd-lr-15">
-      <span>Resume ID: 241242</span>
-      <span>Uploader: NONE 2012.12.12</span>
+      <span>Resume ID: {{ yaml.id }}</span>
+      <span class="uploader">Uploader: {{ yaml.committer }}, {{ yaml.date }}</span>
+    </div>
+    <div class="tool-wrap">
+      <div class="tool-bar pd-lr-15">
+        <span class="check-box"><input type="checkbox" id="tranform-check">Switch to Modify Title</span>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">Modify CV</a>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">Add English CV</a>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="match">Show JD</a>
+        {% if yaml.enversion %}
+        <a href="/edit/{{ yaml.enversion }}" target="_blank">English CV</a>
+        {% endif %}
+      </div>
+      <div class="cv-title-wrap">
+        <table class="table table-bordered table-condensed" id="title-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" class="form-control input-sm" id="Id" value="{{ yaml.id }}"></td>
+              <td><input type="text" class="form-control input-sm" id="name" value="{{ yaml.name }}"></td>
+              <td><input type="text" class="form-control input-sm" id="origin" value="{{ yaml.origin }}"></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary title-btn" id="title-submit-btn">Submit</button>
+      </div>
+    </div>
+    <div class="summary pd-lr-15">
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Name: </span>{{ yaml.name }}</div>
+        <div class="summary-cell"><span class="feild">Gender: </span>{{ yaml.gender }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Age: </span>{{ yaml.age }}</div>
+        <div class="summary-cell"><span class="feild">Education: </span>{{ yaml.education }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Education: </span>{{ yaml.education }}</div>
+        <div class="summary-cell"><span class="feild">University: </span>{{ yaml.school }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Position: </span>{{ yaml.position }}</div>
+        <div class="summary-cell"><span class="feild">Company: </span>{{ yaml.company }}</div>
+      </div>
+      <div class="summary-row ex clearfix">
+        <div><span class="feild">Work Experience: </span></div>
+        <div>
+          {% for item in yaml.experience %}
+          <div class="ex-item">{{ item[0] }}-{{ item[1] }} | {{ item[2] }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="summary-row ex clearfix">
+        <div><span class="feild">Education Experience: </span></div>
+        <div>
+          {% for item in yaml.education_history %}
+          <div class="ex-item">{{ item.date_from }}-{{ item.date_to }} | {{ item.school }} | {{ item.major }} | {{ item.education }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="cv pd-lr-15" id="cv-box">
+      {{ markdown|safe }}
     </div>
   </div>
   <div class="side">
-    
+    <div class="tag-wrap">
+      <div class="wrap-header pd-lr-15">
+        Tag
+      </div>
+      <div class="side-container">
+        {% for key, value in yaml.iteritems() %}
+        {% if key=='tag' %}
+        {% for item in value %}
+        <span class="label label-primary" title="{{ item.author }}">{{ item.content }}</span>
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+        <a href="javascript:;" id="add-label">Add a Tag</a>
+      </div>
+    </div>
+    <div class="follow-up-wrap">
+      <div class="wrap-header pd-lr-15">
+        Follow up
+      </div>
+      <div class="side-container">
+        <input type="text" class="form-control input-sm" placeholder="Write down your follow up situation..." id="tracking-text" required />
+        <div class="btn-box">
+          <div class="input-group input-group-sm">
+            <input class="form-control" id="form_datetime" size="16" type="text" value="" readonly>
+            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+          </div>
+          <a href="javascript:;" class="fold">Fold</a>
+          <button type="button" class="btn btn-primary tracking-btn" id="tracking-btn">Submit</button>
+        </div>
+        <div class="tracking-content" id="tracking-content">
+          
+        </div>
+        
+        
+<!--         <div class="form-input">
+          <input type="text" class="form-control" placeholder="Write down your follow up situation..." id="tracking-text" required="required" />
+          <div class="btn-box">
+            <div class="form-group">
+              <label for="date" class="col-md-2 control-label" style="padding:4px;">Date</label>
+              <div class="input-group date form_date col-md-9" data-date="" data-date-format="dd MM yyyy" data-link-field="date" data-link-format="yyyy-mm-dd">
+                <input class="form-control" size="16" type="text" value="" readonly />
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+              </div>
+              <input type="hidden" id="date" value="" />
+            </div>
+            <a href="javascript:;" class="collapse">Fold</a>
+            <button type="button" class="btn btn-primary" id="tracking-btn">Submit</button>
+          </div>
+        </div> -->
+      </div>
+    </div>
+    <div class="comment-wrap">
+      <div class="wrap-header pd-lr-15">
+        Comments
+      </div>
+      <div class="content">
+      </div>
+    </div>
+    <div class="similar-wrap">
+      <div class="wrap-header pd-lr-15">
+        Similar
+      </div>
+      <div class="content">
+      </div>
+    </div>
   </div>
 </div>
+<p>{{ yaml }}</p>
 {% endblock %}
 
 {% block script %}

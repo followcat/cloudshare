@@ -141,15 +141,17 @@ class Similar(flask.views.MethodView):
         miner = flask.current_app.config['SVC_MIN']
         doc = flask.request.form['doc']
         datas = []
-        for name, score in miner.probability(doc)[:7]:
+        for name, score in miner.probability(doc)[1:6]:
             cname = core.outputstorage.ConvertName(name)
             yaml_info = svc_cv.getyaml(cname.yaml)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
-                'match': score
+                'match': score,
+                'md_filename': cname.md
             }
-            datas.append([cname.md, yaml_info, info])
+            yaml_info.update(info)
+            datas.append(yaml_info)
         return flask.jsonify({'result': datas})
 
 

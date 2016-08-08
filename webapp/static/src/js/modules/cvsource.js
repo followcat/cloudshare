@@ -40,7 +40,7 @@ require([
   "History"
 ],function($, bootstrap, datetimepicker, cvdeal, Upload, ColorGrad, History) {
 
-  window.onload = cvdeal.CVdeal();
+  window.onload = cvdeal.cvDeal("cvContent");
 
   var c = {
     currentUser: $("#name").text().trim(),
@@ -272,27 +272,25 @@ require([
   });
 
   //Get similar person data.
-  // $.ajax({
-  //   url: "/analysis/similar",
-  //   type: "post",
-  //   data: {
-  //     "doc": document.getElementById("cv-content").innerText
-  //   },
-  //   success: function(response) {
-  //     var datas = response.result,
-  //         colorgrad = ColorGrad();
-  //     for(var i = 0, len = datas.length; i < len; i++){
-  //       var fileName = datas[i][0],
-  //           name = datas[i][1].name,
-  //           match = datas[i][2].match;
+  $.ajax({
+    url: "/analysis/similar",
+    type: "post",
+    data: {
+      "doc": document.getElementById("cvContent").innerText
+    },
+    success: function(response) {
+      var datas = response.result;
+      for (var i = 0, len = datas.length; i < len; i++) {
+        var _index = datas[i];
+        var name = _index.name !== "" ? _index.name : _index.id;
 
-  //       colorStyle = colorgrad.gradient(parseInt(match*100));
-  //       $("#similar-person").append("<a href=\"/show/"+ fileName +
-  //         "\" style=\"color:" + colorStyle +
-  //         "\" target=\"_blank\">" + name + "</a>");
-  //     }
-  //   }
-  // });
+        $("#similarContent").append("<div class='similar-item'><a href='/show/" + _index.md_filename + "' target='_blank'>" +
+          name + " | " + _index.position + " | " +
+          _index.age + " | " + _index.gender + " | " + _index.education + "</a></div>"
+        );
+      }
+    }
+  });
 
   //Write history
   var history = new History();

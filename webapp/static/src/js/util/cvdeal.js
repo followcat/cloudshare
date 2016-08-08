@@ -88,16 +88,15 @@ define(['jquery'], function() {
     };
 
     return {
-        CVdeal: function() {
-            var objCV = new CVDeal($("#cv-box"));
+        cvDeal: function(elementId) {
+            var objCV = new CVDeal($("#" + elementId));
             objCV.DeleteHr();
             objCV.DeleteSection();
             objCV.DeleteLink();
             objCV.DeleleLine();
             objCV.ConcatTd();
             objCV = null;
-            $("#loding-img").remove();
-            $("#cv-box").show();
+            $("#" + elementId).show();
         }
     };
 });

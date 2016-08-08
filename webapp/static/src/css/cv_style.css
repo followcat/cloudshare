@@ -129,7 +129,7 @@ body {
   margin-top: 8px;
 }
 
-.tracking-content, .comment-content {
+.tracking-content, .comment-content, .similar-content {
   width: 100%;
   margin-bottom: 4px;
   margin-top: 2px;
@@ -140,10 +140,10 @@ body {
 }
 
 .tracking-content, .comment-content, .similar-content {
-  max-height: 70px;
+  max-height: 80px;
 }
 
-.tracking-item, .comment-item {
+.tracking-item, .comment-item, .similar-item {
   padding: 4px 6px;
   border-bottom: 1px dotted #ccc;
 }

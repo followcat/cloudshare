@@ -157,6 +157,11 @@ header
     position: absolute;
 }
 
+.logo-wrap .logo-box
+{
+    display: inline-block;
+}
+
 .sf
 {
     padding-top: 8px;

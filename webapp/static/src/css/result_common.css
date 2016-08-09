@@ -2,7 +2,7 @@
   position: relative;
   border: 1px solid #eee;
   padding: 10px 20px;
-  width: 1024px;
+  width: 1080px;
   height: auto;
   margin-top: 20px;
   background-color: #f5f5f5;
@@ -35,7 +35,7 @@
 
 .rl {
   margin-top: 10px;
-  width: 1024px;
+  width: 1080px;
 }
 
 .ls {
@@ -112,7 +112,7 @@
 
 .top-fixed {
   position: fixed;
-  width: 1024px;
+  width: 1080px;
   top: 0;
   z-index: 999;
 }

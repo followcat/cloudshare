@@ -4,7 +4,7 @@ require.config({
     jquery: 'lib/js/jquery',
     bootstrap: 'lib/js/bootstrap',
     datetimepicker: 'lib/js/bootstrap-datetimepicker.min',
-    datetimepickerCN: 'lib/js/bootstrap-datetimepicker.zh-CN',
+    // datetimepickerCN: 'lib/js/bootstrap-datetimepicker.zh-CN',
     cvdeal: 'src/js/util/cvdeal',
     Upload: 'src/js/util/upload',
     colorgrad: 'src/js/util/colorgrad',
@@ -34,24 +34,23 @@ require([
   'jquery',
   'bootstrap',
   'datetimepicker',
-  'datetimepickerCN',
   'cvdeal',
   'Upload',
   'colorgrad',
   'History'
-],function($, bootstrap, datetimepicker, datetimepickerCN, cvdeal, Upload, ColorGrad, History) {
+],function($, bootstrap, datetimepicker, cvdeal, Upload, ColorGrad, History) {
 
   window.onload = cvdeal.CVdeal();
 
-  $('.form_date').datetimepicker({
-    language: 'zh-CN',
-      weekStart: 1,
-      todayBtn: 1,
-      autoclose: 1,
-      todayHighlight: 1,
-      startView: 2,
-      minView: 2,
-      forceParse: 0
+  $('#form_datetime').datetimepicker({
+    format: "yyyy-mm-dd",
+    weekStart: 1,
+    todayBtn: true,
+    autoclose: true,
+    todayHighlight: 1,
+    startView: 2,
+    minView: 2,
+    pickerPosition: "bottom-left"
   });
 
   $("#tracking-text").on('focus', function() {
@@ -63,6 +62,9 @@ require([
   });
 
   $(".collapse").on('click', function() {
+    $(this).parent().hide();
+  });
+  $(".fold").on("click", function() {
     $(this).parent().hide();
   });
 
@@ -234,12 +236,14 @@ require([
   $('#tranform-check').click(function() {
     if ($(this).attr('checked')) {
       $(this).removeAttr('checked');
-      $('#title-table tbody tr input').attr('disabled', 'disabled');
-      $('#title-submit-btn').css('display', 'none');
+      // $('#title-table tbody tr input').attr('disabled', 'disabled');
+      // $('#title-submit-btn').css('display', 'none');
+      $(".cv-title-wrap").css('display', 'none');
     } else {
       $(this).attr('checked', 'checked');
-      $('#title-table tbody tr input').removeAttr('disabled');
-      $('#title-submit-btn').css('display', 'block');
+      // $('#title-table tbody tr input').removeAttr('disabled');
+      // $('#title-submit-btn').css('display', 'block');
+      $('.cv-title-wrap').css('display', 'block');
     }
   });
 
@@ -273,27 +277,27 @@ require([
   });
 
   //Get similar person data.
-  $.ajax({
-    url: '/analysis/similar',
-    type: 'post',
-    data: {
-      'doc': document.getElementById("cv-content").innerText
-    },
-    success: function(response) {
-      var datas = response.result,
-          colorgrad = ColorGrad();
-      for(var i = 0, len = datas.length; i < len; i++){
-        var fileName = datas[i][0],
-            name = datas[i][1].name,
-            match = datas[i][2].match;
+  // $.ajax({
+  //   url: '/analysis/similar',
+  //   type: 'post',
+  //   data: {
+  //     'doc': document.getElementById("cv-content").innerText
+  //   },
+  //   success: function(response) {
+  //     var datas = response.result,
+  //         colorgrad = ColorGrad();
+  //     for(var i = 0, len = datas.length; i < len; i++){
+  //       var fileName = datas[i][0],
+  //           name = datas[i][1].name,
+  //           match = datas[i][2].match;
 
-        colorStyle = colorgrad.gradient(parseInt(match*100));
-        $('#similar-person').append("<a href=\"/show/"+ fileName +
-          "\" style=\"color:" + colorStyle +
-          "\" target=\"_blank\">" + name + "</a>");
-      }
-    }
-  });
+  //       colorStyle = colorgrad.gradient(parseInt(match*100));
+  //       $('#similar-person').append("<a href=\"/show/"+ fileName +
+  //         "\" style=\"color:" + colorStyle +
+  //         "\" target=\"_blank\">" + name + "</a>");
+  //     }
+  //   }
+  // });
 
   //Write history
   var history = new History(),
@@ -306,4 +310,20 @@ require([
     }
   );
 
+  var topHeight = $("header").innerHeight() + parseInt($(".wrapper").css("marginTop"));
+  console.log(topHeight);
+  $(document).scroll(function() {
+    var top = $(document).scrollTop();
+    if ( top > topHeight ) {
+      $(".side").css({
+        position: 'fixed',
+        top: '20px'
+      });
+    } else {
+      $(".side").css({
+        position: 'absolute',
+        top: '0'
+      });
+    }
+  });
 });

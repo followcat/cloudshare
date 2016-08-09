@@ -43,5 +43,5 @@ except ImportError:
         return output
 
 
-def strftime(t):
-    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t))
+def strftime(t, format='%Y-%m-%d %H:%M:%S'):
+    return time.strftime(format, time.localtime(t))

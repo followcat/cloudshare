@@ -46,34 +46,38 @@
 </div>
 <div class="rl mg-center">
   <div class="field">
-    <div class="ls field-item wd-200">Name</div>
+    <div class="ls field-item wd-180">Name</div>
     <div class="ls field-item wd-60">Gender</div>
-    <div class="ls field-item wd-56">Age</div>
+    <div class="ls field-item wd-60">Age</div>
     <div class="ls field-item wd-80">Marriage</div>
     <div class="ls field-item wd-100">Education</div>
-    <div class="ls field-item wd-180">University</div>
+    <div class="ls field-item wd-160">University</div>
     <div class="ls field-item wd-120">Position</div>
     <div class="ls field-item wd-200">Company</div>
+    <div class="ls field-item wd-88">Uploader</div>
   </div>
   <div class="blank-line"></div>
   {% if result %}
   {% for item in result %}
   <div class="ls-item">
     <div class="basic-info">
-      <div class="ls bs-info-item wd-200 pd-lr-10 omit">
+      <div class="ls bs-info-item wd-180 pd-lr-5 omit">
         <a class="item-title" href="/show/{{ item[0] }}" target="_blank" data-id="{{ item[1].id }}" data-match="{{ item[2].match }}" title="{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
       </div>
-      <div class="ls bs-info-item wd-60 pd-lr-10 omit" title="{{ item[1].gender }}">{{ item[1].gender }}</div>
-      <div class="ls bs-info-item wd-56 pd-lr-10 omit" title="{{ item[1].age }}">{{ item[1].age }}</div>
+      <div class="ls bs-info-item wd-60 pd-lr-5 omit" title="{{ item[1].gender }}">{{ item[1].gender }}</div>
+      <div class="ls bs-info-item wd-60 pd-lr-5 omit" title="{{ item[1].age }}">{{ item[1].age }}</div>
       {% if item[1].marital_status %}
-      <div class="ls bs-info-item wd-80 pd-lr-10 omit" title="{{ item[1].marital_status }}">{{ item[1].marital_status }}</div>
+      <div class="ls bs-info-item wd-80 pd-lr-5 omit" title="{{ item[1].marital_status }}">{{ item[1].marital_status }}</div>
       {% else %}
-      <div class="ls bs-info-item wd-80 pd-lr-10 omit" title=""></div>
+      <div class="ls bs-info-item wd-80 pd-lr-5 omit" title=""></div>
       {% endif %}
-      <div class="ls bs-info-item wd-100 pd-lr-10 omit" title="{{ item[1].education }}">{{ item[1].education }}</div>
-      <div class="ls bs-info-item wd-180 pd-lr-10 omit" title="{{ item[1].school }}">{{ item[1].school }}</div>
-      <div class="ls bs-info-item wd-120 pd-lr-10 omit" title="{{ item[1].position }}">{{ item[1].position }}</div>
-      <div class="ls bs-info-item wd-200 pd-lr-10 omit" title="{{ item[1].company }}">{{ item[1].company }}</div>
+      <div class="ls bs-info-item wd-100 pd-lr-5 omit" title="{{ item[1].education }}">{{ item[1].education }}</div>
+      <div class="ls bs-info-item wd-160 pd-lr-5 omit" title="{{ item[1].school }}">{{ item[1].school }}</div>
+      <div class="ls bs-info-item wd-120 pd-lr-5 omit" title="{{ item[1].position }}">{{ item[1].position }}</div>
+      <div class="ls bs-info-item wd-200 pd-lr-5 omit" title="{{ item[1].company }}">{{ item[1].company }}</div>
+      <div class="ls bs-info-item wd-88 pd-lr-5 omit" title="{{ item[2].time }}">
+        {{ item[2].author }}
+      </div>
     </div>
     <div class="extend-info clearfix">
       <div class="wk-ex wd-360 bd-r-1">

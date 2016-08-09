@@ -127,7 +127,7 @@ class LSI(flask.views.MethodView):
             yaml_info = svc.getyaml(cname.yaml)
             info = {
                 'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
+                'time': utils.builtin.strftime(yaml_info['date'], '%Y-%m-%d'),
                 'match': score
             }
             datas.append([cname.md, yaml_info, info])

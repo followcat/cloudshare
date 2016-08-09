@@ -1,4 +1,12 @@
-#cv-box
+.wrapper {
+  position: relative;
+  width: 1080px;
+  height: auto;
+  margin-top: 20px;
+  font-size: .857em;
+}
+
+.cv-wrap
 {
   position: relative;
 
@@ -16,23 +24,7 @@
   box-shadow: 0 0 14px;
 }
 
-#cv-box .cv-box-top
-{
-  line-height: 28px;
-
-  top: 0;
-
-  width: 100%;
-  margin-bottom: 2px;
-}
-
-#cv-box .cv-box-top .cv-box-title
-{
-  font-size: 1.375em;
-  font-weight: bold;
-}
-
-.content p
+.cv-wrap p
 {
   font-size: 1em;
   line-height: 22px;
@@ -50,7 +42,7 @@
   border: 1px solid #c2c2c2;
 }
 
-.content h1,
+.cv-wrap h1,
 h2,
 h3
 {
@@ -68,19 +60,19 @@ h3
   border: 1px solid #c2c2c2;
 }
 
-.content table
+.cv-wrap table
 {
   font-size: 1em; 
 
   width: 100%;
 }
 
-.content table thead
+.cv-wrap table thead
 {
   border: 1px solid #c2c2c2;
 }
 
-.content table thead tr th
+.cv-wrap table thead tr th
 {
   font-size: 1.125em;
   font-weight: bold;
@@ -91,17 +83,17 @@ h3
   text-align: center;
 }
 
-.content table tr:nth-child(odd)
+.cv-wrap table tr:nth-child(odd)
 {
   background-color: #ebebeb;
 }
 
-.content table tbody
+.cv-wrap table tbody
 {
   border: 1px solid #c2c2c2;
 }
 
-.content table tbody tr td
+.cv-wrap table tbody tr td
 {
   line-height: 22px;
 

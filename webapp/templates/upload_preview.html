@@ -1,0 +1,75 @@
+{% extends "share/layout.html" %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/cv_common.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/cv_style.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/upload_preview.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="wrapper mg-center">
+  <div class="preview-wrap mg-center">
+    <div class="header pd-lr-15">
+      <span>Resume Preview</span>
+    </div>
+    <div class="tool-wrap pd-lr-15 pd-tb-10">
+      <div class="form-inline">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control input-sm" name="name" id="resumeName" placeholder="Please input resume name">
+        </div>
+        <div class="form-group">
+          <label for="origin">Source:</label>
+          <div class="btn-group">
+            <select class="form-control input-sm" id="originSelection">
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm" id="confirmBtn">Confirm</button>
+        <button type="submit" class="btn btn-default btn-sm" id="goBackBtn">Go back</button>
+      </div>
+    </div>
+    <div class="summary pd-lr-15">
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Name: </span>{{ yaml.name }}</div>
+        <div class="summary-cell"><span class="feild">Gender: </span>{{ yaml.gender }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Age: </span>{{ yaml.age }}</div>
+        <div class="summary-cell"><span class="feild">Education: </span>{{ yaml.education }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Education: </span>{{ yaml.education }}</div>
+        <div class="summary-cell"><span class="feild">University: </span>{{ yaml.school }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Position: </span>{{ yaml.position }}</div>
+        <div class="summary-cell"><span class="feild">Company: </span>{{ yaml.company }}</div>
+      </div>
+      <div class="summary-row ex clearfix">
+        <div><span class="feild">Education Experience: </span></div>
+        <div>
+          {% for item in yaml.education_history %}
+          <div class="ex-item">{{ item.date_from }}-{{ item.date_to }} | {{ item.school }} | {{ item.major }} | {{ item.education }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="summary-row ex clearfix">
+        <div><span class="feild">Work Experience: </span></div>
+        <div>
+          {% for item in yaml.experience %}
+          <div class="ex-item">{{ item[0] }}-{{ item[1] }} | {{ item[2] }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="cv pd-lr-15 cv-wrap" id="cvContent">
+      {{ markdown|safe }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script data-main="{{ url_for('static', filename='src/js/modules/upload_preview') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
+{% endblock %}

@@ -142,12 +142,7 @@ class UploadPreview(flask.views.MethodView):
         upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
         yaml_info = upobj.filepro.yamlinfo
-        # info = {
-        #     "name": upobj.filepro.yamlinfo['name'],
-        #     "origin": upobj.filepro.yamlinfo['origin'],
-        #     "id": upobj.filepro.yamlinfo['originid']
-        # }
-        return flask.render_template('cv.html', markdown=output, yaml_info=yaml_info)
+        return flask.render_template('upload_preview.html', markdown=output, yaml=yaml_info)
 
 
 class Confirm(flask.views.MethodView):
@@ -194,7 +189,7 @@ class Show(flask.views.MethodView):
         md = svc_cv.gethtml(filename)
         yaml_info = svc_cv.getyaml(filename)
         yaml_info['date'] = utils.builtin.strftime(yaml_info['date'])
-        return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
+        return flask.render_template('cv_refactor.html', markdown=md, yaml=yaml_info)
 
 
 class Edit(flask.views.MethodView):

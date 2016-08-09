@@ -80,28 +80,22 @@
   background-color: #eee;
 }
 
-.extend-info .wk-ex,
-.extend-info .ed-ex,
+.extend-info .ex,
 .extend-info .wk-status {
+  float: left;
+}
+
+.extend-info .ex-content {
+  width: 620px;
+}
+
+.extend-info .ex-field,
+.extend-info .ex-content {
   float: left;
 }
 
 .extend-info > .bd-r-1 {
   border-right: 1px dotted #ccc;
-}
-
-.wk-ex span,
-.ed-ex span,
-.wk-status span {
-  display: inline-block;
-}
-
-.ed-ex ul li {
-  overflow: hidden;
-}
-
-.ed-ex ul li span{
-  float: left;
 }
 
 .omit {
@@ -150,4 +144,8 @@
 
 .up-down-box:hover span{
   color: #fff;
+}
+
+.item-title:visited {
+  color: #609;
 }

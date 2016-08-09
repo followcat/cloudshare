@@ -2,14 +2,6 @@ body {
   background-color: #f5f5f5;
 }
 
-.wrapper {
-  position: relative;
-  width: 1080px;
-  height: auto;
-  margin-top: 20px;
-  font-size: .857em;
-}
-
 .main {
   width: 720px;
   border: 1px solid #ccc;

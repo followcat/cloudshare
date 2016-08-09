@@ -154,7 +154,7 @@ def yamlaction(svc_cv, action, *args, **kwargs):
 
 
 
-def tracking_and_command(DATA_DB, attribute, fix=False, filltime=False):
+def tracking_and_command(DEF_SVC_CV, attribute, fix=False, filltime=False):
     def fix_same(l):
         new = list()
         for each in l:
@@ -165,6 +165,7 @@ def tracking_and_command(DATA_DB, attribute, fix=False, filltime=False):
     import re
     import yaml
     import collections
+    DATA_DB = DEF_SVC_CV.interface
     save_dict = collections.defaultdict(list)
     for each in  DATA_DB.history():
         filenames = (re.findall('File ([a-z0-9]{8}\.yaml)\:  Add %s\.'%attribute,

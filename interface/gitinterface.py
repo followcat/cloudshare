@@ -221,9 +221,10 @@ class GitInterface(interface.base.Interface):
             info['time'] = utils.builtin.strftime(commit.author_time)
         return info
 
-    def history(self, author, max_commits=None, skip=0):
+    def history(self, author=None, max_commits=None, skip=0):
         cmd = ['git', 'log', '--format=%H']
-        cmd.append('--author=%s' % author)
+        if author is not None:
+            cmd.append('--author=%s' % author)
         if skip:
             cmd.append('--skip=%d' % skip)
         if max_commits:

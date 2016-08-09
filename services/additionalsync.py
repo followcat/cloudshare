@@ -23,11 +23,18 @@ class AdditionalSync(object):
 
     def __init__(self, multicv):
         self.additionals = multicv.additionals
-        self.interfaces = [additional.interface for additional in self.additionals]
+        self.interfaces = dict([(additional.name, additional.interface)
+                                for additional in self.additionals])
         self.logger = logging.getLogger("AdditionalSyncLogger.UPDATE")
 
-    def update(self):
-        for i in self.interfaces:
+    def update(self, additionals=None):
+        if additionals is None:
+            interfaces = self.interfaces
+        else:
+            interfaces = dict([(additional.name, additional.interface)
+                                for additional in self.additionals
+                                if additional.name in additionals])
+        for name, i in interfaces.items():
             for id in set(i.lsid_raw()) - (set(i.lsid_yaml()) & set(i.lsid_md())):
                 raw_html = i.getraw(id+'.html')
                 raw_yaml = i.getraw(id+'.yaml')
@@ -38,7 +45,7 @@ class AdditionalSync(object):
                     continue
                 t1 = time.time()
                 try:
-                    info = self.generate_yaml(md, raw_yaml)
+                    info = self.generate_yaml(md, raw_yaml, name=name)
                 except KeyboardInterrupt:
                     usetime = time.time() - t1
                     self.logger.info((' ').join(["KeyboardInterrupt", logidname,
@@ -55,25 +62,31 @@ class AdditionalSync(object):
     def generate_md(self, raw_html):
         return pypandoc.convert(raw_html, 'markdown', format='docbook')
 
-    def generate_yaml(self, md, raw_yaml, selected=None):
+    def generate_yaml(self, md, raw_yaml, selected=None, name=None):
         obj = yaml.load(raw_yaml)
         if selected is None:
-            catchinfo = extractor.information_explorer.catch(md)
+            catchinfo = extractor.information_explorer.catch(md, name)
         else:
-            catchinfo = extractor.information_explorer.catch_selected(md, selected)
+            catchinfo = extractor.information_explorer.catch_selected(md, selected, name)
         for key in catchinfo:
             if catchinfo[key]:
                 obj[key] = catchinfo[key]
         return obj
 
-    def upgrade_yaml(self, selected=None):
-        for i in self.interfaces:
+    def upgrade_yaml(self, selected=None, additionals=None):
+        if additionals is None:
+            interfaces = self.interfaces
+        else:
+            interfaces = dict([(additional.name, additional.interface)
+                                for additional in self.additionals
+                                if additional.name in additionals])
+        for name, i in interfaces.items():
             for id in i.lsid_md():
                 if selected is None:
                     origin_yaml = i.getraw(id+'.yaml')
                 else:
                     origin_yaml = i.get(os.path.join(i.cvdir, id+'.yaml'))
                 md = i.get(os.path.join(i.cvdir, id+'.md'))
-                info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected)
+                info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected, name)
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addyaml(id, infostream)

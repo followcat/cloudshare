@@ -7,8 +7,8 @@ var requirejsOptimize = require('gulp-requirejs-optimize'), //requirejs压缩
     revCollector = require('gulp-rev-collector'), //路径替换
     rev = require('gulp-rev'),  //文件名加md5后缀
     minifyHTML = require('gulp-minify-html'),  //html压缩优化
-    minifyCSS = require('gulp-minify-css'),
-    clean = require('gulp-clean');  //文件夹清空
+    clean = require('gulp-clean'),  //文件夹清空
+    cleanCSS = require('gulp-clean-css');  //压缩CSS
 
 //清除构建文件夹
 gulp.task("clean", function(){
@@ -70,7 +70,7 @@ gulp.task('scripts', ['clean'], function(){
 //css打包任务
 gulp.task("style", ['clean'], function(){
   return gulp.src("src/css/*.css")
-    .pipe(minifyCSS())
+    .pipe(cleanCSS({ keepSpecialComments: 1, processImport: false }))
     .pipe(rev())
     .pipe(gulp.dest("dist/css"))
     .pipe(rev.manifest())

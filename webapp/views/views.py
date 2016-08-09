@@ -1,3 +1,4 @@
+import time
 import pickle
 import codecs
 import os.path
@@ -250,7 +251,9 @@ class UpdateInfo(flask.views.MethodView):
         for key, value in updateinfo.iteritems():
             if key in yaml_info:
                 if key in ['tag', 'tracking', 'comment']:
-                    yaml_info[key].insert(0, {'author': user.id, 'content': value})
+                    yaml_info[key].insert(0, {'author': user.id,
+                                              'content': value,
+                                              'date': time.strftime('%Y-%m-%d %H:%M:%S')})
                     commit_string += " Add %s." % (key)
                 else:
                     yaml_info[key] = value

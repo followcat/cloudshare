@@ -57,9 +57,18 @@
       <div class="summary-row ex clearfix">
         <div><span class="feild">Work Experience: </span></div>
         <div>
-          {% for item in yaml.experience %}
-          <div class="ex-item">{{ item[0] }}-{{ item[1] }} | {{ item[2] }}</div>
+          {% if yaml.experience %}
+          {% for item in yaml.experience.experience.company %}
+          <div class="ex-item">{{ item.date_from }}-{{ item.date_to }}
+          {% if item.business %} | {{ item.business }}{% endif %}
+          {% if item.name %} | {{ item.name }}{% endif %}
+          {% for e in yaml.experience.experience.position %}
+            {% if e.at_company == item.id %} | {{ e.name }}{% endif %}
           {% endfor %}
+          {% if item.duration %} | {{ item.duration }}{% endif %}
+          </div>
+          {% endfor %}
+          {% endif %}
         </div>
       </div>
     </div>

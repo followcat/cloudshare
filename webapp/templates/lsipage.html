@@ -231,26 +231,49 @@
         <div class="wk-ex pd-lr-15 clearfix">
           <label class="ex-field wd-140">Work Experience:</label>
           <ul class="list-unstyled ex-content">
-            {% if item[1].experience | length - 2 >= 2 %}
-            {% for e in item[1].experience %}
+            {% if item[1].experience %}
+            {% if item[1].experience.experience.company | length - 2 >= 2 %}
+            {% for e in item[1].experience.experience.company %}
             {% if loop.index > 2 %}
             <li class="ex-fold">
-              <span>{{ e[0] }}-{{ e[1] }} | {{ e[2] }}</span>
+              <span>{{ e.date_from }}-{{ e.date_to }}
+              {% if e.business %} | {{ e.business }}{% endif %}
+              {% if e.name %} | {{ e.name }}{% endif %}
+              {% for i in item[1].experience.experience.position %}
+                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
+              {% endfor %}
+              {% if e.duration %} | {{ e.duration }}{% endif %}
+              </span>
             </li>
             {% else %}
             <li>
-              <span>{{ e[0] }}-{{ e[1] }} | {{ e[2] }}</span>
+              <span>{{ e.date_from }}-{{ e.date_to }}
+              {% if e.business %} | {{ e.business }}{% endif %}
+              {% if e.name %} | {{ e.name }}{% endif %}
+              {% for i in item[1].experience.experience.position %}
+                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
+              {% endfor %}
+              {% if e.duration %} | {{ e.duration }}{% endif %}
+              </span>
             </li>
             {% endif %}
             {% endfor %}
             <a href="javascript:;" class="show-more">Unfold</a>
             {% else %}
 
-            {% for e in item[1].experience %}
+            {% for e in item[1].experience.experience.company %}
             <li>
-              <span>{{ e[0] }}-{{ e[1] }} | {{ e[2] }}</span>
+              <span>{{ e.date_from }}-{{ e.date_to }}
+              {% if e.business %} | {{ e.business }}{% endif %}
+              {% if e.name %} | {{ e.name }}{% endif %}
+              {% for i in item[1].experience.experience.position %}
+                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
+              {% endfor %}
+              {% if e.duration %} | {{ e.duration }}{% endif %}
+              </span>
             </li>
             {% endfor %}
+            {% endif %}
             {% endif %}
           </ul>
         </div>

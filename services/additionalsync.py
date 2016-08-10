@@ -86,7 +86,15 @@ class AdditionalSync(object):
                     origin_yaml = i.getraw(id+'.yaml')
                 else:
                     origin_yaml = i.get(os.path.join(i.cvdir, id+'.yaml'))
+                logidname = os.path.join(i.path, id)
                 md = i.get(os.path.join(i.cvdir, id+'.md'))
-                info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected, name)
+                t1 = time.time()
+                try:
+                    info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected, name)
+                except Exception:
+                    self.logger.info((' ').join(["Upgrade Error generate", logidname]))
+                    continue
+                usetime = time.time() - t1
+                self.logger.info((' ').join(["Upgrade Used", logidname, str(usetime)]))
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addyaml(id, infostream)

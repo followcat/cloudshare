@@ -146,6 +146,11 @@
   color: #fff;
 }
 
+.item-title {
+  display: inline-block;
+  width: inherit;
+}
+
 .item-title:visited {
   color: #609;
 }

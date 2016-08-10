@@ -119,7 +119,8 @@ class ReverseIndexing(object):
             #     'expectation_places',
             #     'education',
             #     'gender',
-            #     'marital_status'
+            #     'marital_status',
+            #     'business'
         """
         if uses is None:
             uses = self.index.keys()
@@ -149,9 +150,23 @@ class ReverseIndexing(object):
             #     'expectation_places',
             #     'education',
             #     'gender',
-            #     'marital_status'
+            #     'marital_status',
+            #     'business'
         """
         return self.get(filtedict, uses) & selected
+
+    def get_indexkeys(self, selected, keywords, uses=None):
+        assert set(selected).issubset(set(self.indexkeys))
+        if uses is None:
+            uses = self.index.keys()
+        results = set()
+        for use in uses:
+            index = self.index[use]
+            for selecte in selected:
+                result = filter(lambda w: [kw for kw in keywords if kw in w],
+                                index[selecte])
+                results.update(result)
+        return results
 
     def _cur_places(self, yamlinfo):
         result = dict()

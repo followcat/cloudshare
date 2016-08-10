@@ -132,13 +132,13 @@ def get_experience(stream, name=None):
                     if re.match(extractor.utils_parsing.TODAY, c['date_to']) is not None:
                         if current_company is None:
                             current_company = c['name']
-    result = dict(experience=extracted_data,
-                  company=current_company,
-                  position=current_position)
-    if result['company'] is None:
-        result['company'] = ''
-    if result['position'] is None:
-        result['position'] = ''
+    result = extracted_data
+    if current_company is None:
+        current_company = ''
+    if current_position is None:
+        current_position = ''
+    result['company']=current_company
+    result['position']=current_position
     return result
 
 

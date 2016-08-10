@@ -15,10 +15,10 @@ PXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?项目经历'+ UNIBRARIGHT +u'?(
 # As company has at least one char, need to handle break just as company tail
 # Catching all employees is too expensive on parenthesis repetition, some will be post processed
 ECO = re.compile(u'^(?P<position>(\S[\S ]+\n)*)\n+(?P<company>(\S[\S ]+\n)*)\n+' + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
-CO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)))(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
-CCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)))(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
-TCO = re.compile(u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)))(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
-PCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)))(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
+CO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
+CCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
+TCO = re.compile(u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
+PCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
 
 PJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<project>.+)\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')$', re.M)
 
@@ -380,6 +380,7 @@ def work_xp(text):
         >>>     # TODO re.compile(u'^(?P<company>\S+)'+ASP+u'+(?P<position>\S+)'+ASP+u'*'+PERIOD+ASP+u'+(\S*)?$', re.M)
         >>> assert work_xp(u'有限公司 工程师 2013/07\~2014/08  广州')[0]
         >>> assert companies(work_xp(u'■医院 （2012-04 \~ 至今）\\n公司性质：\\n担任职位：英语翻译'))
+        >>> assert companies(work_xp(u'2011年8月—2014年12月 中国海运集团\\n职位：航运部  轮机工程师'))
         >>> assert not companies(work_xp(u'2014年10月——2014年11月   技工学校    实习班主任、老师'))  #FIXME
         >>>     #TODO use NOPIPETACO
         >>> assert work_xp(u'2009/09 -- 2010/09\\n\\nAlcatel | CIO | Engineer')[0]
@@ -404,6 +405,8 @@ def work_xp(text):
         >>> assert position_1(work_xp(u'2011.05 - 至今 GE医疗 (4年8个月\\n2011.05 - 至今研发主管、电气工程师15000元/月'))['salary']
         >>> assert len(companies(work_xp(u'2012.02-2012.07 *研究院 (5个月)*\\n2012.02 - 2012.07助理工程师（医疗电子/算法）\\n'
         ...     u'2011.09-2011.12 *University\\nof dundee,UK (3个月)*'))) == 2
+        >>> assert company_1(work_xp(u'2013.01 -\\n2016.04深圳山龙科技 (3年3个月)\\n'
+        ...     u'2013.01 - 2016.04软件工程师'))['duration']
         >>> assert u'股' in name(company_1(work_xp(u'2014/01 – 2014/11\\n\\n股有限公司 | | 法务主管  ')))
 
     SPO related tests:

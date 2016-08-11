@@ -131,11 +131,6 @@ require(
       $("input[name='companyName']").val(this.companyName);
       $("input[name='jdId']").val(this.jdId);
       $("textarea[name='jdContent']").val(this.jdContent);
-      if( this.userName === this.creator ) {
-        $("#changeJDBtn").removeAttr("disabled");
-      } else {
-        $("#changeJDBtn").attr("disabled", "disabled");
-      }
     }
 
     //Edit JD button click function
@@ -263,7 +258,7 @@ require(
             });
           }else{
             $('#modifyJDModal').modal('hide');
-            $('#message').text('Change this job description failed!');
+            $('#message').text('You cant\'t change this job description contents!');
             $('#messageModal').modal('show');
           }
         }

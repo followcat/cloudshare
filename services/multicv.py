@@ -63,3 +63,9 @@ class MultiCV(object):
             raise IOError("No yaml file found for id: %s" % id)
         else:
             return result
+
+    def getnums(self):
+        result = dict()
+        for svc_cv in self.svcls:
+            result[svc_cv.name] = svc_cv.NUMS
+        return result

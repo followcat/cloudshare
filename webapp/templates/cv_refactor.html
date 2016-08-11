@@ -84,11 +84,11 @@
         <div><span class="feild">Work Experience: </span></div>
         <div>
           {% if yaml.experience %}
-          {% for item in yaml.experience.experience.company %}
+          {% for item in yaml.experience.company %}
           <div class="ex-item">{{ item.date_from }}-{{ item.date_to }}
           {% if item.business %} | {{ item.business }}{% endif %}
           {% if item.name %} | {{ item.name }}{% endif %}
-          {% for e in yaml.experience.experience.position %}
+          {% for e in yaml.experience.position %}
             {% if e.at_company == item.id %} | {{ e.name }}{% endif %}
           {% endfor %}
           {% if item.duration %} | {{ item.duration }}{% endif %}
@@ -98,8 +98,17 @@
         </div>
       </div>
     </div>
-    <div class="cv pd-lr-15 cv-wrap" id="cvContent">
-      {{ markdown|safe }}
+    <div class="cv pd-lr-15 cv-wrap">
+      <div class="loading" id="loading">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div id="cvContent" style="display:none;">
+        {{ markdown|safe }}
+      </div>
     </div>
   </div>
   <div class="side">

@@ -1,0 +1,183 @@
+{% extends "share/layout.html" %}
+
+{% block title %}
+<title>
+{% if yaml.name != '' %}
+{{ yaml.name }}
+{% else %}
+{{ yaml.id }}
+{% endif %}-简历
+</title>
+{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='lib/css/bootstrap-datetimepicker.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/cv_common.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/cv_style.css') }}">
+{% endblock %}
+
+{% block content%}
+
+<div class="wrapper mg-center">
+  <div class="main">
+    <div class="main-header pd-lr-15">
+      <span>Resume ID: {{ yaml.id }}</span>
+      <span class="uploader">Uploader: {{ yaml.committer }}, {{ yaml.date }}</span>
+    </div>
+    <div class="tool-wrap">
+      <div class="tool-bar pd-lr-15">
+        <span class="check-box"><input type="checkbox" id="modifyTitle">Switch to Modify Title</span>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">Modify CV</a>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">Add English CV</a>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="match">Show JD</a>
+        {% if yaml.enversion %}
+        <a href="/edit/{{ yaml.enversion }}" target="_blank">English CV</a>
+        {% endif %}
+      </div>
+      <div class="cv-title-wrap" id="cvTitleWrap">
+        <table class="table table-bordered table-condensed">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" class="form-control input-sm" id="titleId" value="{{ yaml.id }}"></td>
+              <td><input type="text" class="form-control input-sm" id="titleName" value="{{ yaml.name }}"></td>
+              <td><input type="text" class="form-control input-sm" id="titleOrigin" value="{{ yaml.origin }}"></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary title-btn" id="titleBtn">Submit</button>
+      </div>
+    </div>
+    <div class="summary pd-lr-15">
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Name: </span>{{ yaml.name }}</div>
+        <div class="summary-cell"><span class="feild">Gender: </span>{{ yaml.gender }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Age: </span>{{ yaml.age }}</div>
+        <div class="summary-cell"><span class="feild">Education: </span>{{ yaml.education }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Education: </span>{{ yaml.education }}</div>
+        <div class="summary-cell"><span class="feild">University: </span>{{ yaml.school }}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-cell"><span class="feild">Position: </span>{{ yaml.position }}</div>
+        <div class="summary-cell"><span class="feild">Company: </span>{{ yaml.company }}</div>
+      </div>
+      <div class="summary-row ex clearfix">
+        <div><span class="feild">Education Experience: </span></div>
+        <div>
+          {% for item in yaml.education_history %}
+          <div class="ex-item">{{ item.date_from }}-{{ item.date_to }} | {{ item.school }} | {{ item.major }} | {{ item.education }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="summary-row ex clearfix">
+        <div><span class="feild">Work Experience: </span></div>
+        <div>
+          {% for item in yaml.experience %}
+          <div class="ex-item">{{ item[0] }}-{{ item[1] }} | {{ item[2] }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="cv pd-lr-15 cv-wrap" id="cvContent">
+      {{ markdown|safe }}
+    </div>
+  </div>
+  <div class="side">
+    <div class="tag-wrap">
+      <div class="wrap-header pd-lr-15">
+        Tag
+      </div>
+      <div class="side-container" id="tagContainer">
+        {% for key, value in yaml.iteritems() %}
+        {% if key=='tag' %}
+        {% for item in value %}
+        <span class="label label-primary" title="{{ item.author }}">{{ item.content }}</span>
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+        <a href="javascript:;" id="addTag">Add a Tag</a>
+        <div class="btn-box">
+          <input type="text" class="form-control input-sm" placeholder="Write down a tag." id="tagText" required />
+          <button type="button" class="btn btn-primary tag-btn" id="tagBtn">Submit</button>
+        </div>
+      </div>
+    </div>
+    <div class="follow-up-wrap">
+      <div class="wrap-header pd-lr-15">
+        Follow up
+      </div>
+      <div class="side-container">
+        <input type="text" class="form-control input-sm" placeholder="Write down your follow up situation..." id="trackingInput" required />
+        <div class="btn-box">
+          <div class="input-group input-group-sm">
+            <input class="form-control" id="formDatetime" size="16" type="text" value="" readonly>
+            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+          </div>
+          <a href="javascript:;" class="fold">Fold</a>
+          <button type="button" class="btn btn-primary tracking-btn" id="trackingBtn">Submit</button>
+        </div>
+        <div class="tracking-content" id="trackingContent">
+          {% for key, value in yaml.iteritems() %}
+          {% if key=='tracking' %}
+          {% for item in value %}
+          <div class="tracking-item">
+            <em>{{ item.author }} / {{ item.content.date }}:</em>
+            <p>{{ item.content.text }}</p>
+          </div>
+          {% endfor %}
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="comment-wrap">
+      <div class="wrap-header pd-lr-15">
+        Comments
+      </div>
+      <div class="side-container">
+        <input type="text" class="form-control input-sm" placeholder="Write down your comments..." id="commentInput" required />
+        <div class="btn-box">
+          <a href="javascript:;" class="fold">Fold</a>
+          <button type="button" class="btn btn-primary comment-btn" id="commentBtn">Submit</button>
+        </div>
+        <div class="comment-content" id="commentContent">
+          {% for key, value in yaml.iteritems() %}
+          {% if key=='comment' %}
+          {% for item in value %}
+          <div class="comment-item">
+            <em>{{ item.author }} / {{ item.content.date }}</em>
+            <p>{{ item.content.text }}</p>
+          </div>
+          {% endfor %}
+          {% endif %}
+          {% endfor %}
+        </div>        
+      </div>
+    </div>
+    <div class="similar-wrap">
+      <div class="wrap-header pd-lr-15">
+        Similar
+      </div>
+      <div class="side-container">
+        <div class="similar-content" id="similarContent">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script data-main="{{ url_for('static', filename='src/js/modules/cvsource.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
+{% endblock %}

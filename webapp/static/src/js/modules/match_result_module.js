@@ -436,27 +436,28 @@ require(
     //修改分页url
     function changePaginationUrl() {
       var linkHref = "",
+          locationURL = "",
           paramObj = {},
           dbParam = [],
-          databaseList = localStorage.databaseList;
-      if (databaseList) {
-        dbParam = JSON.parse(databaseList);
-      } else {
-        dbParam = null;
-      }
+          databaseList = localStorage.databaseList? JSON.parse(localStorage.databaseList) : [];
 
       //遍历所有a标签
       $(".pagination a").map(function(){
         linkHref = $(this).attr("href");
-        paramObj = queryString(linkHref);
+        paramObj = $.extend(queryString(m.currentURL), queryString(linkHref));
         var newParams = {};
         if (m.requestParam.jd_id) {
-          newParams.jd_id = m.requestParam.jd_id;
+          newParams.jd_id = decodeURIComponent(m.requestParam.jd_id);
         } else {
-          newParams.jd_doc = m.requestParam.jd_doc;
+          newParams.jd_doc = decodeURIComponent(m.requestParam.jd_doc);
         }
         newParams.page = paramObj.page;
-        newParams.uses = dbParam;
+        newParams.uses = databaseList ? databaseList.join(',') : '';
+        newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces).replace(/\+/g, ' ') : '';
+        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces).replace(/\+/g, ' ') : '';
+        newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
+        newParams.education = m.requestParam.education ? decodeURIComponent(m.requestParam.education) : '';
+        newParams.marriedStatus = m.requestParam.marriedStatus ? decodeURIComponent(m.requestParam.marriedStatus) : '';
         var newUrl = "/lsipage?" + $.param(newParams);
         $(this).attr("href", newUrl);
       });
@@ -465,7 +466,7 @@ require(
     changePaginationUrl();
 
     //简历数据库选择
-    $(".database-item").on("change", function(){
+    $(".database-item").on("input change", function(){
       var checkedObj = $(this);
       var databaseList = saveInLocalStorage(checkedObj);
 
@@ -474,7 +475,7 @@ require(
       if (m.requestParam.jd_id) {
         newParams.jd_id = m.requestParam.jd_id;
       } else {
-        newParams.jd_doc = m.requestParam.jd_doc;
+        newParams.jd_doc = decodeURIComponent(m.requestParam.jd_doc);
       }
       if (m.requestParam.page) {
         newParams.page = m.requestParam.page;
@@ -482,13 +483,22 @@ require(
         newParams.page = "1";
       }
 
-      newParams.uses = databaseList;
+      newParams.uses = databaseList.join(',');
 
       newUrl = "/lsipage?" + $.param(newParams);
       changePaginationUrl();
       window.location.href = newUrl;
     });
 
+    function inputMapping(className) {
+      var arr = [];
+      $(className).map(function(index, element){
+        if ($(element).is(":checked")) {
+          arr.push($(element).val());
+        }
+      });
+      return arr;
+    }
     /*
       条件过滤按钮点击事件
     */
@@ -498,10 +508,17 @@ require(
       if ( m.requestParam.jd_id ) {
         str = "<input type=\"text\" name=\"jd_id\" value=\""+ m.requestParam.jd_id +"\" style=\"display: none\">";
       } else {
-        str  = "<input type=\"text\" name=\"jd_id\" value=\""+ decodeURIComponent(m.requestParam.jd_doc) +"\" style=\"display: none\">";
+        str  = "<input type=\"text\" name=\"jd_doc\" value=\""+ decodeURIComponent(m.requestParam.jd_doc) +"\" style=\"display: none\">";
       }
-      $("#filterForm").append(str);
-      str = "<input type=\"text\" name=\"uses\" value=\""+ JSON.stringify(databaseList).replace(/"/g, "\'") +"\" style=\"display: none\">";
+      str += "<input type=\"text\" name=\"uses\" value=\""+ databaseList.join(',') +"\" style=\"display: none\">";
+      //遍历性别
+      var genderList = inputMapping('.genderCheckbox'),
+          educationList = inputMapping('.educationCheckbox'),
+          marriedStatusList = inputMapping('.maritalStatusCheckbox');
+      str += "<input type=\"text\" name=\"gender\" value=\""+ genderList.join(',') +"\" style=\"display: none\">";
+      str += "<input type=\"text\" name=\"education\" value=\""+ educationList.join(',') +"\" style=\"display: none\">";
+      str += "<input type=\"text\" name=\"marriedStatus\" value=\""+ marriedStatusList.join(',') +"\" style=\"display: none\">";
+      
       $("#filterForm").append(str);
       $("#filterForm").submit();
     });

@@ -1,3 +1,4 @@
+import time
 import pickle
 import codecs
 import os.path
@@ -26,8 +27,8 @@ class Search(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
+        svc_cv = flask.current_app.config['SVC_CV']
         if 'search_text' in flask.request.args:
-            svc_cv = flask.current_app.config['SVC_CV']
             search_text = flask.request.args['search_text']
             cur_page = flask.request.args.get('page', '1')
             cur_page = int(cur_page)
@@ -42,6 +43,7 @@ class Search(flask.views.MethodView):
                                          pages = pages,
                                          nums=len(result))
         else:
+            cv_nums = svc_cv.getnums()
             return flask.render_template('search.html')
 
     def paginate(self, svc_cv, result, yaml_result, cur_page, eve_count):
@@ -56,7 +58,7 @@ class Search(flask.views.MethodView):
         names = []
         for each in (result+yaml_result)[(cur_page-1)*eve_count:cur_page*eve_count]:
             base, suffix = os.path.splitext(each)
-            name = core.outputstorage.ConvertName(base)
+            name = core.outputstorage.ConvertName(base).md
             if name not in names:
                 names.append(name)
             else:
@@ -68,7 +70,7 @@ class Search(flask.views.MethodView):
                 continue
             info = {
                 'author': yaml_data['committer'],
-                'time': utils.builtin.strftime(yaml_data['date']),
+                'time': utils.builtin.strftime(yaml_data['date'], '%Y-%m-%d'),
             }
             datas.append([name, yaml_data, info])
         return datas, pages
@@ -142,12 +144,7 @@ class UploadPreview(flask.views.MethodView):
         upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
         yaml_info = upobj.filepro.yamlinfo
-        # info = {
-        #     "name": upobj.filepro.yamlinfo['name'],
-        #     "origin": upobj.filepro.yamlinfo['origin'],
-        #     "id": upobj.filepro.yamlinfo['originid']
-        # }
-        return flask.render_template('cv.html', markdown=output, yaml_info=yaml_info)
+        return flask.render_template('upload_preview.html', markdown=output, yaml=yaml_info)
 
 
 class Confirm(flask.views.MethodView):
@@ -191,11 +188,10 @@ class Show(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self, filename):
         svc_cv = flask.current_app.config['SVC_CV']
-        md_data = svc_cv.getmd(filename)
-        md = core.converterutils.md_to_html(md_data)
+        md = svc_cv.gethtml(filename)
         yaml_info = svc_cv.getyaml(filename)
         yaml_info['date'] = utils.builtin.strftime(yaml_info['date'])
-        return flask.render_template('cv.html', markdown=md, yaml=yaml_info)
+        return flask.render_template('cv_refactor.html', markdown=md, yaml=yaml_info)
 
 
 class Edit(flask.views.MethodView):
@@ -203,8 +199,7 @@ class Edit(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self, filename):
         svc_cv = flask.current_app.config['SVC_CV']
-        md_data = svc_cv.getmd(filename)
-        md = core.converterutils.md_to_html(md_data)
+        md = svc_cv.gethtml(filename)
         return flask.render_template('edit.html', markdown=md)
 
 
@@ -257,7 +252,9 @@ class UpdateInfo(flask.views.MethodView):
         for key, value in updateinfo.iteritems():
             if key in yaml_info:
                 if key in ['tag', 'tracking', 'comment']:
-                    yaml_info[key].insert(0, {'author': user.id, 'content': value})
+                    yaml_info[key].insert(0, {'author': user.id,
+                                              'content': value,
+                                              'date': time.strftime('%Y-%m-%d %H:%M:%S')})
                     commit_string += " Add %s." % (key)
                 else:
                     yaml_info[key] = value

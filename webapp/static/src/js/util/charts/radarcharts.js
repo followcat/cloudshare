@@ -31,12 +31,12 @@ define(function() {
         if (typeof datas === 'string') {
             datas = JSON.parse(datas);
         } else if (typeof datas === 'undefined') {
-            return 'Json data is undefined'
+            return 'Json data is undefined';
         }
 
         var option = getOption(datas, max);  //get the radar charts option
         setCharts(this.charts, option);    //set radar charts
-    }
+    };
 
     //Setup the charts
     function setCharts(charts, option) {
@@ -53,7 +53,7 @@ define(function() {
             if (values[i]['name'] !== ''){
                 list.push(values[i]['name']);
             }else{
-                list.push(values[i]['filename']);
+                list.push(values[i]['id']);
             }
         }
 
@@ -69,7 +69,7 @@ define(function() {
                 short_jd = '',
                 jdStr = datas[i]['description'];
             if ( jdStr.length > 16 ) {
-                short_jd = jdStr.slice(0, 17) + '...'
+                short_jd = jdStr.slice(0, 17) + '...';
             } else {
                 short_jd = jdStr;
             }
@@ -89,14 +89,15 @@ define(function() {
 
         var valuesLen = datas[0]['value'].length;
         for (var i = 0; i < valuesLen; i++){
-            var obj = new Object();
+            var obj = {};
             obj.value = [];
 
             for ( var j = 0, datasLen = datas.length; j < datasLen; j++){
                 var match = datas[j]['value'][i]['match'];
                 obj.value.push(parseInt(match));
+
                 if(!obj['name']){
-                    obj['name'] = datas[j]['value'][i]['name'];
+                    obj['name'] = datas[j]['value'][i]['name'] ? datas[j]['value'][i]['name'] : datas[j]['value'][i]['id'];
                 }else{
                     continue;
                 }
@@ -162,5 +163,5 @@ define(function() {
 
     return function(elementId){
         return new RadarChart(elementId);
-    }
+    };
 });

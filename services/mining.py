@@ -128,6 +128,18 @@ class Mining(object):
             result.extend(sim.probability(doc))
         return sorted(result, key=lambda x:float(x[1]), reverse=True)
 
+    def probability_by_id(self, doc, id, uses=None):
+        if uses is None:
+            uses = self.sim.keys()
+        result = tuple()
+        for dbname in uses:
+            sim = self.sim[dbname]
+            probability = sim.probability_by_id(doc, id)
+            if probability is not None:
+                result = probability
+                break
+        return result
+
     def lenght(self, uses=None):
         if uses is None:
             uses = self.sim.keys()
@@ -137,15 +149,20 @@ class Mining(object):
             result += len(sim.names)
         return result
 
-    def minetop(self, doc, top, uses=None):
-        return self.probability(doc, uses=uses)[:top]
+    def minetop(self, doc, top=None, uses=None):
+        results = self.probability(doc, uses=uses)
+        if top is None:
+            top = len(results)
+        return results[:top]
 
     def minelist(self, doc, lists, uses=None):
-        return filter(lambda x: x[0] in lists, self.probability(doc, uses=uses))
+        return map(lambda x: self.probability_by_id(doc, x, uses=uses), lists)
 
     def minelistrank(self, doc, lists, uses=None):
-        ranklist = map(lambda x: x[0], self.probability(doc, uses=uses))
-        return map(lambda x: ranklist.index(x), lists)
+        probalist = set(self.probability(doc, uses=uses))
+        probalist.update(set(lists))
+        ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
+        return map(lambda x: (x[0], ranklist.index(x)), lists)
 
     def default_names(self):
         return [n.name for n in self.services['default'] if n.name in self.sim.keys()]

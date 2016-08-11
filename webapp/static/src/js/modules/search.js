@@ -17,6 +17,13 @@ require.config({
 });
 
 require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], function($, bootstrap, header, formvalidate, Upload, History){
+  //计算高度
+  var size = {
+    width: window.innerWidth || document.documentElement.clienWidth || document.body.clienWidth,
+    height: window.innerHeight || document.documentElement.clienHeight || document.body.clienHeight
+  };
+  $(".wrapper").css({minHeight: size.height - $("header").height() + 'px'});
+
   var item = $('.operate-list-item');
 
   for(var i = 0, len = item.length; i < len; i++){
@@ -69,16 +76,9 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     }
   });
 
-  var databaseList = localStorage.databaseList;
-  if (databaseList) {
-    dbParam = JSON.parse(databaseList);
-  } else {
-    dbParam = null;
-  }
+  var databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
 
-  if (dbParam) {
-    for (var i = dbParam.length - 1; i >= 0; i--) {
-      $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses[]\" value=\""+ dbParam[i] +"\" />");
-    }
+  if (databaseList.length > 0) {
+    $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses\" value=\""+ databaseList.join(",") +"\" />");
   }
 });

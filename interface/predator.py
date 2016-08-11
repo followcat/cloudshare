@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
+import io
 import glob
 import os.path
 import subprocess
+import xml.etree.ElementTree
 
 import yaml
 
@@ -88,8 +90,36 @@ class PredatorLiteInterface(interface.base.Interface):
                 os.path.join(self.rawpath, '*'+self.rawextention))]
 
     def getraw(self, filename):
+        def get_namespaces(raw):
+            namespaces = dict([
+                node for _, node in xml.etree.ElementTree.iterparse(
+                    io.BytesIO(raw), events=['start-ns']
+                )
+            ])
+            return namespaces
+        def remove_namespace(raw, namespaces):
+            """Remove namespace in the passed document in place."""
+            e = xml.etree.ElementTree.fromstring(raw)
+            for name in namespaces:
+                namespace = namespaces[name]
+                ns = u'{%s}' % namespace
+                nsl = len(ns)
+                for elem in e.getiterator():
+                    if elem.tag.startswith(ns):
+                        elem.tag = elem.tag[nsl:]
+            return xml.etree.ElementTree.tostring(e, encoding='utf-8')
+
         rawname = os.path.join(self.rawdir, filename)
-        return self._get_file(rawname)
+        result = self._get_file(rawname)
+        if result is not None:
+            try:
+                namespaces = get_namespaces(result)
+                if namespaces:
+                    result = remove_namespace(result, namespaces)
+            except xml.etree.ElementTree.ParseError:
+                pass
+            result = result.decode('utf-8')
+        return result
 
     def addcv(self, id, data, yamldata):
         self.addmd(id, data)

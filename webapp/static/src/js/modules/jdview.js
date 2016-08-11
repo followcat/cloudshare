@@ -50,17 +50,13 @@ require(
       return jsonObj;
     }
 
-    $(".match").map(function(){
-      var linkHref = $(this).attr("href"),
-          newParams = {},
-          databaseList = [];
-      if ( localStorage.databaseList ) {
-        databaseList = JSON.parse(localStorage.databaseList);
-      }
-      var paramObj = queryString(linkHref);
-      newParams.jd_id = paramObj.jd_id;
-      newParams.page = paramObj.page;
-      newParams.uses = databaseList;
+    $(".match").on("click", function() {
+      var newParams = {},
+          databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
+
+      newParams.jd_id = $(this).attr("data-id");
+      newParams.page = 1;
+      newParams.uses = databaseList.join(",");
       var newUrl = "/lsipage?" + $.param(newParams);
       $(this).attr("href", newUrl);
     });
@@ -218,6 +214,15 @@ require(
     // });
     //Bootstrap-table events re-binding
     window.actionEvents = {
+      "click .match": function(e, value, row, index) {
+        var newParams = {},
+          databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
+        newParams.jd_id = row["_2_data"].id;
+        newParams.page = 1;
+        newParams.uses = databaseList.join(",");
+        var newUrl = "/lsipage?" + $.param(newParams);
+        e.currentTarget.href = newUrl;
+      },
       //Draw a charts button events
       "click .cv-jd-match": function(e, value, row, index) {
         $("textarea[name='jdModalContent']").val(row["_2_title"]);

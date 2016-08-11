@@ -68,9 +68,11 @@ class LSI(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         miner = flask.current_app.config['SVC_MIN']
         svc_jd = flask.current_app.config['SVC_JD']
+        index = flask.current_app.config['SVC_INDEX']
         sim_names = miner.addition_names()
         uses = miner.default_names()
-        uses.extend(flask.request.args.getlist('uses[]'))
+        if 'uses' in flask.request.args and flask.request.args['uses']:
+            uses.extend(flask.request.args['uses'].split(','))
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
             jd_yaml = svc_jd.get(jd_id+'.yaml')
@@ -88,19 +90,23 @@ class LSI(flask.views.MethodView):
         marital_status = ""
         filterdict = dict()
         if 'currentPlaces' in flask.request.args and flask.request.args['currentPlaces']:
-            filterdict['current_places'] = [flask.request.args['currentPlaces']]
+            filterdict['current_places'] = flask.request.args['currentPlaces'].split()
         if 'expectationPlaces' in flask.request.args and flask.request.args['expectationPlaces']:
-            filterdict['expectation_places'] = [flask.request.args['expectationPlaces']]
+            filterdict['expectation_places'] = flask.request.args['expectationPlaces'].split()
         if 'education' in flask.request.args and flask.request.args['education']:
-            filterdict['education'] = [flask.request.args['education']]
+            filterdict['education'] = flask.request.args['education'].split(',')
         if 'gender' in flask.request.args and flask.request.args['gender']:
-            filterdict['gender'] = [flask.request.args['gender']]
+            filterdict['gender'] = flask.request.args['gender'].split(',')
         if 'marriedStatus' in flask.request.args and flask.request.args['marriedStatus']:
-            filterdict['marital_status'] = [flask.request.args['marriedStatus']]
+            filterdict['marital_status'] = flask.request.args['marriedStatus'].split(',')
+        if 'business' in flask.request.args and flask.request.args['business']:
+            keywords = flask.request.args['business'].split(',')
+            filterdict['business'] = index.get_indexkeys(['business'], keywords, uses)
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
         datas, pages, totals = self.process(miner, uses, svc_cv, doc, cur_page, count, filterdict)
+
         return flask.render_template('lsipage.html',result=datas,
                                      button_bar=True, sim_names=sim_names,
                                      cur_page=cur_page,
@@ -121,13 +127,14 @@ class LSI(flask.views.MethodView):
         else:
             pages = totals/eve_count
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = svc.getyaml(name)
+            cname = core.outputstorage.ConvertName(name)
+            yaml_info = svc.getyaml(cname.yaml)
             info = {
                 'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
+                'time': utils.builtin.strftime(yaml_info['date'], '%Y-%m-%d'),
                 'match': score
             }
-            datas.append([name, yaml_info, info])
+            datas.append([cname.md, yaml_info, info])
         return datas, pages, totals
 
 
@@ -138,14 +145,17 @@ class Similar(flask.views.MethodView):
         miner = flask.current_app.config['SVC_MIN']
         doc = flask.request.form['doc']
         datas = []
-        for name, score in miner.probability(doc)[:7]:
-            yaml_info = svc_cv.getyaml(name)
+        for name, score in miner.probability(doc)[1:6]:
+            cname = core.outputstorage.ConvertName(name)
+            yaml_info = svc_cv.getyaml(cname.yaml)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
-                'match': score
+                'match': score,
+                'md_filename': cname.md
             }
-            datas.append([name, yaml_info, info])
+            yaml_info.update(info)
+            datas.append(yaml_info)
         return flask.jsonify({'result': datas})
 
 

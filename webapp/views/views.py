@@ -27,8 +27,8 @@ class Search(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
+        svc_cv = flask.current_app.config['SVC_CV']
         if 'search_text' in flask.request.args:
-            svc_cv = flask.current_app.config['SVC_CV']
             search_text = flask.request.args['search_text']
             cur_page = flask.request.args.get('page', '1')
             cur_page = int(cur_page)
@@ -43,6 +43,7 @@ class Search(flask.views.MethodView):
                                          pages = pages,
                                          nums=len(result))
         else:
+            cv_nums = svc_cv.getnums()
             return flask.render_template('search.html')
 
     def paginate(self, svc_cv, result, yaml_result, cur_page, eve_count):

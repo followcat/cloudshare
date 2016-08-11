@@ -16,6 +16,8 @@ class CurriculumVitae(services.base.Service):
         super(CurriculumVitae, self).__init__(interface, name)
         self.repo_path = self.interface.path + "/" + self.path
         self.info = ""
+        self._nums = 0
+        self.updatenums()
 
     def exists(self, filename):
         path_name = os.path.join(self.path, filename)
@@ -69,6 +71,7 @@ class CurriculumVitae(services.base.Service):
         self.interface.add(os.path.join(self.path, cvobj.filepro.name.yaml),
                            yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
                            committer=committer)
+        self.nums += 1
         return True
 
     def add_md(self, cvobj, committer=None):
@@ -173,6 +176,13 @@ class CurriculumVitae(services.base.Service):
         if yaml_str is None:
             raise IOError
         return yaml.load(yaml_str)
+
+    @property
+    def NUMS(self):
+        return self._nums
+
+    def updatenums(self):
+        self._nums = len(list(self.yamls()))
 
 
 class CurriculumVitaeObject(object):

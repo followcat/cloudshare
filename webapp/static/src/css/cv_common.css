@@ -60,6 +60,11 @@ h3
   border: 1px solid #c2c2c2;
 }
 
+.cv-wrap img {
+  width: 90px;
+  height: 110px;
+}
+
 .cv-wrap table
 {
   font-size: 1em; 

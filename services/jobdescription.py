@@ -82,6 +82,8 @@ class JobDescription(services.base.Service):
     def modify(self, hex_id, description, status, committer):
         filename = self.filename(hex_id)
         data = self.get(filename)
+        if data['description'] != description and data['committer'] != committer:
+            return False
         data['description'] = description
         data['status'] = status
         dump_data = yaml.safe_dump(data, allow_unicode=True)

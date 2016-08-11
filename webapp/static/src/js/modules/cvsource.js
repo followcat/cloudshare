@@ -4,6 +4,8 @@ require.config({
     jquery: "lib/js/jquery",
     bootstrap: "lib/js/bootstrap",
     datetimepicker: "lib/js/bootstrap-datetimepicker.min",
+    header: "src/js/util/header",
+    formvalidate: "src/js/util/formvalidate",
     cvdeal: "src/js/util/cv_deal",
     Upload: "src/js/util/upload",
     colorgrad: "src/js/util/colorgrad",
@@ -18,10 +20,6 @@ require.config({
       deps: ["jquery"],
       exports: "bootstrap-datetimepicker"
     },
-    datetimepickerCN: {
-      deps: ["jquery"],
-      exports: "bootstrap-datetimepicker-zh-CN"
-    },
     cvdeal: {
       deps: ["jquery"],
       exports: "cvdeal"
@@ -31,13 +29,14 @@ require.config({
 
 require([
   "jquery",
-  "bootstrap",
-  "datetimepicker",
   "cvdeal",
+  "datetimepicker",
   "Upload",
   "colorgrad",
-  "History"
-],function($, bootstrap, datetimepicker, cvdeal, Upload, ColorGrad, History) {
+  "History",
+  "header",
+  "bootstrap",
+],function($, cvdeal, datetimepicker, Upload, ColorGrad, History) {
 
   cvdeal.cvDeal("cvContent", function() {
     $("#loading").css("display", "none");
@@ -215,19 +214,20 @@ require([
   Route();
 
   //upload english file
-  $("#upload-btn").on("click", function() {
-    localStorage.name = filename;
+  $("#enUploadSubmit").on("click", function() {
+    localStorage.name = c.filename.split(".")[0];
 
-    var uploader = new Upload("file-form");
+    var uploader = new Upload("enUploadForm");
     uploader.Uploadfile(function() {
       setTimeout(function() {
         window.location.href = "/preview";
       }, 1000);
     });
   });
-  $(".upload").on("click", function() {
-    $("#file").val("");
-    $("#progressmsg").html("");
+
+  $(".upload-en-modal").on("click", function() {
+    $("#enFile").val("");
+    $("#enUploadMsg").html("");
   });
 
   localStorage.title = $("title").text().split("-")[0];

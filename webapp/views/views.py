@@ -180,7 +180,7 @@ class ConfirmEnglish(flask.views.MethodView):
         yaml_data['enversion'] = upobj.filepro.name.md
         svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
                       committer=user.id)
-        return flask.jsonify(result=result)
+        return flask.jsonify(result=result, filename=yaml_data['id']+'.md')
 
 
 class Show(flask.views.MethodView):
@@ -228,7 +228,8 @@ class Preview(flask.views.MethodView):
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
-        return flask.render_template('preview.html', markdown=output, method='get')
+        _id = upobj.filepro.yamlinfo['id']
+        return flask.render_template('upload_preview.html', markdown=output, id=_id)
 
     @flask.ext.login.login_required
     def post(self):

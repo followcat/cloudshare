@@ -6,6 +6,8 @@ require.config({
     bootstrap: "lib/js/bootstrap",
     cvdeal: "src/js/util/cv_deal",
     Upload: "src/js/util/upload",
+    header: "src/js/util/header",
+    formvalidate: "src/js/util/formvalidate",
   },
 
   shim: {
@@ -27,7 +29,9 @@ require([
   "bootstrap"
 ], function($, cvdeal, Upload) {
 
-  window.onload = cvdeal.cvDeal("cvContent");
+  cvdeal.cvDeal("cvContent", function() {
+    $("#loading").css("display", "none");
+  });
 
   //获取source的数据
   $.ajax({
@@ -47,29 +51,40 @@ require([
   });
 
   $("#confirmBtn").on("click", function() {
-    var nameValue = $("#resumeName").val().trim(),
-        sourceValue = $("#originSelection").val();
-    
-    if (nameValue !== "") {
-      $.ajax({
-        url: "/confirm",
-        type: "POST",
-        data: {
-          "name": nameValue,
-          "origin": sourceValue
-        },
-        success: function(response) {
-          console.log(response);
-          if (response.result) {
-            setTimeout(function() {
-              window.location.href = "/show/" + response.filename;
-            }, 500);
-          } else {
-            alert("This resume is existent or this resume hasn't a contact information.");
-          }
+    var nameValue = $("#resumeName").length > 0 ? $("#resumeName").val().trim() : null,
+        sourceValue = $("#originSelection").length > 0 ? $("#originSelection").val() : null,
+        _id = localStorage.name ? localStorage.name : null,
+        postURL = "",
+        postData = null;
+
+    if (_id !== "") {
+      postURL = "/confirmenglish";
+      postData = {
+        "name": _id
+      };
+    } else {
+      postURL = "/confirm";
+      postData = {
+        "name": nameValue !== "" ? nameValue : $("#resumeName").focus(),
+        "origin": sourceValue
+      };
+    }
+
+    $.ajax({
+      url: postURL,
+      type: "POST",
+      data: postData,
+      success: function(response) {
+        console.log(response);
+        if (response.result) {
+          setTimeout(function() {
+            window.location.href = "/show/" + response.filename;
+          }, 500);
+        } else {
+          alert("This resume is existent or this resume hasn't a contact information.");
         }
-      });
-    } 
+      }
+    });
   });
 
   $("#goBackBtn").on("click", function() {

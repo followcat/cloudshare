@@ -14,6 +14,7 @@
     </div>
     <div class="tool-wrap pd-lr-15 pd-tb-10">
       <div class="form-inline">
+        {% if yaml %}
         <div class="form-group">
           <label for="name">Name</label>
           <input type="text" class="form-control input-sm" name="name" id="resumeName" placeholder="Please input resume name">
@@ -25,10 +26,12 @@
             </select>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-sm" id="confirmBtn">Confirm</button>
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-sm" id="confirmBtn" data-id="{{ id }}">Confirm</button>
         <button type="submit" class="btn btn-default btn-sm" id="goBackBtn">Go back</button>
       </div>
     </div>
+    {% if yaml %}
     <div class="summary pd-lr-15">
       <div class="summary-row">
         <div class="summary-cell"><span class="feild">Name: </span>{{ yaml.name }}</div>
@@ -72,6 +75,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
     <div class="cv pd-lr-15 cv-wrap">
       <div class="loading" id="loading">
         <span></span>

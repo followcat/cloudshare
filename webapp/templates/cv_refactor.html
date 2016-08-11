@@ -17,6 +17,28 @@
 {% endblock %}
 
 {% block content%}
+<!--Upload engilish modal-->
+<div class="modal fade upload-en-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="UploadENModalLabel">Upload File</h4>
+      </div>
+      <div class="modal-body">
+        <form id="enUploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+          <input type="file" name="file" id="enFile" />
+          <p id="enUploadMsg"></p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="enUploadSubmit">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Upload engilish modal end-->
 
 <div class="wrapper mg-center">
   <div class="main">
@@ -29,7 +51,7 @@
         <span class="check-box"><input type="checkbox" id="modifyTitle">Switch to Modify Title</span>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">Modify CV</a>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
-        <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">Add English CV</a>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="uploadEn" data-toggle="modal" data-target=".upload-en-modal">Add English CV</a>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="match">Show JD</a>
         {% if yaml.enversion %}
         <a href="/edit/{{ yaml.enversion }}" target="_blank">English CV</a>

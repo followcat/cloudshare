@@ -28,7 +28,7 @@ gulp.task('scripts', ['clean'], function(){
         bootstraptable: __dirname + '/lib/js/bootstrap-table.min',
         datetimepicker: __dirname + '/lib/js/bootstrap-datetimepicker.min',
         datetimepickerCN: __dirname + '/lib/js/bootstrap-datetimepicker.zh-CN',
-        cvdeal: __dirname + '/src/js/util/cvdeal',
+        cvdeal: __dirname + '/src/js/util/cv_deal',
         header: __dirname + '/src/js/util/header',
         formvalidate: __dirname + '/src/js/util/formvalidate',
         Upload: __dirname + '/src/js/util/upload',

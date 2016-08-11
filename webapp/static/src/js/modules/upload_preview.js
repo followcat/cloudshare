@@ -4,7 +4,7 @@ require.config({
   paths: {
     jquery: "lib/js/jquery",
     bootstrap: "lib/js/bootstrap",
-    cvdeal: "src/js/util/cvdeal",
+    cvdeal: "src/js/util/cv_deal",
     Upload: "src/js/util/upload",
   },
 

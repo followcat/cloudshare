@@ -4,8 +4,7 @@ require.config({
     jquery: "lib/js/jquery",
     bootstrap: "lib/js/bootstrap",
     datetimepicker: "lib/js/bootstrap-datetimepicker.min",
-    // datetimepickerCN: "lib/js/bootstrap-datetimepicker.zh-CN",
-    cvdeal: "src/js/util/cvdeal",
+    cvdeal: "src/js/util/cv_deal",
     Upload: "src/js/util/upload",
     colorgrad: "src/js/util/colorgrad",
     History: "src/js/util/history"
@@ -40,7 +39,9 @@ require([
   "History"
 ],function($, bootstrap, datetimepicker, cvdeal, Upload, ColorGrad, History) {
 
-  window.onload = cvdeal.cvDeal("cvContent");
+  cvdeal.cvDeal("cvContent", function() {
+    $("#loading").css("display", "none");
+  });
 
   var c = {
     currentUser: $("#name").text().trim(),

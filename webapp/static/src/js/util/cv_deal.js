@@ -125,45 +125,58 @@ define(['jquery'], function() {
     var tableList = $(this.cv)[0].getElementsByTagName("table"),
         htmlArray = [];
 
-    for (var i = 0, tableLen = tableList.length; i < tableLen; i++) {
-      var tdListOnTable = tableList[i].getElementsByTagName("td"),
-          isExisted = false;
-      for (var j = 0, tdLen = tdListOnTable.length; j < tdLen; j++) {
-        if (isTableTagExisted(tdListOnTable[j])) {
-          isExisted = true;
-          break;
-        } else {
-          isExisted = false;
+    if (tableList.length > 0) {
+      for (var i = 0, tableLen = tableList.length; i < tableLen; i++) {
+        var tdListOnTable = tableList[i].getElementsByTagName("td"),
+            isExisted = false;
+        for (var j = 0, tdLen = tdListOnTable.length; j < tdLen; j++) {
+          if (isTableTagExisted(tdListOnTable[j])) {
+            isExisted = true;
+            break;
+          } else {
+            isExisted = false;
+          }
+        }
+
+        if (!isExisted) {
+          var htmlObj = {
+            "hash": "",
+            "html": "",
+          };
+          htmlObj.hash = hashcode(tableList[i].outerHTML.toString().trim());
+          htmlObj.html = tableList[i].outerHTML.toString().trim();
+          htmlArray.push(htmlObj);
         }
       }
 
-      if (!isExisted) {
-        var htmlObj = {
-          "hash": "",
-          "html": "",
-        };
-        htmlObj.hash = hashcode(tableList[i].outerHTML.toString().trim());
-        htmlObj.html = tableList[i].outerHTML.toString().trim();
-        htmlArray.push(htmlObj);
+      var htmlStr = "";
+      for (var i = 0, len = htmlArray.length; i < len; i++) {
+        htmlStr += htmlArray[i].html;
       }
-    }
 
-    var htmlStr = "";
-    for (var i = 0, len = htmlArray.length; i < len; i++) {
-      htmlStr += htmlArray[i].html;
+      $(this.cv)[0].innerHTML = htmlStr;
     }
-
-    $(this.cv)[0].innerHTML = htmlStr;
 
     if (this.callback && typeof this.callback === "function") {
       this.callback();
     }
   };
 
+  CVDeal.prototype.deleteTableAttribute = function() {
+    var tableList = $(this.cv)[0].getElementsByTagName("table");
+    if (tableList.length > 0) {
+      for (var i = 0, len = tableList.length; i < len; i++) {
+        tableList[i].removeAttribute("width");
+        tableList[i].removeAttribute("style");
+      }
+    }
+  };
+
   return {
     cvDeal: function(elementId, callback) {
       var objCV = new CVDeal($("#" + elementId), callback);
-      objCV.refactorTable(elementId);
+      objCV.refactorTable();
+      objCV.deleteTableAttribute();
       objCV.deleteHrTag();
       objCV.deleteSectionTag();
       objCV.deleteLink();

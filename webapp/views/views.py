@@ -17,10 +17,19 @@ import services.exception
 
 import json
 
+
 class LoginRedirect(flask.views.MethodView):
 
     def get(self):
         return flask.render_template('gotologin.html')
+
+
+class CVnumbers(flask.views.MethodView):
+
+    def get(self):
+        svc_cv = flask.current_app.config['SVC_CV']
+        cv_nums = svc_cv.getnums()
+        return flask.jsonify(result = cv_nums)
 
 
 class Search(flask.views.MethodView):
@@ -43,7 +52,6 @@ class Search(flask.views.MethodView):
                                          pages = pages,
                                          nums=len(result))
         else:
-            cv_nums = svc_cv.getnums()
             return flask.render_template('search.html')
 
     def paginate(self, svc_cv, result, yaml_result, cur_page, eve_count):

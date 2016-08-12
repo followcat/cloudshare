@@ -69,7 +69,7 @@ require(
     var m  = {
       currentURL: window.location.href,
       requestParam: queryString(window.location.href),
-      conditions: ['currentPlaces', 'education', 'expectationPlaces', 'gender', 'marriedStatus'],
+      conditions: ['currentPlaces', 'education', 'expectationPlaces', 'gender', 'marriedStatus', 'business'],
       /*
         @function: 匿名处理
         @params: array

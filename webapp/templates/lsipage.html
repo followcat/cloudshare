@@ -188,7 +188,7 @@
     <div class="basic-info">
       <div class="ls bs-info-item wd-180 pd-lr-5 omit">
         <input type="checkbox" class="checkbox-name" />
-        <a class="item-title" href="/show/{{ item[0] }}" target="_blank" data-id="{{ item[1].id }}" data-match="{{ item[2].match }}" title="{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
+        <a class="item-title omit" href="/show/{{ item[0] }}" target="_blank" data-id="{{ item[1].id }}" data-match="{{ item[2].match }}" title="{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
       </div>
       <div class="ls bs-info-item wd-54 pd-lr-5 omit" title="{{ item[1].gender }}">{{ item[1].gender }}</div>
       <div class="ls bs-info-item wd-44 pd-lr-5 omit" title="{{ item[1].age }}">{{ item[1].age }}</div>
@@ -209,9 +209,9 @@
         <div class="ed-ex pd-lr-15 clearfix">
           <label class="ex-field wd-140">Education Experience:</label>
           <ul class="list-unstyled ex-content">
-            {% if item[1].education_history | length - 2 >= 2 %}
+            {% if item[1].education_history | length - 1 >= 2 %}
             {% for e in item[1].education_history %}
-            {% if loop.index > 2 %}
+            {% if loop.index > 1 %}
             <li class="ex-fold">
               <span>{{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}</span>
             </li>

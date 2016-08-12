@@ -119,11 +119,12 @@ require(
     }
 
     //编辑JD模块封装
-    function EditJD(jdId, jdContent, companyName, creator, userName) {
+    function EditJD(jdId, jdContent, companyName, creator, userName, status) {
       this.jdId = jdId,
       this.jdContent = jdContent,
       this.companyName = companyName,
       this.userName = userName,
+      this.status = status,
       this.creator = creator
     }
 
@@ -131,6 +132,7 @@ require(
       $("input[name='companyName']").val(this.companyName);
       $("input[name='jdId']").val(this.jdId);
       $("textarea[name='jdContent']").val(this.jdContent);
+      $("select[name='status']").val(this.status);
     }
 
     //Edit JD button click function
@@ -143,9 +145,10 @@ require(
             jdId = $(tdElements[2]).attr("data-id"),
             jdContent = $(tdElements[2]).attr("title"),
             creator = $(tdElements[3]).text(),
+            status = $(tdElements[4]).text(),
             userName = $("#name").text().trim();
 
-        var editJdObj = new EditJD(jdId, jdContent, companyName, creator, userName);
+        var editJdObj = new EditJD(jdId, jdContent, companyName, creator, userName, status);
         editJdObj.setValue();
         $('#modifyJDModal').modal('show');
       });
@@ -230,8 +233,9 @@ require(
             jdId = row["_2_data"].id,
             jdContent = row[2],
             creator = row[3],
+            status = row[4],
             userName = $("#name").text().trim();
-        var editJdObj = new EditJD(jdId, jdContent, companyName, creator, userName);
+        var editJdObj = new EditJD(jdId, jdContent, companyName, creator, userName, status);
         editJdObj.setValue();
         $('#modifyJDModal').modal('show');
       }

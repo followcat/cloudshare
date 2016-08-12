@@ -198,7 +198,7 @@ class Show(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         md = svc_cv.gethtml(filename)
         yaml_info = svc_cv.getyaml(filename)
-        yaml_info['date'] = utils.builtin.strftime(yaml_info['date'])
+        yaml_info['date'] = utils.builtin.strftime(yaml_info['date'], '%Y-%m-%d %H:%M')
         return flask.render_template('cv_refactor.html', markdown=md, yaml=yaml_info)
 
 
@@ -250,6 +250,7 @@ class UpdateInfo(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def post(self):
+        response = dict()
         result = True
         user = flask.ext.login.current_user
         svc_cv = flask.current_app.config['SVC_CV']
@@ -261,20 +262,23 @@ class UpdateInfo(flask.views.MethodView):
         for key, value in updateinfo.iteritems():
             if key in yaml_info:
                 if key in ['tag', 'tracking', 'comment']:
-                    yaml_info[key].insert(0, {'author': user.id,
-                                              'content': value,
-                                              'date': time.strftime('%Y-%m-%d %H:%M:%S')})
+                    data = {'author': user.id,
+                            'content': value,
+                            'date': time.strftime('%Y-%m-%d %H:%M:%S')}
+                    yaml_info[key].insert(0, data)
                     commit_string += " Add %s." % (key)
+                    response = { 'result': result, 'data': data }
                 else:
                     yaml_info[key] = value
                     commit_string += " Modify %s to %s." % (key, value)
             else:
                 result = False
+                response = { 'result': result, 'msg': 'Update information error.'}
                 break
         else:
             svc_cv.modify(name.yaml, yaml.safe_dump(yaml_info, allow_unicode=True),
                           commit_string.encode('utf-8'), user.id)
-        return flask.jsonify(result=result)
+        return flask.jsonify(response)
 
 
 class Index(flask.views.MethodView):

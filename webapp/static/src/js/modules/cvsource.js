@@ -164,17 +164,7 @@ require([
 
   //Add comment
   $("#commentBtn").on("click", function() {
-    var commentText = $("#commentInput").val().trim(),
-        dateNow = new Date();
-    
-    var y = dateNow.getFullYear(),
-        mon = dateNow.getMonth() + 1,
-        d = dateNow.getDate(),
-        h = dateNow.getHours(),
-        m = dateNow.getMinutes(),
-        s = dateNow.getSeconds();
-
-    var date = y+"-"+mon+"-"+d+" "+h+":"+m+":"+s;
+    var commentText = $("#commentInput").val().trim();
 
     if (c.checkBlank(commentText)) {
       $("#commentInput").focus();
@@ -187,15 +177,12 @@ require([
         data: JSON.stringify({
           "filename": c.filename,
           "yamlinfo": {
-            "comment": {
-              "date": date,
-              "text": commentText,
-            }
+            "comment": commentText
           }
         }),
         success: function(response) {
           if (response.result) {
-            $("#commentContent").prepend("<div class='comment-item'><em>"+ c.currentUser + " / " + date +"</em><p>" + commentText + "</p></div>");
+            $("#commentContent").prepend("<div class='comment-item'><em>"+ c.currentUser + " / " + response.data.date +"</em><p>" + response.data.content + "</p></div>");
             $("#commentInput").val("");
           } else {
             alert("Failed");

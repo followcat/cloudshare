@@ -43,28 +43,33 @@ class Search(flask.views.MethodView):
             cur_page = int(cur_page)
             result = svc_cv.search(search_text)
             yaml_result = svc_cv.search_yaml(search_text)
+            results = list()
+            for name in result+yaml_result:
+                cname = core.outputstorage.ConvertName(name).base
+                if cname not in results:
+                    results.append(cname)
             count = 20
-            datas, pages = self.paginate(svc_cv, result, yaml_result, cur_page, count)
+            datas, pages = self.paginate(svc_cv, results, cur_page, count)
             return flask.render_template('search_result.html',
                                          search_key=search_text,
                                          result=datas,
                                          cur_page = cur_page,
                                          pages = pages,
-                                         nums=len(result))
+                                         nums=len(results))
         else:
             return flask.render_template('search.html')
 
-    def paginate(self, svc_cv, result, yaml_result, cur_page, eve_count):
+    def paginate(self, svc_cv, results, cur_page, eve_count):
         if not cur_page:
             cur_page = 1
-        sum = len(result)
+        sum = len(results)
         if sum%eve_count != 0:
             pages = sum/eve_count + 1
         else:
             pages = sum/eve_count
         datas = []
         names = []
-        for each in (result+yaml_result)[(cur_page-1)*eve_count:cur_page*eve_count]:
+        for each in results[(cur_page-1)*eve_count:cur_page*eve_count]:
             base, suffix = os.path.splitext(each)
             name = core.outputstorage.ConvertName(base).md
             if name not in names:

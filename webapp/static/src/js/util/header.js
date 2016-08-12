@@ -5,6 +5,7 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
   //upload event
   header.UploadHandle = function(objBtn){
     objBtn.on('click', function(){
+      localStorage.name = "";
       var uploader = new Upload("file-form");
       uploader.Uploadfile(function(){
         setTimeout(function(){

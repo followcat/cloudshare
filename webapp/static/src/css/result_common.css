@@ -155,8 +155,10 @@
 }
 
 .item-title {
-  display: inline-block;
+  display: block;
   max-width: 150px;
+  height: inherit;
+  margin: 0 auto;
 }
 
 .item-title:visited {

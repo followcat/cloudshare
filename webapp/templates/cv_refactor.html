@@ -168,16 +168,14 @@
           <button type="button" class="btn btn-primary tracking-btn" id="trackingBtn">Submit</button>
         </div>
         <div class="tracking-content" id="trackingContent">
-          {% for key, value in yaml.iteritems() %}
-          {% if key=='tracking' %}
-          {% for item in value %}
+          {% if yaml.tracking %}
+          {% for item in yaml.tracking%}
           <div class="tracking-item">
             <em>{{ item.author }} / {{ item.content.date }}:</em>
             <p>{{ item.content.text }}</p>
           </div>
           {% endfor %}
           {% endif %}
-          {% endfor %}
         </div>
       </div>
     </div>
@@ -192,16 +190,14 @@
           <button type="button" class="btn btn-primary comment-btn" id="commentBtn">Submit</button>
         </div>
         <div class="comment-content" id="commentContent">
-          {% for key, value in yaml.iteritems() %}
-          {% if key=='comment' %}
-          {% for item in value %}
+          {% if yaml.comment %}
+          {% for item in yaml.comment %}
           <div class="comment-item">
-            <em>{{ item.author }} / {{ item.content.date }}</em>
-            <p>{{ item.content.text }}</p>
+            <em>{{ item.author }} / {{ item.date }}</em>
+            <p>{{ item.content }}</p>
           </div>
           {% endfor %}
           {% endif %}
-          {% endfor %}
         </div>        
       </div>
     </div>

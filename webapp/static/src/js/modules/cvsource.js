@@ -277,7 +277,7 @@ require([
     url: "/analysis/similar",
     type: "post",
     data: {
-      "doc": document.getElementById("cvContent").innerText
+      "doc": $("#cvContent").text()
     },
     success: function(response) {
       var datas = response.result;

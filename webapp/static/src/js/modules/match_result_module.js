@@ -69,7 +69,7 @@ require(
     var m  = {
       currentURL: window.location.href,
       requestParam: queryString(window.location.href),
-      conditions: ['currentPlaces', 'education', 'expectationPlaces', 'gender', 'marriedStatus'],
+      conditions: ['currentPlaces', 'education', 'expectationPlaces', 'gender', 'marriedStatus', 'business'],
       /*
         @function: 匿名处理
         @params: array
@@ -455,10 +455,10 @@ require(
         newParams.uses = databaseList ? databaseList.join(',') : '';
         newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces).replace(/\+/g, ' ') : '';
         newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces).replace(/\+/g, ' ') : '';
+        newParams.business = m.requestParam.business ? decodeURIComponent(m.requestParam.business).replace(/\+/g, ' ') : '';
         newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
         newParams.education = m.requestParam.education ? decodeURIComponent(m.requestParam.education) : '';
         newParams.marriedStatus = m.requestParam.marriedStatus ? decodeURIComponent(m.requestParam.marriedStatus) : '';
-        console.log(newParams);
         var newUrl = "/lsipage?" + $.param(newParams);
         $(this).attr("href", newUrl);
       });

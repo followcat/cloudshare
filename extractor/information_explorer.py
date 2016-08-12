@@ -62,7 +62,10 @@ def info_by_re_iter(stream, restr):
 def get_education(stream, name=None):
     fix_func = {
         'default': extractor.education.fix,
+        'jingying': extractor.education.fix_jingying,
+        'liepin': extractor.education.fix_liepin,
         'yingcai': extractor.education.fix_yingcai,
+        'zhilian': extractor.education.fix_zhilian,
     }
     try:
         assert name in fix_func
@@ -115,8 +118,8 @@ def get_experience(stream, name=None):
     extracted_data = fix_func[name]()
     if extracted_data:
         (company, position) = extracted_data['experience']['company'], extracted_data['experience']['position']
-        for (i,c) in enumerate(company):
-            current_positions = [p for p in position if p['at_company'] == i]
+        for c in company:
+            current_positions = [p for p in position if p['at_company'] == c['id']]
             for p in current_positions:
                 if (re.match(extractor.utils_parsing.TODAY, c['date_to']) or
                         re.match(extractor.utils_parsing.TODAY, p['date_to'])):
@@ -124,43 +127,18 @@ def get_experience(stream, name=None):
                         current_company = c['name']
                     if current_position is None:
                         current_position = p['name']
-                if 'duration' in c and c['duration']:
-                    if len(current_positions) == 1: 
-                        if 'duration' in p and p['duration']:
-                            experiences.append((p['date_from'], p['date_to'], c['name']+'|'+p['name']+'('+p['duration']+')'))
-                        else:
-                            experiences.append((p['date_from'], p['date_to'], c['name']+'|'+p['name']+'('+c['duration']+')'))
-                    else:
-                        if 'duration' in p and p['duration']:
-                            experiences.append((p['date_from'], p['date_to'], c['name']+'('+c['duration']+')'+'|'+p['name']+'('+p['duration']+')'))
-                        else:
-                            experiences.append((p['date_from'], p['date_to'], c['name']+'('+c['duration']+')'+'|'+p['name']))
-                elif 'duration' in p and p['duration']:
-                    experiences.append((p['date_from'], p['date_to'], c['name']+'|'+p['name']+'('+p['duration']+')'))
-                else:
-                    experiences.append((p['date_from'], p['date_to'], c['name']+'|'+p['name']))
             else:
                 if not len(current_positions):
                     if re.match(extractor.utils_parsing.TODAY, c['date_to']) is not None:
                         if current_company is None:
                             current_company = c['name']
-                    if 'duration' in c and c['duration']:
-                        experiences.append((c['date_from'], c['date_to'], c['name']+'('+c['duration']+')'))
-                    else:
-                        experiences.append((c['date_from'], c['date_to'], c['name']))
-    if not experiences:
-        restr = ur"(\d{4}[/.\\年 ]+\d{1,2}[月]*)[-– —]*(\d{4}[/.\\年 ]+\d{1,2}[月]*|至今)[：: ]*([^\n,，.。（（:]*)"
-        result = get_infofromrestr(stream, restr)
-        for each in result:
-            if each[0] and each[1] and len(each[2]) > 1:
-                experiences.append(each)
-    result = dict(experience=experiences,
-                  company=current_company,
-                  position=current_position)
-    if result['company'] is None:
-        result['company'] = ''
-    if result['position'] is None:
-        result['position'] = ''
+    result = extracted_data
+    if current_company is None:
+        current_company = ''
+    if current_position is None:
+        current_position = ''
+    result['company']=current_company
+    result['position']=current_position
     return result
 
 

@@ -7,7 +7,7 @@ from extractor.utils_parsing import *
 with_prefix = lambda x: u'^'+ASP+u'*'+PREFIX+ASP+u'*'+ x.pattern[1:]
 
 # We check for braket to avoid catching title 教育/培训/学术/科研/院校
-ED = re.compile(ur'^'+ASP+u'*(?P<br>'+UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'*目)|((工'+ASP+u'*作'+ASP+u'*)|(实习)|(工作(与)?实践)))'+ASP+u'*经'+ASP+u'*[历验])|(实习与实践)|(背景)|(培训)|(语言((能力)|(技能)))|(所获奖项)|(校内职务)|(学生实践经验)|(技能证书)|(接受培训))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+ED = re.compile(ur'^'+ASP+u'*(?P<br>'+UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'*目)|((工'+ASP+u'*作'+ASP+u'*)|(实习)|(工作(与)?实践)))'+ASP+u'*经'+ASP+u'*[历验])|(实习与实践)|(背景)|(培训)|(语言((能力)|(技能)))|(所获奖项)|(校内职务)|(学生实践经验)|(技能证书)|(接受培训)|(社会经验))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
 AED = re.compile(ur'^'+ASP+u'*(?P<br>'+ UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*)', re.DOTALL+re.M)
 PFXED = re.compile(with_prefix(ED), re.DOTALL+re.M)
 PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
@@ -17,6 +17,7 @@ SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+ASP+u'*[\n'+SP+SENTENCESEP+u']*'+S
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
 SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+FIELDSEP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
+NOSCSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+u'((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+)'+EDUCATION+ASP+u'*', re.M)
 UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+FIELDSEP+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
 
 PFXSENSEMA = re.compile(with_prefix(SENSEMA), re.M)
@@ -239,6 +240,95 @@ def fix_output(processed):
     if processed:
         result['education_history'] = processed
     return result
+
+def fix_liepin(d):
+    u"""
+        >>> assert u'网络' in fix_liepin(u'教育经历\\n   哈尔滨技师学院 （2007.09 - 2011.07）\\n'
+        ...     u'专业：网络工程                         学历：大专   是否统招：否')['education_history'][0]['major']
+        >>> assert u'齐齐' in fix_liepin(u'教育经历\\n   2002/9-2006/7 齐齐哈尔大学 工商管理 本科')['education_history'][0]['school']
+    """
+    maj = 0
+    processed = []
+    summary = {}
+    MA = re.compile(SPSOLMA.pattern[1:], re.M)
+    for RE in [ED, AED]:
+        res = RE.search(d)
+        if res:
+            remainer = d.replace(res.group('edu'), '')
+            if SUMMARYMAJOR.search(remainer) and SUMMARYSCHOOL.search(remainer):
+                summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
+                summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
+            for r in HDCTLMA.finditer(res.group('edu')):
+                maj +=1
+                format_output(processed, r.groupdict(), summary)
+            else:
+                if maj:
+                    return fix_output(processed)
+            for r in MA.finditer(res.group('edu')):
+                maj +=1
+                format_output(processed, r.groupdict(), summary)
+            else:
+                if maj:
+                    return fix_output(processed)
+            break
+    return fix_output(processed)
+
+def fix_zhilian(d):
+    u"""
+        >>> assert u'大学' in fix_zhilian(u'教育经历\\n  2006年9月  --  2010年6月\\n科技大学\\n专业名称：\\n电子信息工程\\n'
+        ...         u'学历/学位：\\n本科\\n全日制统招：是')['education_history'][0]['school']
+        >>> assert u'测绘' in fix_zhilian(u'教育\\n信息技术\\n培训\\n教育培训\\n展开全部\\n工作经验\\n教育背景\\n2007年9月-2011年7月\\n'
+        ...         u'理工大学\\n专业名称：\\n测绘工程\\n学历/学位：\\n本科\\n全日制统招：是')['education_history'][0]['major']
+    """
+    maj = 0
+    processed = []
+    summary = {}
+    ZHILIANED = re.compile(ED.pattern.replace(u'|((?(br)/?)[及与]?培训)', ''), re.DOTALL+re.M)
+    ZHILIANAED = re.compile(AED.pattern.replace(u'|((?(br)/?)[及与]?培训)', ''), re.DOTALL+re.M)
+    for RE in [ZHILIANED, ZHILIANAED]:
+        res = RE.search(d)
+        if res:
+            remainer = d.replace(res.group('edu'), '')
+            if SUMMARYMAJOR.search(remainer) and SUMMARYSCHOOL.search(remainer):
+                summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
+                summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
+            for r in RVHDCTLMA.finditer(res.group('edu')):
+                maj +=1
+                format_output(processed, r.groupdict(), summary)
+            break
+    return fix_output(processed)
+
+def fix_jingying(d):
+    u"""
+        >>> assert u'云南' in fix_jingying(u'教育经历\\n   2010/9 -- 2012/12   云南师范大学   工商管理    硕士')['education_history'][0]['school']
+        >>> assert u'经济' in fix_jingying(u'教育经历\\n   2007/4 -- 2009/3    国际经济与贸易   硕士')['education_history'][0]['major']
+    """
+    maj = 0
+    processed = []
+    summary = {}
+    MA = re.compile(SPSOLMA.pattern[1:], re.M)
+    NSMA = re.compile(u'(?P<school>)'+NOSCSPSOLMA.pattern[1:], re.M)
+    for RE in [ED, AED]:
+        res = RE.search(d)
+        if res:
+            remainer = d.replace(res.group('edu'), '')
+            if SUMMARYMAJOR.search(remainer) and SUMMARYSCHOOL.search(remainer):
+                summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
+                summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
+            for r in NSMA.finditer(res.group('edu')):
+                maj +=1
+                format_output(processed, r.groupdict(), summary)
+            else:
+                if maj:
+                    return fix_output(processed)
+            for r in MA.finditer(res.group('edu')):
+                maj +=1
+                format_output(processed, r.groupdict(), summary)
+            else:
+                if maj:
+                    return fix_output(processed)
+            break
+    return fix_output(processed)
 
 def fix_yingcai(d):
     u"""

@@ -29,11 +29,10 @@ class AdditionalSync(object):
 
     def update(self, additionals=None):
         if additionals is None:
-            interfaces = self.interfaces
-        else:
-            interfaces = dict([(additional.name, additional.interface)
-                                for additional in self.additionals
-                                if additional.name in additionals])
+            additionals = self.additionals
+        interfaces = dict([(additional.name, additional.interface)
+                            for additional in self.additionals
+                            if additional.name in additionals])
         for name, i in interfaces.items():
             for id in set(i.lsid_raw()) - (set(i.lsid_yaml()) & set(i.lsid_md())):
                 raw_html = i.getraw(id+'.html')
@@ -58,6 +57,9 @@ class AdditionalSync(object):
                 self.logger.info((' ').join(["Used", logidname, str(usetime)]))
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addcv(id, md.encode('utf-8'), infostream)
+
+        for additional in additionals:
+            additional.updatenums()
 
     def generate_md(self, raw_html):
         return pypandoc.convert(raw_html, 'markdown', format='docbook')
@@ -86,7 +88,15 @@ class AdditionalSync(object):
                     origin_yaml = i.getraw(id+'.yaml')
                 else:
                     origin_yaml = i.get(os.path.join(i.cvdir, id+'.yaml'))
+                logidname = os.path.join(i.path, id)
                 md = i.get(os.path.join(i.cvdir, id+'.md'))
-                info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected, name)
+                t1 = time.time()
+                try:
+                    info = self.generate_yaml(md.decode('utf-8'), origin_yaml, selected, name)
+                except Exception:
+                    self.logger.info((' ').join(["Upgrade Error generate", logidname]))
+                    continue
+                usetime = time.time() - t1
+                self.logger.info((' ').join(["Upgrade Used", logidname, str(usetime)]))
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addyaml(id, infostream)

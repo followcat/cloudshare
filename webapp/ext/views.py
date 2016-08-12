@@ -27,6 +27,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/cvnumbers',
+        view_func=webapp.views.views.CVnumbers.as_view('cvnumbers'),
+        )
+
+    app.add_url_rule(
         '/search',
         view_func=webapp.views.views.Search.as_view('search'),
         )

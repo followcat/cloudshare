@@ -151,3 +151,51 @@ def originid(svc_cv, yamlname):
 def yamlaction(svc_cv, action, *args, **kwargs):
     for yamlname in svc_cv.yamls():
         action(svc_cv, yamlname, *args, **kwargs)
+
+
+
+def tracking_and_command(DEF_SVC_CV, attribute, fix=False, filltime=False):
+    def fix_same(l):
+        new = list()
+        for each in l:
+            if each not in new:
+                new.append(each)
+        return tuple(new)
+
+    import re
+    import yaml
+    import collections
+    DATA_DB = DEF_SVC_CV.interface
+    save_dict = collections.defaultdict(list)
+    for each in  DATA_DB.history():
+        filenames = (re.findall('File ([a-z0-9]{8}\.yaml)\:  Add %s\.'%attribute,
+                               each['message']) or
+                    re.findall('Add %s in ([a-z0-9]{8}\.yaml)\.'%attribute,
+                               each['message']))
+        if filenames:
+            save_dict[filenames[0]].append([each['author'], each['time']])
+
+    for each in save_dict:
+        if each:
+            try:
+                yaml_info = DEF_SVC_CV.getyaml(each)
+                infos = yaml_info[attribute]
+            except IOError:
+                print each
+                continue
+            try:
+                assert len(save_dict[each]) == len(infos)
+            except:
+                if fix:
+                    yaml_info[attribute] = fix_same(infos)
+                    infos = yaml_info[attribute]
+                assert len(save_dict[each]) == len(infos)
+            if filltime:
+                for index in range(len(infos)):
+                    assert save_dict[each][index][0].startswith(infos[index]['author'])
+                    if 'date' not in infos[index]:
+                        yaml_info[attribute][index]['date'] = save_dict[each][index][1]
+            if fix or filltime:
+                path_filename = os.path.join(DATA_DB.path, DEF_SVC_CV.path, each)
+                with open(path_filename, 'w') as fp:
+                    fp.write(yaml.safe_dump(yaml_info, allow_unicode=True))

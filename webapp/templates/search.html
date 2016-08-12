@@ -4,30 +4,27 @@
 {% endblock %}
 
 {% block content %}
-<div class="search-box" id="search-box">
-  <div class="container">
-    <div class="col-md-8 col-md-offset-2 form-wrap">
-      <form action="/search" method="GET" id="serachbykey">
-        <input type="text" class="form-control" name="search_text" />
-        <div class="col-sm-4 col-sm-offset-4">
-          <button type="submit" class="btn btn-primary search-btn" id="keywordBtn">Search by keyword</button>
-        </div>
-      </form>
-      <form action="/lsipage" method="GET" id="serachbysentence">
-        <textarea class="form-control" rows="4" name="jd_doc"></textarea>
-        <input class="hide-param" type="text" name="page" value="1"/>
-        <div class="col-md-4 col-sm-offset-4">
-          <button type="submit" class="btn btn-success search-btn" id="sentenceBtn">Search by sentence</button>
-        </div>
-      </form>
-      <div class="type-check">
-        <input id="check" class="check-btn" type="checkbox" />
-        <label for="check"></label>
-        <span>Job Description Search?</span>
-      </div>
+<div class="wrapper">
+  <div class="count" id="count">
+  </div>
+  <div class="search-box" id="search-box">
+    <form action="/search" method="GET" id="serachbykey">
+      <input type="text" class="form-control" name="search_text" />
+      <button type="submit" class="btn btn-primary search-btn" id="keywordBtn">Search by keyword</button>
+    </form>
+    <form action="/lsipage" method="GET" id="serachbysentence">
+      <textarea class="form-control" name="jd_doc"></textarea>
+      <input class="hide-param" type="text" name="page" value="1"/>
+      <button type="submit" class="btn btn-success search-btn" id="sentenceBtn">Search by sentence</button>
+    </form>
+    <div class="type-check">
+      <input id="check" class="check-btn" type="checkbox" />
+      <label for="check"></label>
+      <span>Job Description Search?</span>
     </div>
   </div>
 </div>
+
 {% endblock %}
 {% block script %}
 <script type="text/javascript" data-main="{{ url_for('static', filename='src/js/modules/search.js') }}" src="{{ url_for('static', filename='lib/js/require.js')}}"></script>

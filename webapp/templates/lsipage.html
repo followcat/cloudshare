@@ -151,11 +151,15 @@
     <div class="aw">
       <div class="form-group">
         <label class="control-label filter-control-label" for="currentPlaces">Current Places</label>
-        <input class="form-control filter-form-control" id="currentPlaces" type="text" name="currentPlaces"  placeholder="Current Places" />
+        <input class="form-control filter-form-control input-sm" id="currentPlaces" type="text" name="currentPlaces"  placeholder="Current Places" />
       </div>
       <div class="form-group">
         <label class="control-label filter-control-label" for="expectationPlaces">Expectation Places</label>
-        <input class="form-control filter-form-control" id="expectationPlaces" type="text" name="expectationPlaces"  placeholder="Expectation Places" />
+        <input class="form-control filter-form-control input-sm" id="expectationPlaces" type="text" name="expectationPlaces"  placeholder="Expectation Places" />
+      </div>
+      <div class="form-group">
+        <label class="control-label filter-control-label" for="business">Industry</label>
+        <input class="form-control filter-form-control input-sm" id="industry" type="text" name="business"  placeholder="Industry" />
       </div>
     </div>
     <button type="button" id="filterBtn" class="btn btn-primary filter-btn">Search</button>
@@ -167,100 +171,116 @@
 
 <div class="rl mg-center">
   <div class="field">
-    <div class="ls field-item wd-200">Name</div>
-    <div class="ls field-item wd-60">Gender</div>
-    <div class="ls field-item wd-56">Age</div>
-    <div class="ls field-item wd-80">Marriage</div>
-    <div class="ls field-item wd-100">Education</div>
-    <div class="ls field-item wd-180">University</div>
+    <div class="ls field-item wd-180">Name</div>
+    <div class="ls field-item wd-54">Gender</div>
+    <div class="ls field-item wd-44">Age</div>
+    <div class="ls field-item wd-66">Marriage</div>
+    <div class="ls field-item wd-76">Education</div>
+    <div class="ls field-item wd-160">University</div>
     <div class="ls field-item wd-120">Position</div>
     <div class="ls field-item wd-200">Company</div>
+    <div class="ls field-item wd-148">Uploader</div>
   </div>
   <div class="blank-line"></div>
   {% if result %}
   {% for item in result %}
   <div class="ls-item {% if item[2].author == 'SCRAPPY'%}crawl-item{% endif %}">
     <div class="basic-info">
-      <div class="ls bs-info-item wd-200 pd-lr-10 omit">
+      <div class="ls bs-info-item wd-180 pd-lr-5 omit">
         <input type="checkbox" class="checkbox-name" />
-        <a class="item-title" href="/show/{{ item[0] }}" target="_blank" data-id="{{ item[1].id }}" data-match="{{ item[2].match }}" title="{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
+        <a class="item-title omit" href="/show/{{ item[0] }}" target="_blank" data-id="{{ item[1].id }}" data-match="{{ item[2].match }}" title="{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}">{{ item[1].name }}-{{ item[1].origin }}-{{ item[1].id }}</a>
       </div>
-      <div class="ls bs-info-item wd-60 pd-lr-10 omit" title="{{ item[1].gender }}">{{ item[1].gender }}</div>
-      <div class="ls bs-info-item wd-56 pd-lr-10 omit" title="{{ item[1].age }}">{{ item[1].age }}</div>
+      <div class="ls bs-info-item wd-54 pd-lr-5 omit" title="{{ item[1].gender }}">{{ item[1].gender }}</div>
+      <div class="ls bs-info-item wd-44 pd-lr-5 omit" title="{{ item[1].age }}">{{ item[1].age }}</div>
       {% if item[1].marital_status %}
-      <div class="ls bs-info-item wd-80 pd-lr-10 omit" title="{{ item[1].marital_status }}">{{ item[1].marital_status }}</div>
+      <div class="ls bs-info-item wd-66 pd-lr-5 omit" title="{{ item[1].marital_status }}">{{ item[1].marital_status }}</div>
       {% else %}
-      <div class="ls bs-info-item wd-80 pd-lr-10 omit" title=""></div>
+      <div class="ls bs-info-item wd-66 pd-lr-5 omit" title=""></div>
       {% endif %}
-      <div class="ls bs-info-item wd-100 pd-lr-10 omit" title="{{ item[1].education }}">{{ item[1].education }}</div>
-      <div class="ls bs-info-item wd-180 pd-lr-10 omit" title="{{ item[1].school }}">{{ item[1].school }}</div>
-      <div class="ls bs-info-item wd-120 pd-lr-10 omit" title="{{ item[1].position }}">{{ item[1].position }}</div>
-      <div class="ls bs-info-item wd-200 pd-lr-10 omit" title="{{ item[1].company }}">{{ item[1].company }}</div>
+      <div class="ls bs-info-item wd-76 pd-lr-5 omit" title="{{ item[1].education }}">{{ item[1].education }}</div>
+      <div class="ls bs-info-item wd-160 pd-lr-5 omit" title="{{ item[1].school }}">{{ item[1].school }}</div>
+      <div class="ls bs-info-item wd-120 pd-lr-5 omit" title="{{ item[1].position }}">{{ item[1].position }}</div>
+      <div class="ls bs-info-item wd-200 pd-lr-5 omit" title="{{ item[1].company }}">{{ item[1].company }}</div>
+      <div class="ls bs-info-item wd-148 pd-lr-5 omit" title="{{ item[2].time }}">
+        {{ item[2].author }} | {{ item[2].time }}</div>
     </div>
     <div class="extend-info clearfix">
-      <div class="wk-ex wd-360 bd-r-1">
-        <label>Work Experience:</label>
-        <ul class="list-unstyled">
-          {% if item[1].experience | length - 2 >= 2 %}
-          {% for e in item[1].experience %}
-          {% if loop.index > 2 %}
-          <li class="ex-fold">
-            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
-            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
-          </li>
-          {% else %}
-          <li>
-            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
-            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
-          </li>
-          {% endif %}
-          {% endfor %}
-          <a href="javascript:;" class="show-more">Unfold</a>
-          {% else %}
+      <div class="ex wd-800 bd-r-1">
+        <div class="ed-ex pd-lr-15 clearfix">
+          <label class="ex-field wd-140">Education Experience:</label>
+          <ul class="list-unstyled ex-content">
+            {% if item[1].education_history | length - 1 >= 2 %}
+            {% for e in item[1].education_history %}
+            {% if loop.index > 1 %}
+            <li class="ex-fold">
+              <span>{{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}</span>
+            </li>
+            {% else %}
+            <li>
+              <span>{{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}</span>
+            </li>
+            {% endif %}
+            {% endfor %}
+            <a href="javascript:;" class="show-more">Unfold</a>
+            {% else %}
 
-          {% for e in item[1].experience %}
-          <li>
-            <span class="wd-120 omit" title="{{ e[0] }} - {{ e[1] }}">{{ e[0] }} - {{ e[1] }}</span>
-            <span class="wd-200 omit" title="{{ e[2] }}">{{ e[2] }}</span>
-          </li>
-          {% endfor %}
-          {% endif %}
-        </ul>
-      </div>
-      <div class="ed-ex wd-360 pd-lr-15 bd-r-1">
-        <label>Education Experience:</label>
-        <ul class="list-unstyled">
-          {% if item[1].education_history | length - 2 >= 2 %}
-          {% for e in item[1].education_history %}
-          {% if loop.index > 2 %}
-          <li class="ex-fold">
-            <span class="wd-120 omit" title="{{ e.date_from }} - {{ e.date_to }}">{{ e.date_from }} - {{ e.date_to }}</span>
-            <span class="wd-30 omit" title="{{ e.education }}">{{ e.education }}</span>
-            <span class="wd-70 omit" title="{{ e.major }}">{{ e.major }}</span>
-            <span class="wd-100 omit" title="{{ e.school }}">{{ e.school }}</span>
-          </li>
-          {% else %}
-          <li>
-            <span class="wd-120 omit" title="{{ e.date_from }} - {{ e.date_to }}">{{ e.date_from }} - {{ e.date_to }}</span>
-            <span class="wd-30 omit" title="{{ e.education }}">{{ e.education }}</span>
-            <span class="wd-70 omit" title="{{ e.major }}">{{ e.major }}</span>
-            <span class="wd-100 omit" title="{{ e.school }}">{{ e.school }}</span>
-          </li>
-          {% endif %}
-          {% endfor %}
-          <a href="javascript:;" class="show-more">Unfold</a>
-          {% else %}
+            {% for e in item[1].education_history %}
+            <li>
+              <span>{{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}</span>
+            </li>
+            {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+        <div class="wk-ex pd-lr-15 clearfix">
+          <label class="ex-field wd-140">Work Experience:</label>
+          <ul class="list-unstyled ex-content">
+            {% if item[1].experience %}
+            {% if item[1].experience.company | length - 2 >= 2 %}
+            {% for e in item[1].experience.company %}
+            {% if loop.index > 2 %}
+            <li class="ex-fold">
+              <span>{{ e.date_from }}-{{ e.date_to }}
+              {% if e.business %} | {{ e.business }}{% endif %}
+              {% if e.name %} | {{ e.name }}{% endif %}
+              {% for i in item[1].experience.position %}
+                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
+              {% endfor %}
+              {% if e.duration %} | {{ e.duration }}{% endif %}
+              </span>
+            </li>
+            {% else %}
+            <li>
+              <span>{{ e.date_from }}-{{ e.date_to }}
+              {% if e.business %} | {{ e.business }}{% endif %}
+              {% if e.name %} | {{ e.name }}{% endif %}
+              {% for i in item[1].experience.position %}
+                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
+              {% endfor %}
+              {% if e.duration %} | {{ e.duration }}{% endif %}
+              </span>
+            </li>
+            {% endif %}
+            {% endfor %}
+            <a href="javascript:;" class="show-more">Unfold</a>
+            {% else %}
 
-          {% for e in item[1].education_history %}
-          <li>
-            <span class="wd-120 omit" title="{{ e.date_from }} - {{ e.date_to }}">{{ e.date_from }} - {{ e.date_to }}</span>
-            <span class="wd-30 omit" title="{{ e.education }}">{{ e.education }}</span>
-            <span class="wd-70 omit" title="{{ e.major }}">{{ e.major }}</span>
-            <span class="wd-100 omit" title="{{ e.school }}">{{ e.school }}</span>
-          </li>
-          {% endfor %}
-          {% endif %}
-        </ul>
+            {% for e in item[1].experience.company %}
+            <li>
+              <span>{{ e.date_from }}-{{ e.date_to }}
+              {% if e.business %} | {{ e.business }}{% endif %}
+              {% if e.name %} | {{ e.name }}{% endif %}
+              {% for i in item[1].experience.position %}
+                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
+              {% endfor %}
+              {% if e.duration %} | {{ e.duration }}{% endif %}
+              </span>
+            </li>
+            {% endfor %}
+            {% endif %}
+            {% endif %}
+          </ul>
+        </div>
       </div>
       <div class="wk-status pd-l-15">
         <div class="cur">

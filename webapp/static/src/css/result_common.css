@@ -70,6 +70,7 @@
 }
 
 .basic-info > .bs-info-item {
+  position: relative;
   heigth: 32px;
   line-height: 32px;
 }
@@ -142,13 +143,20 @@
   cursor: pointer;
 }
 
-.up-down-box:hover span{
+.up-down-box:hover span {
   color: #fff;
+}
+
+.checkbox-name {
+  display: inline-block;
+  position: absolute;
+  top: 5px;
+  left: 0;
 }
 
 .item-title {
   display: inline-block;
-  width: inherit;
+  max-width: 150px;
 }
 
 .item-title:visited {

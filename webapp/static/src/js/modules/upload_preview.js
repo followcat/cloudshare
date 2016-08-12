@@ -57,7 +57,7 @@ require([
         postURL = "",
         postData = null;
 
-    if (_id !== "") {
+    if (_id) {
       postURL = "/confirmenglish";
       postData = {
         "name": _id
@@ -75,7 +75,6 @@ require([
       type: "POST",
       data: postData,
       success: function(response) {
-        console.log(response);
         if (response.result) {
           setTimeout(function() {
             window.location.href = "/show/" + response.filename;

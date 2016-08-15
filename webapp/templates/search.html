@@ -3,10 +3,15 @@
 <title>Search-Willendare</title>
 {% endblock %}
 
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='src/css/search.css') }}">
+{% endblock %}
+
 {% block content %}
+
+<div class="count" id="count">
+</div>
 <div class="wrapper">
-  <div class="count" id="count">
-  </div>
   <div class="search-box" id="search-box">
     <form action="/search" method="GET" id="serachbykey">
       <input type="text" class="form-control" name="search_text" />
@@ -24,7 +29,6 @@
     </div>
   </div>
 </div>
-
 {% endblock %}
 {% block script %}
 <script type="text/javascript" data-main="{{ url_for('static', filename='src/js/modules/search.js') }}" src="{{ url_for('static', filename='lib/js/require.js')}}"></script>

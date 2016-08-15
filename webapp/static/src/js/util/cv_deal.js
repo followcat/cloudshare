@@ -1,27 +1,6 @@
 define(['jquery'], function() {
 
-  //获取字符串hash值
-  function hashcode(str) {
-    var hash = 0, i, chr, len;
-    if (str.length === 0) return hash;
-    for (i = 0, len = str.length; i < len; i++) {
-      chr   = str.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-  }
 
-  //判断当前节点的子节点是否存在table标签,若存在返回true
-  function isTableTagExisted(obj) {
-    var childNodeList = obj.children;
-    for (var i = 0, len = childNodeList.length; i < len; i++) {
-      if (childNodeList[i].nodeName === "TABLE") {
-        return true;
-      }
-    }
-    return false;
-  }
 
   //在文字内容中加入<br>
   function addBrOnText(obj) {
@@ -121,10 +100,42 @@ define(['jquery'], function() {
     });
   };
 
-  CVDeal.prototype.refactorTable = function() {
-    var tableList = $(this.cv)[0].getElementsByTagName("table"),
-        htmlArray = [];
+  //获取字符串hash值
+  function hashcode(str) {
+    var hash = 0, i, chr, len;
+    if (str.length === 0) return hash;
+    for (i = 0, len = str.length; i < len; i++) {
+      chr   = str.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  }
 
+  //判断当前节点的子节点是否存在table标签,若存在返回true
+  function isTableTagExisted(obj) {
+    var childNodeList = obj.children;
+    for (var i = 0, len = childNodeList.length; i < len; i++) {
+      if (childNodeList[i].nodeName === "TABLE") {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  function htmlObjectGenarator(obj) {
+    var htmlObj = {
+            "hash": "",
+            "html": "",
+          };
+    htmlObj.hash = hashcode(obj.outerHTML.toString().trim());
+    htmlObj.html = obj.outerHTML.toString().trim();
+    return htmlObj;
+  }
+
+  function refactorTable(elementObj) {
+    var tableList = elementObj.getElementsByTagName("table"),
+        htmlArray = [];
     if (tableList.length > 0) {
       for (var i = 0, tableLen = tableList.length; i < tableLen; i++) {
         var tdListOnTable = tableList[i].getElementsByTagName("td"),
@@ -139,23 +150,30 @@ define(['jquery'], function() {
         }
 
         if (!isExisted) {
-          var htmlObj = {
-            "hash": "",
-            "html": "",
-          };
-          htmlObj.hash = hashcode(tableList[i].outerHTML.toString().trim());
-          htmlObj.html = tableList[i].outerHTML.toString().trim();
-          htmlArray.push(htmlObj);
+          htmlArray.push(htmlObjectGenarator(tableList[i]));
         }
       }
-
-      var htmlStr = "";
-      for (var i = 0, len = htmlArray.length; i < len; i++) {
-        htmlStr += htmlArray[i].html;
-      }
-
-      $(this.cv)[0].innerHTML = htmlStr;
+    } else {
+      htmlArray.push(htmlObjectGenarator(elementObj));
     }
+
+    return htmlArray;
+  }
+
+  CVDeal.prototype.refactorHTML = function() {
+    var childrenList = $(this.cv)[0].children,
+        htmlArray = [];
+
+    for (var i = 0, childrenLen = childrenList.length; i < childrenLen; i++) {
+      htmlArray = htmlArray.concat(refactorTable(childrenList[i]));
+    }
+
+    var htmlStr = "";
+    for (var i = 0, len = htmlArray.length; i < len; i++) {
+      htmlStr += htmlArray[i].html;
+    }
+
+    $(this.cv)[0].innerHTML = htmlStr;
 
     if (this.callback && typeof this.callback === "function") {
       this.callback();
@@ -175,7 +193,7 @@ define(['jquery'], function() {
   return {
     cvDeal: function(elementId, callback) {
       var objCV = new CVDeal($("#" + elementId), callback);
-      objCV.refactorTable();
+      objCV.refactorHTML();
       objCV.deleteTableAttribute();
       objCV.deleteHrTag();
       objCV.deleteSectionTag();

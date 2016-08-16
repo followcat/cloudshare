@@ -213,11 +213,11 @@
             {% for e in item[1].education_history %}
             {% if loop.index > 1 %}
             <li class="ex-fold">
-              <span>{{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}</span>
+              {{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}
             </li>
             {% else %}
             <li>
-              <span>{{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}</span>
+              {{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}
             </li>
             {% endif %}
             {% endfor %}
@@ -226,7 +226,7 @@
 
             {% for e in item[1].education_history %}
             <li>
-              <span>{{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}</span>
+              {{ e.date_from }}-{{ e.date_to }} | {{ e.school }} | {{ e.major }} | {{ e.education }}
             </li>
             {% endfor %}
             {% endif %}
@@ -240,25 +240,11 @@
             {% for e in item[1].experience.company %}
             {% if loop.index > 2 %}
             <li class="ex-fold">
-              <span>{{ e.date_from }}-{{ e.date_to }}
-              {% if e.business %} | {{ e.business }}{% endif %}
-              {% if e.name %} | {{ e.name }}{% endif %}
-              {% for i in item[1].experience.position %}
-                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
-              {% endfor %}
-              {% if e.duration %} | {{ e.duration }}{% endif %}
-              </span>
+              {{ e.date_from }}-{{ e.date_to }}{% if e.business %} | {{ e.business }}{% endif %}{% if e.name %} | {{ e.name }}{% endif %}{% for i in item[1].experience.position %}{% if i.at_company == e.id %} | {{ i.name }}{% endif %}{% endfor %}{% if e.duration %} | {{ e.duration }}{% endif %}
             </li>
             {% else %}
             <li>
-              <span>{{ e.date_from }}-{{ e.date_to }}
-              {% if e.business %} | {{ e.business }}{% endif %}
-              {% if e.name %} | {{ e.name }}{% endif %}
-              {% for i in item[1].experience.position %}
-                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
-              {% endfor %}
-              {% if e.duration %} | {{ e.duration }}{% endif %}
-              </span>
+              {{ e.date_from }}-{{ e.date_to }}{% if e.business %} | {{ e.business }}{% endif %}{% if e.name %} | {{ e.name }}{% endif %}{% for i in item[1].experience.position %}{% if i.at_company == e.id %} | {{ i.name }}{% endif %}{% endfor %}{% if e.duration %} | {{ e.duration }}{% endif %}
             </li>
             {% endif %}
             {% endfor %}
@@ -267,14 +253,7 @@
 
             {% for e in item[1].experience.company %}
             <li>
-              <span>{{ e.date_from }}-{{ e.date_to }}
-              {% if e.business %} | {{ e.business }}{% endif %}
-              {% if e.name %} | {{ e.name }}{% endif %}
-              {% for i in item[1].experience.position %}
-                {% if i.at_company == e.id %} | {{ i.name }}{% endif %}
-              {% endfor %}
-              {% if e.duration %} | {{ e.duration }}{% endif %}
-              </span>
+              {{ e.date_from }}-{{ e.date_to }}{% if e.business %} | {{ e.business }}{% endif %}{% if e.name %} | {{ e.name }}{% endif %}{% for i in item[1].experience.position %}{% if i.at_company == e.id %} | {{ i.name }}{% endif %}{% endfor %}{% if e.duration %} | {{ e.duration }}{% endif %}
             </li>
             {% endfor %}
             {% endif %}

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import os.path
+import functools
 import extractor.education
 import extractor.expectation
 import extractor.utils_parsing
@@ -58,14 +59,28 @@ def info_by_re_iter(stream, restr):
     return result
 
 
-def get_education(stream):
+def get_education(stream, name=None):
+    fix_func = {
+        'default': extractor.education.fix,
+        'jingying': extractor.education.fix_jingying,
+        'liepin': extractor.education.fix_liepin,
+        'yingcai': extractor.education.fix_yingcai,
+        'zhilian': extractor.education.fix_zhilian,
+    }
+    try:
+        assert name in fix_func
+    except AssertionError:
+        name = 'default'
     result = dict(education='', school='', education_history=[])
-    education_result = extractor.education.fix(stream)
+    education_result = fix_func[name](stream)
     result.update(education_result)
     if 'education_history' in education_result:
         for edu in education_result['education_history']:
             result['education'] = edu['education']
-            result['school'] = edu['school']
+            try:
+                result['school'] = edu['school']
+            except KeyError:
+                pass
             break
     return result
 
@@ -75,7 +90,7 @@ def get_expectation(stream):
     return result
 
 
-def get_experience(stream):
+def get_experience(stream, name=None):
     u"""
         >>> get_experience(u"2015.03 - 2015.05   XXCOM")['experience']
         [(u'2015.03', u'2015.05', u'XXCOM')]
@@ -84,44 +99,46 @@ def get_experience(stream):
         >>> assert get_experience(u"2015/03 - 至今   XXCOM")
         >>> assert get_experience(u"2015/03 - 至今   XXCOM XXX")
     """
+
+    fix_func = {
+        'default': functools.partial(extractor.extract_experience.fix, stream, True),
+        'cloudshare': functools.partial(extractor.extract_experience.fix, stream, True),
+        'liepin': functools.partial(extractor.extract_experience.fix_liepin, stream),
+        'jingying': functools.partial(extractor.extract_experience.fix_jingying, stream),
+        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream),
+        'yingcai': functools.partial(extractor.extract_experience.fix_yingcai, stream),
+    }
     experiences = []
     current_company = None
     current_position = None
+    if name is None:
+        name = 'default'
+    assert name in fix_func
 
-    extracted_data = extractor.extract_experience.fix(stream)
-    RE = re.compile(extractor.utils_parsing.DURATION)
-    if not extracted_data[1]:
-        (company, position) = extracted_data[0]
-        for (i,c) in enumerate(company):
-            current_positions = [p for p in position if p[4] == i]
+    extracted_data = fix_func[name]()
+    if extracted_data:
+        (company, position) = extracted_data['experience']['company'], extracted_data['experience']['position']
+        for c in company:
+            current_positions = [p for p in position if p['at_company'] == c['id']]
             for p in current_positions:
-                if re.match(extractor.utils_parsing.TODAY, p[1]) is not None:
+                if (re.match(extractor.utils_parsing.TODAY, c['date_to']) or
+                        re.match(extractor.utils_parsing.TODAY, p['date_to'])):
                     if current_company is None:
-                        current_company = c[2]
+                        current_company = c['name']
                     if current_position is None:
-                        current_position = p[2]
-                if c[3] and len(current_positions) == 1 and not RE.search(p[2]):
-                    experiences.append((p[0], p[1], c[2]+'|'+p[2]+'('+c[3]+')'))
-                elif c[3]:
-                    experiences.append((p[0], p[1], c[2]+'('+c[3]+')'+'|'+p[2]))
-                else:
-                    experiences.append((p[0], p[1], c[2]+'|'+p[2]))
+                        current_position = p['name']
             else:
                 if not len(current_positions):
-                    experiences.append((c[0], c[1], c[2]))
-    if not experiences:
-        restr = ur"(\d{4}[/.\\年 ]+\d{1,2}[月]*)[-– —]*(\d{4}[/.\\年 ]+\d{1,2}[月]*|至今)[：: ]*([^\n,，.。（（:]*)"
-        result = get_infofromrestr(stream, restr)
-        for each in result:
-            if each[0] and each[1] and len(each[2]) > 1:
-                experiences.append(each)
-    result = dict(experience=experiences,
-                  company=current_company,
-                  position=current_position)
-    if result['company'] is None:
-        result['company'] = ''
-    if result['position'] is None:
-        result['position'] = ''
+                    if re.match(extractor.utils_parsing.TODAY, c['date_to']) is not None:
+                        if current_company is None:
+                            current_company = c['name']
+    result = extracted_data
+    if current_company is None:
+        current_company = ''
+    if current_position is None:
+        current_position = ''
+    result['company']=current_company
+    result['position']=current_position
     return result
 
 
@@ -161,20 +178,20 @@ def get_age(stream):
     return result
 
 
-def catch(stream):
+def catch(stream, name=None):
     info_dict = dict()
     info_dict["name"] = get_name(stream)
     info_dict["originid"] = get_originid(stream)
     info_dict["age"] = get_age(stream)
     info_dict["phone"] = get_phone(stream)
     info_dict["email"] = get_email(stream)
-    info_dict.update(get_education(stream))     # experience, company, position
-    info_dict.update(get_experience(stream))    # education_history, education, school
+    info_dict.update(get_education(stream))     # education_history, education, school
+    info_dict.update(get_experience(stream, name))    # experience, company, position
     info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                 # age
     return info_dict
 
-def catch_selected(stream, selected):
+def catch_selected(stream, selected, name=None):
     info_dict = dict()
     if 'name' in selected:
         info_dict["name"] = get_name(stream)
@@ -187,9 +204,9 @@ def catch_selected(stream, selected):
     if 'email' in selected:
         info_dict["email"] = get_email(stream)
     if 'education' in selected:
-        info_dict.update(get_education(stream))
+        info_dict.update(get_education(stream, name))
     if 'experience' in selected:
-        info_dict.update(get_experience(stream))
+        info_dict.update(get_experience(stream, name))
     if 'expectation' in selected:
         info_dict.update(get_expectation(stream))
     return info_dict

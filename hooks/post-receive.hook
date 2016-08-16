@@ -17,3 +17,7 @@ export PYTHONPATH=`pwd`
 export CLOUDSHARE_VIRTUALENV_PATH=/home/$USER/Virtualenv/cloudshare
 . $CLOUDSHARE_VIRTUALENV_PATH/bin/activate
 python tools/repobackup.py
+
+export PATH=$PATH:/opt/bin
+cd $ReleaseCode/webapp/static
+node_modules/gulp/bin/gulp.js build

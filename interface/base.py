@@ -9,6 +9,9 @@ class Interface(object):
     def get(self, filename):
         raise NotImplementedInterface
 
+    def getraw(self, filename):
+        return None
+
     def add(self, filename, filedata):
         raise NotImplementedInterface
 

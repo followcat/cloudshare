@@ -70,6 +70,7 @@ class Mining(object):
         self.lsi_model = None
         self.services = {
                 'default': [cvsvc.default],
+                'additionals': cvsvc.additionals,
                 'all': cvsvc.svcls
             }
         if not os.path.exists(self.path):
@@ -165,10 +166,7 @@ class Mining(object):
         return map(lambda x: (x[0], ranklist.index(x)), lists)
 
     def default_names(self):
-        return [n.name for n in self.services['default'] if n.name in self.sim.keys()]
+        return [n.name for n in self.services['default']]
 
     def addition_names(self):
-        names = self.sim.keys()
-        for n in self.default_names():
-            names.remove(n)
-        return names
+        return [n.name for n in self.services['additionals']]

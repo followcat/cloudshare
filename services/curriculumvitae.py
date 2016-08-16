@@ -71,7 +71,7 @@ class CurriculumVitae(services.base.Service):
         self.interface.add(os.path.join(self.path, cvobj.filepro.name.yaml),
                            yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
                            committer=committer)
-        self.nums += 1
+        self._nums += 1
         return True
 
     def add_md(self, cvobj, committer=None):

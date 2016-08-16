@@ -6,15 +6,15 @@ import services.jobdescription
 import interface.gitinterface
 
 from baseapp.additionals import *
-from baseapp.centerdbs import DATA_DB, DEF_SVC_CV
+from baseapp.centerdbs import DEF_SVC_CV
 
 
 ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 SVC_ACCOUNT = services.account.Account(ACCOUNT_DB)
 
-# DATA_DB_NAME = 'repo'
-# DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
+DATA_DB_NAME = 'repo'
+DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
 
 SVC_CO = services.company.Company(DATA_DB)
 SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)

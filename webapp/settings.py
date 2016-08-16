@@ -41,8 +41,11 @@ JGYG_SVC_CV = services.curriculumvitae.CurriculumVitae(JINGYING_DB, 'jingying')
 ZHILIAN_DB = interface.predator.PredatorInterface('additional/zhilian')
 ZILN_SVC_CV = services.curriculumvitae.CurriculumVitae(ZHILIAN_DB, 'zhilian')
 
+YINGCAI_DB = interface.predator.PredatorInterface('additional/yingcai')
+YICA_SVC_CV = services.curriculumvitae.CurriculumVitae(YINGCAI_DB, 'yingcai')
+
 SVC_CV = services.multicv.MultiCV(DEF_SVC_CV,
-                                  [PRE_SVC_CV, JGYG_SVC_CV, ZILN_SVC_CV])
+                                  [PRE_SVC_CV, JGYG_SVC_CV, ZILN_SVC_CV, YICA_SVC_CV])
 SVC_ADD_SYNC = services.additionalsync.AdditionalSync(SVC_CV)
 
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)

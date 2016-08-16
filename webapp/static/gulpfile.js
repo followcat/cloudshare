@@ -7,13 +7,13 @@ var requirejsOptimize = require('gulp-requirejs-optimize'), //requirejs压缩
     revCollector = require('gulp-rev-collector'), //路径替换
     rev = require('gulp-rev'),  //文件名加md5后缀
     minifyHTML = require('gulp-minify-html'),  //html压缩优化
-    minifyCSS = require('gulp-minify-css'),
-    clean = require('gulp-clean');  //文件夹清空
+    clean = require('gulp-clean'),  //文件夹清空
+    cleanCSS = require('gulp-clean-css');  //压缩CSS
 
 //清除构建文件夹
 gulp.task("clean", function(){
-  return gulp.src(["./dist/js/", "./dist/css/"])
-    .pipe(clean());
+  return gulp.src(["./dist/js/", "./dist/css/", "../templates_dist/"])
+    .pipe(clean({force: true}));
 })
 
 //js打包任务
@@ -28,7 +28,7 @@ gulp.task('scripts', ['clean'], function(){
         bootstraptable: __dirname + '/lib/js/bootstrap-table.min',
         datetimepicker: __dirname + '/lib/js/bootstrap-datetimepicker.min',
         datetimepickerCN: __dirname + '/lib/js/bootstrap-datetimepicker.zh-CN',
-        cvdeal: __dirname + '/src/js/util/cvdeal',
+        cvdeal: __dirname + '/src/js/util/cv_deal',
         header: __dirname + '/src/js/util/header',
         formvalidate: __dirname + '/src/js/util/formvalidate',
         Upload: __dirname + '/src/js/util/upload',
@@ -70,7 +70,7 @@ gulp.task('scripts', ['clean'], function(){
 //css打包任务
 gulp.task("style", ['clean'], function(){
   return gulp.src("src/css/*.css")
-    .pipe(minifyCSS())
+    .pipe(cleanCSS({ keepSpecialComments: 1, processImport: false }))
     .pipe(rev())
     .pipe(gulp.dest("dist/css"))
     .pipe(rev.manifest())
@@ -87,13 +87,12 @@ gulp.task("rev", ["scripts", "style"], function(){
         "src/css": "dist/css"
       }
     }))
-    .pipe(minifyHTML({
-      empty: true,
-      spare: true
-    }))
-    .pipe(gulp.dest("../templates/"))
+    .pipe(gulp.dest("../templates_dist/"))
 });
-
+    // .pipe(minifyHTML({
+    //   empty: true,
+    //   spare: true
+    // }))
 gulp.task("build", ["scripts", "style", "rev"]);
 
 //js错误检测任务

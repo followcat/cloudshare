@@ -29,6 +29,15 @@ class MultiCV(object):
     def search_yaml(self, *args, **kwargs):
         return self.default.search_yaml(*args, **kwargs)
 
+    def gethtml(self, id):
+        result = self.default.gethtml(id)
+        if result is None:
+            for each in self.svcls:
+                result = each.gethtml(id)
+                if result is not None:
+                    break
+        return result
+
     def getmd(self, id):
         result = self.default.getmd(id)
         if result is None:
@@ -54,3 +63,11 @@ class MultiCV(object):
             raise IOError("No yaml file found for id: %s" % id)
         else:
             return result
+
+    def getnums(self):
+        result = dict()
+        result['total'] = 0
+        for svc_cv in self.svcls:
+            result[svc_cv.name] = svc_cv.NUMS
+            result['total'] += svc_cv.NUMS
+        return result

@@ -39,9 +39,7 @@ class ConvertName(str):
         obj._doc = obj._add_suffix('doc')
         obj._docx = obj._add_suffix('docx')
         obj._md = obj._add_suffix('md')
-        obj._random = ''.join(random.choice(
-                              string.ascii_lowercase + string.digits)
-                              for _ in range(8))
+        obj._random = None
         return obj
 
     def _add_suffix(self, suffix):
@@ -77,6 +75,8 @@ class ConvertName(str):
 
     @property
     def random(self):
+        if self._random is None:
+            self.reset_random()
         return ConvertName(self._random + self.suffix)
 
     def reset_random(self):

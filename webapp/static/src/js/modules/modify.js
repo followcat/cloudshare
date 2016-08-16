@@ -2,16 +2,24 @@ require.config({
   baseUrl: '/static/',
   paths: {
     jquery: 'lib/js/jquery',
-    marked: 'lib/js/marked'
+    marked: 'lib/js/marked',
+    bootstrap: "lib/js/bootstrap",
+    Upload: "src/js/util/upload",
+    header: "src/js/util/header",
+    formvalidate: "src/js/util/formvalidate",
   },
   shim: {
     marked: {
       exports: 'marked'
-    }
+    },
+    bootstrap: {
+      deps: ["jquery"],
+      exports: "bootstrap"
+    },
   }
 });
 
-require(['jquery', 'marked'], function($, marked){
+require(['jquery', 'marked', 'bootstrap', 'Upload', 'header'], function($, marked){
   var height = $(window).height() - $("header").height();
 
   // set wrap height

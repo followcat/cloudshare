@@ -27,10 +27,6 @@ share，edit your doc，pdf，md and so on...
     nose==1.3.7
     Flask-Testing==0.4.2
 
-    node.js 4.1.2
-    npm 2.14.4
-    gulp CLI 3.9.0
-
 ### draw && view router graph
 
     xdot 0.4
@@ -60,6 +56,20 @@ Here is a demo bash script to run Jenkins test:
     java -jar $JENKINS_ROOT/jenkins.war --httpPort=8001
 ```
 
+
+## Front-end Building
+
+### Dependencies
+
+    node@6.1.0
+    npm@3.8.6
+    gulp@3.9.1
+
+### Install
+
+Enter ```/static``` folder, run ```npm install``` to install the packages.
+
+
 ## How to
 
 0) Install libreoffice/Openoffice, add libreoffice uno env, and start service.
@@ -70,17 +80,11 @@ export LD_LIBRARY_PATH=/usr/lib/libreoffice/program:$LD_LIBRARY_PATH
 libreoffice --invisible "--accept=socket,host=localhost,port=8100;urp;"
 ```
 
-1) Use method convert_folder in converterutils.py to convert your doc/docx/pdf.
-
-``` python
->>> import tools.batching
->>> import interface.gitinterface
->>> repo = interface.gitinterface.GitInterface("repo")
->>> tools.batching.convert_folder(YOUR_DIR, repo, TEMP_DIR)
+1) Front-end building: enter ```/static``` root folder, and run
 ```
-
-    The generated docbook will save in folder docbook_output
-    and markdown will save in folder md_output.
+gulp build
+```
+there were generate two folders ```/static/dist/``` and ```/templates_dist/```
 
 2) Run flask server and visit page http://localhost:4888/.
 

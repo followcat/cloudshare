@@ -1,130 +1,127 @@
 require.config({
-  baseUrl: '/static/',
+  baseUrl: "/static/",
   paths: {
-    jquery: 'lib/js/jquery',
-    bootstrap: 'lib/js/bootstrap',
-    datetimepicker: 'lib/js/bootstrap-datetimepicker.min',
-    datetimepickerCN: 'lib/js/bootstrap-datetimepicker.zh-CN',
-    cvdeal: 'src/js/util/cvdeal',
-    Upload: 'src/js/util/upload',
-    colorgrad: 'src/js/util/colorgrad',
-    History: 'src/js/util/history'
+    jquery: "lib/js/jquery",
+    bootstrap: "lib/js/bootstrap",
+    datetimepicker: "lib/js/bootstrap-datetimepicker.min",
+    header: "src/js/util/header",
+    formvalidate: "src/js/util/formvalidate",
+    cvdeal: "src/js/util/cv_deal",
+    Upload: "src/js/util/upload",
+    colorgrad: "src/js/util/colorgrad",
+    History: "src/js/util/history"
   },
   shim: {
     bootstrap: {
-      deps: ['jquery'],
-      exports: 'bootstrap'
+      deps: ["jquery"],
+      exports: "bootstrap"
     },
     datetimepicker: {
-      deps: ['jquery'],
-      exports: 'bootstrap-datetimepicker'
-    },
-    datetimepickerCN: {
-      deps: ['jquery'],
-      exports: 'bootstrap-datetimepicker-zh-CN'
+      deps: ["jquery"],
+      exports: "bootstrap-datetimepicker"
     },
     cvdeal: {
-      deps: ['jquery'],
-      exports: 'cvdeal'
+      deps: ["jquery"],
+      exports: "cvdeal"
     }
   }
 });
 
 require([
-  'jquery',
-  'bootstrap',
-  'datetimepicker',
-  'datetimepickerCN',
-  'cvdeal',
-  'Upload',
-  'colorgrad',
-  'History'
-],function($, bootstrap, datetimepicker, datetimepickerCN, cvdeal, Upload, ColorGrad, History) {
+  "jquery",
+  "cvdeal",
+  "datetimepicker",
+  "Upload",
+  "colorgrad",
+  "History",
+  "header",
+  "bootstrap",
+],function($, cvdeal, datetimepicker, Upload, ColorGrad, History) {
 
-  window.onload = cvdeal.CVdeal();
-
-  $('.form_date').datetimepicker({
-    language: 'zh-CN',
-      weekStart: 1,
-      todayBtn: 1,
-      autoclose: 1,
-      todayHighlight: 1,
-      startView: 2,
-      minView: 2,
-      forceParse: 0
+  cvdeal.cvDeal("cvContent", function() {
+    $("#loading").css("display", "none");
   });
 
-  $("#tracking-text").on('focus', function() {
+  var c = {
+    currentUser: $("#name").text().trim(),
+
+    filename: function() {
+      var url = String(window.location.href);
+      var arr = url.split("/");
+      return arr[arr.length - 1];
+    }(),
+
+    checkBlank: function(value) {
+      var reg = /^\s*$/g;
+      if (value === "" || reg.test(value)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
+  $("#formDatetime").datetimepicker({
+    format: "yyyy-mm-dd",
+    weekStart: 1,
+    todayBtn: true,
+    autoclose: true,
+    todayHighlight: 1,
+    startView: 2,
+    minView: 2,
+    pickerPosition: "bottom-left"
+  });
+
+  $("#trackingInput").on("focus", function() {
     $(this).next().show();
   });
 
-  $("#comment-text").on('focus', function() {
+  $("#commentInput").on("focus", function() {
     $(this).next().show();
   });
 
-  $(".collapse").on('click', function() {
+  $(".fold").on("click", function() {
     $(this).parent().hide();
   });
 
-  //add label function
-  $("#add-label").on('click', function() {
-    var display = $(".add-label-box").css("display");
+  //简历标签点击事件
+  $("#addTag").on("click", function() {
+    var _this = $(this);
+    var tagText = _this.text().trim();
 
-    if (display === 'none') {
-      $(this).text("Fold");
-      $(".add-label-box").css("display", "table");
+    if (tagText === "Add a Tag") {
+      _this.text("Fold");
+      $(_this.next()).css("display", "block");
     } else {
-      $(this).text("Add a Tag");
-      $(".add-label-box").css("display", "none");
+      _this.text("Add a Tag");
+      $(_this.next()).css("display", "none");
     }
   });
 
-  function GetFileName() {
-    var url = String(window.location.href);
-    var arr = url.split("/");
-    var filename = arr[arr.length - 1];
+  //提交简历新的标签
+  $("#tagBtn").on("click", function() {
+    var tagText = $("#tagText").val();
 
-    return filename;
-  }
-
-  function CheckBlank(val) {
-    var reg = /^\s*$/g;
-    if (val === "" || reg.test(val)) {
-      return true;
+    if (c.checkBlank(tagText)) {
+      $("#tagText").focus();
     } else {
-      return false;
-    }
-  }
-
-  //Add tag
-  $("#add-label-btn").on('click', function() {
-    var filename = GetFileName();
-    var label_text = $("#label-text").val();
-    var current_user = $("#current-id").text();
-
-    if (CheckBlank(label_text)) {
-      $(this).attr("disable", false);
-      $("#label-text").focus();
-    } else {
-      $(this).attr("disable", true);
       $.ajax({
-        type: 'POST',
-        url: '/updateinfo',
-        dataType: 'json',
-        contentType: 'application/json',
+        type: "POST",
+        url: "/updateinfo",
+        dataType: "json",
+        contentType: "application/json",
         data: JSON.stringify({
-          "filename": filename,
+          "filename": c.filename,
           "yamlinfo": {
-            "tag": label_text
+            "tag": tagText
           }
         }),
-        success: function(result) {
-          if (result.result) {
-            $(".label-item").prepend("<span class='label label-primary' title=" +
-              current_user + ">" + label_text + "</span>");
-            $("#label-text").val("");
+        success: function(response) {
+          if (response.result) {
+            $("#tagContainer").prepend("<span class='label label-primary' title='"+ c.currentUser +"'>"+ tagText +"</span>");
+            $("#tagText").val("");
           } else {
-            alert("Operation failed");
+            alert("Add tag failed");
           }
         }
       });
@@ -132,35 +129,33 @@ require([
   });
 
   //Add tracking massage
-  $("#tracking-btn").on('click', function() {
-    var filename = GetFileName();
-    var tracking_text = $("#tracking-text").val();
-    var date = $("#date").val();
-    var current_user = $("#current-id").text();
+  $("#trackingBtn").on("click", function() {
+    var trackingText = $("#trackingInput").val().trim(),
+        date = $("#formDatetime").val();
 
-    if (CheckBlank(tracking_text) || date === "") {
-      $(this).attr("disable", false);
-      $("#tracking-text").focus();
+    if (c.checkBlank(trackingText) || date === "") {
+      $("#trackingInput").focus();
     } else {
-      $(this).attr("disable", true);
       $.ajax({
-        type: 'POST',
-        url: '/updateinfo',
-        dataType: 'json',
-        contentType: 'application/json',
+        type: "POST",
+        url: "/updateinfo",
+        dataType: "json",
+        contentType: "application/json",
         data: JSON.stringify({
-          "filename": filename,
+          "filename": c.filename,
           "yamlinfo": {
             "tracking": {
               "date": date,
-              "text": tracking_text
+              "text": trackingText
             }
           }
         }),
         success: function(result) {
           if (result.result) {
-            $("#tracking-content").prepend("<div class='tracking-item'><p class='content'>" + tracking_text + "</p><em class='commit-info'>" + current_user + " " + date + "</em></div>");
-            $("#tracking-text").val("");
+            $("#trackingContent").prepend("<div class='tracking-item'><em>"+ c.currentUser +" / "+ date +"</em><p>"+ trackingText +"</p></div>");
+            $("#trackingInput").val("");
+          } else {
+            alert("Failed");
           }
         }
       });
@@ -168,105 +163,97 @@ require([
   });
 
   //Add comment
-  $("#comment-btn").on('click', function() {
-    var filename = GetFileName();
-    var comment_text = $("#comment-text").val();
-    var current_user = $("#current-id").text();
+  $("#commentBtn").on("click", function() {
+    var commentText = $("#commentInput").val().trim();
 
-    if (CheckBlank(comment_text)) {
-      $(this).attr("disable", false);
-      $("#comment-text").focus();
+    if (c.checkBlank(commentText)) {
+      $("#commentInput").focus();
     } else {
-      $(this).attr("disable", true);
       $.ajax({
-        type: 'POST',
-        url: '/updateinfo',
-        dataType: 'json',
-        contentType: 'application/json',
+        type: "POST",
+        url: "/updateinfo",
+        dataType: "json",
+        contentType: "application/json",
         data: JSON.stringify({
-          "filename": filename,
+          "filename": c.filename,
           "yamlinfo": {
-            "comment": comment_text
+            "comment": commentText
           }
         }),
-        success: function(result) {
-          $("#comment-content").prepend("<div class='comment-item'><em class='commit-info'>" + current_user + "</em><p class='content'>" + comment_text + "</p></div>");
-          $("#comment-text").val("");
+        success: function(response) {
+          if (response.result) {
+            $("#commentContent").prepend("<div class='comment-item'><em>"+ c.currentUser + " / " + response.data.date +"</em><p>" + response.data.content + "</p></div>");
+            $("#commentInput").val("");
+          } else {
+            alert("Failed");
+          }
         }
       });
     }
   });
 
-  //Get current url to get file name
-  var url = window.location.href.split('/');
-  var filename = url[url.length - 1];
-
   //Add url into the link button
   function Route() {
-    $("#download").attr('href', '/download/' + filename.split('.')[0] + '.doc');
-    $("#modify").attr('href', '/modify/' + filename);
-    $('#match').attr('href', '/resumetojd/' + filename + '/Opening');
+    $("#download").attr("href", "/download/" + c.filename.split(".")[0] + ".doc");
+    $("#modify").attr("href", "/modify/" + c.filename);
+    $("#match").attr("href", "/resumetojd/" + c.filename + "/Opening");
   }
   Route();
 
   //upload english file
-  $("#upload-btn").on('click', function() {
-    localStorage.name = filename;
+  $("#enUploadSubmit").on("click", function() {
+    localStorage.name = c.filename.split(".")[0];
 
-    var uploader = new Upload("file-form");
+    var uploader = new Upload("enUploadForm");
     uploader.Uploadfile(function() {
       setTimeout(function() {
         window.location.href = "/preview";
       }, 1000);
     });
   });
-  $(".upload").on('click', function() {
-    $("#file").val("");
-    $("#progressmsg").html("");
+
+  $(".upload-en-modal").on("click", function() {
+    $("#enFile").val("");
+    $("#enUploadMsg").html("");
   });
 
-  localStorage.title = $('title').text().split('-')[0];
+  localStorage.title = $("title").text().split("-")[0];
 
 
   //CV Title Data Modify
 
   //Tranform Title Data Modify status
-  $('#tranform-check').click(function() {
-    if ($(this).attr('checked')) {
-      $(this).removeAttr('checked');
-      $('#title-table tbody tr input').attr('disabled', 'disabled');
-      $('#title-submit-btn').css('display', 'none');
+  $("#modifyTitle").click(function() {
+    if ($(this).attr("checked")) {
+      $(this).removeAttr("checked");
+      $("#cvTitleWrap").css("display", "none");
     } else {
-      $(this).attr('checked', 'checked');
-      $('#title-table tbody tr input').removeAttr('disabled');
-      $('#title-submit-btn').css('display', 'block');
+      $(this).attr("checked", "checked");
+      $("#cvTitleWrap").css("display", "block");
     }
   });
 
 
   //Title Button Handle
-  $('#title-submit-btn').on('click', function() {
-    var filename = window.location.href.split('/');
-    filename = filename[filename.length - 1];
-
+  $("#titleBtn").on("click", function() {
     $.ajax({
-      url: '/updateinfo',
-      type: 'post',
-      dataType: 'json',
-      contentType: 'application/json',
+      url: "/updateinfo",
+      type: "post",
+      dataType: "json",
+      contentType: "application/json",
       data: JSON.stringify({
-        'filename': filename,
-        'yamlinfo': {
-          'id': $('#Id').val(),
-          'name': $('#name').val(),
-          'origin': $('#origin').val()
+        "filename": c.filename,
+        "yamlinfo": {
+          "id": $("#titleId").val().trim(),
+          "name": $("#titleName").val().trim(),
+          "origin": $("#titleOrigin").val().trim(),
         }
       }),
       success: function(response) {
         if (response.result) {
           window.location.reload();
         } else {
-          alert('Failed to submit');
+          alert("Failed to submit");
         }
       }
     });
@@ -274,36 +261,46 @@ require([
 
   //Get similar person data.
   $.ajax({
-    url: '/analysis/similar',
-    type: 'post',
+    url: "/analysis/similar",
+    type: "post",
     data: {
-      'doc': document.getElementById("cv-content").innerText
+      "doc": $("#cvContent").text()
     },
     success: function(response) {
-      var datas = response.result,
-          colorgrad = ColorGrad();
-      for(var i = 0, len = datas.length; i < len; i++){
-        var fileName = datas[i][0],
-            name = datas[i][1].name,
-            match = datas[i][2].match;
+      var datas = response.result;
+      for (var i = 0, len = datas.length; i < len; i++) {
+        var _index = datas[i];
+        var name = _index.name !== "" ? _index.name : _index.id;
 
-        colorStyle = colorgrad.gradient(parseInt(match*100));
-        $('#similar-person').append("<a href=\"/show/"+ fileName +
-          "\" style=\"color:" + colorStyle +
-          "\" target=\"_blank\">" + name + "</a>");
+        $("#similarContent").append("<div class='similar-item'><a href='/show/" + _index.md_filename + "' target='_blank'>" +
+          name + " | " + _index.position + " | " +
+          _index.age + " | " + _index.gender + " | " + _index.education + "</a></div>"
+        );
       }
     }
   });
 
   //Write history
-  var history = new History(),
-      name = $('#name').val();
-  history.writeHistory(
-    {
-      name: name,
-      filename: filename,
-      id: $("#Id").val()
-    }
-  );
+  var history = new History();
+  history.writeHistory({
+    name: $("#titleName").val(),
+    filename: c.filename,
+    id: $("#titleId").val(),
+  });
 
+  var topHeight = $("header").innerHeight() + parseInt($(".wrapper").css("marginTop"));
+  $(document).scroll(function() {
+    var top = $(document).scrollTop();
+    if ( top > topHeight ) {
+      $(".side").css({
+        position: "fixed",
+        top: "10px"
+      });
+    } else {
+      $(".side").css({
+        position: "absolute",
+        top: "0"
+      });
+    }
+  });
 });

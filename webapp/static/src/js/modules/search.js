@@ -17,12 +17,6 @@ require.config({
 });
 
 require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], function($, bootstrap, header, formvalidate, Upload, History){
-  //计算高度
-  var size = {
-    width: window.innerWidth || document.documentElement.clienWidth || document.body.clienWidth,
-    height: window.innerHeight || document.documentElement.clienHeight || document.body.clienHeight
-  };
-  $(".wrapper").css({minHeight: size.height - $("header").height() + 'px'});
 
   var item = $('.operate-list-item');
 

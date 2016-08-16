@@ -341,10 +341,9 @@ class UserInfo(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        repo = flask.current_app.config['DATA_DB']
         svc_cv = flask.current_app.config['SVC_CV']
         user = flask.ext.login.current_user
-        info_list = repo.history(user.id, max_commits=10)
+        info_list = svc_cv.history(user.id, max_commits=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:

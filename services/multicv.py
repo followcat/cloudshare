@@ -29,6 +29,9 @@ class MultiCV(object):
     def search_yaml(self, *args, **kwargs):
         return self.default.search_yaml(*args, **kwargs)
 
+    def history(self, *args, **kwargs):
+        return self.default.interface.history(*args, **kwargs)
+
     def gethtml(self, id):
         result = self.default.gethtml(id)
         if result is None:

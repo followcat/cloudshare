@@ -159,17 +159,17 @@ class Mining(object):
             result += len(sim.names)
         return result
 
-    def minetop(self, doc, top=None, uses=None):
-        results = self.probability(doc, uses=uses)
+    def minetop(self, doc, basemodel, top=None, uses=None):
+        results = self.probability(basemodel, doc, uses=uses)
         if top is None:
             top = len(results)
         return results[:top]
 
-    def minelist(self, doc, lists, uses=None):
-        return map(lambda x: self.probability_by_id(doc, x, uses=uses), lists)
+    def minelist(self, doc, lists, basemodel, uses=None):
+        return map(lambda x: self.probability_by_id(basemodel, doc, x, uses=uses), lists)
 
-    def minelistrank(self, doc, lists, uses=None):
-        probalist = set(self.probability(doc, uses=uses))
+    def minelistrank(self, doc, lists, basemodel, uses=None):
+        probalist = set(self.probability(basemodel, doc, uses=uses))
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return map(lambda x: (x[0], ranklist.index(x)), lists)

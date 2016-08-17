@@ -83,6 +83,9 @@ class LSIsimilarity(object):
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 
     def probability(self, doc):
+        results = []
+        if self.index is None:
+            return results
         vec_lsi = self.lsi_model.probability(doc)
         sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
         results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims)

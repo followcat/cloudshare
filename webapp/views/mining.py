@@ -71,6 +71,7 @@ class LSI(flask.views.MethodView):
         index = flask.current_app.config['SVC_INDEX']
         sim_names = miner.addition_names()
         uses = miner.default_names()
+        basemodel = miner.default_names()[0]
         if 'uses' in flask.request.args and flask.request.args['uses']:
             uses.extend(flask.request.args['uses'].split(','))
         if 'jd_id' in flask.request.args:
@@ -105,19 +106,20 @@ class LSI(flask.views.MethodView):
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
-        datas, pages, totals = self.process(miner, uses, svc_cv, doc, cur_page, count, filterdict)
+        datas, pages, totals = self.process(miner, basemodel, uses, svc_cv, doc,
+                                            cur_page, count, filterdict)
 
         return flask.render_template('lsipage.html',result=datas,
                                      button_bar=True, sim_names=sim_names,
                                      cur_page=cur_page,
                                      pages=pages, param=param, nums=totals)
 
-    def process(self, miner, uses, svc, doc, cur_page, eve_count, filterdict=None):
+    def process(self, miner, basemodel, uses, svc, doc, cur_page, eve_count, filterdict=None):
         index = flask.current_app.config['SVC_INDEX']
         if not cur_page:
             cur_page = 1
         datas = []
-        result = miner.probability(doc, uses=uses)
+        result = miner.probability(basemodel, doc, uses=uses)
         if filterdict:
             filteset = index.get(filterdict, uses=uses)
             result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
@@ -144,8 +146,9 @@ class Similar(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         miner = flask.current_app.config['SVC_MIN']
         doc = flask.request.form['doc']
+        basemodel = miner.default_names()[0]
         datas = []
-        for name, score in miner.probability(doc)[1:6]:
+        for name, score in miner.probability(basemodel, doc)[1:6]:
             cname = core.outputstorage.ConvertName(name)
             yaml_info = svc_cv.getyaml(cname.yaml)
             info = {
@@ -172,13 +175,14 @@ class Valuable(flask.views.MethodView):
         elif 'jd_doc' in flask.request.form:
             doc = flask.request.form['jd_doc']
         name_list = flask.request.form['name_list']
+        basemodel = miner.default_names()[0]
         uses = miner.default_names()
         uses.extend(json.loads(flask.request.form['uses']))
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(miner, svc_cv, doc, uses=uses)
+            result = core.mining.valuable.rate(miner, svc_cv, doc, basemodel, uses=uses)
         else:
-            result = core.mining.valuable.rate(miner, svc_cv, doc,
+            result = core.mining.valuable.rate(miner, svc_cv, doc, basemodel,
                                                uses=uses, name_list=name_list)
         svc_cv = flask.current_app.config['SVC_CV']
         response = dict()

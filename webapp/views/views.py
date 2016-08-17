@@ -392,6 +392,35 @@ class ChangePassword(flask.views.MethodView):
         return flask.jsonify(result=result)
 
 
+class GetBookmark(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        user = flask.ext.login.current_user
+        result = user.getbookmark()
+        return flask.jsonify(result=list(result))
+
+
+class AddBookmark(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def post(self):
+        user = flask.ext.login.current_user
+        bookid = flask.request.form['id']
+        result = user.addbookmark(bookid)
+        return flask.jsonify(result=result)
+
+
+class DelBookmark(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def post(self):
+        user = flask.ext.login.current_user
+        bookid = flask.request.form['id']
+        result = user.delbookmark(bookid)
+        return flask.jsonify(result=result)
+
+
 class Urm(flask.views.MethodView):
 
     @flask.ext.login.login_required

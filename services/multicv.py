@@ -1,12 +1,13 @@
 class MultiCV(object):
 
-    def __init__(self, defaultsvc, additionals=None):
-        self.default = defaultsvc
+    def __init__(self, dbcenter, additionals=None):
+        self.dbcenter = dbcenter.values()
+        self.default = dbcenter['medical']
         if additionals is None:
             self.additionals = []
         else:
             self.additionals = additionals
-        self.svcls = [self.default] + self.additionals
+        self.svcls = self.dbcenter + self.additionals
 
     def add(self, *args, **kwargs):
         return self.default.add(*args, **kwargs)

@@ -1,3 +1,4 @@
+'use strict';
 const WebpackDevServer = require('webpack-dev-server');
 const webpack = require('webpack');
 const webpackConf = require('./webpack/webpack.config.js');
@@ -6,16 +7,16 @@ let entryObject = webpackConf.entry;
 for (let key in entryObject) {
   let arr = [];
   arr.push(entryObject[key]);
-  // arr.push('webpack-dev-server/client?http://localhost:3000/');
+  arr.push('webpack-dev-server/client?http://localhost:3000/');
   arr.push('webpack/hot/only-dev-server');
   entryObject[key] = arr;
 }
 
-entryObject.devServerClient = 'webpack-dev-server/client?http://localhost:3000/';
+// entryObject.devServerClient = 'webpack-dev-server/client?http://localhost:3000/';
 
 webpackConf.entry = entryObject;
 // webpackConf.entry.unshift('webpack-dev-server/client?http://0.0.0.0:4888/', 'webpack/hot/only-dev-server');
-console.log(webpackConf.entry);
+
 const compiler = webpack(webpackConf);
 
 const server = new WebpackDevServer(compiler, {

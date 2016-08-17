@@ -37,11 +37,13 @@ const getHtml = function() {
 
   dirs.forEach(function(item) {
     matchs = item.match(/(.+)\.entry\.js$/);
-    console.log(matchs);
     if (matchs) {
       eachFile = new HtmlWebpackPlugin({
+        hash: true,
+        title: 'Willendare',
         template: path.join(PATHS.SRC_PATH, '/template.html'),  // html模板文件
         inject: true,  // 允许修改的内容
+        chunks: [matchs[1]],
         filename: path.join(PATHS.BUILD_PATH, '/'+ matchs[1] +'.html'),  // 生成的html文件存放路径
         minify: {    // 压缩HTML文件
           removeComments: true,    // 移除HTML中的注释
@@ -59,7 +61,7 @@ const config = {
 
   output: {
     path: PATHS.BUILD_PATH,
-    filename: '[name].bundle[hash].js',
+    filename: '[name].bundle.js',
   },
 
   resolve: {
@@ -87,7 +89,9 @@ const config = {
   },
 
   plugins: getHtml(),
+
 };
+
 
 // module.exports = config;
 if (TARGET === 'start' || !TARGET) {

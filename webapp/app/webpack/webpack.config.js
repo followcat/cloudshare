@@ -26,39 +26,10 @@ const getEntry = function() {
   return files;
 };
 
-// const getHtml = function() {
-//   let entryPath = path.resolve(config.PATHS.SRC_PATH, 'entry');
-//   let dirs = fs.readdirSync(entryPath);
-//   let matchs = [], htmlFiles = [], eachFile = {};
-
-//   dirs.forEach(function(item) {
-//     matchs = item.match(/(.+)\.entry\.js$/);
-//     if (matchs) {
-//       eachFile = new HtmlWebpackPlugin({
-//         hash: false,
-//         title: 'Willendare',
-//         template: path.join(config.PATHS.SRC_PATH, '/template.html'),  // html模板文件
-//         inject: true,  // 允许修改的内容
-//         chunks: [matchs[1]],
-//         filename: path.join(config.PATHS.BUILD_PATH, '/'+ matchs[1] +'.html'),  // 生成的html文件存放路径
-//         minify: {    // 压缩HTML文件
-//           removeComments: true,    // 移除HTML中的注释
-//           collapseWhitespace: false,   // 删除空白符与换行符
-//         },
-//       });
-//       htmlFiles.push(eachFile);
-//     }
-//   });
-//   return htmlFiles;
-// };
-
 const webpackConfig = {
   entry: getEntry(),
 
-  // output: {
-  //   path: config.PATHS.BUILD_PATH,
-  //   filename: '[name].bundle.js',
-  // },
+  // output: {},
 
   resolve: {
     extensions: ['', '.js', '.jsx'],
@@ -75,7 +46,10 @@ const webpackConfig = {
       {
         test: /\.css$/,
         loader: 'style-loader!css-loader?modules',
-        include: config.PATHS.SRC_PATH,
+      },
+      {
+        test: /\.less$/,
+        loader: "style!css!less"
       },
       {
         test: /\.(png|jpg)$/,
@@ -83,8 +57,6 @@ const webpackConfig = {
       },
     ],
   },
-
-  // plugins: getHtml(),
 
 };
 

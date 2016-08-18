@@ -129,7 +129,7 @@ class BatchConfirm(flask.views.MethodView):
             result = svc_cv.add(upobj, user.id)
             if result is True:
                 def_cv_name = svc_cv.default.name
-                result = svc_min.sim[def_cv_name].update([svc_cv.default])
+                result = svc_min.sim[def_cv_name][def_cv_name].update([svc_cv.default])
             results[filename] = result
         flask.session[user.id]['batchupload'] = dict()
         return flask.jsonify(result=results)
@@ -176,7 +176,7 @@ class Confirm(flask.views.MethodView):
         result = svc_cv.add(upobj, user.id)
         if result is True:
             def_cv_name = svc_cv.default.name
-            result = svc_min.sim[def_cv_name].update([svc_cv.default])
+            result = svc_min.sim[def_cv_name][def_cv_name].update([svc_cv.default])
         return flask.jsonify(result=result, filename=upobj.filepro.name.md)
 
 

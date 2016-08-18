@@ -71,7 +71,7 @@ class LSI(flask.views.MethodView):
         index = flask.current_app.config['SVC_INDEX']
         sim_names = miner.addition_names()
         uses = miner.default_names()
-        basemodel = miner.default_names()[0]
+        basemodel = svc_cv.default.name
         if 'uses' in flask.request.args and flask.request.args['uses']:
             uses.extend(flask.request.args['uses'].split(','))
         if 'jd_id' in flask.request.args:
@@ -146,7 +146,7 @@ class Similar(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         miner = flask.current_app.config['SVC_MIN']
         doc = flask.request.form['doc']
-        basemodel = miner.default_names()[0]
+        basemodel = svc_cv.default.name
         datas = []
         for name, score in miner.probability(basemodel, doc)[1:6]:
             cname = core.outputstorage.ConvertName(name)
@@ -175,7 +175,7 @@ class Valuable(flask.views.MethodView):
         elif 'jd_doc' in flask.request.form:
             doc = flask.request.form['jd_doc']
         name_list = flask.request.form['name_list']
-        basemodel = miner.default_names()[0]
+        basemodel = svc_cv.default.name
         uses = miner.default_names()
         uses.extend(json.loads(flask.request.form['uses']))
         name_list = json.loads(name_list)

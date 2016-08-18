@@ -49,6 +49,11 @@
     <div class="tool-wrap">
       <div class="tool-bar pd-lr-15">
         <span class="check-box"><input type="checkbox" id="modifyTitle">Switch to Modify Title</span>
+        {% if yaml.collected %}
+        <a type="button" class="btn btn-primary btn-xs" target="_blank" id="collect" data-collected="true">Cancel collection</a>
+        {% else %}
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="collect" data-collected="false">Collect CV</a>
+        {% endif %}
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">Modify CV</a>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="uploadEn" data-toggle="modal" data-target=".upload-en-modal">Add English CV</a>

@@ -303,4 +303,49 @@ require([
       });
     }
   });
+
+  //收藏简历请求
+  $("#collect").on("click", function() {
+    var _this = $(this),
+        cvId = c.filename.split(".")[0],
+        collected = _this.attr("data-collected");
+
+    if (collected === "true") {
+      $.ajax({
+        url: "/delbookmark",
+        type: "POST",
+        data: {
+          "id": cvId
+        },
+        success: function(response) {
+          if (response.result) {
+            _this.text("Collect CV");
+            _this.attr("data-collected", "false");
+            _this.removeClass("btn-primary");
+            _this.addClass("btn-default");
+          } else {
+            alert("Delete bookmark error.");
+          }
+        }
+      });
+    } else {
+      $.ajax({
+        url: "/addbookmark",
+        type: "POST",
+        data: {
+          "id": cvId
+        },
+        success: function(response) {
+          if (response.result) {
+            _this.text("Cancel collection");
+            _this.attr("data-collected", "true");
+            _this.removeClass("btn-default");
+            _this.addClass("btn-primary");
+          } else {
+            alert("Add bookmark error.");
+          }
+        }
+      });
+    }
+  });
 });

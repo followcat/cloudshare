@@ -72,22 +72,24 @@ def filter(processer, origin_path, filename):
         move_file(path, origin_path, filename)
 
 
-def convert_folder(path, repo, temp_output, committer=None, origin=None):
+def convert_folder(path, svc_cv, temp_output, committer=None, origin=None):
+    import services.curriculumvitae
     if not os.path.exists(temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
-            processfile = core.converterutils.FileProcesser(f, filename, temp_output)
+            upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
+                                                                   f, temp_output)
             if origin is not None:
-                processfile.yamlinfo['origin'] = origin
-            if not processfile.yamlinfo['name']:
-                name = name_from_51job(processfile.markdown_stream)
-                processfile.yamlinfo['name'] = name
-                if not processfile.yamlinfo['name']:
-                    processfile.yamlinfo['name'] = name_from_filename(filename)
+                upobj.filepro.yamlinfo['origin'] = origin
+            if not upobj.filepro.yamlinfo['name']:
+                name = '' # name_from_51job(processfile.markdown_stream)
+                upobj.filepro.yamlinfo['name'] = name
+                if not upobj.filepro.yamlinfo['name']:
+                    upobj.filepro.yamlinfo['name'] = '' # name_from_filename(filename)
             try:
-                processfile.storage(repo, committer=committer)
+                result = svc_cv.add(upobj, unique=False)
             except core.exception.DuplicateException as error:
                 continue
 

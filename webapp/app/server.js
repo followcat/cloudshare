@@ -1,8 +1,10 @@
 'use strict';
 const WebpackDevServer = require('webpack-dev-server');
 const webpack = require('webpack');
-const webpackConf = require('./webpack/webpack.config.js');
+const webpackConf = require('./webpack/webpack.config');
+const config = require('./config');
 
+//遍历每个入口文件并加入热加载插件
 let entryObject = webpackConf.entry;
 for (let key in entryObject) {
   let arr = [];
@@ -12,8 +14,6 @@ for (let key in entryObject) {
   entryObject[key] = arr;
 }
 
-// entryObject.devServerClient = 'webpack-dev-server/client?http://localhost:3000/';
-
 webpackConf.entry = entryObject;
 // webpackConf.entry.unshift('webpack-dev-server/client?http://0.0.0.0:4888/', 'webpack/hot/only-dev-server');
 
@@ -22,7 +22,7 @@ const compiler = webpack(webpackConf);
 const server = new WebpackDevServer(compiler, {
   // webpack-dev-server options
 
-  contentBase: './app/',
+  contentBase: './',
 
   progress: true,
 
@@ -33,6 +33,13 @@ const server = new WebpackDevServer(compiler, {
   historyApiFallback: true,
 
   compress: true,  //启用gzip压缩
+
+  // It's a required option.
+  publicPath: config.serverConfig.dev.baseURL,
+
+  headers: { "X-Custom-Header": "yes" },
+
+  stats: { colors: true }
 
 });
 

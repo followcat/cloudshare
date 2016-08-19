@@ -23,16 +23,15 @@ class AdditionalSync(object):
 
     def __init__(self, multicv):
         self.additionals = multicv.additionals
-        self.interfaces = dict([(additional.name, additional.interface)
-                                for additional in self.additionals])
+        self.interfaces = dict([(name, self.additionals[name].interface)
+                                for name in self.additionals])
         self.logger = logging.getLogger("AdditionalSyncLogger.UPDATE")
 
     def update(self, additionals=None):
         if additionals is None:
             additionals = self.additionals
-        interfaces = dict([(additional.name, additional.interface)
-                            for additional in self.additionals
-                            if additional.name in additionals])
+        interfaces = dict([(name, self.additionals[name].interface)
+                            for name in self.additionals if name in additionals])
         for name, i in interfaces.items():
             for id in set(i.lsid_raw()) - (set(i.lsid_yaml()) & set(i.lsid_md())):
                 raw_html = i.getraw(id+'.html')
@@ -58,8 +57,8 @@ class AdditionalSync(object):
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addcv(id, md.encode('utf-8'), infostream)
 
-        for additional in additionals:
-            additional.updatenums()
+        for name in additionals:
+            additionals[name].updatenums()
 
     def generate_md(self, raw_html):
         return pypandoc.convert(raw_html, 'markdown', format='docbook')
@@ -77,11 +76,9 @@ class AdditionalSync(object):
 
     def upgrade_yaml(self, selected=None, additionals=None):
         if additionals is None:
-            interfaces = self.interfaces
-        else:
-            interfaces = dict([(additional.name, additional.interface)
-                                for additional in self.additionals
-                                if additional.name in additionals])
+            additionals = self.additionals
+        interfaces = dict([(name, self.additionals[name].interface)
+                            for name in self.additionals if name in additionals])
         for name, i in interfaces.items():
             for id in i.lsid_md():
                 if selected is None:

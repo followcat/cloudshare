@@ -68,10 +68,13 @@ class Mining(object):
         self.sim = {}
         self.path = path
         self.lsi_model = dict()
+        self.dbcenter = cvsvc.dbcenter
+        self.additionals = cvsvc.additionals
         self.services = {
                 'default': cvsvc.dbcenter,
                 'additionals': cvsvc.additionals,
-                'all': cvsvc.svcls
+                'all': dict(zip(self.dbcenter.keys()+self.additionals.keys(),
+                                self.dbcenter.values()+self.additionals.values()))
             }
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -87,17 +90,18 @@ class Mining(object):
 
     def make_lsi(self, services):
         self.lsi_model = dict()
-        for service in services:
-            lsi_path = os.path.join(self.path, service.name, 'model')
+        for name in services:
+            service = services[name]
+            lsi_path = os.path.join(self.path, name, 'model')
             lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer)
             try:
                 lsi.load()
             except IOError:
                 if lsi.build([service]):
                     lsi.save()
-            self.lsi_model[service.name] = lsi
+            self.lsi_model[name] = lsi
 
-    def add(self, svc_list, name):
+    def add(self, services, name):
         assert self.lsi_model
         for modelname in self.lsi_model:
             if not self.lsi_model[modelname].names:
@@ -105,29 +109,29 @@ class Mining(object):
             model = self.lsi_model[modelname]
             save_path = os.path.join(self.path, modelname, name)
             self.sim[modelname] = dict()
-            for svc in svc_list:
-                assert svc.name
+            for svc_name in services:
+                svc = services[svc_name]
                 index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
-                                                                svc.name), model)
+                                                                svc_name), model)
                 try:
                     index.load()
                 except IOError:
                     if index.build([svc]):
                         index.save()
-                self.sim[modelname][svc.name] = index
+                self.sim[modelname][svc_name] = index
 
     def update_model(self):
         for modelname in self.lsi_model:
-            updated = self.lsi_model[modelname].update(self.services['default'][modelname])
+            updated = self.lsi_model[modelname].update([self.services['default'][modelname]])
             if updated:
                 self.update_sims()
 
     def update_sims(self):
-        for modelname in self.lsi_model:
-            for name in self.services:
-                for svc in self.services[name]:
-                    self.sim[modelname][svc.name].update([svc])
-                    self.sim[modelname][svc.name].save()
+        for modelname in self.sim:
+            for simname in self.sim[modelname]:
+                svc = self.services['all'][simname]
+                self.sim[modelname][simname].update([svc])
+                self.sim[modelname][simname].save()
 
     def probability(self, basemodel, doc, uses=None):
         if uses is None:
@@ -175,15 +179,15 @@ class Mining(object):
         return map(lambda x: (x[0], ranklist.index(x)), lists)
 
     def default_names(self):
-        return [n.name for n in self.services['default']]
+        return [name for name in self.services['default']]
 
     def addition_names(self):
-        return [n.name for n in self.services['additionals']]
+        return [name for name in self.services['additionals']]
 
     @property
     def SIMS(self):
         results = list()
         for modelname in self.lsi_model:
-            for sim in self.sim[modelname]:
-                results.append(sim)
+            for simname in self.sim[modelname]:
+                results.append(self.sim[modelname][simname])
         return results

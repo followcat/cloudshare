@@ -15,6 +15,44 @@ REJECT = re.compile('(('+')|('.join([
     u'互联网',
     ])+'))')
 
+LINE = re.compile(ur'[\n\t]+')
+WEB = re.compile(ur'\(?\s?((([hH][tT][tT][pP][sS]?|[fF][tT][pP])\:\/\/)?([\w\.\-]+(\:[\w\.\&%\$\-]+)*@)?((([^\s\(\)\<\>\\\"\.\[\]\,@;:]+)(\.[^\s\(\)\<\>\\\"\.\[\]\,@;:]+)*(\.[a-zA-Z]{2,4}))|((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5])))(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))?((\/[^\/][\w\.\,\?\'\(\)\\\/\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s\x7F-\xFF])?)\s?\)?')
+SYMBOL = re.compile(ur'[- /]+')
+SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
+
+def jieba_cut(text):
+    return jieba.posseg.cut(text)
+
+def pos_extract(words, flags):
+    return [word.word for word in words if word.flag not in flags]
+
+def re_sub(reg, sub, text):
+    """
+        >>> from services.mining import *
+        >>> s = "[测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]\\n"
+        >>> s += "[测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]"
+        >>> print s
+        [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]
+        [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
+        >>> print re_sub(LINE, ' ', s)
+        [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器] [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
+        >>> print re_sub(HTTP, ' ', s)
+        [测试计量技术及仪器] [测试计量技术及仪器]
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "[测试计量技术及仪器] (www.test.com) [测试计量技术及仪器]"
+        >>> print re_sub(HTTP, ' ', s)
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "[测试计量技术及仪器] (test123@test.com) [测试计量技术及仪器]"
+        >>> print re_sub(HTTP, ' ', s)
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "--------------------\\n"
+        >>> s += "英语(CET4)、普通话\\n"
+        >>> s += "--------------------\\n"
+        >>> print re_sub(LINE, '', re_sub(SYMBOL, '', s))
+        英语(CET4)、普通话
+    """
+    return reg.sub(sub, text)
+
 def silencer(document):
         FLAGS = ['x', # spaces
                  'm', # number and date
@@ -28,33 +66,28 @@ def silencer(document):
                  'v', # vernicular expression
                  'ns', # city and country
                 ]
-        LINE = re.compile(ur'[\n- /]+')
-        SBHTTP = re.compile(ur'\(https?:.*\)(?=\s)')
-        BHTTP = re.compile(ur'\(https?:.*?\)')
-        HTTP = re.compile(ur'https?:\S*(?=\s)')
-        WWW = re.compile('www\.[\.\w]+')
-        EMAIL = re.compile('\w+@[\.\w]+')
-        SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
         if isinstance(document, list):
             texts = document
         else:
             texts = [document]
         selected_texts = []
         for text in texts:
-            text = HTTP.sub('\n', BHTTP.sub('\n', SBHTTP.sub('\n', LINE.sub(' ', text))))
-            text = WWW.sub('', EMAIL.sub('', text))
-            doc = [word.word for word in jieba.posseg.cut(text) if word.flag not in FLAGS]
+            text = re_sub(LINE, ' ', text)
+            text = re_sub(WEB, '\n', text)
+            text = re_sub(SYMBOL, ' ', text)
+            words = jieba_cut(text)
+            words = pos_extract(words, FLAGS)
             out = []
-            for d in doc:
-                if REJECT.match(d):
+            for word in words:
+                if REJECT.match(word):
                     continue
-                if d.istitle():
+                if word.istitle():
                     # Can make it match SHORT later for skip (eg 'Ltd' ...)
-                    d = d.lower()
-                if not SHORT.match(d):
+                    word = word.lower()
+                if not SHORT.match(word):
                     # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
-                    d = d.lower()
-                    out.append(d)
+                    word = word.lower()
+                    out.append(word)
             selected_texts.append(out)
         if isinstance(document, list):
             return selected_texts

@@ -33,20 +33,21 @@ class LSIsimilarity(object):
 
     def build(self, svccv_list):
         names = []
-        texts = []
+        corpus = []
         for svc_cv in svccv_list:
             for data in svc_cv.datas():
                 name, doc = data
                 names.append(name)
-                texts.append(doc)
+                words = utils.cutword.chs_lsisim(doc)
+                corpus.append(self.lsi_model.dictionary.doc2bow(words))
         if len(names) > 0:
-            self.setup(names, texts)
+            self.setup(names, corpus)
             return True
         return False
 
-    def setup(self, names, texts):
+    def setup(self, names, corpus):
         self.names = names
-        self.set_corpus(texts)
+        self.set_corpus(corpus)
         self.set_index()
 
     def save(self):
@@ -73,10 +74,8 @@ class LSIsimilarity(object):
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
 
-    def set_corpus(self, texts):
-        for text in texts:
-            words = utils.cutword.chs_lsisim(text)
-            self.corpus.append(self.lsi_model.dictionary.doc2bow(words))
+    def set_corpus(self, corpus):
+        self.corpus = corpus
 
     def set_index(self):
         if not os.path.exists(self.path):

@@ -69,7 +69,7 @@ class LSIsimilarity(object):
 
     def add(self, name, document):
         assert(self.lsi_model.dictionary)
-        text = self.lsi_model.slicer(document)
+        text = utils.cutword.chs_lsisim(document)
         self.names.append(name)
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)

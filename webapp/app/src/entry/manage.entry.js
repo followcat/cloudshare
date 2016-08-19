@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Manage from '../containers/Manage';
 
 ReactDOM.render(
-  <h1>Index page works!</h1>,
+  <Manage />,
   document.getElementById('app')
 );

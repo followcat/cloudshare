@@ -1,6 +1,7 @@
 import os
 import pickle
 
+import utils.cutword
 from gensim import similarities
 
 
@@ -73,8 +74,9 @@ class LSIsimilarity(object):
         self.corpus.append(corpu)
 
     def set_corpus(self, texts):
-        for text in self.lsi_model.slicer(texts):
-            self.corpus.append(self.lsi_model.dictionary.doc2bow(text))
+        for text in texts:
+            words = utils.cutword.chs_lsisim(text)
+            self.corpus.append(self.lsi_model.dictionary.doc2bow(words))
 
     def set_index(self):
         if not os.path.exists(self.path):

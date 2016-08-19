@@ -4,7 +4,7 @@ import re
 import core.mining.lsimodel
 import core.mining.lsisimilarity
 
-import jieba.posseg
+import utils.cutword
 
 
 REJECT = re.compile('(('+')|('.join([
@@ -43,7 +43,8 @@ def silencer(document):
         for text in texts:
             text = HTTP.sub('\n', BHTTP.sub('\n', SBHTTP.sub('\n', LINE.sub(' ', text))))
             text = WWW.sub('', EMAIL.sub('', text))
-            doc = [word.word for word in jieba.posseg.cut(text) if word.flag not in FLAGS]
+            doc = [word.word for word in utils.cutword.chs_lsimodel(text)
+                   if word.flag not in FLAGS]
             out = []
             for d in doc:
                 if REJECT.match(d):

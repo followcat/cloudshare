@@ -6,24 +6,28 @@
   border-radius: 8px;
   border: 1px solid #c2c2c2;
 }
-.newupdate-box, .history-info{
+.newupdate-box, .history-info, .bookmark-info {
   margin-top: 25px;
 }
-.newupdate-box-top, .history-info-top{
+.newupdate-box-top, .history-info-top, .bookmark-info-top {
   border-radius: 8px 8px 0 0;
   border: 1px solid #c2c2c2;
   background-color: #eee;
 }
-.newupdate-title, .history-info-title{
+.newupdate-title, .history-info-title, .bookmark-info-title {
   font-size: 0.875em;
   font-weight: bold;
   text-indent: 20px;
 }
-.newupdate-box-bottom, .history-info-bottom{
+.newupdate-box-bottom, .history-info-bottom, .bookmark-info-bottom {
   border-radius: 0 0 8px 8px;
   border-left: 1px solid #c2c2c2;
   border-right: 1px solid #c2c2c2;
   border-bottom: 1px solid #c2c2c2;
+}
+.bookmark-info-bottom {
+  max-height: 300px;
+  overflow-y: scroll;
 }
 .list{
   margin: 0 auto;
@@ -38,10 +42,13 @@
 .list-item p{
   text-indent: 10px;
 }
-.browing-wrap .list-item{
+.list-item{
   padding-top: 4px;
   padding-bottom: 6px;
 }
-.browing-wrap > .list-item > a{
+.list-item > a{
   margin-left: 8px;
+}
+.delete {
+  margin-left: 10px;
 }

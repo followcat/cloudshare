@@ -1,5 +1,5 @@
 import os
-import pickle
+import cPickle as pickle
 
 from gensim import corpora, models
 

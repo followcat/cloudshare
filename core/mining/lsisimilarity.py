@@ -1,5 +1,5 @@
 import os
-import pickle
+import cPickle as pickle
 
 import utils.cutword
 from gensim import similarities

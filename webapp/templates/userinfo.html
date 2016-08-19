@@ -34,7 +34,7 @@
     <div class="list clearfix bookmark-wrap" id="bookmark">
       {% for item in bookmark_info %}
       <div class="list-item">
-        <a href="/show/{{item.id}}.md" data-id="{{item.id}}">{% if item.name %}{{item.name}}{% else %}{{item.id}}{% endif %} | {{item.gender}} | {{item.age}} | {{item.position}}</a>
+        <a href="/show/{{item.id}}.md" data-id="{{item.id}}">{% if item.name %}{{item.name}}{% else %}{{item.id}}{% endif %}{% if item.gender %} | {{item.gender}}{% endif %}{% if item.age %}| {{item.age}}{% endif %}{% if item.position %}| {{item.position}}{% endif %}</a>
         <button type="button" class="btn btn-default btn-xs delete">Delete</button>
       </div>
       {% endfor %}

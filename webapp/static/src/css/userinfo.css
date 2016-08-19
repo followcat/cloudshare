@@ -25,6 +25,10 @@
   border-right: 1px solid #c2c2c2;
   border-bottom: 1px solid #c2c2c2;
 }
+.bookmark-info-bottom {
+  max-height: 300px;
+  overflow-y: scroll;
+}
 .list{
   margin: 0 auto;
   padding: 10px 12px 12px 8px;
@@ -44,4 +48,7 @@
 }
 .list-item > a{
   margin-left: 8px;
+}
+.delete {
+  margin-left: 10px;
 }

@@ -123,7 +123,7 @@ class Mining(object):
                 self.update_sims()
 
     def update_sims(self):
-        for modelname in self.lsimodel:
+        for modelname in self.lsi_model:
             for name in self.services:
                 for svc in self.services[name]:
                     self.sim[modelname][svc.name].update([svc])
@@ -183,7 +183,7 @@ class Mining(object):
     @property
     def SIMS(self):
         results = list()
-        for modelname in self.lsimodel:
+        for modelname in self.lsi_model:
             for sim in self.sim[modelname]:
                 results.append(sim)
         return results

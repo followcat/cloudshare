@@ -2,7 +2,7 @@
   position: relative;
   border: 1px solid #eee;
   padding: 10px 20px;
-  width: 1024px;
+  width: 1080px;
   height: auto;
   margin-top: 20px;
   background-color: #f5f5f5;
@@ -35,7 +35,7 @@
 
 .rl {
   margin-top: 10px;
-  width: 1024px;
+  width: 1080px;
 }
 
 .ls {
@@ -70,6 +70,7 @@
 }
 
 .basic-info > .bs-info-item {
+  position: relative;
   heigth: 32px;
   line-height: 32px;
 }
@@ -80,28 +81,22 @@
   background-color: #eee;
 }
 
-.extend-info .wk-ex,
-.extend-info .ed-ex,
+.extend-info .ex,
 .extend-info .wk-status {
+  float: left;
+}
+
+.extend-info .ex-content {
+  width: 620px;
+}
+
+.extend-info .ex-field,
+.extend-info .ex-content {
   float: left;
 }
 
 .extend-info > .bd-r-1 {
   border-right: 1px dotted #ccc;
-}
-
-.wk-ex span,
-.ed-ex span,
-.wk-status span {
-  display: inline-block;
-}
-
-.ed-ex ul li {
-  overflow: hidden;
-}
-
-.ed-ex ul li span{
-  float: left;
 }
 
 .omit {
@@ -112,7 +107,7 @@
 
 .top-fixed {
   position: fixed;
-  width: 1024px;
+  width: 1080px;
   top: 0;
   z-index: 999;
 }
@@ -148,6 +143,24 @@
   cursor: pointer;
 }
 
-.up-down-box:hover span{
+.up-down-box:hover span {
   color: #fff;
+}
+
+.checkbox-name {
+  display: inline-block;
+  position: absolute;
+  top: 5px;
+  left: 0;
+}
+
+.item-title {
+  display: block;
+  max-width: 150px;
+  height: inherit;
+  margin: 0 auto;
+}
+
+.item-title:visited {
+  color: #609;
 }

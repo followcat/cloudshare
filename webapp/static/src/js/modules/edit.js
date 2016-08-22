@@ -2,9 +2,17 @@ require.config({
   baseUrl: '/static/',
   paths: {
     jquery: 'lib/js/jquery',
-    cvdeal: 'src/js/util/cvdeal'
+    bootstrap: "lib/js/bootstrap",
+    cvdeal: 'src/js/util/cv_deal',
+    Upload: "src/js/util/upload",
+    header: "src/js/util/header",
+    formvalidate: "src/js/util/formvalidate",
   },
   shim: {
+    bootstrap: {
+      deps: ["jquery"],
+      exports: "bootstrap"
+    },
     cvdeal: {
       deps: ['jquery'],
       exports: 'cvdeal'
@@ -12,9 +20,11 @@ require.config({
   }
 });
 
-require(['jquery', 'cvdeal'], function($, cvdeal){
+require(['jquery', 'cvdeal', 'Upload', 'bootstrap'], function($, cvdeal){
 
-  window.onload = cvdeal.CVdeal();
+  cvdeal.cvDeal("cvContent", function() {
+    $("#loading").css("display", "none");
+  });
 
   function Edit(obj){
     obj.on('dblclick', function(){

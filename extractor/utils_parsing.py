@@ -87,11 +87,11 @@ STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P
 def compute_duration(date_from, date_to):
     u"""
         >>> print(compute_duration('2002.08', '2006.10'))
-        4年2月
+        4年2个月
         >>> print(compute_duration('2014.08', u'至今')) #doctest: +ELLIPSIS
         2年...
         >>> print(compute_duration('2011.09', '2014.08'))
-        2年11月
+        2年11个月
         >>> print(compute_duration('2012.12', '2013.09'))
         9个月
         >>> print(compute_duration('2014.03', '2016.03'))

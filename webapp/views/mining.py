@@ -100,7 +100,7 @@ class LSI(flask.views.MethodView):
         if 'marriedStatus' in flask.request.args and flask.request.args['marriedStatus']:
             filterdict['marital_status'] = flask.request.args['marriedStatus'].split(',')
         if 'business' in flask.request.args and flask.request.args['business']:
-            keywords = flask.request.args['business'].split(',')
+            keywords = flask.request.args['business'].split(' ')
             filterdict['business'] = index.get_indexkeys(['business'], keywords, uses)
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
@@ -131,7 +131,7 @@ class LSI(flask.views.MethodView):
             yaml_info = svc.getyaml(cname.yaml)
             info = {
                 'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
+                'time': utils.builtin.strftime(yaml_info['date'], '%Y-%m-%d'),
                 'match': score
             }
             datas.append([cname.md, yaml_info, info])
@@ -145,15 +145,17 @@ class Similar(flask.views.MethodView):
         miner = flask.current_app.config['SVC_MIN']
         doc = flask.request.form['doc']
         datas = []
-        for name, score in miner.probability(doc)[:7]:
+        for name, score in miner.probability(doc)[1:6]:
             cname = core.outputstorage.ConvertName(name)
             yaml_info = svc_cv.getyaml(cname.yaml)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
-                'match': score
+                'match': score,
+                'md_filename': cname.md
             }
-            datas.append([cname.md, yaml_info, info])
+            yaml_info.update(info)
+            datas.append(yaml_info)
         return flask.jsonify({'result': datas})
 
 

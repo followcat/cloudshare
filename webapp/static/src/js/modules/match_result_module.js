@@ -69,7 +69,7 @@ require(
     var m  = {
       currentURL: window.location.href,
       requestParam: queryString(window.location.href),
-      conditions: ['currentPlaces', 'education', 'expectationPlaces', 'gender', 'marriedStatus'],
+      conditions: ['currentPlaces', 'education', 'expectationPlaces', 'gender', 'marriedStatus', 'business'],
       /*
         @function: 匿名处理
         @params: array
@@ -453,12 +453,12 @@ require(
         }
         newParams.page = paramObj.page;
         newParams.uses = databaseList ? databaseList.join(',') : '';
-        newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces).replace(/\+/g, ' ') : '';
-        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces).replace(/\+/g, ' ') : '';
+        newParams.currentPlaces = m.requestParam.currentPlaces ? decodeURIComponent(m.requestParam.currentPlaces).replace(/\+/g, ' ').trim() : '';
+        newParams.expectationPlaces = m.requestParam.expectationPlaces ? decodeURIComponent(m.requestParam.expectationPlaces).replace(/\+/g, ' ').trim() : '';
+        newParams.business = m.requestParam.business ? decodeURIComponent(m.requestParam.business).replace(/\+/g, ' ').trim() : '';
         newParams.gender = m.requestParam.gender ? decodeURIComponent(m.requestParam.gender) : '';
         newParams.education = m.requestParam.education ? decodeURIComponent(m.requestParam.education) : '';
         newParams.marriedStatus = m.requestParam.marriedStatus ? decodeURIComponent(m.requestParam.marriedStatus) : '';
-        console.log(newParams);
         var newUrl = "/lsipage?" + $.param(newParams);
         $(this).attr("href", newUrl);
       });
@@ -504,6 +504,9 @@ require(
       条件过滤按钮点击事件
     */
     $("#filterBtn").on("click", function() {
+      $("#currentPlaces").val($("#currentPlaces").val().trim());
+      $("#expectationPlaces").val($("#expectationPlaces").val().trim());
+      $("#industry").val($("#industry").val().trim());
       var str = "",
           databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
       if ( m.requestParam.jd_id ) {

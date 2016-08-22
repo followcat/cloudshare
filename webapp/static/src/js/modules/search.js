@@ -17,6 +17,7 @@ require.config({
 });
 
 require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], function($, bootstrap, header, formvalidate, Upload, History){
+
   var item = $('.operate-list-item');
 
   for(var i = 0, len = item.length; i < len; i++){
@@ -74,4 +75,27 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
   if (databaseList.length > 0) {
     $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses\" value=\""+ databaseList.join(",") +"\" />");
   }
+
+  $.ajax({
+    url: "/cvnumbers",
+    dataType: "json",
+    success: function(response) {
+      var numbers = response.result,
+          len = 0;
+      for (var e in numbers) {
+        len++;
+      }
+      var mgLeft = (720 - len * 80) / (len + 1);
+
+      for (var e in numbers) {
+        $("#count").append("<div class=\"count-item\" style=\"margin-left: " + mgLeft+"px"+ "\">" + 
+          "<div class=\"k\">" + e +
+          "</div>" +
+          "<div class=\"n\">" + numbers[e] +
+          "</div>" +
+          "</div>"
+        );
+      }
+    }
+  });
 });

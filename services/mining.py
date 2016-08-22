@@ -4,6 +4,7 @@ import re
 import core.mining.lsimodel
 import core.mining.lsisimilarity
 
+import jieba
 import jieba.posseg
 
 
@@ -20,8 +21,37 @@ WEB = re.compile(ur'\(?\s?((([hH][tT][tT][pP][sS]?|[fF][tT][pP])\:\/\/)?([\w\.\-
 SYMBOL = re.compile(ur'[- /]+')
 SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
 
-def jieba_cut(text):
-    return jieba.posseg.cut(text)
+FLAGS = ['x', # spaces
+         'm', # number and date
+         'a', # adverb
+         'i', 'j',
+         'nrt', 'nr', 'ns', #'nz', fails on myjnoee7.md
+         'u', # unclassified (eg. etc)
+         'f', # time and place
+         'q', # quantifier
+         'p', # preposition
+         'v', # vernicular expression
+         'ns', # city and country
+        ]
+
+def jieba_cut(text, pos=False):
+    """
+        >>> from services.mining import *
+        >>> s = "测试计量技术及仪器"
+        >>> words = ' '.join(jieba_cut(s))
+        >>> words
+        u'\u6d4b\u8bd5 \u8ba1\u91cf \u6280\u672f \u53ca \u4eea\u5668'
+        >>> for _w in jieba_cut(s, pos=True):
+        ...     print _w
+        测试/vn
+        计量/n
+        技术/n
+        及/c
+        仪器/n
+    """
+    if pos:
+        return jieba.posseg.cut(text)
+    return jieba.cut(text)
 
 def pos_extract(words, flags):
     return [word.word for word in words if word.flag not in flags]
@@ -36,14 +66,14 @@ def re_sub(reg, sub, text):
         [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
         >>> print re_sub(LINE, ' ', s)
         [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器] [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
-        >>> print re_sub(HTTP, ' ', s)
+        >>> print re_sub(WEB, ' ', s)
         [测试计量技术及仪器] [测试计量技术及仪器]
         [测试计量技术及仪器]   [测试计量技术及仪器]
         >>> s = "[测试计量技术及仪器] (www.test.com) [测试计量技术及仪器]"
-        >>> print re_sub(HTTP, ' ', s)
+        >>> print re_sub(WEB, ' ', s)
         [测试计量技术及仪器]   [测试计量技术及仪器]
         >>> s = "[测试计量技术及仪器] (test123@test.com) [测试计量技术及仪器]"
-        >>> print re_sub(HTTP, ' ', s)
+        >>> print re_sub(WEB, ' ', s)
         [测试计量技术及仪器]   [测试计量技术及仪器]
         >>> s = "--------------------\\n"
         >>> s += "英语(CET4)、普通话\\n"
@@ -54,45 +84,33 @@ def re_sub(reg, sub, text):
     return reg.sub(sub, text)
 
 def silencer(document):
-        FLAGS = ['x', # spaces
-                 'm', # number and date
-                 'a', # adverb
-                 'i', 'j',
-                 'nrt', 'nr', 'ns', #'nz', fails on myjnoee7.md
-                 'u', # unclassified (eg. etc)
-                 'f', # time and place
-                 'q', # quantifier
-                 'p', # preposition
-                 'v', # vernicular expression
-                 'ns', # city and country
-                ]
-        if isinstance(document, list):
-            texts = document
-        else:
-            texts = [document]
-        selected_texts = []
-        for text in texts:
-            text = re_sub(LINE, ' ', text)
-            text = re_sub(WEB, '\n', text)
-            text = re_sub(SYMBOL, ' ', text)
-            words = jieba_cut(text)
-            words = pos_extract(words, FLAGS)
-            out = []
-            for word in words:
-                if REJECT.match(word):
-                    continue
-                if word.istitle():
-                    # Can make it match SHORT later for skip (eg 'Ltd' ...)
-                    word = word.lower()
-                if not SHORT.match(word):
-                    # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
-                    word = word.lower()
-                    out.append(word)
-            selected_texts.append(out)
-        if isinstance(document, list):
-            return selected_texts
-        else:
-            return selected_texts[0]
+    if isinstance(document, list):
+        texts = document
+    else:
+        texts = [document]
+    selected_texts = []
+    for text in texts:
+        text = re_sub(LINE, ' ', text)
+        text = re_sub(WEB, '\n', text)
+        text = re_sub(SYMBOL, ' ', text)
+        words = jieba_cut(text, pos=True)
+        words = pos_extract(words, FLAGS)
+        out = []
+        for word in words:
+            if REJECT.match(word):
+                continue
+            if word.istitle():
+                # Can make it match SHORT later for skip (eg 'Ltd' ...)
+                word = word.lower()
+            if not SHORT.match(word):
+                # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
+                word = word.lower()
+                out.append(word)
+        selected_texts.append(out)
+    if isinstance(document, list):
+        return selected_texts
+    else:
+        return selected_texts[0]
 
 
 class Mining(object):

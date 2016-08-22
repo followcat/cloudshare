@@ -13,7 +13,7 @@ from webapp.restful.curriculumvitae import *
 def initialize(app):
     api = flask.ext.restful.Api(app)
     api.add_resource(AccountAPI, '/api/account/<string:id>', endpoint = 'account')
-    api.add_resource(AccountListAPI, '/api/accountlist', endpoint = 'accountlist')
+    api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')
     api.add_resource(AccountHistoryAPI, '/api/accounthistory', endpoint = 'accounthistory')
 
     api.add_resource(CompanyAPI, '/api/company/<string:name>', endpoint = 'company')

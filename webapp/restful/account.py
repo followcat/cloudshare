@@ -2,6 +2,7 @@ import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
+import services
 import json
 import utils.builtin
 
@@ -19,7 +20,7 @@ class AccountAPI(Resource):
                 Delete account.
     """
 
-    decorators = [flask.ext.login.login_required]
+    # decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
@@ -75,15 +76,34 @@ class AccountListAPI(Resource):
         GET    Get Account List.
     """
 
-    decorators = [flask.ext.login.login_required]
+    # decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        self.reqparse = reqparse.RequestParser()
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         super(AccountListAPI, self).__init__()
+        self.reqparse.add_argument('name', type = str, required = True,
+                                   help = 'No name provided', location = 'json')
+        self.reqparse.add_argument('password', type = str, required = True,
+                                   help = 'No password provided', location = 'json')
 
     def get(self):
         userlist = self.svc_account.get_user_list()
-        return { 'data': userlist }
+        return { 'code': 200, 'data': userlist }
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        name = args['name']
+        password = args['password']
+        root_user = flask.ext.login.current_user
+        try:
+            if self.svc_account.add(root_user.id, name, password):
+                result = { 'code': 200, 'message': 'Create user successed.'}
+            else:
+                result = { 'code': 400, 'message': 'The currently logged in user does not have permissions.'}
+        except services.exception.ExistsUser:
+            result = { 'code': 400, 'message': 'This username is existed.'}
+        return result
 
 
 class AccountHistoryAPI(Resource):
@@ -92,7 +112,7 @@ class AccountHistoryAPI(Resource):
         GET     Get Accout commit history.
     """
 
-    decorators = [flask.ext.login.login_required]
+    # decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         self.repo = flask.current_app.config['DATA_DB']

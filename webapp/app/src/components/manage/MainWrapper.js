@@ -1,6 +1,8 @@
 'use strict';
 import React, { Component } from 'react';
-import { Menu, Table, Button } from 'antd';
+import { Menu, Table, Button, Modal, Form, Input } from 'antd';
+
+import CreateUser from './CreateUser';
 
 import './mainwrapper.less';
 
@@ -14,10 +16,23 @@ const columns = [
     title: 'Operation',
     key: 'operation',
     render: () => (
-      <a href="#">删除</a>
+      <a href="#" onClick={showConfirm}>Delete</a>
     )
   }
 ];
+
+function showConfirm() {
+  Modal.confirm({
+    title: "Delete User",
+    content: "Are you sure to delete this user item?",
+    onOk() {
+      return new Promise((resolve) => {
+        setTimeout(resolve, 2000);
+      });
+    },
+    onCancel() {},
+  });
+}
 
 export default class MainWrapper extends Component {
   constructor(props) {
@@ -35,19 +50,8 @@ export default class MainWrapper extends Component {
       current: e.key,
     });
   }
-  render() {
-    
-    const datas = [
-      {
-        key: 1,
-        name: 'CJK',
-      },
-      {
-        key: 2,
-        name: 'Test'
-      }
-    ];
 
+  render() {
     return (
       <div className="cs-layout-bottom">
         <div className="cs-layout-wrapper">
@@ -63,12 +67,17 @@ export default class MainWrapper extends Component {
           </div>
           <div className="cs-layout-content">
             <div className="toolbar">
-              <Button type="primary">Create User</Button>
+              <CreateUser {...this.props} />
             </div>
-            <Table columns={columns} dataSource={datas} />
+            <Table columns={columns} dataSource={this.props.userList} />
           </div>
         </div>
       </div>
     );
   }
 }
+
+React.propTypes = {
+  datas: React.PropTypes.array.isRequired,
+  visible: React.PropTypes.bool,
+};

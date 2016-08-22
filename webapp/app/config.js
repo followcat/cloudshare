@@ -2,6 +2,7 @@
 const path = require('path');
 
 module.exports = {
+  host: "http://0.0.0.0:4888",
   serverConfig: {
     dev: {
       baseURL: 'http://localhost:3000/',

@@ -1,88 +1,26 @@
 'use strict';
-import React, { Component, PropTypes } from 'react';
-import 'whatwg-fetch';
+import React from 'react';
+import { Link } from 'react-router';
+
+import { Menu } from 'antd';
 
 import Header from '../components/manage/Header';
-import MainWrapper from '../components/manage/MainWrapper';
 
-import config from '../../config';
+import './manage.less';
 
-
-export default class Manage extends Component {
-  constructor(props) {
-    super(props);
+export default class Manage extends React.Component {
+  constructor() {
+    super();
     this.state = {
-      datas: [],
-      visible: false,
-      confirmLoading: false,
+      current: 'userList',
     };
-
-    this.handleModalOpen = this.handleModalOpen.bind(this);
-    this.handleModalClose = this.handleModalClose.bind(this);
-    this.handleSubmitCreation = this.handleSubmitCreation.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  loadUserList() {
-    fetch(config.host + '/api/accounts')
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      if (json.code === 200) {
-        let datas = json.data.map((value, index) => {
-          return { key: index, name: value };
-        });
-        this.setState({ datas: datas });
-      }
-    })
-  }
-
-  handleModalOpen() {
+  handleClick(e) {
     this.setState({
-      visible: true,
+      current: e.key,
     });
-  }
-
-  handleModalClose() {
-    this.setState({
-      visible: false,
-    });
-  }
-
-  handleSubmitCreation(user) {
-    this.setState({
-      confirmLoading: true,
-    });
-    fetch(config.host + '/api/accounts',{
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: user.name,
-        password: user.password,
-      })
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      if (json.code === 200) {
-        let datas = this.state.datas,
-            len = datas.length;
-        datas.push({ key: len, name: user.name });
-        this.setState({
-          datas: datas,
-          confirmLoading: false,
-          visible: false,
-        });
-      }
-    });
-  }
-
-  componentDidMount() {
-    this.loadUserList();
   }
 
   render() {
@@ -90,14 +28,21 @@ export default class Manage extends Component {
       <div>
         <div id="viewport">
           <Header />
-          <MainWrapper 
-            userList={this.state.datas}
-            visible={this.state.visible}
-            confirmLoading={this.state.confirmLoading}
-            onSubmitCreation={this.handleSubmitCreation}
-            onModalOpen={this.handleModalOpen}
-            onModalClose={this.handleModalClose}
-          />
+          <div className="cs-layout-bottom">
+            <div className="cs-layout-wrapper">
+              <div className="cs-layout-sider">
+                <Menu
+                  mode="inline"
+                  selectedKeys={[this.state.current]}
+                  onClick={this.handleClick}
+                >
+                  <Menu.Item key="userList"><Link to="/userlist">User List</Link></Menu.Item>
+                  <Menu.Item key="setting"><Link to="/setting">Setting</Link></Menu.Item>
+                </Menu>
+              </div>
+              {this.props.children}
+            </div>
+          </div>
         </div>
       </div>
     );

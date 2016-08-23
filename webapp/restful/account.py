@@ -20,7 +20,7 @@ class AccountAPI(Resource):
                 Delete account.
     """
 
-    # decorators = [flask.ext.login.login_required]
+    decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
@@ -64,9 +64,12 @@ class AccountAPI(Resource):
         return { 'data': result }
 
     def delete(self, id):
-        user = flask.ext.login.current_user
-        result = self.svc_account.delete(user.id, id)
-        return { 'data': result }
+        root_user = flask.ext.login.current_user
+        if self.svc_account.delete(root_user.id, id):
+            result = { 'code': 200, 'message': 'Delete ' + id + ' successed.' }
+        else:
+            result = { 'code': 400, 'message': 'Deleted ' + id + ' failed.' }
+        return result
 
 
 class AccountListAPI(Resource):
@@ -76,7 +79,7 @@ class AccountListAPI(Resource):
         GET    Get Account List.
     """
 
-    # decorators = [flask.ext.login.login_required]
+    decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -112,7 +115,7 @@ class AccountHistoryAPI(Resource):
         GET     Get Accout commit history.
     """
 
-    # decorators = [flask.ext.login.login_required]
+    decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         self.repo = flask.current_app.config['DATA_DB']

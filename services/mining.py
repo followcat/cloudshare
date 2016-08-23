@@ -23,15 +23,28 @@ SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
 
 FLAGS = ['x', # spaces
          'm', # number and date
-         'a', # adverb
-         'i', 'j',
-         'nrt', 'nr', 'ns', #'nz', fails on myjnoee7.md
-         'u', # unclassified (eg. etc)
-         'f', # time and place
-         'q', # quantifier
+         #'a', # adverb
+         'c', # conjunction
+         'd', # adverb
+         'e', # interjection
+         'f', # noun of locality
+         'g', # morpheme word
+         'h', # prefix
+         'i', # idiom
+         #'j', # abbreviation
+         'k', # suffix
+         'nrt', 'nr', 'ng', #'nz', fails on myjnoee7.md
+         'o', # onomatopoeia
          'p', # preposition
-         'v', # vernicular expression
-         'ns', # city and country
+         'q', # quantifier
+         'r', # pronoun
+         'tg', # time root word
+         'u', # unclassified (eg. etc)
+         'vg', # verb morpheme word
+         #'v', # verb
+         'y', # statement label designator
+         'z', # State word
+         #'ns', # city and country
         ]
 
 def jieba_cut(text, pos=False):
@@ -54,6 +67,34 @@ def jieba_cut(text, pos=False):
     return jieba.cut(text)
 
 def pos_extract(words, flags):
+    """
+        >>> from services.mining import *
+        >>> s = "◆负责产品环境、电磁兼容、可靠性、安规等测试；"
+        >>> words = list(jieba_cut(s, pos=True))
+        >>> for _w in words:
+        ...     print _w
+        ◆/x
+        负责/v
+        产品/n
+        环境/n
+        、/x
+        电磁兼容/l
+        、/x
+        可靠性/n
+        、/x
+        安规/nr
+        等/u
+        测试/vn
+        ；/x
+        >>> words = pos_extract(words, FLAGS)
+        >>> for _w in words:
+        ...     print _w
+        产品
+        环境
+        电磁兼容
+        可靠性
+        测试
+    """
     return [word.word for word in words if word.flag not in flags]
 
 def re_sub(reg, sub, text):

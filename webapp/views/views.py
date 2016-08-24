@@ -166,7 +166,8 @@ class Confirm(flask.views.MethodView):
     def post(self):
         info = {
             'name': flask.request.form['name'],
-            'origin': flask.request.form['origin']
+            'origin': flask.request.form['origin'],
+            'model': flask.request.form['model']
         }
         user = flask.ext.login.current_user
         svc_cv = flask.current_app.config['SVC_CV']

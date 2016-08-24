@@ -319,10 +319,8 @@ require([
         },
         success: function(response) {
           if (response.result) {
-            _this.text("Collect CV");
             _this.attr("data-collected", "false");
-            _this.removeClass("btn-primary");
-            _this.addClass("btn-default");
+            _this.removeClass("star-active");
           } else {
             alert("Delete bookmark error.");
           }
@@ -337,10 +335,8 @@ require([
         },
         success: function(response) {
           if (response.result) {
-            _this.text("Cancel collection");
             _this.attr("data-collected", "true");
-            _this.removeClass("btn-default");
-            _this.addClass("btn-primary");
+            _this.addClass("star-active");
           } else {
             alert("Add bookmark error.");
           }

@@ -70,11 +70,29 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     }
   });
 
-  var databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
+  $("#sentenceBtn").on("click", function() {
+    var sbs = $("#serachbysentence"),
+        databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
 
-  if (databaseList.length > 0) {
-    $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses\" value=\""+ databaseList.join(",") +"\" />");
-  }
+    if (databaseList.length > 0) {
+      var usesInput = sbs.find("input[name='uses']");
+      if (usesInput.length > 0) {
+        $(usesInput).val(databaseList.join(","));
+      } else {
+        $(sbs).append("<input type=\"text\" class=\"hide-param\" name=\"uses\" value=\""+ databaseList.join(",") +"\" />");
+      }
+    }
+
+    if (localStorage.model) {
+      var modelInput = sbs.find("input[name='model']");
+      if (modelInput.length > 0) {
+        $(modelInput).val(localStorage.model);
+      } else {
+        $(sbs).append("<input type=\"text\" class=\"hide-param\" name=\"model\" value=\""+ localStorage.model +"\" />");
+      }
+    }
+    $(sbs).submit();
+  });
 
   $.ajax({
     url: "/cvnumbers",

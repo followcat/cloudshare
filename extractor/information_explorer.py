@@ -137,8 +137,10 @@ def get_experience(stream, name=None):
         current_company = ''
     if current_position is None:
         current_position = ''
-    result['company']=current_company
-    result['position']=current_position
+    if 'experience' not in result:
+        result['experience'] = {}
+    result['company'] = current_company
+    result['position'] = current_position
     return result
 
 
@@ -185,7 +187,7 @@ def catch(stream, name=None):
     info_dict["age"] = get_age(stream)
     info_dict["phone"] = get_phone(stream)
     info_dict["email"] = get_email(stream)
-    info_dict.update(get_education(stream))     # education_history, education, school
+    info_dict.update(get_education(stream, name))     # education_history, education, school
     info_dict.update(get_experience(stream, name))    # experience, company, position
     info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                 # age

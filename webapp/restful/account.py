@@ -36,7 +36,7 @@ class AccountAPI(Resource):
         info = ''
         args = self.reqparse.parse_args()
         if 'oldpassword' not in args or 'newpassword' not in args:
-            result = False
+            result = { 'code': 400, 'message': 'Change password failed.', 'error': 'Request arguments error.' }
         else:
             oldpassword = args['oldpassword']
             newpassword = args['newpassword']
@@ -45,12 +45,12 @@ class AccountAPI(Resource):
         try:
             if(user.password == md5newpwd):
                 user.changepassword(newpassword)
-                result = True
+                result = { 'code': 200, 'message': 'Change password successed.' }
             else:
-                result = False
+                result = { 'code': 400, 'message': 'Old password validation errors.' }
         except services.exception.ExistsUser:
             pass
-        return  { 'data': result }
+        return  result
 
     def post(self, id):
         result = False

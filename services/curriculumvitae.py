@@ -2,6 +2,7 @@ import time
 import yaml
 import os.path
 
+import utils._yaml
 import services.base
 import core.outputstorage
 import core.converterutils
@@ -175,7 +176,7 @@ class CurriculumVitae(services.base.Service):
         yaml_str = self.interface.get(path_name)
         if yaml_str is None:
             raise IOError
-        return yaml.load(yaml_str)
+        return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
     @property
     def NUMS(self):

@@ -16,6 +16,7 @@ body {
   border-bottom: 1px solid #ccc; 
   background-color: #eee;
   overflow: hidden;
+  position: relative;
 }
 
 .main-header .uploader {
@@ -207,4 +208,71 @@ h3
   text-align: left;
 
   border: 1px solid #c2c2c2;
+}
+
+.star-box {
+  position: absolute;
+  top: 14px;
+  left: 180px;
+  cursor: pointer;
+}
+
+.star {
+  position: relative;
+  display: block;
+  width: 0;
+  height: 0;
+  border-right: 16px solid transparent;
+  border-bottom: 11px solid white;
+  border-left: 16px solid transparent;
+  -moz-transform: rotate(35deg);
+  -webkit-transform: rotate(35deg);
+  -ms-transform: rotate(35deg);
+  -o-transform: rotate(35deg);
+  transform: rotate(35deg);
+}
+
+.star:before {
+  border-bottom: 12px solid white;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  position: absolute;
+  height: 0;
+  width: 0;
+  top: -8px;
+  left: -10px;
+  display: block;
+  content: '';
+  -webkit-transform: rotate(-35deg);
+  -moz-transform:    rotate(-35deg);
+  -ms-transform:     rotate(-35deg);
+  -o-transform:      rotate(-35deg);
+}
+.star:after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: -16px;
+  width: 0px;
+  height: 0px;
+  border-right: 16px solid transparent;
+  border-bottom: 11px solid white;
+  border-left: 16px solid transparent;
+  -webkit-transform: rotate(-70deg);
+  -moz-transform:    rotate(-70deg);
+  -ms-transform:     rotate(-70deg);
+  -o-transform:      rotate(-70deg);
+  content: '';
+}
+
+.star-active {
+  border-bottom: 11px solid #FFC107;
+}
+
+.star-active:before {
+  border-bottom: 12px solid #FFC107;
+}
+
+.star-active:after {
+  border-bottom: 11px solid #FFC107;
 }

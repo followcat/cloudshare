@@ -19,7 +19,6 @@ export default class UserList extends Component {
       datas: [],
       visible: false,
       confirmLoading: false,
-      tableHeight: 0,
     };
     this.handleModalOpen = this.handleModalOpen.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
@@ -122,11 +121,6 @@ export default class UserList extends Component {
 
   componentDidMount() {
     this.loadUserList();
-
-    let height = parseInt(this.refs.contentDiv.offsetHeight - this.refs.toolbarDiv.offsetHeight) - 90;
-    this.setState({
-      tableHeight: height,
-    });
   }
 
   render() {
@@ -148,19 +142,17 @@ export default class UserList extends Component {
     const rowSelection = {};
     return (
       <div>
-        <div className="cs-layout-content" ref="contentDiv">
-          <div className="toolbar" ref="toolbarDiv">
-            <CreateUser             
-              userList={this.state.datas}
-              visible={this.state.visible}
-              confirmLoading={this.state.confirmLoading}
-              onSubmitCreation={this.handleSubmitCreation}
-              onModalOpen={this.handleModalOpen}
-              onModalClose={this.handleModalClose}
-            />
-          </div>
-          <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.datas} scroll={{ y: this.state.tableHeight }} />
+        <div className="toolbar" ref="toolbarDiv">
+          <CreateUser             
+            userList={this.state.datas}
+            visible={this.state.visible}
+            confirmLoading={this.state.confirmLoading}
+            onSubmitCreation={this.handleSubmitCreation}
+            onModalOpen={this.handleModalOpen}
+            onModalClose={this.handleModalClose}
+          />
         </div>
+        <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.datas} scroll={{ y: this.props.wrapperHeigth }}/>
       </div>
     );
   }

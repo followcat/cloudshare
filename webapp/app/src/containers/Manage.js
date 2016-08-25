@@ -13,6 +13,7 @@ export default class Manage extends React.Component {
     super();
     this.state = {
       current: 'userList',
+      wrapperHeigth: 0,
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -23,13 +24,20 @@ export default class Manage extends React.Component {
     });
   }
 
+  componentDidMount() {
+    let height = parseInt(this.refs.wrapper.offsetHeight) - 220;
+    this.setState({
+      wrapperHeigth: height,
+    });
+  }
+
   render() {
     return (
       <div>
         <div id="viewport">
           <Header />
           <div className="cs-layout-bottom">
-            <div className="cs-layout-wrapper">
+            <div className="cs-layout-wrapper" ref="wrapper">
               <div className="cs-layout-sider">
                 <Menu
                   mode="inline"
@@ -40,7 +48,9 @@ export default class Manage extends React.Component {
                   <Menu.Item key="setting"><Link to="/setting">Setting</Link></Menu.Item>
                 </Menu>
               </div>
-              {this.props.children}
+              <div className="cs-layout-content">
+                {this.props.children && React.cloneElement(this.props.children, { wrapperHeigth: this.state.wrapperHeigth })}
+              </div>
             </div>
           </div>
         </div>

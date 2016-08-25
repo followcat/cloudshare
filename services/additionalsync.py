@@ -108,9 +108,9 @@ class AdditionalSync(object):
             additionals = dict([(additional.name, additional)
                                 for additional in self.additionals
                                 if additional.name in additionals])
-        for name in additionals:
-            a = additionals[name]
-            i = additionals[name].interface
+        for additional in additionals:
+            a = additional
+            i = additional.interface
             for yamlname in a.yamls():
                 raw_yamlstr = i.getraw(yamlname)
                 raw_yaml = yaml.load(raw_yamlstr, Loader=utils._yaml.SafeLoader)

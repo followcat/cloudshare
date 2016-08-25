@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component } from 'react';
-import './header.less';
-import LogoImg from '../../image/logo.png'
+
+import LogoImg from '../../image/logo.png';
 
 export default class Header extends Component {
 

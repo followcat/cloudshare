@@ -6,15 +6,65 @@
 
 @baseWidth: 1080px;
 
-@baseBackgroundColor: #ECECEC;
+@baseBackgroundColor: #F5F5F5;
+
+@white: #FFF;
+
+* {
+  box-sizing: border-box;
+}
 
 #app, #app>div, .viewport, body, html {
   height: 100%;
 }
 
+body {
+  background-color: @baseBackgroundColor;
+}
+
 #viewport {
   position: relative;
+  width: 100%;
   height: 100%;
   padding: @topNavHeight 0 20px 0;
-  background-color: @baseBackgroundColor;
+}
+
+.cs-layout-top {
+  position: fixed;
+  width: 100%;
+  height: @topNavHeight;
+  top: 0;
+  left: 0;
+  -moz-box-shadow: 0 2px 3px @topShadowColor;
+  -webkit-box-shadow: 0 2px 3px @topShadowColor;
+  box-shadow: 0 2px 3px @topShadowColor;
+
+  .cs-layout-herader {
+    background-color: @willendareColor;
+    height: inherit;
+
+    .cs-layout-wrapper {
+      width: @baseWidth;
+      height: inherit;
+      margin: 0 auto;
+      padding: 0 15px;
+
+      .cs-layout-logo {
+        width: 200px;
+        height: inherit;
+        text-align: center;
+
+        img {
+          vertical-align: middle;
+        }
+      }
+
+      .cs-layout-logo:before {
+        content: "";
+        display: inline-block;
+        height: 100%;
+        vertical-align: middle;
+      }
+    }
+  }
 }

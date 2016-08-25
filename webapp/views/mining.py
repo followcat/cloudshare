@@ -72,6 +72,8 @@ class LSI(flask.views.MethodView):
         sim_names = miner.addition_names()
         uses = miner.default_names()
         basemodel = svc_cv.default.name
+        if 'model' in flask.request.args and flask.request.args['model']:
+            basemodel = flask.request.args['model']
         if 'uses' in flask.request.args and flask.request.args['uses']:
             uses.extend(flask.request.args['uses'].split(','))
         if 'jd_id' in flask.request.args:
@@ -201,3 +203,11 @@ class Valuable(flask.views.MethodView):
         response['data'] = datas
         response['max'] = 100
         return flask.jsonify(response)
+
+
+class ModelList(flask.views.MethodView):
+
+    def post(self):
+        miner = flask.current_app.config['SVC_MIN']
+        uses = miner.default_names()
+        return flask.jsonify(uses)

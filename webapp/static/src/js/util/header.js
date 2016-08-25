@@ -131,5 +131,45 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
   };
   header.UploadDiv($(".upload"));
 
+  header.getModelList = function() {
+    $.ajax({
+      url: "/modellist",
+      type: "POST",
+      success: function(response) {
+        var model = localStorage.model ? localStorage.model : '';
+
+        for (var i = 0, len = response.length; i < len; i++) {
+          if (model === response[i] && model !== "") {
+            $("#modelMenu").append("<li><a href=\"#\" class=\"model-item\" data-flag=\"true\">"+ response[i] +"<span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></a></li>");
+          } else {
+            $("#modelMenu").append("<li><a href=\"#\" class=\"model-item\" data-flag=\"false\">"+ response[i] +"</a></li>");
+          }
+        }
+      }
+    })
+  };
+  header.getModelList();
+
+  header.modelItemEvent = function() {
+    $("#modelMenu").delegate(".model-item", "click", function() {
+      var _this = $(this);
+      if (_this.attr("data-flag") === "true") {
+        _this.attr("data-flag", "false");
+        localStorage.model = "";
+        _this.find(".glyphicon").remove();
+      } else {
+        var models = $(".model-item");
+        for (var i = 0, len = models.length; i < len; i++) {
+          $(models[i]).attr("data-flag", "false");
+          $(models[i]).find(".glyphicon").remove();
+        }
+        localStorage.model = _this.text();
+        _this.attr("data-flag", "true");
+        _this.append("<span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span>");
+      }
+    });
+  };
+  header.modelItemEvent();
+
   return header;
 });

@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Button, Form, Input, Row, Col } from 'antd';
 
+import './changepassword.less';
+
 import classNames from 'classnames';
 
 function noop() {
@@ -18,12 +20,30 @@ class ChangePassword extends React.Component {
       newPwdStrength: 'L',
       rePwdStrength: 'L',
     };
+    this.handleReset = this.handleReset.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
     this.getPassStrenth = this.getPassStrenth.bind(this);
     this.renderPassStrengthBar = this.renderPassStrengthBar.bind(this);
     this.checkPassword = this.checkPassword.bind(this);
     this.checkRePassword = this.checkRePassword.bind(this);
   }
 
+  handleReset(e) {
+    e.preventDefault();
+    this.props.form.resetFields();
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    this.props.form.validateFields((errors, values) => {
+      if (!!errors) {
+        return;
+      } else {
+        this.props.onSubmit(values);
+        this.props.form.resetFields();
+      }
+    });
+  }
 
   getPassStrenth(value, type) {
     if (value) {
@@ -206,10 +226,10 @@ class ChangePassword extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Col span="18">
-              <Col span="18" offset="12">
-                <Button type="primary">Submit</Button>
-              </Col>
+            <Col span="16" offset="8">
+              <Button type="ghost" onClick={this.handleReset}>Reset</Button>
+              &nbsp;&nbsp;&nbsp;
+              <Button type="primary" onClick={this.handleSubmit}>Submit</Button>
             </Col>
           </Row>
         </Form>

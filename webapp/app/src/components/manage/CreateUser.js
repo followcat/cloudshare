@@ -22,9 +22,16 @@ class CreateUser extends Component {
     }
   }
 
-  handleSubmit() {
-    this.props.onSubmitCreation(this.props.form.getFieldsValue(['name', 'password']));
-    this.props.form.resetFields();
+  handleSubmit(e) {
+    e.preventDefault();
+    this.props.form.validateFields((errors, values) => {
+      if (!!errors) {
+        return;
+      } else {
+        this.props.onSubmitCreation(values);
+        this.props.form.resetFields();
+      }
+    });
   }
 
   render() {

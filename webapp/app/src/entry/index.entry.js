@@ -1,7 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import enUS from 'antd/lib/locale-provider/en_US';
+import { LocaleProvider } from 'antd';
+
+import Index from '../containers/Index';
+
 ReactDOM.render(
-  <h1>Index page works!</h1>,
+  <LocaleProvider locale={enUS}>
+    <Index />
+  </LocaleProvider>,
   document.getElementById('app')
 );

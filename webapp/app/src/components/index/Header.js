@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component } from 'react';
 
-// import Feature from './Feature';
+import Feature from './Feature';
 
 import './header.less';
 
@@ -16,6 +16,9 @@ export default class Header extends Component {
           <div className="cs-layout-wrapper">
             <div className="cs-layout-logo">
               <img src={LogoImg} alt="Logo" />
+            </div>
+            <div className="cs-layout-feature">
+              <Feature />
             </div>
           </div>
         </div>

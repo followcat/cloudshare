@@ -8,7 +8,7 @@ from webapp.restful.account import *
 from webapp.restful.company import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
-
+from webapp.restful.feature import *
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
@@ -52,3 +52,6 @@ def initialize(app):
                                         endpoint = 'valuablebyjdid')
     api.add_resource(ValuablebydocAPI, '/api/mining/valuablebydoc',
                                         endpoint = 'valuablebydoc')
+
+    api.add_resource(FeatureAPI, '/api/feature',
+                                        endpoint = 'feature')

@@ -1,7 +1,8 @@
+import flask
 import flask.ext.login
 
 import services.exception
-
+from itsdangerous import JSONWebSignatureSerializer
 
 class User(flask.ext.login.UserMixin):
 
@@ -11,6 +12,10 @@ class User(flask.ext.login.UserMixin):
         if id not in svc_account.USERS:
             raise services.exception.UserNotFoundError()
         self.password = svc_account.USERS[unicode(id)]
+
+    def get_auth_token(self, password):
+        s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
+        return s.dumps({ 'id': self.id, 'password': password })
 
     def changepassword(self, password):
         self.svc_account.modify(self.id, password)

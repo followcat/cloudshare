@@ -1,11 +1,12 @@
 import flask.ext.login
+import utils.builtin
 
 import webapp.views.views
 import webapp.views.mining
 import webapp.views.company
 import webapp.views.account
 import webapp.views.jobdescription
-
+from itsdangerous import JSONWebSignatureSerializer
 
 def init_login(app):
     login_manager = flask.ext.login.LoginManager()
@@ -15,6 +16,20 @@ def init_login(app):
     @login_manager.user_loader
     def load_user(id):
         return webapp.views.account.User.get(id, app.config['SVC_ACCOUNT'])
+
+    @login_manager.token_loader
+    def load_token(token):
+        s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except Exception:
+            return None
+        svcaccount = flask.current_app.config['SVC_ACCOUNT']
+        user = webapp.views.account.User.get(data.id, svcaccount)
+        upassword = utils.builtin.md5(data.password)
+        if user and upassword == user.password:
+            return user
+        return None
 
 
 def configure(app):

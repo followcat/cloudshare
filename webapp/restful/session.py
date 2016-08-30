@@ -36,3 +36,13 @@ class SessionAPI(Resource):
         else:
             result =  { 'code': 400 , 'message': 'Username or Password Incorrect.' }
         return result
+
+    @flask.ext.login.login_required
+    def delete(self):
+        result = dict()
+        try:
+            flask.ext.login.logout_user()
+            result = { 'code': 200, 'massage': 'Sign out successed.', 'redirect_url': '/' }
+        except Exception:
+            result = { 'code': 400, 'massage': Exception }
+        return result

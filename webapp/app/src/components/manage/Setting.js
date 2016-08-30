@@ -4,6 +4,8 @@ import { message } from 'antd';
 
 import ChangePassword from '../common/ChangePassword';
 
+import config from '../../../config';
+
 message.config({
   top: 66,
   duration: 3,
@@ -15,8 +17,29 @@ export default class Setting extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleSubmit(e) {
-    //Submit fetch
+  handleSubmit(pwd) {
+    fetch(`${config.host}/api/accounts/${localStorage.user}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        oldpassword: pwd.oldPwd,
+        newpassword: pwd.reNewPwd,
+      }),
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        message.success(json.message);
+      } else {
+        message.error(json.message);
+      }
+    });
   }
 
   render() {

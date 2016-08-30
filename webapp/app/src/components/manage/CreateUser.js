@@ -22,8 +22,7 @@ class CreateUser extends Component {
     }
   }
 
-  handleSubmit(e) {
-    e.preventDefault();
+  handleSubmit() {
     this.props.form.validateFields((errors, values) => {
       if (!!errors) {
         return;

@@ -27,7 +27,11 @@ export default class UserList extends Component {
   }
 
   loadUserList() {
-    fetch(`${config.host}/api/accounts`)
+    fetch(`${config.host}/api/accounts`, {
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`
+      }
+    })
     .then((response) => {
       return response.json();
     })
@@ -57,9 +61,10 @@ export default class UserList extends Component {
     this.setState({
       confirmLoading: true,
     });
-    fetch(`${config.host}/api/accounts`,{
+    fetch(`${config.host}/api/accounts`, {
       method: 'POST',
       headers: {
+        'Authorization': `Basic ${localStorage.token}`,
         'Accept': 'application/json',
         'Content-type': 'application/json',
       },
@@ -102,6 +107,9 @@ export default class UserList extends Component {
       onOk() {
         fetch(`${config.host}/api/accounts/${name}`, {
           method: "DELETE",
+          headers: {
+            'Authorization': `Basic ${localStorage.token}`,
+          }
         })
         .then((response) => {
           return response.json();

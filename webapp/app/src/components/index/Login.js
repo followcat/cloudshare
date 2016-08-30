@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import { Card, Form, Input, Button, Row, Col } from 'antd';
 
 class Login extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.handleOnSignIn = this.handleOnSignIn.bind(this);
   }
 
@@ -13,7 +13,7 @@ class Login extends Component {
       if (!!errors) {
         return;
       } else {
-        //Submit
+        this.props.onSignIn(values);
       }
     });
   }

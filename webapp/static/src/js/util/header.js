@@ -136,13 +136,14 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
       url: "/modellist",
       type: "POST",
       success: function(response) {
-        var model = localStorage.model ? localStorage.model : '';
+        var data = response.model_list,
+            model = localStorage.model ? localStorage.model : '';
 
-        for (var i = 0, len = response.length; i < len; i++) {
-          if (model === response[i] && model !== "") {
-            $("#modelMenu").append("<li><a href=\"#\" class=\"model-item\" data-flag=\"true\">"+ response[i] +"<span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></a></li>");
+        for (var i = 0, len = data.length; i < len; i++) {
+          if (model === data[i] && model !== "") {
+            $("#modelMenu").append("<li><a href=\"#\" class=\"model-item\" data-flag=\"true\">"+ data[i] +"<span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></a></li>");
           } else {
-            $("#modelMenu").append("<li><a href=\"#\" class=\"model-item\" data-flag=\"false\">"+ response[i] +"</a></li>");
+            $("#modelMenu").append("<li><a href=\"#\" class=\"model-item\" data-flag=\"false\">"+ data[i] +"</a></li>");
           }
         }
       }

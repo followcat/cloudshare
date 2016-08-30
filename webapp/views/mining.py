@@ -209,5 +209,5 @@ class ModelList(flask.views.MethodView):
 
     def post(self):
         miner = flask.current_app.config['SVC_MIN']
-        uses = miner.default_names()
-        return flask.jsonify(uses)
+        model_list = miner.default_names()
+        return flask.jsonify(model_list=model_list)

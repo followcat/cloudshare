@@ -37,7 +37,7 @@ export default class Index extends Component {
         localStorage.user = json.user;
         location.href = json.redirect_url;
       } else {
-        message.error(json.massage);
+        message.error(json.message);
       }
     });
   }

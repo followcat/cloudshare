@@ -35,16 +35,12 @@ def init_login(app):
         token = request.headers.get('Authorization')
         if token:
             token = token.replace('Basic ', '', 1)
-            try:
-                token = base64.b64decode(token)
-                s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
-                data = s.loads(token)
-                svcaccount = flask.current_app.config['SVC_ACCOUNT']
-                user = webapp.views.account.User.get(data.id, svcaccount)
-                if user is not None:
-                    return user
-            except Exception:
-                return None
+            s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
+            data = s.loads(token)
+            svcaccount = flask.current_app.config['SVC_ACCOUNT']
+            user = webapp.views.account.User.get(data['id'], svcaccount)
+            if user is not None:
+                return user
         return None
 
 def configure(app):

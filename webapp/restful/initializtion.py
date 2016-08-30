@@ -9,9 +9,11 @@ from webapp.restful.company import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
 from webapp.restful.feature import *
+from webapp.restful.session import *
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
+    api.add_resource(SessionAPI, '/api/session')
     api.add_resource(AccountAPI, '/api/accounts/<string:id>')
     api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')
     api.add_resource(AccountHistoryAPI, '/api/accounthistory', endpoint = 'accounthistory')

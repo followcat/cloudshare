@@ -13,9 +13,9 @@ class User(flask.ext.login.UserMixin):
             raise services.exception.UserNotFoundError()
         self.password = svc_account.USERS[unicode(id)]
 
-    def get_auth_token(self, password):
+    def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
-        return s.dumps({ 'id': self.id, 'password': password })
+        return s.dumps({ 'id': self.id })
 
     def changepassword(self, password):
         self.svc_account.modify(self.id, password)

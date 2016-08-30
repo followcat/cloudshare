@@ -25,8 +25,6 @@ class AccountAPI(Resource):
     def __init__(self):
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('password', type = str, required = True,
-                                   help = 'No password provided', location = 'json')
         self.reqparse.add_argument('oldpassword', type = str, location = 'json')
         self.reqparse.add_argument('newpassword', type = str, location = 'json')
         super(AccountAPI, self).__init__()

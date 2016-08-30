@@ -29,10 +29,10 @@ class SessionAPI(Resource):
             flask.ext.login.login_user(user,remember=True)
             token = flask.ext.login.current_user.get_auth_token()
             if(user.id == "root"):
-                result = { 'code': 200, 'token': token }
+                result = { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/manage.html' }
             else:
                 flask.session[user.id] = dict()
-                result =  { 'code': 200, 'token': token }
+                result =  { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '' }
         else:
             result =  { 'code': 400 , 'message': 'Username or Password Incorrect.' }
         return result

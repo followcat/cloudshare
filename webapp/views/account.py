@@ -43,3 +43,12 @@ class User(flask.ext.login.UserMixin):
             return self_class(id, svc_account)
         except services.exception.UserNotFoundError:
             return None
+
+    @classmethod
+    def get_by_authorization(self_class, token, svc_account):
+        if token:
+            token = token.replace('Basic ', '', 1)
+            s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
+            data = s.loads(token)
+            return User.get(data['id'], svc_account)
+        return None

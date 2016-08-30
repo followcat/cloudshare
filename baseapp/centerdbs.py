@@ -3,7 +3,7 @@ import interface.gitinterface
 import services.curriculumvitae
 
 DBCENTER_NAME = 'dbcenter'
-DBCENTER_NAMES = tuple(['medical', 'RAV'])
+DBCENTER_NAMES = tuple(['medical', 'UAV'])
 
 DBCENTER = dict()
 DBCENTER_SVC_CV = dict()

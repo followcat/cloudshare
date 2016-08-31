@@ -57,7 +57,7 @@ class AdditionalSync(object):
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addcv(id, md.encode('utf-8'), infostream)
 
-        for name in additionals:
+        for name in self.additionals:
             additionals[name].updatenums()
 
     def generate_md(self, raw_html):
@@ -70,7 +70,7 @@ class AdditionalSync(object):
         else:
             catchinfo = extractor.information_explorer.catch_selected(md, selected, name)
         for key in catchinfo:
-            if catchinfo[key] or key in selected:
+            if catchinfo[key] or (selected is not None and key in selected):
                 obj[key] = catchinfo[key]
         return obj
 
@@ -105,9 +105,9 @@ class AdditionalSync(object):
             additionals = dict([(additional.name, additional)
                                 for additional in self.additionals
                                 if additional.name in additionals])
-        for name in additionals:
-            a = additionals[name]
-            i = additionals[name].interface
+        for additional in additionals:
+            a = additional
+            i = additional.interface
             for yamlname in a.yamls():
                 raw_yamlstr = i.getraw(yamlname)
                 raw_yaml = yaml.load(raw_yamlstr, Loader=utils._yaml.SafeLoader)

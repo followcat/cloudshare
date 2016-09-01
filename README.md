@@ -65,11 +65,6 @@ Here is a demo bash script to run Jenkins test:
     npm@3.8.6
     gulp@3.9.1
 
-### Install
-
-Enter ```/static``` folder, run ```npm install``` to install the packages.
-
-
 ## How to
 
 0) Install libreoffice/Openoffice, add libreoffice uno env, and start service.

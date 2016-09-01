@@ -21,16 +21,10 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
     //obj is a element object
     obj.on("click", function(event){
       $.ajax({
-        url: '/api/session',
-        type: 'DELETE',
-        success: function(response){
-          if (response.code === 200) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = "/";
-          } else {
-            alert(response.message);
-          }
+        url: '/logout',
+        type: 'GET',
+        success: function(){
+          window.location.href = "/";
         },
         error: function(msg){
           alert("Operate Error!");

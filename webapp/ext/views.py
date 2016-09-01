@@ -33,6 +33,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/login/check',
+        view_func=webapp.views.views.LoginCheck.as_view('logincheck'),
+        )
+
+    app.add_url_rule(
         '/cvnumbers',
         view_func=webapp.views.views.CVnumbers.as_view('cvnumbers'),
         )
@@ -133,48 +138,13 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/login',
-        view_func=webapp.views.views.Login.as_view('login'),
-        )
-
-    app.add_url_rule(
-        '/login/check',
-        view_func=webapp.views.views.LoginCheck.as_view('logincheck'),
-        )
-
-    app.add_url_rule(
-        '/logout',
-        view_func=webapp.views.views.Logout.as_view('logout'),
-        )
-
-    app.add_url_rule(
         '/userinfo',
         view_func=webapp.views.views.UserInfo.as_view('userinfo'),
         )
 
     app.add_url_rule(
-        '/adduser',
-        view_func=webapp.views.views.AddUser.as_view('adduser'),
-        )
-
-    app.add_url_rule(
-        '/changepassword',
-        view_func=webapp.views.views.ChangePassword.as_view('changepassword'),
-        )
-
-    app.add_url_rule(
-        '/urm',
-        view_func=webapp.views.views.Urm.as_view('urm'),
-        )
-
-    app.add_url_rule(
-        '/urmsetting',
-        view_func=webapp.views.views.UrmSetting.as_view('urmsetting'),
-        )
-
-    app.add_url_rule(
-        '/deleteuser',
-        view_func=webapp.views.views.DeleteUser.as_view('deleteuser'),
+        '/manage',
+        view_func=webapp.views.views.Manage.as_view('manage'),
         )
 
     app.add_url_rule(

@@ -294,18 +294,6 @@ class Index(flask.views.MethodView):
         return flask.render_template('index.html', features=data)
 
 
-class Login(flask.views.MethodView):
-
-    def get(self):
-        return '''
-            <form action="/login/check" method="post">
-                <p>Username: <input name="username" type="text"></p>
-                <p>Password: <input name="password" type="password"></p>
-                <input type="submit">
-            </form>
-        '''
-
-
 class LoginCheck(flask.views.MethodView):
 
     def post(self):
@@ -329,14 +317,6 @@ class LoginCheck(flask.views.MethodView):
         # return flask.redirect(flask.url_for('index'),error=error)
 
 
-class Logout(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def get(self):
-        flask.ext.login.logout_user()
-        return flask.redirect(flask.url_for('index'))
-
-
 class UserInfo(flask.views.MethodView):
 
     @flask.ext.login.login_required
@@ -356,67 +336,11 @@ class UserInfo(flask.views.MethodView):
         return flask.render_template('userinfo.html', info=info_list)
 
 
-class AddUser(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        result = False
-        id = flask.request.form['username']
-        password = flask.request.form['password']
-        user = flask.ext.login.current_user
-        try:
-            svcaccount = flask.current_app.config['SVC_ACCOUNT']
-            result = svcaccount.add(user.id, id, password)
-        except services.exception.ExistsUser:
-            pass
-        return flask.jsonify(result=result)
-
-
-class ChangePassword(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        result = False
-        oldpassword = flask.request.form['oldpassword']
-        newpassword = flask.request.form['newpassword']
-        md5newpwd = utils.builtin.md5(oldpassword)
-        user = flask.ext.login.current_user
-        try:
-            if(user.password == md5newpwd):
-                user.changepassword(newpassword)
-                result = True
-            else:
-                result = False
-        except services.exception.ExistsUser:
-            pass
-        return flask.jsonify(result=result)
-
-
-class Urm(flask.views.MethodView):
+class Manage(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        svcaccount = flask.current_app.config['SVC_ACCOUNT']
-        userlist = svcaccount.get_user_list()
-        return flask.render_template('urm.html', userlist=userlist)
-
-
-class UrmSetting(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def get(self):
-        return flask.render_template('urmsetting.html')
-
-
-class DeleteUser(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        name = flask.request.form['name']
-        user = flask.ext.login.current_user
-        svcaccount = flask.current_app.config['SVC_ACCOUNT']
-        result = svcaccount.delete(user.id, name)
-        return flask.jsonify(result=result)
+        return flask.render_template('manage.html')
 
 
 class UploadFile(flask.views.MethodView):

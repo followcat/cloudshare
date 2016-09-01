@@ -26,13 +26,13 @@ class SessionAPI(Resource):
         upassword = utils.builtin.md5(password)
         error = None
         if (user and user.password == upassword):
-            flask.ext.login.login_user(user,remember=True)
+            flask.ext.login.login_user(user, remember=True)
             token = flask.ext.login.current_user.get_auth_token()
             if(user.id == "root"):
-                result = { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/manage.html' }
+                result = { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/manage' }
             else:
                 flask.session[user.id] = dict()
-                result =  { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '' }
+                result =  { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/search' }
         else:
             result =  { 'code': 400 , 'message': 'Username or Password Incorrect.' }
         return result

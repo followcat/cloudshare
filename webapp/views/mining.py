@@ -100,7 +100,7 @@ class LSI(flask.views.MethodView):
         if 'marriedStatus' in flask.request.args and flask.request.args['marriedStatus']:
             filterdict['marital_status'] = flask.request.args['marriedStatus'].split(',')
         if 'business' in flask.request.args and flask.request.args['business']:
-            keywords = flask.request.args['business'].split(',')
+            keywords = flask.request.args['business'].split(' ')
             filterdict['business'] = index.get_indexkeys(['business'], keywords, uses)
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)

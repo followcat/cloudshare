@@ -18,5 +18,14 @@ export CLOUDSHARE_VIRTUALENV_PATH=/home/$USER/Virtualenv/cloudshare
 . $CLOUDSHARE_VIRTUALENV_PATH/bin/activate
 python tools/repobackup.py
 
+export PATH=$PATH:/opt/bin
+
+echo "Running Webpack Builder"
+cd $ReleaseCode/webapp/app
+npm install
+npm run build:production
+
+echo "Running Gulp Builder"
 cd $ReleaseCode/webapp/static
-node_modules/gulp/bin/gulp.js build
+npm install
+npm run build

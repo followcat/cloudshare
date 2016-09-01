@@ -81,4 +81,27 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
   if (databaseList.length > 0) {
     $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses\" value=\""+ databaseList.join(",") +"\" />");
   }
+
+  $.ajax({
+    url: "/cvnumbers",
+    dataType: "json",
+    success: function(response) {
+      var numbers = response.result,
+          len = 0;
+      for (var e in numbers) {
+        len++;
+      }
+      var mgLeft = (720 - len * 80) / (len + 1);
+
+      for (var e in numbers) {
+        $("#count").append("<div class=\"count-item\" style=\"margin-left: " + mgLeft+"px"+ "\">" + 
+          "<div class=\"k\">" + e +
+          "</div>" +
+          "<div class=\"n\">" + numbers[e] +
+          "</div>" +
+          "</div>"
+        );
+      }
+    }
+  });
 });

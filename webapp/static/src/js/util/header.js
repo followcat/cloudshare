@@ -5,6 +5,7 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
   //upload event
   header.UploadHandle = function(objBtn){
     objBtn.on('click', function(){
+      localStorage.name = "";
       var uploader = new Upload("file-form");
       uploader.Uploadfile(function(){
         setTimeout(function(){
@@ -20,10 +21,16 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
     //obj is a element object
     obj.on("click", function(event){
       $.ajax({
-        url: '/logout',
-        type: 'GET',
-        success: function(){
-          window.location.href = "/";
+        url: '/api/session',
+        type: 'DELETE',
+        success: function(response){
+          if (response.code === 200) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = "/";
+          } else {
+            alert(response.message);
+          }
         },
         error: function(msg){
           alert("Operate Error!");

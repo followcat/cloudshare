@@ -17,10 +17,19 @@ import services.exception
 
 import json
 
+
 class LoginRedirect(flask.views.MethodView):
 
     def get(self):
         return flask.render_template('gotologin.html')
+
+
+class CVnumbers(flask.views.MethodView):
+
+    def get(self):
+        svc_cv = flask.current_app.config['SVC_CV']
+        cv_nums = svc_cv.getnums()
+        return flask.jsonify(result = cv_nums)
 
 
 class Search(flask.views.MethodView):
@@ -34,29 +43,33 @@ class Search(flask.views.MethodView):
             cur_page = int(cur_page)
             result = svc_cv.search(search_text)
             yaml_result = svc_cv.search_yaml(search_text)
+            results = list()
+            for name in result+yaml_result:
+                cname = core.outputstorage.ConvertName(name).base
+                if cname not in results:
+                    results.append(cname)
             count = 20
-            datas, pages = self.paginate(svc_cv, result, yaml_result, cur_page, count)
+            datas, pages = self.paginate(svc_cv, results, cur_page, count)
             return flask.render_template('search_result.html',
                                          search_key=search_text,
                                          result=datas,
                                          cur_page = cur_page,
                                          pages = pages,
-                                         nums=len(result))
+                                         nums=len(results))
         else:
-            cv_nums = svc_cv.getnums()
             return flask.render_template('search.html')
 
-    def paginate(self, svc_cv, result, yaml_result, cur_page, eve_count):
+    def paginate(self, svc_cv, results, cur_page, eve_count):
         if not cur_page:
             cur_page = 1
-        sum = len(result)
+        sum = len(results)
         if sum%eve_count != 0:
             pages = sum/eve_count + 1
         else:
             pages = sum/eve_count
         datas = []
         names = []
-        for each in (result+yaml_result)[(cur_page-1)*eve_count:cur_page*eve_count]:
+        for each in results[(cur_page-1)*eve_count:cur_page*eve_count]:
             base, suffix = os.path.splitext(each)
             name = core.outputstorage.ConvertName(base).md
             if name not in names:
@@ -180,7 +193,7 @@ class ConfirmEnglish(flask.views.MethodView):
         yaml_data['enversion'] = upobj.filepro.name.md
         svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
                       committer=user.id)
-        return flask.jsonify(result=result)
+        return flask.jsonify(result=result, filename=yaml_data['id']+'.md')
 
 
 class Show(flask.views.MethodView):
@@ -190,7 +203,7 @@ class Show(flask.views.MethodView):
         svc_cv = flask.current_app.config['SVC_CV']
         md = svc_cv.gethtml(filename)
         yaml_info = svc_cv.getyaml(filename)
-        yaml_info['date'] = utils.builtin.strftime(yaml_info['date'])
+        yaml_info['date'] = utils.builtin.strftime(yaml_info['date'], '%Y-%m-%d %H:%M')
         return flask.render_template('cv_refactor.html', markdown=md, yaml=yaml_info)
 
 
@@ -228,7 +241,8 @@ class Preview(flask.views.MethodView):
         user = flask.ext.login.current_user
         upobj = pickle.loads(flask.session[user.id]['upload'])
         output = upobj.preview_markdown()
-        return flask.render_template('preview.html', markdown=output, method='get')
+        _id = upobj.filepro.yamlinfo['id']
+        return flask.render_template('upload_preview.html', markdown=output, id=_id)
 
     @flask.ext.login.login_required
     def post(self):
@@ -241,6 +255,7 @@ class UpdateInfo(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def post(self):
+        response = dict()
         result = True
         user = flask.ext.login.current_user
         svc_cv = flask.current_app.config['SVC_CV']
@@ -252,20 +267,23 @@ class UpdateInfo(flask.views.MethodView):
         for key, value in updateinfo.iteritems():
             if key in yaml_info:
                 if key in ['tag', 'tracking', 'comment']:
-                    yaml_info[key].insert(0, {'author': user.id,
-                                              'content': value,
-                                              'date': time.strftime('%Y-%m-%d %H:%M:%S')})
+                    data = {'author': user.id,
+                            'content': value,
+                            'date': time.strftime('%Y-%m-%d %H:%M:%S')}
+                    yaml_info[key].insert(0, data)
                     commit_string += " Add %s." % (key)
+                    response = { 'result': result, 'data': data }
                 else:
                     yaml_info[key] = value
                     commit_string += " Modify %s to %s." % (key, value)
             else:
                 result = False
+                response = { 'result': result, 'msg': 'Update information error.'}
                 break
         else:
             svc_cv.modify(name.yaml, yaml.safe_dump(yaml_info, allow_unicode=True),
                           commit_string.encode('utf-8'), user.id)
-        return flask.jsonify(result=result)
+        return flask.jsonify(response)
 
 
 class Index(flask.views.MethodView):
@@ -274,49 +292,6 @@ class Index(flask.views.MethodView):
         with codecs.open('webapp/features.md', 'r', encoding='utf-8') as fp:
             data = fp.read()
         return flask.render_template('index.html', features=data)
-
-
-class Login(flask.views.MethodView):
-
-    def get(self):
-        return '''
-            <form action="/login/check" method="post">
-                <p>Username: <input name="username" type="text"></p>
-                <p>Password: <input name="password" type="password"></p>
-                <input type="submit">
-            </form>
-        '''
-
-
-class LoginCheck(flask.views.MethodView):
-
-    def post(self):
-        username = flask.request.form['username']
-        password = flask.request.form['password']
-        svcaccount = flask.current_app.config['SVC_ACCOUNT']
-        user = webapp.views.account.User.get(username, svcaccount)
-        upassword = utils.builtin.md5(password)
-        error = None
-        if (user and user.password == upassword):
-            flask.ext.login.login_user(user)
-            if(user.id == "root"):
-                return flask.redirect(flask.url_for("urm"))
-            else:
-                flask.session[user.id] = dict()
-                return flask.redirect(flask.url_for("search"))
-        else:
-            # flask.flash('Username or Password Incorrect.')
-            error = 'Username or Password Incorrect.'
-        return flask.render_template('index.html', error=error)
-        # return flask.redirect(flask.url_for('index'),error=error)
-
-
-class Logout(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def get(self):
-        flask.ext.login.logout_user()
-        return flask.redirect(flask.url_for('index'))
 
 
 class UserInfo(flask.views.MethodView):
@@ -338,67 +313,11 @@ class UserInfo(flask.views.MethodView):
         return flask.render_template('userinfo.html', info=info_list)
 
 
-class AddUser(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        result = False
-        id = flask.request.form['username']
-        password = flask.request.form['password']
-        user = flask.ext.login.current_user
-        try:
-            svcaccount = flask.current_app.config['SVC_ACCOUNT']
-            result = svcaccount.add(user.id, id, password)
-        except services.exception.ExistsUser:
-            pass
-        return flask.jsonify(result=result)
-
-
-class ChangePassword(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        result = False
-        oldpassword = flask.request.form['oldpassword']
-        newpassword = flask.request.form['newpassword']
-        md5newpwd = utils.builtin.md5(oldpassword)
-        user = flask.ext.login.current_user
-        try:
-            if(user.password == md5newpwd):
-                user.changepassword(newpassword)
-                result = True
-            else:
-                result = False
-        except services.exception.ExistsUser:
-            pass
-        return flask.jsonify(result=result)
-
-
-class Urm(flask.views.MethodView):
+class Manage(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        svcaccount = flask.current_app.config['SVC_ACCOUNT']
-        userlist = svcaccount.get_user_list()
-        return flask.render_template('urm.html', userlist=userlist)
-
-
-class UrmSetting(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def get(self):
-        return flask.render_template('urmsetting.html')
-
-
-class DeleteUser(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        name = flask.request.form['name']
-        user = flask.ext.login.current_user
-        svcaccount = flask.current_app.config['SVC_ACCOUNT']
-        result = svcaccount.delete(user.id, name)
-        return flask.jsonify(result=result)
+        return flask.render_template('manage.html')
 
 
 class UploadFile(flask.views.MethodView):

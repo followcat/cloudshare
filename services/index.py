@@ -21,7 +21,7 @@ class ReverseIndexing(object):
 
     def setup(self):
         self.load()
-        self.update()
+        # self.update()
 
     def save(self):
         if not os.path.exists(self.path):

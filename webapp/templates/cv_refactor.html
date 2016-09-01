@@ -17,6 +17,28 @@
 {% endblock %}
 
 {% block content%}
+<!--Upload engilish modal-->
+<div class="modal fade upload-en-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="UploadENModalLabel">Upload File</h4>
+      </div>
+      <div class="modal-body">
+        <form id="enUploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+          <input type="file" name="file" id="enFile" />
+          <p id="enUploadMsg"></p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="enUploadSubmit">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Upload engilish modal end-->
 
 <div class="wrapper mg-center">
   <div class="main">
@@ -29,7 +51,7 @@
         <span class="check-box"><input type="checkbox" id="modifyTitle">Switch to Modify Title</span>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="modify">Modify CV</a>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
-        <a type="button" class="btn btn-default btn-xs" target="_blank" id="upload-en" data-toggle="modal" data-target=".upload-modal">Add English CV</a>
+        <a type="button" class="btn btn-default btn-xs" target="_blank" id="uploadEn" data-toggle="modal" data-target=".upload-en-modal">Add English CV</a>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="match">Show JD</a>
         {% if yaml.enversion %}
         <a href="/edit/{{ yaml.enversion }}" target="_blank">English CV</a>
@@ -83,14 +105,32 @@
       <div class="summary-row ex clearfix">
         <div><span class="feild">Work Experience: </span></div>
         <div>
-          {% for item in yaml.experience %}
-          <div class="ex-item">{{ item[0] }}-{{ item[1] }} | {{ item[2] }}</div>
+          {% if yaml.experience %}
+          {% for item in yaml.experience.company %}
+          <div class="ex-item">{{ item.date_from }}-{{ item.date_to }}
+          {% if item.business %} | {{ item.business }}{% endif %}
+          {% if item.name %} | {{ item.name }}{% endif %}
+          {% for e in yaml.experience.position %}
+            {% if e.at_company == item.id %} | {{ e.name }}{% endif %}
           {% endfor %}
+          {% if item.duration %} | {{ item.duration }}{% endif %}
+          </div>
+          {% endfor %}
+          {% endif %}
         </div>
       </div>
     </div>
-    <div class="cv pd-lr-15 cv-wrap" id="cvContent">
-      {{ markdown|safe }}
+    <div class="cv pd-lr-15 cv-wrap">
+      <div class="loading" id="loading">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div id="cvContent" style="display:none;">
+        {{ markdown|safe }}
+      </div>
     </div>
   </div>
   <div class="side">
@@ -128,16 +168,14 @@
           <button type="button" class="btn btn-primary tracking-btn" id="trackingBtn">Submit</button>
         </div>
         <div class="tracking-content" id="trackingContent">
-          {% for key, value in yaml.iteritems() %}
-          {% if key=='tracking' %}
-          {% for item in value %}
+          {% if yaml.tracking %}
+          {% for item in yaml.tracking%}
           <div class="tracking-item">
             <em>{{ item.author }} / {{ item.content.date }}:</em>
             <p>{{ item.content.text }}</p>
           </div>
           {% endfor %}
           {% endif %}
-          {% endfor %}
         </div>
       </div>
     </div>
@@ -152,16 +190,14 @@
           <button type="button" class="btn btn-primary comment-btn" id="commentBtn">Submit</button>
         </div>
         <div class="comment-content" id="commentContent">
-          {% for key, value in yaml.iteritems() %}
-          {% if key=='comment' %}
-          {% for item in value %}
+          {% if yaml.comment %}
+          {% for item in yaml.comment %}
           <div class="comment-item">
-            <em>{{ item.author }} / {{ item.content.date }}</em>
-            <p>{{ item.content.text }}</p>
+            <em>{{ item.author }} / {{ item.date }}</em>
+            <p>{{ item.content }}</p>
           </div>
           {% endfor %}
           {% endif %}
-          {% endfor %}
         </div>        
       </div>
     </div>

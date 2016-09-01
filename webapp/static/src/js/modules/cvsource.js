@@ -4,8 +4,9 @@ require.config({
     jquery: "lib/js/jquery",
     bootstrap: "lib/js/bootstrap",
     datetimepicker: "lib/js/bootstrap-datetimepicker.min",
-    // datetimepickerCN: "lib/js/bootstrap-datetimepicker.zh-CN",
-    cvdeal: "src/js/util/cvdeal",
+    header: "src/js/util/header",
+    formvalidate: "src/js/util/formvalidate",
+    cvdeal: "src/js/util/cv_deal",
     Upload: "src/js/util/upload",
     colorgrad: "src/js/util/colorgrad",
     History: "src/js/util/history"
@@ -19,10 +20,6 @@ require.config({
       deps: ["jquery"],
       exports: "bootstrap-datetimepicker"
     },
-    datetimepickerCN: {
-      deps: ["jquery"],
-      exports: "bootstrap-datetimepicker-zh-CN"
-    },
     cvdeal: {
       deps: ["jquery"],
       exports: "cvdeal"
@@ -32,15 +29,18 @@ require.config({
 
 require([
   "jquery",
-  "bootstrap",
-  "datetimepicker",
   "cvdeal",
+  "datetimepicker",
   "Upload",
   "colorgrad",
-  "History"
-],function($, bootstrap, datetimepicker, cvdeal, Upload, ColorGrad, History) {
+  "History",
+  "header",
+  "bootstrap",
+],function($, cvdeal, datetimepicker, Upload, ColorGrad, History) {
 
-  window.onload = cvdeal.cvDeal("cvContent");
+  cvdeal.cvDeal("cvContent", function() {
+    $("#loading").css("display", "none");
+  });
 
   var c = {
     currentUser: $("#name").text().trim(),
@@ -164,17 +164,7 @@ require([
 
   //Add comment
   $("#commentBtn").on("click", function() {
-    var commentText = $("#commentInput").val().trim(),
-        dateNow = new Date();
-    
-    var y = dateNow.getFullYear(),
-        mon = dateNow.getMonth() + 1,
-        d = dateNow.getDate(),
-        h = dateNow.getHours(),
-        m = dateNow.getMinutes(),
-        s = dateNow.getSeconds();
-
-    var date = y+"-"+mon+"-"+d+" "+h+":"+m+":"+s;
+    var commentText = $("#commentInput").val().trim();
 
     if (c.checkBlank(commentText)) {
       $("#commentInput").focus();
@@ -187,15 +177,12 @@ require([
         data: JSON.stringify({
           "filename": c.filename,
           "yamlinfo": {
-            "comment": {
-              "date": date,
-              "text": commentText,
-            }
+            "comment": commentText
           }
         }),
         success: function(response) {
           if (response.result) {
-            $("#commentContent").prepend("<div class='comment-item'><em>"+ c.currentUser + " / " + date +"</em><p>" + commentText + "</p></div>");
+            $("#commentContent").prepend("<div class='comment-item'><em>"+ c.currentUser + " / " + response.data.date +"</em><p>" + response.data.content + "</p></div>");
             $("#commentInput").val("");
           } else {
             alert("Failed");
@@ -214,19 +201,20 @@ require([
   Route();
 
   //upload english file
-  $("#upload-btn").on("click", function() {
-    localStorage.name = filename;
+  $("#enUploadSubmit").on("click", function() {
+    localStorage.name = c.filename.split(".")[0];
 
-    var uploader = new Upload("file-form");
+    var uploader = new Upload("enUploadForm");
     uploader.Uploadfile(function() {
       setTimeout(function() {
         window.location.href = "/preview";
       }, 1000);
     });
   });
-  $(".upload").on("click", function() {
-    $("#file").val("");
-    $("#progressmsg").html("");
+
+  $(".upload-en-modal").on("click", function() {
+    $("#enFile").val("");
+    $("#enUploadMsg").html("");
   });
 
   localStorage.title = $("title").text().split("-")[0];
@@ -276,7 +264,7 @@ require([
     url: "/analysis/similar",
     type: "post",
     data: {
-      "doc": document.getElementById("cvContent").innerText
+      "doc": $("#cvContent").text()
     },
     success: function(response) {
       var datas = response.result;

@@ -1,15 +1,33 @@
-{% extends "share/cv_layout.html" %}
+{% extends "share/layout.html" %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/cv_common.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/cv_style.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/css/upload_preview.css') }}">
+{% endblock %}
+
 {% block content %}
-<div id="cv-box">
-  <div class="cv-box-top clearfix">
-    <span>简历情况：</span>
-    <button type="button" class="btn btn-default btn-xs" id="exports-btn">导出</button>
-  </div>
-  <div id="cv-content">
-    <div class="content">
-      {{ markdown|safe }}
+<div class="wrapper mg-center">
+  <div class="preview-wrap mg-center">
+    <div class="header pd-lr-15">
+      <span>Resume Preview</span>
+    </div>
+    <div class="cv pd-lr-15 cv-wrap">
+      <div class="loading" id="loading">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div id="cvContent" style="display:none;">
+        {{ markdown|safe }}
+      </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block script %}
 <script data-main="{{ url_for('static', filename='src/js/modules/edit.js') }}" src="{{ url_for('static', filename='lib/js/require.js') }}"></script>
 {% endblock %}

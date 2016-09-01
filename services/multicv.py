@@ -66,6 +66,8 @@ class MultiCV(object):
 
     def getnums(self):
         result = dict()
+        result['total'] = 0
         for svc_cv in self.svcls:
             result[svc_cv.name] = svc_cv.NUMS
+            result['total'] += svc_cv.NUMS
         return result

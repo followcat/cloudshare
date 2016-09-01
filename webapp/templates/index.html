@@ -31,7 +31,7 @@
     <div class="panel panel-primary">
     <div class="panel-heading title-font">Login in</div>
       <div class="panel-body">
-        <form>
+        <form action="/login/check" method="post" >
           <div class="form-group">
             <label for="userInput">User Name</label>
             <input type="text" class="form-control" name="username" id="userInput" placeholder="Please Input Your Account." required="required" />
@@ -42,7 +42,7 @@
           </div>
           <p class="login-msg"></p>
             {% if error %}<strong class="error-msg">Error:{{ error }}</strong>{% endif %}
-          <button type="button" id="loginBtn" class=" col-sm-4 col-sm-offset-4 btn btn-primary">Login In</button>
+          <button type="submit" class=" col-sm-4 col-sm-offset-4 btn btn-primary">Login In</button>
         </form>
       </div>
     </div>

@@ -43,23 +43,4 @@ require(['jquery', 'formvalidate', 'marked', 'bootstrap'], function($, formvalid
     var text = $("#textarea").val();
     $("#preview").html(marked(text));
   });
-
-  $("#loginBtn").on("click", function() {
-    var username = $("#userInput").val(),
-        password = $("#passwordInput").val();
-
-    $.ajax({
-      url: "/login/check",
-      type: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      dataType: "json",
-      data: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    });
-  });
 });

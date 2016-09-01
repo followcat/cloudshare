@@ -297,24 +297,25 @@ class Index(flask.views.MethodView):
 class LoginCheck(flask.views.MethodView):
 
     def post(self):
-        username = flask.request.form['username']
-        password = flask.request.form['password']
+        result = dict()
+        data = flask.request.get_json()
+        username = data.get('username')
+        password = data.get('password')
         svcaccount = flask.current_app.config['SVC_ACCOUNT']
         user = webapp.views.account.User.get(username, svcaccount)
         upassword = utils.builtin.md5(password)
         error = None
         if (user and user.password == upassword):
             flask.ext.login.login_user(user)
+            token = flask.ext.login.current_user.get_auth_token()
             if(user.id == "root"):
-                return flask.redirect(flask.url_for("urm"))
+                result = { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/manage' }
             else:
                 flask.session[user.id] = dict()
-                return flask.redirect(flask.url_for("search"))
+                result = { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/search' }
         else:
-            # flask.flash('Username or Password Incorrect.')
-            error = 'Username or Password Incorrect.'
-        return flask.render_template('index.html', error=error)
-        # return flask.redirect(flask.url_for('index'),error=error)
+            result = { 'code': 400, 'message': 'Username or Password Incorrect.' }
+        return flask.jsonify(result)
 
 
 class UserInfo(flask.views.MethodView):

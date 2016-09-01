@@ -12,7 +12,7 @@ class SessionAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         super(SessionAPI, self).__init__()
-        self.reqparse.add_argument('name', type = str, required = True,
+        self.reqparse.add_argument('username', type = str, required = True,
                                    help = 'No name provided', location = 'json')
         self.reqparse.add_argument('password', type = str, required = True,
                                    help = 'No password provided', location = 'json')
@@ -20,9 +20,9 @@ class SessionAPI(Resource):
     def post(self):
         result = dict()
         args = self.reqparse.parse_args()
-        name = args['name']
+        username = args['username']
         password = args['password']
-        user = webapp.views.account.User.get(name, self.svc_account)
+        user = webapp.views.account.User.get(username, self.svc_account)
         upassword = utils.builtin.md5(password)
         error = None
         if (user and user.password == upassword):

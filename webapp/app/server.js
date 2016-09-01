@@ -39,7 +39,14 @@ const server = new WebpackDevServer(compiler, {
 
   headers: { "X-Custom-Header": "yes" },
 
-  stats: { colors: true }
+  stats: { colors: true },
+
+  proxy: {
+    '/api/*': {
+      target: 'http://127.0.0.1:4888',
+      secure: false,
+    }
+  },
 
 });
 

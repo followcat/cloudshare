@@ -14,8 +14,9 @@ export default class Header extends Component {
   handleShowConfirm() {
     fetch(`/api/session`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`
+        'Authorization': `Basic ${localStorage.token}`,
       },
     })
     .then((response) => {

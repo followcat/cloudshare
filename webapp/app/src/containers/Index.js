@@ -17,14 +17,14 @@ export default class Index extends Component {
   }
 
   handleOnSignIn(user) {
-    fetch(`${config.host}/api/session`, {
+    fetch(`${config.host}/login/check`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: user.account,
+        username: user.account,
         password: user.password,
       }),
     })

@@ -294,30 +294,6 @@ class Index(flask.views.MethodView):
         return flask.render_template('index.html', features=data)
 
 
-class LoginCheck(flask.views.MethodView):
-
-    def post(self):
-        result = dict()
-        data = flask.request.get_json()
-        username = data.get('username')
-        password = data.get('password')
-        svcaccount = flask.current_app.config['SVC_ACCOUNT']
-        user = webapp.views.account.User.get(username, svcaccount)
-        upassword = utils.builtin.md5(password)
-        error = None
-        if (user and user.password == upassword):
-            flask.ext.login.login_user(user)
-            token = flask.ext.login.current_user.get_auth_token()
-            if(user.id == "root"):
-                result = { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/manage' }
-            else:
-                flask.session[user.id] = dict()
-                result = { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/search' }
-        else:
-            result = { 'code': 400, 'message': 'Username or Password Incorrect.' }
-        return flask.jsonify(result)
-
-
 class UserInfo(flask.views.MethodView):
 
     @flask.ext.login.login_required

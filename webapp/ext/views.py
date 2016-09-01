@@ -33,11 +33,6 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/login/check',
-        view_func=webapp.views.views.LoginCheck.as_view('logincheck'),
-        )
-
-    app.add_url_rule(
         '/cvnumbers',
         view_func=webapp.views.views.CVnumbers.as_view('cvnumbers'),
         )

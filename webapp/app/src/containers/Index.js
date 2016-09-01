@@ -9,15 +9,13 @@ import Login from '../components/index/Login';
 
 import './index.less';
 
-import config from '../../config';
-
 export default class Index extends Component {
   constructor() {
     super();
   }
 
   handleOnSignIn(user) {
-    fetch(`${config.host}/api/session`, {
+    fetch(`/api/session`, {
       method: 'POST',
       credentials: 'include',
       headers: {

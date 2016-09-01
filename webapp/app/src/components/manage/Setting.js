@@ -4,8 +4,6 @@ import { message } from 'antd';
 
 import ChangePassword from '../common/ChangePassword';
 
-import config from '../../../config';
-
 message.config({
   top: 66,
   duration: 3,
@@ -18,7 +16,7 @@ export default class Setting extends Component {
   }
 
   handleSubmit(pwd) {
-    fetch(`${config.host}/api/accounts/${localStorage.user}`, {
+    fetch(`/api/accounts/${localStorage.user}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Basic ${localStorage.token}`,

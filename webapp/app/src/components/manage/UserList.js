@@ -5,7 +5,6 @@ import 'whatwg-fetch';
 import { Table, message, Modal } from 'antd';
 
 import CreateUser from './CreateUser';
-import config from '../../../config';
 
 message.config({
   top: 66,
@@ -27,7 +26,7 @@ export default class UserList extends Component {
   }
 
   loadUserList() {
-    fetch(`${config.host}/api/accounts`, {
+    fetch(`/api/accounts`, {
       headers: {
         'Authorization': `Basic ${localStorage.token}`
       }
@@ -61,7 +60,7 @@ export default class UserList extends Component {
     this.setState({
       confirmLoading: true,
     });
-    fetch(`${config.host}/api/accounts`, {
+    fetch(`/api/accounts`, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${localStorage.token}`,
@@ -105,7 +104,7 @@ export default class UserList extends Component {
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        fetch(`${config.host}/api/accounts/${name}`, {
+        fetch(`/api/accounts/${name}`, {
           method: "DELETE",
           headers: {
             'Authorization': `Basic ${localStorage.token}`,
@@ -148,6 +147,16 @@ export default class UserList extends Component {
       }
     ];
     const rowSelection = {};
+    const pagination = {
+      total: this.state.datas.length,
+      showSizeChanger: true,
+      onShowSizeChange(current, pageSize) {
+        console.log('Current: ', current, '; PageSize: ', pageSize);
+      },
+      onChange(current) {
+        console.log('Current: ', current);
+      },
+    };
     return (
       <div>
         <div className="toolbar" ref="toolbarDiv">
@@ -160,7 +169,13 @@ export default class UserList extends Component {
             onModalClose={this.handleModalClose}
           />
         </div>
-        <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.datas} scroll={{ y: this.props.wrapperHeigth }}/>
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={this.state.datas}
+          scroll={{ y: this.props.wrapperHeigth }}
+          pagination={pagination}
+        />
       </div>
     );
   }

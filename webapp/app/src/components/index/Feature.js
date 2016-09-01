@@ -4,7 +4,6 @@ import { Modal, message } from 'antd';
 
 import 'whatwg-fetch';
 import marked from 'marked';
-import config from '../../../config';
 
 export default class Feature extends Component {
   constructor() {
@@ -19,7 +18,7 @@ export default class Feature extends Component {
   }
 
   handleShowModal() {
-    fetch(`${config.host}/api/feature`)
+    fetch(`/api/feature`)
     .then((response) => {
       return response.json();
     })

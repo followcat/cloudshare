@@ -5,8 +5,6 @@ import { Menu, Dropdown, Icon, Modal, message } from 'antd';
 
 import LogoImg from '../../image/logo.png';
 
-import config from '../../../config';
-
 export default class Header extends Component {
   constructor() {
     super();
@@ -14,7 +12,7 @@ export default class Header extends Component {
   }
 
   handleShowConfirm() {
-    fetch(`${config.host}/api/session`, {
+    fetch(`/api/session`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Basic ${localStorage.token}`

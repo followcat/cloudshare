@@ -9,7 +9,7 @@ import webapp.restful.initializtion
 from flask_cors import CORS, cross_origin
 
 
-app = flask.Flask(__name__, template_folder="templates_dist")
+app = flask.Flask(__name__)
 app.config.from_object('webapp.settings')
 app.jinja_env.add_extension(jinja2.ext.loopcontrols)
 ext.views.configure(app)

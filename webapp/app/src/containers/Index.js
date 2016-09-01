@@ -19,6 +19,7 @@ export default class Index extends Component {
   handleOnSignIn(user) {
     fetch(`${config.host}/login/check`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

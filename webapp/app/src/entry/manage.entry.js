@@ -17,7 +17,6 @@ ReactDOM.render(
         <Route path="/userlist" component={UserList} />
         <Route path="/setting" component={Setting} />
       </Route>
-      <Manage />
     </Router>
   </LocaleProvider>,
   document.getElementById('app')

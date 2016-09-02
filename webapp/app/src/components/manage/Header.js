@@ -1,5 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
+import 'whatwg-fetch';
 
 import { Menu, Dropdown, Icon, Modal, message } from 'antd';
 

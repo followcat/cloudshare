@@ -80,9 +80,9 @@ export LD_LIBRARY_PATH=/usr/lib/libreoffice/program:$LD_LIBRARY_PATH
 libreoffice --invisible "--accept=socket,host=localhost,port=8100;urp;"
 ```
 
-1) Front-end building: enter ```/static``` root folder, and run
+1) Front-end building: enter ```/webapp``` root folder, and run
 ```
-gulp build
+sh ./build.sh
 ```
 there were generate two folders ```/static/dist/``` and ```/templates_dist/```
 

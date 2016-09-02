@@ -132,7 +132,7 @@ class ChangePassword extends React.Component {
     const oldPwdProps = getFieldProps('oldPwd', {
       rules: [
         { required: true, message: 'Password is required.' },
-        { min: 6, max: 12, message: 'Invalid Password. (At least 6-12 characters)' },
+        { min: 6, max: 18, message: 'Invalid Password. (At least 6-12 characters)' },
       ]
     });
 
@@ -140,7 +140,7 @@ class ChangePassword extends React.Component {
     const newPwdProps = getFieldProps('newPwd', {
       rules: [
         { required: true, message: 'Password is required.'},
-        { min: 6, max: 12, message: 'Invalid Password. (At least 6-12 characters)' },
+        { min: 6, max: 18, message: 'Invalid Password. (At least 6-12 characters)' },
         { validator: this.checkPassword }
       ]
     });
@@ -149,7 +149,7 @@ class ChangePassword extends React.Component {
     const reNewPwdProps = getFieldProps('reNewPwd', {
       rules: [
         { required: true, message: 'Password is required.'},
-        { min: 6, max: 12, message: 'Invalid Password. (At least 6-12 characters)' },
+        { min: 6, max: 18, message: 'Invalid Password. (At least 6-12 characters)' },
         { validator: this.checkRePassword }
       ]
     });

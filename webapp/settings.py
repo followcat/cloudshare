@@ -32,25 +32,21 @@ SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
 
 DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB, 'cloudshare')
 
-PREDATOR_DB = interface.predator.PredatorInterface('additional/liepin')
-PRE_SVC_CV = services.curriculumvitae.CurriculumVitae(PREDATOR_DB, 'liepin')
+RAW_DIR = 'raw'
+ADDITIONAL_DIR = 'additional'
 
-JINGYING_DB = interface.predator.PredatorInterface('additional/jingying')
-JGYG_SVC_CV = services.curriculumvitae.CurriculumVitae(JINGYING_DB, 'jingying')
+ADD_DB = dict()
+ADD_SVC_CV = dict()
+for name in os.listdir(ADDITIONAL_DIR):
+    namepath = os.path.join(ADDITIONAL_DIR, name)
+    ADD_DB[name] = interface.predator.PredatorInterface(namepath)
+    ADD_SVC_CV[name] = services.curriculumvitae.CurriculumVitae(ADD_DB[name], name)
 
-ZHILIAN_DB = interface.predator.PredatorInterface('additional/zhilian')
-ZILN_SVC_CV = services.curriculumvitae.CurriculumVitae(ZHILIAN_DB, 'zhilian')
-
-YINGCAI_DB = interface.predator.PredatorInterface('additional/yingcai')
-YICA_SVC_CV = services.curriculumvitae.CurriculumVitae(YINGCAI_DB, 'yingcai')
-
-SVC_CV = services.multicv.MultiCV(DEF_SVC_CV,
-                                  [PRE_SVC_CV, JGYG_SVC_CV, ZILN_SVC_CV, YICA_SVC_CV])
+SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, ADD_SVC_CV.values())
 SVC_ADD_SYNC = services.additionalsync.AdditionalSync(SVC_CV)
 
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)
 SVC_INDEX.setup()
-
 
 LSI_PATH = 'lsimodel'
 SVC_MIN = services.mining.Mining(LSI_PATH, SVC_CV)

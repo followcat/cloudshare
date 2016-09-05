@@ -126,18 +126,18 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 3:
-        print "USAGE: python %s <input-file> <output-file>" % sys.argv[0]
+        print("USAGE: python %s <input-file> <output-file>" % sys.argv[0])
         sys.exit(255)
     if not os.path.isfile(sys.argv[1]):
-        print "no such input file: %s" % sys.argv[1]
+        print("no such input file: %s" % sys.argv[1])
         sys.exit(1)
 
     try:
         converter = DocumentConverter()
         converter.convert(sys.argv[1], sys.argv[2])
     except DocumentConversionException, exception:
-        print "ERROR! " + str(exception)
+        print("ERROR! " + str(exception))
         sys.exit(1)
     except ErrorCodeIOException, exception:
-        print "ERROR! ErrorCodeIOException %d" % exception.ErrCode
+        print("ERROR! ErrorCodeIOException %d" % exception.ErrCode)
         sys.exit(1)

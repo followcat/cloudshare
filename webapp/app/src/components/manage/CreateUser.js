@@ -48,7 +48,7 @@ class CreateUser extends Component {
     const pwdProps = getFieldProps('password', {
       rules: [
         { required: true, message: 'Password is required.'},
-        { min: 6, max: 12, message: 'Invalid Password. (At least 6-12 characters)' },
+        { min: 6, max: 18, message: 'Invalid Password. (At least 6-12 characters)' },
       ]
     });
 

@@ -20,6 +20,15 @@ class User(flask.ext.login.UserMixin):
     def changepassword(self, password):
         self.svc_account.modify(self.id, password)
 
+    def getbookmark(self):
+        return self.svc_account.getbookmark(self.id)
+
+    def addbookmark(self, id):
+        return self.svc_account.addbookmark(self.id, id)
+
+    def delbookmark(self, id):
+        return self.svc_account.delbookmark(self.id, id)
+
     @classmethod
     def get(self_class, id, svc_account):
         """

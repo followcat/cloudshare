@@ -204,6 +204,12 @@ class Show(flask.views.MethodView):
         md = svc_cv.gethtml(filename)
         yaml_info = svc_cv.getyaml(filename)
         yaml_info['date'] = utils.builtin.strftime(yaml_info['date'], '%Y-%m-%d %H:%M')
+        user = flask.ext.login.current_user
+        result = user.getbookmark()
+        if yaml_info['id'] in result:
+            yaml_info['collected'] = True
+        else:
+            yaml_info['collected'] = False
         return flask.render_template('cv_refactor.html', markdown=md, yaml=yaml_info)
 
 
@@ -301,6 +307,11 @@ class UserInfo(flask.views.MethodView):
         repo = flask.current_app.config['DATA_DB']
         svc_cv = flask.current_app.config['SVC_CV']
         user = flask.ext.login.current_user
+        bookmark_list = user.getbookmark()
+        bookmark_info = []
+        for item in bookmark_list:
+            yaml_info = svc_cv.getyaml(item+'.md')
+            bookmark_info.append(yaml_info)
         info_list = repo.history(user.id, max_commits=10)
         for info in info_list:
             for md5 in info['filenames']:
@@ -310,7 +321,36 @@ class UserInfo(flask.views.MethodView):
                     info['filenames'] = md5
                 info['name'] = md5
             info['message'] = info['message'].decode('utf-8')
-        return flask.render_template('userinfo.html', info=info_list)
+        return flask.render_template('userinfo.html', info=info_list, bookmark_info=bookmark_info)
+
+
+class GetBookmark(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        user = flask.ext.login.current_user
+        result = user.getbookmark()
+        return flask.jsonify(result=list(result))
+
+
+class AddBookmark(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def post(self):
+        user = flask.ext.login.current_user
+        bookid = flask.request.form['id']
+        result = user.addbookmark(bookid)
+        return flask.jsonify(result=result)
+
+
+class DelBookmark(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def post(self):
+        user = flask.ext.login.current_user
+        bookid = flask.request.form['id']
+        result = user.delbookmark(bookid)
+        return flask.jsonify(result=result)
 
 
 class Manage(flask.views.MethodView):

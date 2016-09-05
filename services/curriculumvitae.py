@@ -2,6 +2,7 @@ import time
 import yaml
 import os.path
 
+import utils._yaml
 import services.base
 import core.outputstorage
 import core.converterutils
@@ -71,7 +72,7 @@ class CurriculumVitae(services.base.Service):
         self.interface.add(os.path.join(self.path, cvobj.filepro.name.yaml),
                            yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
                            committer=committer)
-        self.nums += 1
+        self._nums += 1
         return True
 
     def add_md(self, cvobj, committer=None):
@@ -175,7 +176,7 @@ class CurriculumVitae(services.base.Service):
         yaml_str = self.interface.get(path_name)
         if yaml_str is None:
             raise IOError
-        return yaml.load(yaml_str)
+        return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
     @property
     def NUMS(self):

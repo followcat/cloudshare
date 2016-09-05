@@ -17,12 +17,6 @@ require.config({
 });
 
 require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], function($, bootstrap, header, formvalidate, Upload, History){
-  //计算高度
-  var size = {
-    width: window.innerWidth || document.documentElement.clienWidth || document.body.clienWidth,
-    height: window.innerHeight || document.documentElement.clienHeight || document.body.clienHeight
-  };
-  $(".wrapper").css({minHeight: size.height - $("header").height() + 'px'});
 
   var item = $('.operate-list-item');
 
@@ -103,5 +97,26 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
         );
       }
     }
+  });
+
+  //删除收藏
+  $(".delete").on("click", function() {
+    var _this = $(this),
+        collectionLinkObj = _this.prev();
+    var id = collectionLinkObj.attr("data-id");
+    $.ajax({
+      url: "/delbookmark",
+      type: "POST",
+      data: {
+        "id": id
+      },
+      success: function(response) {
+        if (response.result) {
+          _this.parent().remove();
+        } else {
+          alert("Delete error.")
+        }
+      }
+    });
   });
 });

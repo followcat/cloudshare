@@ -138,6 +138,21 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/getbookmark',
+        view_func=webapp.views.views.GetBookmark.as_view('getbookmark'),
+        )
+
+    app.add_url_rule(
+        '/addbookmark',
+        view_func=webapp.views.views.AddBookmark.as_view('addbookmark'),
+        )
+
+    app.add_url_rule(
+        '/delbookmark',
+        view_func=webapp.views.views.DelBookmark.as_view('delbookmark'),
+        )
+
+    app.add_url_rule(
         '/manage',
         view_func=webapp.views.views.Manage.as_view('manage'),
         )

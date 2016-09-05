@@ -303,4 +303,45 @@ require([
       });
     }
   });
+
+  //收藏简历请求
+  $("#collect").on("click", function() {
+    var _this = $(this),
+        cvId = c.filename.split(".")[0],
+        collected = _this.attr("data-collected");
+
+    if (collected === "true") {
+      $.ajax({
+        url: "/delbookmark",
+        type: "POST",
+        data: {
+          "id": cvId
+        },
+        success: function(response) {
+          if (response.result) {
+            _this.attr("data-collected", "false");
+            _this.removeClass("star-active");
+          } else {
+            alert("Delete bookmark error.");
+          }
+        }
+      });
+    } else {
+      $.ajax({
+        url: "/addbookmark",
+        type: "POST",
+        data: {
+          "id": cvId
+        },
+        success: function(response) {
+          if (response.result) {
+            _this.attr("data-collected", "true");
+            _this.addClass("star-active");
+          } else {
+            alert("Add bookmark error.");
+          }
+        }
+      });
+    }
+  });
 });

@@ -159,8 +159,9 @@
   max-width: 150px;
   height: inherit;
   margin: 0 auto;
+  background-color: #f5f5f5;
 }
 
 .item-title:visited {
-  color: #609;
+  background-color: #DDD;
 }

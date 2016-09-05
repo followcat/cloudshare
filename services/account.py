@@ -5,6 +5,7 @@ import yaml
 import utils.builtin
 import services.base
 import services.exception
+import core.outputstorage
 
 
 class Account(services.base.Service):
@@ -58,6 +59,7 @@ class Account(services.base.Service):
         dump_data = yaml.dump(data)
         self.interface.modify(self.account_filename, dump_data,
                               self.default_root_name)
+        self.initaccount(uid)
         return True
 
     def modify(self, id, password):
@@ -76,7 +78,7 @@ class Account(services.base.Service):
         data.pop(unicode(id))
         dump_data = yaml.dump(data)
         self.interface.modify(self.account_filename, dump_data,
-                              self.default_root_name)
+                              "Delete %s user." % id, idself.default_root_name)
         return True
 
     @property
@@ -96,3 +98,52 @@ class Account(services.base.Service):
         account_list.remove(self.default_root_name)
         user_list = account_list
         return user_list
+
+    def getinfo(self, id):
+        filename = core.outputstorage.ConvertName(id).yaml
+        account_file = self.interface.repo.get_named_file(
+            os.path.join('..', filename))
+        if account_file is None:
+            self.initaccount(id)
+            account_file = self.interface.repo.get_named_file(
+            os.path.join('..', filename))
+        data = yaml.load(account_file.read())
+        account_file.close()
+        return data
+
+    def saveinfo(self, id, data, message=None):
+        if message is None:
+            message = "Modify %s data." % id
+        filename = core.outputstorage.ConvertName(id).yaml
+        dump_data = yaml.dump(data)
+        self.interface.modify(filename, dump_data, message)
+        return True
+
+    def initaccount(self, id):
+        empty_dict = {'id': id, 'bookmark': set()}
+        filename = core.outputstorage.ConvertName(id).yaml
+        self.interface.add(filename, yaml.dump(empty_dict),
+                           "Add %s account setting." % id)
+        return True
+
+    def getbookmark(self, id):
+        info = self.getinfo(id)
+        return info['bookmark']
+
+    def addbookmark(self, id, book):
+        info = self.getinfo(id)
+        bookmark = info['bookmark']
+        if id in bookmark:
+            return False
+        bookmark.add(book)
+        self.saveinfo(id, info, "Add %s bookmark." % id)
+        return True
+
+    def delbookmark(self, id, book):
+        info = self.getinfo(id)
+        bookmark = info['bookmark']
+        if book not in bookmark:
+            return False
+        bookmark.remove(book)
+        self.saveinfo(id, info, "Delete %s bookmark." % id)
+        return True

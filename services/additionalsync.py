@@ -27,12 +27,12 @@ class AdditionalSync(object):
                                 for additional in self.additionals])
         self.logger = logging.getLogger("AdditionalSyncLogger.UPDATE")
 
-    def update(self, additionals=None):
-        if additionals is None:
-            additionals = self.additionals
+    def update(self, add_names=None):
+        if add_names is None:
+            add_names = [additional.name for additional in self.additionals]
         interfaces = dict([(additional.name, additional.interface)
                             for additional in self.additionals
-                            if additional.name in additionals])
+                            if additional.name in add_names])
         for name, i in interfaces.items():
             for id in set(i.lsid_raw()) - (set(i.lsid_yaml()) & set(i.lsid_md())):
                 raw_html = i.getraw(id+'.html')
@@ -75,13 +75,12 @@ class AdditionalSync(object):
                 obj[key] = catchinfo[key]
         return obj
 
-    def upgrade_yaml(self, selected=None, additionals=None):
-        if additionals is None:
-            interfaces = self.interfaces
-        else:
-            interfaces = dict([(additional.name, additional.interface)
-                                for additional in self.additionals
-                                if additional.name in additionals])
+    def upgrade_yaml(self, selected=None, add_names=None):
+        if add_names is None:
+            add_names = [additional.name for additional in self.additionals]
+        interfaces = dict([(additional.name, additional.interface)
+                            for additional in self.additionals
+                            if additional.name in add_names])
         for name, i in interfaces.items():
             for id in i.lsid_md():
                 if selected is None:
@@ -101,13 +100,12 @@ class AdditionalSync(object):
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addyaml(id, infostream)
 
-    def upgrade_key(self, key, additionals=None):
-        if additionals is None:
-            additionals = self.additionals
-        else:
-            additionals = dict([(additional.name, additional)
-                                for additional in self.additionals
-                                if additional.name in additionals])
+    def upgrade_key(self, key, add_names=None):
+        if add_names is None:
+            add_names = [additional.name for additional in self.additionals]
+        additionals = dict([(additional.name, additional)
+                             for additional in self.additionals
+                             if additional.name in add_names])
         for additional in additionals:
             a = additional
             i = additional.interface

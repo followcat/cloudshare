@@ -51,11 +51,15 @@ def jieba_cut(text, pos=False):
     """
         >>> from services.mining import *
         >>> s = "测试计量技术及仪器"
-        >>> words = ' '.join(jieba_cut(s))
-        >>> words
-        u'\u6d4b\u8bd5 \u8ba1\u91cf \u6280\u672f \u53ca \u4eea\u5668'
+        >>> for _w in jieba_cut(s):
+        ...     print(_w.encode('utf-8'))
+        测试
+        计量
+        技术
+        及
+        仪器
         >>> for _w in jieba_cut(s, pos=True):
-        ...     print _w
+        ...     print(_w.encode('utf-8'))
         测试/vn
         计量/n
         技术/n
@@ -72,7 +76,7 @@ def pos_extract(words, flags):
         >>> s = "◆负责产品环境、电磁兼容、可靠性、安规等测试；"
         >>> words = list(jieba_cut(s, pos=True))
         >>> for _w in words:
-        ...     print _w
+        ...     print(_w.encode('utf-8'))
         ◆/x
         负责/v
         产品/n
@@ -88,7 +92,8 @@ def pos_extract(words, flags):
         ；/x
         >>> words = pos_extract(words, FLAGS)
         >>> for _w in words:
-        ...     print _w
+        ...     print(_w.encode('utf-8'))
+        负责
         产品
         环境
         电磁兼容
@@ -102,24 +107,24 @@ def re_sub(reg, sub, text):
         >>> from services.mining import *
         >>> s = "[测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]\\n"
         >>> s += "[测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]"
-        >>> print s
+        >>> print(s)
         [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]
         [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
-        >>> print re_sub(LINE, ' ', s)
+        >>> print(re_sub(LINE, ' ', s))
         [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器] [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
-        >>> print re_sub(WEB, ' ', s)
+        >>> print(re_sub(WEB, ' ', s))
         [测试计量技术及仪器] [测试计量技术及仪器]
         [测试计量技术及仪器]   [测试计量技术及仪器]
         >>> s = "[测试计量技术及仪器] (www.test.com) [测试计量技术及仪器]"
-        >>> print re_sub(WEB, ' ', s)
+        >>> print(re_sub(WEB, ' ', s))
         [测试计量技术及仪器]   [测试计量技术及仪器]
         >>> s = "[测试计量技术及仪器] (test123@test.com) [测试计量技术及仪器]"
-        >>> print re_sub(WEB, ' ', s)
+        >>> print(re_sub(WEB, ' ', s))
         [测试计量技术及仪器]   [测试计量技术及仪器]
         >>> s = "--------------------\\n"
         >>> s += "英语(CET4)、普通话\\n"
         >>> s += "--------------------\\n"
-        >>> print re_sub(LINE, '', re_sub(SYMBOL, '', s))
+        >>> print(re_sub(LINE, '', re_sub(SYMBOL, '', s)))
         英语(CET4)、普通话
     """
     return reg.sub(sub, text)

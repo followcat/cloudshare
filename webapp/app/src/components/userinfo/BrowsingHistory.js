@@ -12,9 +12,9 @@ export default class BrowsingHistory extends Component {
   render() {
     return (
       <div>
-        <Card title="Browsing History" bordered={true} bodyStyle={{ height: this.props.wrapperHeigth, overflowY: 'scroll' }}>
-          {this.props.historyList.map((item) => {
-              return <HistoryItem historyObject={item}/>
+        <Card title="Browsing History" bordered={true} bodyStyle={{ height: this.props.historyHeight, overflowY: 'scroll' }}>
+          {this.props.historyList.map((item, index) => {
+              return <HistoryItem key={index} historyObject={item}/>
             })}
         </Card>
       </div>

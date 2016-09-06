@@ -14,12 +14,12 @@ export default class HistoryItem extends Component {
       color: '#999',
       marginRight: 40,
     };
-    console.log(this.props.historyObject);
+
     return (
       <div>
         <div style={itemWrapStyle}>
           <span style={timeStyle}>{this.props.historyObject.time}</span>
-          <a>{this.props.historyObject.name !== "" ? this.props.historyObject.name : this.props.historyObject.id}</a>
+          <a href={`/show/${this.props.historyObject.filename}`} target="_blank">{this.props.historyObject.name !== "" ? this.props.historyObject.name : this.props.historyObject.id}</a>
         </div>
       </div>
     );

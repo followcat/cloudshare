@@ -51,6 +51,7 @@ SVC_ADD_SYNC = services.additionalsync.AdditionalSync(SVC_CV)
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)
 SVC_INDEX.setup()
 
+
 LSI_PATH = 'lsimodel'
 SVC_MIN = services.mining.Mining(LSI_PATH, SVC_CV)
 SVC_MIN.setup('all')

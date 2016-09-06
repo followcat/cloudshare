@@ -50,6 +50,15 @@ class PredatorLiteInterface(interface.base.Interface):
                 data = fp.read()
         return data
 
+    def modify(self, filepath, stream, message=None, committer=None):
+        result = False
+        filepath = os.path.join(self.path, filepath)
+        if os.path.exists(filepath):
+            with open(filepath, 'w') as f:
+                f.write(stream)
+            result = True
+        return result
+
     def lsfiles(self, *args, **kwargs):
         return [os.path.split(f)[1] for f in glob.glob(
                 os.path.join(self.cvpath, '*'+self.yamlextention))]

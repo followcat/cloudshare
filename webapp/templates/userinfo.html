@@ -26,6 +26,21 @@
     <h2>{{ current_user.id }}</h2>
   </div>
 </div>
+<div class="col-md-6 col-md-offset-3 bookmark-info">
+  <div class="bookmark-info-top">
+    <h2 class="bookmark-info-title">Bookmark</h2>
+  </div>
+  <div class="bookmark-info-bottom">
+    <div class="list clearfix bookmark-wrap" id="bookmark">
+      {% for item in bookmark_info %}
+      <div class="list-item">
+        <a href="/show/{{item.id}}.md" data-id="{{item.id}}">{% if item.name %}{{item.name}}{% else %}{{item.id}}{% endif %}{% if item.gender %} | {{item.gender}}{% endif %}{% if item.age %}| {{item.age}}{% endif %}{% if item.position %}| {{item.position}}{% endif %}</a>
+        <button type="button" class="btn btn-default btn-xs delete">Delete</button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
 <div class="col-md-6 col-md-offset-3 history-info">
   <div class="history-info-top">
     <h2 class="history-info-title">Browing History</h2>

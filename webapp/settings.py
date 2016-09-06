@@ -40,10 +40,17 @@ ADD_SVC_CV = dict()
 for name in os.listdir(ADDITIONAL_DIR):
     namepath = os.path.join(ADDITIONAL_DIR, name)
     ADD_DB[name] = interface.predator.PredatorInterface(namepath)
-    ADD_SVC_CV[name] = services.curriculumvitae.CurriculumVitae(ADD_DB[name], name)
+    add_svc_cv = services.curriculumvitae.CurriculumVitae(ADD_DB[name], name)
+    if add_svc_cv.NUMS > 0:
+        ADD_SVC_CV[name] = add_svc_cv
+
+RAW_DB = dict()
+for name in os.listdir(RAW_DIR):
+    namepath = os.path.join(RAW_DIR, name)
+    RAW_DB[name] = interface.predator.PredatorInterface(namepath)
 
 SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, ADD_SVC_CV.values())
-SVC_ADD_SYNC = services.additionalsync.AdditionalSync(SVC_CV)
+SVC_ADD_SYNC = services.additionalsync.AdditionalSync(ADD_SVC_CV, ADDITIONAL_DIR, RAW_DB)
 
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)
 SVC_INDEX.setup()

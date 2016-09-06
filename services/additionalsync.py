@@ -6,6 +6,9 @@ import logging
 import pypandoc
 
 import utils._yaml
+import interface.predator
+import sources.industry_id
+import services.curriculumvitae
 import extractor.information_explorer
 
 
@@ -21,45 +24,71 @@ logger.setLevel(log_level)
 
 class AdditionalSync(object):
 
-    def __init__(self, multicv):
-        self.additionals = multicv.additionals
-        self.interfaces = dict([(additional.name, additional.interface)
-                                for additional in self.additionals])
+    INDUSTRY_DIR = "JOBTITLES"
+
+    def __init__(self, addsvc, addpath, rawdb):
+        self.raws = rawdb
+        self.additional_path = addpath
+        self.additionals = addsvc
+        self.interfaces = dict([(name, self.additionals[name].interface)
+                                for name in self.additionals])
         self.logger = logging.getLogger("AdditionalSyncLogger.UPDATE")
 
     def update(self, additionals=None):
         if additionals is None:
-            additionals = self.additionals
-        interfaces = dict([(additional.name, additional.interface)
-                            for additional in self.additionals
-                            if additional.name in additionals])
-        for name, i in interfaces.items():
-            for id in set(i.lsid_raw()) - (set(i.lsid_yaml()) & set(i.lsid_md())):
-                raw_html = i.getraw(id+'.html')
-                raw_yaml = i.getraw(id+'.yaml')
-                md = self.generate_md(raw_html)
-                logidname = os.path.join(i.path, id)
-                if len(md) < 100:
-                    self.logger.info((' ').join(["Skip", logidname]))
-                    continue
-                t1 = time.time()
-                try:
-                    info = self.generate_yaml(md, raw_yaml, name=name)
-                except KeyboardInterrupt:
-                    usetime = time.time() - t1
-                    self.logger.info((' ').join(["KeyboardInterrupt", logidname,
-                                                 "used", str(usetime)]))
-                    continue
-                except:
-                    self.logger.info((' ').join(["Error generate", logidname]))
-                    continue
-                usetime = time.time() - t1
-                self.logger.info((' ').join(["Used", logidname, str(usetime)]))
-                infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
-                i.addcv(id, md.encode('utf-8'), infostream)
+            additionals = sources.industry_id.industryID.keys()
+        interfaces = dict([(name, self.additionals[name].interface)
+                            for name in self.additionals if name in additionals])
 
-        for additional in self.additionals:
-            additional.updatenums()
+        for in_name, in_id in sources.industry_id.industryID.items():
+            if in_name not in additionals:
+                continue
+            if in_name not in self.additionals:
+                namepath = os.path.join(self.additional_path, in_name)
+                add_db = interface.predator.PredatorInterface(namepath)
+                add_svc = services.curriculumvitae.CurriculumVitae(add_db, in_name)
+                self.additionals[in_name] = add_svc
+                self.interfaces[in_name] = add_db
+                interfaces[in_name] = add_db
+            add_db = interfaces[in_name]
+            for dbname in self.raws:
+                raw_db = self.raws[dbname]
+                urls_str = raw_db.get(os.path.join(self.INDUSTRY_DIR, in_id+'.yaml'))
+                if urls_str is None:
+                    continue
+                results = yaml.load(urls_str, Loader=utils._yaml.Loader)['datas']
+                ids = [id for id in results]
+                results = None
+                for id in (set(ids) & set(raw_db.lsid_raw()))-(
+                            set(add_db.lsid_yaml()) & set(add_db.lsid_md())):
+                    raw_html = raw_db.getraw(id+'.html')
+                    raw_yaml = raw_db.getraw(id+'.yaml')
+                    md = self.generate_md(raw_html)
+                    logidname = os.path.join(raw_db.path, id)
+                    if len(md) < 100:
+                        self.logger.info((' ').join(["Skip", logidname]))
+                        continue
+                    t1 = time.time()
+                    try:
+                        info = self.generate_yaml(md, raw_yaml, name=dbname)
+                        info['classify'] = in_name
+                    except KeyboardInterrupt:
+                        usetime = time.time() - t1
+                        self.logger.info((' ').join(["KeyboardInterrupt", logidname,
+                                                     "used", str(usetime)]))
+                        continue
+                    except:
+                        self.logger.info((' ').join(["Error generate", logidname]))
+                        continue
+                    usetime = time.time() - t1
+                    self.logger.info((' ').join(["Used", logidname, str(usetime)]))
+                    infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
+                                           allow_unicode=True)
+                    add_db.addcv(id, md.encode('utf-8'), infostream)
+                    add_db.addraw(id, raw_html.encode('utf-8'), raw_yaml.encode('utf-8'))
+
+        for name in self.additionals:
+            self.additionals[name].updatenums()
 
     def generate_md(self, raw_html):
         return pypandoc.convert(raw_html, 'markdown', format='docbook')

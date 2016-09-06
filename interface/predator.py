@@ -6,8 +6,6 @@ import os.path
 import subprocess
 import xml.etree.ElementTree
 
-import yaml
-
 import utils.builtin
 import interface.base
 
@@ -145,6 +143,17 @@ class PredatorLiteInterface(interface.base.Interface):
         filename = id + self.yamlextention
         filepath = os.path.join(self.cvpath, filename)
         self._add(filepath, data)
+        return True
+
+    def addraw(self, id, htmlraw, yamlraw):
+        if not os.path.exists(self.rawpath):
+            os.makedirs(self.rawpath)
+        htmlname = id + self.rawextention
+        yamlname = id + self.yamlextention
+        htmlpath = os.path.join(self.rawpath, htmlname)
+        yamlpath = os.path.join(self.rawpath, yamlname)
+        self._add(htmlpath, htmlraw)
+        self._add(yamlpath, yamlraw)
         return True
 
     def _add(self, filepath, filedate):

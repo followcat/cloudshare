@@ -52,6 +52,7 @@ class AdditionalSync(object):
                 interfaces[in_name] = add_db
             add_db = interfaces[in_name]
             for dbname in self.raws:
+                self.logger.info((' ').join(["Begin", in_name, 'at', dbname]))
                 raw_db = self.raws[dbname]
                 urls_str = raw_db.get(os.path.join(self.INDUSTRY_DIR, in_id+'.yaml'))
                 if urls_str is None:

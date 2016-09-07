@@ -274,6 +274,7 @@ def work_xp_zhilian(text):
         >>> assert u'应用' in name(position_1(work_xp_zhilian(u'2009年1月  --  至今\\n有限公司\\n|  软件工程师（公司产品） 兼\\n'
         ...     u'视觉应用工程师\\n（7年5个月）')))
         >>> assert u'软件' in name(position_1(work_xp_zhilian(u'2013年8月  --  2014年11月 有限公司  |  linux c++\\n中级软件工程师  （1年3个月）')))
+        >>> assert '2006.07' == position_1(work_xp_zhilian(u'91261-11\\n2006年7月-至今\\n中国银行\\n| 人力资源部\\n|  其他\\n（3个月）'))['date_from']
     """
     pos = 0
     out = {'company': [], 'position': []}

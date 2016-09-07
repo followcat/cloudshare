@@ -3,7 +3,7 @@ import re
 import time
 
 
-TODAY = u'((至今)|(目前)|(现在)|今|([Pp]resent)|([Nn]ow))'
+TODAY = u'(?:(?:至今)|(?:目前)|(?:现在)|今|(?:[Pp]resent)|(?:[Nn]ow))'
 CHNUMBERS = u'一二三四五六七八九十'
 SP = u'\s\xa0\ufffd\u2028\u3000'
 ASP = u'[' + SP + u']'
@@ -11,8 +11,11 @@ SEP = u'\-\u2013\u2014\u2015\u4e00\\\\·,~～/'
 UNIBRALEFT = ur'[（\(\[【]'
 UNIBRARIGHT = ur'[）\)\]】]'
 DATESEP = u'['+SEP+SP+u'至]+'
-DATE = ur'(?:(?:\d{4}'+ASP+u'?['+SEP+u'\.．年]'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))(?:'+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
-PERIOD = u'(?P<from>' + DATE + ur')' + DATESEP + ASP+ u'*(?P<to>' + DATE + ')(?:'+UNIBRALEFT+u'含[^（\(\[【]+?期'+UNIBRARIGHT+u')?'
+_PDATE = ur'(?:(?:\d{4}'+ASP+u'?__DATE_SEP__'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))(?:'+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
+FDSEP = u'(?P<fromsep>['+SEP+u'\.．年])'
+DATE = _PDATE.replace('__DATE_SEP__', FDSEP.replace('P<fromsep>', ':'))
+SDSEP = u'(?P=fromsep)'
+PERIOD = u'(?P<from>' + _PDATE.replace('__DATE_SEP__', FDSEP) + ur')' + DATESEP + ASP+ u'*(?P<to>' + _PDATE.replace('__DATE_SEP__', SDSEP) + ')(?:'+UNIBRALEFT+u'含[^（\(\[【]+?期'+UNIBRARIGHT+u')?'
 DURATION = ur'(?P<duration>(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
@@ -86,6 +89,8 @@ STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P
 
 def compute_duration(date_from, date_to):
     u"""
+        >>> print(compute_duration(u'至今', '2006.10'))
+        一个月内
         >>> print(compute_duration('2002.08', '2006.10'))
         4年2个月
         >>> print(compute_duration('2014.08', u'至今')) #doctest: +ELLIPSIS
@@ -97,6 +102,8 @@ def compute_duration(date_from, date_to):
         >>> print(compute_duration('2014.03', '2016.03'))
         2年
     """
+    if date_from == u'至今':
+        return u'一个月内'
     break_date = lambda x: tuple([int(i) for i in x.split('.')])
     time_from = time.mktime(break_date(date_from)+(1,0,0,0,0,0,0))
     if date_to == u'至今':

@@ -258,4 +258,17 @@ const exec = function(id) {
   processer = null;
 }
 
-module.exports = exec;
+const CVProcess = {
+  exec: function(id) {
+    let processer = new Process(id);
+    processer.refactorHTML();
+    processer.deleteTableAttribute();
+    processer.deleteHrTag();
+    processer.deleteSectionTag();
+    processer.deleteLink();
+    processer.deleteLine();
+    processer = null;
+  }
+}
+
+module.exports = CVProcess;

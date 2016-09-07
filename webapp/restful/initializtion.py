@@ -11,6 +11,8 @@ from webapp.restful.curriculumvitae import *
 from webapp.restful.feature import *
 from webapp.restful.session import *
 from webapp.restful.bookmark import *
+from webapp.restful.databases import *
+
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
@@ -57,5 +59,7 @@ def initialize(app):
     api.add_resource(ValuablebydocAPI, '/api/mining/valuablebydoc',
                                         endpoint = 'valuablebydoc')
 
-    api.add_resource(FeatureAPI, '/api/feature',
-                                        endpoint = 'feature')
+    api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
+
+    api.add_resource(DatabasesAPI, '/api/databases', endpoint = 'databases')
+    api.add_resource(DBNumbersAPI, '/api/dbnumbers/<string:name>', endpoint = 'dbnumbers')

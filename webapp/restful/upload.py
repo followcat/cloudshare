@@ -19,17 +19,7 @@ class UploadCVAPI(Resource):
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type = str, location = 'json')
-        self.reqparse.add_argument('index', type = int, location = 'json')
         self.reqparse.add_argument('updates', type = dict, location = 'json')
-
-    def get(self):
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        id = args['index']
-        upobj = flask.session[user.id]['upload'][id]
-        md = upobj.preview_markdown()
-        yamlinfo = upobj.filepro.yamlinfo
-        return { 'result': { 'markdown': md, 'yaml_info': yaml_info } }
 
     def put(self):
         results = dict()
@@ -48,21 +38,22 @@ class UploadCVAPI(Resource):
         return { 'result': results }
 
     def post(self):
+        user = flask.ext.login.current_user
         if 'upload' not in flask.session[user.id]:
             flask.session[user.id]['upload'] = dict()
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        netword_file = args['files']
+        netword_file = flask.request.files['files']
         filename = netword_file.filename
         upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
                                                 netword_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
         if not upobj.filepro.yamlinfo['name']:
-            u_filename = filename.encode('utf-8')
-            upobj.filepro.yamlinfo['name'] = utils.chsname.name_from_filename(u_filename)
+            #u_filename = filename.encode('utf-8')
+            upobj.filepro.yamlinfo['name'] = utils.chsname.name_from_filename(filename)
         flask.session[user.id]['upload'][upobj.ID] = upobj
         flask.session.modified = True
-        return flask.jsonify(result=upobj.result, name=upobj.filepro.yamlinfo['name'])
+        return { 'code': 200, 'data': { 'result': upobj.result,
+                                        'name': upobj.filepro.yamlinfo['name'],
+                                        'id': upobj.filepro.yamlinfo['id'] } }
 
 
 class UploadEnglishCVAPI(Resource):
@@ -105,3 +96,22 @@ class UploadEnglishCVAPI(Resource):
         flask.session[user.id]['uploadeng'] = upobj
         flask.session.modified = True
         return { 'result': upobj.result }
+
+
+class UploadCVPreviewAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(UploadCVPreviewAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('id', type = str, location = 'json')
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        upobj = flask.session[user.id]['upload'][id]
+        md = upobj.preview_markdown()
+        yaml_info = upobj.filepro.yamlinfo
+        return { 'code': 200, 'data': { 'id': id, 'markdown': md, 'yaml_info': yaml_info } }

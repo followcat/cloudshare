@@ -220,7 +220,7 @@ class CurriculumVitaeObject(object):
 
     @property
     def ID(self):
-        return filepro.name.base
+        return self.filepro.name.base
 
     def markdown(self):
         return self.filepro.markdown_stream

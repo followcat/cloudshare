@@ -5,6 +5,7 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
+import utils.chsname
 import services.curriculumvitae
 
 
@@ -58,7 +59,7 @@ class UploadCVAPI(Resource):
                                                 flask.current_app.config['UPLOAD_TEMP'])
         if not upobj.filepro.yamlinfo['name']:
             u_filename = filename.encode('utf-8')
-            upobj.filepro.yamlinfo['name'] = tools.batching.name_from_filename(u_filename)
+            upobj.filepro.yamlinfo['name'] = utils.chsname.name_from_filename(u_filename)
         flask.session[user.id]['upload'][upobj.ID] = upobj
         flask.session.modified = True
         return flask.jsonify(result=upobj.result, name=upobj.filepro.yamlinfo['name'])

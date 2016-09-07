@@ -39,7 +39,6 @@ def initialize(app):
                      endpoint = 'curriculumvitaeyaml')
 
     api.add_resource(UploadCVAPI, '/api/uploadcv', endpoint = 'uploadcv')
-    api.add_resource(UploadBatchCVAPI, '/api/uploadbatchcv', endpoint = 'uploadbatchcv')
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv', endpoint = 'uploadengcv')
 
     api.add_resource(SearchbyTextAPI, '/api/search/<string:text>', endpoint = 'searchbytext')

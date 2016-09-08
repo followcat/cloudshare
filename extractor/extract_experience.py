@@ -54,7 +54,7 @@ SPO = re.compile(u'(项目)?职务[:：]'+ASP+u'*(?P<aposition>[^= \n:：\*]+)$'
 POASP = ASP.replace('\s', ' ')
 PODEPARTMENT = u'([^\n:：'+SP+u']|('+POASP+u'[^\n'+SP+u']))+'
 POFIELD = u'(?(nl)(([^\n:：'+SP+u'](\n+/)?)+)|([^\n'+SP+u']|('+POASP+u'[^\n'+SP+u']))+)'
-PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*(?P<field>'+POFIELD+u')'+POASP+u'*\n+(?:(?:'+ASP+u'*(?='+APERIOD+u')|(?:\-{3})|(?:下属人数)|(?:所在地区)|(?:汇报对象)|(?:所在部门))|(?:'+POASP+u'*((?P<dpt>'+PODEPARTMENT+u'(（离职原因：.*?）)?)(?(nl)()|(?:'+POASP+u'+)))?(?(nl)(?:'+POASP+u'*(\n+|('+POASP+u'+))))(主管：)?(?P<aposition>(?(dpt)(?:[^=\n:：\*]+)|(?:[^= \n:：\*]+)))(（汇报对象：.*?）)?$))', re.M)
+PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*(?P<field>'+POFIELD+u')'+POASP+u'*\n+(?:(?:'+ASP+u'*(?='+APERIOD+u')|(?:\-{3})|(?:下属人数)|(?:所在地区)|(?:汇报对象)|(?:所在部门))|(?:'+POASP+u'*((?P<dpt>'+PODEPARTMENT+u'(（离职原因：.*?）)?)(?(nl)()|(?:'+POASP+u'+)))?(?(nl)(?:'+POASP+u'*(\n+|('+POASP+u'+))))(主管：)?(?P<aposition>(?(dpt)(?:[^=\n:：]+)|(?:[^= \n:：]+)))(（汇报对象：.*?）)?$))', re.M)
 
 IXPO = re.compile(u'所属行业[:：]'+ASP+u'*(?P<field>.+)\n+'+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+'+ASP+u'*职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*$', re.M)
 APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
@@ -306,6 +306,8 @@ def work_xp_jingying(text):
         >>> assert len(positions(work_xp_jingying(u'2012年12月—至今：有限公司\\n所属行业： 医疗电子\\n职责:\\n编写程序功能块实现方案'))) == 0
         >>> assert u'：' not in name(position_1(work_xp_jingying(u'2010 /4—2014/4：有限公司（300-500人） [ 3年]\\n所属行业：石油/化工/能源\\n'
         ...         u'人力资源部   人事经理  （汇报对象：公司总经理）')))
+        >>> assert 1 == len(positions(work_xp_jingying(u'2007/7 -- 至今： 科技有限公司（ 500-1000人） [ 9年1个月 ]\\n'
+        ...         u'所属行业：  医疗设备/器械\\n车间\\*采购部\\*品质部    操作工\\*库房管理员\\*检验员\\*包装员')))
     """
     pos = 0
     out = {'company': [], 'position': []}

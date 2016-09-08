@@ -163,6 +163,7 @@ def fix(d):
         >>> assert gender(fix(u'男 | 23岁(1991年7月12日) | 1年工作经验 | 未婚 |  O型')) == u'男'
         >>> assert age(fix(u'杨伟东 （男，26）\\n中山大学\\n')) == 26
         >>> assert marital_status(fix(u'杨伟东 （男，26）\\n中山大学\\n3.  婚姻状况：未婚')) == u'未婚'
+        >>> assert not fix(u'·······························')
     """
     def fix_output(processed):
         result = processed
@@ -206,6 +207,7 @@ def fix(d):
     if current:
         processed['current'] = current
 
+    d = re.compile(u'^ *·{3}.*$', re.M).sub('', d)
     if NAMEHEADER.search(d):
         processed.update(extract_general(NAMEHEADER.search(d).groupdict()))
         res = LABELMARITAL.search(d)

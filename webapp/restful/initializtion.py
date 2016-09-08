@@ -10,6 +10,9 @@ from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
 from webapp.restful.feature import *
 from webapp.restful.session import *
+from webapp.restful.bookmark import *
+from webapp.restful.databases import *
+
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
@@ -17,6 +20,8 @@ def initialize(app):
     api.add_resource(AccountAPI, '/api/accounts/<string:id>')
     api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')
     api.add_resource(AccountHistoryAPI, '/api/accounthistory', endpoint = 'accounthistory')
+
+    api.add_resource(BookmarkAPI, '/api/accounts/<string:id>/bookmark')
 
     api.add_resource(CompanyAPI, '/api/company/<string:name>', endpoint = 'company')
     api.add_resource(CompanyListAPI, '/api/companylist', endpoint = 'companylist')
@@ -36,8 +41,8 @@ def initialize(app):
                      endpoint = 'curriculumvitaeyaml')
 
     api.add_resource(UploadCVAPI, '/api/uploadcv', endpoint = 'uploadcv')
-    api.add_resource(UploadBatchCVAPI, '/api/uploadbatchcv', endpoint = 'uploadbatchcv')
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv', endpoint = 'uploadengcv')
+    api.add_resource(UploadCVPreviewAPI, '/api/uploadcv/preview')
 
     api.add_resource(SearchbyTextAPI, '/api/search/<string:text>', endpoint = 'searchbytext')
 
@@ -55,5 +60,7 @@ def initialize(app):
     api.add_resource(ValuablebydocAPI, '/api/mining/valuablebydoc',
                                         endpoint = 'valuablebydoc')
 
-    api.add_resource(FeatureAPI, '/api/feature',
-                                        endpoint = 'feature')
+    api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
+
+    api.add_resource(DatabasesAPI, '/api/databases', endpoint = 'databases')
+    api.add_resource(DBNumbersAPI, '/api/dbnumbers/<string:name>', endpoint = 'dbnumbers')

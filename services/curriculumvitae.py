@@ -218,6 +218,10 @@ class CurriculumVitaeObject(object):
         else:
             self.information = 'Sucess'
 
+    @property
+    def ID(self):
+        return self.filepro.name.base
+
     def markdown(self):
         return self.filepro.markdown_stream
 

@@ -5,7 +5,7 @@ import services.mining
 import services.account
 import services.company
 import services.multicv
-import services.classify
+import services.classifycv
 import services.cvstoragesync
 import services.curriculumvitae
 import services.jobdescription
@@ -49,10 +49,10 @@ SVC_CV_STO = services.curriculumvitae.CurriculumVitaeStorage(CV_STORAGE_DB, 'cvs
 SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_CV_STO, RAW_DB)
 
 CLASSIFY_DIR = 'classify'
-CLS_SVC_CV = dict()
+SVC_CLS_CV = dict()
 for name in sources.industry_id.industryID.keys():
-    CLS_SVC_CV[name] = services.classify.ClassifyCV(name, CLASSIFY_DIR, SVC_CV_STO, RAW_DB)
-SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, CLS_SVC_CV.values())
+    SVC_CLS_CV[name] = services.classifycv.ClassifyCV(name, CLASSIFY_DIR, SVC_CV_STO, RAW_DB)
+SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, SVC_CLS_CV.values())
 
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)
 SVC_INDEX.setup()

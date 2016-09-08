@@ -1,4 +1,5 @@
 import os
+import yaml
 
 import utils.builtin
 import core.outputstorage
@@ -15,7 +16,7 @@ class ClassifyCV(object):
     def __init__(self, name, path, cvstorage, rawdb):
         self.name = name
         self.path = os.path.join(path, name)
-        self.cvids = list()
+        self.cvids = set()
         self.config = dict()
         self.cvstorage = cvstorage
         self.rawdb = rawdb
@@ -24,10 +25,10 @@ class ClassifyCV(object):
         except IOError:
             pass
 
-    def setup(self, classify):
+    def setup(self):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
-        self.config['classify'] = classify
+        self.config['classify'] = self.name
         self.update()
 
     def load(self):
@@ -39,12 +40,14 @@ class ClassifyCV(object):
         for dbname in self.rawdb:
             raw_db = self.rawdb[dbname]
             urls_str = raw_db.get(os.path.join(self.INDUSTRY_DIR, in_id+'.yaml'))
+            if urls_str is None:
+                continue
             results = yaml.load(urls_str, Loader=utils._yaml.Loader)['datas']
             ids = [id for id in results]
             results = None
-            for id in set(self.cvstorage.lsids())-
-                         (set(ids) & set(raw_db.lsid_raw())):
-                self._add(yamlname, name)
+            for id in set(self.cvstorage.lsids())- (set(ids) & set(raw_db.lsid_raw())):
+                if not self.exists(id):
+                    self._add(id)
         utils.builtin.save_yaml(self.config, self.path, self.config_file)
         utils.builtin.save_yaml(self.cvids, self.path, self.ids_file)
 
@@ -52,9 +55,9 @@ class ClassifyCV(object):
         id = core.outputstorage.ConvertName(name)
         return id in self.cvids
 
-    def _add(self, name, svccv_name):
+    def _add(self, name):
         id = core.outputstorage.ConvertName(name).base
-        self.cvids.append(id)
+        self.cvids.add(id)
 
     def yamls(self):
         for id in self.cvids:

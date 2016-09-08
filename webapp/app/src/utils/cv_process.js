@@ -3,8 +3,8 @@
  * Deal with cv format, makes cv display beautiful.
  */
 
-function Process(id) {
-  this.__cvElement__ = document.getElementById(id);
+function Process(element) {
+  this.__cvElement__ = element;
 }
 
 /**
@@ -223,7 +223,7 @@ Process.prototype.refactorHTML = function() {
   }
 
   for (let i = 0, len = htmlArray.length; i < len; i++) {
-    htmlString += htmlArray.html;
+    htmlString += htmlArray[i].html;
   }
 
   this.__cvElement__.innerHTML = htmlString;
@@ -247,25 +247,14 @@ Process.prototype.deleteTableAttribute = function() {
   }
 };
 
-const exec = function(id) {
-  let processer = new Process(id);
-  processer.refactorHTML();
-  processer.deleteTableAttribute();
-  processer.deleteHrTag();
-  processer.deleteSectionTag();
-  processer.deleteLink();
-  processer.deleteLine();
-  processer = null;
-}
-
 const CVProcess = {
-  exec: function(id) {
-    let processer = new Process(id);
+  exec: function(element) {
+    let processer = new Process(element);
     processer.refactorHTML();
     processer.deleteTableAttribute();
     processer.deleteHrTag();
     processer.deleteSectionTag();
-    processer.deleteLink();
+    processer.deleteLinkOnParagraph();
     processer.deleteLine();
     processer = null;
   }

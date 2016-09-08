@@ -19,6 +19,7 @@ lsimodel/
 celerybeat-schedule
 similarity.*
 raw/
+cvstorage/
 additional/
 Index/
 webapp/static/node_modules/

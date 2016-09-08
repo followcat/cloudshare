@@ -186,6 +186,11 @@ class CurriculumVitae(services.base.Service):
         self._nums = len(list(self.yamls()))
 
 
+class CurriculumVitaeStorage(CurriculumVitae):
+
+    path = ''
+
+
 class CurriculumVitaeObject(object):
 
     def __init__(self, filename, fileobject, path):

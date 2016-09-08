@@ -8,6 +8,7 @@ import services.multicv
 import services.additionalsync
 import services.curriculumvitae
 import services.jobdescription
+import interface.basefs
 import interface.predator
 import interface.gitinterface
 
@@ -34,6 +35,10 @@ DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB, 'cloudshare')
 
 RAW_DIR = 'raw'
 ADDITIONAL_DIR = 'additional'
+
+CV_STORAGE_DIR = 'cvstorage'
+CV_STORAGE_DB = interface.basefs.BaseFSInterface(CV_STORAGE_DIR)
+SVC_CV_STO = services.curriculumvitae.CurriculumVitae(CV_STORAGE_DB, 'cvstorage')
 
 ADD_DB = dict()
 ADD_SVC_CV = dict()

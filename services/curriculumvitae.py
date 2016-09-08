@@ -190,6 +190,17 @@ class CurriculumVitaeStorage(CurriculumVitae):
 
     path = ''
 
+    def addcv(self, id, data, yamldata, rawdata=None):
+        cn_id = core.outputstorage.ConvertName(id)
+        self.interface.add(os.path.join(self.path, cn_id.md), data)
+        self.interface.add(os.path.join(self.path, cn_id.yaml), yamldata)
+        if rawdata is not None:
+            self.interface.add(os.path.join(self.path, cn_id.html), rawdata)
+        return True
+
+    def lsids(self, *args, **kwargs):
+        return [f.split('.')[0] for f in self.interface.lsfiles()]
+
 
 class CurriculumVitaeObject(object):
 

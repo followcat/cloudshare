@@ -5,7 +5,7 @@ import services.mining
 import services.account
 import services.company
 import services.multicv
-import services.additionalsync
+import services.cvstoragesync
 import services.curriculumvitae
 import services.jobdescription
 import interface.basefs
@@ -38,7 +38,7 @@ ADDITIONAL_DIR = 'additional'
 
 CV_STORAGE_DIR = 'cvstorage'
 CV_STORAGE_DB = interface.basefs.BaseFSInterface(CV_STORAGE_DIR)
-SVC_CV_STO = services.curriculumvitae.CurriculumVitae(CV_STORAGE_DB, 'cvstorage')
+SVC_CV_STO = services.curriculumvitae.CurriculumVitaeStorage(CV_STORAGE_DB, 'cvstorage')
 
 ADD_DB = dict()
 ADD_SVC_CV = dict()
@@ -55,7 +55,7 @@ for name in os.listdir(RAW_DIR):
     RAW_DB[name] = interface.predator.PredatorInterface(namepath)
 
 SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, ADD_SVC_CV.values())
-SVC_ADD_SYNC = services.additionalsync.AdditionalSync(ADD_SVC_CV, ADDITIONAL_DIR, RAW_DB)
+SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_CV_STO, RAW_DB)
 
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)
 SVC_INDEX.setup()

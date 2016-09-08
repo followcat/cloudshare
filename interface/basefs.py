@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import io
 import glob
 import os.path
 import subprocess
+import xml.etree.ElementTree
 
 import interface.base
 
@@ -32,6 +34,38 @@ class BaseFSInterface(interface.base.Interface):
             with open(path_file) as fp:
                 data = fp.read()
         return data
+
+    def getraw(self, filename):
+        def get_namespaces(raw):
+            namespaces = dict([
+                node for _, node in xml.etree.ElementTree.iterparse(
+                    io.BytesIO(raw), events=['start-ns']
+                )
+            ])
+            return namespaces
+        def remove_namespace(raw, namespaces):
+            """Remove namespace in the passed document in place."""
+            e = xml.etree.ElementTree.fromstring(raw)
+            for name in namespaces:
+                namespace = namespaces[name]
+                ns = u'{%s}' % namespace
+                nsl = len(ns)
+                for elem in e.getiterator():
+                    if elem.tag.startswith(ns):
+                        elem.tag = elem.tag[nsl:]
+            return xml.etree.ElementTree.tostring(e, encoding='utf-8')
+
+        rawname = os.path.join(self.rawdir, filename)
+        result = self._get_file(rawname)
+        if result is not None:
+            try:
+                namespaces = get_namespaces(result)
+                if namespaces:
+                    result = remove_namespace(result, namespaces)
+            except xml.etree.ElementTree.ParseError:
+                pass
+            result = result.decode('utf-8')
+        return result
 
     def modify(self, filepath, stream, message=None, committer=None):
         result = False
@@ -87,6 +121,7 @@ class BaseFSInterface(interface.base.Interface):
         return grep_list
 
     def add(self, filepath, filedate):
-        with open(filepath, 'w') as f:
+        path = os.path.join(self.path, filepath)
+        with open(path, 'w') as f:
             f.write(filedate)
         return True

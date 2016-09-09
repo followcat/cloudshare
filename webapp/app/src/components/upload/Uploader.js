@@ -11,7 +11,7 @@ export default class Uploader extends Component {
   render() {
     return (
       <div>
-        <div style={{ width: 720, height: 180, margin: '0 auto' }}>
+        <div style={{ width: 720, minHeight: 180, margin: '0 auto' }}>
           <Dragger {...this.props.uploadProps}>
             <p className="ant-upload-drag-icon">
               <Icon type="inbox" />

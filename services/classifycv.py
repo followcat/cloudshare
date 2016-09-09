@@ -45,7 +45,7 @@ class ClassifyCV(object):
             results = yaml.load(urls_str, Loader=utils._yaml.Loader)['datas']
             ids = [id for id in results]
             results = None
-            for id in set(self.cvstorage.lsids())- (set(ids) & set(raw_db.lsid_raw())):
+            for id in (set(ids) & set(raw_db.lsid_raw()) & set(self.cvstorage.lsids())):
                 if not self.exists(id):
                     self._add(id)
         utils.builtin.save_yaml(self.config, self.path, self.config_file)

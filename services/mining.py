@@ -126,6 +126,17 @@ def re_sub(reg, sub, text):
         >>> s += "--------------------\\n"
         >>> print(re_sub(LINE, '', re_sub(SYMBOL, '', s)))
         英语(CET4)、普通话
+        >>> assert 'http://search.51job.com/job/52405118,c.html' in WEB.match('http://search.51job.com/job/52405118,c.html').group(0)
+        >>> assert 'https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD' in WEB.match(
+        ...             "https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD").group(0)
+        >>> assert '2014.06' in WEB.match("https://h.liepin.com/cvsearch/soResume/?company=%AC%E5%8F%B8)2014.06").group(0) #FIXME
+        >>> assert 'bertwalker2005@yahoo.co.uk' in WEB.match('bertwalker2005@yahoo.co.uk').group(0)
+        >>> assert 'http://h.highpin.cn/ResumeManage/26566491@qq.com' in WEB.match('http://h.highpin.cn/ResumeManage/26566491@qq.com').group(0)
+        >>> assert 'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.match('http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
+        >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' not in WEB.match('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0) #FIXME
+        >>> assert 'https://h.liepin.com/message/showmessage/#c:1' not in WEB.match('https://h.liepin.com/message/showmessage/#c:1').group(0) #FIXME
+        >>> assert 'http://www.hindawi.com/journals/tswj/2014/465702/ 2007' in WEB.match('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0) #FIXME
+        >>> assert 'team.Desig' in WEB.match('team.Desig').group(0) #FIXME
     """
     return reg.sub(sub, text)
 

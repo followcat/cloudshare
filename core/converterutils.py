@@ -94,8 +94,8 @@ class FileProcesser():
         location = self.copy()
         logger.info('Backup to: %s' % location)
 
-        self.result = self.convert()
         self.resultcode = None
+        self.result = self.convert()
 
     def generate_yaml_template(self):
         yamlinfo = {}

@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 
 import { Form, Input, Select, Button, Icon } from 'antd';
 
+import ResumeComfirm from './ResumeComfirm';
+
 class ResumeTitle extends Component {
   constructor(props){
     super(props);
@@ -13,13 +15,15 @@ class ResumeTitle extends Component {
   handlePrevClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    this.props.onPrevPreview(fieldsValue)
+    let value = Object.assign(fieldsValue, { id: this.props.yaml_info.id });
+    this.props.onPrevPreview(value);
   }
 
   handleNextClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    this.props.onNextPreview(fieldsValue);
+    let value = Object.assign(fieldsValue, { id: this.props.yaml_info.id });
+    this.props.onNextPreview(value);
   }
 
   render() {
@@ -37,48 +41,59 @@ class ResumeTitle extends Component {
       { "num" : 9, "origin" : "其他" }
     ];
 
+    const isLastPreview = this.props.current === this.props.length - 1;
+
     return (
       <div className="cs-preview-top">
-        <Form inline style={{ width: 620, margin: '0 auto' }}>
-          <Form.Item>
+        <Form inline style={{ position: 'relative' }}>
+          <Form.Item
+            style={{ position: 'absolute', top: 0, left: 0 }}
+          >
             <Button
               type="primary"
               size="small"
-              disabled={this.props.index === 0 ? true : false}
+              disabled={this.props.index === 0 || this.props.disabled}
               onClick={this.handlePrevClick}
             >
               <Icon type="left" />Prev
             </Button>
           </Form.Item>
-          <Form.Item
-            label="Name"
-          >
-            <Input
-              {...getFieldProps('name', { initialValue: this.props.name ? this.props.name : '' })}
-              type="text"
-              placeholder="Please input resume name"
-            />
-          </Form.Item>
-          <Form.Item
-            label="Source"
-          >
-            <Select
-              {...getFieldProps('source', { initialValue: sourceData[0].origin })}
-              style={{ width: 200 }}
-              defaultValue={sourceData[0].origin}
+          <div style={{ width: 720, margin: '0 auto' }}>
+            <Form.Item
+              label="Name"
             >
-              {sourceData.map((item) => {
-                return (
-                  <Select.Option key={item.num} value={item.origin}>{item.origin}</Select.Option>
-                );
-              })}
-            </Select>
-          </Form.Item>
-          <Form.Item>
+              <Input
+                {...getFieldProps('name', { initialValue: this.props.name ? this.props.name : '' })}
+                type="text"
+                placeholder="Please input resume name"
+              />
+            </Form.Item>
+            <Form.Item
+              label="Source"
+            >
+              <Select
+                {...getFieldProps('source', { initialValue: sourceData[0].origin })}
+                style={{ width: 200 }}
+                defaultValue={sourceData[0].origin}
+              >
+                {sourceData.map((item) => {
+                  return (
+                    <Select.Option key={item.num} value={item.origin}>{item.origin}</Select.Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+            <Form.Item>
+              {isLastPreview ? <ResumeComfirm {...this.props} /> : ''}
+            </Form.Item>
+          </div>
+          <Form.Item
+            style={{ position: 'absolute', top: 0, right: 0 }}
+          >
             <Button
               type="primary"
               size="small"
-              disabled={this.props.current === this.props.length - 1}
+              disabled={isLastPreview}
               onClick={this.handleNextClick}
             >
               Next<Icon type="right" />

@@ -30,6 +30,9 @@ export default class PreviewList extends Component {
             yaml_info: previewItem.yaml_info,
             onPrevPreview: this.props.onPrevPreview,
             onNextPreview: this.props.onNextPreview,
+            onComfirmUpload: this.props.onComfirmUpload,
+            loading: this.props.loading,
+            disabled: this.props.disabled,
           };
 
           return (

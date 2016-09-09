@@ -16,10 +16,15 @@ export default class Upload extends Component {
       files: [],
       currentPreview: 0,
       completedFileList: [],
+      comfirmList: [],
+      loading: false,
+      disabled: false,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handlePrevPreview = this.handlePrevPreview.bind(this);
     this.handleNextPreview = this.handleNextPreview.bind(this);
+    this.handleComfirmUpload = this.handleComfirmUpload.bind(this);
+    this.isObjectExisted = this.isObjectExisted.bind(this);
   }
 
   handleChange(info) {
@@ -59,30 +64,80 @@ export default class Upload extends Component {
         });
       }
     });
-
-    if (completedFileList.length > 1) {
-      this.setState({
-        buttonVisible: true,
-      });
-    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return nextState.files.length === nextState.completedFileList.length;
   }
 
-  handlePrevPreview(fieldsValue) {
-    let current = this.state.currentPreview;
+  isObjectExisted(array, targetId) {
+    for( let item of array) {
+      if (item.id === targetId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  handlePrevPreview(value) {
+    let current = this.state.currentPreview,
+        comfirm = this.state.comfirmList;
+    if (!this.isObjectExisted(comfirm, value.id)) {
+      comfirm.push(value);
+    }
     this.setState({
       currentPreview: current - 1,
+      comfirmList: comfirm,
     });
   }
 
-  handleNextPreview(fieldsValue) {
-    let current = this.state.currentPreview;
+  handleNextPreview(value) {
+    let current = this.state.currentPreview,
+        comfirm = this.state.comfirmList;
+    if (!this.isObjectExisted(comfirm, value.id)) {
+      comfirm.push(value);
+    }
     this.setState({
       currentPreview: current + 1,
+      comfirmList: comfirm,
     });
+  }
+
+  handleComfirmUpload(value) {
+    let comfirm = this.state.comfirmList;
+    if (!this.isObjectExisted(comfirm, value.id)) {
+      comfirm.push(value);
+    }
+
+    this.setState({
+      comfirmList: comfirm,
+      loading: true,
+      disabled: true,
+    });
+
+    fetch(`/api/uploadcv`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        updates: comfirm
+      })
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        this.setState({
+          loading: false,
+          disabled: false,
+        });
+      }
+    })
   }
 
   render() {
@@ -109,6 +164,9 @@ export default class Upload extends Component {
             currentPreview={this.state.currentPreview}
             onPrevPreview={this.handlePrevPreview}
             onNextPreview={this.handleNextPreview}
+            onComfirmUpload={this.handleComfirmUpload}
+            loading={this.state.loading}
+            disabled={this.state.disabled}
           />
         </div>
       </div>

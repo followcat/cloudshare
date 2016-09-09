@@ -139,14 +139,14 @@ class FileProcesser():
         return location
 
     def convert_docfile(self, input, filename, output, outputname):
-        returncode = True
+        result = True
         try:
             self.converter.convert(os.path.join(input, filename),
                                    os.path.join(output, outputname))
         except Exception as e:
             logger.info(e)
-            returncode = False
-        return returncode
+            result = False
+        return result
 
     def process_mht(self):
         message = email.message_from_string(self.stream)

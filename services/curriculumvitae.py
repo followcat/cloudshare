@@ -213,10 +213,7 @@ class CurriculumVitaeObject(object):
                                                          self.convertname,
                                                          self.tmp_path)
         self.result = self.filepro.result
-        if self.result is False:
-            self.resultid = self.filepro.resultinfo
-        else:
-            self.resultid = self.filepro.resultinfo
+        self.resultid = self.filepro.resultcode
 
     @property
     def ID(self):

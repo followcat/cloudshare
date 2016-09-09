@@ -32,6 +32,13 @@ def md_to_html(stream):
 
 
 class FileProcesser():
+    """
+        result code:
+            0 - success
+            1 - can not generate docbook
+            2 - convert exception
+            3 - not support doc type
+    """
 
     converter = None
 
@@ -88,6 +95,7 @@ class FileProcesser():
         logger.info('Backup to: %s' % location)
 
         self.result = self.convert()
+        self.resultcode = None
 
     def generate_yaml_template(self):
         yamlinfo = {}
@@ -217,6 +225,10 @@ class FileProcesser():
             if not os.path.exists(os.path.join(
                                   self.docbook_path, self.name.xml)):
                 logger.info('Not exists')
+                self.resultcode = 2
+                return False
+            if returncode is False:
+                self.resultcode = 3
                 return False
             self.remove_note()
             self.file_docbook_to_markdown()
@@ -228,9 +240,11 @@ class FileProcesser():
             self.yamlinfo['id'] = self.name.base
             utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)
             logger.info('Success')
+            self.resultcode = 0
             return True
         else:
             logger.info('Skip')
+            self.resultcode = 1
             return False
 
     def deleteconvert(self):

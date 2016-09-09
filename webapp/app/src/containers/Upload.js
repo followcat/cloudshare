@@ -19,18 +19,43 @@ export default class Upload extends Component {
       comfirmList: [],
       loading: false,
       disabled: false,
+      industryList: [],
     };
+    this.handleBeforeUpload = this.handleBeforeUpload.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handlePrevPreview = this.handlePrevPreview.bind(this);
     this.handleNextPreview = this.handleNextPreview.bind(this);
     this.handleComfirmUpload = this.handleComfirmUpload.bind(this);
     this.isObjectExisted = this.isObjectExisted.bind(this);
+    this.loadIndustry = this.loadIndustry.bind(this);
+  }
+
+  loadIndustry() {
+    fetch(`/api/industry`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`
+      }
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        this.setState({
+          industryList: json.data,
+        });
+      }
+    })
+  }
+
+  componentDidMount() {
+    this.loadIndustry();
   }
 
   handleChange(info) {
     let fileList = info.fileList,
         completedFileList = this.state.completedFileList;
-    
     this.setState({
       files: fileList,
     });
@@ -149,7 +174,7 @@ export default class Upload extends Component {
       headers: {
         'Authorization': `Basic ${localStorage.token}`
       },
-      mutiple: true,
+      multiple: true,
       onChange: this.handleChange,
     };
 
@@ -167,6 +192,7 @@ export default class Upload extends Component {
             onComfirmUpload={this.handleComfirmUpload}
             loading={this.state.loading}
             disabled={this.state.disabled}
+            industryList={this.state.industryList}
           />
         </div>
       </div>

@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Form, Input, Select, Button, Icon } from 'antd';
 
 import ResumeComfirm from './ResumeComfirm';
+import IndustrySingleSelection from '../common/IndustrySingleSelection';
 
 class ResumeTitle extends Component {
   constructor(props){
@@ -64,21 +65,43 @@ class ResumeTitle extends Component {
             >
               <Input
                 {...getFieldProps('name', { initialValue: this.props.name ? this.props.name : '' })}
+                style={{ width: 120 }}
                 type="text"
-                placeholder="Please input resume name"
+                placeholder="Input resume name"
               />
             </Form.Item>
             <Form.Item
               label="Source"
             >
               <Select
-                {...getFieldProps('source', { initialValue: sourceData[0].origin })}
-                style={{ width: 200 }}
-                defaultValue={sourceData[0].origin}
+                {...getFieldProps('source')}
+                showSearch
+                style={{ width: 140 }}
+                placeholder="Select a source"
+                optionFilterProp="children"
+                notFoundContent="Not found"
               >
                 {sourceData.map((item) => {
                   return (
                     <Select.Option key={item.num} value={item.origin}>{item.origin}</Select.Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              label="Industry"
+            >
+              <Select
+                {...getFieldProps('industry')}
+                showSearch
+                style={{ width: 160 }}
+                placeholder="Select a industry"
+                optionFilterProp="children"
+                notFoundContent="Not found"
+              >
+                {this.props.industryList.map((item, index) => {
+                  return (
+                    <Select.Option key={index} value={item}>{item}</Select.Option>
                   );
                 })}
               </Select>

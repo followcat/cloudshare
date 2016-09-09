@@ -207,7 +207,6 @@ def fix(d):
     if current:
         processed['current'] = current
 
-    d = re.compile(u'^ *·{3}.*$', re.M).sub('', d)
     if NAMEHEADER.search(d):
         processed.update(extract_general(NAMEHEADER.search(d).groupdict()))
         res = LABELMARITAL.search(d)

@@ -46,14 +46,19 @@ class UploadCVAPI(Resource):
         upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
                                                 netword_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
-        if not upobj.filepro.yamlinfo['name']:
-            #u_filename = filename.encode('utf-8')
-            upobj.filepro.yamlinfo['name'] = utils.chsname.name_from_filename(filename)
-        flask.session[user.id]['upload'][upobj.ID] = upobj
-        flask.session.modified = True
+        id = ''
+        name = ''
+        if upobj.result is True:
+            if not upobj.filepro.yamlinfo['name']:
+                #u_filename = filename.encode('utf-8')
+                upobj.filepro.yamlinfo['name'] = utils.chsname.name_from_filename(filename)
+            flask.session[user.id]['upload'][upobj.ID] = upobj
+            flask.session.modified = True
+            name = upobj.filepro.yamlinfo['name']
+            id = upobj.filepro.yamlinfo['id']
         return { 'code': 200, 'data': { 'result': upobj.result,
-                                        'name': upobj.filepro.yamlinfo['name'],
-                                        'id': upobj.filepro.yamlinfo['id'] } }
+                                        'resultid': upobj.resultid,
+                                        'name': name, 'id': id } }
 
 
 class UploadEnglishCVAPI(Resource):

@@ -25,7 +25,7 @@ def name_from_filename(filename):
                        段,郝,孔,邵,史,毛,常,万,顾,赖,武,康,贺,严,尹,钱,\
                        施,牛,洪,龚,翟,由,樊,戚,季,岑,付,占,肖,舒,闫,麦,\
                        黎,童,欧".split(u',')
-    splits = extractor.information_explorer.get_tagfromstring(filename, ur'[\u4e00-\u9fa5]+')
+    splits = extractor.information_explorer.get_infofromrestr(filename, ur'[\u4e00-\u9fa5]+')
     name = ''
     for each in splits:
         if each[0] in firstname_list:

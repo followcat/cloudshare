@@ -230,9 +230,9 @@ class CurriculumVitaeObject(object):
                                                          self.tmp_path)
         self.result = self.filepro.result
         if self.result is False:
-            self.information = 'Can not Convert'
+            self.resultid = self.filepro.resultinfo
         else:
-            self.information = 'Sucess'
+            self.resultid = self.filepro.resultinfo
 
     @property
     def ID(self):

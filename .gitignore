@@ -19,6 +19,8 @@ lsimodel/
 celerybeat-schedule
 similarity.*
 raw/
+tags/
+classify/
 cvstorage/
 additional/
 Index/

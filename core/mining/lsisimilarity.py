@@ -14,10 +14,9 @@ class LSIsimilarity(object):
     corpus_save_name = 'lsi.corpus'
 
     def __init__(self, savepath, lsi_model):
-        self.corpus = []
         self.path = savepath
         self.names = []
-        self.corpus = []
+        self._corpus = []
 
         self.lsi_model = lsi_model
         self.index = None
@@ -63,8 +62,6 @@ class LSIsimilarity(object):
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
             self.names = pickle.load(f)
-        with open(os.path.join(self.path, self.corpus_save_name), 'r') as f:
-            self.corpus = pickle.load(f)
         self.index = similarities.Similarity.load(os.path.join(self.path,
                                                         self.matrix_save_name))
 
@@ -101,3 +98,10 @@ class LSIsimilarity(object):
         result = abs(self.index[vec_lsi][index])
         return (id, str(result))
 
+    @property
+    def corpus(self):
+        corpus_path = os.path.join(self.path, self.corpus_save_name)
+        if os.path.exists(corpus_path) and not self._corpus:
+            with open(corpus_path, 'r') as f:
+                self._corpus = pickle.load(f)
+        return self._corpus

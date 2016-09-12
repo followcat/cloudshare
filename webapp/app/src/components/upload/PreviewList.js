@@ -33,6 +33,7 @@ export default class PreviewList extends Component {
             onComfirmUpload: this.props.onComfirmUpload,
             loading: this.props.loading,
             disabled: this.props.disabled,
+            industryList: this.props.industryList,
           };
 
           return (

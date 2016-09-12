@@ -12,7 +12,6 @@ from webapp.restful.feature import *
 from webapp.restful.session import *
 from webapp.restful.bookmark import *
 from webapp.restful.databases import *
-from webapp.restful.industry import *
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
@@ -64,6 +63,4 @@ def initialize(app):
 
     api.add_resource(DatabasesAPI, '/api/databases', endpoint = 'databases')
     api.add_resource(DBNumbersAPI, '/api/dbnumbers/<string:name>', endpoint = 'dbnumbers')
-
-    api.add_resource(IndustryAPI, '/api/industry', endpoint = 'industry')
     

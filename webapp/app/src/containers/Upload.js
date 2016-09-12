@@ -21,7 +21,7 @@ export default class Upload extends Component {
       comfirmList: [],
       loading: false,
       disabled: false,
-      industryList: [],
+      classifyList: [],
       comfirmResult: [],
     };
 
@@ -30,11 +30,11 @@ export default class Upload extends Component {
     this.handleNextPreview = this.handleNextPreview.bind(this);
     this.handleComfirmUpload = this.handleComfirmUpload.bind(this);
     this.isObjectExisted = this.isObjectExisted.bind(this);
-    this.loadIndustry = this.loadIndustry.bind(this);
+    this.loadClassify = this.loadClassify.bind(this);
   }
 
-  loadIndustry() {
-    fetch(`/api/industry`, {
+  loadClassify() {
+    fetch(`/api/databases`, {
       method: 'GET',
       headers: {
         'Authorization': `Basic ${localStorage.token}`
@@ -46,14 +46,14 @@ export default class Upload extends Component {
     .then((json) => {
       if (json.code === 200) {
         this.setState({
-          industryList: json.data,
+          classifyList: json.data,
         });
       }
     })
   }
 
   componentDidMount() {
-    this.loadIndustry();
+    this.loadClassify();
   }
 
   handleChange(info) {
@@ -203,7 +203,7 @@ export default class Upload extends Component {
             onComfirmUpload={this.handleComfirmUpload}
             loading={this.state.loading}
             disabled={this.state.disabled}
-            industryList={this.state.industryList}
+            classifyList={this.state.classifyList}
           />
           {this.state.comfirmResult.length !== 0 ? <ComfirmResult comfirmResult={this.state.comfirmResult}/> : ''}
         </div>

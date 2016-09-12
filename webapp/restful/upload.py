@@ -29,7 +29,7 @@ class UploadCVAPI(Resource):
         for item in updates:
             upobj = upload[user.id].pop(item['id'])
             for key, value in item.iteritems():
-                if key in upobj.filepro.yamlinfo and key is not u'id':
+                if key is not u'id':
                     upobj.filepro.yamlinfo[key] = value
             result = self.svc_cv.add(upobj, user.id)
             if result is True:

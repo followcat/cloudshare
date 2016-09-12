@@ -10,8 +10,8 @@ class ClassifyCV(object):
 
     INDUSTRY_DIR = "JOBTITLES"
 
-    config_file = 'config.yaml'
-    ids_file = 'names.yaml'
+    config_file = 'config.json'
+    ids_file = 'names.json'
 
     def __init__(self, name, path, cvstorage, rawdb):
         self.name = name
@@ -32,8 +32,12 @@ class ClassifyCV(object):
         self.update()
 
     def load(self):
-        self.config = utils.builtin.load_yaml(self.path, self.config_file)
-        self.cvids = utils.builtin.load_yaml(self.path, self.ids_file)
+        self.config = utils.builtin.load_json(self.path, self.config_file)
+        self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
+
+    def save(self):
+        utils.builtin.save_json(self.config, self.path, self.config_file)
+        utils.builtin.save_json(self.cvids, self.path, self.ids_file)
 
     def update(self):
         in_id = sources.industry_id.industryID[self.config['classify']]
@@ -48,8 +52,7 @@ class ClassifyCV(object):
             for id in (set(ids) & set(raw_db.lsid_raw()) & set(self.cvstorage.lsids())):
                 if not self.exists(id):
                     self._add(id)
-        utils.builtin.save_yaml(self.config, self.path, self.config_file)
-        utils.builtin.save_yaml(self.cvids, self.path, self.ids_file)
+        self.save()
 
     def exists(self, name):
         id = core.outputstorage.ConvertName(name)

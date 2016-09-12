@@ -5,6 +5,7 @@ import 'whatwg-fetch';
 import Header from '../components/common/Header';
 import Uploader from '../components/upload/Uploader';
 import PreviewList from '../components/upload/PreviewList';
+import ComfirmResult from '../components/upload/ComfirmResult';
 
 import './upload.less';
 
@@ -12,15 +13,16 @@ export default class Upload extends Component {
 
   constructor(props) {
     super(props);
-    
+
     this.state = {
-      files: [],
+      fileList: [],
       currentPreview: 0,
       completedFileList: [],
       comfirmList: [],
       loading: false,
       disabled: false,
       industryList: [],
+      comfirmResult: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -57,11 +59,8 @@ export default class Upload extends Component {
   handleChange(info) {
     let fileList = info.fileList,
         completedFileList = this.state.completedFileList;
-    this.setState({
-      files: fileList,
-    });
 
-    fileList.map((file) => {
+    fileList = fileList.filter((file) => {
       if (file.response && file.state !== 'done') {
         fetch(`/api/uploadcv/preview`, {
           method: 'POST',
@@ -88,12 +87,19 @@ export default class Upload extends Component {
             });
           }
         });
+        return file;
       }
+      return true;
+    });
+
+    this.setState({
+      fileList: fileList,
+      comfirmResult: [],
     });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextState.files.length === nextState.completedFileList.length;
+    return nextState.fileList.length === nextState.completedFileList.length;
   }
 
   isObjectExisted(array, targetId) {
@@ -159,6 +165,10 @@ export default class Upload extends Component {
     .then((json) => {
       if (json.code === 200) {
         this.setState({
+          completedFileList: [],
+          fileList: [],
+          comfirmList: [],
+          comfirmResult: json.data,
           loading: false,
           disabled: false,
         });
@@ -175,7 +185,7 @@ export default class Upload extends Component {
       headers: {
         'Authorization': `Basic ${localStorage.token}`
       },
-      multiple: true,
+      multiple: false,
       onChange: this.handleChange,
     };
 
@@ -195,7 +205,9 @@ export default class Upload extends Component {
             disabled={this.state.disabled}
             industryList={this.state.industryList}
           />
+          {this.state.comfirmResult.length !== 0 ? <ComfirmResult comfirmResult={this.state.comfirmResult}/> : ''}
         </div>
+        
       </div>
     );
   }

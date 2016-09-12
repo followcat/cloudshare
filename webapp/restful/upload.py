@@ -22,7 +22,7 @@ class UploadCVAPI(Resource):
         self.reqparse.add_argument('updates', type = list, location = 'json')
 
     def put(self):
-        results = dict()
+        results = []
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         updates = args['updates']
@@ -32,10 +32,13 @@ class UploadCVAPI(Resource):
                 if key in upobj.filepro.yamlinfo and key is not u'id':
                     upobj.filepro.yamlinfo[key] = value
             result = self.svc_cv.add(upobj, user.id)
-            results[item['id']] = result
+            if result is True:
+                results.append({ 'id': item['id'], 'status': 'success', 'filename': upobj.filepro.yamlinfo['filename'] })
+            else:
+                results.append({ 'id': item['id'], 'status': 'fail', 'filename': upobj.filepro.yamlinfo['filename'] })
         def_cv_name = self.svc_cv.default.name
         self.svc_min.sim[def_cv_name].update([self.svc_cv.default])
-        return { 'code': 200, 'result': results }
+        return { 'code': 200, 'data': results }
 
     def post(self):
         user = flask.ext.login.current_user

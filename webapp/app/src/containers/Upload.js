@@ -12,6 +12,7 @@ export default class Upload extends Component {
 
   constructor(props) {
     super(props);
+    
     this.state = {
       files: [],
       currentPreview: 0,
@@ -21,7 +22,7 @@ export default class Upload extends Component {
       disabled: false,
       industryList: [],
     };
-    this.handleBeforeUpload = this.handleBeforeUpload.bind(this);
+
     this.handleChange = this.handleChange.bind(this);
     this.handlePrevPreview = this.handlePrevPreview.bind(this);
     this.handleNextPreview = this.handleNextPreview.bind(this);

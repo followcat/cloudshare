@@ -17,7 +17,15 @@ REJECT = re.compile('(('+')|('.join([
     ])+'))')
 
 LINE = re.compile(ur'[\n\t]+')
-WEB = re.compile(ur'\(?\s?((([hH][tT][tT][pP][sS]?|[fF][tT][pP])\:\/\/)?([\w\.\-]+(\:[\w\.\&%\$\-]+)*@)?((([^\s\(\)\<\>\\\"\.\[\]\,@;:]+)(\.[^\s\(\)\<\>\\\"\.\[\]\,@;:]+)*(\.[a-zA-Z]{2,4}))|((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5])))(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))?((\/[^\/][\w\.\,\?\'\(\)\\\/\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s\x7F-\xFF])?)\s?\)?')
+HEAD = ur'(((http|HTTP)[sS]?|(ftp|FTP))\:\/\/)'
+UID_PW = ur'([\w\_\-]+(\:[\w\.\,!@%\^\&\$\*\-]+)*@)'
+DEMAIN = ur'([a-zA-Z0-9][\-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][\-a-zA-Z0-9]{0,62})*(\.(cn|us|uk|jp|hk|com|edu|gov|int|mil|net|org|biz)))'
+IP = ur'((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5]))'
+PORT = ur'(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))'
+SERVICE = ur'((\/[^\/][\w\.\,\?\'\(\)\*\\\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s]?)*'
+
+WEB = re.compile(ur"\(?\s?(" + HEAD + ur'?' + UID_PW + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")\s?\)?")
+
 SYMBOL = re.compile(ur'[- /]+')
 SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
 
@@ -133,10 +141,13 @@ def re_sub(reg, sub, text):
         >>> assert 'bertwalker2005@yahoo.co.uk' in WEB.match('bertwalker2005@yahoo.co.uk').group(0)
         >>> assert 'http://h.highpin.cn/ResumeManage/26566491@qq.com' in WEB.match('http://h.highpin.cn/ResumeManage/26566491@qq.com').group(0)
         >>> assert 'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.match('http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
-        >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' not in WEB.match('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0) #FIXME
-        >>> assert 'https://h.liepin.com/message/showmessage/#c:1' not in WEB.match('https://h.liepin.com/message/showmessage/#c:1').group(0) #FIXME
+        >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' in WEB.match('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0)
+        >>> assert 'https://h.liepin.com/message/showmessage/#c:1' in WEB.match('https://h.liepin.com/message/showmessage/#c:1').group(0)
         >>> assert 'http://www.hindawi.com/journals/tswj/2014/465702/ 2007' in WEB.match('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0) #FIXME
-        >>> assert 'team.Desig' in WEB.match('team.Desig').group(0) #FIXME
+        >>> assert 'team.Desig' in WEB.match('team.Desig').group(0) # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        AttributeError: 'NoneType' object has no attribute 'group'
     """
     return reg.sub(sub, text)
 

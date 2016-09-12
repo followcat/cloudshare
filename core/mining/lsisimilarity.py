@@ -1,5 +1,8 @@
 import os
-import pickle
+try :
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 from gensim import similarities
 

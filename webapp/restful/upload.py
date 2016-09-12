@@ -8,6 +8,8 @@ from flask.ext.restful import Resource
 import utils.chsname
 import services.curriculumvitae
 
+upload = dict()
+uploadeng = dict()
 
 class UploadCVAPI(Resource):
 
@@ -27,7 +29,7 @@ class UploadCVAPI(Resource):
         args = self.reqparse.parse_args()
         updates = args['updates']
         for item in updates:
-            upobj = flask.session[user.id]['upload'].pop(item['id'])
+            upobj = upload[user.id].pop(item['id'])
             for key, value in item.iteritems():
                 if key in upobj.filepro.yamlinfo and key is not u'id':
                     upobj.filepro.yamlinfo[key] = value
@@ -39,8 +41,6 @@ class UploadCVAPI(Resource):
 
     def post(self):
         user = flask.ext.login.current_user
-        if 'upload' not in flask.session[user.id]:
-            flask.session[user.id]['upload'] = dict()
         netword_file = flask.request.files['files']
         filename = netword_file.filename
         upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
@@ -52,8 +52,9 @@ class UploadCVAPI(Resource):
             if not upobj.filepro.yamlinfo['name']:
                 #u_filename = filename.encode('utf-8')
                 upobj.filepro.yamlinfo['name'] = utils.chsname.name_from_filename(filename)
-            flask.session[user.id]['upload'][upobj.ID] = upobj
-            flask.session.modified = True
+            if user.id not in upload:
+                upload[user.id] = dict()
+            upload[user.id][upobj.ID] = upobj
             name = upobj.filepro.yamlinfo['name']
             id = upobj.filepro.yamlinfo['id']
         return { 'code': 200, 'data': { 'result': upobj.result,
@@ -74,7 +75,7 @@ class UploadEnglishCVAPI(Resource):
 
     def get(self):
         user = flask.ext.login.current_user
-        upobj = flask.session[user.id]['uploadeng']
+        upobj = user.uploadeng
         md = upobj.preview_markdown()
         return { 'result': { 'markdown': md } }
 
@@ -83,12 +84,12 @@ class UploadEnglishCVAPI(Resource):
         args = self.reqparse.parse_args()
         name = core.outputstorage.ConvertName(args['name'])
         yaml_data = self.svc_cv.getyaml(name)
-        upobj = flask.session[user.id]['uploadeng']
+        upobj = uploadeng[user.id]
         result = self.svc_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
         svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
                       committer=user.id)
-        flask.session[user.id]['uploadeng'] = None
+        user.uploadeng = None
         return { 'result': result }
 
     def post(self):
@@ -98,8 +99,7 @@ class UploadEnglishCVAPI(Resource):
         upobj = services.curriculumvitae.CurriculumVitaeObject(network_file.filename,
                                                 network_file,
                                                 flask.current_app.config['UPLOAD_TEMP'])
-        flask.session[user.id]['uploadeng'] = upobj
-        flask.session.modified = True
+        uploadeng[user.id] = upobj
         return { 'result': upobj.result }
 
 
@@ -116,7 +116,7 @@ class UploadCVPreviewAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        upobj = flask.session[user.id]['upload'][id]
+        upobj = upload[user.id][id]
         md = upobj.preview_markdown()
         yaml_info = upobj.filepro.yamlinfo
         return { 'code': 200, 'data': { 'id': id, 'markdown': md, 'yaml_info': yaml_info } }

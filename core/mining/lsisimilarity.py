@@ -1,8 +1,5 @@
 import os
-try :
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import ujson
 
 from gensim import similarities
 
@@ -54,14 +51,14 @@ class LSIsimilarity(object):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
-            pickle.dump(self.names, f)
+            ujson.dump(self.names, f)
         with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-            pickle.dump(self.corpus, f)
+            ujson.dump(self.corpus, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
-            self.names = pickle.load(f)
+            self.names = ujson.load(f)
         self.index = similarities.Similarity.load(os.path.join(self.path,
                                                         self.matrix_save_name))
 
@@ -103,5 +100,8 @@ class LSIsimilarity(object):
         corpus_path = os.path.join(self.path, self.corpus_save_name)
         if os.path.exists(corpus_path) and not self._corpus:
             with open(corpus_path, 'r') as f:
-                self._corpus = pickle.load(f)
+                try:
+                    self._corpus = ujson.load(f)
+                except ValueError:
+                    self._corpus = []
         return self._corpus

@@ -1,8 +1,5 @@
 import os
-try :
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import ujson
 
 from gensim import corpora, models
 
@@ -72,17 +69,17 @@ class LSImodel(object):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
-            pickle.dump(self.names, f)
+            ujson.dump(self.names, f)
         with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-            pickle.dump(self.corpus, f)
+            ujson.dump(self.corpus, f)
         with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
-            pickle.dump(self.texts, f)
+            ujson.dump(self.texts, f)
         self.lsi.save(os.path.join(self.path, self.model_save_name))
         self.dictionary.save(os.path.join(self.path, self.corpu_dict_save_name))
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
-            self.names = pickle.load(f)
+            self.names = ujson.load(f)
         self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
                                                              self.corpu_dict_save_name))
@@ -131,7 +128,10 @@ class LSImodel(object):
         corpus_path = os.path.join(self.path, self.corpus_save_name)
         if os.path.exists(corpus_path) and not self._corpus:
             with open(corpus_path, 'r') as f:
-                self._corpus = pickle.load(f)
+                try:
+                    self._corpus = ujson.load(f)
+                except ValueError:
+                    self._corpus = []
         return self._corpus
 
     @property
@@ -139,6 +139,9 @@ class LSImodel(object):
         texts_path = os.path.join(self.path, self.texts_save_name)
         if os.path.exists(texts_path) and not self._texts:
             with open(texts_path, 'r') as f:
-                self._texts = pickle.load(f)
+                try:
+                    self._texts = ujson.load(f)
+                except ValueError:
+                    self._texts = []
         return self._texts
     

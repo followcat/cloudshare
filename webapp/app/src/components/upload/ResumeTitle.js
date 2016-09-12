@@ -16,14 +16,14 @@ class ResumeTitle extends Component {
   handlePrevClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.yaml_info.id });
+    let value = Object.assign(fieldsValue, { id: this.props.id });
     this.props.onPrevPreview(value);
   }
 
   handleNextClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.yaml_info.id });
+    let value = Object.assign(fieldsValue, { id: this.props.id });
     this.props.onNextPreview(value);
   }
 

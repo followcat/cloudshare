@@ -4,6 +4,7 @@ import re
 import core.mining.lsimodel
 import core.mining.lsisimilarity
 
+import jieba
 import jieba.posseg
 
 
@@ -15,51 +16,158 @@ REJECT = re.compile('(('+')|('.join([
     u'互联网',
     ])+'))')
 
+LINE = re.compile(ur'[\n\t]+')
+WEB = re.compile(ur'\(?\s?((([hH][tT][tT][pP][sS]?|[fF][tT][pP])\:\/\/)?([\w\.\-]+(\:[\w\.\&%\$\-]+)*@)?((([^\s\(\)\<\>\\\"\.\[\]\,@;:]+)(\.[^\s\(\)\<\>\\\"\.\[\]\,@;:]+)*(\.[a-zA-Z]{2,4}))|((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5])))(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))?((\/[^\/][\w\.\,\?\'\(\)\\\/\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s\x7F-\xFF])?)\s?\)?')
+SYMBOL = re.compile(ur'[- /]+')
+SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
+
+FLAGS = ['x', # spaces
+         'm', # number and date
+         #'a', # adverb
+         'c', # conjunction
+         'd', # adverb
+         'e', # interjection
+         'f', # noun of locality
+         'g', # morpheme word
+         'h', # prefix
+         'i', # idiom
+         #'j', # abbreviation
+         'k', # suffix
+         'nrt', 'nr', 'ng', #'nz', fails on myjnoee7.md
+         'o', # onomatopoeia
+         'p', # preposition
+         'q', # quantifier
+         'r', # pronoun
+         'tg', # time root word
+         'u', # unclassified (eg. etc)
+         'vg', # verb morpheme word
+         #'v', # verb
+         'y', # statement label designator
+         'z', # State word
+         #'ns', # city and country
+        ]
+
+def jieba_cut(text, pos=False):
+    """
+        >>> from services.mining import *
+        >>> s = "测试计量技术及仪器"
+        >>> for _w in jieba_cut(s):
+        ...     print(_w.encode('utf-8'))
+        测试
+        计量
+        技术
+        及
+        仪器
+        >>> for _w in jieba_cut(s, pos=True):
+        ...     print(_w.encode('utf-8'))
+        测试/vn
+        计量/n
+        技术/n
+        及/c
+        仪器/n
+    """
+    if pos:
+        return jieba.posseg.cut(text)
+    return jieba.cut(text)
+
+def pos_extract(words, flags):
+    """
+        >>> from services.mining import *
+        >>> s = "◆负责产品环境、电磁兼容、可靠性、安规等测试；"
+        >>> words = list(jieba_cut(s, pos=True))
+        >>> for _w in words:
+        ...     print(_w.encode('utf-8'))
+        ◆/x
+        负责/v
+        产品/n
+        环境/n
+        、/x
+        电磁兼容/l
+        、/x
+        可靠性/n
+        、/x
+        安规/nr
+        等/u
+        测试/vn
+        ；/x
+        >>> words = pos_extract(words, FLAGS)
+        >>> for _w in words:
+        ...     print(_w.encode('utf-8'))
+        负责
+        产品
+        环境
+        电磁兼容
+        可靠性
+        测试
+    """
+    return [word.word for word in words if word.flag not in flags]
+
+def re_sub(reg, sub, text):
+    """
+        >>> from services.mining import *
+        >>> s = "[测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]\\n"
+        >>> s += "[测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]"
+        >>> print(s)
+        [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]
+        [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
+        >>> print(re_sub(LINE, ' ', s))
+        [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器] [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
+        >>> print(re_sub(WEB, ' ', s))
+        [测试计量技术及仪器] [测试计量技术及仪器]
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "[测试计量技术及仪器] (www.test.com) [测试计量技术及仪器]"
+        >>> print(re_sub(WEB, ' ', s))
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "[测试计量技术及仪器] (test123@test.com) [测试计量技术及仪器]"
+        >>> print(re_sub(WEB, ' ', s))
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "--------------------\\n"
+        >>> s += "英语(CET4)、普通话\\n"
+        >>> s += "--------------------\\n"
+        >>> print(re_sub(LINE, '', re_sub(SYMBOL, '', s)))
+        英语(CET4)、普通话
+        >>> assert 'http://search.51job.com/job/52405118,c.html' in WEB.match('http://search.51job.com/job/52405118,c.html').group(0)
+        >>> assert 'https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD' in WEB.match(
+        ...             "https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD").group(0)
+        >>> assert '2014.06' in WEB.match("https://h.liepin.com/cvsearch/soResume/?company=%AC%E5%8F%B8)2014.06").group(0) #FIXME
+        >>> assert 'bertwalker2005@yahoo.co.uk' in WEB.match('bertwalker2005@yahoo.co.uk').group(0)
+        >>> assert 'http://h.highpin.cn/ResumeManage/26566491@qq.com' in WEB.match('http://h.highpin.cn/ResumeManage/26566491@qq.com').group(0)
+        >>> assert 'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.match('http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
+        >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' not in WEB.match('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0) #FIXME
+        >>> assert 'https://h.liepin.com/message/showmessage/#c:1' not in WEB.match('https://h.liepin.com/message/showmessage/#c:1').group(0) #FIXME
+        >>> assert 'http://www.hindawi.com/journals/tswj/2014/465702/ 2007' in WEB.match('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0) #FIXME
+        >>> assert 'team.Desig' in WEB.match('team.Desig').group(0) #FIXME
+    """
+    return reg.sub(sub, text)
+
 def silencer(document):
-        FLAGS = ['x', # spaces
-                 'm', # number and date
-                 'a', # adverb
-                 'i', 'j',
-                 'nrt', 'nr', 'ns', #'nz', fails on myjnoee7.md
-                 'u', # unclassified (eg. etc)
-                 'f', # time and place
-                 'q', # quantifier
-                 'p', # preposition
-                 'v', # vernicular expression
-                 'ns', # city and country
-                ]
-        LINE = re.compile(ur'[\n- /]+')
-        SBHTTP = re.compile(ur'\(https?:.*\)(?=\s)')
-        BHTTP = re.compile(ur'\(https?:.*?\)')
-        HTTP = re.compile(ur'https?:\S*(?=\s)')
-        WWW = re.compile('www\.[\.\w]+')
-        EMAIL = re.compile('\w+@[\.\w]+')
-        SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
-        if isinstance(document, list):
-            texts = document
-        else:
-            texts = [document]
-        selected_texts = []
-        for text in texts:
-            text = HTTP.sub('\n', BHTTP.sub('\n', SBHTTP.sub('\n', LINE.sub(' ', text))))
-            text = WWW.sub('', EMAIL.sub('', text))
-            doc = [word.word for word in jieba.posseg.cut(text) if word.flag not in FLAGS]
-            out = []
-            for d in doc:
-                if REJECT.match(d):
-                    continue
-                if d.istitle():
-                    # Can make it match SHORT later for skip (eg 'Ltd' ...)
-                    d = d.lower()
-                if not SHORT.match(d):
-                    # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
-                    d = d.lower()
-                    out.append(d)
-            selected_texts.append(out)
-        if isinstance(document, list):
-            return selected_texts
-        else:
-            return selected_texts[0]
+    if isinstance(document, list):
+        texts = document
+    else:
+        texts = [document]
+    selected_texts = []
+    for text in texts:
+        text = re_sub(LINE, ' ', text)
+        text = re_sub(WEB, '\n', text)
+        text = re_sub(SYMBOL, ' ', text)
+        words = jieba_cut(text, pos=True)
+        words = pos_extract(words, FLAGS)
+        out = []
+        for word in words:
+            if REJECT.match(word):
+                continue
+            if word.istitle():
+                # Can make it match SHORT later for skip (eg 'Ltd' ...)
+                word = word.lower()
+            if not SHORT.match(word):
+                # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
+                word = word.lower()
+                out.append(word)
+        selected_texts.append(out)
+    if isinstance(document, list):
+        return selected_texts
+    else:
+        return selected_texts[0]
 
 
 class Mining(object):

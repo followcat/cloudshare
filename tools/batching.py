@@ -155,7 +155,7 @@ def tracking_and_command(DEF_SVC_CV, attribute, fix=False, filltime=False):
                 yaml_info = DEF_SVC_CV.getyaml(each)
                 infos = yaml_info[attribute]
             except IOError:
-                print each
+                print(each)
                 continue
             try:
                 assert len(save_dict[each]) == len(infos)

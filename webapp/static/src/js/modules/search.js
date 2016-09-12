@@ -98,4 +98,25 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
       }
     }
   });
+
+  //删除收藏
+  $(".delete").on("click", function() {
+    var _this = $(this),
+        collectionLinkObj = _this.prev();
+    var id = collectionLinkObj.attr("data-id");
+    $.ajax({
+      url: "/delbookmark",
+      type: "POST",
+      data: {
+        "id": id
+      },
+      success: function(response) {
+        if (response.result) {
+          _this.parent().remove();
+        } else {
+          alert("Delete error.")
+        }
+      }
+    });
+  });
 });

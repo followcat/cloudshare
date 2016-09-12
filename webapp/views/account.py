@@ -1,7 +1,8 @@
+import flask
 import flask.ext.login
 
 import services.exception
-
+from itsdangerous import JSONWebSignatureSerializer
 
 class User(flask.ext.login.UserMixin):
 
@@ -12,8 +13,21 @@ class User(flask.ext.login.UserMixin):
             raise services.exception.UserNotFoundError()
         self.password = svc_account.USERS[unicode(id)]
 
+    def get_auth_token(self):
+        s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
+        return s.dumps({ 'id': self.id })
+
     def changepassword(self, password):
         self.svc_account.modify(self.id, password)
+
+    def getbookmark(self):
+        return self.svc_account.getbookmark(self.id)
+
+    def addbookmark(self, id):
+        return self.svc_account.addbookmark(self.id, id)
+
+    def delbookmark(self, id):
+        return self.svc_account.delbookmark(self.id, id)
 
     @classmethod
     def get(self_class, id, svc_account):
@@ -38,3 +52,12 @@ class User(flask.ext.login.UserMixin):
             return self_class(id, svc_account)
         except services.exception.UserNotFoundError:
             return None
+
+    @classmethod
+    def get_by_authorization(self_class, token, svc_account):
+        if token:
+            token = token.replace('Basic ', '', 1)
+            s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
+            data = s.loads(token)
+            return User.get(data['id'], svc_account)
+        return None

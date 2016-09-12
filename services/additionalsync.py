@@ -27,12 +27,12 @@ class AdditionalSync(object):
                                 for additional in self.additionals])
         self.logger = logging.getLogger("AdditionalSyncLogger.UPDATE")
 
-    def update(self, additionals=None):
-        if additionals is None:
-            additionals = self.additionals
+    def update(self, add_names=None):
+        if add_names is None:
+            add_names = [additional.name for additional in self.additionals]
         interfaces = dict([(additional.name, additional.interface)
                             for additional in self.additionals
-                            if additional.name in additionals])
+                            if additional.name in add_names])
         for name, i in interfaces.items():
             for id in set(i.lsid_raw()) - (set(i.lsid_yaml()) & set(i.lsid_md())):
                 raw_html = i.getraw(id+'.html')
@@ -58,7 +58,7 @@ class AdditionalSync(object):
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addcv(id, md.encode('utf-8'), infostream)
 
-        for additional in additionals:
+        for additional in self.additionals:
             additional.updatenums()
 
     def generate_md(self, raw_html):
@@ -71,17 +71,16 @@ class AdditionalSync(object):
         else:
             catchinfo = extractor.information_explorer.catch_selected(md, selected, name)
         for key in catchinfo:
-            if catchinfo[key]:
+            if catchinfo[key] or (selected is not None and key in selected):
                 obj[key] = catchinfo[key]
         return obj
 
-    def upgrade_yaml(self, selected=None, additionals=None):
-        if additionals is None:
-            interfaces = self.interfaces
-        else:
-            interfaces = dict([(additional.name, additional.interface)
-                                for additional in self.additionals
-                                if additional.name in additionals])
+    def upgrade_yaml(self, selected=None, add_names=None):
+        if add_names is None:
+            add_names = [additional.name for additional in self.additionals]
+        interfaces = dict([(additional.name, additional.interface)
+                            for additional in self.additionals
+                            if additional.name in add_names])
         for name, i in interfaces.items():
             for id in i.lsid_md():
                 if selected is None:
@@ -100,3 +99,22 @@ class AdditionalSync(object):
                 self.logger.info((' ').join(["Upgrade Used", logidname, str(usetime)]))
                 infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
                 i.addyaml(id, infostream)
+
+    def upgrade_key(self, key, add_names=None):
+        if add_names is None:
+            add_names = [additional.name for additional in self.additionals]
+        additionals = dict([(additional.name, additional)
+                             for additional in self.additionals
+                             if additional.name in add_names])
+        for additional in additionals:
+            a = additional
+            i = additional.interface
+            for yamlname in a.yamls():
+                raw_yamlstr = i.getraw(yamlname)
+                raw_yaml = yaml.load(raw_yamlstr, Loader=utils._yaml.SafeLoader)
+                if key not in raw_yaml:
+                    continue
+                cv_yaml = a.getyaml(yamlname)
+                cv_yaml[key] = raw_yaml[key]
+                yamlstr = yaml.dump(cv_yaml, Dumper=utils._yaml.SafeDumper, allow_unicode=True)
+                a.modify(yamlname, yamlstr)

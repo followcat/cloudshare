@@ -145,7 +145,6 @@ class FileProcesser():
                                    os.path.join(output, outputname))
         except Exception as e:
             logger.info(e)
-            print e
             result = False
         return result
 

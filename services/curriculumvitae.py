@@ -18,7 +18,6 @@ class CurriculumVitae(services.base.Service):
         self.repo_path = self.interface.path + "/" + self.path
         self.info = ""
         self._nums = 0
-        self.updatenums()
 
     def exists(self, filename):
         path_name = os.path.join(self.path, filename)
@@ -180,10 +179,9 @@ class CurriculumVitae(services.base.Service):
 
     @property
     def NUMS(self):
+        if not self._nums:
+            self._nums = len(list(self.yamls()))
         return self._nums
-
-    def updatenums(self):
-        self._nums = len(list(self.yamls()))
 
 
 class CurriculumVitaeStorage(CurriculumVitae):

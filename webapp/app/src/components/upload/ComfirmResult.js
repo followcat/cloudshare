@@ -20,7 +20,7 @@ export default class ComfirmResult extends Component {
       {
         title: 'Operation',
         key: 'operation',
-        render: (record) => <a href={`/show/${record.id}.md`} target="_blank">Check</a>
+        render: (record) => <a href={`/show/${record.id}.md`} target="_blank" disabled={record.status !== 'success' ? true : false}>Check</a>
       }
     ];
     return (

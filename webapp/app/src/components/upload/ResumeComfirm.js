@@ -10,10 +10,17 @@ export default class ResumeComfirm extends Component {
     this.handleComfirmClick = this.handleComfirmClick.bind(this);
   }
 
-  handleComfirmClick() {
-    const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.id });
-    this.props.onComfirmUpload(value);
+  handleComfirmClick(e) {
+    e.preventDefault();
+    this.props.form.validateFields((errors, values) => {
+      if (!!errors) {
+        return;
+      } else {
+        const fieldsValue = this.props.form.getFieldsValue();
+        let value = Object.assign(fieldsValue, { id: this.props.id });
+        this.props.onComfirmUpload(value);
+      }
+    });
   }
 
   render() {

@@ -53,7 +53,7 @@ def strftime(t, format='%Y-%m-%d %H:%M:%S'):
 
 def jieba_cut(text, pos=False, HMM=True):
     """
-        >>> from services.mining import *
+        >>> from utils.builtin import jieba_cut
         >>> s = "测试计量技术及仪器"
         >>> for _w in jieba_cut(s):
         ...     print(_w.encode('utf-8'))
@@ -76,7 +76,8 @@ def jieba_cut(text, pos=False, HMM=True):
 
 def pos_extract(words, flags):
     """
-        >>> from services.mining import *
+        >>> from services.mining import FLAGS
+        >>> from utils.builtin import jieba_cut, pos_extract
         >>> s = "◆负责产品环境、电磁兼容、可靠性、安规等测试；"
         >>> words = list(jieba_cut(s, pos=True))
         >>> for _w in words:

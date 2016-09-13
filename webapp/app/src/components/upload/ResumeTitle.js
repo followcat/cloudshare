@@ -64,7 +64,7 @@ class ResumeTitle extends Component {
             >
               <Input
                 {...getFieldProps('name', { initialValue: this.props.name ? this.props.name : '' })}
-                style={{ width: 120 }}
+                style={{ width: 110 }}
                 type="text"
                 placeholder="Input resume name"
               />
@@ -91,7 +91,9 @@ class ResumeTitle extends Component {
               label="Classify"
             >
               <Select
-                {...getFieldProps('classify')}
+                {...getFieldProps('classify', {
+                  rules: [{ required: true, message: 'Classify is required.'},]
+                })}
                 showSearch
                 style={{ width: 160 }}
                 placeholder="Select a classify"

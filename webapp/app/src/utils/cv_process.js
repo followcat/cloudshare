@@ -92,7 +92,7 @@ Process.prototype.deleteLine = function() {
       tds = this.__cvElement__.getElementsByTagName("td");
 
   for (let i = 0, len = ths.length; i < len; i++) {
-    let text = ths[i].textContent ? ths[i].textContent : '';
+    let text = (ths[i] && ths[i].textContent) ? ths[i].textContent : '';
     if (pattern.test(text)) {
       ths[i].parentElement.remove();
     }

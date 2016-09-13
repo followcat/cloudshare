@@ -49,7 +49,6 @@ export default class UserInfo extends Component {
         });
       } else {
         message.error(json.message);
-        console.log(json);
       }
     });
   }
@@ -83,6 +82,50 @@ export default class UserInfo extends Component {
   handleClick(e) {
     this.setState({
       current: e.key,
+    });
+  }
+
+  handleChangePassword(pwd) {
+    fetch(`/api/accounts/${localStorage.user}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        oldpassword: pwd.oldPwd,
+        newpassword: pwd.reNewPwd,
+      }),
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        message.success(json.message);
+        setTimeout(() => {
+          fetch(`/api/session`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+              'Authorization': `Basic ${localStorage.token}`,
+            },
+          })
+          .then((response) => {
+            return response.json();
+          })
+          .then((json) => {
+            if (json.code === 200) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              location.href = json.redirect_url;
+            }
+          });
+        }, 1000);
+      } else {
+        message.error(json.message);
+      }
     });
   }
 
@@ -124,6 +167,7 @@ export default class UserInfo extends Component {
                     historyList: this.state.historyList,
                     bookmarkList: this.state.bookmarkList,
                     onDeleteBookmark: this.onDeleteBookmark,
+                    onSubmitChangePassword: this.handleChangePassword,
                   })}
               </div>
             </div>

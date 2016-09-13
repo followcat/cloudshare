@@ -8,6 +8,7 @@ import { LocaleProvider } from 'antd';
 import UserInfo from '../containers/UserInfo';
 import BrowsingHistory from '../components/userinfo/BrowsingHistory';
 import Bookmark from '../components/userinfo/Bookmark';
+import Setting from '../components/userinfo/Setting';
 
 ReactDOM.render(
   <LocaleProvider locale={enUS}>
@@ -16,6 +17,7 @@ ReactDOM.render(
         <IndexRoute component={BrowsingHistory}/>
         <Route path="/browsingHistory" component={BrowsingHistory} />
         <Route path="/bookmark" component={Bookmark} />
+        <Route path="/setting" component={Setting} />
       </Route>
     </Router>
   </LocaleProvider>,

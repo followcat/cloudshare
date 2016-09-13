@@ -1,10 +1,9 @@
 'use strict';
 import React, { Component } from 'react';
-import 'whatwg-fetch';
 
 import { Select } from 'antd';
 
-export default class IndustrySingleSelection extends Component {
+export default class ClassifySingleSelection extends Component {
   
   constructor(props) {
     super(props);
@@ -14,7 +13,7 @@ export default class IndustrySingleSelection extends Component {
     return (
       <Select
         width={{ width: 200 }}
-        placeholder="Please select a industry"
+        placeholder="Please select a classify"
         optionFilterProp="children"
         notFoundContent="Not found"
       >

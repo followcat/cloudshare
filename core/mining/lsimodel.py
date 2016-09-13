@@ -134,6 +134,10 @@ class LSImodel(object):
                     self._corpus = []
         return self._corpus
 
+    @corpus.setter
+    def corpus(self, value):
+        self._corpus = value
+
     @property
     def texts(self):
         texts_path = os.path.join(self.path, self.texts_save_name)
@@ -144,4 +148,7 @@ class LSImodel(object):
                 except ValueError:
                     self._texts = []
         return self._texts
-    
+
+    @texts.setter
+    def texts(self, value):
+        self._texts = value

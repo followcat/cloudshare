@@ -12,7 +12,7 @@ class DatabasesAPI(Resource):
         super(DatabasesAPI, self).__init__()
 
     def get(self):
-        return { 'result': [a.name for a in self.svc_cv.additionals] }
+        return { 'code': 200, 'data': [a.name for a in self.svc_cv.additionals] }
 
 
 class DBNumbersAPI(Resource):

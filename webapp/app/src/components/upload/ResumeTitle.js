@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { Form, Input, Select, Button, Icon } from 'antd';
 
 import ResumeComfirm from './ResumeComfirm';
-import IndustrySingleSelection from '../common/IndustrySingleSelection';
 
 class ResumeTitle extends Component {
   constructor(props){
@@ -16,14 +15,14 @@ class ResumeTitle extends Component {
   handlePrevClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.yaml_info.id });
+    let value = Object.assign(fieldsValue, { id: this.props.id });
     this.props.onPrevPreview(value);
   }
 
   handleNextClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.yaml_info.id });
+    let value = Object.assign(fieldsValue, { id: this.props.id });
     this.props.onNextPreview(value);
   }
 
@@ -89,17 +88,17 @@ class ResumeTitle extends Component {
               </Select>
             </Form.Item>
             <Form.Item
-              label="Industry"
+              label="Classify"
             >
               <Select
-                {...getFieldProps('industry')}
+                {...getFieldProps('classify')}
                 showSearch
                 style={{ width: 160 }}
-                placeholder="Select a industry"
+                placeholder="Select a classify"
                 optionFilterProp="children"
                 notFoundContent="Not found"
               >
-                {this.props.industryList.map((item, index) => {
+                {this.props.classifyList.map((item, index) => {
                   return (
                     <Select.Option key={index} value={item}>{item}</Select.Option>
                   );

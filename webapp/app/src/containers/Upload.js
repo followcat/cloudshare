@@ -5,6 +5,7 @@ import 'whatwg-fetch';
 import Header from '../components/common/Header';
 import Uploader from '../components/upload/Uploader';
 import PreviewList from '../components/upload/PreviewList';
+import ComfirmResult from '../components/upload/ComfirmResult';
 
 import './upload.less';
 
@@ -12,15 +13,16 @@ export default class Upload extends Component {
 
   constructor(props) {
     super(props);
-    
+
     this.state = {
-      files: [],
+      fileList: [],
       currentPreview: 0,
       completedFileList: [],
       comfirmList: [],
       loading: false,
       disabled: false,
-      industryList: [],
+      classifyList: [],
+      comfirmResult: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -28,11 +30,11 @@ export default class Upload extends Component {
     this.handleNextPreview = this.handleNextPreview.bind(this);
     this.handleComfirmUpload = this.handleComfirmUpload.bind(this);
     this.isObjectExisted = this.isObjectExisted.bind(this);
-    this.loadIndustry = this.loadIndustry.bind(this);
+    this.loadClassify = this.loadClassify.bind(this);
   }
 
-  loadIndustry() {
-    fetch(`/api/industry`, {
+  loadClassify() {
+    fetch(`/api/databases`, {
       method: 'GET',
       headers: {
         'Authorization': `Basic ${localStorage.token}`
@@ -44,24 +46,21 @@ export default class Upload extends Component {
     .then((json) => {
       if (json.code === 200) {
         this.setState({
-          industryList: json.data,
+          classifyList: json.data,
         });
       }
     })
   }
 
   componentDidMount() {
-    this.loadIndustry();
+    this.loadClassify();
   }
 
   handleChange(info) {
     let fileList = info.fileList,
         completedFileList = this.state.completedFileList;
-    this.setState({
-      files: fileList,
-    });
 
-    fileList.map((file) => {
+    fileList = fileList.filter((file) => {
       if (file.response && file.state !== 'done') {
         fetch(`/api/uploadcv/preview`, {
           method: 'POST',
@@ -88,12 +87,19 @@ export default class Upload extends Component {
             });
           }
         });
+        return file;
       }
+      return true;
+    });
+
+    this.setState({
+      fileList: fileList,
+      comfirmResult: [],
     });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextState.files.length === nextState.completedFileList.length;
+    return nextState.fileList.length === nextState.completedFileList.length;
   }
 
   isObjectExisted(array, targetId) {
@@ -159,6 +165,10 @@ export default class Upload extends Component {
     .then((json) => {
       if (json.code === 200) {
         this.setState({
+          completedFileList: [],
+          fileList: [],
+          comfirmList: [],
+          comfirmResult: json.data,
           loading: false,
           disabled: false,
         });
@@ -175,7 +185,7 @@ export default class Upload extends Component {
       headers: {
         'Authorization': `Basic ${localStorage.token}`
       },
-      multiple: true,
+      multiple: false,
       onChange: this.handleChange,
     };
 
@@ -193,9 +203,11 @@ export default class Upload extends Component {
             onComfirmUpload={this.handleComfirmUpload}
             loading={this.state.loading}
             disabled={this.state.disabled}
-            industryList={this.state.industryList}
+            classifyList={this.state.classifyList}
           />
+          {this.state.comfirmResult.length !== 0 ? <ComfirmResult comfirmResult={this.state.comfirmResult}/> : ''}
         </div>
+        
       </div>
     );
   }

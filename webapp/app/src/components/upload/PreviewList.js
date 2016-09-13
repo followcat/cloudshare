@@ -27,13 +27,14 @@ export default class PreviewList extends Component {
             index: index,
             current: this.props.currentPreview,
             length: this.props.length,
-            yaml_info: previewItem.yaml_info,
+            name: previewItem.name,
+            id: previewItem.id,
             onPrevPreview: this.props.onPrevPreview,
             onNextPreview: this.props.onNextPreview,
             onComfirmUpload: this.props.onComfirmUpload,
             loading: this.props.loading,
             disabled: this.props.disabled,
-            industryList: this.props.industryList,
+            classifyList: this.props.classifyList,
           };
 
           return (

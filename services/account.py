@@ -78,7 +78,7 @@ class Account(services.base.Service):
         data.pop(unicode(id))
         dump_data = yaml.dump(data)
         self.interface.modify(self.account_filename, dump_data,
-                              "Delete %s user." % id, idself.default_root_name)
+                              "Delete %s user." % id, self.default_root_name)
         return True
 
     @property

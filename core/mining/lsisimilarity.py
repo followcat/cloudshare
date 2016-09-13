@@ -2,7 +2,6 @@ import os
 import pickle
 
 from gensim import similarities
-from utils.builtin import jieba_cut
 
 
 class LSIsimilarity(object):
@@ -68,15 +67,14 @@ class LSIsimilarity(object):
 
     def add(self, name, document):
         assert(self.lsi_model.dictionary)
-        text = jieba_cut(document)
+        text = self.lsi_model.slicer(document)
         self.names.append(name)
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
 
     def set_corpus(self, texts):
-        for text in texts:
-            doc = [_t for _t in jieba_cut(text)]
-            self.corpus.append(self.lsi_model.dictionary.doc2bow(doc))
+        for text in self.lsi_model.slicer(texts):
+            self.corpus.append(self.lsi_model.dictionary.doc2bow(text))
 
     def set_index(self):
         if not os.path.exists(self.path):

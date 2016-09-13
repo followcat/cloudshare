@@ -300,30 +300,6 @@ class Index(flask.views.MethodView):
         return flask.render_template('index.html', features=data)
 
 
-class UserInfo(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def get(self):
-        repo = flask.current_app.config['DATA_DB']
-        svc_cv = flask.current_app.config['SVC_CV']
-        user = flask.ext.login.current_user
-        bookmark_list = user.getbookmark()
-        bookmark_info = []
-        for item in bookmark_list:
-            yaml_info = svc_cv.getyaml(item+'.md')
-            bookmark_info.append(yaml_info)
-        info_list = repo.history(user.id, max_commits=10)
-        for info in info_list:
-            for md5 in info['filenames']:
-                try:
-                    info['filenames'] = svc_cv.getyaml(md5)
-                except IOError:
-                    info['filenames'] = md5
-                info['name'] = md5
-            info['message'] = info['message'].decode('utf-8')
-        return flask.render_template('userinfo.html', info=info_list, bookmark_info=bookmark_info)
-
-
 class GetBookmark(flask.views.MethodView):
 
     @flask.ext.login.login_required
@@ -353,6 +329,7 @@ class DelBookmark(flask.views.MethodView):
         return flask.jsonify(result=result)
 
 
+#Render mange page of RESTful
 class Manage(flask.views.MethodView):
 
     @flask.ext.login.login_required
@@ -360,15 +337,16 @@ class Manage(flask.views.MethodView):
         return flask.render_template('manage.html')
 
 
-class UploadFile(flask.views.MethodView):
+#Render uploader page of RESTful
+class Uploader(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        return flask.render_template('uploadfile.html')
+        return flask.render_template('upload.html')
 
-
-class MakeChart(flask.views.MethodView):
+#Render userinfo page of RESTful
+class UserInfo(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        return flask.render_template('makechart.html')
+        return flask.render_template('userinfo.html')

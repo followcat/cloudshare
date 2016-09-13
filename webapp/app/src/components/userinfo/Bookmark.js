@@ -22,6 +22,7 @@ export default class Bookmark extends Component {
     const columns = [{
       title: 'Name',
       dataIndex: 'name',
+      width: 150,
       key: 'name',
       render: (text, record) => (
         <a href={`/show/${record.id}.md`}>
@@ -31,15 +32,18 @@ export default class Bookmark extends Component {
     }, {
       title: 'Gender',
       dataIndex: 'gender',
+      width: 120,
       key: 'gender',
     }, {
       title: 'Age',
       dataIndex: 'age',
+      width: 120,
       key: 'age',
     }, {
       title: 'Position',
       dataIndex: 'position',
       key: 'position',
+      width: 240,
     }, {
       title: 'Operation',
       key: 'operation',

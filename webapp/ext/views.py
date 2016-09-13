@@ -27,6 +27,24 @@ def configure(app):
 
     init_login(app)
 
+    #RESTful Uploader page entrance
+    app.add_url_rule(
+        '/uploader',
+        view_func=webapp.views.views.Uploader.as_view('uploader'),
+        )
+
+    #RESTful Manage page entrance
+    app.add_url_rule(
+        '/manage',
+        view_func=webapp.views.views.Manage.as_view('manage'),
+        )
+
+    #RESTful UserInfo page entrance
+    app.add_url_rule(
+        '/userinfo',
+        view_func=webapp.views.views.UserInfo.as_view('userinfo'),
+        )
+
     app.add_url_rule(
         '/gotologin',
         view_func=webapp.views.views.LoginRedirect.as_view('gotologin'),
@@ -133,11 +151,6 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/userinfo',
-        view_func=webapp.views.views.UserInfo.as_view('userinfo'),
-        )
-
-    app.add_url_rule(
         '/getbookmark',
         view_func=webapp.views.views.GetBookmark.as_view('getbookmark'),
         )
@@ -153,18 +166,8 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/manage',
-        view_func=webapp.views.views.Manage.as_view('manage'),
-        )
-
-    app.add_url_rule(
         '/lsipage',
         view_func=webapp.views.mining.LSI.as_view('lsipage'),
-        )
-
-    app.add_url_rule(
-        '/makechart',
-        view_func=webapp.views.views.MakeChart.as_view('makechart'),
         )
 
     app.add_url_rule(

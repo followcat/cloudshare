@@ -74,8 +74,9 @@ class LSIsimilarity(object):
         self.corpus.append(corpu)
 
     def set_corpus(self, texts):
-        for text in jieba_cut(texts):
-            self.corpus.append(self.lsi_model.dictionary.doc2bow(text))
+        for text in texts:
+            doc = [_t for _t in jieba_cut(text)]
+            self.corpus.append(self.lsi_model.dictionary.doc2bow(doc))
 
     def set_index(self):
         if not os.path.exists(self.path):

@@ -51,7 +51,7 @@ def strftime(t, format='%Y-%m-%d %H:%M:%S'):
     return time.strftime(format, time.localtime(t))
 
 
-def jieba_cut(text, pos=False):
+def jieba_cut(text, pos=False, HMM=True):
     """
         >>> from services.mining import *
         >>> s = "测试计量技术及仪器"
@@ -71,8 +71,8 @@ def jieba_cut(text, pos=False):
         仪器/n
     """
     if pos:
-        return jieba.posseg.cut(text)
-    return jieba.cut(text)
+        return jieba.posseg.cut(text, HMM=HMM)
+    return jieba.cut(text, HMM=HMM)
 
 def pos_extract(words, flags):
     """

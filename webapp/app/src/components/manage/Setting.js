@@ -34,6 +34,26 @@ export default class Setting extends Component {
     .then((json) => {
       if (json.code === 200) {
         message.success(json.message);
+        setTimeout(() => {
+          fetch(`/api/session`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+              'Authorization': `Basic ${localStorage.token}`,
+            },
+          })
+          .then((response) => {
+            return response.json();
+          })
+          .then((json) => {
+            if (json.code === 200) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              location.href = json.redirect_url;
+            }
+          });
+        }, 1000);
+        
       } else {
         message.error(json.message);
       }

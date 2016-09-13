@@ -4,9 +4,7 @@ import re
 import core.mining.lsimodel
 import core.mining.lsisimilarity
 
-import jieba
-import jieba.posseg
-
+from utils.builtin import jieba_cut, pos_extract
 
 REJECT = re.compile('(('+')|('.join([
     u'中文', u'日期', u'汽车',
@@ -22,7 +20,7 @@ UID_PW = ur'([\w\_\-]+(\:[\w\.\,!@%\^\&\$\*\-]+)*@)'
 DEMAIN = ur'([a-zA-Z0-9][\-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][\-a-zA-Z0-9]{0,62})*(\.(cn|us|uk|jp|hk|com|edu|gov|int|mil|net|org|biz)))'
 IP = ur'((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5]))'
 PORT = ur'(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))'
-SERVICE = ur'((\/[^\/][\w\.\,\?\'\(\)\*\\\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s]?)*'
+SERVICE = ur'((\/[^\/\s][\w\.\,\?\'\(\)\*\\\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s]?)*'
 
 WEB = re.compile(ur"\(?\s?(" + HEAD + ur'?' + UID_PW + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")\s?\)?")
 
@@ -54,61 +52,6 @@ FLAGS = ['x', # spaces
          'z', # State word
          #'ns', # city and country
         ]
-
-def jieba_cut(text, pos=False):
-    """
-        >>> from services.mining import *
-        >>> s = "测试计量技术及仪器"
-        >>> for _w in jieba_cut(s):
-        ...     print(_w.encode('utf-8'))
-        测试
-        计量
-        技术
-        及
-        仪器
-        >>> for _w in jieba_cut(s, pos=True):
-        ...     print(_w.encode('utf-8'))
-        测试/vn
-        计量/n
-        技术/n
-        及/c
-        仪器/n
-    """
-    if pos:
-        return jieba.posseg.cut(text)
-    return jieba.cut(text)
-
-def pos_extract(words, flags):
-    """
-        >>> from services.mining import *
-        >>> s = "◆负责产品环境、电磁兼容、可靠性、安规等测试；"
-        >>> words = list(jieba_cut(s, pos=True))
-        >>> for _w in words:
-        ...     print(_w.encode('utf-8'))
-        ◆/x
-        负责/v
-        产品/n
-        环境/n
-        、/x
-        电磁兼容/l
-        、/x
-        可靠性/n
-        、/x
-        安规/nr
-        等/u
-        测试/vn
-        ；/x
-        >>> words = pos_extract(words, FLAGS)
-        >>> for _w in words:
-        ...     print(_w.encode('utf-8'))
-        负责
-        产品
-        环境
-        电磁兼容
-        可靠性
-        测试
-    """
-    return [word.word for word in words if word.flag not in flags]
 
 def re_sub(reg, sub, text):
     """
@@ -143,7 +86,7 @@ def re_sub(reg, sub, text):
         >>> assert 'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.match('http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
         >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' in WEB.match('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0)
         >>> assert 'https://h.liepin.com/message/showmessage/#c:1' in WEB.match('https://h.liepin.com/message/showmessage/#c:1').group(0)
-        >>> assert 'http://www.hindawi.com/journals/tswj/2014/465702/ 2007' in WEB.match('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0) #FIXME
+        >>> assert '2007' not in WEB.match('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0)
         >>> assert 'team.Desig' in WEB.match('team.Desig').group(0) # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...

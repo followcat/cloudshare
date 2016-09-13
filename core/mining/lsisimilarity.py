@@ -2,6 +2,7 @@ import os
 import ujson
 
 from gensim import similarities
+from utils.builtin import jieba_cut
 
 
 class LSIsimilarity(object):
@@ -64,13 +65,13 @@ class LSIsimilarity(object):
 
     def add(self, name, document):
         assert(self.lsi_model.dictionary)
-        text = self.lsi_model.slicer(document)
+        text = jieba_cut(document)
         self.names.append(name)
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
 
     def set_corpus(self, texts):
-        for text in self.lsi_model.slicer(texts):
+        for text in jieba_cut(texts):
             self.corpus.append(self.lsi_model.dictionary.doc2bow(text))
 
     def set_index(self):

@@ -43,7 +43,7 @@ export default class HeaderPerson extends Component {
     const menu = (
       <Menu>
         <Menu.Item key="0">
-          <a href="http://www.alipay.com/">Individual Center</a>
+          <a href="/userinfo">Individual Center</a>
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item key="1">

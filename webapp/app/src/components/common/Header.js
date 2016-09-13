@@ -16,7 +16,9 @@ export default class Header extends Component {
           <div className="cs-layout-herader">
             <div className="cs-layout-wrapper">
               <div className="cs-layout-logo">
-                <img src={LogoImg} alt="Logo" />
+                <a href="/search">
+                  <img src={LogoImg} alt="Logo" />
+                </a>
               </div>
               <div className="cs-layout-person">
                 <HeaderPerson />

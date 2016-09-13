@@ -29,7 +29,6 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="name"><span class="glyphicon glyphicon-user"></span>{{ current_user.id }} <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="/userinfo">Individual Center</a></li>
-            <li><a href="#" data-toggle="modal" data-target=".setting-modal">Change Password</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="#" data-toggle="modal" data-target=".quit-modal">Quit</a></li>
           </ul>
@@ -37,36 +36,13 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-upload"></span>Tools <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#" data-toggle="modal" data-target=".upload-modal">Upload</a></li>
-            <li><a href="/batchupload" target="_blank">Bulk Upload</a></li>
+            <li><a href="/uploader">Upload</a></li>
           </ul>
         </li>
         <li><a href="/listjd?status=Opening">Select a JD</a></li>
       </ul>
     </div>
   </header>
-  <!-- upload modal begin-->
-  <div class="modal fade upload-modal" tabindex="-1" role="dialog" aria-labelledby="myUploadModalLabel">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="UploadModalLabel">Upload File</h4>
-        </div>
-        <div class="modal-body">
-          <form id="file-form" action="/upload" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" id="file" />
-            <p id="progressmsg"></p>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary" id="upload-btn">Upload</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- upload modal end-->
   <!--quit modal begin-->
   <div class="modal fade quit-modal" tabindex="-1" role="dialog" aria-labelledby="myQuitModalLabel">
       <div class="modal-dialog modal-sm">
@@ -86,40 +62,6 @@
       </div>
     </div>
     <!--quit modal end-->
-
-    <!--setting modal begin-->
-  <div class="modal fade setting-modal" tabindex="-1" role="dialog" aria-labelledby="mySettingModalLabel">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="pwdModalLabel">Change password</h4>
-          </div>
-          <form id="cpwd-form" action="/changepassword" method="POST">
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="oldpassword">Old Password</label>
-              <input type="password" class="form-control" name="oldpassword" id="oldpassword" placeholder="Old Password" required="required">
-            </div>
-            <div class="form-group">
-              <label for="newpassword">New Password</label>
-              <input type="password" class="form-control" name="newpassword" id="newpassword" placeholder="New Password" required="required">
-            </div>
-            <div class="form-group">
-              <label for="confirmpassword">Confirm New Password</label>
-              <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" data-compare="#newpassword" placeholder="Confirm New Password" required="required" />
-            </div>
-            <strong id="error-msg"></strong>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="cpwd-btn">Submit</button>
-          </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <!--setting modal end-->
     {% block content %}{% endblock %}
     {% block script %}{% endblock %}
 </body>

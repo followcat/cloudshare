@@ -105,3 +105,7 @@ class LSIsimilarity(object):
                 except ValueError:
                     self._corpus = []
         return self._corpus
+
+    @corpus.setter
+    def corpus(self, value):
+        self._corpus = value

@@ -80,9 +80,9 @@ class ClassifyCV(object):
         return self.cvstorage.gethtml(name)
 
     def datas(self):
-        for id in self.cvids:
-            text = self.cvstorage.getmd(id)
-            yield id, text
+        for name in self.names():
+            text = self.cvstorage.getmd(name)
+            yield name, text
 
     @property
     def NUMS(self):

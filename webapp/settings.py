@@ -38,9 +38,10 @@ DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB, 'cloudshare')
 
 RAW_DIR = 'raw'
 RAW_DB = dict()
-for name in os.listdir(RAW_DIR):
-    namepath = os.path.join(RAW_DIR, name)
-    RAW_DB[name] = interface.predator.PredatorInterface(namepath)
+if os.path.exists(RAW_DIR):
+    for name in os.listdir(RAW_DIR):
+        namepath = os.path.join(RAW_DIR, name)
+        RAW_DB[name] = interface.predator.PredatorInterface(namepath)
 
 CV_STORAGE_DIR = 'cvstorage'
 CV_STORAGE_DB = interface.basefs.BaseFSInterface(CV_STORAGE_DIR)

@@ -1,5 +1,6 @@
 import os
 
+import webapp.jsonencoder
 import services.index
 import services.mining
 import services.account
@@ -15,6 +16,8 @@ import interface.gitinterface
 
 import sources.industry_id
 
+
+RESTFUL_JSON = {'cls': webapp.jsonencoder.CustomJSONEncoder}
 
 UPLOAD_TEMP = 'output'
 SECRET_KEY = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'

@@ -166,6 +166,7 @@ class Mining(object):
             try:
                 index.load()
             except IOError:
+                continue
                 if index.build([svc]):
                     index.save()
             self.sim[svc.name] = index

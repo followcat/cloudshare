@@ -55,7 +55,10 @@ SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_CV_STO, RAW_DB)
 CLASSIFY_DIR = 'classify'
 SVC_CLS_CV = dict()
 for name in sources.industry_id.industryID.keys():
-    SVC_CLS_CV[name] = services.classifycv.ClassifyCV(name, CLASSIFY_DIR, SVC_CV_STO, RAW_DB)
+     cls_cv = services.classifycv.ClassifyCV(name, CLASSIFY_DIR, SVC_CV_STO, RAW_DB)
+     if cls_cv.NUMS == 0:
+        continue
+     SVC_CLS_CV[name] = cls_cv
 SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, SVC_CLS_CV.values())
 
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)

@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 
 import CVProcess from '../../utils/cv_process';
@@ -24,3 +24,7 @@ export default class Preview extends Component {
     );
   }
 }
+
+Preview.propTypes = {
+  markdown: PropTypes.string,
+};

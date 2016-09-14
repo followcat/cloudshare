@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Table } from 'antd';
 
@@ -35,3 +35,7 @@ export default class ComfirmResult extends Component {
     );
   }
 }
+
+ComfirmResult.propTypes = {
+  comfirmResult: PropTypes.arrayOf(PropTypes.object),
+};

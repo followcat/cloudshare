@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Button } from 'antd';
 
@@ -34,3 +34,8 @@ export default class ResumeComfirm extends Component {
     );
   }
 }
+
+ResumeComfirm.propTypes = {
+  id: PropTypes.string,
+  loading: PropTypes.bool,
+};

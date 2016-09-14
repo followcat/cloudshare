@@ -10,8 +10,8 @@ message.config({
 });
 
 export default class Setting extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 

@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Form, Input, Select, Button, Icon } from 'antd';
 
@@ -128,5 +128,17 @@ class ResumeTitle extends Component {
     );
   }
 }
+
+ResumeTitle.propTypes = {
+  id: PropTypes.string,
+  current: PropTypes.number,
+  length: PropTypes.number,
+  index: PropTypes.number,
+  disabled: PropTypes.bool,
+  classifyList: PropTypes.array,
+  name: PropTypes.string,
+  onPrevPreview: PropTypes.func.isRequired,
+  onNextPreview: PropTypes.func.isRequired,
+};
 
 export default ResumeTitle = Form.create({})(ResumeTitle);

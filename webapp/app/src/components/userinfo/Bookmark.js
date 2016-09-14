@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Table, Popconfirm, message } from 'antd';
 
@@ -82,3 +82,9 @@ export default class Bookmark extends Component {
     );
   }
 }
+
+Bookmark.propTypes = {
+  bookmarkList: PropTypes.array,
+  bookmarkHeight: PropTypes.number,
+  onDeleteBookmark: PropTypes.func,
+};

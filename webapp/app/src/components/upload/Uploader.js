@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Upload, Icon } from 'antd';
 const Dragger = Upload.Dragger;
@@ -24,3 +24,7 @@ export default class Uploader extends Component {
     );
   }
 }
+
+Uploader.propTypes = {
+  uploadProps: PropTypes.object,
+};

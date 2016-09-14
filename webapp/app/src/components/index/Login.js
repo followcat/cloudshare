@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Card, Form, Input, Button, Row, Col } from 'antd';
 
@@ -65,5 +65,9 @@ class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  onSignIn: PropTypes.func.isRequired,
+};
 
 export default Login = Form.create({})(Login);

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Button, Modal, Form, Input } from 'antd';
 
@@ -88,5 +88,14 @@ class CreateUser extends Component {
     );
   }
 }
+
+CreateUser.propTypes = {
+  userList: PropTypes.array,
+  visible: PropTypes.bool,
+  confirmLoading: PropTypes.bool,
+  onSubmitCreation: PropTypes.func.isRequired,
+  onModalOpen: PropTypes.func.isRequired,
+  onModalClose: PropTypes.func.isRequired,
+};
 
 export default CreateUser = Form.create({})(CreateUser);

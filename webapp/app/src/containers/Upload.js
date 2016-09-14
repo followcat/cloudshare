@@ -196,7 +196,6 @@ export default class Upload extends Component {
           <Uploader uploadProps={uploadProps} />
           <PreviewList
             previewList={this.state.completedFileList}
-            length={this.state.completedFileList.length}
             currentPreview={this.state.currentPreview}
             onPrevPreview={this.handlePrevPreview}
             onNextPreview={this.handleNextPreview}

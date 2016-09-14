@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Button, Icon } from 'antd';
 
@@ -20,13 +20,14 @@ export default class PreviewList extends Component {
   }
 
   render() {
+    const previewListLength = this.props.previewList.length;
     return (
       <div>
         {this.props.previewList.map((previewItem, index) => {
           const resumeProps = {
             index: index,
             current: this.props.currentPreview,
-            length: this.props.length,
+            length: previewListLength,
             name: previewItem.name,
             id: previewItem.id,
             onPrevPreview: this.props.onPrevPreview,
@@ -48,3 +49,14 @@ export default class PreviewList extends Component {
     );
   }
 }
+
+PreviewList.propTypes = {
+  previewList: PropTypes.array,
+  currentPreview: PropTypes.number,
+  loading: PropTypes.bool,
+  disabled: PropTypes.bool,
+  classifyList: PropTypes.array,
+  onPrevPreview: PropTypes.func.isRequired,
+  onNextPreview: PropTypes.func.isRequired,
+  onComfirmUpload: PropTypes.func.isRequired,
+};

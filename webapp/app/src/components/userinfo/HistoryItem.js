@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 export default class HistoryItem extends Component {
   render() {
@@ -25,3 +25,7 @@ export default class HistoryItem extends Component {
     );
   }
 }
+
+HistoryItem.propTypes = {
+  historyObject: PropTypes.object,
+};

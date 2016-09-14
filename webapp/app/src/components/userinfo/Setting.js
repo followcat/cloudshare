@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import ChangePassword from '../common/ChangePassword';
 
@@ -14,3 +14,7 @@ export default class Setting extends Component {
     );
   }
 }
+
+Setting.propTypes = {
+  onSubmitChangePassword: PropTypes.func,
+};

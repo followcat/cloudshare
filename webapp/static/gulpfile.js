@@ -17,8 +17,12 @@ gulp.task("clean", function(){
 })
 
 //js打包任务
-gulp.task('scripts', ['clean'], function(){
-  return gulp.src(["src/js/modules/*.js", "!src/js/modules/batchupload.js"])
+gulp.task('scripts', function(){
+  return gulp.src(["src/js/modules/*.js",
+                  "!src/js/modules/batchupload.js",
+                  "!src/js/modules/index.js",
+                  "!src/js/modules/urm_home.js",
+                  "!src/js/modules/urm_setting.js"])
     .pipe(requirejsOptimize({
       paths: {
         jquery: __dirname + '/lib/js/jquery',
@@ -68,7 +72,7 @@ gulp.task('scripts', ['clean'], function(){
 });
 
 //css打包任务
-gulp.task("style", ['clean'], function(){
+gulp.task("style", function(){
   return gulp.src("src/css/*.css")
     .pipe(cleanCSS({ keepSpecialComments: 1, processImport: false }))
     .pipe(rev())
@@ -79,7 +83,11 @@ gulp.task("style", ['clean'], function(){
 
 //路径替换
 gulp.task("rev", ["scripts", "style"], function(){
-  return gulp.src(["./rev/**/*.json", "../templates/**/*.html"])
+  return gulp.src(["./rev/**/*.json",
+                  "../templates/**/*.html",
+                  "!../templates/index.html",
+                  "!../templates/urm.html",
+                  "!../templates/urmsetting.html"])
     .pipe(revCollector({
       replaceReved: true,
       dirReplacements: {

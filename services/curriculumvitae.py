@@ -16,9 +16,9 @@ class CurriculumVitae(services.base.Service):
     def __init__(self, interface, name=None):
         super(CurriculumVitae, self).__init__(interface, name)
         self.repo_path = self.interface.path + "/" + self.path
+        self.unique_checker = None
         self.info = ""
         self._nums = 0
-        self.updatenums()
 
     def exists(self, filename):
         path_name = os.path.join(self.path, filename)
@@ -61,8 +61,10 @@ class CurriculumVitae(services.base.Service):
         """
         if cvobj.result is False:
             return False
-        unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
-        if unique is True and unique_checker.unique(cvobj.filepro.yamlinfo) is False:
+        if self.unique_checker is None:
+            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
+        self.unique_checker.update()
+        if unique is True and self.unique_checker.unique(cvobj.filepro.yamlinfo) is False:
             self.info = "Exists File"
             return False
         cvobj.filepro.yamlinfo['committer'] = committer
@@ -180,10 +182,25 @@ class CurriculumVitae(services.base.Service):
 
     @property
     def NUMS(self):
+        if not self._nums:
+            self._nums = len(list(self.yamls()))
         return self._nums
 
-    def updatenums(self):
-        self._nums = len(list(self.yamls()))
+
+class CurriculumVitaeStorage(CurriculumVitae):
+
+    path = ''
+
+    def addcv(self, id, data, yamldata, rawdata=None):
+        cn_id = core.outputstorage.ConvertName(id)
+        self.interface.add(os.path.join(self.path, cn_id.md), data)
+        self.interface.add(os.path.join(self.path, cn_id.yaml), yamldata)
+        if rawdata is not None:
+            self.interface.add(os.path.join(self.path, cn_id.html), rawdata)
+        return True
+
+    def lsids(self, *args, **kwargs):
+        return [f.split('.')[0] for f in self.interface.lsfiles()]
 
 
 class CurriculumVitaeObject(object):
@@ -213,10 +230,11 @@ class CurriculumVitaeObject(object):
                                                          self.convertname,
                                                          self.tmp_path)
         self.result = self.filepro.result
-        if self.result is False:
-            self.information = 'Can not Convert'
-        else:
-            self.information = 'Sucess'
+        self.resultid = self.filepro.resultcode
+
+    @property
+    def ID(self):
+        return self.filepro.name.base
 
     def markdown(self):
         return self.filepro.markdown_stream

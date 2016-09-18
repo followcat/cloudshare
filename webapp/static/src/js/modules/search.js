@@ -94,26 +94,49 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     $(sbs).submit();
   });
 
+  function objectToArray(obj) {
+    var arr = [];
+    for (var e in obj) {
+      arr.push({ name: e, number: obj[e] });
+    }
+
+    return arr;
+  }
+
+  function compare(obj1, obj2) {
+    if (obj1.number < obj2.number) {
+      return 1;
+    } else if (obj1.number > obj2.number) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
   $.ajax({
     url: "/cvnumbers",
     dataType: "json",
     success: function(response) {
-      var numbers = response.result,
-          len = 0;
-      for (var e in numbers) {
-        len++;
-      }
-      var mgLeft = (720 - len * 80) / (len + 1);
+      var data = response.result;
+      var classifyDatas = objectToArray(data);
+      classifyDatas.sort(compare);
 
-      for (var e in numbers) {
-        $("#count").append("<div class=\"count-item\" style=\"margin-left: " + mgLeft+"px"+ "\">" + 
-          "<div class=\"k\">" + e +
-          "</div>" +
-          "<div class=\"n\">" + numbers[e] +
-          "</div>" +
-          "</div>"
-        );
+      for (var i = 0, len = classifyDatas.length; i < len; i++) {
+        if (classifyDatas[i].name === "total") {
+          $("#total").append(classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number);
+        } else if (classifyDatas[i].name === "cloudshare") {
+          $("#countList").prepend("<div class=\"count-list-item\">" + classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number + "</div>");
+        } else if (classifyDatas[i].number !== 0){
+          $("#countList").append("<div class=\"count-list-item\">" + classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number + "</div>");
+        }
       }
+    }
+  });
+
+  $("#total").on("click", function() {
+    if ($("#countList").css("display") === "none") {
+      $("#countList").css("display", "block");
+    } else {
+      $("#countList").css("display", "none");
     }
   });
 

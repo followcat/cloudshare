@@ -4,7 +4,7 @@ import re
 import core.mining.lsimodel
 import core.mining.lsisimilarity
 
-import utils.cutword
+from utils.builtin import jieba_cut, pos_extract
 
 
 REJECT = re.compile('(('+')|('.join([
@@ -15,52 +15,114 @@ REJECT = re.compile('(('+')|('.join([
     u'互联网',
     ])+'))')
 
+LINE = re.compile(ur'[\n\t]+')
+HEAD = ur'(((http|HTTP)[sS]?|(ftp|FTP))\:\/\/)'
+UID = ur'([\w\-]+@)'
+DEMAIN = ur'([a-zA-Z0-9][\-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][\-a-zA-Z0-9]{0,62})*(\.(cn|us|uk|jp|hk|com|edu|gov|int|mil|net|org|biz)))'
+IP = ur'((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5]))'
+PORT = ur'(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))'
+SERVICE = ur'((\/[^\/\s][\w\.\,\?\'\(\)\*\\\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s]?)*'
+
+WEB = re.compile(ur"\(?\s?(" + HEAD + ur'?' + UID + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")\s?\)?")
+
+SYMBOL = re.compile(ur'[- /]+')
+SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
+
+FLAGS = ['x', # spaces
+         'm', # number and date
+         #'a', # adverb
+         'c', # conjunction
+         'd', # adverb
+         'e', # interjection
+         'f', # noun of locality
+         'g', # morpheme word
+         'h', # prefix
+         'i', # idiom
+         #'j', # abbreviation
+         'k', # suffix
+         'nrt', 'nr', 'ng', #'nz', fails on myjnoee7.md
+         'o', # onomatopoeia
+         'p', # preposition
+         'q', # quantifier
+         'r', # pronoun
+         'tg', # time root word
+         'u', # unclassified (eg. etc)
+         'vg', # verb morpheme word
+         #'v', # verb
+         'y', # statement label designator
+         'z', # State word
+         #'ns', # city and country
+        ]
+
+def re_sub(reg, sub, text):
+    """
+        >>> from services.mining import *
+        >>> s = "[测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]\\n"
+        >>> s += "[测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]"
+        >>> print(s)
+        [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]
+        [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
+        >>> print(re_sub(LINE, ' ', s))
+        [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器] [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
+        >>> print(re_sub(WEB, ' ', s))
+        [测试计量技术及仪器] [测试计量技术及仪器]
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "[测试计量技术及仪器] (www.test.com) [测试计量技术及仪器]"
+        >>> print(re_sub(WEB, ' ', s))
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "[测试计量技术及仪器] (test123@test.com) [测试计量技术及仪器]"
+        >>> print(re_sub(WEB, ' ', s))
+        [测试计量技术及仪器]   [测试计量技术及仪器]
+        >>> s = "--------------------\\n"
+        >>> s += "英语(CET4)、普通话\\n"
+        >>> s += "--------------------\\n"
+        >>> print(re_sub(LINE, '', re_sub(SYMBOL, '', s)))
+        英语(CET4)、普通话
+        >>> assert 'http://search.51job.com/job/52405118,c.html' in WEB.match('http://search.51job.com/job/52405118,c.html').group(0)
+        >>> assert 'https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD' in WEB.match(
+        ...             "https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD").group(0)
+        >>> assert '2014.06' in WEB.match("https://h.liepin.com/cvsearch/soResume/?company=%AC%E5%8F%B8)2014.06").group(0) #FIXME
+        >>> assert 'bertwalker2005@yahoo.co.uk' in WEB.match('bertwalker2005@yahoo.co.uk').group(0)
+        >>> assert 'http://h.highpin.cn/ResumeManage/26566491@qq.com' in WEB.match('http://h.highpin.cn/ResumeManage/26566491@qq.com').group(0)
+        >>> assert 'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.match('http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
+        >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' in WEB.match('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0)
+        >>> assert 'https://h.liepin.com/message/showmessage/#c:1' in WEB.match('https://h.liepin.com/message/showmessage/#c:1').group(0)
+        >>> assert '2007' not in WEB.match('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0)
+        >>> assert 'team.Desig' in WEB.match('team.Desig').group(0) # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        AttributeError: 'NoneType' object has no attribute 'group'
+    """
+    return reg.sub(sub, text)
+
 def silencer(document):
-        FLAGS = ['x', # spaces
-                 'm', # number and date
-                 'a', # adverb
-                 'i', 'j',
-                 'nrt', 'nr', 'ns', #'nz', fails on myjnoee7.md
-                 'u', # unclassified (eg. etc)
-                 'f', # time and place
-                 'q', # quantifier
-                 'p', # preposition
-                 'v', # vernicular expression
-                 'ns', # city and country
-                ]
-        LINE = re.compile(ur'[\n- /]+')
-        SBHTTP = re.compile(ur'\(https?:.*\)(?=\s)')
-        BHTTP = re.compile(ur'\(https?:.*?\)')
-        HTTP = re.compile(ur'https?:\S*(?=\s)')
-        WWW = re.compile('www\.[\.\w]+')
-        EMAIL = re.compile('\w+@[\.\w]+')
-        SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
-        if isinstance(document, list):
-            texts = document
-        else:
-            texts = [document]
-        selected_texts = []
-        for text in texts:
-            text = HTTP.sub('\n', BHTTP.sub('\n', SBHTTP.sub('\n', LINE.sub(' ', text))))
-            text = WWW.sub('', EMAIL.sub('', text))
-            doc = [word.word for word in utils.cutword.chs_lsimodel(text)
-                   if word.flag not in FLAGS]
-            out = []
-            for d in doc:
-                if REJECT.match(d):
-                    continue
-                if d.istitle():
-                    # Can make it match SHORT later for skip (eg 'Ltd' ...)
-                    d = d.lower()
-                if not SHORT.match(d):
-                    # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
-                    d = d.lower()
-                    out.append(d)
-            selected_texts.append(out)
-        if isinstance(document, list):
-            return selected_texts
-        else:
-            return selected_texts[0]
+    if isinstance(document, list):
+        texts = document
+    else:
+        texts = [document]
+    selected_texts = []
+    for text in texts:
+        text = re_sub(LINE, ' ', text)
+        text = re_sub(WEB, '\n', text)
+        text = re_sub(SYMBOL, ' ', text)
+        words = jieba_cut(text, pos=True)
+        words = pos_extract(words, FLAGS)
+        out = []
+        for word in words:
+            if REJECT.match(word):
+                continue
+            if word.istitle():
+                # Can make it match SHORT later for skip (eg 'Ltd' ...)
+                word = word.lower()
+            if not SHORT.match(word):
+                # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
+                word = word.lower()
+                out.append(word)
+        selected_texts.append(out)
+    if isinstance(document, list):
+        return selected_texts
+    else:
+        return selected_texts[0]
 
 
 class Mining(object):
@@ -69,13 +131,11 @@ class Mining(object):
         self.sim = {}
         self.path = path
         self.lsi_model = dict()
-        self.dbcenter = cvsvc.dbcenter
         self.additionals = cvsvc.additionals
         self.services = {
-                'default': cvsvc.dbcenter,
-                'additionals': cvsvc.additionals,
-                'all': dict(zip(self.dbcenter.keys()+self.additionals.keys(),
-                                self.dbcenter.values()+self.additionals.values()))
+                'default': {cvsvc.default.name: cvsvc.default},
+                'all': dict([tuple([each.name, each])
+                            for each in self.additionals+[cvsvc.default]])
             }
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -183,7 +243,7 @@ class Mining(object):
         return [name for name in self.services['default']]
 
     def addition_names(self):
-        return [name for name in self.services['additionals']]
+        return [additional.name for additional in self.additionals]
 
     @property
     def SIMS(self):

@@ -36,7 +36,7 @@ class ReverseIndexing(object):
             path, name = os.path.split(f)
             with open(f) as fp:
                 index = cPickle.load(fp)
-                self.index[name] = index
+                self.index[name.decode('utf-8')] = index
 
     def update(self):
         for svc in self.cvs:

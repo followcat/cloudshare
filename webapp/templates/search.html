@@ -8,9 +8,6 @@
 {% endblock %}
 
 {% block content %}
-
-<div class="count" id="count">
-</div>
 <div class="wrapper">
   <div class="search-box" id="search-box">
     <form action="/search" method="GET" id="serachbykey">
@@ -28,6 +25,11 @@
       <span>Job Description Search?</span>
     </div>
   </div>
+</div>
+<div class="count" id="count">
+  <div class="count-list" id="countList">
+  </div>
+  <div class="total" id="total"></div>
 </div>
 {% endblock %}
 {% block script %}

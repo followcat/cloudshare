@@ -17,7 +17,7 @@ REJECT = re.compile('(('+')|('.join([
 LINE = re.compile(ur'[\n\t]+')
 HEAD = ur'(((http|HTTP)[sS]?|(ftp|FTP))\:\/\/)'
 UID = ur'([\w\-]+@)'
-DEMAIN = ur'([a-zA-Z0-9][\-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][\-a-zA-Z0-9]{0,62})*(\.(cn|us|uk|jp|hk|com|edu|gov|int|mil|net|org|biz)))'
+DEMAIN = ur'([a-zA-Z0-9][\-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][\-a-zA-Z0-9]{0,62})*(\.(cn|CN|us|US|uk|jp|hk|com|COM|edu|gov|int|mil|net|org|biz)))'
 IP = ur'((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5]))'
 PORT = ur'(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))'
 SERVICE = ur'((\/[^\/\s][\w\.\,\?\'\(\)\*\\\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s]?)*'
@@ -95,14 +95,8 @@ def re_sub(reg, sub, text):
         Traceback (most recent call last):
         ...
         AttributeError: 'NoneType' object has no attribute 'group'
-        >>> assert 'IP.COM' in WEB.match('IP.COM').group(0) # FIXME doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        AttributeError: 'NoneType' object has no attribute 'group'
-        >>> assert '123456789@QQ.COM' in WEB.match('123456789@QQ.COM').group(0) # FIXME doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        AttributeError: 'NoneType' object has no attribute 'group'
+        >>> assert 'IP.COM' in WEB.match('IP.COM').group(0)
+        >>> assert '123456789@QQ.COM' in WEB.match('123456789@QQ.COM').group(0)
     """
     return reg.sub(sub, text)
 

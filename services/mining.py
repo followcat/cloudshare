@@ -16,13 +16,13 @@ REJECT = re.compile('(('+')|('.join([
 
 LINE = re.compile(ur'[\n\t]+')
 HEAD = ur'(((http|HTTP)[sS]?|(ftp|FTP))\:\/\/)'
-UID_PW = ur'([\w\_\-]+(\:[\w\.\,!@%\^\&\$\*\-]+)*@)'
+UID = ur'([\w\-]+@)'
 DEMAIN = ur'([a-zA-Z0-9][\-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][\-a-zA-Z0-9]{0,62})*(\.(cn|us|uk|jp|hk|com|edu|gov|int|mil|net|org|biz)))'
 IP = ur'((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5]))'
 PORT = ur'(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))'
 SERVICE = ur'((\/[^\/\s][\w\.\,\?\'\(\)\*\\\+&%\$#\=~_\-@]*)*[^\.\,\?\"\'\(\)\[\]!;<>{}\s]?)*'
 
-WEB = re.compile(ur"\(?\s?(" + HEAD + ur'?' + UID_PW + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")\s?\)?")
+WEB = re.compile(ur"\(?\s?(" + HEAD + ur'?' + UID + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")\s?\)?")
 
 SYMBOL = re.compile(ur'[- /]+')
 SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')

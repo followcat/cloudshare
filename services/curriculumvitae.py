@@ -16,6 +16,7 @@ class CurriculumVitae(services.base.Service):
     def __init__(self, interface, name=None):
         super(CurriculumVitae, self).__init__(interface, name)
         self.repo_path = self.interface.path + "/" + self.path
+        self.unique_checker = None
         self.info = ""
         self._nums = 0
 
@@ -60,8 +61,10 @@ class CurriculumVitae(services.base.Service):
         """
         if cvobj.result is False:
             return False
-        unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
-        if unique_checker.unique(cvobj.filepro.yamlinfo) is False:
+        if self.unique_checker is None:
+            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
+        self.unique_checker.update()
+        if self.unique_checker.unique(cvobj.filepro.yamlinfo) is False:
             self.info = "Exists File"
             return False
         cvobj.filepro.yamlinfo['committer'] = committer

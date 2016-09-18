@@ -69,6 +69,17 @@ class LSIsimilarity(object):
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
 
+    def add_documents(self, names, documents):
+        assert(self.lsi_model.dictionary)
+        assert len(names) == len(documents)
+        corpus = []
+        for name, document in zip(names, documents):
+            text = self.lsi_model.slicer(document)
+            self.names.append(name)
+            corpu = self.lsi_model.dictionary.doc2bow(text)
+            corpus.append(corpu)
+        self.index.add_documents(corpus)
+
     def set_corpus(self, texts):
         for text in self.lsi_model.slicer(texts):
             self.corpus.append(self.lsi_model.dictionary.doc2bow(text))

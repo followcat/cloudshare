@@ -91,6 +91,18 @@ def re_sub(reg, sub, text):
         Traceback (most recent call last):
         ...
         AttributeError: 'NoneType' object has no attribute 'group'
+        >>> assert 'www.chineseanytime.com' in WEB.match('负责创业公司官方网站建设（已上线，网址www.chineseanytime.com）').group(0) # FIXME doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        AttributeError: 'NoneType' object has no attribute 'group'
+        >>> assert 'IP.COM' in WEB.match('IP.COM').group(0) # FIXME doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        AttributeError: 'NoneType' object has no attribute 'group'
+        >>> assert '123456789@QQ.COM' in WEB.match('123456789@QQ.COM').group(0) # FIXME doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        AttributeError: 'NoneType' object has no attribute 'group'
     """
     return reg.sub(sub, text)
 

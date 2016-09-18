@@ -26,6 +26,8 @@ class UploadCVAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         updates = args['updates']
+        names = []
+        documents = []
         for item in updates:
             upobj = upload[user.id].pop(item['id'])
             for key, value in item.iteritems():
@@ -33,11 +35,13 @@ class UploadCVAPI(Resource):
                     upobj.filepro.yamlinfo[key] = value
             result = self.svc_cv.add(upobj, user.id)
             if result is True:
+                names.append(upobj.ID+'.md')
+                documents.append(upobj.markdown)
                 results.append({ 'id': item['id'], 'status': 'success', 'filename': upobj.filepro.yamlinfo['filename'] })
             else:
                 results.append({ 'id': item['id'], 'status': 'fail', 'filename': upobj.filepro.yamlinfo['filename'] })
         def_cv_name = self.svc_cv.default.name
-        self.svc_min.sim[def_cv_name].update([self.svc_cv.default])
+        self.svc_min.sim[def_cv_name].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):

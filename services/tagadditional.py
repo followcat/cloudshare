@@ -1,8 +1,3 @@
-try:
-    from yaml import CSafeLoader as SafeLoader, CSafeDumper as SafeDumper
-except ImportError:
-    from yaml import SafeLoader, SafeDumper
-
 import os
 
 import utils.builtin
@@ -11,8 +6,8 @@ import core.outputstorage
 
 class TagsCurriculumVitae(object):
 
-    config_file = 'config.yaml'
-    ids_file = 'names.yaml'
+    config_file = 'config.json'
+    ids_file = 'names.json'
 
     def __init__(self, name, path, additionals):
         self.name = name
@@ -34,8 +29,12 @@ class TagsCurriculumVitae(object):
         self.update()
 
     def load(self):
-        self.config = utils.builtin.load_yaml(self.path, self.config_file)
-        self.cvids = utils.builtin.load_yaml(self.path, self.ids_file)
+        self.config = utils.builtin.load_json(self.path, self.config_file)
+        self.cvids = utils.builtin.load_json(self.path, self.ids_file)
+
+    def save(self):
+        utils.builtin.save_json(self.config, self.path, self.config_file)
+        utils.builtin.save_json(self.cvids, self.path, self.ids_file)
 
     def update(self):
         for name in self.config['additionals']:
@@ -51,8 +50,7 @@ class TagsCurriculumVitae(object):
                             keyset.update(each)
                         if keyset.intersection(values_set):
                             self._add(yamlname, name)
-        utils.builtin.save_yaml(self.config, self.path, self.config_file)
-        utils.builtin.save_yaml(self.cvids, self.path, self.ids_file)
+        self.save()
 
     def exists(self, name):
         id = core.outputstorage.ConvertName(name)

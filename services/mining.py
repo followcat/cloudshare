@@ -132,11 +132,9 @@ class Mining(object):
         self.path = path
         self.lsi_model = dict()
         self.additionals = cvsvc.additionals
-        self.services = {
-                'default': {cvsvc.default.name: cvsvc.default},
-                'all': dict([tuple([each.name, each])
-                            for each in self.additionals+[cvsvc.default]])
-            }
+        self.services = {'default': cvsvc.projects, 'all': dict()}
+        self.services['all'].update(cvsvc.projects)
+        self.services['all'].update(cvsvc.additionals)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
@@ -243,7 +241,7 @@ class Mining(object):
         return [name for name in self.services['default']]
 
     def addition_names(self):
-        return [additional.name for additional in self.additionals]
+        return [name for name in self.additionals]
 
     @property
     def SIMS(self):

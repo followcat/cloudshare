@@ -46,9 +46,9 @@ UAV_needed = [
                 ]
 
 MED_DB = interface.gitinterface.GitInterface(os.path.join(PRJ_PATH, 'medical'))
-SVC_PRJ_MED = services.projectcv.ProjectCV(MED_DB, DATA_DB, 'medical', SVC_CV_STO)
+SVC_PRJ_MED = services.projectcv.ProjectCV(MED_DB, DEF_SVC_CV, 'medical', SVC_CV_STO)
 SVC_PRJ_MED.setup(MED_needed)
 
 UAV_DB = interface.gitinterface.GitInterface(os.path.join(PRJ_PATH, 'UAV'))
-SVC_PRJ_UAV = services.projectcv.ProjectCV(UAV_DB, DATA_DB, 'UAV', SVC_CV_STO)
+SVC_PRJ_UAV = services.projectcv.ProjectCV(UAV_DB, DEF_SVC_CV, 'UAV', SVC_CV_STO)
 SVC_PRJ_UAV.setup(UAV_needed)

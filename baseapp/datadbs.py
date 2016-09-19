@@ -2,7 +2,6 @@ import os
 
 import services.account
 import services.company
-import services.multicv
 import services.classifycv
 import services.cvstoragesync
 import services.jobdescription
@@ -46,5 +45,3 @@ for name in sources.industry_id.industryID.keys():
      if cls_cv.NUMS == 0:
         continue
      SVC_CLS_CV[name] = cls_cv
-
-SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, SVC_CLS_CV.values())

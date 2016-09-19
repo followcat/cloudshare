@@ -17,10 +17,10 @@ class ProjectCV(services.simulationcv.SimulationCV):
     )
 
     def __init__(self, interface, repo, name, cvstorage):
+        super(ProjectCV, self).__init__(name, interface.path, cvstorage)
         self.interface = interface
         self.repo = repo
         self.path = interface.path
-        super(ProjectCV, self).__init__(name, self.path, cvstorage)
         self.cvpath = os.path.join(self.path, self.YAML_DIR)
 
     def setup(self, classify, committer=None):
@@ -90,8 +90,13 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def search(self, keyword):
         allmd = self.repo.search(keyword)
         result = []
-        for each in allmd:
-            name = core.outputstorage.ConvertName(id).base
+        for md in allmd:
+            name = core.outputstorage.ConvertName(md).base
             if name in self.cvids:
-                result.append(each)
+                result.append(md)
         return result
+
+    def search_yaml(self, keyword):
+        results = self.interface.grep_yaml(keyword, self.YAML_DIR)
+        return results
+

@@ -1,5 +1,5 @@
 import services.mining
-from baseapp.datadbs import SVC_CV
+from baseapp.multicv import SVC_CV
 
 
 LSI_PATH = 'lsimodel'

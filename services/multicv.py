@@ -1,12 +1,13 @@
 class MultiCV(object):
 
-    def __init__(self, defaultsvc, additionals=None):
-        self.default = defaultsvc
+    def __init__(self, projects, additionals=None):
+        self.default = projects[0]
+        self.projects = dict([tuple([p.name, p]) for p in projects])
         if additionals is None:
-            self.additionals = []
+            self.additionals = dict()
         else:
             self.additionals = additionals
-        self.svcls = [self.default] + self.additionals
+        self.svcls = projects + self.additionals.values()
 
     def add(self, *args, **kwargs):
         return self.default.add(*args, **kwargs)

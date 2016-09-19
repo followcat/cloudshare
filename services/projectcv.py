@@ -64,8 +64,9 @@ class ProjectCV(services.simulationcv.SimulationCV):
 
     def getyaml(self, id):
         yaml = super(ProjectCV, self).getyaml(id)
-        info = self.getinfo(id)
-        yaml.update(info)
+        if yaml is not None:
+            info = self.getinfo(id)
+            yaml.update(info)
         return yaml
 
     def getclassify(self):

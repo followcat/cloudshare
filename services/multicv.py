@@ -60,7 +60,8 @@ class MultiCV(object):
             for each in self.svcls:
                 try:
                     result = each.getyaml(id)
-                    break
+                    if result is not None:
+                        break
                 except IOError:
                     result = None
         if result is None:

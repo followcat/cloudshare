@@ -35,7 +35,7 @@ class SimulationCV(object):
         utils.builtin.save_json(self.cvids, self.path, self.ids_file)
 
     def exists(self, name):
-        id = core.outputstorage.ConvertName(name)
+        id = core.outputstorage.ConvertName(name).base
         return id in self.cvids
 
     def _add(self, name):
@@ -51,17 +51,17 @@ class SimulationCV(object):
             yield core.outputstorage.ConvertName(id).md
 
     def getmd(self, name):
-        if not exists(name):
+        if not self.exists(name):
             return None
         return self.cvstorage.getmd(name)
 
     def getyaml(self, name):
-        if not exists(name):
+        if not self.exists(name):
             return None
         return self.cvstorage.getyaml(name)
 
     def gethtml(self, name):
-        if not exists(name):
+        if not self.exists(name):
             return None
         return self.cvstorage.gethtml(name)
 

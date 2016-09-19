@@ -51,12 +51,18 @@ class SimulationCV(object):
             yield core.outputstorage.ConvertName(id).md
 
     def getmd(self, name):
+        if not exists(name):
+            return None
         return self.cvstorage.getmd(name)
 
     def getyaml(self, name):
+        if not exists(name):
+            return None
         return self.cvstorage.getyaml(name)
 
     def gethtml(self, name):
+        if not exists(name):
+            return None
         return self.cvstorage.gethtml(name)
 
     def datas(self):

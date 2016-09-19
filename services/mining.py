@@ -97,6 +97,7 @@ def re_sub(reg, sub, text):
         AttributeError: 'NoneType' object has no attribute 'group'
         >>> assert 'IP.COM' in WEB.match('IP.COM').group(0)
         >>> assert '123456789@QQ.COM' in WEB.match('123456789@QQ.COM').group(0)
+        >>> assert 'http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv' not in WEB.match('http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv').group(0) #FIXME
     """
     return reg.sub(sub, text)
 

@@ -11,6 +11,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
     YAML_DIR = "CV"
 
     YAML_TEMPLATE = (
+        ("committer",           []),
         ("comment",             []),
         ("tag",                 []),
         ("tracking",            []),
@@ -28,8 +29,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
             os.makedirs(self.cvpath)
             self.config['classify'] = classify
             self.save()
-            self.interface.add_files([os.path.join(self.path, self.config_file),
-                                      os.path.join(self.path, self.ids_file)],
+            self.interface.add_files([bytes(self.config_file), bytes(self.ids_file)],
                                       message='Create new project %s.'%self.name,
                                       committer=committer)
 
@@ -37,11 +37,12 @@ class ProjectCV(services.simulationcv.SimulationCV):
         result = False
         if not self.exists(id):
             self._add(id)
-            info = generate_yaml_template()
-            name = core.outputstorage.ConvertName(name).yaml
+            info = self.generate_info_template()
+            info['committer'] = committer
+            name = core.outputstorage.ConvertName(id).yaml
             utils.builtin.save_yaml(info, self.cvpath, name)
-            self.interface.add_files([os.path.join(self.path, self.ids_file),
-                                      os.path.join(self.cvpath, name)],
+            self.interface.add_files([bytes(self.ids_file),
+                                      bytes(os.path.join(self.YAML_DIR, name))],
                                       message='Add new cv %s.'%id,
                                       committer=committer)
             result = True
@@ -49,7 +50,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
 
     def generate_info_template(self):
         info = {}
-        for each in self.yaml_template:
+        for each in self.YAML_TEMPLATE:
             info[each[0]] = each[1]
         return info
 
@@ -69,7 +70,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def updateinfo(self, id, info, message, committer):
         name = core.outputstorage.ConvertName(id).yaml
         utils.builtin.save_yaml(info, self.cvpath, name)
-        self.interface.add_files([os.path.join(self.cvpath, name)],
+        self.interface.add_files([bytes(os.path.join(self.YAML_DIR, name))],
                                   message=message, committer=committer)
 
     def addtag(self, id, tag, committer):

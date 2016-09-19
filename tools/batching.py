@@ -175,3 +175,18 @@ def tracking_and_command(DEF_SVC_CV, attribute, fix=False, filltime=False):
                 path_filename = os.path.join(DATA_DB.path, DEF_SVC_CV.path, each)
                 with open(path_filename, 'w') as fp:
                     fp.write(yaml.safe_dump(yaml_info, allow_unicode=True))
+
+
+def initproject(DEF_SVC_CV, SVC_PRJ):
+    import utils.builtin
+    for y in DEF_SVC_CV.yamls():
+        info = DEF_SVC_CV.getyaml(y)
+        convert_info = dict()
+        convert_info['tag'] = info.pop('tag')
+        convert_info['comment'] = info.pop('comment')
+        convert_info['tracking'] = info.pop('tracking')
+        convert_info['committer'] = info['committer']
+        SVC_PRJ._add(y)
+        utils.builtin.save_yaml(info, DEF_SVC_CV.repo_path , y)
+        utils.builtin.save_yaml(convert_info, SVC_PRJ.cvpath , y)
+        SVC_PRJ.save()

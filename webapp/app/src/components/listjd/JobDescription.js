@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react';
 
 import { Table } from 'antd';
 
+import ToolBar from './ToolBar';
+
 export default class JobDescription extends Component {
 
   constructor(props){
@@ -40,6 +42,7 @@ export default class JobDescription extends Component {
           { text: 'Opening', value: 'Opening' },
           { text: 'Closed', value: 'Closed' },
         ],
+        onFilter: (value, record) => record.status  === value,
       },
       {
         title: 'Operation',
@@ -51,7 +54,7 @@ export default class JobDescription extends Component {
     ];
 
     const pagination = {
-      total: this.props.jobDescriptionData.length,
+      total: this.props.searchData.length > 0 ? this.props.searchData.length : this.props.jobDescriptionData.length,
       showSizeChanger: true,
       onShowSizeChange(current, pageSize) {
         console.log('Current: ', current, '; PageSize: ', pageSize);
@@ -63,13 +66,19 @@ export default class JobDescription extends Component {
 
     return (
       <div>
+        <ToolBar
+          onSearch={this.props.onSearch}
+          companyData={this.props.companyData}
+          confirmLoading={this.props.confirmLoading}
+          onCreateNewJobDescription={this.props.onCreateNewJobDescription}
+        />
         <Table
           columns={columns}
           pagination={pagination}
-          dataSource={this.props.jobDescriptionData}
-          expandedRowRender={record => <p>{record.description.split('\n').map((item) => {
+          dataSource={this.props.searchData.length > 0 ? this.props.searchData : this.props.jobDescriptionData}
+          expandedRowRender={record => <p>{record.description.split('\n').map((item, index) => {
             return (
-              <span>
+              <span key={index}>
                 {item}
                 <br />
               </span>
@@ -84,5 +93,7 @@ export default class JobDescription extends Component {
 
 JobDescription.propTypes = {
   jobDescriptionData: PropTypes.array,
+  searchData: PropTypes.array,
   height: PropTypes.number,
+  onSearch: PropTypes.func,
 };

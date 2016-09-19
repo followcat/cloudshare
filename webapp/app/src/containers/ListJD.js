@@ -16,10 +16,15 @@ export default class ListJD extends Component {
     this.state = {
       current: 'jobdescription',
       jobDescriptionData: [],
+      searchData: [],
       companyData: [],
       height: 0,
+      confirmLoading: false,
     };
     this.loadJobDescription = this.loadJobDescription.bind(this);
+    this.loadCompany = this.loadCompany.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.handleCreateNewJobDescription = this.handleCreateNewJobDescription.bind(this);
   }
 
   loadJobDescription() {
@@ -44,13 +49,38 @@ export default class ListJD extends Component {
         this.setState({
           jobDescriptionData: data,
         });
+      } else {
+        console.log('Get jd error.');
+      }
+    })
+  }
+
+  loadCompany() {
+    fetch(`/api/companylist`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`,
+      },
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        console.log(json.data);
+        this.setState({
+          companyData: json.data,
+        });
+      } else {
+        console.log('Get company error.');
       }
     })
   }
 
   componentDidMount() {
     this.loadJobDescription();
-    const height = parseInt(this.refs.wrapper.offsetHeight) - 160;
+    this.loadCompany();
+    const height = parseInt(this.refs.wrapper.offsetHeight) - 208;
     this.setState({
       height: height,
     });
@@ -60,6 +90,60 @@ export default class ListJD extends Component {
     this.setState({
       current: e.key,
     });
+  }
+
+  handleSearch(value) {
+    let jdData = this.state.jobDescriptionData;
+    if (value !== '') {
+      let searchResultArray = [];
+      for (let item of jdData) {
+        for (let key in item) {
+          if (typeof item[key] === 'string' && item[key].indexOf(value) > -1) {
+            searchResultArray.push(item);
+            break;
+          }
+        }
+      }
+      this.setState({
+        searchData: searchResultArray,
+      });
+    } else {
+      this.setState({
+        searchData: [],
+      });
+    }
+  }
+
+  handleCreateNewJobDescription(obj) {
+    const _this = this;
+    this.setState({
+      confirmLoading: true,
+    });
+
+    fetch(`/api/jdbyname`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        jd_name: obj.jdName,
+        co_name: obj.companySelection,
+        jd_description: obj.jdContent,
+      }),
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        this.setState({
+          confirmLoading: false,
+        });
+        _this.loadJobDescription();
+      }
+    })
   }
 
   render() {
@@ -83,7 +167,12 @@ export default class ListJD extends Component {
                 {this.props.children && React.cloneElement(
                   this.props.children, {
                     jobDescriptionData: this.state.jobDescriptionData,
+                    companyData: this.state.companyData,
+                    searchData: this.state.searchData,
                     height: this.state.height,
+                    confirmLoading: this.state.confirmLoading,
+                    onSearch: this.handleSearch,
+                    onCreateNewJobDescription: this.handleCreateNewJobDescription,
                   })}
               </div>
             </div>

@@ -17,12 +17,16 @@ class ProjectCV(services.simulationcv.SimulationCV):
         ("tracking",            []),
     )
 
-    def __init__(self, interface, repo, name, cvstorage):
-        super(ProjectCV, self).__init__(name, interface.path, cvstorage)
+    def __init__(self, interface, repo, name):
+        super(ProjectCV, self).__init__(name, interface.path, repo)
         self.interface = interface
         self.repo = repo
         self.path = interface.path
         self.cvpath = os.path.join(self.path, self.YAML_DIR)
+        try:
+            self.load()
+        except IOError:
+            pass
 
     def setup(self, classify, committer=None):
         if not os.path.exists(self.cvpath):

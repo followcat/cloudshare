@@ -45,8 +45,8 @@ class ListJobDescription(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         svcjd = flask.current_app.config['SVC_JD']
-        repocompany = flask.current_app.config['SVC_CO']
-        names = repocompany.names()
+        svccv = flask.current_app.config['SVC_CV']
+        names = svccv.default.company_names()
         results = svcjd.lists()
         datas = []
         status = flask.request.args['status']
@@ -68,8 +68,8 @@ class ResumeToJobDescription(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self, filename, status):
         svcjd = flask.current_app.config['SVC_JD']
-        repocompany = flask.current_app.config['SVC_CO']
-        names = repocompany.names()
+        svccv = flask.current_app.config['SVC_CV']
+        names = svccv.default.company_names()
         results = svcjd.lists()
         datas = []
         if status == 'Closed':

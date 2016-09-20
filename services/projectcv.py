@@ -3,6 +3,7 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
+import services.company
 import services.simulationcv
 
 
@@ -23,6 +24,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
         self.repo = repo
         self.path = interface.path
         self.cvpath = os.path.join(self.path, self.YAML_DIR)
+        self.company = services.company.Company(interface)
         try:
             self.load()
         except IOError:
@@ -105,4 +107,13 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def search_yaml(self, keyword):
         results = self.interface.grep_yaml(keyword, self.YAML_DIR)
         return results
+
+    def company_add(self, name, introduction, committer):
+        return self.company.add(name, introduction, committer)
+
+    def company_get(self, name):
+        return self.company.company(name)
+
+    def company_names(self):
+        return self.company.names()
 

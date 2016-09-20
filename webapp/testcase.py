@@ -262,5 +262,5 @@ class TestSVCCompany(SVCCompany):
         self.init_svccompany()
         rv = self.addcompany(self.name, self.introduction)
         assert (json.loads(rv.data)['result'] is True)
-        SVC_CO = self.app.config['SVC_CO']
-        assert ('Company Introduce' in SVC_CO.company(self.name)['introduction'])
+        SVC_CV = self.app.config['SVC_CV']
+        assert ('Company Introduce' in SVC_CV.default.company_get(self.name)['introduction'])

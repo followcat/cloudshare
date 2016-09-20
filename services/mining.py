@@ -77,27 +77,27 @@ def re_sub(reg, sub, text):
         >>> s += "--------------------\\n"
         >>> print(re_sub(LINE, '', re_sub(SYMBOL, '', s)))
         英语(CET4)、普通话
-        >>> assert 'http://search.51job.com/job/52405118,c.html' in WEB.match('http://search.51job.com/job/52405118,c.html').group(0)
-        >>> assert 'https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD' in WEB.match(
+        >>> assert 'http://search.51job.com/job/52405118,c.html' in WEB.search('http://search.51job.com/job/52405118,c.html').group(0)
+        >>> assert 'https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD' in WEB.search(
         ...             "https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD").group(0)
-        >>> assert '2014.06' not in WEB.match("https://h.liepin.com/cvsearch/soResume/?company=%AC%E5%8F%B8)2014.06").group(0)
-        >>> assert 'bertwalker2005@yahoo.co.uk' in WEB.match('bertwalker2005@yahoo.co.uk').group(0)
-        >>> assert 'http://h.highpin.cn/ResumeManage/26566491@qq.com' in WEB.match('http://h.highpin.cn/ResumeManage/26566491@qq.com').group(0)
-        >>> assert 'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.match('http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
-        >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' in WEB.match('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0)
-        >>> assert 'https://h.liepin.com/message/showmessage/#c:1' in WEB.match('https://h.liepin.com/message/showmessage/#c:1').group(0)
-        >>> assert '2007' not in WEB.match('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0)
-        >>> assert 'team.Desig' in WEB.match('team.Desig').group(0) # doctest: +ELLIPSIS
+        >>> assert '2014.06' not in WEB.search("https://h.liepin.com/cvsearch/soResume/?company=%AC%E5%8F%B8)2014.06").group(0)
+        >>> assert 'bertwalker2005@yahoo.co.uk' in WEB.search('bertwalker2005@yahoo.co.uk').group(0)
+        >>> assert 'http://h.highpin.cn/ResumeManage/26566491@qq.com' in WEB.search('http://h.highpin.cn/ResumeManage/26566491@qq.com').group(0)
+        >>> assert 'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.search('http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
+        >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' in WEB.search('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0)
+        >>> assert 'https://h.liepin.com/message/showmessage/#c:1' in WEB.search('https://h.liepin.com/message/showmessage/#c:1').group(0)
+        >>> assert '2007' not in WEB.search('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0)
+        >>> assert 'team.Desig' in WEB.search('team.Desig').group(0) # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         AttributeError: 'NoneType' object has no attribute 'group'
-        >>> assert 'www.chineseanytime.com' in WEB.match('负责创业公司官方网站建设（已上线，网址www.chineseanytime.com）').group(0) # FIXME doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> assert 'www.chineseanytime.com' in WEB.search('负责创业公司官方网站建设（已上线，网址www.chineseanytime.com）').group(0) # FIXME doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         AttributeError: 'NoneType' object has no attribute 'group'
-        >>> assert 'IP.COM' in WEB.match('IP.COM').group(0)
-        >>> assert '123456789@QQ.COM' in WEB.match('123456789@QQ.COM').group(0)
-        >>> assert 'http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv' in WEB.match('http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv').group(0)
+        >>> assert 'IP.COM' in WEB.search('IP.COM').group(0)
+        >>> assert '123456789@QQ.COM' in WEB.search('123456789@QQ.COM').group(0)
+        >>> assert 'http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv' in WEB.search('http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv').group(0)
     """
     return reg.sub(sub, text)
 

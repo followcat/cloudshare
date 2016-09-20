@@ -78,6 +78,22 @@ def jieba_cut(text, pos=False, HMM=True):
         技术/n
         及/c
         仪器/n
+        >>> s = '有较强的自学能力'
+        >>> words = list(jieba_cut(s))
+        >>> for _w in words:     
+        ...     print(_w.encode('utf-8'))
+        有
+        较
+        强
+        的
+        自学能力
+        >>> words = list(jieba_cut(s, pos=True))
+        >>> for _w in words:
+        ...     print(_w.encode('utf-8'))
+        有/v
+        较强/a
+        的/uj
+        自学能力/l
     """
     if pos:
         return jieba.posseg.cut(text, HMM=HMM)
@@ -113,5 +129,37 @@ def pos_extract(words, flags):
         电磁兼容
         可靠性
         测试
+        >>> s = "研究表明电子器件的失效中70%是由焊点失效引起的"
+        >>> words = list(jieba_cut(s, pos=True))
+        >>> for _w in words:
+        ...     print(_w.encode('utf-8'))
+        研究/vn
+        表明/v
+        电子器件/n
+        的/uj
+        失效/a
+        中/ns
+        70/m
+        %/x
+        是/v
+        由/p
+        焊点/n
+        失效/a
+        引起/v
+        的/uj
+        >>> words = pos_extract(words, FLAGS)
+        >>> for _w in words:
+        ...     print(_w.encode('utf-8'))
+        研究
+        表明
+        电子器件
+        的
+        失效
+        中
+        是
+        焊点
+        失效
+        引起
+        的
     """
     return [word.word for word in words if word.flag not in flags]

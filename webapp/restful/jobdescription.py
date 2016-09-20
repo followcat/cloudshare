@@ -9,7 +9,7 @@ class JobDescriptionAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_jd = flask.current_app.config['SVC_JD']
+        self.svc_cv = flask.current_app.config['SVC_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('coname', type = str, location = 'json')
         self.reqparse.add_argument('status', type = str, location = 'json')
@@ -17,7 +17,7 @@ class JobDescriptionAPI(Resource):
         super(JobDescriptionAPI, self).__init__()
 
     def get(self, id):
-        result = self.svc_jd.get(id)
+        result = self.svc_cv.default.jd_get(id)
         return { 'result': result }
 
     def put(self, id):
@@ -26,7 +26,7 @@ class JobDescriptionAPI(Resource):
         status = args['status']
         co_name = args['coname']
         description = args['description']
-        result = self.svc_jd.modify(id, description, status, user.id)
+        result = self.svc_cv.default.jd_modify(id, description, status, user.id)
         return { 'result': result }
 
 
@@ -38,7 +38,7 @@ class JobDescriptionByNameAPI(JobDescriptionAPI):
         status = args['status']
         co_name = args['coname']
         description = args['description']
-        result = self.svc_jd.add(co_name, jd_name, description, user.id, status)
+        result = self.svc_cv.default.jd_add(co_name, jd_name, description, user.id, status)
         return { 'result': result }
 
 
@@ -47,10 +47,10 @@ class JobDescriptionListAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_jd = flask.current_app.config['SVC_JD']
+        self.svc_cv = flask.current_app.config['SVC_CV']
         super(JobDescriptionListAPI, self).__init__()
 
     def get(self):
-        result = self.svc_jd.lists()
+        result = self.svc_cv.default.jd_lists()
         return { 'result': result }
 

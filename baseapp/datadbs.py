@@ -1,10 +1,8 @@
 import os
 
 import services.account
-import services.company
 import services.classifycv
 import services.cvstoragesync
-import services.jobdescription
 import services.curriculumvitae
 import interface.basefs
 import interface.predator

@@ -5,6 +5,7 @@ import core.outputstorage
 import sources.industry_id
 import services.company
 import services.simulationcv
+import services.jobdescription
 
 
 class ProjectCV(services.simulationcv.SimulationCV):
@@ -25,6 +26,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
         self.path = interface.path
         self.cvpath = os.path.join(self.path, self.YAML_DIR)
         self.company = services.company.Company(interface)
+        self.jobdescription = services.jobdescription.JobDescription(interface,
+                                                                     self.company)
         try:
             self.load()
         except IOError:
@@ -117,3 +120,17 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def company_names(self):
         return self.company.names()
 
+    def jd_get(self, name):
+        return self.jobdescription.get(name)
+
+    def jd_add(self, company, name, description, committer, status=None):
+        return self.jobdescription.add(company, name, description, committer, status)
+
+    def jd_modify(self, hex_id, description, status, committer):
+        return self.jobdescription.modify(hex_id, description, status, committer)
+
+    def jd_search(self, keyword):
+        return self.jobdescription.search(keyword)
+
+    def jd_lists(self):
+        return self.jobdescription.lists()

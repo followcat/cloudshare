@@ -67,7 +67,6 @@ class LSI(flask.views.MethodView):
         search = False
         svc_cv = flask.current_app.config['SVC_CV']
         miner = flask.current_app.config['SVC_MIN']
-        svc_jd = flask.current_app.config['SVC_JD']
         index = flask.current_app.config['SVC_INDEX']
         sim_names = miner.addition_names()
         uses = miner.default_names()
@@ -78,7 +77,7 @@ class LSI(flask.views.MethodView):
             uses.extend(flask.request.args['uses'].split(','))
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
-            jd_yaml = svc_jd.get(jd_id+'.yaml')
+            jd_yaml = svc_cv.default.jd_get(jd_id+'.yaml')
             doc = jd_yaml['description']
             param = 'jd_id='+jd_id
         elif 'jd_doc' in flask.request.args:
@@ -169,10 +168,9 @@ class Valuable(flask.views.MethodView):
     def post(self):
         miner = flask.current_app.config['SVC_MIN']
         svc_cv = flask.current_app.config['SVC_CV']
-        svc_jd = flask.current_app.config['SVC_JD']
         if 'jd_id' in flask.request.form:
             jd_id = flask.request.form['jd_id']
-            jd_yaml = svc_jd.get(jd_id+'.yaml')
+            jd_yaml = svc_cv.default.jd_get(jd_id+'.yaml')
             doc = jd_yaml['description']
         elif 'jd_doc' in flask.request.form:
             doc = flask.request.form['jd_doc']

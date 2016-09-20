@@ -120,10 +120,10 @@ class LSIbyJDidAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbyJDidAPI, self).__init__()
-        self.svc_jd = flask.current_app.config['SVC_JD']
+        self.svc_cv = flask.current_app.config['SVC_CV']
 
     def get(self, id):
-        jd_yaml = self.svc_jd.get(id+'.yaml')
+        jd_yaml = self.svc_cv.default.jd_get(id+'.yaml')
         doc = jd_yaml['description']
         result = self._get(doc)
         return { 'result': result }
@@ -209,10 +209,10 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
 
     def __init__(self):
         super(ValuablebyJDidAPI, self).__init__()
-        self.svc_jd = flask.current_app.config['SVC_JD']
+        self.svc_cv = flask.current_app.config['SVC_CV']
 
     def get(self, id):
-        jd_yaml = self.svc_jd.get(id+'.yaml')
+        jd_yaml = self.svc_cv.default.jd_get(id+'.yaml')
         doc = jd_yaml['description']
         result = self._get(doc)
         return { 'result': result }

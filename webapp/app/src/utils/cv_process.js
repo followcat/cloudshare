@@ -214,7 +214,7 @@ function refactorTable(elementObj) {
  * @return {None}
  */
 Process.prototype.refactorHTML = function() {
-  let childrens = this.__cvElement__.getElementsByTagName('table'),
+  let childrens = this.__cvElement__.children,
       htmlArray = [],
       htmlString = '';
 

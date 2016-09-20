@@ -24,14 +24,6 @@ class LoginRedirect(flask.views.MethodView):
         return flask.render_template('gotologin.html')
 
 
-class CVnumbers(flask.views.MethodView):
-
-    def get(self):
-        svc_cv = flask.current_app.config['SVC_CV']
-        cv_nums = svc_cv.getnums()
-        return flask.jsonify(result = cv_nums)
-
-
 class Search(flask.views.MethodView):
 
     @flask.ext.login.login_required
@@ -88,52 +80,6 @@ class Search(flask.views.MethodView):
             datas.append([name, yaml_data, info])
         return datas, pages
 
-class BatchUpload(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def get(self):
-        user = flask.ext.login.current_user
-        flask.session[user.id]['batchupload'] = dict()
-        return flask.render_template('batchupload.html')
-
-    @flask.ext.login.login_required
-    def post(self):
-        user = flask.ext.login.current_user
-        netword_file = flask.request.files['files']
-        filename = netword_file.filename
-        upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
-                                                netword_file,
-                                                flask.current_app.config['UPLOAD_TEMP'])
-        if not upobj.filepro.yamlinfo['name']:
-            u_filename = filename.encode('utf-8')
-            upobj.filepro.yamlinfo['name'] = utils.chsname.name_from_filename(u_filename)
-        flask.session[user.id]['batchupload'][filename] = upobj
-        flask.session.modified = True
-        return flask.jsonify(result=upobj.result, name=upobj.filepro.yamlinfo['name'])
-
-
-class BatchConfirm(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        results = dict()
-        user = flask.ext.login.current_user
-        svc_cv = flask.current_app.config['SVC_CV']
-        svc_min = flask.current_app.config['SVC_MIN']
-        updates = json.loads(flask.request.form['updates'])
-        for filename, upobj in flask.session[user.id]['batchupload'].iteritems():
-            if filename in updates:
-                for key, value in updates[filename].iteritems():
-                    if key in upobj.filepro.yamlinfo:
-                        upobj.filepro.yamlinfo[key] = value
-            result = svc_cv.add(upobj, user.id)
-            if result is True:
-                def_cv_name = svc_cv.default.name
-                result = svc_min.sim[def_cv_name][def_cv_name].update([svc_cv.default])
-            results[filename] = result
-        flask.session[user.id]['batchupload'] = dict()
-        return flask.jsonify(result=results)
-
 
 class Upload(flask.views.MethodView):
 
@@ -158,27 +104,6 @@ class UploadPreview(flask.views.MethodView):
         output = upobj.preview_markdown()
         yaml_info = upobj.filepro.yamlinfo
         return flask.render_template('upload_preview.html', markdown=output, yaml=yaml_info)
-
-
-class Confirm(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        info = {
-            'name': flask.request.form['name'],
-            'origin': flask.request.form['origin'],
-            'model': flask.request.form['model']
-        }
-        user = flask.ext.login.current_user
-        svc_cv = flask.current_app.config['SVC_CV']
-        svc_min = flask.current_app.config['SVC_MIN']
-        upobj = pickle.loads(flask.session[user.id]['upload'])
-        upobj.filepro.yamlinfo.update(info)
-        result = svc_cv.add(upobj, user.id)
-        if result is True:
-            def_cv_name = svc_cv.default.name
-            result = svc_min.sim[def_cv_name][def_cv_name].update([svc_cv.default])
-        return flask.jsonify(result=result, filename=upobj.filepro.name.md)
 
 
 class ConfirmEnglish(flask.views.MethodView):

@@ -36,7 +36,7 @@ class UploadCVAPI(Resource):
             result = self.svc_cv.add(upobj, user.id)
             if result is True:
                 names.append(upobj.ID+'.md')
-                documents.append(upobj.markdown)
+                documents.append(upobj.markdown())
                 results.append({ 'id': item['id'], 'status': 'success', 'filename': upobj.filepro.yamlinfo['filename'] })
             else:
                 results.append({ 'id': item['id'], 'status': 'fail', 'filename': upobj.filepro.yamlinfo['filename'] })

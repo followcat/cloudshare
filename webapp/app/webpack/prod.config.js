@@ -12,7 +12,8 @@ const getHtml = function() {
   let matchs = [], htmlFiles = [], eachFile = {};
 
   dirs.forEach(function(item) {
-    matchs = item.match(/(.+)\.entry\.js$/);
+    // matchs = item.match(/(.+)\.entry\.js$/);
+    matchs = item.match(/(^(?!listjd).*)\.entry\.js$/);
     if (matchs) {
       eachFile = new HtmlWebpackPlugin({
         hash: false,

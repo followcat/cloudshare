@@ -1,14 +1,38 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Table } from 'antd';
+import { Table, Button, Modal, Form, Input, Select } from 'antd';
 
 import ToolBar from './ToolBar';
 
-export default class JobDescription extends Component {
+class JobDescription extends Component {
 
   constructor(props){
     super(props);
+    this.state = {
+      visible: false,
+    };
+
+    this.handleClick = this.handleClick.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+  }
+
+  handleClick(record) {
+    this.props.form.setFieldsValue({
+      companyName: record.company,
+      jdId: record.id,
+      jdContent: record.description,
+      statusSelect: record.status,
+    });
+    this.setState({
+      visible: true,
+    });
+  }
+
+  handleCancel() {
+    this.setState({
+      visible: false,
+    });
   }
 
   render() {
@@ -42,7 +66,10 @@ export default class JobDescription extends Component {
         title: 'Operation',
         key: 'operation',
         render: (record) => (
-          <a href="#">CV Fast Matching</a>
+          <div>
+            <Button type="primary" size="small">CV Fast Matching</Button>
+            <Button type="ghost" size="small" onClick={() => this.handleClick(record)}>Edit Job Description</Button>
+          </div>
         )
       }
     ];
@@ -58,6 +85,7 @@ export default class JobDescription extends Component {
       },
     };
 
+    const { getFieldProps } = this.props.form;
     return (
       <div>
         <ToolBar
@@ -83,6 +111,50 @@ export default class JobDescription extends Component {
           })}</p>}
           scroll={{ y: this.props.height }}
         />
+        <Modal
+          title="Edit Job Description"
+          okText="Submit"
+          wrapClassName="vertical-center-modal"
+          visible={this.state.visible}
+          onCancel={this.handleCancel}
+        >
+          <Form horizontal style={{ width: '88%', margin: '0 auto' }}>
+            <Form.Item
+              label="Company Name"
+            >
+              <Input
+                {...getFieldProps('companyName')}
+                disabled={true}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Job Description ID"
+            >
+              <Input
+                {...getFieldProps('jdId')}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Job Description Content"
+            >
+              <Input
+                {...getFieldProps('jdContent')}
+                type="textarea"
+                rows="4"
+              />
+            </Form.Item>
+            <Form.Item
+              label="Status"
+            >
+              <Select
+                {...getFieldProps('statusSelect')}
+              >
+                <Select.Option key={0} value="Opening">Opening</Select.Option>
+                <Select.Option key={0} value="Closed">Closed</Select.Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </Modal>
       </div>
     );
   }
@@ -94,3 +166,5 @@ JobDescription.propTypes = {
   height: PropTypes.number,
   onSearch: PropTypes.func,
 };
+
+export default JobDescription = Form.create({})(JobDescription);

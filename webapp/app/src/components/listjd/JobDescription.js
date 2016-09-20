@@ -37,12 +37,6 @@ export default class JobDescription extends Component {
         key: 'status',
         width: 80,
         render: (text) => <span style={text === 'Opening' ? { color: 'green' } : { color: 'red' }}>{text}</span>,
-        filterMultiple: true,
-        filters: [
-          { text: 'Opening', value: 'Opening' },
-          { text: 'Closed', value: 'Closed' },
-        ],
-        onFilter: (value, record) => record.status  === value,
       },
       {
         title: 'Operation',
@@ -70,6 +64,9 @@ export default class JobDescription extends Component {
           onSearch={this.props.onSearch}
           companyData={this.props.companyData}
           confirmLoading={this.props.confirmLoading}
+          visible={this.props.visible}
+          onModalOpen={this.props.onModalOpen}
+          onModalCancel={this.props.onModalCancel}
           onCreateNewJobDescription={this.props.onCreateNewJobDescription}
         />
         <Table

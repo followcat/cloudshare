@@ -20,13 +20,19 @@ export default class ListJD extends Component {
       companyData: [],
       height: 0,
       confirmLoading: false,
+      visible: false,
     };
     this.loadJobDescription = this.loadJobDescription.bind(this);
     this.loadCompany = this.loadCompany.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleCreateNewJobDescription = this.handleCreateNewJobDescription.bind(this);
+    this.handleModalOpen = this.handleModalOpen.bind(this);
+    this.handleModalCancel = this.handleModalCancel.bind(this);
   }
 
+  /**
+   * 加载所有职位描述数据
+   */
   loadJobDescription() {
     fetch(`/api/jdlist`, {
       method: 'GET',
@@ -55,6 +61,9 @@ export default class ListJD extends Component {
     })
   }
 
+  /**
+   * 加载所有公司数据
+   */
   loadCompany() {
     fetch(`/api/companylist`, {
       method: 'GET',
@@ -67,7 +76,6 @@ export default class ListJD extends Component {
     })
     .then((json) => {
       if (json.code === 200) {
-        console.log(json.data);
         this.setState({
           companyData: json.data,
         });
@@ -92,6 +100,11 @@ export default class ListJD extends Component {
     });
   }
 
+  /**
+   * 表格数据搜索
+   * @param  {[string]} value [获取Input的值]
+   * @return {[type]}  None
+   */
   handleSearch(value) {
     let jdData = this.state.jobDescriptionData;
     if (value !== '') {
@@ -114,6 +127,11 @@ export default class ListJD extends Component {
     }
   }
 
+  /**
+   * 创建一个新的职位描述
+   * @param  {[type]} object [获取表单数据对象]
+   * @return {[type]} None
+   */
   handleCreateNewJobDescription(obj) {
     const _this = this;
     this.setState({
@@ -122,6 +140,7 @@ export default class ListJD extends Component {
 
     fetch(`/api/jdbyname`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Authorization': `Basic ${localStorage.token}`,
         'Accept': 'application/json',
@@ -139,11 +158,31 @@ export default class ListJD extends Component {
     .then((json) => {
       if (json.code === 200) {
         this.setState({
+          visible: false,
           confirmLoading: false,
         });
+        message.success(json.message);
         _this.loadJobDescription();
       }
     })
+  }
+
+  /**
+   * Modal显示事件
+   */
+  handleModalOpen() {
+    this.setState({
+      visible: true,
+    });
+  }
+
+  /**
+   * Modal隐藏事件
+   */
+  handleModalCancel() {
+    this.setState({
+      visible: false,
+    });
   }
 
   render() {
@@ -171,6 +210,9 @@ export default class ListJD extends Component {
                     searchData: this.state.searchData,
                     height: this.state.height,
                     confirmLoading: this.state.confirmLoading,
+                    visible: this.state.visible,
+                    onModalOpen: this.handleModalOpen,
+                    onModalCancel: this.handleModalCancel,
                     onSearch: this.handleSearch,
                     onCreateNewJobDescription: this.handleCreateNewJobDescription,
                   })}

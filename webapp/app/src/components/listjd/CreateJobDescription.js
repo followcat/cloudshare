@@ -7,9 +7,7 @@ class CreateJobDescription extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      visible: false,
-    };
+
     this.handleOk = this.handleOk.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
@@ -67,15 +65,15 @@ class CreateJobDescription extends Component {
       <div style={style}>
         <Button
           type="primary"
-          onClick={this.handleClick}
+          onClick={this.props.onModalOpen}
         >
         Create job description
         </Button>
         <Modal
           title="Create A Job Description"
-          visible={this.state.visible}
+          visible={this.props.visible}
           confirmLoading={this.props.confirmLoading}
-          onCancel={this.handleCancel}
+          onCancel={this.props.onModalCancel}
           onOk={this.handleOk}
         >
           <Form horizontal style={{ width: '88%', margin: '0 auto' }}>

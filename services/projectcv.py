@@ -4,6 +4,7 @@ import utils.builtin
 import core.outputstorage
 import sources.industry_id
 import services.company
+import services.exception
 import services.simulationcv
 import services.jobdescription
 
@@ -26,8 +27,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
         self.path = interface.path
         self.cvpath = os.path.join(self.path, self.YAML_DIR)
         self.company = services.company.Company(interface)
-        self.jobdescription = services.jobdescription.JobDescription(interface,
-                                                                     self.company)
+        self.jobdescription = services.jobdescription.JobDescription(interface)
         try:
             self.load()
         except IOError:
@@ -124,6 +124,10 @@ class ProjectCV(services.simulationcv.SimulationCV):
         return self.jobdescription.get(name)
 
     def jd_add(self, company, name, description, committer, status=None):
+        try:
+            self.company_get(company)
+        except services.exception.NotExistsCompany:
+            return False
         return self.jobdescription.add(company, name, description, committer, status)
 
     def jd_modify(self, hex_id, description, status, committer):

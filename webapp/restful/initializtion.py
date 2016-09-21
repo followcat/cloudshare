@@ -27,7 +27,7 @@ def initialize(app):
 
     api.add_resource(JobDescriptionAPI, '/api/jd/<string:id>',
                      endpoint = 'jobdescription')
-    api.add_resource(JobDescriptionByNameAPI, '/api/jdbyname/<string:name>',
+    api.add_resource(JobDescriptionByNameAPI, '/api/jdbyname',
                      endpoint = 'jobdescriptionbyname')
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
                      endpoint = 'jobdescriptionlist')

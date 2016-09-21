@@ -36,4 +36,4 @@ class CompanyListAPI(Resource):
 
     def get(self):
         result = self.svc_company.names()
-        return { 'result': result }
+        return { 'code': 200, 'data': result }

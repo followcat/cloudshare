@@ -116,13 +116,12 @@ class AccountHistoryAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.repo = flask.current_app.config['DATA_DB']
         self.svc_cv = flask.current_app.config['SVC_CV']
         super(AccountHistoryAPI, self).__init__()
 
     def get(self):
         user = flask.ext.login.current_user
-        info_list = self.repo.history(user.id, max_commits=10)
+        info_list = self.svc_cv.getproject().interface.history(user.id, max_commits=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:

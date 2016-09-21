@@ -15,9 +15,9 @@ ACCOUNT_DB_NAME = 'account'
 ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
 SVC_ACCOUNT = services.account.Account(ACCOUNT_DB)
 
-DATA_DB_NAME = 'repo'
-DATA_DB = interface.gitinterface.GitInterface(DATA_DB_NAME)
-DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB, 'cloudshare')
+REPO_DB_NAME = 'repo'
+REPO_DB = interface.gitinterface.GitInterface(REPO_DB_NAME)
+SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(REPO_DB, 'cloudshare')
 
 
 CV_STORAGE_DIR = 'cvstorage'

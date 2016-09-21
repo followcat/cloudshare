@@ -21,7 +21,7 @@ class Test(flask.ext.testing.TestCase):
         self.app = flask.Flask(__name__)
         self.app.config.from_object('tests.settings.config')
         self.config = self.app.config
-        self.data_db = self.app.config['DATA_DB']
+        self.repo_db = self.app.config['REPO_DB']
         self.account_db = self.app.config['ACCOUNT_DB']
         self.upload_tmp = self.app.config['UPLOAD_TEMP']
         self.svc_cv = self.app.config['SVC_CV']
@@ -174,7 +174,7 @@ class TestUploadFile(UploadFile):
 
     def test_upload(self):
         self.init_upload()
-        commit = self.data_db.repo.get_object(self.data_db.repo.head())
+        commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
         assert('Add file' in commit.message)
         assert('username' in commit.author)
         yamlname = list(self.svc_cv.yamls())[0]

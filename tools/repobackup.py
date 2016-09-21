@@ -9,7 +9,7 @@ import dulwich.porcelain
 
 backup_folders = baseapp.backup.BACKUP_DIRS
 ISOTIMEFORMAT = '%Y-%m-%d-%X'
-source_repo = baseapp.settings.DATA_DB.repo
+source_repo = baseapp.settings.REPO_DB.repo
 account_repo = baseapp.settings.ACCOUNT_DB.repo
 
 

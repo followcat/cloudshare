@@ -59,7 +59,7 @@ class Company(services.base.Service):
                            yaml.safe_dump(empty_list, allow_unicode=True),
                            "Add company file.")
 
-    def add(self, name, introduction, committer):
+    def add(self, name, committer):
         companys = self.COMPANYS
         for company in companys:
             if company['name'] == name:
@@ -67,7 +67,6 @@ class Company(services.base.Service):
         data = {
             'name': name,
             'committer': committer,
-            'introduction': introduction,
         }
         companys.append(data)
         dump_data = yaml.safe_dump(companys, allow_unicode=True)

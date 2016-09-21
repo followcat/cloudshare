@@ -11,19 +11,19 @@ class CompanyAPI(Resource):
     def __init__(self):
         self.svc_company = flask.current_app.config['SVC_CO']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('introduction', type = str, location = 'json')
+        self.reqparse.add_argument('coname', location = 'json')
         super(CompanyAPI, self).__init__()
 
     def get(self, name):
         result = self.svc_company.company(name)
         return { 'result': result }
 
-    def post(self, name):
+    def post(self):
         args = self.reqparse.parse_args()
-        introduction = args['introduction']
+        coname = args['coname']
         user = flask.ext.login.current_user
-        result = self.svc_company.add(name, introduction, user.id)
-        return { 'result': result }
+        result = self.svc_company.add(coname, user.id)
+        return { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
 
 
 class CompanyListAPI(Resource):

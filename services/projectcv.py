@@ -65,6 +65,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
         return info
 
     def getinfo(self, id):
+        if not self.exists(id):
+            return None
         name = core.outputstorage.ConvertName(id).yaml
         return utils.builtin.load_yaml(self.cvpath, name)
 
@@ -87,7 +89,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def updateinfo(self, id, key, value, committer):
         data = None
         info = self.getinfo(id)
-        if key in info:
+        if info is not None and key in info:
             data = { key: value }
             if key == 'tag':
                 data = self.addtag(id, value, committer)
@@ -96,7 +98,6 @@ class ProjectCV(services.simulationcv.SimulationCV):
             elif key == 'comment':
                 data = self.addcomment(id, value, committer)
             else:
-                info = self.getinfo(id)
                 info[key] = value
                 self.saveinfo(id, info,
                               'Update %s key %s to %s.' % (id, key, value), committer)
@@ -109,6 +110,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
         return data
 
     def addtag(self, id, tag, committer):
+        assert self.exists(id)
         info = self.getinfo(id)
         data = self._infoframe(tag, committer)
         info['tag'].insert(0, data)
@@ -116,6 +118,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
         return data
 
     def addcomment(self, id, comment, committer):
+        assert self.exists(id)
         info = self.getinfo(id)
         data = self._infoframe(comment, committer)
         info['comment'].insert(0, data)
@@ -123,6 +126,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
         return data
 
     def addtracking(self, id, tracking, committer):
+        assert self.exists(id)
         info = self.getinfo(id)
         data = self._infoframe(tracking, committer)
         info['tracking'].insert(0, data)

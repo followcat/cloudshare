@@ -1,7 +1,8 @@
 class MultiCV(object):
 
-    def __init__(self, projects, additionals=None):
+    def __init__(self, projects, repodb, additionals=None):
         self.default = projects[0]
+        self.repodb = repodb
         self.projects = dict([tuple([p.name, p]) for p in projects])
         if additionals is None:
             self.additionals = dict()
@@ -9,29 +10,26 @@ class MultiCV(object):
             self.additionals = additionals
         self.svcls = projects + self.additionals.values()
 
-    def add(self, *args, **kwargs):
-        return self.default.add(*args, **kwargs)
+    def add(self, cvobj, committer=None, unique=True):
+        return self.repodb.add(cvobj, committer, unique)
 
-    def add_md(self, *args, **kwargs):
-        return self.default.add_md(*args, **kwargs)
+    def add_md(self, cvobj, committer=None):
+        return self.repodb.add_md(cvobj, committer)
 
-    def modify(self, *args, **kwargs):
-        return self.default.modify(*args, **kwargs)
+    def modify(self, filename, stream, message=None, committer=None):
+        return self.repodb.modify(filename, stream, message, committer)
 
-    def yamls(self, *args, **kwargs):
-        return self.default.yamls(*args, **kwargs)
+    def yamls(self):
+        return self.default.yamls()
 
-    def datas(self, *args, **kwargs):
-        return self.default.datas(*args, **kwargs)
+    def datas(self):
+        return self.default.datas()
 
-    def search(self, *args, **kwargs):
-        return self.default.search(*args, **kwargs)
+    def search(self, keyword):
+        return self.default.search(keyword)
 
-    def search_yaml(self, *args, **kwargs):
-        return self.default.search_yaml(*args, **kwargs)
-
-    def history(self, *args, **kwargs):
-        return self.default.interface.history(*args, **kwargs)
+    def search_yaml(self, keyword):
+        return self.default.search_yaml(keyword)
 
     def gethtml(self, id):
         result = self.default.gethtml(id)

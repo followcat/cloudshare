@@ -11,10 +11,12 @@ class JobDescription extends Component {
     super(props);
     this.state = {
       visible: false,
+      confirmLoading: false,
     };
 
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
+    this.handleModalOk = this.handleModalOk.bind(this);
   }
 
   handleClick(record) {
@@ -32,6 +34,26 @@ class JobDescription extends Component {
   handleCancel() {
     this.setState({
       visible: false,
+    });
+  }
+
+  handleModalOk() {
+    const _this = this;
+    this.setState({
+      confirmLoading: true,
+    });
+    this.props.form.validateFields((error, value) => {
+      if (!!error) {
+        return;
+      } else {
+        this.props.onSubmitEditJD(value, function() {
+          _this.setState({
+            visible: false,
+            confirmLoading: false,
+          });
+          _this.props.form.resetFields();
+        });
+      }
     });
   }
 
@@ -115,23 +137,39 @@ class JobDescription extends Component {
           title="Edit Job Description"
           okText="Submit"
           wrapClassName="vertical-center-modal"
+          comfirmLoading={this.state.comfirmLoading}
           visible={this.state.visible}
           onCancel={this.handleCancel}
+          onOk={this.handleModalOk}
         >
           <Form horizontal style={{ width: '88%', margin: '0 auto' }}>
             <Form.Item
               label="Company Name"
             >
-              <Input
+              <Select
+                showSearch
                 {...getFieldProps('companyName')}
-                disabled={true}
-              />
+                optionFilterProp="value"
+                notFoundContent="Not found"
+              >
+                {this.props.companyData.map((item, index) => {
+                  return (
+                    <Select.Option
+                      key={index}
+                      value={item}
+                    >
+                      {item}
+                    </Select.Option>
+                  )
+                })}
+              </Select>
             </Form.Item>
             <Form.Item
               label="Job Description ID"
             >
               <Input
                 {...getFieldProps('jdId')}
+                readOnly
               />
             </Form.Item>
             <Form.Item
@@ -163,8 +201,14 @@ class JobDescription extends Component {
 JobDescription.propTypes = {
   jobDescriptionData: PropTypes.array,
   searchData: PropTypes.array,
+  companyData: PropTypes.array,
   height: PropTypes.number,
+  confirmLoading: PropTypes.bool,
+  visible: PropTypes.bool,
   onSearch: PropTypes.func,
+  onModalOpen: PropTypes.func,
+  onModalCancel: PropTypes.func,
+  onCreateNewJobDescription: PropTypes.func,
 };
 
 export default JobDescription = Form.create({})(JobDescription);

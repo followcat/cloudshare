@@ -26,6 +26,7 @@ export default class ListJD extends Component {
     this.loadCompany = this.loadCompany.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleCreateNewJobDescription = this.handleCreateNewJobDescription.bind(this);
+    this.handleSubmitEditJD = this.handleSubmitEditJD.bind(this);
     this.handleModalOpen = this.handleModalOpen.bind(this);
     this.handleModalCancel = this.handleModalCancel.bind(this);
   }
@@ -168,6 +169,42 @@ export default class ListJD extends Component {
   }
 
   /**
+   * 修改Job Description
+   * @param  {[object]}   value    [表单数据对象]
+   * @param  {Function} callback [回调函数: 为了修改子组件state]
+   * @return {[type]}  None
+   */
+  handleSubmitEditJD(value, callback) {
+    const _this = this;
+    fetch(`/api/jd/${value.jdId}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Authroization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        status: value.statusSelect,
+        coname: value.companyName,
+        description: value.jdContent,
+      }),
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        if (callback && typeof callback === 'function') {
+          callback();
+        }
+        message.success(json.message);
+        _this.loadJobDescription();
+      }
+    })
+  }
+
+  /**
    * Modal显示事件
    */
   handleModalOpen() {
@@ -215,6 +252,7 @@ export default class ListJD extends Component {
                     onModalCancel: this.handleModalCancel,
                     onSearch: this.handleSearch,
                     onCreateNewJobDescription: this.handleCreateNewJobDescription,
+                    onSubmitEditJD: this.handleSubmitEditJD,
                   })}
               </div>
             </div>

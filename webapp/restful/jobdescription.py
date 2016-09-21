@@ -30,16 +30,17 @@ class JobDescriptionAPI(Resource):
         return { 'code': 200, 'data': result, 'message': 'Update job description successed.' }
 
 
-class JobDescriptionByNameAPI(Resource):
+class JobDescriptionUploadAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_jd = flask.current_app.config['SVC_JD']
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_name', location = 'json')
         self.reqparse.add_argument('co_name', location = 'json')
         self.reqparse.add_argument('jd_description', location = 'json')
-        super(JobDescriptionByNameAPI, self).__init__()
+        super(JobDescriptionUploadAPI, self).__init__()
 
     def post(self):
         user = flask.ext.login.current_user

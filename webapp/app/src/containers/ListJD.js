@@ -141,7 +141,7 @@ export default class ListJD extends Component {
       confirmLoading: true,
     });
 
-    fetch(`/api/jdbyname`, {
+    fetch(`/api/uploadjd`, {
       method: 'POST',
       credentials: 'include',
       headers: {

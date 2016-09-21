@@ -113,7 +113,7 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     }
   }
   $.ajax({
-    url: "/cvnumbers",
+    url: "/api/dbnumbers",
     dataType: "json",
     success: function(response) {
       var data = response.result;

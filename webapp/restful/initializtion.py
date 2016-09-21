@@ -61,6 +61,8 @@ def initialize(app):
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
 
-    api.add_resource(DatabasesAPI, '/api/databases', endpoint = 'databases')
-    api.add_resource(DBNumbersAPI, '/api/dbnumbers/<string:name>', endpoint = 'dbnumbers')
+    api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')
+    api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')
+    api.add_resource(DBNumberAPI, '/api/dbnumber/<string:name>', endpoint = 'dbnumber')
+    api.add_resource(DBNumbersAPI, '/api/dbnumbers', endpoint = 'dbnumbers')
     

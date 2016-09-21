@@ -116,16 +116,16 @@ class AccountHistoryAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         super(AccountHistoryAPI, self).__init__()
 
     def get(self):
         user = flask.ext.login.current_user
-        info_list = self.svc_cv.getproject().interface.history(user.id, max_commits=10)
+        info_list = self.svc_mult_cv.getproject().interface.history(user.id, max_commits=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:
-                    info['information'] = self.svc_cv.getyaml(md5)
+                    info['information'] = self.svc_mult_cv.getyaml(md5)
                 except IOError:
                     info['information'] = md5
                 info['name'] = md5

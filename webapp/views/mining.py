@@ -14,18 +14,18 @@ import core.outputstorage
 class Position(flask.views.MethodView):
 
     def post(self):
-        svc_cv = flask.current_app.config['SVC_CV']
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         search_text = flask.request.form['search_text']
         if 'md_ids' in flask.request.form and len(search_text) > 0:
             searches = json.loads(flask.request.form['md_ids'])
         else:
-            searches = svc_cv.search(search_text)
+            searches = svc_mult_cv.search(search_text)
         result = dict()
         for name in searches:
-            md_data = svc_cv.getmd(name)
+            md_data = svc_mult_cv.getmd(name)
             positions = core.mining.info.position(md_data, search_text)
             try:
-                yaml_data = svc_cv.getyaml(name)
+                yaml_data = svc_mult_cv.getyaml(name)
             except IOError:
                 continue
             for position in positions:
@@ -38,12 +38,12 @@ class Position(flask.views.MethodView):
 class Region(flask.views.MethodView):
 
     def post(self):
-        svc_cv = flask.current_app.config['SVC_CV']
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         markdown_ids = flask.request.form['md_ids']
         markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
-            stream = svc_cv.getmd(id)
+            stream = svc_mult_cv.getmd(id)
             result.append(core.mining.info.region(stream))
         return flask.jsonify(result=result)
 
@@ -51,12 +51,12 @@ class Region(flask.views.MethodView):
 class Capacity(flask.views.MethodView):
 
     def post(self):
-        svc_cv = flask.current_app.config['SVC_CV']
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         markdown_ids = flask.request.form['md_ids']
         markdown_ids = json.loads(markdown_ids)
         result = []
         for id in markdown_ids:
-            stream = svc_cv.getmd(id)
+            stream = svc_mult_cv.getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return flask.jsonify(result=result)
 
@@ -65,19 +65,19 @@ class LSI(flask.views.MethodView):
 
     def get(self):
         search = False
-        svc_cv = flask.current_app.config['SVC_CV']
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         miner = flask.current_app.config['SVC_MIN']
         index = flask.current_app.config['SVC_INDEX']
         sim_names = miner.addition_names()
         uses = miner.default_names()
-        basemodel = svc_cv.default.name
+        basemodel = svc_mult_cv.default.name
         if 'model' in flask.request.args and flask.request.args['model']:
             basemodel = flask.request.args['model']
         if 'uses' in flask.request.args and flask.request.args['uses']:
             uses.extend(flask.request.args['uses'].split(','))
         if 'jd_id' in flask.request.args:
             jd_id = flask.request.args['jd_id']
-            jd_yaml = svc_cv.default.jd_get(jd_id+'.yaml')
+            jd_yaml = svc_mult_cv.default.jd_get(jd_id+'.yaml')
             doc = jd_yaml['description']
             param = 'jd_id='+jd_id
         elif 'jd_doc' in flask.request.args:
@@ -107,7 +107,7 @@ class LSI(flask.views.MethodView):
         cur_page = flask.request.args.get('page', '1')
         cur_page = int(cur_page)
         count = 20
-        datas, pages, totals = self.process(miner, basemodel, uses, svc_cv, doc,
+        datas, pages, totals = self.process(miner, basemodel, uses, svc_mult_cv, doc,
                                             cur_page, count, filterdict)
 
         return flask.render_template('lsipage.html',result=datas,
@@ -144,14 +144,14 @@ class LSI(flask.views.MethodView):
 class Similar(flask.views.MethodView):
 
     def post(self):
-        svc_cv = flask.current_app.config['SVC_CV']
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         miner = flask.current_app.config['SVC_MIN']
         doc = flask.request.form['doc']
-        basemodel = svc_cv.default.name
+        basemodel = svc_mult_cv.default.name
         datas = []
         for name, score in miner.probability(basemodel, doc)[1:6]:
             cname = core.outputstorage.ConvertName(name)
-            yaml_info = svc_cv.getyaml(cname.yaml)
+            yaml_info = svc_mult_cv.getyaml(cname.yaml)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
@@ -167,24 +167,24 @@ class Valuable(flask.views.MethodView):
 
     def post(self):
         miner = flask.current_app.config['SVC_MIN']
-        svc_cv = flask.current_app.config['SVC_CV']
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         if 'jd_id' in flask.request.form:
             jd_id = flask.request.form['jd_id']
-            jd_yaml = svc_cv.default.jd_get(jd_id+'.yaml')
+            jd_yaml = svc_mult_cv.default.jd_get(jd_id+'.yaml')
             doc = jd_yaml['description']
         elif 'jd_doc' in flask.request.form:
             doc = flask.request.form['jd_doc']
         name_list = flask.request.form['name_list']
-        basemodel = svc_cv.default.name
+        basemodel = svc_mult_cv.default.name
         uses = miner.default_names()
         uses.extend(json.loads(flask.request.form['uses']))
         name_list = json.loads(name_list)
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(miner, svc_cv, doc, basemodel, uses=uses)
+            result = core.mining.valuable.rate(miner, svc_mult_cv, doc, basemodel, uses=uses)
         else:
-            result = core.mining.valuable.rate(miner, svc_cv, doc, basemodel,
+            result = core.mining.valuable.rate(miner, svc_mult_cv, doc, basemodel,
                                                uses=uses, name_list=name_list)
-        svc_cv = flask.current_app.config['SVC_CV']
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         response = dict()
         datas = []
         for index in result:
@@ -193,7 +193,7 @@ class Valuable(flask.views.MethodView):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = svc_cv.getyaml(name+'.yaml')
+                yaml_data = svc_mult_cv.getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
                 values.append(yaml_data)
             item['value'] = values

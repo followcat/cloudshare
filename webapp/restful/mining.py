@@ -16,7 +16,7 @@ class BaseAPI(Resource):
 
     def __init__(self):
         super(BaseAPI, self).__init__()
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('md_ids', type = list, location = 'json')
 
@@ -28,13 +28,13 @@ class PositionAPI(BaseAPI):
         if 'md_ids' in args and len(text) > 0:
             searches = args['md_ids']
         else:
-            searches = self.svc_cv.search(text)
+            searches = self.svc_mult_cv.search(text)
         result = dict()
         for name in searches:
-            md_data = self.svc_cv.getmd(name)
+            md_data = self.svc_mult_cv.getmd(name)
             positions = core.mining.info.position(md_data, text)
             try:
-                yaml_data = self.svc_cv.getyaml(name)
+                yaml_data = self.svc_mult_cv.getyaml(name)
             except IOError:
                 continue
             for position in positions:
@@ -50,7 +50,7 @@ class RegionAPI(BaseAPI):
         args = self.reqparse.parse_args()
         result = []
         for id in args['md_ids']:
-            stream = self.svc_cv.getmd(id)
+            stream = self.svc_mult_cv.getmd(id)
             result.append(core.mining.info.region(stream))
         return { 'result': result }
 
@@ -61,7 +61,7 @@ class CapacityAPI(BaseAPI):
         args = self.reqparse.parse_args()
         result = []
         for id in args['md_ids']:
-            stream = self.svc_cv.getmd(id)
+            stream = self.svc_mult_cv.getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return { 'result': result }
 
@@ -72,7 +72,7 @@ class LSIbaseAPI(Resource):
 
     def __init__(self):
         super(LSIAPI, self).__init__()
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
         self.sim_names = miner.addition_names()
@@ -120,10 +120,10 @@ class LSIbyJDidAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbyJDidAPI, self).__init__()
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
 
     def get(self, id):
-        jd_yaml = self.svc_cv.default.jd_get(id+'.yaml')
+        jd_yaml = self.svc_mult_cv.default.jd_get(id+'.yaml')
         doc = jd_yaml['description']
         result = self._get(doc)
         return { 'result': result }
@@ -148,14 +148,14 @@ class SimilarAPI(Resource):
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
 
     def get(self, id):
-        doc = self.svc_cv.getmd(id)
+        doc = self.svc_mult_cv.getmd(id)
         datas = []
         for name, score in self.miner.probability(doc)[:7]:
-            yaml_info = self.svc_cv.getyaml(name)
+            yaml_info = self.svc_mult_cv.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
@@ -171,7 +171,7 @@ class ValuablebaseAPI(Resource):
 
     def __init__(self):
         super(ValuablebaseAPI, self).__init__()
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.uses = miner.default_names()
         self.reqparse = reqparse.RequestParser()
@@ -183,9 +183,9 @@ class ValuablebaseAPI(Resource):
         uses = self.uses + args['uses']
         name_list = args['name_list']
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(self.miner, self.svc_cv, doc, uses=uses)
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, uses=uses)
         else:
-            result = core.mining.valuable.rate(self.miner, self.svc_cv, doc,
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc,
                                                uses=uses, name_list=name_list)
         response = dict()
         datas = []
@@ -195,7 +195,7 @@ class ValuablebaseAPI(Resource):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = self.svc_cv.getyaml(name+'.yaml')
+                yaml_data = self.svc_mult_cv.getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
                 values.append(yaml_data)
             item['value'] = values
@@ -209,10 +209,10 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
 
     def __init__(self):
         super(ValuablebyJDidAPI, self).__init__()
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
 
     def get(self, id):
-        jd_yaml = self.svc_cv.default.jd_get(id+'.yaml')
+        jd_yaml = self.svc_mult_cv.default.jd_get(id+'.yaml')
         doc = jd_yaml['description']
         result = self._get(doc)
         return { 'result': result }

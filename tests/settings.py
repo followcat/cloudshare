@@ -31,9 +31,9 @@ class Config(object):
         self.REPO_DB = interface.gitinterface.GitInterface(self.REPO_DB_NAME)
 
         self.SVC_REPO_CV = services.curriculumvitae.CurriculumVitae(self.REPO_DB, 'cloudshare')
-        self.SVC_CV = services.multicv.MultiCV(self.SVC_REPO_CV, [])
+        self.SVC_MULT_CV = services.multicv.MultiCV(self.SVC_REPO_CV, [])
 
-        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_CV)
+        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MULT_CV)
         self.SVC_MIN.lsi_model.no_above = 1
         self.SVC_MIN.lsi_model.setup('first.md', ['here is a text for testing.'])
         self.SVC_MIN.setup('default')

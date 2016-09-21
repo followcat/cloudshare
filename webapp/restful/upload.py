@@ -14,7 +14,7 @@ class UploadCVAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.svc_min = flask.current_app.config['SVC_MIN']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -33,14 +33,14 @@ class UploadCVAPI(Resource):
             for key, value in item.iteritems():
                 if key is not u'id':
                     upobj.filepro.yamlinfo[key] = value
-            result = self.svc_cv.add(upobj, user.id)
+            result = self.svc_mult_cv.add(upobj, user.id)
             if result is True:
                 names.append(upobj.ID+'.md')
                 documents.append(upobj.markdown())
                 results.append({ 'id': item['id'], 'status': 'success', 'filename': upobj.filepro.yamlinfo['filename'] })
             else:
                 results.append({ 'id': item['id'], 'status': 'fail', 'filename': upobj.filepro.yamlinfo['filename'] })
-        def_cv_name = self.svc_cv.default.name
+        def_cv_name = self.svc_mult_cv.default.name
         self.svc_min.sim[def_cv_name].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
@@ -73,7 +73,7 @@ class UploadEnglishCVAPI(Resource):
 
     def __init__(self):
         super(UploadEnglishCV, self).__init__()
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('file', type = str, location = 'json')
         self.reqparse.add_argument('name', type = str, location = 'json')
@@ -88,11 +88,11 @@ class UploadEnglishCVAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         name = core.outputstorage.ConvertName(args['name'])
-        yaml_data = self.svc_cv.getyaml(name)
+        yaml_data = self.svc_mult_cv.getyaml(name)
         upobj = uploadeng[user.id]
-        result = self.svc_cv.add_md(upobj, user.id)
+        result = self.svc_mult_cv.add_md(upobj, user.id)
         yaml_data['enversion'] = upobj.filepro.name.md
-        svc_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
+        svc_mult_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
                       committer=user.id)
         user.uploadeng = None
         return { 'result': result }

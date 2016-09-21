@@ -14,7 +14,7 @@ class MultiCV(object):
         if name is not None:
             assert name in self.projects
             projectcv = self.projects[name]
-        projcetcv = self.default
+        projectcv = self.default
         return projectcv
 
     def add(self, cvobj, committer=None, unique=True, projectname=None):
@@ -32,23 +32,23 @@ class MultiCV(object):
 
     def yamls(self, projectname=None):
         cvservice = self.getproject(projectname)
-        return self.cvservice.yamls()
+        return cvservice.yamls()
 
     def datas(self, projectname=None):
         cvservice = self.getproject(projectname)
-        return self.cvservice.datas()
+        return cvservice.datas()
 
     def search(self, keyword, projectname=None):
         cvservice = self.getproject(projectname)
-        return self.cvservice.search(keyword)
+        return cvservice.search(keyword)
 
     def search_yaml(self, keyword, projectname=None):
         cvservice = self.getproject(projectname)
-        return self.cvservice.search_yaml(keyword)
+        return cvservice.search_yaml(keyword)
 
     def gethtml(self, id, projectname=None):
         cvservice = self.getproject(projectname)
-        result = self.cvservice.gethtml(id)
+        result = cvservice.gethtml(id)
         if result is None:
             for each in self.additionals.values():
                 result = each.gethtml(id)
@@ -58,7 +58,7 @@ class MultiCV(object):
 
     def getmd(self, id, projectname=None):
         cvservice = self.getproject(projectname)
-        result = self.cvservice.getmd(id)
+        result = cvservice.getmd(id)
         if result is None:
             for each in self.additionals.values():
                 result = each.getmd(id)
@@ -69,7 +69,7 @@ class MultiCV(object):
     def getyaml(self, id, projectname=None):
         cvservice = self.getproject(projectname)
         try:
-            result = self.cvservice.getyaml(id)
+            result = cvservice.getyaml(id)
         except IOError:
             result = None
         if result is None:

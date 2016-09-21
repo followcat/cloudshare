@@ -68,7 +68,7 @@ class LSI(flask.views.MethodView):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         miner = flask.current_app.config['SVC_MIN']
         index = flask.current_app.config['SVC_INDEX']
-        sim_names = miner.addition_names()
+        sim_names = svc_mult_cv.default.getclassify()
         uses = miner.default_names()
         basemodel = svc_mult_cv.default.name
         if 'model' in flask.request.args and flask.request.args['model']:

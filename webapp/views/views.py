@@ -193,29 +193,14 @@ class UpdateInfo(flask.views.MethodView):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         filename = flask.request.json['filename']
         updateinfo = flask.request.json['yamlinfo']
-        name = core.outputstorage.ConvertName(filename)
-        yaml_info = svc_mult_cv.getyaml(filename)
-        commit_string = "File %s: " % (name.yaml)
+        id = core.outputstorage.ConvertName(filename).base
         for key, value in updateinfo.iteritems():
-            if key in yaml_info:
-                if key in ['tag', 'tracking', 'comment']:
-                    data = {'author': user.id,
-                            'content': value,
-                            'date': time.strftime('%Y-%m-%d %H:%M:%S')}
-                    yaml_info[key].insert(0, data)
-                    commit_string += " Add %s." % (key)
-                    response = { 'result': result, 'data': data }
-                else:
-                    yaml_info[key] = value
-                    commit_string += " Modify %s to %s." % (key, value)
-            else:
+            data = svc_mult_cv.default.updateinfo(id, key, value, user.id)
+            response = { 'result': result, 'data': data }
+            if data is None:
                 result = False
                 response = { 'result': result, 'msg': 'Update information error.'}
                 break
-        else:
-            svc_mult_cv.modify(name.yaml,
-                               yaml.safe_dump(yaml_info, allow_unicode=True),
-                               commit_string.encode('utf-8'), user.id)
         return flask.jsonify(response)
 
 

@@ -1,4 +1,5 @@
 import os
+import time
 
 import utils.builtin
 import core.outputstorage
@@ -77,26 +78,56 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def getclassify(self):
         return self.config['classify']
 
-    def updateinfo(self, id, info, message, committer):
+    def saveinfo(self, id, info, message, committer):
         name = core.outputstorage.ConvertName(id).yaml
         utils.builtin.save_yaml(info, self.cvpath, name)
         self.interface.add_files([bytes(os.path.join(self.YAML_DIR, name))],
                                   message=message, committer=committer)
 
+    def updateinfo(self, id, key, value, committer):
+        data = None
+        info = self.getinfo(id)
+        if key in info:
+            data = { key: value }
+            if key == 'tag':
+                data = self.addtag(id, value, committer)
+            elif key == 'tracking':
+                data = self.addtracking(id, value, committer)
+            elif key == 'comment':
+                data = self.addcomment(id, value, committer)
+            else:
+                info = self.getinfo(id)
+                info[key] = value
+                self.saveinfo(id, info,
+                              'Update %s key %s to %s.' % (id, key, value), committer)
+        return data
+
+    def _infoframe(self, value, username):
+        data = {'author': username,
+                'content': value,
+                'date': time.strftime('%Y-%m-%d %H:%M:%S')}
+        return data
+
     def addtag(self, id, tag, committer):
         info = self.getinfo(id)
-        info['tag'].append(tag)
-        self.updateinfo(id, info, 'Add %s tag.'%id, committer)
+        data = self._infoframe(tag, committer)
+        info['tag'].insert(0, data)
+        self.saveinfo(id, info, 'Add %s tag.'%id, committer)
+        return data
 
     def addcomment(self, id, comment, committer):
         info = self.getinfo(id)
-        info['comment'].append(comment)
-        self.updateinfo(id, info, 'Add %s comment.'%id, committer)
+        data = self._infoframe(comment, committer)
+        info['comment'].insert(0, data)
+        self.saveinfo(id, info, 'Add %s comment.'%id, committer)
+        return data
 
     def addtracking(self, id, tracking, committer):
         info = self.getinfo(id)
-        info['tracking'].append(tracking)
-        self.updateinfo(id, info, 'Add %s tracking.'%id, committer)
+        data = self._infoframe(tracking, committer)
+        info['tracking'].insert(0, data)
+        self.saveinfo(id, info, 'Add %s tracking.'%id, committer)
+        return data
 
     def search(self, keyword):
         allmd = self.repo.search(keyword)

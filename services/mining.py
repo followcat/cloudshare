@@ -20,9 +20,9 @@ UID = ur'([\w\-]+@)'
 DEMAIN = ur'([a-zA-Z0-9][\-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][\-a-zA-Z0-9]{0,62})*(\.(cn|CN|us|US|uk|jp|hk|com|COM|edu|gov|int|mil|net|org|biz)))'
 IP = ur'((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5]))'
 PORT = ur'(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))'
-SERVICE = ur'((\/[^\/\s][\w\.\,\?\'\*\\\+&%\$#\=~_\-@]*)*(\([^\s\(\)]+\))*[^\s\(\)]*)*'
+SERVICE = ur'((\/[^\/\s> 】）\)\]][\w\.\,\?\'\*\\\+&%\$#\=~_\-@]*)*([\(（【<\[][^\s \(\)（）\[\]<>【】]+[\)）】>\]])*[^\s \(\)<> （）【】\[\]]*)*'
 
-WEB = re.compile(ur"\(?\s?(" + HEAD + ur'?' + UID + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")\s?\)?")
+WEB = re.compile(ur"(" + HEAD + ur'?' + UID + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")")
 
 SYMBOL = re.compile(ur'[- /]+')
 SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
@@ -64,37 +64,53 @@ def re_sub(reg, sub, text):
         >>> print(re_sub(LINE, ' ', s))
         [测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器] [测试计量技术及仪器] (http://www.test.com) [测试计量技术及仪器]
         >>> print(re_sub(WEB, ' ', s))
-        [测试计量技术及仪器] [测试计量技术及仪器]
-        [测试计量技术及仪器]   [测试计量技术及仪器]
+        [测试计量技术及仪器](   )[测试计量技术及仪器]
+        [测试计量技术及仪器] ( ) [测试计量技术及仪器]
         >>> s = "[测试计量技术及仪器] (www.test.com) [测试计量技术及仪器]"
         >>> print(re_sub(WEB, ' ', s))
-        [测试计量技术及仪器]   [测试计量技术及仪器]
+        [测试计量技术及仪器] ( ) [测试计量技术及仪器]
         >>> s = "[测试计量技术及仪器] (test123@test.com) [测试计量技术及仪器]"
         >>> print(re_sub(WEB, ' ', s))
-        [测试计量技术及仪器]   [测试计量技术及仪器]
+        [测试计量技术及仪器] ( ) [测试计量技术及仪器]
         >>> s = "--------------------\\n"
         >>> s += "英语(CET4)、普通话\\n"
         >>> s += "--------------------\\n"
         >>> print(re_sub(LINE, '', re_sub(SYMBOL, '', s)))
         英语(CET4)、普通话
-        >>> assert 'http://search.51job.com/job/52405118,c.html' in WEB.search('http://search.51job.com/job/52405118,c.html').group(0)
-        >>> assert 'https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD' in WEB.search(
-        ...             "https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD").group(0)
-        >>> assert '2014.06' not in WEB.search("https://h.liepin.com/cvsearch/soResume/?company=%AC%E5%8F%B8)2014.06").group(0)
-        >>> assert 'bertwalker2005@yahoo.co.uk' in WEB.search('bertwalker2005@yahoo.co.uk').group(0)
-        >>> assert 'http://h.highpin.cn/ResumeManage/26566491@qq.com' in WEB.search('http://h.highpin.cn/ResumeManage/26566491@qq.com').group(0)
-        >>> assert 'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.search('http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
-        >>> assert 'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' in WEB.search('http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0)
-        >>> assert 'https://h.liepin.com/message/showmessage/#c:1' in WEB.search('https://h.liepin.com/message/showmessage/#c:1').group(0)
-        >>> assert '2007' not in WEB.search('http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0)
-        >>> assert 'team.Desig' in WEB.search('team.Desig').group(0) # doctest: +ELLIPSIS
+        >>> assert u'http://search.51job.com/job/52405118,c.html' in WEB.search(u'http://search.51job.com/job/52405118,c.html').group(0)
+        >>> assert u'https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD' in WEB.search(
+        ...             u"https://h.liepin.com/soResume/?company=ASI+CONVEYORS(Shanghai)+CO.,LTD").group(0)
+        >>> assert u'2014.06' not in WEB.search(u"https://h.liepin.com/cvsearch/soResume/?company=%AC%E5%8F%B8)2014.06").group(0)
+        >>> assert u'bertwalker2005@yahoo.co.uk' in WEB.search(u'bertwalker2005@yahoo.co.uk').group(0)
+        >>> assert u'http://h.highpin.cn/ResumeManage/26566491@qq.com' in WEB.search(u'http://h.highpin.cn/ResumeManage/26566491@qq.com').group(0)
+        >>> assert u'http://www.dajie.com/profile/W39a7xmS5fk*' in WEB.search(u'http://www.dajie.com/profile/W39a7xmS5fk*').group(0)
+        >>> assert u'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name' in WEB.search(u'http://www.linkedin.com/search?search=&goback=%2Enmp_*1_*1&trk=prof-exp-company-name').group(0)
+        >>> assert u'https://h.liepin.com/message/showmessage/#c:1' in WEB.search(u'https://h.liepin.com/message/showmessage/#c:1').group(0)
+        >>> assert u'2007' not in WEB.search(u'http://www.hindawi.com/journals/tswj/2014/465702/ 2007').group(0)
+        >>> assert u'team.Desig' in WEB.search(u'team.Desig').group(0) # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         AttributeError: 'NoneType' object has no attribute 'group'
-        >>> assert 'www.chineseanytime.com' in WEB.search('负责创业公司官方网站建设（已上线，网址www.chineseanytime.com）').group(0)
-        >>> assert 'IP.COM' in WEB.search('IP.COM').group(0)
-        >>> assert '123456789@QQ.COM' in WEB.search('123456789@QQ.COM').group(0)
-        >>> assert 'http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv' in WEB.search('http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv').group(0)
+        >>> assert u'www.chineseanytime.com' in WEB.search(u'负责创业公司官方网站建设（已上线，网址www.chineseanytime.com）').group(0)
+        >>> assert u'IP.COM' in WEB.search(u'IP.COM').group(0)
+        >>> assert u'123456789@QQ.COM' in WEB.search(u'123456789@QQ.COM').group(0)
+        >>> assert u'http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv' in WEB.search(u'http://www.linkedin.com/vsearch/p?f_G=cn:8905&goback=.pyk_eml*4inv').group(0)
+        >>> assert u'www.chineseanytime.com' == WEB.search(u'负责创业公司官方网站建设[已上线，网址www.chineseanytime.com]').group(0)
+        >>> assert u'http://search.51job.com/job/18,c.html' == WEB.search('http://search.51job.com/job/18,c.html 广州乐电子科技有限公司是一家专业的超声公司'.decode('utf-8')).group(0)
+        >>> assert 'http://www.test.com/company=贝恩医疗设备（广州）有限公司'.decode('utf-8') == WEB.search('http://www.test.com/company=贝恩医疗设备（广州）有限公司)由香港集团有限公司投资'.decode('utf-8')).group(0)
+        >>> assert u'http://www.test.com/' == WEB.search('http://www.test.com/)由香某基集团有限公司投资'.decode('utf-8')).group(0)
+        >>> assert u'http://www.test.com/' == WEB.search('http://www.test.com/】由某基集团有限公司投资'.decode('utf-8')).group(0)
+        >>> assert u'http://www.test.com/' == WEB.search('http://www.test.com/>由香某基集团有限公司投资'.decode('utf-8')).group(0)
+        >>> assert u'http://www.test.com/' == WEB.search('http://www.test.com/）由某基集团有限公司投资'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=某医备(广州)有限公司'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=某医备(广州)有限公司'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=某医备（广州）有限公司'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=某医备（广州）有限公司'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=%AC%E5%8F%B8'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=%AC%E5%8F%B8)2014.06'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=中国集团（央企）业——长沙有限公司'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=中国集团（央企）业——长沙有限公司)2010.07'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=浙江院附属第一医院(浙江省第一医院)'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=浙江院附属第一医院(浙江省第一医院)'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=深圳生物医疗电子有限公司（www.mindray.com）'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=深圳生物医疗电子有限公司（www.mindray.com）'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=天津XX集团有限公司[电话15900376608]'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=天津XX集团有限公司[电话15900376608]'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=天津XX集团有限公司(电话15900376608)'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=天津XX集团有限公司(电话15900376608)'.decode('utf-8')).group(0)
+        >>> assert 'http://h.test.com/cv/soResume/?c=(天津)+XX+(集团)有限公司(电话15900376608)'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=(天津)+XX+(集团)有限公司(电话15900376608)'.decode('utf-8')).group(0)
     """
     return reg.sub(sub, text)
 

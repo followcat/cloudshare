@@ -22,12 +22,12 @@ def initialize(app):
 
     api.add_resource(BookmarkAPI, '/api/accounts/<string:id>/bookmark')
 
-    api.add_resource(CompanyAPI, '/api/company/<string:name>', endpoint = 'company')
+    api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyListAPI, '/api/companylist', endpoint = 'companylist')
 
     api.add_resource(JobDescriptionAPI, '/api/jd/<string:id>',
                      endpoint = 'jobdescription')
-    api.add_resource(JobDescriptionByNameAPI, '/api/jdbyname/<string:name>',
+    api.add_resource(JobDescriptionByNameAPI, '/api/jdbyname',
                      endpoint = 'jobdescriptionbyname')
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
                      endpoint = 'jobdescriptionlist')

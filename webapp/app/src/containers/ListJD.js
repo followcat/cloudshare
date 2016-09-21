@@ -20,13 +20,22 @@ export default class ListJD extends Component {
       companyData: [],
       height: 0,
       confirmLoading: false,
+      visible: false,
     };
     this.loadJobDescription = this.loadJobDescription.bind(this);
     this.loadCompany = this.loadCompany.bind(this);
+    this.handleMenuClick = this.handleMenuClick.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleCreateNewJobDescription = this.handleCreateNewJobDescription.bind(this);
+    this.handleSubmitEditJD = this.handleSubmitEditJD.bind(this);
+    this.handleModalOpen = this.handleModalOpen.bind(this);
+    this.handleModalCancel = this.handleModalCancel.bind(this);
+    this.handleCreateNewCompany = this.handleCreateNewCompany.bind(this);
   }
 
+  /**
+   * 加载所有职位描述数据
+   */
   loadJobDescription() {
     fetch(`/api/jdlist`, {
       method: 'GET',
@@ -55,6 +64,9 @@ export default class ListJD extends Component {
     })
   }
 
+  /**
+   * 加载所有公司数据
+   */
   loadCompany() {
     fetch(`/api/companylist`, {
       method: 'GET',
@@ -67,7 +79,6 @@ export default class ListJD extends Component {
     })
     .then((json) => {
       if (json.code === 200) {
-        console.log(json.data);
         this.setState({
           companyData: json.data,
         });
@@ -92,6 +103,11 @@ export default class ListJD extends Component {
     });
   }
 
+  /**
+   * 表格数据搜索
+   * @param  {[string]} value [获取Input的值]
+   * @return {[type]}  None
+   */
   handleSearch(value) {
     let jdData = this.state.jobDescriptionData;
     if (value !== '') {
@@ -114,6 +130,11 @@ export default class ListJD extends Component {
     }
   }
 
+  /**
+   * 创建一个新的职位描述
+   * @param  {[type]} object [获取表单数据对象]
+   * @return {[type]} None
+   */
   handleCreateNewJobDescription(obj) {
     const _this = this;
     this.setState({
@@ -122,6 +143,7 @@ export default class ListJD extends Component {
 
     fetch(`/api/jdbyname`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Authorization': `Basic ${localStorage.token}`,
         'Accept': 'application/json',
@@ -139,11 +161,103 @@ export default class ListJD extends Component {
     .then((json) => {
       if (json.code === 200) {
         this.setState({
+          visible: false,
           confirmLoading: false,
         });
+        message.success(json.message);
         _this.loadJobDescription();
       }
     })
+  }
+
+  /**
+   * 修改Job Description
+   * @param  {[object]}   value    [表单数据对象]
+   * @param  {Function} callback [回调函数: 为了修改子组件state]
+   * @return {[type]}  None
+   */
+  handleSubmitEditJD(value, callback) {
+    const _this = this;
+    fetch(`/api/jd/${value.jdId}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Authroization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        status: value.statusSelect,
+        coname: value.companyName,
+        description: value.jdContent,
+      }),
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        if (callback && typeof callback === 'function') {
+          callback();
+        }
+        message.success(json.message);
+        _this.loadJobDescription();
+      }
+    })
+  }
+
+  /**
+   * 创建公司
+   * @param  {[object]}   value    [表单数据对象]
+   * @param  {Function} callback [回调函数: 为了修改子组件state]
+   * @return {[type]}  None
+   */
+  handleCreateNewCompany(value, callback) {
+    const _this = this;
+
+    fetch(`/api/company`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Authroization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        coname: value.companyName,
+        introduction: value.introduction,
+      }),
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        if (callback && typeof callback === 'function') {
+          callback();
+        }
+        message.success(json.message);
+        _this.loadCompany();
+      }
+    })
+  }
+
+  /**
+   * Modal显示事件
+   */
+  handleModalOpen() {
+    this.setState({
+      visible: true,
+    });
+  }
+
+  /**
+   * Modal隐藏事件
+   */
+  handleModalCancel() {
+    this.setState({
+      visible: false,
+    });
   }
 
   render() {
@@ -171,8 +285,13 @@ export default class ListJD extends Component {
                     searchData: this.state.searchData,
                     height: this.state.height,
                     confirmLoading: this.state.confirmLoading,
+                    visible: this.state.visible,
+                    onModalOpen: this.handleModalOpen,
+                    onModalCancel: this.handleModalCancel,
                     onSearch: this.handleSearch,
                     onCreateNewJobDescription: this.handleCreateNewJobDescription,
+                    onSubmitEditJD: this.handleSubmitEditJD,
+                    onCreateNewCompany: this.handleCreateNewCompany,
                   })}
               </div>
             </div>

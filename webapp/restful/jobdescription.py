@@ -11,9 +11,9 @@ class JobDescriptionAPI(Resource):
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('coname', type = str, location = 'json')
-        self.reqparse.add_argument('status', type = str, location = 'json')
-        self.reqparse.add_argument('description', type = str, location = 'json')
+        self.reqparse.add_argument('coname', location = 'json')
+        self.reqparse.add_argument('status', location = 'json')
+        self.reqparse.add_argument('description', location = 'json')
         super(JobDescriptionAPI, self).__init__()
 
     def get(self, id):
@@ -27,19 +27,28 @@ class JobDescriptionAPI(Resource):
         co_name = args['coname']
         description = args['description']
         result = self.svc_mult_cv.default.jd_modify(id, description, status, user.id)
-        return { 'result': result }
+        return { 'code': 200, 'data': result, 'message': 'Update job description successed.' }
 
 
-class JobDescriptionByNameAPI(JobDescriptionAPI):
+class JobDescriptionByNameAPI(Resource):
 
-    def post(self, jdname):
+    def __init__(self):
+        self.svc_jd = flask.current_app.config['SVC_JD']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('jd_name', location = 'json')
+        self.reqparse.add_argument('co_name', location = 'json')
+        self.reqparse.add_argument('jd_description', location = 'json')
+        super(JobDescriptionByNameAPI, self).__init__()
+
+    def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        status = args['status']
-        co_name = args['coname']
-        description = args['description']
-        result = self.svc_mult_cv.default.jd_add(co_name, jd_name, description, user.id, status)
-        return { 'result': result }
+        co_name = args['co_name']
+        jd_name = args['jd_name']
+        description = args['jd_description']
+        result = self.svc_mult_cv.default.jd_add(co_name, jd_name, description, user.id)
+        return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 
 class JobDescriptionListAPI(Resource):
@@ -52,5 +61,5 @@ class JobDescriptionListAPI(Resource):
 
     def get(self):
         result = self.svc_mult_cv.default.jd_lists()
-        return { 'result': result }
+        return { 'code': 200, 'data': result }
 

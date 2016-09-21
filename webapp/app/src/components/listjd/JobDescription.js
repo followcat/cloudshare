@@ -99,12 +99,6 @@ class JobDescription extends Component {
     const pagination = {
       total: this.props.searchData.length > 0 ? this.props.searchData.length : this.props.jobDescriptionData.length,
       showSizeChanger: true,
-      onShowSizeChange(current, pageSize) {
-        console.log('Current: ', current, '; PageSize: ', pageSize);
-      },
-      onChange(current) {
-        console.log('Current: ', current);
-      },
     };
 
     const { getFieldProps } = this.props.form;
@@ -156,9 +150,9 @@ class JobDescription extends Component {
                   return (
                     <Select.Option
                       key={index}
-                      value={item}
+                      value={item.name}
                     >
-                      {item}
+                      {item.name}
                     </Select.Option>
                   )
                 })}

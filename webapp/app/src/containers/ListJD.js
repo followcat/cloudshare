@@ -24,11 +24,13 @@ export default class ListJD extends Component {
     };
     this.loadJobDescription = this.loadJobDescription.bind(this);
     this.loadCompany = this.loadCompany.bind(this);
+    this.handleMenuClick = this.handleMenuClick.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleCreateNewJobDescription = this.handleCreateNewJobDescription.bind(this);
     this.handleSubmitEditJD = this.handleSubmitEditJD.bind(this);
     this.handleModalOpen = this.handleModalOpen.bind(this);
     this.handleModalCancel = this.handleModalCancel.bind(this);
+    this.handleCreateNewCompany = this.handleCreateNewCompany.bind(this);
   }
 
   /**
@@ -77,8 +79,12 @@ export default class ListJD extends Component {
     })
     .then((json) => {
       if (json.code === 200) {
+        let data = [];
+        for (let item of json.data) {
+          data.push({ name: item });
+        }
         this.setState({
-          companyData: json.data,
+          companyData: data,
         });
       } else {
         console.log('Get company error.');
@@ -205,6 +211,41 @@ export default class ListJD extends Component {
   }
 
   /**
+   * 创建公司
+   * @param  {[object]}   value    [表单数据对象]
+   * @param  {Function} callback [回调函数: 为了修改子组件state]
+   * @return {[type]}  None
+   */
+  handleCreateNewCompany(value, callback) {
+    const _this = this;
+
+    fetch(`/api/company`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Authroization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        coname: value.companyName,
+      }),
+    })
+    .then((response) => {
+      return response.json();
+    })
+    .then((json) => {
+      if (json.code === 200) {
+        if (callback && typeof callback === 'function') {
+          callback();
+        }
+        message.success(json.message);
+        _this.loadCompany();
+      }
+    })
+  }
+
+  /**
    * Modal显示事件
    */
   handleModalOpen() {
@@ -253,6 +294,7 @@ export default class ListJD extends Component {
                     onSearch: this.handleSearch,
                     onCreateNewJobDescription: this.handleCreateNewJobDescription,
                     onSubmitEditJD: this.handleSubmitEditJD,
+                    onCreateNewCompany: this.handleCreateNewCompany,
                   })}
               </div>
             </div>

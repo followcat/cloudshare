@@ -86,7 +86,7 @@ class CreateJobDescription extends Component {
               >
                 {this.props.companyData.map((item, index) => {
                   return (
-                    <Select.Option key={index} value={item}>{item}</Select.Option>
+                    <Select.Option key={index} value={item.name}>{item.name}</Select.Option>
                   )
                 })}
               </Select>
@@ -113,6 +113,7 @@ class CreateJobDescription extends Component {
 CreateJobDescription.propTypes = {
   visible: PropTypes.bool,
   confirmLoading: PropTypes.bool,
+  companyData: PropTypes.array,
 };
 
 export default CreateJobDescription = Form.create({})(CreateJobDescription);

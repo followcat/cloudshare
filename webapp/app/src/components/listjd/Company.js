@@ -57,6 +57,12 @@ class Company extends Component {
         title: 'Company Name',
         dataIndex: 'name',
         key: 'name',
+        width: 280,
+      },
+      {
+        title: 'Introduction',
+        dataIndex: 'introduction',
+        key: 'introduction',
       },
     ];
 
@@ -83,14 +89,22 @@ class Company extends Component {
             onCancel={this.handleCancel}
             onOk={this.handleOk}
           >
-            <Form inline style={{ width: '80%', margin: '0 auto' }}>
+            <Form horizontal style={{ width: '88%', margin: '0 auto' }}>
               <Form.Item
                 label="Company Name"
               >
                 <Input
                   {...getFieldProps('companyName', { rules: [{ required: true }]})}
                   placeholder="Please input the company name"
-                  style={{ width: 200 }}
+                />
+              </Form.Item>
+              <Form.Item
+                label="Introduction"
+              >
+                <Input
+                  {...getFieldProps('introduction')}
+                  type="textarea"
+                  rows="4"
                 />
               </Form.Item>
             </Form>

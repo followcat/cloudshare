@@ -79,12 +79,8 @@ export default class ListJD extends Component {
     })
     .then((json) => {
       if (json.code === 200) {
-        let data = [];
-        for (let item of json.data) {
-          data.push({ name: item });
-        }
         this.setState({
-          companyData: data,
+          companyData: json.data,
         });
       } else {
         console.log('Get company error.');
@@ -229,6 +225,7 @@ export default class ListJD extends Component {
       },
       body: JSON.stringify({
         coname: value.companyName,
+        introduction: value.introduction,
       }),
     })
     .then((response) => {

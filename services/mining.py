@@ -24,6 +24,8 @@ SERVICE = ur'((\/[^\/\s> 】）\)\]][\w\.\,\?\'\*\\\+&%\$#\=~_\-@]*)*([\(（【
 
 WEB = re.compile(ur"(" + HEAD + ur'?' + UID + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")")
 
+DOT_NET = re.compile(ur'((vs|VS|C#|c#|asp|ASP|Asp|ADO|ado)\.(Net|net|NET))')
+
 SYMBOL = re.compile(ur'[- /]+')
 SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
 
@@ -53,7 +55,7 @@ FLAGS = ['x', # spaces
          #'ns', # city and country
         ]
 
-def re_sub(reg, sub, text):
+def re_sub(reg, repl, text):
     """
         >>> from services.mining import *
         >>> s = "[测试计量技术及仪器]( http://www.test.com )[测试计量技术及仪器]\\n"
@@ -111,8 +113,17 @@ def re_sub(reg, sub, text):
         >>> assert 'http://h.test.com/cv/soResume/?c=天津XX集团有限公司[电话15900376608]'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=天津XX集团有限公司[电话15900376608]'.decode('utf-8')).group(0)
         >>> assert 'http://h.test.com/cv/soResume/?c=天津XX集团有限公司(电话15900376608)'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=天津XX集团有限公司(电话15900376608)'.decode('utf-8')).group(0)
         >>> assert 'http://h.test.com/cv/soResume/?c=(天津)+XX+(集团)有限公司(电话15900376608)'.decode('utf-8') == WEB.search('http://h.test.com/cv/soResume/?c=(天津)+XX+(集团)有限公司(电话15900376608)'.decode('utf-8')).group(0)
+        >>> assert u'asp.net' in re_sub(WEB, repl_web, '使用asp.net，ado.net进行业务开发'.decode('utf-8'))
+        >>> assert u'C#.Net' in re_sub(WEB, repl_web, '使用C#.Net进行业务开发'.decode('utf-8'))
+        >>> assert u'yu_yinghui@yeah.net' not in re_sub(WEB, repl_web, 'emailto: yu_yinghui@yeah.net'.decode('utf-8'))
     """
-    return reg.sub(sub, text)
+    return reg.sub(repl, text)
+
+def repl_web(m):
+    if DOT_NET.search(m.group(0)) is not None:
+        return m.group(0)
+    else:
+        return '\n'
 
 def silencer(document):
     if isinstance(document, list):
@@ -122,7 +133,7 @@ def silencer(document):
     selected_texts = []
     for text in texts:
         text = re_sub(LINE, ' ', text)
-        text = re_sub(WEB, '\n', text)
+        text = re_sub(WEB, repl_web, text)
         text = re_sub(SYMBOL, ' ', text)
         words = jieba_cut(text, pos=True)
         words = pos_extract(words, FLAGS)

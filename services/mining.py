@@ -20,7 +20,7 @@ UID = ur'([\w\-]+@)'
 DEMAIN = ur'([a-zA-Z0-9][\-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][\-a-zA-Z0-9]{0,62})*(\.(cn|CN|us|US|uk|jp|hk|com|COM|edu|gov|int|mil|net|org|biz)))'
 IP = ur'((([1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([1]?\d{1,2}|2[0-4]\d|25[0-5]))'
 PORT = ur'(\:(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0))'
-SERVICE = ur'((\/[^\/\s> 】）\)\]][\w\.\,\?\'\*\\\+&%\$#\=~_\-@]*)*([\(（【<\[][^\s \(\)（）\[\]<>【】]+[\)）】>\]])*[^\s \(\)<> （）【】\[\]]*)*'
+SERVICE = ur'(\/(([\(（【<\[][^\s \(\)（）\[\]<>【】]+[\)）】>\]])*[^\s ，\(\)<> （）【】\[\]]*)*)*'
 
 WEB = re.compile(ur"(" + HEAD + ur'?' + UID + ur'?(' + DEMAIN + ur'|' + IP + ur')' + PORT + ur'?' + SERVICE + ur")")
 
@@ -116,6 +116,7 @@ def re_sub(reg, repl, text):
         >>> assert u'asp.net' in re_sub(WEB, repl_web, '使用asp.net，ado.net进行业务开发'.decode('utf-8'))
         >>> assert u'C#.Net' in re_sub(WEB, repl_web, '使用C#.Net进行业务开发'.decode('utf-8'))
         >>> assert u'yu_yinghui@yeah.net' not in re_sub(WEB, repl_web, 'emailto: yu_yinghui@yeah.net'.decode('utf-8'))
+        >>> assert u'EHS.CN' == WEB.search('EHS.CN于2011年12月前成功上线'.decode('utf-8')).group(0)
     """
     return reg.sub(repl, text)
 

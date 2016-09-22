@@ -1,5 +1,5 @@
 import os
-import pickle
+import ujson
 
 from gensim import corpora, models
 
@@ -16,7 +16,6 @@ class LSImodel(object):
     most_save_name = 'lsi.most'
 
     def __init__(self, savepath, no_above=1./8, topics=100, slicer=None):
-        self.corpus = []
         self.path = savepath
         self.topics = topics
         self.no_above = no_above
@@ -25,8 +24,8 @@ class LSImodel(object):
         else:
             self.slicer = lambda x:x.split('\n')
         self.names = []
-        self.texts = []
-        self.corpus = []
+        self._texts = []
+        self._corpus = []
 
         self.lsi = None
         self.tfidf = None
@@ -70,21 +69,17 @@ class LSImodel(object):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
-            pickle.dump(self.names, f)
+            ujson.dump(self.names, f)
         with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-            pickle.dump(self.corpus, f)
+            ujson.dump(self.corpus, f)
         with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
-            pickle.dump(self.texts, f)
+            ujson.dump(self.texts, f)
         self.lsi.save(os.path.join(self.path, self.model_save_name))
         self.dictionary.save(os.path.join(self.path, self.corpu_dict_save_name))
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
-            self.names = pickle.load(f)
-        with open(os.path.join(self.path, self.corpus_save_name), 'r') as f:
-            self.corpus = pickle.load(f)
-        with open(os.path.join(self.path, self.texts_save_name), 'r') as f:
-            self.texts = pickle.load(f)
+            self.names = ujson.load(f)
         self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
                                                              self.corpu_dict_save_name))
@@ -127,3 +122,33 @@ class LSImodel(object):
         vec_bow = self.dictionary.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
         return vec_lsi
+
+    @property
+    def corpus(self):
+        corpus_path = os.path.join(self.path, self.corpus_save_name)
+        if os.path.exists(corpus_path) and not self._corpus:
+            with open(corpus_path, 'r') as f:
+                try:
+                    self._corpus = ujson.load(f)
+                except ValueError:
+                    self._corpus = []
+        return self._corpus
+
+    @corpus.setter
+    def corpus(self, value):
+        self._corpus = value
+
+    @property
+    def texts(self):
+        texts_path = os.path.join(self.path, self.texts_save_name)
+        if os.path.exists(texts_path) and not self._texts:
+            with open(texts_path, 'r') as f:
+                try:
+                    self._texts = ujson.load(f)
+                except ValueError:
+                    self._texts = []
+        return self._texts
+
+    @texts.setter
+    def texts(self, value):
+        self._texts = value

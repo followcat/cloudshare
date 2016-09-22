@@ -4,6 +4,7 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import core.outputstorage
+import core.converterutils
 
 
 class CurrivulumvitaeAPI(Resource):

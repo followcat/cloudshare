@@ -1,16 +1,23 @@
 import os
 
+import webapp.jsonencoder
 import services.index
 import services.mining
 import services.account
 import services.company
 import services.multicv
-import services.additionalsync
+import services.classifycv
+import services.cvstoragesync
 import services.curriculumvitae
 import services.jobdescription
+import interface.basefs
 import interface.predator
 import interface.gitinterface
 
+import sources.industry_id
+
+
+RESTFUL_JSON = {'cls': webapp.jsonencoder.CustomJSONEncoder}
 
 UPLOAD_TEMP = 'output'
 SECRET_KEY = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
@@ -32,25 +39,30 @@ SVC_JD = services.jobdescription.JobDescription(DATA_DB, SVC_CO)
 
 DEF_SVC_CV = services.curriculumvitae.CurriculumVitae(DATA_DB, 'cloudshare')
 
-PREDATOR_DB = interface.predator.PredatorInterface('additional/liepin')
-PRE_SVC_CV = services.curriculumvitae.CurriculumVitae(PREDATOR_DB, 'liepin')
+RAW_DIR = 'raw'
+RAW_DB = dict()
+if os.path.exists(RAW_DIR):
+    for name in os.listdir(RAW_DIR):
+        namepath = os.path.join(RAW_DIR, name)
+        RAW_DB[name] = interface.predator.PredatorInterface(namepath)
 
-JINGYING_DB = interface.predator.PredatorInterface('additional/jingying')
-JGYG_SVC_CV = services.curriculumvitae.CurriculumVitae(JINGYING_DB, 'jingying')
+CV_STORAGE_DIR = 'cvstorage'
+CV_STORAGE_DB = interface.basefs.BaseFSInterface(CV_STORAGE_DIR)
+SVC_CV_STO = services.curriculumvitae.CurriculumVitaeStorage(CV_STORAGE_DB, 'cvstorage')
 
-ZHILIAN_DB = interface.predator.PredatorInterface('additional/zhilian')
-ZILN_SVC_CV = services.curriculumvitae.CurriculumVitae(ZHILIAN_DB, 'zhilian')
+SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_CV_STO, RAW_DB)
 
-YINGCAI_DB = interface.predator.PredatorInterface('additional/yingcai')
-YICA_SVC_CV = services.curriculumvitae.CurriculumVitae(YINGCAI_DB, 'yingcai')
-
-SVC_CV = services.multicv.MultiCV(DEF_SVC_CV,
-                                  [PRE_SVC_CV, JGYG_SVC_CV, ZILN_SVC_CV, YICA_SVC_CV])
-SVC_ADD_SYNC = services.additionalsync.AdditionalSync(SVC_CV)
+CLASSIFY_DIR = 'classify'
+SVC_CLS_CV = dict()
+for name in sources.industry_id.industryID.keys():
+     cls_cv = services.classifycv.ClassifyCV(name, CLASSIFY_DIR, SVC_CV_STO, RAW_DB)
+     if cls_cv.NUMS == 0:
+        continue
+     SVC_CLS_CV[name] = cls_cv
+SVC_CV = services.multicv.MultiCV(DEF_SVC_CV, SVC_CLS_CV.values())
 
 SVC_INDEX = services.index.ReverseIndexing('Index', SVC_CV)
 SVC_INDEX.setup()
-
 
 LSI_PATH = 'lsimodel'
 SVC_MIN = services.mining.Mining(LSI_PATH, SVC_CV)

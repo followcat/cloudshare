@@ -18,6 +18,10 @@ account/
 lsimodel/
 celerybeat-schedule
 similarity.*
+raw/
+tags/
+classify/
+cvstorage/
 additional/
 Index/
 webapp/static/node_modules/

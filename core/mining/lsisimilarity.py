@@ -1,5 +1,5 @@
 import os
-import pickle
+import ujson
 
 from gensim import similarities
 
@@ -11,10 +11,9 @@ class LSIsimilarity(object):
     corpus_save_name = 'lsi.corpus'
 
     def __init__(self, savepath, lsi_model):
-        self.corpus = []
         self.path = savepath
         self.names = []
-        self.corpus = []
+        self._corpus = []
 
         self.lsi_model = lsi_model
         self.index = None
@@ -52,16 +51,14 @@ class LSIsimilarity(object):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
-            pickle.dump(self.names, f)
+            ujson.dump(self.names, f)
         with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-            pickle.dump(self.corpus, f)
+            ujson.dump(self.corpus, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
-            self.names = pickle.load(f)
-        with open(os.path.join(self.path, self.corpus_save_name), 'r') as f:
-            self.corpus = pickle.load(f)
+            self.names = ujson.load(f)
         self.index = similarities.Similarity.load(os.path.join(self.path,
                                                         self.matrix_save_name))
 
@@ -71,6 +68,17 @@ class LSIsimilarity(object):
         self.names.append(name)
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
+
+    def add_documents(self, names, documents):
+        assert(self.lsi_model.dictionary)
+        assert len(names) == len(documents)
+        corpus = []
+        for name, document in zip(names, documents):
+            text = self.lsi_model.slicer(document)
+            self.names.append(name)
+            corpu = self.lsi_model.dictionary.doc2bow(text)
+            corpus.append(corpu)
+        self.index.add_documents(corpus)
 
     def set_corpus(self, texts):
         for text in self.lsi_model.slicer(texts):
@@ -83,9 +91,11 @@ class LSIsimilarity(object):
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 
     def probability(self, doc):
+        results = []
         vec_lsi = self.lsi_model.probability(doc)
-        sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims)
+        if self.index is not None:
+            sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
+            results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims)
         return results
 
     def probability_by_id(self, doc, id):
@@ -96,3 +106,17 @@ class LSIsimilarity(object):
         result = abs(self.index[vec_lsi][index])
         return (id, str(result))
 
+    @property
+    def corpus(self):
+        corpus_path = os.path.join(self.path, self.corpus_save_name)
+        if os.path.exists(corpus_path) and not self._corpus:
+            with open(corpus_path, 'r') as f:
+                try:
+                    self._corpus = ujson.load(f)
+                except ValueError:
+                    self._corpus = []
+        return self._corpus
+
+    @corpus.setter
+    def corpus(self, value):
+        self._corpus = value

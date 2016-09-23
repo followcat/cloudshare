@@ -7,6 +7,10 @@ import FilterForm from './FilterForm';
 
 export default class FilterBox extends Component {
 
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     const style = {
       width: 1080,
@@ -17,10 +21,14 @@ export default class FilterBox extends Component {
     return (
       <Card style={style}>
         <div className="pd-lr-30">
-          <FilterInfo />
-          <FilterForm />
+          <FilterInfo {...this.props} />
+          <FilterForm {...this.props} />
         </div>
       </Card>
     );
   }
 }
+
+FilterBox.propTypes ={
+  total: PropTypes.number,
+};

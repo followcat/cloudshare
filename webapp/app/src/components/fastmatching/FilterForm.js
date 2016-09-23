@@ -5,6 +5,10 @@ import { Row, Col, Form, Select, Input, Checkbox, Button } from 'antd';
 
 class FilterForm extends Component {
 
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     const genderChildren = [
       {
@@ -41,6 +45,7 @@ class FilterForm extends Component {
         value: '已婚',
       },
     ];
+
     return (
       <Form horizontal>
         <Row>
@@ -53,9 +58,9 @@ class FilterForm extends Component {
               <Select
                 multiple
               >
-                <Select.Option key={0} value="计算机软件" >计算机软件</Select.Option>
-                <Select.Option key={1} value="计算机硬件">计算机硬件</Select.Option>
-                <Select.Option key={2} value="生物-制药-医疗器械">生物-制药-医疗器械</Select.Option>
+                {this.props.classify.map((item, index) => {
+                  return <Select.Option key={index} value={item} >{item}</Select.Option>
+                })}
               </Select>
             </Form.Item>
           </Col>
@@ -115,7 +120,7 @@ class FilterForm extends Component {
           </Col>
         </Row>
         <Row>
-          <Col span={8} offset={10}>
+          <Col span={4} offset={10}>
             <Button type="primary" >Search</Button>
             <Button style={{ marginLeft: 8 }}>Reset</Button>
           </Col>
@@ -124,5 +129,9 @@ class FilterForm extends Component {
     );
   }
 }
+
+FilterForm.propTypes = {
+  classify: PropTypes.array,
+};
 
 export default FilterForm = Form.create({})(FilterForm);

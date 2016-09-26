@@ -71,7 +71,7 @@ body
     border-bottom: 1px dotted #c2c2c2;
 }
 
-.count .count-list .count-list-item:nth-child(1) {
+.count .count-list .font-bolder {
     font-weight: bold;
 }
 

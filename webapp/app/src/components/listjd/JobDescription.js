@@ -1,14 +1,60 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Table } from 'antd';
+import { Table, Button, Modal, Form, Input, Select } from 'antd';
 
 import ToolBar from './ToolBar';
 
-export default class JobDescription extends Component {
+class JobDescription extends Component {
 
   constructor(props){
     super(props);
+    this.state = {
+      visible: false,
+      confirmLoading: false,
+    };
+
+    this.handleClick = this.handleClick.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+    this.handleModalOk = this.handleModalOk.bind(this);
+  }
+
+  handleClick(record) {
+    this.props.form.setFieldsValue({
+      companyName: record.company,
+      jdId: record.id,
+      jdContent: record.description,
+      statusSelect: record.status,
+    });
+    this.setState({
+      visible: true,
+    });
+  }
+
+  handleCancel() {
+    this.setState({
+      visible: false,
+    });
+  }
+
+  handleModalOk() {
+    const _this = this;
+    this.setState({
+      confirmLoading: true,
+    });
+    this.props.form.validateFields((error, value) => {
+      if (!!error) {
+        return;
+      } else {
+        this.props.onSubmitEditJD(value, function() {
+          _this.setState({
+            visible: false,
+            confirmLoading: false,
+          });
+          _this.props.form.resetFields();
+        });
+      }
+    });
   }
 
   render() {
@@ -37,18 +83,15 @@ export default class JobDescription extends Component {
         key: 'status',
         width: 80,
         render: (text) => <span style={text === 'Opening' ? { color: 'green' } : { color: 'red' }}>{text}</span>,
-        filterMultiple: true,
-        filters: [
-          { text: 'Opening', value: 'Opening' },
-          { text: 'Closed', value: 'Closed' },
-        ],
-        onFilter: (value, record) => record.status  === value,
       },
       {
         title: 'Operation',
         key: 'operation',
         render: (record) => (
-          <a href="#">CV Fast Matching</a>
+          <div>
+            <Button type="primary" size="small">CV Fast Matching</Button>
+            <Button type="ghost" size="small" onClick={() => this.handleClick(record)}>Edit Job Description</Button>
+          </div>
         )
       }
     ];
@@ -56,20 +99,18 @@ export default class JobDescription extends Component {
     const pagination = {
       total: this.props.searchData.length > 0 ? this.props.searchData.length : this.props.jobDescriptionData.length,
       showSizeChanger: true,
-      onShowSizeChange(current, pageSize) {
-        console.log('Current: ', current, '; PageSize: ', pageSize);
-      },
-      onChange(current) {
-        console.log('Current: ', current);
-      },
     };
 
+    const { getFieldProps } = this.props.form;
     return (
       <div>
         <ToolBar
           onSearch={this.props.onSearch}
           companyData={this.props.companyData}
           confirmLoading={this.props.confirmLoading}
+          visible={this.props.visible}
+          onModalOpen={this.props.onModalOpen}
+          onModalCancel={this.props.onModalCancel}
           onCreateNewJobDescription={this.props.onCreateNewJobDescription}
         />
         <Table
@@ -86,6 +127,66 @@ export default class JobDescription extends Component {
           })}</p>}
           scroll={{ y: this.props.height }}
         />
+        <Modal
+          title="Edit Job Description"
+          okText="Submit"
+          wrapClassName="vertical-center-modal"
+          comfirmLoading={this.state.comfirmLoading}
+          visible={this.state.visible}
+          onCancel={this.handleCancel}
+          onOk={this.handleModalOk}
+        >
+          <Form horizontal style={{ width: '88%', margin: '0 auto' }}>
+            <Form.Item
+              label="Company Name"
+            >
+              <Select
+                showSearch
+                {...getFieldProps('companyName')}
+                optionFilterProp="value"
+                notFoundContent="Not found"
+              >
+                {this.props.companyData.map((item, index) => {
+                  return (
+                    <Select.Option
+                      key={index}
+                      value={item.name}
+                    >
+                      {item.name}
+                    </Select.Option>
+                  )
+                })}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              label="Job Description ID"
+            >
+              <Input
+                {...getFieldProps('jdId')}
+                readOnly
+              />
+            </Form.Item>
+            <Form.Item
+              label="Job Description Content"
+            >
+              <Input
+                {...getFieldProps('jdContent')}
+                type="textarea"
+                rows="4"
+              />
+            </Form.Item>
+            <Form.Item
+              label="Status"
+            >
+              <Select
+                {...getFieldProps('statusSelect')}
+              >
+                <Select.Option key={0} value="Opening">Opening</Select.Option>
+                <Select.Option key={0} value="Closed">Closed</Select.Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </Modal>
       </div>
     );
   }
@@ -94,6 +195,14 @@ export default class JobDescription extends Component {
 JobDescription.propTypes = {
   jobDescriptionData: PropTypes.array,
   searchData: PropTypes.array,
+  companyData: PropTypes.array,
   height: PropTypes.number,
+  confirmLoading: PropTypes.bool,
+  visible: PropTypes.bool,
   onSearch: PropTypes.func,
+  onModalOpen: PropTypes.func,
+  onModalCancel: PropTypes.func,
+  onCreateNewJobDescription: PropTypes.func,
 };
+
+export default JobDescription = Form.create({})(JobDescription);

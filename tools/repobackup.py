@@ -1,15 +1,16 @@
 import os
 import time
 
-import webapp.settings
+import baseapp.backup
+import baseapp.settings
 
 import dulwich.porcelain
 
 
-backup_folders = webapp.settings.BACKUP_DIRS
+backup_folders = baseapp.backup.BACKUP_DIRS
 ISOTIMEFORMAT = '%Y-%m-%d-%X'
-source_repo = webapp.settings.DATA_DB.repo
-account_repo = webapp.settings.ACCOUNT_DB.repo
+source_repo = baseapp.settings.REPO_DB.repo
+account_repo = baseapp.settings.ACCOUNT_DB.repo
 
 
 def assure_path_exists(path):

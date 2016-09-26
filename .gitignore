@@ -11,6 +11,7 @@ flask_session/
 *.pyc
 *.bak
 output/
+dbcenter/
 repo/
 default_repo/
 Index/

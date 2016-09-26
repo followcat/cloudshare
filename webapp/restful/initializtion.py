@@ -22,13 +22,13 @@ def initialize(app):
 
     api.add_resource(BookmarkAPI, '/api/accounts/<string:id>/bookmark')
 
-    api.add_resource(CompanyAPI, '/api/company/<string:name>', endpoint = 'company')
+    api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyListAPI, '/api/companylist', endpoint = 'companylist')
 
+    api.add_resource(JobDescriptionUploadAPI, '/api/uploadjd',
+                     endpoint = 'jobdescriptionupload')
     api.add_resource(JobDescriptionAPI, '/api/jd/<string:id>',
                      endpoint = 'jobdescription')
-    api.add_resource(JobDescriptionByNameAPI, '/api/jdbyname/<string:name>',
-                     endpoint = 'jobdescriptionbyname')
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
                      endpoint = 'jobdescriptionlist')
 
@@ -61,6 +61,8 @@ def initialize(app):
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
 
-    api.add_resource(DatabasesAPI, '/api/databases', endpoint = 'databases')
-    api.add_resource(DBNumbersAPI, '/api/dbnumbers/<string:name>', endpoint = 'dbnumbers')
-    
+    api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')
+    api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')
+    api.add_resource(DBNumberAPI, '/api/dbnumber/<string:name>', endpoint = 'dbnumber')
+    api.add_resource(DBNumbersAPI, '/api/dbnumbers', endpoint = 'dbnumbers')
+    api.add_resource(ClassifyAPI, '/api/classify', endpoint = 'classify')

@@ -25,7 +25,7 @@ class CurriculumVitae(services.base.Service):
         result = self.interface.exists(path_name)
         return result
 
-    def add(self, cvobj, committer=None):
+    def add(self, cvobj, committer=None, unique=True):
         """
             >>> import glob
             >>> import shutil
@@ -64,7 +64,7 @@ class CurriculumVitae(services.base.Service):
         if self.unique_checker is None:
             self.unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
         self.unique_checker.update()
-        if self.unique_checker.unique(cvobj.filepro.yamlinfo) is False:
+        if unique is True and self.unique_checker.unique(cvobj.filepro.yamlinfo) is False:
             self.info = "Exists File"
             return False
         cvobj.filepro.yamlinfo['committer'] = committer

@@ -212,8 +212,8 @@ h3
 
 .star-box {
   position: absolute;
-  top: 14px;
-  left: 180px;
+  top: 12px;
+  left: 6px;
   cursor: pointer;
 }
 
@@ -275,4 +275,8 @@ h3
 
 .star-active:after {
   border-bottom: 11px solid #FFC107;
+}
+
+.resume-id {
+  margin-left: 30px;
 }

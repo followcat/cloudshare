@@ -145,10 +145,13 @@ def silencer(document):
             if word.istitle():
                 # Can make it match SHORT later for skip (eg 'Ltd' ...)
                 word = word.lower()
-            if not SHORT.match(word):
+            if SHORT.match(word):
+                continue
                 # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
-                word = word.lower()
-                out.append(word)
+            if len(word) == 1:
+                continue
+            word = word.lower()
+            out.append(word)
         selected_texts.append(out)
     if isinstance(document, list):
         return selected_texts

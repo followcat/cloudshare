@@ -240,3 +240,14 @@ header
 {
     color: #ea0000;
 }
+
+#modelMenu {
+  width: 80px;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  right: 300px;
+  line-height: 50px;
+  text-align: center;
+  color: #fff;
+}

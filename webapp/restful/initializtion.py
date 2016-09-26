@@ -65,4 +65,4 @@ def initialize(app):
     api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')
     api.add_resource(DBNumberAPI, '/api/dbnumber/<string:name>', endpoint = 'dbnumber')
     api.add_resource(DBNumbersAPI, '/api/dbnumbers', endpoint = 'dbnumbers')
-    
+    api.add_resource(ClassifyAPI, '/api/classify', endpoint = 'classify')

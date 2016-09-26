@@ -42,3 +42,13 @@ class DBNumbersAPI(flask.views.MethodView):
 
     def get(self):
         return { 'result': self.svc_mult_cv.getnums() }
+
+
+class ClassifyAPI(flask.views.MethodView):
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(ClassifyAPI, self).__init__()
+
+    def get(self):
+        return { 'code': 200, 'data': self.svc_mult_cv.default.getclassify() }

@@ -124,7 +124,7 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
         if (classifyDatas[i].name === "total") {
           $("#total").append(classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number);
         } else if (classifyDatas[i].name === "cloudshare") {
-          $("#countList").prepend("<div class=\"count-list-item\">" + classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number + "</div>");
+          $("#countList").prepend("<div class=\"count-list-item font-bolder\">" + classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number + "</div>");
         } else if (classifyDatas[i].number !== 0){
           $("#countList").append("<div class=\"count-list-item\">" + classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number + "</div>");
         }

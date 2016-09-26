@@ -41,7 +41,7 @@ class UploadCVAPI(Resource):
             else:
                 results.append({ 'id': item['id'], 'status': 'fail', 'filename': upobj.filepro.yamlinfo['filename'] })
         def_cv_name = self.svc_mult_cv.default.name
-        self.svc_min.sim[def_cv_name].add_documents(names, documents)
+        self.svc_min.sim[def_cv_name][def_cv_name].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):

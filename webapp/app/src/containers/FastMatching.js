@@ -12,14 +12,19 @@ export default class FastMatching extends Component {
   constructor() {
     super();
     this.state = {
+      id: '',
       classify: [],
       searchResultDataSource: [],
       pages: 0,
       total: 0,
       spinning: true,
+      visible: false,
+      postData: {},
     };
 
-    this.loadSearchResultData = this.loadSearchResultData.bind(this);
+    this.loadClassifyData = this.loadClassifyData.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.handleSwitchPage = this.handleSwitchPage.bind(this);
   }
 
   loadClassifyData() {
@@ -36,31 +41,77 @@ export default class FastMatching extends Component {
     })
   }
 
-  loadSearchResultData() {
+  handleSearch(value) {
+    const filterData = {};
+    for (let key in value) {
+      if (key !== 'uses') {
+        filterData[key] = value[key];
+      }
+    }
+    const postData = {
+      id: '5b8fcdb00d0b11e6bb746c3be51cefca',
+      uses: value.uses,
+      filterdict: filterData,
+    };
+
     this.setState({
+      postData: postData,
+      visible: true,
       spinning: true,
     });
 
-    fetch(`/api/mining/lsibyjdid/e761265657c311e6b4544ccc6a30cd76`, {
-      method: 'GET',
+    fetch(`/api/mining/lsibyjdid`, {
+      method: 'POST',
       credentials: 'include',
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
     })
     .then(response => response.json())
     .then((json) => {
-      if (json.code === 200) {
-        this.setState({
+      this.setState({
+          spinning: false,
           searchResultDataSource: json.data.datas,
           pages: json.data.pages,
           total: json.data.totals,
-          spinning: false,
-        });
-      }
+      });
+    })
+  }
+
+  handleSwitchPage(page) {
+    this.setState({
+      spinning: true,
+      searchResultDataSource: [],
     });
+    fetch(`/api/mining/lsibyjdid`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Basic ${localStorage.token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(Object.assign(this.state.postData, { page: page })),
+    })
+    .then(response => response.json())
+    .then((json) => {
+      this.setState({
+        spinning: false,
+        searchResultDataSource: json.data.datas,
+      });
+    })
   }
 
   componentDidMount() {
+    const url = window.location.href.split('/');
+
+    this.setState({
+      id: url[url.length - 1],
+    });
     this.loadClassifyData();
-    this.loadSearchResultData();
   }
 
   render() {
@@ -69,11 +120,16 @@ export default class FastMatching extends Component {
         <Header />
         <FilterBox
           classify={this.state.classify}
+          visible={this.state.visible}
           total={this.state.total}
+          onSearch={this.handleSearch}
         />
         <SearchResultBox
+          visible={this.state.visible}
+          total={this.state.total}
           spinning={this.state.spinning}
           dataSource={this.state.searchResultDataSource}
+          onSwitchPage={this.handleSwitchPage}
         />
       </div>
     );

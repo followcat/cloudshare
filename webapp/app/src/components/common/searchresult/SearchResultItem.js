@@ -33,7 +33,7 @@ export default class SearchResultItem extends Component {
               <Checkbox />
             </Col>
             <Col span={4}>
-              <a href={`/show/${props.cv_id}`} target="_blank">{props.yaml_info.name}</a>
+              <a href={`/show/${props.cv_id}`} target="_blank">{props.yaml_info.name ? props.yaml_info.name : props.yaml_info.id}</a>
             </Col>
             <Col span={1}>{props.yaml_info.gender}</Col>
             <Col span={1}>{props.yaml_info.age}</Col>

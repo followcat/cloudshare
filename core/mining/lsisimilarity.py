@@ -56,6 +56,10 @@ class LSIsimilarity(object):
         with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
             ujson.dump(self.corpus, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
+        self.clear()
+
+    def clear(self):
+        self.corpus = None
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:

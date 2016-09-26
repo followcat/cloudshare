@@ -51,6 +51,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
             info['committer'] = committer
             name = core.outputstorage.ConvertName(id).yaml
             utils.builtin.save_yaml(info, self.cvpath, name)
+            utils.builtin.save_json(self.cvids, self.path, self.ids_file)
             self.interface.add_files([bytes(self.ids_file),
                                       bytes(os.path.join(self.YAML_DIR, name))],
                                       message='Add new cv %s.'%id,

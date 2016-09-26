@@ -9,6 +9,7 @@ import utils.builtin
 import core.mining.info
 import core.mining.valuable
 
+import json
 
 class BaseAPI(Resource):
 
@@ -71,32 +72,24 @@ class LSIbaseAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        super(LSIAPI, self).__init__()
+        super(LSIbaseAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
-        self.sim_names = miner.addition_names()
-        self.uses = miner.default_names()
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('uses', type = list, location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
-        self.reqparse.add_argument('filterdict', type = dict, location = 'json')
+        self.sim_names = self.miner.addition_names()
+        self.basemodel = self.svc_mult_cv.default.name
 
-    def _get(self, doc):
-        args = self.reqparse.parse_args()
-        uses = self.uses + args['uses']
+    def _post(self, doc, uses, filterdict, cur_page):
+        basemodel = self.basemodel
         count = 20
-        cur_page = args['page']
-        filterdict = args['filterdict']
-        datas, pages, totals = self.process(uses, doc, cur_page,
-                                            count, filterdict)
+        datas, pages, totals = self.process(basemodel, uses, doc, cur_page, count, filterdict)
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
-    def process(self, uses, doc, cur_page, eve_count, filterdict=None):
+    def process(self, basemodel, uses, doc, cur_page, eve_count, filterdict=None):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(doc, uses=uses)
+        result = self.miner.probability(basemodel, doc, uses=uses)
         if filterdict:
             filteset = self.index.get(filterdict, uses=uses)
             result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
@@ -106,13 +99,25 @@ class LSIbaseAPI(Resource):
         else:
             pages = totals/eve_count
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = self.svc.getyaml(name)
+            yaml_info = self.svc_mult_cv.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
                 'match': score
             }
-            datas.append([name, yaml_info, info])
+            ex_company = yaml_info['experience']['company']
+            ex_position = yaml_info['experience']['position']
+            if len(ex_position) > 0:
+                for position in ex_position:
+                    for company in ex_company:
+                        if position['at_company'] == company['id']:
+                            position['company'] = company['name']
+                            if 'business' in company:
+                                position['business'] = company['business']
+                yaml_info['experience'] = ex_position
+            else: 
+                yaml_info['experience'] = ex_company
+            datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
         return datas, pages, totals
 
 
@@ -121,12 +126,23 @@ class LSIbyJDidAPI(LSIbaseAPI):
     def __init__(self):
         super(LSIbyJDidAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.uses = self.miner.default_names()
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('uses', type = list, location = 'json')
+        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
-    def get(self, id):
+    def post(self):
+        args = self.reqparse.parse_args()
+        id = args['id']
         jd_yaml = self.svc_mult_cv.default.jd_get(id+'.yaml')
         doc = jd_yaml['description']
-        result = self._get(doc)
-        return { 'result': result }
+        uses = self.uses + args['uses']
+        filterdict = args['filterdict']
+        cur_page = args['page']
+        result = self._post(doc, uses, filterdict, cur_page)
+        return { 'code': 200, 'data': result }
 
 
 class LSIbydocAPI(LSIbaseAPI):
@@ -173,7 +189,7 @@ class ValuablebaseAPI(Resource):
         super(ValuablebaseAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
-        self.uses = miner.default_names()
+        self.uses = self.miner.default_names()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')

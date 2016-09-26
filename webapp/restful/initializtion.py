@@ -50,7 +50,8 @@ def initialize(app):
     api.add_resource(PositionAPI, '/api/mining/position/<string:text>', endpoint = 'position')
 
     api.add_resource(LSIbydocAPI, '/api/mining/lsibydoc', endpoint = 'lsibydoc')
-    api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid/<string:id>', endpoint = 'lsibyjdid')
+    # api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid/<string:id>', endpoint = 'lsibyjdid')
+    api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
 
     api.add_resource(SimilarAPI, '/api/mining/similar/<string:id>', endpoint = 'similar')
 

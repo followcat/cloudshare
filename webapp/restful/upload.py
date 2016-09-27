@@ -28,20 +28,22 @@ class UploadCVAPI(Resource):
         updates = args['updates']
         names = []
         documents = []
+        def_cv_name = self.svc_mult_cv.default.name
         for item in updates:
+            status = 'fail'
             upobj = upload[user.id].pop(item['id'])
             for key, value in item.iteritems():
                 if key is not u'id':
                     upobj.filepro.yamlinfo[key] = value
-            result = self.svc_mult_cv.add(upobj, user.id)
+            result = self.svc_mult_cv.add(upobj, user.id, def_cv_name)
             if result is True:
                 names.append(upobj.ID+'.md')
                 documents.append(upobj.markdown())
-                results.append({ 'id': item['id'], 'status': 'success', 'filename': upobj.filepro.yamlinfo['filename'] })
-            else:
-                results.append({ 'id': item['id'], 'status': 'fail', 'filename': upobj.filepro.yamlinfo['filename'] })
-        def_cv_name = self.svc_mult_cv.default.name
-        self.svc_min.sim[def_cv_name].add_documents(names, documents)
+                status = 'success'
+            results.append({ 'id': item['id'],
+                             'status': status,
+                             'filename': upobj.filepro.yamlinfo['filename'] })
+        self.svc_min.sim[def_cv_name][def_cv_name].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):

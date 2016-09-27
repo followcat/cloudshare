@@ -147,9 +147,9 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
 
         for (var i = 0, len = data.length; i < len; i++) {
           if (model === data[i] && model !== "") {
-            $("#modelMenu").append("<li><a href=\"#\" class=\"model-item\" data-flag=\"true\">"+ data[i] +"<span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></a></li>");
+            $("#modelMenu").append("<p>"+ data[i] +"</p>");
           } else {
-            $("#modelMenu").append("<li><a href=\"#\" class=\"model-item\" data-flag=\"false\">"+ data[i] +"</a></li>");
+            $("#modelMenu").append("<p>"+ data[i] +"</p>");
           }
         }
       }

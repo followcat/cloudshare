@@ -46,7 +46,7 @@ def filter(processer, origin_path, filename):
         move_file(path, origin_path, filename)
 
 
-def convert_folder(path, svc_cv, temp_output, committer=None, origin=None):
+def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origin=None):
     import services.curriculumvitae
     if not os.path.exists(temp_output):
         os.makedirs(temp_output)
@@ -63,7 +63,7 @@ def convert_folder(path, svc_cv, temp_output, committer=None, origin=None):
                 if not upobj.filepro.yamlinfo['name']:
                     upobj.filepro.yamlinfo['name'] = '' # name_from_filename(filename)
             try:
-                result = svc_cv.add(upobj, unique=False)
+                result = svc_cv.add(upobj, unique=False, projectname=projectname)
             except core.exception.DuplicateException as error:
                 continue
 

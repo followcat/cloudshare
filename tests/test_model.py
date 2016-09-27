@@ -20,7 +20,7 @@ class NotInRankRange(RuntimeError):
 def get_job_description(jd_id, jd_service=None):
     if jd_service is None:
         import webapp.settings
-        jd_service = webapp.settings.SVC_JD
+        jd_service = webapp.settings.SVC_PRJ_MED.jobdescription
     jd = jd_service.get(jd_service.search(jd_id)[0])['description']
     return jd
 
@@ -35,10 +35,11 @@ def get_scores(job_desc, sim=None, json_file=None):
 def test_kgr_generator(sim=None, json_file=None):
     if json_file is None and sim is None:
         import webapp.settings
-        sim = webapp.settings.SVC_MIN
+        sim = webapp.settings.SVC_MIN.sim['medical']['medical']
     for _d in datas:
         jd_id, cvs = _d.popitem()
-        job_desc = get_job_description(jd_id, webapp.settings.SVC_JD)
+        job_desc = get_job_description(jd_id,
+                        webapp.settings.SVC_PRJ_MED.jobdescription)
         global scores
         scores = get_scores(job_desc, sim=sim, json_file=json_file)
         for cv_id in cvs:

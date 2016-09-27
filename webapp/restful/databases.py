@@ -3,26 +3,52 @@ import flask.ext.login
 from flask.ext.restful import Resource
 
 
-class DatabasesAPI(Resource):
-
-    decorators = [flask.ext.login.login_required]
+class ProjectNamesAPI(Resource):
     
     def __init__(self):
-        self.svc_cv = flask.current_app.config['SVC_CV']
-        super(DatabasesAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(ProjectNamesAPI, self).__init__()
 
     def get(self):
-        return { 'code': 200, 'data': [a.name for a in self.svc_cv.additionals] }
+        return { 'code': 200, 'data': self.svc_mult_cv.projects.keys() }
 
 
-class DBNumbersAPI(Resource):
+class AdditionNamesAPI(Resource):
 
-    decorators = [flask.ext.login.login_required]
-    
     def __init__(self):
-        self.svc_cv = flask.current_app.config['SVC_CV']
-        super(DatabasesAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(AdditionNamesAPI, self).__init__()
+
+    def get(self):
+        return { 'code': 200, 'data': self.svc_mult_cv.additionals.keys() }
+
+
+class DBNumberAPI(Resource):
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(DBNumberAPI, self).__init__()
 
     def get(self, name):
-        numbs = self.svc_cv.getnums()
+        numbs = self.svc_mult_cv.getnums()
         return { 'result': numbs[name] }
+
+
+class DBNumbersAPI(flask.views.MethodView):
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(DBNumbersAPI, self).__init__()
+
+    def get(self):
+        return { 'result': self.svc_mult_cv.getnums() }
+
+
+class ClassifyAPI(flask.views.MethodView):
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(ClassifyAPI, self).__init__()
+
+    def get(self):
+        return { 'code': 200, 'data': self.svc_mult_cv.default.getclassify() }

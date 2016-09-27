@@ -1,62 +1,85 @@
 class MultiCV(object):
 
-    def __init__(self, defaultsvc, additionals=None):
-        self.default = defaultsvc
+    def __init__(self, projects, repodb, additionals=None):
+        self.default = projects[0]
+        self.repodb = repodb
+        self.projects = dict([tuple([p.name, p]) for p in projects])
         if additionals is None:
-            self.additionals = []
+            self.additionals = dict()
         else:
             self.additionals = additionals
-        self.svcls = [self.default] + self.additionals
+        self.svcls = projects + self.additionals.values()
 
-    def add(self, *args, **kwargs):
-        return self.default.add(*args, **kwargs)
+    def getproject(self, name=None):
+        if name is not None:
+            assert name in self.projects
+            projectcv = self.projects[name]
+        projectcv = self.default
+        return projectcv
 
-    def add_md(self, *args, **kwargs):
-        return self.default.add_md(*args, **kwargs)
+    def add(self, cvobj, committer=None, unique=True, projectname=None):
+        if projectname is None:
+            projectname = self.default.name
+        result = self.repodb.add(cvobj, committer, unique)
+        if result is True:
+            project = self.getproject(projectname)
+            project.add(cvobj.filepro.name.base, committer)
+        return result
 
-    def modify(self, *args, **kwargs):
-        return self.default.modify(*args, **kwargs)
+    def add_md(self, cvobj, committer=None):
+        return self.repodb.add_md(cvobj, committer)
 
-    def yamls(self, *args, **kwargs):
-        return self.default.yamls(*args, **kwargs)
+    def modify(self, filename, stream, message=None, committer=None):
+        return self.repodb.modify(filename, stream, message, committer)
 
-    def datas(self, *args, **kwargs):
-        return self.default.datas(*args, **kwargs)
+    def yamls(self, projectname=None):
+        cvservice = self.getproject(projectname)
+        return cvservice.yamls()
 
-    def search(self, *args, **kwargs):
-        return self.default.search(*args, **kwargs)
+    def datas(self, projectname=None):
+        cvservice = self.getproject(projectname)
+        return cvservice.datas()
 
-    def search_yaml(self, *args, **kwargs):
-        return self.default.search_yaml(*args, **kwargs)
+    def search(self, keyword, projectname=None):
+        cvservice = self.getproject(projectname)
+        return cvservice.search(keyword)
 
-    def gethtml(self, id):
-        result = self.default.gethtml(id)
+    def search_yaml(self, keyword, projectname=None):
+        cvservice = self.getproject(projectname)
+        return cvservice.search_yaml(keyword)
+
+    def gethtml(self, id, projectname=None):
+        cvservice = self.getproject(projectname)
+        result = cvservice.gethtml(id)
         if result is None:
-            for each in self.svcls:
+            for each in self.additionals.values():
                 result = each.gethtml(id)
                 if result is not None:
                     break
         return result
 
-    def getmd(self, id):
-        result = self.default.getmd(id)
+    def getmd(self, id, projectname=None):
+        cvservice = self.getproject(projectname)
+        result = cvservice.getmd(id)
         if result is None:
-            for each in self.svcls:
+            for each in self.additionals.values():
                 result = each.getmd(id)
                 if result is not None:
                     break
         return result
 
-    def getyaml(self, id):
+    def getyaml(self, id, projectname=None):
+        cvservice = self.getproject(projectname)
         try:
-            result = self.default.getyaml(id)
+            result = cvservice.getyaml(id)
         except IOError:
             result = None
         if result is None:
-            for each in self.svcls:
+            for each in self.additionals.values():
                 try:
                     result = each.getyaml(id)
-                    break
+                    if result is not None:
+                        break
                 except IOError:
                     result = None
         if result is None:

@@ -26,7 +26,8 @@ require([
   "jquery",
   "cvdeal",
   "Upload",
-  "bootstrap"
+  "bootstrap",
+  "header"
 ], function($, cvdeal, Upload) {
 
   cvdeal.cvDeal("cvContent", function() {
@@ -50,9 +51,20 @@ require([
     }
   });
 
+  $.ajax({
+    url: "/modellist",
+    type: "POST",
+    success: function(response) {
+      for (var i = 0, len = response.length; i < len; i++) {
+        $("#modelSelection").append("<option value=\""+ response[i] +"\">"+ response[i] +"</option>")
+      }
+    }  
+  });
+  
   $("#confirmBtn").on("click", function() {
     var nameValue = $("#resumeName").length > 0 ? $("#resumeName").val().trim() : null,
         sourceValue = $("#originSelection").length > 0 ? $("#originSelection").val() : null,
+        modelValue = $("#modelSelection").length > 0 ? $("#modelSelection").val() : null,
         _id = localStorage.name ? localStorage.name : null,
         postURL = "",
         postData = null;
@@ -66,7 +78,8 @@ require([
       postURL = "/confirm";
       postData = {
         "name": nameValue !== "" ? nameValue : $("#resumeName").focus(),
-        "origin": sourceValue
+        "origin": sourceValue,
+        "model": modelValue,
       };
     }
 

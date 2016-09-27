@@ -5,7 +5,6 @@ import os.path
 import yaml
 
 import services.base
-import services.exception
 
 
 class JobDescription(services.base.Service):
@@ -17,11 +16,8 @@ class JobDescription(services.base.Service):
 
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> svc_co = services.company.Company(interface)
-        >>> svc_co.add('CompanyA', 'This is Co.A', 'Dever')
-        True
 
-        >>> svc_jd = services.jobdescription.JobDescription(interface, svc_co)
+        >>> svc_jd = services.jobdescription.JobDescription(interface)
         >>> svc_jd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
         >>> results = svc_jd.search('JD-A')
@@ -40,11 +36,9 @@ class JobDescription(services.base.Service):
     """
     path = 'JD'
 
-    def __init__(self, interface, svc_co, name=None):
+    def __init__(self, interface, name=None):
         super(JobDescription, self).__init__(interface, name)
         self.repo_path = self.interface.repo.path + "/" + self.path
-        self.svc_co = svc_co
-        self.info = ""
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
@@ -54,11 +48,6 @@ class JobDescription(services.base.Service):
         return yaml.load(yaml_str)
 
     def add(self, company, name, description, committer, status=None):
-        try:
-            self.svc_co.company(company)
-        except services.exception.NotExistsCompany:
-            self.info = "NotExistsCompany."
-            return False
         if status is None:
             status = 'Opening'
 

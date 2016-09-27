@@ -34,7 +34,7 @@ export default class Upload extends Component {
   }
 
   loadClassify() {
-    fetch(`/api/databases`, {
+    fetch(`/api/additionnames`, {
       method: 'GET',
       headers: {
         'Authorization': `Basic ${localStorage.token}`

@@ -137,5 +137,46 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
   };
   header.UploadDiv($(".upload"));
 
+  header.getModelList = function() {
+    $.ajax({
+      url: "/modellist",
+      type: "POST",
+      success: function(response) {
+        var data = response.model_list,
+            model = localStorage.model ? localStorage.model : '';
+
+        for (var i = 0, len = data.length; i < len; i++) {
+          if (model === data[i] && model !== "") {
+            $("#modelMenu").append("<p>"+ data[i] +"</p>");
+          } else {
+            $("#modelMenu").append("<p>"+ data[i] +"</p>");
+          }
+        }
+      }
+    })
+  };
+  header.getModelList();
+
+  header.modelItemEvent = function() {
+    $("#modelMenu").delegate(".model-item", "click", function() {
+      var _this = $(this);
+      if (_this.attr("data-flag") === "true") {
+        _this.attr("data-flag", "false");
+        localStorage.model = "";
+        _this.find(".glyphicon").remove();
+      } else {
+        var models = $(".model-item");
+        for (var i = 0, len = models.length; i < len; i++) {
+          $(models[i]).attr("data-flag", "false");
+          $(models[i]).find(".glyphicon").remove();
+        }
+        localStorage.model = _this.text();
+        _this.attr("data-flag", "true");
+        _this.append("<span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span>");
+      }
+    });
+  };
+  header.modelItemEvent();
+
   return header;
 });

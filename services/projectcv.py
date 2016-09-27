@@ -65,6 +65,11 @@ class ProjectCV(services.simulationcv.SimulationCV):
             info[each[0]] = each[1]
         return info
 
+    def getmd_en(self, id):
+        yamlinfo = self.getyaml(id)
+        veren = yamlinfo['enversion']
+        return self.repo.gethtml(veren)
+
     def getinfo(self, id):
         if not self.exists(id):
             return None

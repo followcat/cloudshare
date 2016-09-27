@@ -13,9 +13,9 @@ from extractor.utils_parsing import *
 EDUCATION_REQUIREMENT = re.compile(ur'(?P<education>.+)[及或]?以上学历')
 
 
-def rate(miner, svc_cv, doc, top=10, selected=5, uses=None, name_list=None):
+def rate(miner, svc_cv, doc, basemodel, top=10, selected=5, uses=None, name_list=None):
     result = []
-    rating = next(miner, svc_cv, doc, top, uses=uses, name_list=name_list)
+    rating = next(miner, svc_cv, doc, top, basemodel, uses=uses, name_list=name_list)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]
     for text, rate in rating:
@@ -51,20 +51,20 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(miner, svc_cv, doc, top, uses=None, name_list=None):
+def next(miner, svc_cv, doc, top, basemodel, uses=None, name_list=None):
     rating = []
     extract_data_full = []
     if name_list is not None:
-        names_data_full = miner.minelist(doc, name_list)
+        names_data_full = miner.minelist(doc, name_list, basemodel)
         extract_data_full.extend(extract(names_data_full))
     else:
         name_list = []
-        top_data_full = miner.minetop(doc, top, uses=uses)
+        top_data_full = miner.minetop(doc, basemodel, top=top, uses=uses)
         extract_data_full = extract(top_data_full)
         name_list.extend([core.outputstorage.ConvertName(each[1]).md
                           for each in extract_data_full])
     rating.append((doc, extract_data_full))
-    total = miner.lenght(uses=miner.default_names())
+    total = miner.lenght(basemodel, uses=miner.default_names())
     for text in doc.split('\n'):
         if not text.strip():
             continue
@@ -73,8 +73,9 @@ def next(miner, svc_cv, doc, top, uses=None, name_list=None):
             total_point = mine_education(svc_cv,
                 education_requirement.group('education'), name_list)
         else:
-            value_res = miner.minelist(text, name_list)
-            rank_res = miner.minelistrank(text, value_res, uses=miner.default_names())
+            value_res = miner.minelist(text, name_list, basemodel)
+            rank_res = miner.minelistrank(text, value_res, basemodel,
+                                          uses=miner.default_names())
             value_point = map(lambda x: (x[0], float(x[1])/2), value_res)
             rank_point = map(lambda x: (x[0], rankvalue(x[1], total)), rank_res)
             total_point = map(lambda x: (x[0][0], x[0][1]*0.5+x[1][1]*0.5),

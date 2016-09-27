@@ -51,23 +51,8 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/cvnumbers',
-        view_func=webapp.views.views.CVnumbers.as_view('cvnumbers'),
-        )
-
-    app.add_url_rule(
         '/search',
         view_func=webapp.views.views.Search.as_view('search'),
-        )
-
-    app.add_url_rule(
-        '/batchupload',
-        view_func=webapp.views.views.BatchUpload.as_view('batchupload'),
-        )
-
-    app.add_url_rule(
-        '/batchconfirm',
-        view_func=webapp.views.views.BatchConfirm.as_view('batchconfirm'),
         )
 
     app.add_url_rule(
@@ -78,11 +63,6 @@ def configure(app):
     app.add_url_rule(
         '/uppreview',
         view_func=webapp.views.views.UploadPreview.as_view('uppreview'),
-        )
-
-    app.add_url_rule(
-        '/confirm',
-        view_func=webapp.views.views.Confirm.as_view('confirm'),
         )
 
     app.add_url_rule(
@@ -208,4 +188,9 @@ def configure(app):
     app.add_url_rule(
         '/resumetojd/<path:filename>/<status>',
         view_func=webapp.views.jobdescription.ResumeToJobDescription.as_view('resumetojd'),
+        )
+
+    app.add_url_rule(
+        '/modellist',
+        view_func=webapp.views.mining.ModelList.as_view('modellist'),
         )

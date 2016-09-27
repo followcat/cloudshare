@@ -29,7 +29,7 @@ def get_tagfromstring(tag, stream, rule=None):
         re_string += each
         re_string += ur"[ \u3000]*"
     re_string += ur"[ \u3000:\uff1a]+(?P<tag>[%s]+)\W" % rule
-    re_words = re.search(re_string, stream)
+    re_words = re.search(re_string, stream.replace(u'\xa0', ' '))
     if re_words is not None:
         name = re_words.group('tag')
     return name

@@ -6,6 +6,7 @@ import core.mining.lsisimilarity
 
 from utils.builtin import jieba_cut, pos_extract
 
+
 REJECT = re.compile('(('+')|('.join([
     u'中文', u'日期', u'汽车',
     #u'个人', u'未填写',
@@ -145,10 +146,13 @@ def silencer(document):
             if word.istitle():
                 # Can make it match SHORT later for skip (eg 'Ltd' ...)
                 word = word.lower()
-            if not SHORT.match(word):
+            if SHORT.match(word):
+                continue
                 # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
-                word = word.lower()
-                out.append(word)
+            if len(word) == 1:
+                continue
+            word = word.lower()
+            out.append(word)
         selected_texts.append(out)
     if isinstance(document, list):
         return selected_texts
@@ -161,11 +165,11 @@ class Mining(object):
     def __init__(self, path, cvsvc, slicer=None):
         self.sim = {}
         self.path = path
-        self.lsi_model = None
-        self.services = {
-                'default': [cvsvc.default],
-                'all': cvsvc.svcls
-            }
+        self.lsi_model = dict()
+        self.additionals = cvsvc.additionals
+        self.services = {'default': cvsvc.projects, 'all': dict()}
+        self.services['all'].update(cvsvc.projects)
+        self.services['all'].update(cvsvc.additionals)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
@@ -178,91 +182,106 @@ class Mining(object):
         assert name in self.services
         self.add(self.services[name], name)
 
-    def make_lsi(self, service):
-        self.lsi_model = None
-        lsi_path = os.path.join(self.path, 'model')
-        lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer)
-        try:
-            lsi.load()
-        except IOError:
-            if lsi.build(service):
-                lsi.save()
-        self.lsi_model = lsi
-
-    def add(self, svc_list, name):
-        assert self.lsi_model
-        save_path = os.path.join(self.path, name)
-        for svc in svc_list:
-            assert svc.name
-            index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path, svc.name), self.lsi_model)
+    def make_lsi(self, services):
+        self.lsi_model = dict()
+        for name in services:
+            service = services[name]
+            lsi_path = os.path.join(self.path, name, 'model')
+            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer)
             try:
-                index.load()
+                lsi.load()
             except IOError:
-                if index.build([svc]):
-                    index.save()
-            self.sim[svc.name] = index
+                if lsi.build([service]):
+                    lsi.save()
+            self.lsi_model[name] = lsi
+
+    def add(self, services, name):
+        assert self.lsi_model
+        for modelname in self.lsi_model:
+            if not self.lsi_model[modelname].names:
+                continue
+            model = self.lsi_model[modelname]
+            save_path = os.path.join(self.path, modelname, name)
+            self.sim[modelname] = dict()
+            for svc_name in services:
+                svc = services[svc_name]
+                index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
+                                                                svc_name), model)
+                try:
+                    index.load()
+                except IOError:
+                    if index.build([svc]):
+                        index.save()
+                self.sim[modelname][svc_name] = index
 
     def update_model(self):
-        updated = self.lsi_model.update(self.services['default'])
-        if updated:
-            self.update_sims()
+        for modelname in self.lsi_model:
+            updated = self.lsi_model[modelname].update([self.services['default'][modelname]])
+            if updated:
+                self.update_sims()
 
     def update_sims(self):
-        for name in self.services:
-            for svc in self.services[name]:
-                self.sim[svc.name].update([svc])
-                self.sim[svc.name].save()
+        for modelname in self.sim:
+            for simname in self.sim[modelname]:
+                svc = self.services['all'][simname]
+                self.sim[modelname][simname].update([svc])
+                self.sim[modelname][simname].save()
 
-    def probability(self, doc, uses=None):
+    def probability(self, basemodel, doc, uses=None):
         if uses is None:
-            uses = self.sim.keys()
+            uses = self.sim[basemodel].keys()
         result = []
         for name in uses:
-            sim = self.sim[name]
+            sim = self.sim[basemodel][name]
             result.extend(sim.probability(doc))
         return sorted(result, key=lambda x:float(x[1]), reverse=True)
 
-    def probability_by_id(self, doc, id, uses=None):
+    def probability_by_id(self, basemodel, doc, id, uses=None):
         if uses is None:
-            uses = self.sim.keys()
+            uses = self.sim[basemodel].keys()
         result = tuple()
         for dbname in uses:
-            sim = self.sim[dbname]
+            sim = self.sim[basemodel][dbname]
             probability = sim.probability_by_id(doc, id)
             if probability is not None:
                 result = probability
                 break
         return result
 
-    def lenght(self, uses=None):
+    def lenght(self, basemodel, uses=None):
         if uses is None:
-            uses = self.sim.keys()
+            uses = self.sim[basemodel].keys()
         result = 0
         for name in uses:
-            sim = self.sim[name]
+            sim = self.sim[basemodel][name]
             result += len(sim.names)
         return result
 
-    def minetop(self, doc, top=None, uses=None):
-        results = self.probability(doc, uses=uses)
+    def minetop(self, doc, basemodel, top=None, uses=None):
+        results = self.probability(basemodel, doc, uses=uses)
         if top is None:
             top = len(results)
         return results[:top]
 
-    def minelist(self, doc, lists, uses=None):
-        return map(lambda x: self.probability_by_id(doc, x, uses=uses), lists)
+    def minelist(self, doc, lists, basemodel, uses=None):
+        return map(lambda x: self.probability_by_id(basemodel, doc, x, uses=uses), lists)
 
-    def minelistrank(self, doc, lists, uses=None):
-        probalist = set(self.probability(doc, uses=uses))
+    def minelistrank(self, doc, lists, basemodel, uses=None):
+        probalist = set(self.probability(basemodel, doc, uses=uses))
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return map(lambda x: (x[0], ranklist.index(x)), lists)
 
     def default_names(self):
-        return [n.name for n in self.services['default'] if n.name in self.sim.keys()]
+        return [name for name in self.services['default']]
 
     def addition_names(self):
-        names = self.sim.keys()
-        for n in self.default_names():
-            names.remove(n)
-        return names
+        return [name for name in self.additionals]
+
+    @property
+    def SIMS(self):
+        results = list()
+        for modelname in self.lsi_model:
+            for simname in self.sim[modelname]:
+                results.append(self.sim[modelname][simname])
+        return results

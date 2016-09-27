@@ -32,8 +32,9 @@ SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
 FLAGS = ['x', # spaces
          'm', # number and date
          #'a', # adverb
+         'ad', 'an',
          'c', # conjunction
-         'd', # adverb
+         'd', 'df', # adverb
          'e', # interjection
          'f', # noun of locality
          'g', # morpheme word
@@ -41,17 +42,19 @@ FLAGS = ['x', # spaces
          'i', # idiom
          #'j', # abbreviation
          'k', # suffix
-         'nrt', 'nr', 'ng', #'nz', fails on myjnoee7.md
+         'm', 'mq',
+         'nrt', 'nr', 'ng', 'nrfg', 'ngrf', #'nz', fails on myjnoee7.md
          'o', # onomatopoeia
          'p', # preposition
          'q', # quantifier
-         'r', # pronoun
-         'tg', # time root word
-         'u', # unclassified (eg. etc)
-         'vg', # verb morpheme word
+         'r', 'rg', 'rr', # pronoun
+         's', #space
+         't', 'tg', # time root word
+         'u', 'ug', # unclassified (eg. etc)
+         'vi', 'vd', 'vg', 'vq',  # verb morpheme word
          #'v', # verb
          'y', # statement label designator
-         'z', # State word
+         'z', 'zg', # State word
          #'ns', # city and country
         ]
 

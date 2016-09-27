@@ -8,6 +8,7 @@ import { LocaleProvider } from 'antd';
 
 import ListJD from '../containers/ListJD';
 import JobDescription from '../components/listjd/JobDescription';
+import Company from '../components/listjd/Company';
 
 ReactDOM.render(
   <LocaleProvider locale={enUS}>
@@ -15,6 +16,7 @@ ReactDOM.render(
       <Route path="/" component={ListJD}>
         <IndexRoute component={JobDescription} />
         <Route path="/jobdescription" component={JobDescription} />
+        <Route path="/company" component={Company} />
       </Route>
     </Router>
   </LocaleProvider>,

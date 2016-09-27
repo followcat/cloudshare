@@ -1,43 +1,24 @@
 import os
 import yaml
 
-import utils.builtin
-import core.outputstorage
+import utils._yaml
 import sources.industry_id
+import services.simulationcv
 
 
-class ClassifyCV(object):
+class ClassifyCV(services.simulationcv.SimulationCV):
 
     INDUSTRY_DIR = "JOBTITLES"
 
-    config_file = 'config.json'
-    ids_file = 'names.json'
-
     def __init__(self, name, path, cvstorage, rawdb):
-        self.name = name
-        self.path = os.path.join(path, name)
-        self.cvids = set()
-        self.config = dict()
-        self.cvstorage = cvstorage
+        super(ClassifyCV, self).__init__(name, path, cvstorage)
         self.rawdb = rawdb
-        try:
-            self.load()
-        except IOError:
-            pass
 
     def setup(self):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         self.config['classify'] = self.name
         self.update()
-
-    def load(self):
-        self.config = utils.builtin.load_json(self.path, self.config_file)
-        self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
-
-    def save(self):
-        utils.builtin.save_json(self.config, self.path, self.config_file)
-        utils.builtin.save_json(self.cvids, self.path, self.ids_file)
 
     def update(self):
         in_id = sources.industry_id.industryID[self.config['classify']]
@@ -53,37 +34,3 @@ class ClassifyCV(object):
                 if not self.exists(id):
                     self._add(id)
         self.save()
-
-    def exists(self, name):
-        id = core.outputstorage.ConvertName(name)
-        return id in self.cvids
-
-    def _add(self, name):
-        id = core.outputstorage.ConvertName(name).base
-        self.cvids.add(id)
-
-    def yamls(self):
-        for id in self.cvids:
-            yield core.outputstorage.ConvertName(id).yaml
-
-    def names(self):
-        for id in self.cvids:
-            yield core.outputstorage.ConvertName(id).md
-
-    def getmd(self, name):
-        return self.cvstorage.getmd(name)
-
-    def getyaml(self, name):
-        return self.cvstorage.getyaml(name)
-
-    def gethtml(self, name):
-        return self.cvstorage.gethtml(name)
-
-    def datas(self):
-        for name in self.names():
-            text = self.cvstorage.getmd(name)
-            yield name, text
-
-    @property
-    def NUMS(self):
-        return len(self.cvids)

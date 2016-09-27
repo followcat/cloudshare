@@ -46,22 +46,24 @@ def filter(processer, origin_path, filename):
         move_file(path, origin_path, filename)
 
 
-def convert_folder(path, repo, temp_output, committer=None, origin=None):
+def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origin=None):
+    import services.curriculumvitae
     if not os.path.exists(temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
-            processfile = core.converterutils.FileProcesser(f, filename, temp_output)
+            upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
+                                                                   f, temp_output)
             if origin is not None:
-                processfile.yamlinfo['origin'] = origin
-            if not processfile.yamlinfo['name']:
-                name = utils.chsname.name_from_51job(processfile.markdown_stream)
-                processfile.yamlinfo['name'] = name
-                if not processfile.yamlinfo['name']:
-                    processfile.yamlinfo['name'] = utils.chsname.name_from_filename(filename)
+                upobj.filepro.yamlinfo['origin'] = origin
+            if not upobj.filepro.yamlinfo['name']:
+                name = '' # name_from_51job(processfile.markdown_stream)
+                upobj.filepro.yamlinfo['name'] = name
+                if not upobj.filepro.yamlinfo['name']:
+                    upobj.filepro.yamlinfo['name'] = '' # name_from_filename(filename)
             try:
-                processfile.storage(repo, committer=committer)
+                result = svc_cv.add(upobj, unique=False, projectname=projectname)
             except core.exception.DuplicateException as error:
                 continue
 
@@ -128,7 +130,7 @@ def yamlaction(svc_cv, action, *args, **kwargs):
 
 
 
-def tracking_and_command(DEF_SVC_CV, attribute, fix=False, filltime=False):
+def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
     def fix_same(l):
         new = list()
         for each in l:
@@ -139,9 +141,9 @@ def tracking_and_command(DEF_SVC_CV, attribute, fix=False, filltime=False):
     import re
     import yaml
     import collections
-    DATA_DB = DEF_SVC_CV.interface
+    REPO_DB = SVC_CV_REPO.interface
     save_dict = collections.defaultdict(list)
-    for each in  DATA_DB.history():
+    for each in  REPO_DB.history():
         filenames = (re.findall('File ([a-z0-9]{8}\.yaml)\:  Add %s\.'%attribute,
                                each['message']) or
                     re.findall('Add %s in ([a-z0-9]{8}\.yaml)\.'%attribute,
@@ -152,7 +154,7 @@ def tracking_and_command(DEF_SVC_CV, attribute, fix=False, filltime=False):
     for each in save_dict:
         if each:
             try:
-                yaml_info = DEF_SVC_CV.getyaml(each)
+                yaml_info = SVC_CV_REPO.getyaml(each)
                 infos = yaml_info[attribute]
             except IOError:
                 print(each)
@@ -170,6 +172,21 @@ def tracking_and_command(DEF_SVC_CV, attribute, fix=False, filltime=False):
                     if 'date' not in infos[index]:
                         yaml_info[attribute][index]['date'] = save_dict[each][index][1]
             if fix or filltime:
-                path_filename = os.path.join(DATA_DB.path, DEF_SVC_CV.path, each)
+                path_filename = os.path.join(REPO_DB.path, SVC_CV_REPO.path, each)
                 with open(path_filename, 'w') as fp:
                     fp.write(yaml.safe_dump(yaml_info, allow_unicode=True))
+
+
+def initproject(SVC_CV_REPO, SVC_PRJ):
+    import utils.builtin
+    for y in SVC_CV_REPO.yamls():
+        info = SVC_CV_REPO.getyaml(y)
+        convert_info = dict()
+        convert_info['tag'] = info.pop('tag')
+        convert_info['comment'] = info.pop('comment')
+        convert_info['tracking'] = info.pop('tracking')
+        convert_info['committer'] = info['committer']
+        SVC_PRJ._add(y)
+        utils.builtin.save_yaml(info, SVC_CV_REPO.repo_path , y)
+        utils.builtin.save_yaml(convert_info, SVC_PRJ.cvpath , y)
+        SVC_PRJ.save()

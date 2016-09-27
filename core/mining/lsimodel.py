@@ -52,7 +52,7 @@ class LSImodel(object):
                 name, doc = data
                 names.append(name)
                 texts.append(doc)
-        if len(names) > 0:
+        if len(names) > 10:
             self.setup(names, texts)
             return True
         return False

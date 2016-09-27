@@ -9,15 +9,15 @@ class JobDescriptionAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_jd = flask.current_app.config['SVC_JD']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('coname', type = str, location = 'json')
-        self.reqparse.add_argument('status', type = str, location = 'json')
-        self.reqparse.add_argument('description', type = str, location = 'json')
+        self.reqparse.add_argument('coname', location = 'json')
+        self.reqparse.add_argument('status', location = 'json')
+        self.reqparse.add_argument('description', location = 'json')
         super(JobDescriptionAPI, self).__init__()
 
     def get(self, id):
-        result = self.svc_jd.get(id)
+        result = self.svc_mult_cv.default.jd_get(id)
         return { 'result': result }
 
     def put(self, id):
@@ -26,20 +26,30 @@ class JobDescriptionAPI(Resource):
         status = args['status']
         co_name = args['coname']
         description = args['description']
-        result = self.svc_jd.modify(id, description, status, user.id)
-        return { 'result': result }
+        result = self.svc_mult_cv.default.jd_modify(id, description, status, user.id)
+        return { 'code': 200, 'data': result, 'message': 'Update job description successed.' }
 
 
-class JobDescriptionByNameAPI(JobDescriptionAPI):
+class JobDescriptionUploadAPI(Resource):
 
-    def post(self, jdname):
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('jd_name', location = 'json')
+        self.reqparse.add_argument('co_name', location = 'json')
+        self.reqparse.add_argument('jd_description', location = 'json')
+        super(JobDescriptionUploadAPI, self).__init__()
+
+    def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        status = args['status']
-        co_name = args['coname']
-        description = args['description']
-        result = self.svc_jd.add(co_name, jd_name, description, user.id, status)
-        return { 'result': result }
+        co_name = args['co_name']
+        jd_name = args['jd_name']
+        description = args['jd_description']
+        result = self.svc_mult_cv.default.jd_add(co_name, jd_name, description, user.id)
+        return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 
 class JobDescriptionListAPI(Resource):
@@ -47,10 +57,10 @@ class JobDescriptionListAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_jd = flask.current_app.config['SVC_JD']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         super(JobDescriptionListAPI, self).__init__()
 
     def get(self):
-        result = self.svc_jd.lists()
-        return { 'result': result }
+        result = self.svc_mult_cv.default.jd_lists()
+        return { 'code': 200, 'data': result }
 

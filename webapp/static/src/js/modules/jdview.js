@@ -17,7 +17,7 @@ require.config({
     bootstraptable: {
       deps: ['jquery'],
       exports: 'bootstraptable'
-    }
+    },
   }
 });
 
@@ -31,9 +31,6 @@ require(
     'formvalidate',
     'Upload'
   ],function($, radarcharts){
-    $('#match').on('click', function(e){
-      e.stopPropagation();
-    });
     //url参数截取，返回参数对象
     function queryString(str) {
       var arr = [],
@@ -53,7 +50,9 @@ require(
     $(".match").on("click", function() {
       var newParams = {},
           databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
-
+      if (localStorage.model) {
+        newParams.model = localStorage.model;
+      }
       newParams.jd_id = $(this).attr("data-id");
       newParams.page = 1;
       newParams.uses = databaseList.join(",");
@@ -274,4 +273,5 @@ require(
       var link = $(this).val();
       window.location.href = link;
     });
+
 });

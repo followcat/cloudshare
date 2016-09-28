@@ -95,6 +95,21 @@ class LSIsimilarity(object):
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 
     def probability(self, doc):
+        """
+            >>> from tests.test_model import *
+            >>> from webapp.settings import *
+            >>> jd_service = SVC_PRJ_MED.jobdescription
+            >>> sim = SVC_MIN.sim['medical']['medical']
+            >>> assert kgr_perfect('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('cb3a4d820ab011e691ce6c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('f12cd9fc1b3011e6a5286c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('d09227ca0b5d11e6b01c6c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('4a9f2d9c0b4f11e6877a6c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('7cadbda40b5d11e699956c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('d10df4940b4f11e69d676c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('046ad1040b5511e6bd4d6c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('542330f40d0011e69e136c3be51cefca', jd_service, sim)
+        """
         results = []
         vec_lsi = self.lsi_model.probability(doc)
         if self.index is not None:

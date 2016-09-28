@@ -21,6 +21,45 @@ def kgr_perfect(jd_id, jd_service, sim):
     sucess_count = kgr(jd_id, cvs, jd_service, sim)
     return sucess_count == len(cvs)
 
+def kgr_good(jd_id, jd_service, sim):
+    """
+        >>> from tests.test_model import *
+        >>> from webapp.settings import *
+        >>> jd_service = SVC_PRJ_MED.jobdescription
+        >>> sim = SVC_MIN.sim['medical']['medical']
+        >>> jd_id = '098a91ca0b4f11e6abf46c3be51cefca'
+        >>> assert kgr_good(jd_id, jd_service, sim)
+    """
+    cvs = datas[jd_id]
+    sucess_count = kgr(jd_id, cvs, jd_service, sim)
+    return len(cvs)*0.5 <= sucess_count < len(cvs)
+
+def kgr_medium(jd_id, jd_service, sim):
+    """
+        >>> from tests.test_model import *
+        >>> from webapp.settings import *
+        >>> jd_service = SVC_PRJ_MED.jobdescription
+        >>> sim = SVC_MIN.sim['medical']['medical']
+        >>> jd_id = 'be97722a0cff11e6a3e16c3be51cefca'
+        >>> assert kgr_medium(jd_id, jd_service, sim)
+    """
+    cvs = datas[jd_id]
+    sucess_count = kgr(jd_id, cvs, jd_service, sim)
+    return len(cvs)*0.25 <= sucess_count < len(cvs)*0.5
+
+def kgr_poor(jd_id, jd_service, sim):
+    """
+        >>> from tests.test_model import *
+        >>> from webapp.settings import *
+        >>> jd_service = SVC_PRJ_MED.jobdescription
+        >>> sim = SVC_MIN.sim['medical']['medical']
+        >>> jd_id = '06fdc0680b5d11e6ae596c3be51cefca'
+        >>> assert kgr_poor(jd_id, jd_service, sim)
+    """
+    cvs = datas[jd_id]
+    sucess_count = kgr(jd_id, cvs, jd_service, sim)
+    return sucess_count < len(cvs)*0.25
+
 def kgr(jd_id, cvs, jd_service, sim):
     job_desc = jd_service.get(jd_service.search(jd_id)[0])['description']
     score_board = sim.probability(job_desc)

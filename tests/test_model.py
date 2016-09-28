@@ -1,53 +1,42 @@
-"""
-    To use:
-        cd $CLOUDSHARE_HOME
-        nosetests tests/test_model.py
-"""
-
-import json
 import yaml
+
+
+FIRST_PAGE = range(20)
 
 kgr_file = 'tests/known_good_jd_cv_mapping.yaml'
 with open(kgr_file) as f:
-    datas = yaml.load(f)['datas']
-
-scores = None
+    datas = yaml.load(f)
 
 
-class NotInRankRange(RuntimeError):
-    """"""
+def kgr_perfect(jd_id, jd_service, sim):
+    """
+        >>> from tests.test_model import *
+        >>> from webapp.settings import *
+        >>> jd_service = SVC_PRJ_MED.jobdescription
+        >>> sim = SVC_MIN.sim['medical']['medical']
+        >>> jd_id = '9bbc45a81e4511e6b7066c3be51cefca'
+        >>> assert kgr_perfect(jd_id, jd_service, sim)
+    """
+    cvs = datas[jd_id]
+    sucess_count = kgr(jd_id, cvs, jd_service, sim)
+    return sucess_count == len(cvs)
 
-def get_job_description(jd_id, jd_service=None):
-    if jd_service is None:
-        import webapp.settings
-        jd_service = webapp.settings.SVC_PRJ_MED.jobdescription
-    jd = jd_service.get(jd_service.search(jd_id)[0])['description']
-    return jd
+def kgr(jd_id, cvs, jd_service, sim):
+    job_desc = jd_service.get(jd_service.search(jd_id)[0])['description']
+    score_board = sim.probability(job_desc)
+    sucess_count = 0
+    for _rank in ranks(score_board, cvs).values():
+        if _rank in FIRST_PAGE:
+            sucess_count += 1
+    return sucess_count
 
-def get_scores(job_desc, sim=None, json_file=None):
-    if json_file is not None:
-        with open(json_file) as _file:
-            scores = json.load(_file)
-        return scores
-    scores = sim.probability(job_desc)
-    return scores
-
-def test_kgr_generator(sim=None, json_file=None):
-    if json_file is None and sim is None:
-        import webapp.settings
-        sim = webapp.settings.SVC_MIN.sim['medical']['medical']
-    for _d in datas:
-        jd_id, cvs = _d.popitem()
-        job_desc = get_job_description(jd_id,
-                        webapp.settings.SVC_PRJ_MED.jobdescription)
-        global scores
-        scores = get_scores(job_desc, sim=sim, json_file=json_file)
-        for cv_id in cvs:
-            yield kgr, jd_id, cv_id
-
-def kgr(jd_id, cv_id):
-    global scores
-    for current_rank, (_c, _s) in enumerate(scores):
+def rank(score_board, cv_id):
+    for _rank, (_c, _s) in enumerate(score_board):
         if cv_id == _c:
-            if not current_rank < 20:
-                raise NotInRankRange('rank: %d'%current_rank)
+            return _rank
+
+def ranks(score_board, cvs):
+    ranks_dict = {}
+    for cv_id in cvs:
+        ranks_dict[cv_id] = rank(score_board, cv_id)
+    return ranks_dict

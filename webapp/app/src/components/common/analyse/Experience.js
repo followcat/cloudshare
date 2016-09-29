@@ -7,10 +7,9 @@ import Charts from '../Charts';
 
 import 'whatwg-fetch';
 
-export default class Competency extends Component {
-  
-  constructor() {
-    super();
+export default class Experience extends Component {
+  constructor(props) {
+    super(props);
     this.state = {
       visible: false,
       data: [],
@@ -40,7 +39,7 @@ export default class Competency extends Component {
       }],
       yAxis: [{
         type: 'value',
-        name: 'Ability Values',
+        name: 'Experience Values',
         scale: true,
       }],
       series: [{
@@ -60,7 +59,7 @@ export default class Competency extends Component {
 
     const _this = this;
     
-    fetch(`/api/mining/ability`, {
+    fetch(`/api/mining/experience`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -75,7 +74,7 @@ export default class Competency extends Component {
     .then(response => response.json())
     .then((json) => {
       if (json.code === 200) {
-        const data = json.data.map((item) => [item.ability.work_year, item.ability.ability_value]),
+        const data = json.data.map((item) => [item.experience.work_year, item.experience.experience_value]),
               option = _this.getOption(data);
         _this.setState({
           data: data,
@@ -94,7 +93,7 @@ export default class Competency extends Component {
   render() {
     return (
       <div>
-        <Button type="primary" onClick={this.handleClick}>Show Competency</Button>
+        <Button type="primary" onClick={this.handleClick}>Show Work Experience</Button>
         <Modal
           title="Charts View"
           visible={this.state.visible}
@@ -111,7 +110,3 @@ export default class Competency extends Component {
     );
   }
 }
-
-Competency.propTypes = {
-  dataSource: PropTypes.array,
-};

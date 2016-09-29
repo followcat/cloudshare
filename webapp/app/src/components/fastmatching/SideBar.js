@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Icon, Card, Form, Button, Tag, Modal } from 'antd';
 
 import Competency from '../common/analyse/Competency';
+import Experience from '../common/analyse/Experience';
 
 import classNames from 'classnames';
 
@@ -82,6 +83,10 @@ export default class SideBar extends Component {
               <h3>Analyse</h3>
             </div>
             <Competency
+              domId={chartsViewId}
+              dataSource={this.props.dataSource}
+            />
+            <Experience 
               domId={chartsViewId}
               dataSource={this.props.dataSource}
             />

@@ -13,19 +13,19 @@ with open(kgr_file) as f:
     datas = yaml.load(f)
 
 
-def kgr_percentage(jd_id, jd_service, sim, percentage=1, cvs=None):
+def kgr_percentage(jd_id, jd_service, sim, cvs=None, percentage=100):
     """
         >>> from tests.test_model import *
         >>> from webapp.settings import *
         >>> jd_service = SVC_PRJ_MED.jobdescription
         >>> sim = SVC_MIN.sim['medical']['medical']
-        >>> assert kgr_percentage('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim, PERFECT)
-        >>> assert kgr_percentage('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim, GOOD)
-        >>> assert kgr_percentage('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim, MEDIUM)
-        >>> assert kgr_percentage('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim, POOR)
-        >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, 33)
+        >>> assert kgr_percentage('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim, percentage=PERFECT)
+        >>> assert kgr_percentage('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim, percentage=GOOD)
+        >>> assert kgr_percentage('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim, percentage=MEDIUM)
+        >>> assert kgr_percentage('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim, percentage=POOR)
+        >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=33)
         >>> jd_id, cvs = '2fe1c53a231b11e6b7096c3be51cefca', ['3hffapdz', '2x5wx4aa']
-        >>> assert kgr_percentage(jd_id, jd_service, sim, POOR, cvs)
+        >>> assert kgr_percentage(jd_id, jd_service, sim, cvs=cvs, percentage=POOR)
     """
     if cvs is None:
         cvs = datas[jd_id]

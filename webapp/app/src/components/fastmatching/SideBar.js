@@ -81,7 +81,10 @@ export default class SideBar extends Component {
             <div className="title">
               <h3>Analyse</h3>
             </div>
-            <Button type="primary">Show Competency</Button>
+            <Competency
+              domId={chartsViewId}
+              dataSource={this.props.dataSource}
+            />
             <Button type="primary">Show Work Experience</Button>
           </div>
           <div className="radar">

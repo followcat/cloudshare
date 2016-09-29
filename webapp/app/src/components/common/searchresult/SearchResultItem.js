@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Row, Col, Card, Checkbox, Button } from 'antd';
 
@@ -10,6 +10,17 @@ export default class SearchResultItem extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      checked: false,
+    };
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+  }
+
+  handleCheckboxChange(e) {
+    this.props.onAddSelection({
+      id: e.target['data-id'],
+      name: e.target['data-name'],
+    });
   }
 
   render() {
@@ -30,7 +41,11 @@ export default class SearchResultItem extends Component {
         <div className="basic-info">
           <Row>
             <Col span={1}>
-              <Checkbox />
+              <Checkbox
+                data-id={props.yaml_info.id}
+                data-name={props.yaml_info.name}
+                onChange={this.handleCheckboxChange}
+              />
             </Col>
             <Col span={4}>
               <a href={`/show/${props.cv_id}`} target="_blank">{props.yaml_info.name ? props.yaml_info.name : props.yaml_info.id}</a>
@@ -87,3 +102,22 @@ export default class SearchResultItem extends Component {
     );
   }
 }
+
+SearchResultItem.propTypes = {
+  cv_id: PropTypes.string,
+  yaml_info: PropTypes.shape({
+    name: PropTypes.string,
+    education_history: PropTypes.array,
+    experience: PropTypes.array,
+    current: PropTypes.object,
+    gender: PropTypes.string,
+    age: PropTypes.number,
+    marital_status: PropTypes.string,
+    education: PropTypes.string,
+    school: PropTypes.string,
+    position: PropTypes.string,
+    company: PropTypes.string,
+    author: PropTypes.string,
+  }),
+
+};

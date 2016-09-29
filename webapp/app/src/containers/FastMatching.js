@@ -1,10 +1,16 @@
 'use strict';
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+
+import Immutable from 'immutable';
+import 'whatwg-fetch';
 
 import Header from '../components/common/Header';
 import FilterBox from '../components/fastmatching/FilterBox';
 import SearchResultBox from '../components/common/searchresult/SearchResultBox';
+import SideBar from '../components/fastmatching/SideBar';
 
+import checkObjectExist from '../utils/check_object_exist';
 import './fastmatching.less';
 
 export default class FastMatching extends Component {
@@ -20,11 +26,13 @@ export default class FastMatching extends Component {
       spinning: true,
       visible: false,
       postData: {},
+      selection: Immutable.List(Immutable.Map()),
     };
 
     this.loadClassifyData = this.loadClassifyData.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
+    this.handleAddSelection = this.handleAddSelection.bind(this);
   }
 
   loadClassifyData() {
@@ -105,6 +113,23 @@ export default class FastMatching extends Component {
     })
   }
 
+  handleAddSelection(obj) {
+    const index = this.state.selection.findIndex(v => {
+      return v.get('id') === obj.id 
+    });
+    if (index > -1) {
+      this.setState(({ selection }) => ({
+        selection: selection.delete(index)
+      }));
+    } else {
+      this.setState(({ selection }) => ({
+        selection: selection.update(sel => {
+          return sel.push(Immutable.fromJS(obj))
+        })
+      }));
+    }
+  }
+
   componentDidMount() {
     const url = window.location.href.split('/');
 
@@ -130,6 +155,12 @@ export default class FastMatching extends Component {
           spinning={this.state.spinning}
           dataSource={this.state.searchResultDataSource}
           onSwitchPage={this.handleSwitchPage}
+          onAddSelection={this.handleAddSelection}
+        />
+        <SideBar
+          visible={this.state.visible}
+          selection={this.state.selection}
+          dataSource={this.state.searchResultDataSource}
         />
       </div>
     );

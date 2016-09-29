@@ -28,7 +28,13 @@ export default class SearchResultBox extends Component {
         <Spin spinning={this.props.spinning}>
           <SearchResultHeader />
           {this.props.dataSource.map((item, index) => {
-            return <SearchResultItem key={index} {...item} />
+            return (
+              <SearchResultItem
+                {...item}
+                key={index}
+                onAddSelection={this.props.onAddSelection}
+              />
+            );
           })}
         </Spin>
         <SearchResultPagination
@@ -41,5 +47,9 @@ export default class SearchResultBox extends Component {
 }
 
 SearchResultBox.propTypes = {
+  visible: PropTypes.bool,
+  spinning: PropTypes.bool,
+  total: PropTypes.number,
   dataSource: PropTypes.array,
+  onSwitchPage: PropTypes.func,
 };

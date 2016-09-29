@@ -21,6 +21,12 @@ class BaseAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('md_ids', type = list, location = 'json')
 
+    def calculate_work_month(self, begin_y, begin_m, end_y, end_m):
+        year = int(end_y) - int(begin_y)
+        month = int(end_m) - int(begin_m)
+        return year * 12 + month
+
+
 
 class PositionAPI(BaseAPI): 
 
@@ -65,6 +71,44 @@ class CapacityAPI(BaseAPI):
             stream = self.svc_mult_cv.getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return { 'result': result }
+
+
+class AbilityAPI(BaseAPI):
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        result = []
+        for id in args['md_ids']:
+            stream = self.svc_mult_cv.getmd(id)
+            capacitys = core.mining.info.capacity(stream)
+            month = 0
+            actpoint = 0
+            doclen = 0
+            for capacity in capacitys:
+                if (len(capacity['begin']) and len(capacity['end'])):
+                    month += self.calculate_work_month(capacity['begin'][0], capacity['begin'][1], capacity['end'][0], capacity['end'][1])
+                actpoint += float(capacity['actpoint'])
+                doclen += float(capacity['doclen'])
+            result.append({ 'md': id, 'ability': { 'work_year': month/12, 'ability_value': (actpoint/doclen)*100 } })
+        return { 'code': 200, 'data': result }
+
+
+class ExperienceAPI(BaseAPI):
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        result = []
+        for id in args['md_ids']:
+            stream = self.svc_mult_cv.getmd(id)
+            capacitys = core.mining.info.capacity(stream)
+            month = 0
+            actpoint = 0
+            for capacity in capacitys:
+                if (len(capacity['begin']) and len(capacity['end'])):
+                    month += self.calculate_work_month(capacity['begin'][0], capacity['begin'][1], capacity['end'][0], capacity['end'][1])
+                actpoint += capacity['actpoint']
+            result.append({ 'md': id, 'experience': { 'work_year': month/12, 'experience_value': actpoint } })
+        return { 'code': 200, 'data': result }
 
 
 class LSIbaseAPI(Resource):

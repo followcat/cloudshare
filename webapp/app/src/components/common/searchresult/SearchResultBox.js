@@ -32,7 +32,8 @@ export default class SearchResultBox extends Component {
               <SearchResultItem
                 {...item}
                 key={index}
-                onAddSelection={this.props.onAddSelection}
+                selection={this.props.selection}
+                onToggleSelection={this.props.onToggleSelection}
               />
             );
           })}
@@ -52,4 +53,5 @@ SearchResultBox.propTypes = {
   total: PropTypes.number,
   dataSource: PropTypes.array,
   onSwitchPage: PropTypes.func,
+  onToggleSelection: PropTypes.func,
 };

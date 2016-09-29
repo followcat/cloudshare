@@ -17,7 +17,7 @@ export default class SearchResultItem extends Component {
   }
 
   handleCheckboxChange(e) {
-    this.props.onAddSelection({
+    this.props.onToggleSelection({
       id: e.target['data-id'],
       name: e.target['data-name'],
     });
@@ -45,6 +45,7 @@ export default class SearchResultItem extends Component {
                 data-id={props.yaml_info.id}
                 data-name={props.yaml_info.name}
                 onChange={this.handleCheckboxChange}
+                checked={props.selection.findIndex(v => v.get('id') === props.yaml_info.id ) > -1 ? true : false}
               />
             </Col>
             <Col span={4}>

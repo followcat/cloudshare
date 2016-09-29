@@ -5,6 +5,7 @@ import { Icon, Card, Form, Button, Tag, Modal } from 'antd';
 
 import Competency from '../common/analyse/Competency';
 import Experience from '../common/analyse/Experience';
+import HistorySelection from '../common/analyse/HistorySelection';
 
 import classNames from 'classnames';
 
@@ -39,6 +40,7 @@ export default class SideBar extends Component {
       visible: false,
     };
     this.handleSidebarBtnClick = this.handleSidebarBtnClick.bind(this);
+    this.handleTagClose = this.handleTagClose.bind(this);
   }
 
   handleSidebarBtnClick() {
@@ -58,6 +60,13 @@ export default class SideBar extends Component {
       });
     }
     moved(element, t, target);
+  }
+
+  handleTagClose(id, name) {
+    this.props.onToggleSelection({
+      id: id,
+      name: name,
+    });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -96,7 +105,10 @@ export default class SideBar extends Component {
             <div className="title">
               <h3>Draw Charts</h3>
             </div>
-            <Button type="primary">Select From History</Button>
+            <HistorySelection
+              selection={this.props.selection}
+              onToggleSelection={this.props.onToggleSelection}
+            />
             <Button type="primary">Show Radar Chart</Button>
             <div className="selection-box">
               <div className="selection-title">
@@ -108,7 +120,7 @@ export default class SideBar extends Component {
                     <Tag
                       key={index}
                       closable={true}
-                      data-id={item.get('id')}
+                      afterClose={() => this.handleTagClose(item.get('id'), item.get('name'))}
                     >
                       {item.get('name') ? item.get('name') : item.get('id')}
                     </Tag>

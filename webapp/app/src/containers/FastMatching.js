@@ -32,7 +32,7 @@ export default class FastMatching extends Component {
     this.loadClassifyData = this.loadClassifyData.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
-    this.handleAddSelection = this.handleAddSelection.bind(this);
+    this.handleToggleSelection = this.handleToggleSelection.bind(this);
   }
 
   loadClassifyData() {
@@ -113,7 +113,7 @@ export default class FastMatching extends Component {
     })
   }
 
-  handleAddSelection(obj) {
+  handleToggleSelection(obj) {
     const index = this.state.selection.findIndex(v => {
       return v.get('id') === obj.id 
     });
@@ -154,13 +154,15 @@ export default class FastMatching extends Component {
           total={this.state.total}
           spinning={this.state.spinning}
           dataSource={this.state.searchResultDataSource}
+          selection={this.state.selection}
           onSwitchPage={this.handleSwitchPage}
-          onAddSelection={this.handleAddSelection}
+          onToggleSelection={this.handleToggleSelection}
         />
         <SideBar
           visible={this.state.visible}
           selection={this.state.selection}
           dataSource={this.state.searchResultDataSource}
+          onToggleSelection={this.handleToggleSelection}
         />
       </div>
     );

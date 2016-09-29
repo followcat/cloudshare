@@ -16,3 +16,8 @@ export default class FilterInfo extends Component {
     );
   }
 }
+
+FilterInfo.propTypes = {
+  visible: PropTypes.bool,
+  total: PropTypes.number,
+};

@@ -170,6 +170,7 @@ class FilterForm extends Component {
 
 FilterForm.propTypes = {
   classify: PropTypes.array,
+  onSearch: PropTypes.func,
 };
 
 export default FilterForm = Form.create({})(FilterForm);

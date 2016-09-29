@@ -155,6 +155,14 @@ class LSIsimilarity(object):
             >>> assert kgr_percentage('80ce049a320711e6ac1f4ccc6a30cd76', jd_service, sim, cvs=['nvujsh0u'], percentage=POOR)
             >>> assert kgr_percentage('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'], percentage=POOR)
             >>> assert kgr_percentage('d33a669c313511e69edc4ccc6a30cd76', jd_service, sim, cvs=['csa46gdd', 'fahayhk8'], percentage=POOR)
+
+        IBA new:
+            >>> assert kgr_percentage('4f2d032e53e911e685e24ccc6a30cd76', jd_service, sim, cvs=['X4dy5bzu', 'x4dy5bzu', '1xm7sml'], percentage=POOR)
+            >>> assert kgr_percentage('86119050313711e69b804ccc6a30cd76', jd_service, sim, cvs=['dpaxyqns', 'kf9sxzox', 'o4tiazc', 'n2ae2kyt', 'hieheubl', 'jc496tc2', 'hieheubl', 'rzcqg8m3'], percentage=POOR)
+            >>> assert kgr_percentage('9b48f97653e811e6af534ccc6a30cd76', jd_service, sim, cvs=['6r03u6so', '8fq1dwq3', 'g2n5hqa'], percentage=POOR)
+            >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, cvs=['cn1rg3mo', 'ienforp4', 'u9vljdd'], percentage=POOR)
+            >>> assert kgr_percentage('e3bd422a2d6411e6b5296c3be51cefca', jd_service, sim, cvs=['qsfmtebc'], percentage=POOR)
+            >>> assert kgr_percentage('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim, cvs=['fv51hvdy', 'je7d0xeg', 'v0gcrsow', 'sjk41azl', 'f280mmdm', 'cla50bo5'], percentage=POOR)
         """
         results = []
         vec_lsi = self.lsi_model.probability(doc)

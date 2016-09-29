@@ -13,7 +13,7 @@ with open(kgr_file) as f:
     datas = yaml.load(f)
 
 
-def kgr_percentage(jd_id, jd_service, sim, percentage=1):
+def kgr_percentage(jd_id, jd_service, sim, percentage=1, cvs=None):
     """
         >>> from tests.test_model import *
         >>> from webapp.settings import *
@@ -24,8 +24,13 @@ def kgr_percentage(jd_id, jd_service, sim, percentage=1):
         >>> assert kgr_percentage('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim, MEDIUM)
         >>> assert kgr_percentage('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim, POOR)
         >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, 33)
+        >>> jd_id, cvs = '2fe1c53a231b11e6b7096c3be51cefca', ['3hffapdz', '2x5wx4aa']
+        >>> assert kgr_percentage(jd_id, jd_service, sim, POOR, cvs)
     """
-    cvs = datas[jd_id]
+    if cvs is None:
+        cvs = datas[jd_id]
+    if not hasattr(cvs, '__iter__'):
+        cvs = {cvs}
     success_count = kgr(jd_id, cvs, jd_service, sim)
     if percentage == PERFECT:
         return success_count == len(cvs)

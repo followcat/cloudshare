@@ -44,21 +44,18 @@ def kgr_percentage(jd_id, jd_service, sim, percentage=1, cvs=None):
         return len(cvs)*float(percentage)/100 <= success_count < len(cvs)
 
 def kgr(jd_id, cvs, jd_service, sim):
-    job_desc = jd_service.get(jd_service.search(jd_id)[0])['description']
-    score_board = sim.probability(job_desc)
     sucess_count = 0
-    for _rank in ranks(score_board, cvs).values():
+    for _rank in ranks(jd_id, cvs, jd_service, sim).values():
         if _rank in FIRST_PAGE:
             sucess_count += 1
     return sucess_count
 
-def rank(score_board, cv_id):
-    for _rank, (_c, _s) in enumerate(score_board):
-        if cv_id == _c:
-            return _rank
-
-def ranks(score_board, cvs):
+def ranks(jd_id, cvs, jd_service, sim):
+    job_desc = jd_service.get(jd_service.search(jd_id)[0])['description']
+    score_board = sim.probability(job_desc)
     ranks_dict = {}
     for cv_id in cvs:
-        ranks_dict[cv_id] = rank(score_board, cv_id)
+        for _rank, (_c, _s) in enumerate(score_board):
+            if cv_id == _c:
+                ranks_dict[cv_id] = _rank
     return ranks_dict

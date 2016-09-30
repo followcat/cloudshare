@@ -233,19 +233,21 @@ class ValuablebaseAPI(Resource):
         super(ValuablebaseAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
+        self.basemodel = self.svc_mult_cv.default.name
         self.uses = self.miner.default_names()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name_list', type = list, location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('uses', type = list, location = 'json')
 
     def _get(self, doc):
         args = self.reqparse.parse_args()
+        basemodel = self.basemodel
         uses = self.uses + args['uses']
         name_list = args['name_list']
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, uses=uses)
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, basemodel, uses=uses)
         else:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc,
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, basemodel,
                                                uses=uses, name_list=name_list)
         response = dict()
         datas = []
@@ -257,12 +259,12 @@ class ValuablebaseAPI(Resource):
                 name = match_item[0]
                 yaml_data = self.svc_mult_cv.getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
-                values.append(yaml_data)
+                values.append({ 'match': match_item[1], 'id': yaml_data['id'], 'name': yaml_data['name'] })
             item['value'] = values
             datas.append(item)
-        response['data'] = datas
+        response['result'] = datas
         response['max'] = 100
-        return { 'result': response }
+        return response
 
 
 class ValuablebyJDidAPI(ValuablebaseAPI):
@@ -271,11 +273,11 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
         super(ValuablebyJDidAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
 
-    def get(self, id):
+    def post(self, id):
         jd_yaml = self.svc_mult_cv.default.jd_get(id+'.yaml')
         doc = jd_yaml['description']
         result = self._get(doc)
-        return { 'result': result }
+        return { 'code': 200, 'data': result }
 
 class ValuablebydocAPI(ValuablebaseAPI):
 
@@ -288,3 +290,22 @@ class ValuablebydocAPI(ValuablebaseAPI):
         doc = args['doc']
         result = self._get(doc)
         return { 'result': result }
+
+
+class ValuableAPI(ValuablebaseAPI):
+
+    def __init__(self):
+        super(ValuableAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('doc', type = str, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        if args['id']:
+            jd_yaml = self.svc_mult_cv.default.jd_get(args['id'] + '.yaml')
+            doc = jd_yaml['description']
+        elif args['doc']:
+            doc = args['doc']
+        result = self._get(doc)
+        return { 'code': 200, 'data': result }

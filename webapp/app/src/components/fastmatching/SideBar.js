@@ -1,11 +1,12 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Icon, Card, Form, Button, Tag, Modal } from 'antd';
 
 import Competency from '../common/analyse/Competency';
 import Experience from '../common/analyse/Experience';
 import HistorySelection from '../common/analyse/HistorySelection';
+import RadarChart from '../common/analyse/RadarChart';
 
 import classNames from 'classnames';
 
@@ -99,7 +100,6 @@ export default class SideBar extends Component {
               domId={chartsViewId}
               dataSource={this.props.dataSource}
             />
-            <Button type="primary">Show Work Experience</Button>
           </div>
           <div className="radar">
             <div className="title">
@@ -109,7 +109,10 @@ export default class SideBar extends Component {
               selection={this.props.selection}
               onToggleSelection={this.props.onToggleSelection}
             />
-            <Button type="primary">Show Radar Chart</Button>
+            <RadarChart 
+              selection={this.props.selection}
+              postData={this.props.postData}
+            />
             <div className="selection-box">
               <div className="selection-title">
                 <h4>Selection</h4>
@@ -133,4 +136,12 @@ export default class SideBar extends Component {
       </div>
     );
   }
+}
+
+SideBar.propTypes = {
+  visible: PropTypes.bool,
+  dataSource: PropTypes.array,
+  selection: PropTypes.array,
+  postData: PropTypes.object,
+  onToggleSelection: PropTypes.func,
 }

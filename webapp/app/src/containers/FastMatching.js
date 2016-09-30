@@ -160,6 +160,7 @@ export default class FastMatching extends Component {
         />
         <SideBar
           visible={this.state.visible}
+          postData={this.state.postData}
           selection={this.state.selection}
           dataSource={this.state.searchResultDataSource}
           onToggleSelection={this.handleToggleSelection}

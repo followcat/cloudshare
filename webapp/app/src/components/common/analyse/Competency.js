@@ -9,8 +9,8 @@ import 'whatwg-fetch';
 
 export default class Competency extends Component {
   
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       visible: false,
       data: [],

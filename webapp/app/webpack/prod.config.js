@@ -46,6 +46,7 @@ module.exports = {
       },
       __DEVELOPMENT__: false,
     }),
+    new webpack.optimize.CommonsChunkPlugin('common.chunk.js'),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({

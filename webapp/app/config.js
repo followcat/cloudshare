@@ -17,5 +17,6 @@ module.exports = {
     SRC_PATH: path.join(__dirname, './src'),
     BUILD_PATH: path.join(__dirname, './dist'),
     STATIC_PATH: path.join(__dirname, '../static'),
+    NODE_MODULES_PATH: path.join(__dirname, './node_modules'),
   },
 };

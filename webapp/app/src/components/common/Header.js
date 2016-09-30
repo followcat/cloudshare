@@ -7,6 +7,8 @@ import HeaderPerson from './HeaderPerson';
 
 import LogoImg from '../../image/logo.png';
 
+import './header.less';
+
 export default class Header extends Component {
 
   render() {
@@ -20,8 +22,16 @@ export default class Header extends Component {
                   <img src={LogoImg} alt="Logo" />
                 </a>
               </div>
-              <div className="cs-layout-person">
-                <HeaderPerson />
+              <div className="cs-layout-nav">
+                <div className="cs-layout-item">
+                  <HeaderPerson />
+                </div>
+                <div className="cs-layout-item">
+                  <a href="/upload" target="_blank">Upload</a>
+                </div>
+                <div className="cs-layout-item">
+                  <a href="/listjd" target="_blank">JD List</a>
+                </div>
               </div>
             </div>
           </div>

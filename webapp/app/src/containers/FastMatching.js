@@ -13,6 +13,10 @@ import SideBar from '../components/fastmatching/SideBar';
 import checkObjectExist from '../utils/check_object_exist';
 import './fastmatching.less';
 
+function getJDId() {
+
+}
+
 export default class FastMatching extends Component {
 
   constructor() {
@@ -57,7 +61,7 @@ export default class FastMatching extends Component {
       }
     }
     const postData = {
-      id: '5b8fcdb00d0b11e6bb746c3be51cefca',
+      id: this.state.id,
       uses: value.uses,
       filterdict: filterData,
     };

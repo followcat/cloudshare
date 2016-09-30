@@ -262,3 +262,17 @@ class UserInfo(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         return flask.render_template('userinfo.html')
+
+#Render listjd page of RESTful
+class ListJD(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('listjd.html')
+
+#Render fastmatching page of RESTful
+class FastMatching(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self, id):
+        return flask.render_template('fastmatching.html')

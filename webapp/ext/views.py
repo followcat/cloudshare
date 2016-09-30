@@ -45,6 +45,18 @@ def configure(app):
         view_func=webapp.views.views.UserInfo.as_view('userinfo'),
         )
 
+    #RESTful ListJD page entrance
+    app.add_url_rule(
+        '/listjd',
+        view_func=webapp.views.views.ListJD.as_view('listjd')
+    )
+
+    #RESTful FastMatching page entrance
+    app.add_url_rule(
+        '/fastmatching/<path:id>',
+        view_func=webapp.views.views.FastMatching.as_view('fastmatching')
+    )
+
     app.add_url_rule(
         '/gotologin',
         view_func=webapp.views.views.LoginRedirect.as_view('gotologin'),
@@ -180,10 +192,10 @@ def configure(app):
         view_func=webapp.views.jobdescription.SearchJobDescription.as_view('searchjd'),
         )
 
-    app.add_url_rule(
-        '/listjd',
-        view_func=webapp.views.jobdescription.ListJobDescription.as_view('listjd'),
-        )
+    # app.add_url_rule(
+    #     '/listjd',
+    #     view_func=webapp.views.jobdescription.ListJobDescription.as_view('listjd'),
+    #     )
 
     app.add_url_rule(
         '/resumetojd/<path:filename>/<status>',

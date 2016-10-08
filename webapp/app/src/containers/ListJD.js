@@ -4,9 +4,8 @@ import { Link } from 'react-router';
 import { Menu, message } from 'antd';
 import 'whatwg-fetch';
 
-
 import Header from '../components/common/Header';
-
+import Storage from '../utils/storage';
 import './manage.less';
 
 export default class ListJD extends Component {
@@ -40,7 +39,7 @@ export default class ListJD extends Component {
     fetch(`/api/jdlist`, {
       method: 'GET',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${Storage.get('token')}`,
       },
     })
     .then((response) => {

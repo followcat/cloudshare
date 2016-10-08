@@ -7,6 +7,8 @@ import Charts from '../Charts';
 
 import Immutable from 'immutable';
 
+import Storage from '../../../utils/storage';
+import Generator from '../../../utils/generator';
 import 'whatwg-fetch';
 
 export default class RadarChart extends Component {
@@ -97,15 +99,15 @@ export default class RadarChart extends Component {
       method: 'POST',
       credential: 'include',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${Storage.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         id: this.props.postData.id,
         name_list: this.props.selection.toJS().map(item => { return item.id + '.md' }),
         uses: this.props.postData.uses,
-      })
+      }),
     })
     .then(response => response.json())
     .then(json => {

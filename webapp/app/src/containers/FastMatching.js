@@ -10,12 +10,11 @@ import FilterBox from '../components/fastmatching/FilterBox';
 import SearchResultBox from '../components/common/searchresult/SearchResultBox';
 import SideBar from '../components/fastmatching/SideBar';
 
+import StorageUtil from '../utils/storage';
+import Generator from '../utils/generator';
+
 import checkObjectExist from '../utils/check_object_exist';
 import './fastmatching.less';
-
-function getJDId() {
-
-}
 
 export default class FastMatching extends Component {
 
@@ -64,7 +63,6 @@ export default class FastMatching extends Component {
       id: this.state.id,
       uses: value.uses,
       filterdict: filterData,
-      basemodel: localStorage.getItem('_pj'),
     };
 
     this.setState({
@@ -77,11 +75,11 @@ export default class FastMatching extends Component {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${StorageUtil.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(postData),
+      body: Generator.getPostData(postData),
     })
     .then(response => response.json())
     .then((json) => {
@@ -103,7 +101,7 @@ export default class FastMatching extends Component {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${StorageUtil.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },

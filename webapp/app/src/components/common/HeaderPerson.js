@@ -21,7 +21,7 @@ export default class HeaderPerson extends Component {
           method: 'DELETE',
           credentials: 'include',
           headers: {
-            'Authorization': `Basic ${localStorage.token}`,
+            'Authorization': `Basic ${StorageUtil.get('token')}`,
           },
         })
         .then((response) => {

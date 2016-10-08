@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 
 import { Button, Modal, Table } from 'antd';
 
+import StorageUtil from '../../../utils/storage';
+
 export default class HistorySelection extends Component {
   
   constructor() {
@@ -20,7 +22,7 @@ export default class HistorySelection extends Component {
   handleClick() {
     this.setState({
       visible: true,
-      data: JSON.parse(localStorage.history),
+      data: StorageUtil.get('history'),
     });
   }
 

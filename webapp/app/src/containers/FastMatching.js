@@ -56,7 +56,7 @@ export default class FastMatching extends Component {
     const filterData = {};
     for (let key in value) {
       if (key !== 'uses') {
-        filterData[key] = value[key];
+        filterData[key] = value[key] instanceof Array ? value[key] : value[key] ? value[key].split(' ') : '';
       }
     }
     const postData = {

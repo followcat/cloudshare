@@ -144,7 +144,7 @@ def get_experience(stream, name=None):
     return result
 
 
-def get_classify(experience, classify):
+def get_classify(experience, classify=[]):
     return extractor.extract_experience.match_classify(experience, classify)
 
 
@@ -193,6 +193,7 @@ def catch(stream, name=None):
     info_dict["email"] = get_email(stream)
     info_dict.update(get_education(stream, name))     # education_history, education, school
     info_dict.update(get_experience(stream, name))    # experience, company, position
+    info_dict["classify"] = get_classify(info_dict['experience'])
     info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                 # age
     return info_dict
@@ -215,4 +216,7 @@ def catch_selected(stream, selected, name=None):
         info_dict.update(get_experience(stream, name))
     if 'expectation' in selected:
         info_dict.update(get_expectation(stream))
+    if 'classify' in selected:
+        experience = get_experience(stream, name)
+        info_dict["classify"] = get_classify(experience)
     return info_dict

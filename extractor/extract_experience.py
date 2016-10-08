@@ -611,7 +611,7 @@ def match_classify(experience, d=[]):
         >>> assert len(match_classify(experience)) == 2
     """
     if isinstance(d, (str, unicode)):
-        d = [d.replace('-', '/')]
+        d = [d]
     output = set(d)
     try:
         company = experience['company']

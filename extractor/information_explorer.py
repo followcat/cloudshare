@@ -144,6 +144,10 @@ def get_experience(stream, name=None):
     return result
 
 
+def get_classify(experience, classify):
+    return extractor.extract_experience.match_classify(experience, classify)
+
+
 def get_name(stream):
     name = get_tagfromstring(u'姓名', stream)
     namelist = get_infofromrestr(name, u'^[\u4E00-\u9FA5\w]*$')

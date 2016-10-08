@@ -1,4 +1,15 @@
 #encoding: utf-8
+import yaml
+
+
+with open('sources/industry_needed_medical.yaml') as f:
+    needed_medical = [n.replace('/', '-') for n in yaml.load(f.read())]
+
+with open('sources/industry_needed_uav.yaml') as f:
+    needed_uav = [n.replace('/', '-') for n in yaml.load(f.read())]
+
+with open('sources/industry_sources.yaml') as f:
+    sources = yaml.load(f.read())
 
 industryID = {
         u'培训':'0',

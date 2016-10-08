@@ -41,7 +41,7 @@ class DBNumbersAPI(flask.views.MethodView):
         super(DBNumbersAPI, self).__init__()
 
     def get(self):
-        return { 'result': self.svc_mult_cv.getnums() }
+        return { 'code': 200, 'data': self.svc_mult_cv.getnums() }
 
 
 class ClassifyAPI(flask.views.MethodView):

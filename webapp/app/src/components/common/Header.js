@@ -7,6 +7,7 @@ import HeaderPerson from './HeaderPerson';
 
 import LogoImg from '../../image/logo.png';
 
+import StorageUtil from '../../utils/storage';
 import './header.less';
 
 export default class Header extends Component {
@@ -22,6 +23,9 @@ export default class Header extends Component {
               </a>
             </div>
             <div className="cs-layout-nav">
+              <div className="cs-layout-item">
+                <p>{StorageUtil.get('_pj')}</p>
+              </div>
               <div className="cs-layout-item">
                 <HeaderPerson />
               </div>

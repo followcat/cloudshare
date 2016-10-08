@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+import os.path
+
 import yaml
 
 
@@ -13,7 +16,7 @@ with open(kgr_file) as f:
     datas = yaml.load(f)
 
 
-def kgr_percentage(jd_id, jd_service, sim, cvs=None, percentage=100):
+def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterdict=None, percentage=100):
     """
         >>> from tests.test_model import *
         >>> from webapp.settings import *
@@ -26,12 +29,14 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, percentage=100):
         >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=33)
         >>> jd_id, cvs = '2fe1c53a231b11e6b7096c3be51cefca', ['3hffapdz', '2x5wx4aa']
         >>> assert kgr_percentage(jd_id, jd_service, sim, cvs=cvs, percentage=POOR)
+        >>> assert kgr_percentage('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'], percentage=POOR)
+        >>> assert kgr_percentage('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=int(float(2)/3*100))
     """
     if cvs is None:
         cvs = datas[jd_id]
     if not hasattr(cvs, '__iter__'):
         cvs = {cvs}
-    success_count = kgr(jd_id, cvs, jd_service, sim)
+    success_count = kgr(jd_id, cvs, jd_service, sim, index_service, filterdict)
     if percentage == PERFECT:
         return success_count == len(cvs)
     elif percentage == GOOD:
@@ -43,18 +48,24 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, percentage=100):
     elif 0 < percentage < 100:
         return len(cvs)*float(percentage)/100 <= success_count < len(cvs)
 
-def kgr(jd_id, cvs, jd_service, sim):
+def kgr(jd_id, cvs, jd_service, sim, index_service, filterdict):
     sucess_count = 0
-    for _rank in ranks(jd_id, jd_service, sim, cvs).values():
+    _ranks = ranks(jd_id, jd_service, sim, cvs, index_service, filterdict)
+    for _rank in _ranks.values():
         if _rank in FIRST_PAGE:
             sucess_count += 1
     return sucess_count
 
-def ranks(jd_id, jd_service, sim, cvs=None):
+def ranks(jd_id, jd_service, sim, cvs=None, index_service=None,
+            filterdict=None):
     if cvs is None:
         cvs = datas[jd_id]
     job_desc = jd_service.get(jd_service.search(jd_id)[0])['description']
     score_board = sim.probability(job_desc)
+    if index_service is not None and filterdict is not None:
+        filteset = index_service.get(filterdict)
+        score_board = filter(lambda x: os.path.splitext(x[0])[0] in filteset,
+                             score_board)
     ranks_dict = {}
     for cv_id in cvs:
         for _rank, (_c, _s) in enumerate(score_board):

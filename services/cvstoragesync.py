@@ -7,7 +7,6 @@ import pypandoc
 
 import utils._yaml
 import interface.predator
-import sources.industry_id
 import services.curriculumvitae
 import extractor.information_explorer
 

@@ -2,6 +2,7 @@ import os
 import yaml
 
 import utils._yaml
+import utils.builtin
 import sources.industry_id
 import services.simulationcv
 
@@ -11,7 +12,9 @@ class ClassifyCV(services.simulationcv.SimulationCV):
     INDUSTRY_DIR = "JOBTITLES"
 
     def __init__(self, name, path, cvstorage, rawdb):
-        super(ClassifyCV, self).__init__(name, path, cvstorage)
+        classifypath = utils.builtin.industrytopath(name)
+        super(ClassifyCV, self).__init__(classifypath, path, cvstorage)
+        self.name = name
         self.rawdb = rawdb
 
     def setup(self):

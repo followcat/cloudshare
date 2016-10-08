@@ -4,7 +4,7 @@ import re
 import core.mining.lsimodel
 import core.mining.lsisimilarity
 
-from utils.builtin import jieba_cut, pos_extract
+from utils.builtin import jieba_cut, pos_extract, industrytopath
 
 
 REJECT = re.compile('(('+')|('.join([
@@ -205,8 +205,9 @@ class Mining(object):
             self.sim[modelname] = dict()
             for svc_name in services:
                 svc = services[svc_name]
+                industrypath = industrytopath(svc_name)
                 index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
-                                                                svc_name), model)
+                                                                industrypath), model)
                 try:
                     index.load()
                 except IOError:

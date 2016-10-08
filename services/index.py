@@ -3,6 +3,8 @@ import glob
 import cPickle
 import collections
 
+import utils.builtin
+
 
 class ReverseIndexing(object):
 
@@ -27,7 +29,8 @@ class ReverseIndexing(object):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         for name in self.index:
-            savepath = os.path.join(self.path, name)
+            industrypath = utils.builtin.industrytopath(name)
+            savepath = os.path.join(self.path, industrypath)
             with open(savepath, 'w') as fp:
                 cPickle.dump(self.index[name], fp)
 

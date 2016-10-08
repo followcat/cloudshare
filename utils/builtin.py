@@ -11,6 +11,10 @@ import jieba
 import jieba.posseg
 
 
+def industrytopath(industry):
+    return industry.replace('/', '-')
+
+
 def md5(text):
     m = hashlib.md5()
     m.update(text)

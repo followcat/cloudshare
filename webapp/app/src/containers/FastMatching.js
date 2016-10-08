@@ -64,6 +64,7 @@ export default class FastMatching extends Component {
       id: this.state.id,
       uses: value.uses,
       filterdict: filterData,
+      basemodel: localStorage.getItem('_pj'),
     };
 
     this.setState({

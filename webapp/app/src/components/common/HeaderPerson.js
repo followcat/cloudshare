@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import 'whatwg-fetch';
 import { Menu, Dropdown, Icon, Modal, message } from 'antd';
 
+import StorageUtil from '../../utils/storage';
+
 export default class HeaderPerson extends Component {
   constructor() {
     super();
@@ -27,8 +29,7 @@ export default class HeaderPerson extends Component {
         })
         .then((json) => {
           if (json.code === 200) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            StorageUtil.unsetAll(['_pj', 'token', 'user']);
             location.href = json.redirect_url;
           } else {
             message.error(json.message);

@@ -117,14 +117,13 @@ class LSIbaseAPI(Resource):
 
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
         self.sim_names = self.miner.addition_names()
-        self.basemodel = self.svc_mult_cv.default.name
 
-    def _post(self, doc, uses, filterdict, cur_page):
-        basemodel = self.basemodel
+    def _post(self, basemodel, doc, uses, filterdict, cur_page):
         count = 20
         datas, pages, totals = self.process(basemodel, uses, doc, cur_page, count, filterdict)
         return { 'datas': datas, 'pages': pages, 'totals': totals }
@@ -173,6 +172,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         self.reqparse = reqparse.RequestParser()
         self.uses = self.miner.default_names()
         self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('basemodel', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -185,7 +185,8 @@ class LSIbyJDidAPI(LSIbaseAPI):
         uses = self.uses + args['uses']
         filterdict = args['filterdict']
         cur_page = args['page']
-        result = self._post(doc, uses, filterdict, cur_page)
+        basemodel = args['basemodel']
+        result = self._post(basemodel, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 

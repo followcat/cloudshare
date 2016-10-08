@@ -118,12 +118,15 @@ class LSIbaseAPI(Resource):
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('basemodel', type = str, location = 'json')
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
         self.sim_names = self.miner.addition_names()
 
-    def _post(self, basemodel, doc, uses, filterdict, cur_page):
+    def _post(self, doc, uses, filterdict, cur_page):
+        args = self.reqparse.parse_args()
+        basemodel = args['basemodel']
         count = 20
         datas, pages, totals = self.process(basemodel, uses, doc, cur_page, count, filterdict)
         return { 'datas': datas, 'pages': pages, 'totals': totals }
@@ -169,10 +172,8 @@ class LSIbyJDidAPI(LSIbaseAPI):
     def __init__(self):
         super(LSIbyJDidAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.reqparse = reqparse.RequestParser()
         self.uses = self.miner.default_names()
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('basemodel', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -185,8 +186,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         uses = self.uses + args['uses']
         filterdict = args['filterdict']
         cur_page = args['page']
-        basemodel = args['basemodel']
-        result = self._post(basemodel, doc, uses, filterdict, cur_page)
+        result = self._post(doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -234,15 +234,15 @@ class ValuablebaseAPI(Resource):
         super(ValuablebaseAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
-        self.basemodel = self.svc_mult_cv.default.name
         self.uses = self.miner.default_names()
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('basemodel', type = str, location = 'json')
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
 
     def _get(self, doc):
         args = self.reqparse.parse_args()
-        basemodel = self.basemodel
+        basemodel = args['basemodel']
         uses = self.uses + args['uses']
         name_list = args['name_list']
         if len(name_list) == 0:

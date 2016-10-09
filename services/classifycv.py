@@ -1,6 +1,7 @@
 import os
 
 import utils.builtin
+import core.outputstorage
 import sources.industry_id
 import services.simulationcv
 
@@ -36,3 +37,20 @@ class ClassifyCV(services.simulationcv.SimulationCV):
     def save(self):
         utils.builtin.save_yaml(self.config, self.path, self.config_file)
         utils.builtin.save_json(self.cvids, self.path, self.ids_file)
+
+    def dump(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        def storage(filepath, stream):
+            with open(filepath, 'w') as f:
+                f.write(stream.encode('utf-8'))
+        for i in self.cvids:
+            name = core.outputstorage.ConvertName(i)
+            mdpath = os.path.join(path, name.md)
+            mdstream = self.cvstorage.getmd(i)
+            storage(mdpath, mdstream)
+            htmlpath = os.path.join(path, name.html)
+            htmlstream = self.cvstorage.gethtml(i)
+            storage(htmlpath, htmlstream)
+            yamlinfo = self.cvstorage.getyaml(i)
+            utils.builtin.save_yaml(yamlinfo, path, name.yaml)

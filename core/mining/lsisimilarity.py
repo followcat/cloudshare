@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import ujson
 
@@ -95,6 +96,78 @@ class LSIsimilarity(object):
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 
     def probability(self, doc):
+        """
+            >>> from tests.test_model import *
+            >>> from webapp.settings import *
+            >>> jd_service = SVC_PRJ_MED.jobdescription
+            >>> sim = SVC_MIN.sim['medical']['medical']
+            >>> (PERFECT, GOOD, MEDIUM, POOR)
+            (100, 50, 25, 0)
+            >>> assert kgr_percentage('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('cb3a4d820ab011e691ce6c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('f12cd9fc1b3011e6a5286c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('d09227ca0b5d11e6b01c6c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('4a9f2d9c0b4f11e6877a6c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('7cadbda40b5d11e699956c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('d10df4940b4f11e69d676c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('046ad1040b5511e6bd4d6c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('542330f40d0011e69e136c3be51cefca', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('d652742841a211e68dc34ccc6a30cd76', jd_service, sim, percentage=PERFECT)
+            >>> assert kgr_percentage('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim, percentage=int(float(2)/3*100))
+            >>> assert kgr_percentage('9b48f97653e811e6af534ccc6a30cd76', jd_service, sim, percentage=GOOD)
+            >>> assert kgr_percentage('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim, percentage=GOOD)
+            >>> assert kgr_percentage('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim, percentage=MEDIUM)
+            >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=int(float(1)/3*100))
+            >>> assert kgr_percentage('80ce049a320711e6ac1f4ccc6a30cd76', jd_service, sim, percentage=MEDIUM)
+            >>> assert kgr_percentage('b73ac9621cd811e694e76c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('48dc231c0b5d11e6b89e6c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('e3bd422a2d6411e6b5296c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('437958560b5b11e6aaa86c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('a9a20a84473211e6a6934ccc6a30cd76', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('fb2ac1c80b4d11e6adce6c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('048b4bc60d0011e6be436c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('57317f820cfe11e681466c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('684605740b4e11e6ba746c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('763199560a9411e6a7936c3be51cefca', jd_service, sim, percentage=POOR)
+            >>> assert kgr_percentage('8c43b5343c4511e680994ccc6a30cd76', jd_service, sim, percentage=POOR)
+
+        HHMT new:
+            >>> assert kgr_percentage('2fe1c53a231b11e6b7096c3be51cefca', jd_service, sim, cvs=['3hffapdz', '2x5wx4aa'], percentage=POOR)
+            >>> assert kgr_percentage('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim, cvs=['2hw11q81', '8z3fxnr7', 'ltpyt2hp'], percentage=POOR)
+            >>> assert kgr_percentage('2898a70a3f6111e6b68d4ccc6a30cd76', jd_service, sim, cvs=['mjm6vl3k'], percentage=POOR)
+            >>> assert kgr_percentage('437958560b5b11e6aaa86c3be51cefca', jd_service, sim, cvs=['hy24julz'], percentage=POOR)
+            >>> assert kgr_percentage('48dc231c0b5d11e6b89e6c3be51cefca', jd_service, sim, cvs=['ohapy8ge'], percentage=POOR)
+            >>> assert kgr_percentage('7858d9aa636411e6815f4ccc6a30cd76', jd_service, sim, cvs=['o3fjv894', '59c102os', '8y5nqhoc'], percentage=POOR)
+            >>> assert kgr_percentage('6cadbda40b5d11e699956c3be51cefca', jd_service, sim, cvs=['dpaxyqns'], percentage=POOR)
+            >>> assert kgr_percentage('7cadbda40b5d11e699956c3be51cefca', jd_service, sim, cvs=['uqototc6', 'fs60ntrm', 'wbrnwrob'], percentage=33)
+            >>> assert kgr_percentage('def2a4120b5c11e691246c3be51cefca', jd_service, sim, cvs=['0p2unnwd', 'o0njv8te'], percentage=POOR)
+            >>> assert kgr_percentage('9df8a1b20b4f11e686a56c3be51cefca', jd_service, sim, cvs=['rt9qa1gf', 'py6d1c0k'], percentage=POOR)
+            >>> assert kgr_percentage('5c2a203a596011e6bb374ccc6a30cd76', jd_service, sim, cvs=['18utt3gq', 'k0hov59f'], percentage=GOOD)
+            >>> assert kgr_percentage('542330f40d0011e69e136c3be51cefca', jd_service, sim, cvs=['nbdsjvzx'], percentage=PERFECT)
+            >>> assert kgr_percentage('046ad1040b5511e6bd4d6c3be51cefca', jd_service, sim, cvs=['cfvpiab7', 'pc42qr9a'], percentage=GOOD)
+
+        FKJY new:
+            >>> assert kgr_percentage('07ea1a8018be11e684026c3be51cefca', jd_service, sim, cvs=['cn64i09t', 'fxetvyzc', 'kgmp7dpg', 'u5dh7ozn', 'xt7613fa'], percentage=int(float(2)/5*100))
+            >>> assert kgr_percentage('2fe1c53a231b11e6b7096c3be51cefca', jd_service, sim, cvs=['3hffapdz', '2x5wx4aa'], percentage=POOR)
+            >>> assert kgr_percentage('ae31247274c811e6b6b54ccc6a30cd76', jd_service, sim, cvs=['2sh48rjp'], percentage=POOR)
+            >>> assert kgr_percentage('5b2f8548320611e6b4e84ccc6a30cd76', jd_service, sim, cvs=['cfimev64', 'ko5luqyi', '0x4zpslk'], percentage=int(float(1)/3*100))
+            >>> assert kgr_percentage('5b2f8548320611e6b4e84ccc6a30cd76', jd_service, sim, cvs=['cfimev64', 'ko5luqyi', '0x4zpslk'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=POOR)
+            >>> assert kgr_percentage('78df9d86555f11e6abad4ccc6a30cd76', jd_service, sim, cvs=['5ziy6c80', '6y0a1a75', '80clrjqi', 'rlb3jau0', 'sbip7deq', 'uwbvmsod', '68oojytn'], percentage=int(float(1)/7*100))
+            >>> assert kgr_percentage('78df9d86555f11e6abad4ccc6a30cd76', jd_service, sim, cvs=['5ziy6c80', '6y0a1a75', '80clrjqi', 'rlb3jau0', 'sbip7deq', 'uwbvmsod', '68oojytn'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=int(float(2)/7*100))
+            >>> assert kgr_percentage('80ce049a320711e6ac1f4ccc6a30cd76', jd_service, sim, cvs=['nvujsh0u'], percentage=POOR)
+            >>> assert kgr_percentage('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'], percentage=POOR)
+            >>> assert kgr_percentage('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=int(float(2)/3*100))
+            >>> assert kgr_percentage('d33a669c313511e69edc4ccc6a30cd76', jd_service, sim, cvs=['csa46gdd', 'fahayhk8'], percentage=POOR)
+
+        IBA new:
+            >>> assert kgr_percentage('4f2d032e53e911e685e24ccc6a30cd76', jd_service, sim, cvs=['X4dy5bzu', 'x4dy5bzu', '1xm7sml'], percentage=POOR)
+            >>> assert kgr_percentage('86119050313711e69b804ccc6a30cd76', jd_service, sim, cvs=['dpaxyqns', 'kf9sxzox', 'o4tiazc', 'n2ae2kyt', 'hieheubl', 'jc496tc2', 'hieheubl', 'rzcqg8m3'], percentage=POOR)
+            >>> assert kgr_percentage('9b48f97653e811e6af534ccc6a30cd76', jd_service, sim, cvs=['6r03u6so', '8fq1dwq3', 'g2n5hqa'], percentage=POOR)
+            >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, cvs=['cn1rg3mo', 'ienforp4', 'u9vljdd'], percentage=POOR)
+            >>> assert kgr_percentage('e3bd422a2d6411e6b5296c3be51cefca', jd_service, sim, cvs=['qsfmtebc'], percentage=POOR)
+            >>> assert kgr_percentage('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim, cvs=['fv51hvdy', 'je7d0xeg', 'v0gcrsow', 'sjk41azl', 'f280mmdm', 'cla50bo5'], percentage=POOR)
+        """
         results = []
         vec_lsi = self.lsi_model.probability(doc)
         if self.index is not None:

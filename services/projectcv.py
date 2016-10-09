@@ -43,6 +43,12 @@ class ProjectCV(services.simulationcv.SimulationCV):
                                       message='Create new project %s.'%self.name,
                                       committer=committer)
 
+    def save(self):
+        utils.builtin.save_yaml(self.config, self.path, self.config_file,
+                                default_flow_style=False)
+        utils.builtin.save_json(self.cvids, self.path, self.ids_file,
+                                indent=4)
+
     def add(self, id, committer):
         result = False
         if not self.exists(id):

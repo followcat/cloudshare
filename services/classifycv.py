@@ -8,8 +8,6 @@ import services.simulationcv
 
 class ClassifyCV(services.simulationcv.SimulationCV):
 
-    config_file = 'config.yaml'
-
     def __init__(self, name, path, cvstorage):
         classifypath = utils.builtin.industrytopath(name)
         super(ClassifyCV, self).__init__(classifypath, path, cvstorage)
@@ -29,14 +27,6 @@ class ClassifyCV(services.simulationcv.SimulationCV):
                 if self.name in info['classify']:
                     self._add(y)
         self.save()
-
-    def load(self):
-        self.config = utils.builtin.load_yaml(self.path, self.config_file)
-        self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
-
-    def save(self):
-        utils.builtin.save_yaml(self.config, self.path, self.config_file)
-        utils.builtin.save_json(self.cvids, self.path, self.ids_file)
 
     def dump(self, path):
         if not os.path.exists(path):

@@ -145,7 +145,7 @@ export default class UserInfo extends Component {
     return (
       <div>
         <div id="viewport">
-          <Header />
+          <Header fixed={true} />
           <div className="cs-layout-bottom">
             <div className="cs-layout-wrapper" ref="wrapper">
               <div className="cs-layout-sider">

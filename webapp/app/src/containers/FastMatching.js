@@ -84,10 +84,10 @@ export default class FastMatching extends Component {
     .then(response => response.json())
     .then((json) => {
       this.setState({
-          spinning: false,
-          searchResultDataSource: json.data.datas,
-          pages: json.data.pages,
-          total: json.data.totals,
+        spinning: false,
+        searchResultDataSource: json.data.datas,
+        pages: json.data.pages,
+        total: json.data.totals,
       });
     })
   }

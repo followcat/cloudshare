@@ -191,7 +191,7 @@ export default class Upload extends Component {
 
     return (
       <div>
-        <Header />
+        <Header fixed={true} />
         <div className="container" style={{ minHeight: h }}>
           <Uploader uploadProps={uploadProps} />
           <PreviewList

@@ -43,7 +43,8 @@ def initialize(app):
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv', endpoint = 'uploadengcv')
     api.add_resource(UploadCVPreviewAPI, '/api/uploadcv/preview')
 
-    api.add_resource(SearchbyTextAPI, '/api/search/<string:text>', endpoint = 'searchbytext')
+    # api.add_resource(SearchbyTextAPI, '/api/search/<string:text>', endpoint = 'searchbytext')
+    api.add_resource(SearchbyTextAPI, '/api/searchbytext', endpoint = 'searchbytext')
 
     api.add_resource(RegionAPI, '/api/mining/region', endpoint = 'region')
     api.add_resource(CapacityAPI, '/api/mining/capacity', endpoint = 'capacity')

@@ -40,15 +40,15 @@ export default class SearchResultItem extends Component {
       <Card className="cs-ls-i">
         <div className="basic-info">
           <Row>
-            <Col span={1}>
+            {this.props.type === 'default' ? '' : <Col span={1}>
               <Checkbox
                 data-id={props.yaml_info.id}
                 data-name={props.yaml_info.name}
                 onChange={this.handleCheckboxChange}
                 checked={props.selection.findIndex(v => v.get('id') === props.yaml_info.id ) > -1 ? true : false}
               />
-            </Col>
-            <Col span={4}>
+            </Col>}
+            <Col span={this.props.type === 'default' ? 5 : 4}>
               <a href={`/show/${props.cv_id}`} target="_blank">{props.yaml_info.name ? props.yaml_info.name : props.yaml_info.id}</a>
             </Col>
             <Col span={1}>{props.yaml_info.gender}</Col>

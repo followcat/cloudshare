@@ -3,26 +3,51 @@ import React, { Component } from 'react';
 
 import { Row, Col, Form, Input, Button } from 'antd';
 
-export default class KeywordSearch extends Component {
+class KeywordSearch extends Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    const searchText = this.props.form.getFieldValue('searchText');
+    console.log(searchText);
+    console.log(this.props);
+    this.props.onSubmit(searchText);
   }
 
   render() {
+    const { getFieldProps } = this.props.form;
+
     return (
-      <div className="center">
+      <Form className="center">
         <Row>
           <Col span={12} offset={6}>
-            <Input id="sInput" size="large" />
+            <Form.Item>
+              <Input
+                {...getFieldProps('searchText')}
+                size="large"
+              />
+            </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col span={4} offset={10}>
-            <Button id="sBtn" type="primary" size="large">Search</Button>
+            <Button
+              id="sBtn"
+              type="primary"
+              size="large"
+              onClick={this.handleClick}
+              htmlType="submit"
+            >
+            Search
+            </Button>
           </Col>
         </Row>
-      </div>
+      </Form>
     );
   }
 }
+
+export default KeywordSearch = Form.create({})(KeywordSearch);

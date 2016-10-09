@@ -4,6 +4,7 @@ import shutil
 import services.mining
 import services.account
 import services.multicv
+import services.projectcv
 import services.curriculumvitae
 import interface.gitinterface
 
@@ -15,6 +16,7 @@ class Config(object):
     REPO_DB_NAME = 'tests/testcase_data'
     ACCOUNT_DB_NAME = 'tests/testcase_account'
     LSI_PATH = 'tests/lsimodel'
+    PRJ_PATH = 'tests/projects'
 
     def __init__(self):
         self.build()
@@ -24,19 +26,37 @@ class Config(object):
     def build(self):
         if not os.path.exists(self.UPLOAD_TEMP):
             os.mkdir(self.UPLOAD_TEMP)
+        if not os.path.exists(self.PRJ_PATH):
+            os.mkdir(self.PRJ_PATH)
 
         self.ACCOUNT_DB = interface.gitinterface.GitInterface(self.ACCOUNT_DB_NAME)
         self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB)
 
         self.REPO_DB = interface.gitinterface.GitInterface(self.REPO_DB_NAME)
+        self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB, 'cloudshare')
 
-        self.SVC_REPO_CV = services.curriculumvitae.CurriculumVitae(self.REPO_DB, 'cloudshare')
-        self.SVC_MULT_CV = services.multicv.MultiCV(self.SVC_REPO_CV, [])
+        self.PRJ_DB = interface.gitinterface.GitInterface(os.path.join(self.PRJ_PATH,
+                                                          'project_test'))
+        self.SVC_PRJ_MED = services.projectcv.ProjectCV(self.PRJ_DB,
+                                                        self.SVC_CV_REPO,
+                                                        'project_test')
+        self.SVC_PRJ_MED.setup([])
+
+        self.SVC_MULT_CV = services.multicv.MultiCV([self.SVC_PRJ_MED],
+                                                    self.SVC_CV_REPO)
 
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MULT_CV)
-        self.SVC_MIN.lsi_model.no_above = 1
-        self.SVC_MIN.lsi_model.setup('first.md', ['here is a text for testing.'])
+        self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].no_above = 1
+        self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].setup('first.md',
+            ['here is a text for testing.'])
         self.SVC_MIN.setup('default')
+
+    def init_samplecv(self):
+        filename = 'cv_1.doc'
+        f = open(os.path.join('core/test', filename))
+        upobj = services.curriculumvitae.CurriculumVitaeObject(filename, f,
+                                                               self.UPLOAD_TEMP)
+        self.SVC_MULT_CV.add(upobj, projectname='project_test')
 
     def rebuild(self):
         self.destory()
@@ -51,5 +71,7 @@ class Config(object):
             shutil.rmtree(self.ACCOUNT_DB_NAME)
         if os.path.exists(self.LSI_PATH):
             shutil.rmtree(self.LSI_PATH)
+        if os.path.exists(self.PRJ_PATH):
+            shutil.rmtree(self.PRJ_PATH)
 
 config = Config()

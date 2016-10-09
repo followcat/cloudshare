@@ -1,6 +1,7 @@
 import os
 import time
 
+import utils.issue
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
@@ -92,10 +93,11 @@ class ProjectCV(services.simulationcv.SimulationCV):
         self.interface.add_files([bytes(os.path.join(self.YAML_DIR, name))],
                                   message=message, committer=committer)
 
+    @utils.issue.report_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
         data = None
-        info = self.getinfo(id)
-        if info is not None and key in info:
+        projectinfo = self.getinfo(id)
+        if projectinfo is not None and key in projectinfo:
             data = { key: value }
             if key == 'tag':
                 data = self.addtag(id, value, committer)
@@ -104,8 +106,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
             elif key == 'comment':
                 data = self.addcomment(id, value, committer)
             else:
-                info[key] = value
-                self.saveinfo(id, info,
+                projectinfo[key] = value
+                self.saveinfo(id, projectinfo,
                               'Update %s key %s to %s.' % (id, key, value), committer)
         return data
 

@@ -93,11 +93,12 @@ class ProjectCV(services.simulationcv.SimulationCV):
         self.interface.add_files([bytes(os.path.join(self.YAML_DIR, name))],
                                   message=message, committer=committer)
 
-    @utils.issue.report_issue('issues/update_name.rst')
+    @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
         data = None
         projectinfo = self.getinfo(id)
-        if projectinfo is not None and key in projectinfo:
+        baseinfo = self.getyaml(id)
+        if projectinfo is not None and (key in projectinfo or key in baseinfo):
             data = { key: value }
             if key == 'tag':
                 data = self.addtag(id, value, committer)

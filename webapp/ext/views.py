@@ -57,14 +57,21 @@ def configure(app):
         view_func=webapp.views.views.FastMatching.as_view('fastmatching')
     )
 
+    #RESTful Search page entrance
+    app.add_url_rule(
+        '/search',
+        view_func=webapp.views.views.Search.as_view('search')
+    )
+
+    #RESTful SearchResult page entrance
+    app.add_url_rule(
+        '/search/result',
+        view_func=webapp.views.views.SearchResult.as_view('searchresult')
+    )
+
     app.add_url_rule(
         '/gotologin',
         view_func=webapp.views.views.LoginRedirect.as_view('gotologin'),
-        )
-
-    app.add_url_rule(
-        '/search',
-        view_func=webapp.views.views.Search.as_view('search'),
         )
 
     app.add_url_rule(

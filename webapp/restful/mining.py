@@ -118,7 +118,7 @@ class LSIbaseAPI(Resource):
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('basemodel', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
@@ -126,16 +126,16 @@ class LSIbaseAPI(Resource):
 
     def _post(self, doc, uses, filterdict, cur_page):
         args = self.reqparse.parse_args()
-        basemodel = args['basemodel']
+        project = args['project']
         count = 20
-        datas, pages, totals = self.process(basemodel, uses, doc, cur_page, count, filterdict)
+        datas, pages, totals = self.process(project, uses, doc, cur_page, count, filterdict)
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
-    def process(self, basemodel, uses, doc, cur_page, eve_count, filterdict=None):
+    def process(self, project, uses, doc, cur_page, eve_count, filterdict=None):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(basemodel, doc, uses=uses)
+        result = self.miner.probability(project, doc, uses=uses)
         if filterdict:
             filteset = self.index.get(filterdict, uses=uses)
             result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
@@ -240,19 +240,19 @@ class ValuablebaseAPI(Resource):
         self.miner = flask.current_app.config['SVC_MIN']
         self.uses = self.miner.default_names()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('basemodel', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
 
     def _get(self, doc):
         args = self.reqparse.parse_args()
-        basemodel = args['basemodel']
+        project = args['project']
         uses = self.uses + args['uses']
         name_list = args['name_list']
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, basemodel, uses=uses)
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project, uses=uses)
         else:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, basemodel,
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project,
                                                uses=uses, name_list=name_list)
         response = dict()
         datas = []

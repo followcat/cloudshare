@@ -27,6 +27,9 @@ export default class SearchResult extends Component {
   }
 
   loadSearchResult(searchText) {
+    this.setState({
+      spinning: true,
+    });
     fetch(`/api/searchbytext`, {
       method: 'POST',
       credentials: 'include',
@@ -46,6 +49,7 @@ export default class SearchResult extends Component {
           pages: json.data.pages,
           total: json.data.totals,
           data: json.data.datas,
+          spinning: false,
         });
       }
     })

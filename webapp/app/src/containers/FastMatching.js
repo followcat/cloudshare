@@ -153,6 +153,7 @@ export default class FastMatching extends Component {
           onSearch={this.handleSearch}
         />
         <SearchResultBox
+          type="match"
           visible={this.state.visible}
           total={this.state.total}
           spinning={this.state.spinning}

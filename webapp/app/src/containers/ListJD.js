@@ -6,6 +6,7 @@ import 'whatwg-fetch';
 
 import Header from '../components/common/Header';
 import Storage from '../utils/storage';
+import Generator from '../utils/generator';
 import './manage.less';
 
 export default class ListJD extends Component {
@@ -37,10 +38,13 @@ export default class ListJD extends Component {
    */
   loadJobDescription() {
     fetch(`/api/jdlist`, {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'Authorization': `Basic ${Storage.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
+      body: Generator.getPostData(),
     })
     .then((response) => {
       return response.json();
@@ -68,10 +72,13 @@ export default class ListJD extends Component {
    */
   loadCompany() {
     fetch(`/api/companylist`, {
-      method: 'GET',
+      method: 'POST',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${Storage.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
+      body: Generator.getPostData(),
     })
     .then((response) => {
       return response.json();
@@ -144,11 +151,11 @@ export default class ListJD extends Component {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${Storage.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         jd_name: obj.jdName,
         co_name: obj.companySelection,
         jd_description: obj.jdContent,
@@ -181,11 +188,11 @@ export default class ListJD extends Component {
       method: 'PUT',
       credentials: 'include',
       headers: {
-        'Authroization': `Basic ${localStorage.token}`,
+        'Authroization': `Basic ${Storage.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         status: value.statusSelect,
         coname: value.companyName,
         description: value.jdContent,
@@ -218,11 +225,11 @@ export default class ListJD extends Component {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Authroization': `Basic ${localStorage.token}`,
+        'Authroization': `Basic ${Storage.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         coname: value.companyName,
         introduction: value.introduction,
       }),

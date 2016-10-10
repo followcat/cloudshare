@@ -1,13 +1,13 @@
 'use strict';
 import Storage from './storage';
 
-const addBasemodel = (postData) => {
-  let basemodel = Storage.get('_pj');
-  return Object.assign(postData, { basemodel: basemodel });
+const addBasemodel = (postData={}) => {
+  let project = Storage.get('_pj');
+  return Object.assign(postData, { project: project });
 };
 
 const Generator = {
-  getPostData: (postData) => {
+  getPostData: (postData={}) => {
     postData = addBasemodel(postData);
     return JSON.stringify(postData);
   },

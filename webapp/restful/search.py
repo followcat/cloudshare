@@ -24,8 +24,9 @@ class SearchbyTextAPI(Resource):
         cur_page = args['page']
         result = self.svc_cv.search(text)
         yaml_result = self.svc_cv.search_yaml(text)
+        results = list(set(result+yaml_result))
         count = 20
-        datas, pages = self.paginate(result, yaml_result, cur_page, count)
+        datas, pages = self.paginate(results, cur_page, count)
         return { 'result': {
                 'search_key': text,
                 'result': datas,
@@ -35,17 +36,17 @@ class SearchbyTextAPI(Resource):
             }
         }
 
-    def paginate(self, result, yaml_result, cur_page, eve_count):
+    def paginate(self, results, cur_page, eve_count):
         if not cur_page:
             cur_page = 1
-        sum = len(result)
+        sum = len(results)
         if sum%eve_count != 0:
             pages = sum/eve_count + 1
         else:
             pages = sum/eve_count
         datas = []
         names = []
-        for each in (result+yaml_result)[(cur_page-1)*eve_count:cur_page*eve_count]:
+        for each in results[(cur_page-1)*eve_count:cur_page*eve_count]:
             base, suffix = os.path.splitext(each)
             name = core.outputstorage.ConvertName(base)
             if name not in names:

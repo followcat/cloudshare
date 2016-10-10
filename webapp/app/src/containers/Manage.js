@@ -34,7 +34,7 @@ export default class Manage extends React.Component {
   render() {
     return (
       <div>
-        <div id="viewport">
+        <div id="viewport" className="pd-top">
           <Header fixed={true} />
           <div className="cs-layout-bottom">
             <div className="cs-layout-wrapper" ref="wrapper">

@@ -22,8 +22,8 @@ export default class Search extends Component {
 
   render() {
     return (
-      <div id="viewport">
-        <Header />
+      <div id="viewport" className="pd-top">
+        <Header fixed={true} />
         <div className="cs-layout-container">
           <KeywordSearch onSubmit={this.handleSubmit}/>
           <DataBaseBox />

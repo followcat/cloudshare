@@ -70,11 +70,29 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     }
   });
 
-  var databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
+  $("#sentenceBtn").on("click", function() {
+    var sbs = $("#serachbysentence"),
+        databaseList = localStorage.databaseList ? JSON.parse(localStorage.databaseList) : [];
 
-  if (databaseList.length > 0) {
-    $("#serachbysentence").append("<input type=\"text\" class=\"hide-param\" name=\"uses\" value=\""+ databaseList.join(",") +"\" />");
-  }
+    if (databaseList.length > 0) {
+      var usesInput = sbs.find("input[name='uses']");
+      if (usesInput.length > 0) {
+        $(usesInput).val(databaseList.join(","));
+      } else {
+        $(sbs).append("<input type=\"text\" class=\"hide-param\" name=\"uses\" value=\""+ databaseList.join(",") +"\" />");
+      }
+    }
+
+    if (localStorage.model) {
+      var modelInput = sbs.find("input[name='model']");
+      if (modelInput.length > 0) {
+        $(modelInput).val(localStorage.model);
+      } else {
+        $(sbs).append("<input type=\"text\" class=\"hide-param\" name=\"model\" value=\""+ localStorage.model +"\" />");
+      }
+    }
+    $(sbs).submit();
+  });
 
   function objectToArray(obj) {
     var arr = [];
@@ -95,7 +113,7 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
     }
   }
   $.ajax({
-    url: "/cvnumbers",
+    url: "/api/dbnumbers",
     dataType: "json",
     success: function(response) {
       var data = response.result;
@@ -106,7 +124,7 @@ require(['jquery', 'bootstrap', 'header', 'formvalidate', 'Upload', 'History'], 
         if (classifyDatas[i].name === "total") {
           $("#total").append(classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number);
         } else if (classifyDatas[i].name === "cloudshare") {
-          $("#countList").prepend("<div class=\"count-list-item\">" + classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number + "</div>");
+          $("#countList").prepend("<div class=\"count-list-item font-bolder\">" + classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number + "</div>");
         } else if (classifyDatas[i].number !== 0){
           $("#countList").append("<div class=\"count-list-item\">" + classifyDatas[i].name.toUpperCase() + ": " + classifyDatas[i].number + "</div>");
         }

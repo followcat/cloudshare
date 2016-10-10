@@ -15,6 +15,7 @@ class JobDescription extends Component {
     };
 
     this.handleClick = this.handleClick.bind(this);
+    this.handleFastMatchingClick = this.handleFastMatchingClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleModalOk = this.handleModalOk.bind(this);
   }
@@ -29,6 +30,10 @@ class JobDescription extends Component {
     this.setState({
       visible: true,
     });
+  }
+
+  handleFastMatchingClick(record) {
+    window.open(`/fastmatching/${record.id}`);
   }
 
   handleCancel() {
@@ -89,7 +94,7 @@ class JobDescription extends Component {
         key: 'operation',
         render: (record) => (
           <div>
-            <Button type="primary" size="small">CV Fast Matching</Button>
+            <Button type="primary" size="small" onClick={() => this.handleFastMatchingClick(record)}>CV Fast Matching</Button>
             <Button type="ghost" size="small" onClick={() => this.handleClick(record)}>Edit Job Description</Button>
           </div>
         )

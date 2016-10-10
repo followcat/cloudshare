@@ -15,15 +15,15 @@ class SearchbyTextAPI(Resource):
 
     def __init__(self):
         super(SearchbyTextAPI, self).__init__()
-        self.svc_cv = flask.current_app.config['SVC_CV']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('page', type = int, location = 'json')
 
     def get(self, text):
         args = self.reqparse.parse_args()
         cur_page = args['page']
-        result = self.svc_cv.search(text)
-        yaml_result = self.svc_cv.search_yaml(text)
+        result = self.svc_mult_cv.search(text)
+        yaml_result = self.svc_mult_cv.search_yaml(text)
         results = list(set(result+yaml_result))
         count = 20
         datas, pages = self.paginate(results, cur_page, count)
@@ -54,7 +54,7 @@ class SearchbyTextAPI(Resource):
             else:
                 continue
             try:
-                yaml_data = self.svc_cv.getyaml(base)
+                yaml_data = self.svc_mult_cv.getyaml(base)
             except IOError:
                 names.remove(name)
                 continue

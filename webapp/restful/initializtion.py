@@ -25,10 +25,10 @@ def initialize(app):
     api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyListAPI, '/api/companylist', endpoint = 'companylist')
 
+    api.add_resource(JobDescriptionUploadAPI, '/api/uploadjd',
+                     endpoint = 'jobdescriptionupload')
     api.add_resource(JobDescriptionAPI, '/api/jd/<string:id>',
                      endpoint = 'jobdescription')
-    api.add_resource(JobDescriptionByNameAPI, '/api/jdbyname',
-                     endpoint = 'jobdescriptionbyname')
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
                      endpoint = 'jobdescriptionlist')
 
@@ -49,10 +49,16 @@ def initialize(app):
     api.add_resource(CapacityAPI, '/api/mining/capacity', endpoint = 'capacity')
     api.add_resource(PositionAPI, '/api/mining/position/<string:text>', endpoint = 'position')
 
+    api.add_resource(AbilityAPI, '/api/mining/ability', endpoint = 'ability')
+    api.add_resource(ExperienceAPI, '/api/mining/experience', endpoint = 'experience')
+
     api.add_resource(LSIbydocAPI, '/api/mining/lsibydoc', endpoint = 'lsibydoc')
-    api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid/<string:id>', endpoint = 'lsibyjdid')
+    # api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid/<string:id>', endpoint = 'lsibyjdid')
+    api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
 
     api.add_resource(SimilarAPI, '/api/mining/similar/<string:id>', endpoint = 'similar')
+
+    api.add_resource(ValuableAPI, '/api/mining/valuable')
 
     api.add_resource(ValuablebyJDidAPI, '/api/mining/valuablebyjdid/<string:id>',
                                         endpoint = 'valuablebyjdid')
@@ -61,6 +67,8 @@ def initialize(app):
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
 
-    api.add_resource(DatabasesAPI, '/api/databases', endpoint = 'databases')
-    api.add_resource(DBNumbersAPI, '/api/dbnumbers/<string:name>', endpoint = 'dbnumbers')
-    
+    api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')
+    api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')
+    api.add_resource(DBNumberAPI, '/api/dbnumber/<string:name>', endpoint = 'dbnumber')
+    api.add_resource(DBNumbersAPI, '/api/dbnumbers', endpoint = 'dbnumbers')
+    api.add_resource(ClassifyAPI, '/api/classify', endpoint = 'classify')

@@ -24,6 +24,8 @@
         </a>
       </div>
       {% block search %}{% endblock %}
+      <div id="modelMenu">
+      </div>
       <ul class="navbar-right nav-list list-unstyled">
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="name"><span class="glyphicon glyphicon-user"></span>{{ current_user.id }} <span class="caret"></span></a>
@@ -39,7 +41,7 @@
             <li><a href="/uploader">Upload</a></li>
           </ul>
         </li>
-        <li><a href="/listjd?status=Opening">Select a JD</a></li>
+        <li><a href="/listjd">Select a JD</a></li>
       </ul>
     </div>
   </header>

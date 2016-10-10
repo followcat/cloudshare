@@ -1,15 +1,18 @@
 import os
 import time
 
-import webapp.settings
+import baseapp.backup
+import baseapp.datadbs
+import baseapp.projects
 
 import dulwich.porcelain
 
 
-backup_folders = webapp.settings.BACKUP_DIRS
+backup_folders = baseapp.backup.BACKUP_DIRS
 ISOTIMEFORMAT = '%Y-%m-%d-%X'
-source_repo = webapp.settings.DATA_DB.repo
-account_repo = webapp.settings.ACCOUNT_DB.repo
+source_repo = baseapp.datadbs.REPO_DB.repo
+account_repo = baseapp.datadbs.ACCOUNT_DB.repo
+medical_repo = baseapp.projects.MED_DB.repo
 
 
 def assure_path_exists(path):
@@ -22,7 +25,10 @@ if __name__ == '__main__':
     for folder in backup_folders:
         data_backup_path = os.path.join(folder, 'data', backup_name)
         account_backup_path = os.path.join(folder, 'account', backup_name)
+        medical_backup_path = os.path.join(folder, 'medical', backup_name)
         assure_path_exists(data_backup_path)
         assure_path_exists(account_backup_path)
+        assure_path_exists(medical_backup_path)
         dulwich.porcelain.clone(source_repo.path, data_backup_path, bare=True)
         dulwich.porcelain.clone(account_repo.path, account_backup_path, bare=True)
+        dulwich.porcelain.clone(medical_repo.path, medical_backup_path, bare=True)

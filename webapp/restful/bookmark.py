@@ -18,11 +18,11 @@ class BookmarkAPI(Resource):
 
     def get(self, id):
         data = []
-        svc_cv = flask.current_app.config['SVC_CV']
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         user = flask.ext.login.current_user
         bookmark_list = list(user.getbookmark())
         for bookmark_item in bookmark_list:
-            yaml_info = svc_cv.getyaml(bookmark_item)
+            yaml_info = svc_mult_cv.getyaml(bookmark_item)
             data.append(yaml_info)
         if id == user.id:
             result = { 'code': 200, 'data': data }

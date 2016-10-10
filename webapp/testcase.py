@@ -21,10 +21,10 @@ class Test(flask.ext.testing.TestCase):
         self.app = flask.Flask(__name__)
         self.app.config.from_object('tests.settings.config')
         self.config = self.app.config
-        self.data_db = self.app.config['DATA_DB']
+        self.repo_db = self.app.config['REPO_DB']
         self.account_db = self.app.config['ACCOUNT_DB']
         self.upload_tmp = self.app.config['UPLOAD_TEMP']
-        self.svc_cv = self.app.config['SVC_CV']
+        self.svc_mult_cv = self.app.config['SVC_MULT_CV']
         self.app.jinja_env.add_extension(jinja2.ext.loopcontrols)
         ext.views.configure(self.app)
         return self.app
@@ -174,11 +174,11 @@ class TestUploadFile(UploadFile):
 
     def test_upload(self):
         self.init_upload()
-        commit = self.data_db.repo.get_object(self.data_db.repo.head())
+        commit = self.repo_db.repo.get_object(self.repo_db.repo.head())
         assert('Add file' in commit.message)
         assert('username' in commit.author)
-        yamlname = list(self.svc_cv.yamls())[0]
-        yaml_obj = self.svc_cv.getyaml(yamlname)
+        yamlname = list(self.svc_mult_cv.yamls())[0]
+        yaml_obj = self.svc_mult_cv.getyaml(yamlname)
         assert(yaml_obj['originid'] == '')
         assert(yaml_obj['id'] in yamlname)
 
@@ -196,7 +196,7 @@ class ShowCV(UploadFile):
 
     def init_showcv(self):
         self.init_upload()
-        self.yamlname = [yaml for yaml in self.app.config['SVC_CV'].yamls()][0]
+        self.yamlname = [yaml for yaml in self.app.config['SVC_MULT_CV'].yamls()][0]
         self.name = self.yamlname.replace('yaml', 'md')
 
 
@@ -245,7 +245,7 @@ class TestShowCV(ShowCV):
         rv = self.uppreview()
         assert ('13777777777' in rv.data)
         self.confirmenglish(self.name)
-        yamldata = self.app.config['SVC_CV'].getyaml(self.yamlname)
+        yamldata = self.app.config['SVC_MULT_CV'].getyaml(self.yamlname)
         assert ('enversion' in yamldata)
 
 class SVCCompany(User):
@@ -262,5 +262,5 @@ class TestSVCCompany(SVCCompany):
         self.init_svccompany()
         rv = self.addcompany(self.name, self.introduction)
         assert (json.loads(rv.data)['result'] is True)
-        SVC_CO = self.app.config['SVC_CO']
-        assert ('Company Introduce' in SVC_CO.company(self.name)['introduction'])
+        SVC_MULT_CV = self.app.config['SVC_MULT_CV']
+        assert ('Company Introduce' in SVC_MULT_CV.default.company_get(self.name)['introduction'])

@@ -146,6 +146,7 @@ require(
           },
           success: function(response) {
             var data = chartsCommon.getProportionPointData(response.result);
+            console.log(data);
             scatter.makeScatter(data);
           }
         });

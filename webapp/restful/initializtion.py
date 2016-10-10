@@ -54,14 +54,14 @@ def initialize(app):
     api.add_resource(ExperienceAPI, '/api/mining/experience', endpoint = 'experience')
 
     api.add_resource(LSIbydocAPI, '/api/mining/lsibydoc', endpoint = 'lsibydoc')
-    # api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid/<string:id>', endpoint = 'lsibyjdid')
+
     api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
 
     api.add_resource(SimilarAPI, '/api/mining/similar/<string:id>', endpoint = 'similar')
 
     api.add_resource(ValuableAPI, '/api/mining/valuable')
 
-    api.add_resource(ValuablebyJDidAPI, '/api/mining/valuablebyjdid/<string:id>',
+    api.add_resource(ValuablebyJDidAPI, '/api/mining/valuablebyjdid',
                                         endpoint = 'valuablebyjdid')
     api.add_resource(ValuablebydocAPI, '/api/mining/valuablebydoc',
                                         endpoint = 'valuablebydoc')

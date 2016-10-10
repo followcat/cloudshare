@@ -118,15 +118,13 @@ class LSIbaseAPI(Resource):
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', type = str, location = 'json')
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
         self.sim_names = self.miner.addition_names()
 
-    def _post(self, doc, uses, filterdict, cur_page):
+    def _post(self, project, doc, uses, filterdict, cur_page):
         args = self.reqparse.parse_args()
-        project = args['project']
         count = 20
         datas, pages, totals = self.process(project, uses, doc, cur_page, count, filterdict)
         return { 'datas': datas, 'pages': pages, 'totals': totals }
@@ -177,6 +175,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         super(LSIbyJDidAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.uses = self.miner.default_names()
+        self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
@@ -185,12 +184,13 @@ class LSIbyJDidAPI(LSIbaseAPI):
     def post(self):
         args = self.reqparse.parse_args()
         id = args['id']
-        jd_yaml = self.svc_mult_cv.default.jd_get(id+'.yaml')
+        project = args['project']
+        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id+'.yaml')
         doc = jd_yaml['description']
         uses = self.uses + args['uses']
         filterdict = args['filterdict']
         cur_page = args['page']
-        result = self._post(doc, uses, filterdict, cur_page)
+        result = self._post(project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -240,13 +240,11 @@ class ValuablebaseAPI(Resource):
         self.miner = flask.current_app.config['SVC_MIN']
         self.uses = self.miner.default_names()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
 
-    def _get(self, doc):
+    def _get(self, doc, project):
         args = self.reqparse.parse_args()
-        project = args['project']
         uses = self.uses + args['uses']
         name_list = args['name_list']
         if len(name_list) == 0:
@@ -277,11 +275,16 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
     def __init__(self):
         super(ValuablebyJDidAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
-    def post(self, id):
-        jd_yaml = self.svc_mult_cv.default.jd_get(id+'.yaml')
+    def post(self):
+        args = self.reqparse.parse_args()
+        id = args['id']
+        project = args['project']
+        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id+'.yaml')
         doc = jd_yaml['description']
-        result = self._get(doc)
+        result = self._get(doc, project)
         return { 'code': 200, 'data': result }
 
 class ValuablebydocAPI(ValuablebaseAPI):
@@ -289,11 +292,13 @@ class ValuablebydocAPI(ValuablebaseAPI):
     def __init__(self):
         super(ValuablebydocAPI, self).__init__()
         self.reqparse.add_argument('doc', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
-    def get(self):
+    def post(self):
         args = self.reqparse.parse_args()
         doc = args['doc']
-        result = self._get(doc)
+        project = args['project']
+        result = self._get(doc, project)
         return { 'result': result }
 
 
@@ -304,13 +309,15 @@ class ValuableAPI(ValuablebaseAPI):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('doc', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
+        project = args['project']
         if args['id']:
-            jd_yaml = self.svc_mult_cv.default.jd_get(args['id'] + '.yaml')
+            jd_yaml = self.svc_mult_cv.getproject(project).jd_get(args['id'] + '.yaml')
             doc = jd_yaml['description']
         elif args['doc']:
             doc = args['doc']
-        result = self._get(doc)
+        result = self._get(doc, project)
         return { 'code': 200, 'data': result }

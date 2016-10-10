@@ -105,7 +105,7 @@ export default class FastMatching extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(Object.assign(this.state.postData, { page: page })),
+      body: Generator.getPostData(Object.assign(this.state.postData, { page: page })),
     })
     .then(response => response.json())
     .then((json) => {

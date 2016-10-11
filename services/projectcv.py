@@ -1,6 +1,7 @@
 import os
 import time
 
+import utils.issue
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
@@ -37,11 +38,17 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def setup(self, classify, committer=None):
         if not os.path.exists(self.cvpath):
             os.makedirs(self.cvpath)
-            self.config['classify'] = classify
+            self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
             self.save()
             self.interface.add_files([bytes(self.config_file), bytes(self.ids_file)],
                                       message='Create new project %s.'%self.name,
                                       committer=committer)
+
+    def save(self):
+        utils.builtin.save_yaml(self.config, self.path, self.config_file,
+                                default_flow_style=False)
+        utils.builtin.save_json(self.cvids, self.path, self.ids_file,
+                                indent=4)
 
     def add(self, id, committer):
         result = False
@@ -65,6 +72,11 @@ class ProjectCV(services.simulationcv.SimulationCV):
             info[each[0]] = each[1]
         return info
 
+    def getmd_en(self, id):
+        yamlinfo = self.getyaml(id)
+        veren = yamlinfo['enversion']
+        return self.repo.gethtml(veren)
+
     def getinfo(self, id):
         if not self.exists(id):
             return None
@@ -87,10 +99,12 @@ class ProjectCV(services.simulationcv.SimulationCV):
         self.interface.add_files([bytes(os.path.join(self.YAML_DIR, name))],
                                   message=message, committer=committer)
 
+    @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
         data = None
-        info = self.getinfo(id)
-        if info is not None and key in info:
+        projectinfo = self.getinfo(id)
+        baseinfo = self.getyaml(id)
+        if projectinfo is not None and (key in projectinfo or key in baseinfo):
             data = { key: value }
             if key == 'tag':
                 data = self.addtag(id, value, committer)
@@ -99,8 +113,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
             elif key == 'comment':
                 data = self.addcomment(id, value, committer)
             else:
-                info[key] = value
-                self.saveinfo(id, info,
+                projectinfo[key] = value
+                self.saveinfo(id, projectinfo,
                               'Update %s key %s to %s.' % (id, key, value), committer)
         return data
 

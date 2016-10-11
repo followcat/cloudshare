@@ -1,14 +1,12 @@
 import os
 
 import services.account
-import services.classifycv
+import services.multiclsify
 import services.cvstoragesync
 import services.curriculumvitae
 import interface.basefs
 import interface.predator
 import interface.gitinterface
-
-import sources.industry_id
 
 
 ACCOUNT_DB_NAME = 'account'
@@ -32,10 +30,5 @@ if os.path.exists(RAW_DIR):
         RAW_DB[name] = interface.predator.PredatorInterface(namepath)
 SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_CV_STO, RAW_DB)
 
-CLASSIFY_DIR = 'classify'
-SVC_CLS_CV = dict()
-for name in sources.industry_id.industryID.keys():
-     cls_cv = services.classifycv.ClassifyCV(name, CLASSIFY_DIR, SVC_CV_STO, RAW_DB)
-     if cls_cv.NUMS == 0:
-        continue
-     SVC_CLS_CV[name] = cls_cv
+SVC_MULT_CLSIFY = services.multiclsify.MultiClassify(SVC_CV_STO)
+SVC_CLS_CV = SVC_MULT_CLSIFY.classifies

@@ -177,6 +177,14 @@ def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
                     fp.write(yaml.safe_dump(yaml_info, allow_unicode=True))
 
 
+def initclassify(SVC_CV):
+    import utils.builtin
+    for y in SVC_CV.yamls():
+        info = SVC_CV.getyaml(y)
+        info['classify'] = extractor.information_explorer.get_classify(info['experience'])
+        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
+
+
 def initproject(SVC_CV_REPO, SVC_PRJ):
     import utils.builtin
     for y in SVC_CV_REPO.yamls():

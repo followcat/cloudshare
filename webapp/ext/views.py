@@ -135,6 +135,11 @@ def configure(app):
         )
 
     app.add_url_rule(
+        '/showeng/<path:id>',
+        view_func=webapp.views.views.ShowEnglish.as_view('showenglish'),
+        )
+
+    app.add_url_rule(
         '/preview',
         view_func=webapp.views.views.Preview.as_view('preview'),
         )

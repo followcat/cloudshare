@@ -82,6 +82,8 @@ h3
   font-size: 1em; 
 
   width: 100%;
+  display: table;
+  word-wrap: break-word;
 }
 
 .cv-wrap table thead
@@ -123,6 +125,7 @@ h3
   text-align: left;
 
   border: 1px solid #c2c2c2;
+  word-break: break-word;
 }
 
 .loading

@@ -90,6 +90,15 @@ class Edit(flask.views.MethodView):
         return flask.render_template('edit.html', markdown=md)
 
 
+class ShowEnglish(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self, id):
+        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        md = svc_mult_cv.default.getmd_en(id)
+        return flask.render_template('edit.html', markdown=md)
+
+
 class Modify(flask.views.MethodView):
 
     @flask.ext.login.login_required

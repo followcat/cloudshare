@@ -124,9 +124,12 @@ class LSIbaseAPI(Resource):
         self.sim_names = self.miner.addition_names()
 
     def _post(self, project, doc, uses, filterdict, cur_page):
-        args = self.reqparse.parse_args()
+        indexdict = {}
+        for key in filterdict:
+            if filterdict[key]:
+                indexdict[key] = self.index.get_indexkeys([key], filterdict[key], uses)
         count = 20
-        datas, pages, totals = self.process(project, uses, doc, cur_page, count, filterdict)
+        datas, pages, totals = self.process(project, uses, doc, cur_page, count, indexdict)
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
     def process(self, project, uses, doc, cur_page, eve_count, filterdict=None):
@@ -174,7 +177,6 @@ class LSIbyJDidAPI(LSIbaseAPI):
     def __init__(self):
         super(LSIbyJDidAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.uses = self.miner.default_names()
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
@@ -187,7 +189,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         project = args['project']
         jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id+'.yaml')
         doc = jd_yaml['description']
-        uses = self.uses + args['uses']
+        uses = [project] + args['uses']
         filterdict = args['filterdict']
         cur_page = args['page']
         result = self._post(project, doc, uses, filterdict, cur_page)

@@ -56,11 +56,12 @@ export default class FastMatching extends Component {
     const filterData = {};
     for (let key in value) {
       if (key !== 'uses') {
-        filterData[key] = value[key] instanceof Array ? value[key] : value[key] ? value[key].split(' ') : '';
+        filterData[key] = value[key] instanceof Array ? value[key] : value[key] ? value[key].split(' ') : [];
       }
     }
     const postData = {
-      id: this.state.id,
+      // id: this.state.id,
+      id: '684605740b4e11e6ba746c3be51cefca',
       uses: value.uses,
       filterdict: filterData,
     };

@@ -110,21 +110,30 @@ class FilterForm extends Component {
               labelCol={{ span: 6 }}
               wrapperCol={{ span: 18 }}
             >
-              <Checkbox.Group options={genderOptions} onChange={this.handleGenderChange} />
+              <Checkbox.Group
+                options={genderOptions}
+                onChange={this.handleGenderChange}
+              />
             </Form.Item>
             <Form.Item
               label="Education"
               labelCol={{ span: 6 }}
               wrapperCol={{ span: 18 }}
             >
-              <Checkbox.Group options={educationOptions} onChange={this.handleEducationChange} />
+              <Checkbox.Group
+                options={educationOptions}
+                onChange={this.handleEducationChange}
+              />
             </Form.Item>
             <Form.Item
               label="Marital Status"
               labelCol={{ span: 6 }}
               wrapperCol={{ span: 18 }}
             >
-              <Checkbox.Group options={maritalStatusOptions} onChange={this.handleMaritalStatusChange} />
+              <Checkbox.Group
+                options={maritalStatusOptions}
+                onChange={this.handleMaritalStatusChange}
+              />
             </Form.Item>
           </Col>
           <Col span={12}>

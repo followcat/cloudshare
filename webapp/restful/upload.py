@@ -20,22 +20,24 @@ class UploadCVAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type = str, location = 'json')
         self.reqparse.add_argument('updates', type = list, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
     def put(self):
         results = []
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         updates = args['updates']
+        project = args['project']
         names = []
         documents = []
-        def_cv_name = self.svc_mult_cv.default.name
+        def_cv_name = self.svc_mult_cv.getproject(project).name
         for item in updates:
             status = 'fail'
             upobj = upload[user.id].pop(item['id'])
             for key, value in item.iteritems():
                 if key is not u'id':
                     upobj.filepro.yamlinfo[key] = value
-            result = self.svc_mult_cv.add(upobj, user.id, def_cv_name)
+            result = self.svc_mult_cv.add(upobj, user.id, def_cv_name, unique=True)
             if result is True:
                 names.append(upobj.ID+'.md')
                 documents.append(upobj.markdown())

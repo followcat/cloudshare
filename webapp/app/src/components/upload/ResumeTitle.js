@@ -92,13 +92,14 @@ class ResumeTitle extends Component {
             >
               <Select
                 {...getFieldProps('classify', {
-                  rules: [{ required: true, message: 'Classify is required.'},]
+                  rules: [{ required: true, type: 'array', message: 'Classify is required.'},]
                 })}
+                multiple
                 showSearch
+                tags
                 style={{ width: 160 }}
                 placeholder="Select a classify"
                 optionFilterProp="children"
-                notFoundContent="Not found"
               >
                 {this.props.classifyList.map((item, index) => {
                   return (

@@ -33,14 +33,24 @@ export default class FastMatching extends Component {
     };
 
     this.loadClassifyData = this.loadClassifyData.bind(this);
+    this.loadResultData = this.loadResultData.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
     this.handleToggleSelection = this.handleToggleSelection.bind(this);
   }
 
+  /**
+   * [初始加载classify列表]
+   * @return {[type]} [description]
+   */
   loadClassifyData() {
     fetch(`/api/classify`, {
-      method: 'GET',
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: Generator.getPostData(),
     })
     .then(response => response.json())
     .then((json) => {
@@ -52,6 +62,45 @@ export default class FastMatching extends Component {
     })
   }
 
+  /**
+   * 初始加载默认的fastmatching结果
+   * @param  {[string]} id [JD id]
+   * @return {[type]}    [description]
+   */
+  loadResultData(id) {
+    let postData = { id: id };
+    this.setState({
+      visible: true,
+      spinning: true,
+      postData: postData,
+    });
+
+    fetch(`/api/mining/lsibyjdid`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Basic ${StorageUtil.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: Generator.getPostData(postData),
+    })
+    .then(response => response.json())
+    .then((json) => {
+      this.setState({
+        spinning: false,
+        searchResultDataSource: json.data.datas,
+        pages: json.data.pages,
+        total: json.data.totals,
+      });
+    })
+  }
+
+  /**
+   * Filter表单的过滤功能事件
+   * @param  {[object]} value [表单对象数据]
+   * @return {[type]}       [description]
+   */
   handleSearch(value) {
     const filterData = {};
     for (let key in value) {
@@ -60,8 +109,7 @@ export default class FastMatching extends Component {
       }
     }
     const postData = {
-      // id: this.state.id,
-      id: '684605740b4e11e6ba746c3be51cefca',
+      id: this.state.id,
       uses: value.uses,
       filterdict: filterData,
     };
@@ -93,6 +141,11 @@ export default class FastMatching extends Component {
     })
   }
 
+  /**
+   * 底部翻页按钮功能
+   * @param  {[int]} page [页码]
+   * @return {[type]}      [description]
+   */
   handleSwitchPage(page) {
     this.setState({
       spinning: true,
@@ -117,6 +170,11 @@ export default class FastMatching extends Component {
     })
   }
 
+  /**
+   * Fastmatching结果条目checkbox与右边侧边栏selection box条目的联动功能
+   * @param  {[object]} obj [当前点击的item对象]
+   * @return {[type]}     [description]
+   */
   handleToggleSelection(obj) {
     const index = this.state.selection.findIndex(v => {
       return v.get('id') === obj.id 
@@ -135,12 +193,14 @@ export default class FastMatching extends Component {
   }
 
   componentDidMount() {
-    const url = window.location.href.split('/');
+    const url = window.location.href.split('/'),
+          id = url[url.length - 1];
 
     this.setState({
-      id: url[url.length - 1],
+      id: id,
     });
     this.loadClassifyData();
+    this.loadResultData(id);
   }
 
   render() {

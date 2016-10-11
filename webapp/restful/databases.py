@@ -1,5 +1,6 @@
 import flask
 import flask.ext.login
+from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 
@@ -49,6 +50,10 @@ class ClassifyAPI(flask.views.MethodView):
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         super(ClassifyAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
-    def get(self):
-        return { 'code': 200, 'data': self.svc_mult_cv.default.getclassify() }
+    def post(self):
+        args = self.reqparse.parse_args()
+        project = args['project']
+        return { 'code': 200, 'data': self.svc_mult_cv.getproject(project).getclassify() }

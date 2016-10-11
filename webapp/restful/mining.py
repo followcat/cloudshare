@@ -189,8 +189,8 @@ class LSIbyJDidAPI(LSIbaseAPI):
         project = args['project']
         jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id+'.yaml')
         doc = jd_yaml['description']
-        uses = [project] + args['uses']
-        filterdict = args['filterdict']
+        uses = [project] + args['uses'] if args['uses'] else [project]
+        filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self._post(project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }

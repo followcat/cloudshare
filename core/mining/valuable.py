@@ -64,7 +64,7 @@ def next(miner, svc_cv, doc, top, basemodel, uses=None, name_list=None):
         name_list.extend([core.outputstorage.ConvertName(each[1]).md
                           for each in extract_data_full])
     rating.append((doc, extract_data_full))
-    total = miner.lenght(basemodel, uses=miner.default_names())
+    total = miner.lenght(basemodel, uses=[basemodel])
     for text in doc.split('\n'):
         if not text.strip():
             continue
@@ -75,7 +75,7 @@ def next(miner, svc_cv, doc, top, basemodel, uses=None, name_list=None):
         else:
             value_res = miner.minelist(text, name_list, basemodel)
             rank_res = miner.minelistrank(text, value_res, basemodel,
-                                          uses=miner.default_names())
+                                          uses=[basemodel])
             value_point = map(lambda x: (x[0], float(x[1])/2), value_res)
             rank_point = map(lambda x: (x[0], rankvalue(x[1], total)), rank_res)
             total_point = map(lambda x: (x[0][0], x[0][1]*0.5+x[1][1]*0.5),

@@ -6,6 +6,7 @@ import SearchResultBox from '../components/common/searchresult/SearchResultBox';
 
 import queryString from '../utils/query_string';
 import StorageUtil from '../utils/storage';
+import Generator from '../utils/generator';
 
 import './searchresult.less';
 
@@ -38,7 +39,7 @@ export default class SearchResult extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         'search_text': searchText,
       })
     })
@@ -78,7 +79,7 @@ export default class SearchResult extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         'search_text': this.state.keyword,
         'page': page,
       })

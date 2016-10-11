@@ -17,15 +17,17 @@ class SearchbyTextAPI(Resource):
         super(SearchbyTextAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
+        project = args['project']
         text = args['search_text']
         cur_page = args['page']
-        result = self.svc_mult_cv.search(text)
-        yaml_result = self.svc_mult_cv.search_yaml(text)
+        result = self.svc_mult_cv.search(text, project)
+        yaml_result = self.svc_mult_cv.search_yaml(text, project)
         results = list(set(result+yaml_result))
         count = 20
         datas, pages = self.paginate(results, cur_page, count)

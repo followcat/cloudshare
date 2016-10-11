@@ -20,33 +20,7 @@ def mapping_topic_words(doc, model, num_topics=10, num_words=10):
         ...     u"\\n3.有良好的团队精神、协调沟通能力及表达能力；"
         ...     u"\\n4.具有良好的英文写作及口头表达能力。"}
         >>> assert  u'英文' in model.dictionary.values()
-        >>> assert u'推广' in model.dictionary.values()
-        >>> assert u'产业化' in model.dictionary.values()
-        >>> assert u'放射' in model.dictionary.values()
         >>> assert u'放疗' in mapping_topic_words(jd['text'], model, num_topics=5, num_words=10)
-        >>> assert not u'市场' in model.dictionary.values() #FIXME
-        >>> assert not u'行销' in mapping_topic_words(jd['text'], model) #FIXME
-        >>> assert not u'市场' in mapping_topic_words(jd['text'], model) #FIXME
-        >>> assert not u'医学影像' in mapping_topic_words(jd['text'], model) #FIXME
-        >>> assert not u'英文' in mapping_topic_words(jd['text'], model) #FIXME
-
-    after removing sentences containing '放疗' and '物理' from jd,
-    mapping topic change to more torward '销售' related.
-        >>> jd = {'text' : u"岗位职责："
-        ...     u"\\n1.协助部门经理实施公司医疗装置产业化的市场业务推广与沟通；"
-        ...     u"\\n2.负责参与各种市场行销展会的工作；"
-        ...     u"\\n3.配合装置售前，售后技术推广与沟通工作；"
-        ...     u"\\n4.相关的英文沟通及翻译工作。"
-        ...     u"\\n"
-        ...     u"\\n岗位要求："
-        ...     u"\\n3.有良好的团队精神、协调沟通能力及表达能力；"
-        ...     u"\\n4.具有良好的英文写作及口头表达能力。"}
-        >>> assert not u'市场' in model.dictionary.values() #FIXME
-        >>> assert not u'市场' in mapping_topic_words(jd['text'], model) #FIXME
-        >>> assert not u'行销' in mapping_topic_words(jd['text'], model) #FIXME
-        >>> assert not u'产业化' in mapping_topic_words(jd['text'], model) #FIXME
-        >>> assert not u'推广' in mapping_topic_words(jd['text'], model) #FIXME
-        >>> assert not u'英文' in mapping_topic_words(jd['text'], model) #FIXME
     """
     vec = model.probability(doc)
     mapping_vec = sorted(vec, key=lambda item: abs(item[1]), reverse=True)
@@ -63,48 +37,7 @@ def topic_words_list(topics, mapping_vec=None):
         >>> topics = model.lsi.show_topics()
         >>> words = topic_words_list(topics)
         >>> fatten_words = compiler.ast.flatten(words)
-
-    Some words happen to appear in the most significant topics from time
-    to time, that will be considered as defective.
-        >>> assert not fatten_words.count(u'品质') < 15 #FIXME
-        >>> assert not fatten_words.count(u'飞利浦') < 15 #FIXME
-        >>> assert not fatten_words.count(u'通用电气') < 15 #FIXME
-        >>> assert not fatten_words.count(u'机器人') < 15 #FIXME
-        >>> assert not fatten_words.count(u'南京') < 15 #FIXME
-        >>> assert not fatten_words.count(u'天津') < 15 #FIXME
-        >>> assert not fatten_words.count(u'可靠性') < 15 #FIXME
-        >>> assert not fatten_words.count(u'加速器') < 15 #FIXME
-        >>> assert not fatten_words.count(u'ge') < 15 #FIXME
-        >>> assert not fatten_words.count(u'图像') < 14 #FIXME
-
-    On the other hand, some words do not appear in any of the topics
-    at all.
-        >>> topics = model.lsi.show_topics(num_topics=100, num_words=10)
-        >>> words = topic_words_list(topics)
-        >>> fatten_words = compiler.ast.flatten(words)
-        >>> assert u'飞机' in model.dictionary.values()
-        >>> assert u'航天' in model.dictionary.values()
-        >>> assert u'航空' in model.dictionary.values()
-        >>> assert not u'飞机' in fatten_words #FIXME
-        >>> assert not u'航天' in fatten_words #FIXME
-        >>> assert not u'航空' in fatten_words #FIXME
-        >>> assert u'物流' in model.dictionary.values()
-        >>> assert not u'物流' in fatten_words #FIXME
-        >>> assert u'律师' in model.dictionary.values()
-        >>> assert not u'律师' in fatten_words #FIXME
-        >>> assert u'法律' in model.dictionary.values()
-        >>> assert not u'法律' in fatten_words #FIXME
-        >>> assert u'行销' in model.dictionary.values()
-        >>> assert not u'行销' in fatten_words #FIXME
-        >>> assert u'产业化' in model.dictionary.values()
-        >>> assert not u'产业化' in fatten_words #FIXME
-        >>> assert not u'销售' in model.dictionary.values() #FIXME
-        >>> assert not u'销售' in fatten_words #FIXME
-        >>> assert not u'售后' in model.dictionary.values() #FIXME
-        >>> assert not u'售后' in fatten_words #FIXME
-        >>> assert u'商务' in model.dictionary.values()
-        >>> assert not u'商务' in fatten_words #FIXME
-
+        >>> assert u'品质' in fatten_words
     """
     words = []
     if mapping_vec is None:

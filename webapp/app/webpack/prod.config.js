@@ -12,8 +12,8 @@ const getHtml = function() {
   let matchs = [], htmlFiles = [], eachFile = {};
 
   dirs.forEach(function(item) {
-    // matchs = item.match(/(.+)\.entry\.js$/);
-    matchs = item.match(/(^(?!listjd).*)\.entry\.js$/);
+    matchs = item.match(/(.+)\.entry\.js$/);
+    // matchs = item.match(/(^(?!listjd).*)\.entry\.js$/);
     if (matchs) {
       eachFile = new HtmlWebpackPlugin({
         hash: false,
@@ -46,6 +46,7 @@ module.exports = {
       },
       __DEVELOPMENT__: false,
     }),
+    new webpack.optimize.CommonsChunkPlugin('common.chunk.js'),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({

@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Row, Col, Card, Checkbox, Button } from 'antd';
 
@@ -10,6 +10,17 @@ export default class SearchResultItem extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      checked: false,
+    };
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+  }
+
+  handleCheckboxChange(e) {
+    this.props.onToggleSelection({
+      id: e.target['data-id'],
+      name: e.target['data-name'],
+    });
   }
 
   render() {
@@ -29,11 +40,16 @@ export default class SearchResultItem extends Component {
       <Card className="cs-ls-i">
         <div className="basic-info">
           <Row>
-            <Col span={1}>
-              <Checkbox />
-            </Col>
-            <Col span={4}>
-              <a href={`/show/${props.cv_id}`} target="_blank">{props.yaml_info.name}</a>
+            {this.props.type === 'default' ? '' : <Col span={1}>
+              <Checkbox
+                data-id={props.yaml_info.id}
+                data-name={props.yaml_info.name}
+                onChange={this.handleCheckboxChange}
+                checked={props.selection.findIndex(v => v.get('id') === props.yaml_info.id ) > -1 ? true : false}
+              />
+            </Col>}
+            <Col span={this.props.type === 'default' ? 5 : 4}>
+              <a href={`/show/${props.cv_id}`} target="_blank">{props.yaml_info.name ? props.yaml_info.name : props.yaml_info.id}</a>
             </Col>
             <Col span={1}>{props.yaml_info.gender}</Col>
             <Col span={1}>{props.yaml_info.age}</Col>
@@ -87,3 +103,22 @@ export default class SearchResultItem extends Component {
     );
   }
 }
+
+SearchResultItem.propTypes = {
+  cv_id: PropTypes.string,
+  yaml_info: PropTypes.shape({
+    name: PropTypes.string,
+    education_history: PropTypes.array,
+    experience: PropTypes.array,
+    current: PropTypes.object,
+    gender: PropTypes.string,
+    age: PropTypes.number,
+    marital_status: PropTypes.string,
+    education: PropTypes.string,
+    school: PropTypes.string,
+    position: PropTypes.string,
+    company: PropTypes.string,
+    author: PropTypes.string,
+  }),
+
+};

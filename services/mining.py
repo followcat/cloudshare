@@ -238,7 +238,8 @@ class Mining(object):
         for name in uses:
             sim = self.sim[basemodel][name]
             result.extend(sim.probability(doc))
-        return sorted(result, key=lambda x:float(x[1]), reverse=True)
+        results_set = set(result)
+        return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
 
     def probability_by_id(self, basemodel, doc, id, uses=None):
         if uses is None:

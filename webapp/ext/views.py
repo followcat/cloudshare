@@ -94,33 +94,8 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/mining/position',
-        view_func=webapp.views.mining.Position.as_view('miningposition'),
-        )
-
-    app.add_url_rule(
-        '/mining/region',
-        view_func=webapp.views.mining.Region.as_view('miningregion'),
-        )
-
-    app.add_url_rule(
-        '/mining/capacity',
-        view_func=webapp.views.mining.Capacity.as_view('miningcapacity'),
-        )
-
-    app.add_url_rule(
-        '/analysis/lsi',
-        view_func=webapp.views.mining.LSI.as_view('lsi'),
-        )
-
-    app.add_url_rule(
         '/analysis/similar',
         view_func=webapp.views.mining.Similar.as_view('mining_similar'),
-        )
-
-    app.add_url_rule(
-        '/analysis/valuable',
-        view_func=webapp.views.mining.Valuable.as_view('valuable'),
         )
 
     app.add_url_rule(

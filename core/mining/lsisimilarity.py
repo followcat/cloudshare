@@ -84,6 +84,7 @@ class LSIsimilarity(object):
             self.names.append(name)
             corpu = self.lsi_model.dictionary.doc2bow(text)
             corpus.append(corpu)
+        self.set_corpus(corpus)
         self.set_index()
 
     def set_corpus(self, corpus):

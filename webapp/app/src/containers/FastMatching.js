@@ -13,7 +13,6 @@ import SideBar from '../components/fastmatching/SideBar';
 import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
 
-import checkObjectExist from '../utils/check_object_exist';
 import './fastmatching.less';
 
 export default class FastMatching extends Component {

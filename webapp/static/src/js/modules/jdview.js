@@ -130,7 +130,7 @@ require(
     EditJD.prototype.setValue = function(){
       $("input[name='companyName']").val(this.companyName);
       $("input[name='jdId']").val(this.jdId);
-      $("textarea[name='jdContent']").val(this.jdContent);
+      $("textarea[name='jdContent']").val(this.jdContent.replace(/&nbsp;/g, ''));
       $("select[name='status']").val(this.status);
     }
 

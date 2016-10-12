@@ -53,7 +53,7 @@ def configure(app):
 
     #RESTful FastMatching page entrance
     app.add_url_rule(
-        '/fastmatching/<path:id>',
+        '/fastmatching',
         view_func=webapp.views.views.FastMatching.as_view('fastmatching')
     )
 

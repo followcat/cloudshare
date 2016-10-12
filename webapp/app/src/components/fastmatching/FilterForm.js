@@ -81,6 +81,22 @@ class FilterForm extends Component {
 
     return (
       <Form horizontal>
+        {this.props.textarea ? 
+          <Row>
+            <Col>
+              <Form.Item
+                label="Job description"
+                labelCol={{ span: 3 }}
+                wrapperCol={{ span: 8 }}
+              >
+                <Input
+                  {...getFieldProps('doc')}
+                  type="textarea"
+                  rows={1}
+                />
+              </Form.Item>
+            </Col>
+          </Row> : ''}
         <Row>
           <Col>
             <Form.Item
@@ -91,7 +107,7 @@ class FilterForm extends Component {
               <Select
                 {...getFieldProps('uses', {
                   rules: [
-                    { required: true, type: 'array', message: 'Classify is required.' },
+                    { type: 'array' },
                   ],
                 })}
                 multiple

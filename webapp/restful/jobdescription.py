@@ -17,8 +17,8 @@ class JobDescriptionAPI(Resource):
         super(JobDescriptionAPI, self).__init__()
 
     def get(self, id):
-        result = self.svc_mult_cv.default.jd_get(id)
-        return { 'result': result }
+        result = self.svc_mult_cv.default.jd_get(id + '.yaml')
+        return { 'code': 200, 'data': result }
 
     def put(self, id):
         user = flask.ext.login.current_user

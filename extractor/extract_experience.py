@@ -23,6 +23,7 @@ TCO = re.compile(u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'(('+ASP+u'?[:�
 PCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
 
 PJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<project>.+)\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')$', re.M)
+WYJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<position>'+POSITION+u')'+ASP+u'+\|'+ASP+u'+(?P<dpt>\S+)\n'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'(?(cit)\*)?$', re.M)
 
 # Avoid conflict in group names when combining *CO and *PO
 AEMPLOYEES = EMPLOYEES.replace('employees', 'aemployees')
@@ -101,7 +102,7 @@ def output_cleanup(groupdict):
             continue
         except TypeError:
             continue
-                    
+
 def company_output(output, groupdict, begin='', end='', company=''):
     if 'company' in groupdict or 'ccompany' in groupdict:
         result = {}
@@ -332,9 +333,27 @@ def work_xp_jingying(text):
         ...         u'人力资源部   人事经理  （汇报对象：公司总经理）')))
         >>> assert 1 == len(positions(work_xp_jingying(u'2007/7 -- 至今： 科技有限公司（ 500-1000人） [ 9年1个月 ]\\n'
         ...         u'所属行业：  医疗设备/器械\\n车间\\*采购部\\*品质部    操作工\\*库房管理员\\*检验员\\*包装员')))
+        >>> assert u'****' in name(company_1(work_xp_jingying(u'    2013/3 -- 2016/8： \*\*\*\*集团公司（ 1000-5000人） [ 3年5个月 ]\\n'
+        ...         u'所属行业：   法律\\n          法务   法务部诉讼经理\\n    主要负责集团诉讼')))
+        >>> assert u'台湾' in name(company_1(work_xp_jingying(u'2008/3-2010/11         业务推广 | 光电事业处\\n\\n'
+        ...         u'台湾汉唐集成股份有限公司 [2年 8个月 ]\\n\\n多元化业务集团公司|150-500人|外资(非欧美)\\n')))
     """
     pos = 0
     out = {'company': [], 'position': []}
+    res = WYJCO.search(text)
+    if res:
+        AEMPLOYEES = EMPLOYEES.replace('employees', 'aemployees')
+        AAEMPLOYEES = EMPLOYEES.replace('employees', 'aaemployees')
+        COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\(非欧美\)'
+        COMPANY_TYPE = u'(([^/\|\n\- ：]*?('+COMPANY_TYPE_KEYWORD+u')[^/\|\n\- ]*)|(其他))'
+        company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*((((企业性质|公司性质)：)?'+COMPANY_TYPE+u')|('+POASP+u'*\|'+POASP+u'*)|((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))|(((公司)?规模：)?'+AEMPLOYEES+u')){1,5}\n'
+        RE = re.compile(company_business_noborder(WYJCO), re.M)
+        for r in RE.finditer(text):
+            pos +=1
+            company_output(out, r.groupdict())
+            position_output(out, r.groupdict())
+        if pos:
+            return pos, out
     for RE in [CCO, CO, TCO]:
         if (RE == TCO or re.compile(BDURATION).search(text)) and RE.search(text):
             dto = ''
@@ -470,13 +489,22 @@ def work_xp(text):
             company_output(out, r.groupdict())
             position_output(out, r.groupdict())
     if not pos:
+        AEMPLOYEES = EMPLOYEES.replace('employees', 'aemployees')
+        AAEMPLOYEES = EMPLOYEES.replace('employees', 'aaemployees')
+        COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\(非欧美\)'
+        COMPANY_TYPE = u'(([^/\|\n\- ：]*?('+COMPANY_TYPE_KEYWORD+u')[^/\|\n\- ]*)|(其他))'
+        company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*((((企业性质|公司性质)：)?'+COMPANY_TYPE+u')|('+POASP+u'*\|'+POASP+u'*)|((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))|(((公司)?规模：)?'+AEMPLOYEES+u')){1,5}\n'
         out = {'company': [], 'position': []}
-        # Can't use CO/TCO as they expect EOL
-        MA = re.compile(u'^'+ASP+u'*'+PERIOD+ASP+u'*(?P<company>[^' + SENTENCESEP + '=\n\*]+?)'+ASP+u'*'+SPO.pattern, re.M)
-        for r in MA.finditer(text):
-            company_output(out, r.groupdict())
-            pos +=1
-            position_output(out, r.groupdict())
+        RE = re.compile(company_business_noborder(re.compile(BDURATION, re.M)), re.M)
+        res = RE.search(text)
+        # Only run SPO if WYJCO does not match (for speed up)
+        if not res:
+            # Can't use CO/TCO as they expect EOL
+            MA = re.compile(u'^'+ASP+u'*'+PERIOD+ASP+u'*(?P<company>[^' + SENTENCESEP + '=\n\*]+?)'+ASP+u'*'+SPO.pattern, re.M)
+            for r in MA.finditer(text):
+                company_output(out, r.groupdict())
+                pos +=1
+                position_output(out, r.groupdict())
     if not pos:
         if not pos:
             pos, out = work_xp_jingying(text)

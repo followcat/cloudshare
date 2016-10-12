@@ -35,11 +35,14 @@ class ReverseIndexing(object):
                 cPickle.dump(self.index[name], fp)
 
     def load(self):
-        for f in glob.glob(os.path.join(self.path, '*')):
-            path, name = os.path.split(f)
-            with open(f) as fp:
+        for cv in self.cvs:
+            name = cv.name
+            loadpath = os.path.join(self.path, utils.builtin.industrytopath(name))
+            if not os.path.exists(loadpath):
+                continue
+            with open(loadpath) as fp:
                 index = cPickle.load(fp)
-                self.index[name.decode('utf-8')] = index
+                self.index[name] = index
 
     def update(self):
         for svc in self.cvs:

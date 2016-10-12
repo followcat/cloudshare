@@ -104,8 +104,8 @@ class LSImodel(object):
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
-        self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
-                                        no_above=self.no_above)
+        #self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
+        #                                no_above=self.no_above)
 
     def set_corpus(self):
         for text in self.texts:
@@ -125,7 +125,7 @@ class LSImodel(object):
             >>> from webapp.settings import *
             >>> import compiler.ast
             >>> model = SVC_MIN.lsi_model['medical']
-            >>> topics = model.lsi.show_topics()
+            >>> topics = model.lsi.show_topics(formatted=False)
             >>> words = topic_words_list(topics)
             >>> fatten_words = compiler.ast.flatten(words)
 
@@ -144,7 +144,7 @@ class LSImodel(object):
 
         On the other hand, some words do not appear in any of the topics
         at all.
-            >>> topics = model.lsi.show_topics(num_topics=100, num_words=10)
+            >>> topics = model.lsi.show_topics(num_topics=100, num_words=10, formatted=False)
             >>> words = topic_words_list(topics)
             >>> fatten_words = compiler.ast.flatten(words)
             >>> assert u'飞机' in model.dictionary.values()

@@ -7,6 +7,8 @@ import Uploader from '../components/upload/Uploader';
 import PreviewList from '../components/upload/PreviewList';
 import ComfirmResult from '../components/upload/ComfirmResult';
 
+import Generator from '../utils/generator';
+
 import './upload.less';
 
 export default class Upload extends Component {
@@ -155,7 +157,7 @@ export default class Upload extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         updates: comfirm
       })
     })

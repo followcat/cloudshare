@@ -200,13 +200,21 @@ class LSIbydocAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbydocAPI, self).__init__()
-        self.reqparse.add_argument('doc', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('doc', location = 'json')
+        self.reqparse.add_argument('uses', type = list, location = 'json')
+        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
-    def get(self):
+    def post(self):
         args = self.reqparse.parse_args()
         doc = args['doc']
-        result = self._get(doc)
-        return { 'result': result }
+        project = args['project']
+        uses = [project] + args['uses'] if args['uses'] else [project]
+        filterdict = args['filterdict'] if args['filterdict'] else {}
+        cur_page = args['page']
+        result = self._post(project, doc, uses, filterdict, cur_page)
+        return { 'code': 200, 'data': result }
 
 
 class SimilarAPI(Resource):
@@ -246,7 +254,7 @@ class ValuablebaseAPI(Resource):
 
     def _get(self, doc, project):
         args = self.reqparse.parse_args()
-        uses = [project] + args['uses']
+        uses = [project] + args['uses'] if args['uses'] else [project]
         name_list = args['name_list']
         if len(name_list) == 0:
             result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project, uses=uses)
@@ -309,7 +317,7 @@ class ValuableAPI(ValuablebaseAPI):
         super(ValuableAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('doc', type = str, location = 'json')
+        self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):

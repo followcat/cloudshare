@@ -33,7 +33,7 @@ class JobDescription extends Component {
   }
 
   handleFastMatchingClick(record) {
-    window.open(`/fastmatching/${record.id}`);
+    window.open(`/fastmatching?jd_id=${record.id}`);
   }
 
   handleCancel() {

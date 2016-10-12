@@ -12,8 +12,6 @@ class KeywordSearch extends Component {
 
   handleClick() {
     const searchText = this.props.form.getFieldValue('searchText');
-    console.log(searchText);
-    console.log(this.props);
     this.props.onSubmit(searchText);
   }
 
@@ -33,7 +31,10 @@ class KeywordSearch extends Component {
           </Col>
         </Row>
         <Row>
-          <Col span={4} offset={10}>
+          <Col span={2} offset={6}>
+            <a href="/fastmatching">Search by sentence</a>
+          </Col>
+          <Col span={4} offset={2}>
             <Button
               id="sBtn"
               type="primary"

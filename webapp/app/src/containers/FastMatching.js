@@ -12,6 +12,7 @@ import SideBar from '../components/fastmatching/SideBar';
 
 import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
+import queryString from '../utils/query_string';
 
 import './fastmatching.less';
 
@@ -27,7 +28,9 @@ export default class FastMatching extends Component {
       total: 0,
       spinning: true,
       visible: false,
+      textarea: false,
       postData: {},
+      postAPI: '',
       selection: Immutable.List(Immutable.Map()),
     };
 
@@ -66,7 +69,7 @@ export default class FastMatching extends Component {
    * @param  {[string]} id [JD id]
    * @return {[type]}    [description]
    */
-  loadResultData(id) {
+  loadResultData(id, postAPI) {
     let postData = { id: id };
     this.setState({
       visible: true,
@@ -74,7 +77,7 @@ export default class FastMatching extends Component {
       postData: postData,
     });
 
-    fetch(`/api/mining/lsibyjdid`, {
+    fetch(postAPI, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -101,17 +104,28 @@ export default class FastMatching extends Component {
    * @return {[type]}       [description]
    */
   handleSearch(value) {
-    const filterData = {};
+    let filterData = {},
+          postData = {};
+
     for (let key in value) {
-      if (key !== 'uses') {
+      if (key !== 'uses' && key !== 'doc') {
         filterData[key] = value[key] instanceof Array ? value[key] : value[key] ? value[key].split(' ') : [];
       }
     }
-    const postData = {
-      id: this.state.id,
-      uses: value.uses,
-      filterdict: filterData,
-    };
+
+    if (value.doc) {
+      postData = {
+        doc: value.doc,
+        uses: value.uses,
+        filterdict: filterData,
+      };
+    } else {
+      postData = {
+        id: this.state.id,
+        uses: value.uses,
+        filterdict: filterData,
+      };
+    }
 
     this.setState({
       postData: postData,
@@ -119,7 +133,7 @@ export default class FastMatching extends Component {
       spinning: true,
     });
 
-    fetch(`/api/mining/lsibyjdid`, {
+    fetch(this.state.postAPI, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -150,7 +164,8 @@ export default class FastMatching extends Component {
       spinning: true,
       searchResultDataSource: [],
     });
-    fetch(`/api/mining/lsibyjdid`, {
+
+    fetch(this.state.postAPI, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -192,14 +207,23 @@ export default class FastMatching extends Component {
   }
 
   componentDidMount() {
-    const url = window.location.href.split('/'),
-          id = url[url.length - 1];
+    const params = queryString(window.location.href),
+          id = params.jd_id ? params.jd_id : '';
 
-    this.setState({
-      id: id,
-    });
     this.loadClassifyData();
-    this.loadResultData(id);
+    if (id) {
+      let postAPI = '/api/mining/lsibyjdid';
+      this.setState({
+        id: id,
+        postAPI: postAPI,
+      });
+      this.loadResultData(id, postAPI);
+    } else {
+      this.setState({
+        textarea: true,
+        postAPI: '/api/mining/lsibydoc',
+      });
+    }
   }
 
   render() {
@@ -207,6 +231,7 @@ export default class FastMatching extends Component {
       <div>
         <Header />
         <FilterBox
+          textarea={this.state.textarea}
           classify={this.state.classify}
           visible={this.state.visible}
           total={this.state.total}

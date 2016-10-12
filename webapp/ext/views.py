@@ -3,7 +3,6 @@ import utils.builtin
 
 import webapp.views.views
 import webapp.views.mining
-import webapp.views.company
 import webapp.views.account
 import webapp.views.jobdescription
 
@@ -172,21 +171,6 @@ def configure(app):
     app.add_url_rule(
         '/lsipage',
         view_func=webapp.views.mining.LSI.as_view('lsipage'),
-        )
-
-    app.add_url_rule(
-        '/addcompany',
-        view_func=webapp.views.company.AddCompany.as_view('addcompany'),
-        )
-
-    app.add_url_rule(
-        '/listcompany',
-        view_func=webapp.views.company.ListCompany.as_view('listcompany'),
-        )
-
-    app.add_url_rule(
-        '/companybyname',
-        view_func=webapp.views.company.CompanyByName.as_view('companybyname'),
         )
 
     app.add_url_rule(

@@ -254,7 +254,7 @@ class ValuablebaseAPI(Resource):
 
     def _get(self, doc, project):
         args = self.reqparse.parse_args()
-        uses = [project] + args['uses']
+        uses = [project] + args['uses'] if args['uses'] else [project]
         name_list = args['name_list']
         if len(name_list) == 0:
             result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project, uses=uses)
@@ -317,7 +317,7 @@ class ValuableAPI(ValuablebaseAPI):
         super(ValuableAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('doc', type = str, location = 'json')
+        self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):

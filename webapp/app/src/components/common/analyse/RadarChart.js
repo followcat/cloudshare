@@ -94,6 +94,7 @@ export default class RadarChart extends Component {
     });
 
     const _this = this;
+    let postData = this.props.postData.id ? { id: this.props.postData.id } : { doc: this.props.postData.doc };
 
     fetch(`/api/mining/valuable`, {
       method: 'POST',
@@ -103,11 +104,10 @@ export default class RadarChart extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: Generator.getPostData({
-        id: this.props.postData.id,
+      body: Generator.getPostData(Object.assign(postData, {
         name_list: this.props.selection.toJS().map(item => { return item.id + '.md' }),
         uses: this.props.postData.uses,
-      }),
+      })),
     })
     .then(response => response.json())
     .then(json => {

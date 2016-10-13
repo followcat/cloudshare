@@ -25,11 +25,3 @@ class Similar(flask.views.MethodView):
             yaml_info.update(info)
             datas.append(yaml_info)
         return flask.jsonify({'result': datas})
-
-
-class ModelList(flask.views.MethodView):
-
-    def post(self):
-        miner = flask.current_app.config['SVC_MIN']
-        model_list = miner.default_names()
-        return flask.jsonify(model_list=model_list)

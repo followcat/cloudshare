@@ -147,8 +147,3 @@ def configure(app):
         '/resumetojd/<path:filename>/<status>',
         view_func=webapp.views.jobdescription.ResumeToJobDescription.as_view('resumetojd'),
         )
-
-    app.add_url_rule(
-        '/modellist',
-        view_func=webapp.views.mining.ModelList.as_view('modellist'),
-        )

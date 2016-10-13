@@ -18,7 +18,8 @@ class JobDescriptionAPI(Resource):
         super(JobDescriptionAPI, self).__init__()
 
     def get(self, id):
-        result = self.svc_mult_cv.default.jd_get(id)
+        project = args['project']
+        result = self.svc_mult_cv.getproject(project).jd_get(id)
         return { 'result': result }
 
     def put(self, id):

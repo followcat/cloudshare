@@ -17,7 +17,8 @@ class CompanyAPI(Resource):
         super(CompanyAPI, self).__init__()
 
     def get(self, name):
-        result = self.svc_mult_cv.default.company_get(name)
+        project = args['project']
+        result = self.svc_mult_cv.getproject(project).company_get(name)
         return { 'result': result }
 
     def post(self):

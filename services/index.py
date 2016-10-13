@@ -23,7 +23,8 @@ class ReverseIndexing(object):
 
     def setup(self):
         self.load()
-        # self.update()
+        if not os.path.exists(self.path):
+            self.update()
 
     def save(self):
         if not os.path.exists(self.path):

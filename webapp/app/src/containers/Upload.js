@@ -142,7 +142,6 @@ export default class Upload extends Component {
     if (!this.isObjectExisted(comfirm, value.id)) {
       comfirm.push(value);
     }
-
     this.setState({
       comfirmList: comfirm,
       loading: true,

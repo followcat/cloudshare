@@ -20,6 +20,7 @@ class BaseAPI(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('md_ids', type = list, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
     def calculate_work_month(self, begin_y, begin_m, end_y, end_m):
         year = int(end_y) - int(begin_y)
@@ -30,25 +31,40 @@ class BaseAPI(Resource):
 
 class PositionAPI(BaseAPI): 
 
-    def get(self, text):
+    def __init__(self):
+        super(PositionAPI, self).__init__()
+        self.reqparse.add_argument('search_text', location = 'json')
+
+    def post(self):
         args = self.reqparse.parse_args()
-        if 'md_ids' in args and len(text) > 0:
+        project = args['project']
+        text = args['search_text']
+        if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            searches = self.svc_mult_cv.search(text)
-        result = dict()
+            searches = self.svc_mult_cv.getproject(project).search(text)
+        result = []
         for name in searches:
-            md_data = self.svc_mult_cv.getmd(name)
-            positions = core.mining.info.position(md_data, text)
+            positions = []
             try:
                 yaml_data = self.svc_mult_cv.getyaml(name)
             except IOError:
                 continue
+            if 'position' in yaml_data['experience']:
+                positions = [p['name'] for p in yaml_data['experience']['position']]
             for position in positions:
-                if position not in result:
-                    result[position] = []
-                result[position].append({ name: yaml_data })
-        return { 'result': result }
+                index = self.position_indexof(position, result)
+                if index > -1:
+                    result[index]['id_list'].append(name)
+                else:
+                    result.append({ 'position_name': position, 'id_list': [name] })
+        return { 'code': 200, 'data': result }
+
+    def position_indexof(self, position, result):
+        for index, item in enumerate(result):
+            if (item['position_name'] == position):
+                return index
+        return -1
 
 
 class RegionAPI(BaseAPI):
@@ -187,7 +203,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id+'.yaml')
+        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id)
         doc = jd_yaml['description']
         uses = [project] + args['uses'] if args['uses'] else [project]
         filterdict = args['filterdict'] if args['filterdict'] else {}
@@ -200,13 +216,21 @@ class LSIbydocAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbydocAPI, self).__init__()
-        self.reqparse.add_argument('doc', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('doc', location = 'json')
+        self.reqparse.add_argument('uses', type = list, location = 'json')
+        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
-    def get(self):
+    def post(self):
         args = self.reqparse.parse_args()
         doc = args['doc']
-        result = self._get(doc)
-        return { 'result': result }
+        project = args['project']
+        uses = [project] + args['uses'] if args['uses'] else [project]
+        filterdict = args['filterdict'] if args['filterdict'] else {}
+        cur_page = args['page']
+        result = self._post(project, doc, uses, filterdict, cur_page)
+        return { 'code': 200, 'data': result }
 
 
 class SimilarAPI(Resource):
@@ -246,7 +270,7 @@ class ValuablebaseAPI(Resource):
 
     def _get(self, doc, project):
         args = self.reqparse.parse_args()
-        uses = [project] + args['uses']
+        uses = [project] + args['uses'] if args['uses'] else [project]
         name_list = args['name_list']
         if len(name_list) == 0:
             result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project, uses=uses)
@@ -283,7 +307,7 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id+'.yaml')
+        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id)
         doc = jd_yaml['description']
         result = self._get(doc, project)
         return { 'code': 200, 'data': result }
@@ -309,14 +333,14 @@ class ValuableAPI(ValuablebaseAPI):
         super(ValuableAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('doc', type = str, location = 'json')
+        self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
         project = args['project']
         if args['id']:
-            jd_yaml = self.svc_mult_cv.getproject(project).jd_get(args['id'] + '.yaml')
+            jd_yaml = self.svc_mult_cv.getproject(project).jd_get(args['id'])
             doc = jd_yaml['description']
         elif args['doc']:
             doc = args['doc']

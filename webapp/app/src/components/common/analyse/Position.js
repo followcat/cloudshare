@@ -5,48 +5,87 @@ import { Button, Modal } from 'antd';
 
 import Charts from '../Charts';
 
+import Storage from '../../../utils/storage';
+import Generator from '../../../utils/generator';
+
 import 'whatwg-fetch';
 
-export default class Competency extends Component {
+const compare = (value1, value2) => {
+  let valueLen1 = value1.id_list.length,
+      valueLen2 = value2.id_list.length;
+
+  if (valueLen1 < valueLen2) {
+    return 1;
+  } else if (valueLen1 > valueLen2) {
+    return -1;
+  } else {
+    return 0;
+  }
+};
+
+const topNine = (data) => {
+  if (data.length > 9) {
+    return data.splice(0, 9);
+  } else {
+    return data;
+  }
+};
+
+export default class Position extends Component {
   
   constructor(props) {
     super(props);
+
     this.state = {
-      visible: false,
       data: [],
+      visible: false,
       option: {},
     };
-    this.getOption = this.getOption.bind(this);
+
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
   }
 
   getOption(data) {
     const option = {
-      title: { text: 'Ability' },
-      tooltip: {
-        trigger: 'item',
+      title: {
+        text: 'Position'
       },
-      toolbox: {
-        feature: {
-          dataZoom: { show: true },
-          saveAsImage: { show: true },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+          type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
         },
       },
+      toolbox: {
+        show: true,
+        feature: {
+          magicType: {
+            show: true,
+            type: ['line', 'bar']
+          },
+          saveAsImage: {
+            show: true
+          }
+        }
+      },
       xAxis: [{
-        type: 'value',
-        name: 'Work Years',
-        scale: true,
+        type: 'category',
+        data: topNine(data.map(item => item.position_name)),
+        axisTick: {
+          alignWithLabel: true
+        }
       }],
       yAxis: [{
-        type: 'value',
-        name: 'Ability Values',
-        scale: true,
+        type: 'value'
       }],
-      series: [{
-        type: 'scatter',
-        data: data,
-      }],
+      series:[
+        {
+          name: 'Count',
+          type: 'bar',
+          data: topNine(data.map(item => item.id_list.length))
+        }
+      ]
     };
 
     return option;
@@ -60,22 +99,22 @@ export default class Competency extends Component {
 
     const _this = this;
     
-    fetch(`/api/mining/ability`, {
+    fetch(`/api/mining/position`, {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${Storage.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        md_ids: this.props.dataSource.map(item => item.cv_id)
-      }),
+      body: Generator.getPostData({
+        'search_text': this.props.keyword,
+      })
     })
     .then(response => response.json())
     .then((json) => {
       if (json.code === 200) {
-        const data = json.data.map((item) => [item.ability.work_year, item.ability.ability_value]),
+        const data = json.data.sort(compare),
               option = _this.getOption(data);
         _this.setState({
           data: data,
@@ -94,7 +133,7 @@ export default class Competency extends Component {
   render() {
     return (
       <div style={this.props.style}>
-        <Button type="primary" onClick={this.handleClick}>Show Competency</Button>
+        <Button type="primary" onClick={this.handleClick}>Show No. of Positions</Button>
         <Modal
           title="Charts View"
           visible={this.state.visible}
@@ -110,8 +149,4 @@ export default class Competency extends Component {
       </div>
     );
   }
-}
-
-Competency.propTypes = {
-  dataSource: PropTypes.array,
-};
+}``

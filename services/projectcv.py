@@ -37,12 +37,16 @@ class ProjectCV(services.simulationcv.SimulationCV):
 
     def setup(self, classify, committer=None):
         if not os.path.exists(self.cvpath):
+            self.update(classify, committer)
+
+    def update(self, classify, committer=None):
+        if not os.path.exists(self.cvpath):
             os.makedirs(self.cvpath)
-            self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
-            self.save()
-            self.interface.add_files([bytes(self.config_file), bytes(self.ids_file)],
-                                      message='Create new project %s.'%self.name,
-                                      committer=committer)
+        self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
+        self.save()
+        self.interface.add_files([bytes(self.config_file), bytes(self.ids_file)],
+                                  message='Create new project %s.'%self.name,
+                                  committer=committer)
 
     def save(self):
         utils.builtin.save_yaml(self.config, self.path, self.config_file,
@@ -170,8 +174,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def company_names(self):
         return self.company.names()
 
-    def jd_get(self, name):
-        return self.jobdescription.get(name)
+    def jd_get(self, hex_id):
+        return self.jobdescription.get(hex_id)
 
     def jd_add(self, company, name, description, committer, status=None):
         try:

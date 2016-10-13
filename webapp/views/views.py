@@ -225,7 +225,7 @@ class ListJD(flask.views.MethodView):
 class FastMatching(flask.views.MethodView):
 
     @flask.ext.login.login_required
-    def get(self, id):
+    def get(self):
         return flask.render_template('fastmatching.html')
 
 #Render search page of RESTful

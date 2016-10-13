@@ -48,7 +48,7 @@ def initialize(app):
 
     api.add_resource(RegionAPI, '/api/mining/region', endpoint = 'region')
     api.add_resource(CapacityAPI, '/api/mining/capacity', endpoint = 'capacity')
-    api.add_resource(PositionAPI, '/api/mining/position/<string:text>', endpoint = 'position')
+    api.add_resource(PositionAPI, '/api/mining/position', endpoint = 'position')
 
     api.add_resource(AbilityAPI, '/api/mining/ability', endpoint = 'ability')
     api.add_resource(ExperienceAPI, '/api/mining/experience', endpoint = 'experience')

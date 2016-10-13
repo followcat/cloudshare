@@ -3,7 +3,6 @@ import utils.builtin
 
 import webapp.views.views
 import webapp.views.mining
-import webapp.views.company
 import webapp.views.account
 import webapp.views.jobdescription
 
@@ -53,7 +52,7 @@ def configure(app):
 
     #RESTful FastMatching page entrance
     app.add_url_rule(
-        '/fastmatching/<path:id>',
+        '/fastmatching',
         view_func=webapp.views.views.FastMatching.as_view('fastmatching')
     )
 
@@ -95,33 +94,8 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/mining/position',
-        view_func=webapp.views.mining.Position.as_view('miningposition'),
-        )
-
-    app.add_url_rule(
-        '/mining/region',
-        view_func=webapp.views.mining.Region.as_view('miningregion'),
-        )
-
-    app.add_url_rule(
-        '/mining/capacity',
-        view_func=webapp.views.mining.Capacity.as_view('miningcapacity'),
-        )
-
-    app.add_url_rule(
-        '/analysis/lsi',
-        view_func=webapp.views.mining.LSI.as_view('lsi'),
-        )
-
-    app.add_url_rule(
         '/analysis/similar',
         view_func=webapp.views.mining.Similar.as_view('mining_similar'),
-        )
-
-    app.add_url_rule(
-        '/analysis/valuable',
-        view_func=webapp.views.mining.Valuable.as_view('valuable'),
         )
 
     app.add_url_rule(
@@ -170,51 +144,6 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/lsipage',
-        view_func=webapp.views.mining.LSI.as_view('lsipage'),
-        )
-
-    app.add_url_rule(
-        '/addcompany',
-        view_func=webapp.views.company.AddCompany.as_view('addcompany'),
-        )
-
-    app.add_url_rule(
-        '/listcompany',
-        view_func=webapp.views.company.ListCompany.as_view('listcompany'),
-        )
-
-    app.add_url_rule(
-        '/companybyname',
-        view_func=webapp.views.company.CompanyByName.as_view('companybyname'),
-        )
-
-    app.add_url_rule(
-        '/addjd',
-        view_func=webapp.views.jobdescription.AddJobDescription.as_view('addjd'),
-        )
-
-    app.add_url_rule(
-        '/modifyjd',
-        view_func=webapp.views.jobdescription.ModifyJobDescription.as_view('modifyjd'),
-        )
-
-    app.add_url_rule(
-        '/searchjd',
-        view_func=webapp.views.jobdescription.SearchJobDescription.as_view('searchjd'),
-        )
-
-    # app.add_url_rule(
-    #     '/listjd',
-    #     view_func=webapp.views.jobdescription.ListJobDescription.as_view('listjd'),
-    #     )
-
-    app.add_url_rule(
         '/resumetojd/<path:filename>/<status>',
         view_func=webapp.views.jobdescription.ResumeToJobDescription.as_view('resumetojd'),
-        )
-
-    app.add_url_rule(
-        '/modellist',
-        view_func=webapp.views.mining.ModelList.as_view('modellist'),
         )

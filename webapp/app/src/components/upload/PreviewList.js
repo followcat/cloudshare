@@ -28,6 +28,7 @@ export default class PreviewList extends Component {
             index: index,
             current: this.props.currentPreview,
             length: previewListLength,
+            classify: previewItem.yaml_info.classify,
             name: previewItem.name,
             id: previewItem.id,
             onPrevPreview: this.props.onPrevPreview,

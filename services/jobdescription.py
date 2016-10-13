@@ -70,12 +70,12 @@ class JobDescription(services.base.Service):
         return True
 
     def modify(self, hex_id, description, status, committer):
-        filename = self.filename(hex_id)
-        data = self.get(filename)
+        data = self.get(hex_id)
         if data['description'] != description and data['committer'] != committer:
             return False
-        data['description'] = description
+        filename = self.filename(hex_id)
         data['status'] = status
+        data['description'] = description
         dump_data = yaml.safe_dump(data, allow_unicode=True)
         self.interface.modify(os.path.join(self.path, filename), dump_data,
                               message="Modify job description: " + filename,
@@ -86,7 +86,10 @@ class JobDescription(services.base.Service):
         return hex_id + '.yaml'
 
     def search(self, keyword):
-        return self.interface.grep_yaml(keyword, self.path)
+        results = list()
+        for name in self.interface.grep_yaml(keyword, self.path):
+            results.append(os.path.splitext(name)[0])
+        return results
 
     def lists(self):
         results = []

@@ -162,14 +162,20 @@ def silencer(document):
 
 class Mining(object):
 
+    SIMS_PATH = 'all'
+
     def __init__(self, path, cvsvc, slicer=None):
         self.sim = {}
         self.path = path
         self.lsi_model = dict()
+        self.projects = cvsvc.projects
         self.additionals = cvsvc.additionals
-        self.services = {'default': cvsvc.projects, 'all': dict()}
+        self.services = {'default': cvsvc.projects,
+                         'classify': dict(),
+                         'all': dict()}
         self.services['all'].update(cvsvc.projects)
         self.services['all'].update(cvsvc.additionals)
+        self.services['classify'].update(cvsvc.additionals)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
@@ -178,9 +184,26 @@ class Mining(object):
             self.slicer = slicer
         self.make_lsi(self.services['default'])
 
-    def setup(self, name):
-        assert name in self.services
-        self.add(self.services[name], name)
+    def setup(self):
+        assert self.lsi_model
+        for modelname in self.lsi_model:
+            if not self.lsi_model[modelname].names:
+                continue
+            model = self.lsi_model[modelname]
+            save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
+            self.sim[modelname] = dict()
+            service_names = [modelname] + self.projects[modelname].getclassify()
+            for svc_name in service_names:
+                svc = self.services['all'][svc_name]
+                industrypath = industrytopath(svc_name)
+                index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
+                                                                industrypath), model)
+                try:
+                    index.load()
+                except IOError:
+                    if index.build([svc]):
+                        index.save()
+                self.sim[modelname][svc_name] = index
 
     def make_lsi(self, services):
         self.lsi_model = dict()
@@ -194,26 +217,6 @@ class Mining(object):
                 if lsi.build([service]):
                     lsi.save()
             self.lsi_model[name] = lsi
-
-    def add(self, services, name):
-        assert self.lsi_model
-        for modelname in self.lsi_model:
-            if not self.lsi_model[modelname].names:
-                continue
-            model = self.lsi_model[modelname]
-            save_path = os.path.join(self.path, modelname, name)
-            self.sim[modelname] = dict()
-            for svc_name in services:
-                svc = services[svc_name]
-                industrypath = industrytopath(svc_name)
-                index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
-                                                                industrypath), model)
-                try:
-                    index.load()
-                except IOError:
-                    if index.build([svc]):
-                        index.save()
-                self.sim[modelname][svc_name] = index
 
     def update_model(self):
         for modelname in self.lsi_model:

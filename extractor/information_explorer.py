@@ -92,10 +92,14 @@ def get_expectation(stream):
 
 def get_experience(stream, name=None):
     u"""
-        >>> get_experience(u"2015.03 - 2015.05   XXCOM")['experience']
-        [(u'2015.03', u'2015.05', u'XXCOM')]
-        >>> get_experience(u"2015/03 - 2015/05   XXCOM")['experience']
-        [(u'2015/03', u'2015/05', u'XXCOM')]
+        >>> xp = get_experience(u"工作经历\\n2010.03 - 2015.05 公司")['experience']['company'][0]
+        >>> xp['date_from'], xp['date_to']
+        (u'2010.03', u'2015.05')
+        >>> assert xp['name'] == u'公司'
+        >>> xp = get_experience(u"工作经历\\n2010/03 - 2015/05 公司")['experience']['company'][0]
+        >>> xp['date_from'], xp['date_to']
+        (u'2010.03', u'2015.05')
+        >>> assert xp['name'] == u'公司'
         >>> assert get_experience(u"2015/03 - 至今   XXCOM")
         >>> assert get_experience(u"2015/03 - 至今   XXCOM XXX")
     """

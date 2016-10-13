@@ -20,6 +20,7 @@ class BaseAPI(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('md_ids', type = list, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
     def calculate_work_month(self, begin_y, begin_m, end_y, end_m):
         year = int(end_y) - int(begin_y)
@@ -30,13 +31,19 @@ class BaseAPI(Resource):
 
 class PositionAPI(BaseAPI): 
 
-    def get(self, text):
+    def __init__(self):
+        super(PositionAPI, self).__init__()
+        self.reqparse.add_argument('search_text', type = str, location = 'json')
+
+    def post(self):
         args = self.reqparse.parse_args()
+        project = args['project']
+        text = args['search_text']
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            searches = self.svc_mult_cv.search(text)
-        result = dict()
+            searches = self.svc_mult_cv.getproject(project).search(text)
+        result = []
         for name in searches:
             positions = []
             try:
@@ -46,10 +53,18 @@ class PositionAPI(BaseAPI):
             if 'position' in yaml_data['experience']:
                 positions = [p['name'] for p in yaml_data['experience']['position']]
             for position in positions:
-                if position not in result:
-                    result[position] = []
-                result[position].append(name)
-        return { 'result': result }
+                index = self.position_indexof(position, result)
+                if index > -1:
+                    result[index]['id_list'].append(name)
+                else:
+                    result.append({ 'position_name': position, 'id_list': [name] })
+        return { 'code': 200, 'data': result }
+
+    def position_indexof(self, position, result):
+        for index, item in enumerate(result):
+            if (item['position_name'] == position):
+                return index
+        return -1
 
 
 class RegionAPI(BaseAPI):

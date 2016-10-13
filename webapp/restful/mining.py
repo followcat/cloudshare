@@ -33,7 +33,7 @@ class PositionAPI(BaseAPI):
 
     def __init__(self):
         super(PositionAPI, self).__init__()
-        self.reqparse.add_argument('search_text', type = str, location = 'json')
+        self.reqparse.add_argument('search_text', location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()

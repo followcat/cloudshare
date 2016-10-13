@@ -92,7 +92,7 @@ export default class Experience extends Component {
 
   render() {
     return (
-      <div>
+      <div style={this.props.style}>
         <Button type="primary" onClick={this.handleClick}>Show Work Experience</Button>
         <Modal
           title="Charts View"

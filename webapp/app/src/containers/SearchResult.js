@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 
 import Header from '../components/common/Header';
+import ResultInfo from '../components/search/ResultInfo';
 import SearchResultBox from '../components/common/searchresult/SearchResultBox';
 
 import queryString from '../utils/query_string';
@@ -40,7 +41,8 @@ export default class SearchResult extends Component {
         'Content-Type': 'application/json',
       },
       body: Generator.getPostData({
-        'search_text': searchText,
+        // 'search_text': searchText,
+        'search_text': 'software engineer',
       })
     })
     .then(response => response.json())
@@ -137,6 +139,11 @@ export default class SearchResult extends Component {
           onSearch={this.handleOnSearch}
         />
         <div style={{ marginTop: 24 }}>
+          <ResultInfo 
+            total={this.state.total}
+            keyword={this.state.keyword}
+            dataSource={this.state.data}
+          />
           <SearchResultBox
             visible={true}
             total={this.state.total}

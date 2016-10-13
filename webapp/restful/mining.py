@@ -32,22 +32,23 @@ class PositionAPI(BaseAPI):
 
     def get(self, text):
         args = self.reqparse.parse_args()
-        if 'md_ids' in args and len(text) > 0:
+        if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
             searches = self.svc_mult_cv.search(text)
         result = dict()
         for name in searches:
-            md_data = self.svc_mult_cv.getmd(name)
-            positions = core.mining.info.position(md_data, text)
+            positions = []
             try:
                 yaml_data = self.svc_mult_cv.getyaml(name)
             except IOError:
                 continue
+            if 'position' in yaml_data['experience']:
+                positions = [p['name'] for p in yaml_data['experience']['position']]
             for position in positions:
                 if position not in result:
                     result[position] = []
-                result[position].append({ name: yaml_data })
+                result[position].append(name)
         return { 'result': result }
 
 

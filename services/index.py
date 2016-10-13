@@ -23,6 +23,15 @@ class ReverseIndexing(object):
 
     def setup(self):
         self.load()
+        updated = False
+        for svc in self.cvs:
+            name = svc.name
+            loadpath = os.path.join(self.path, utils.builtin.industrytopath(name))
+            if not os.path.exists(loadpath):
+                self.updatecv(svc)
+                updated = True
+        if updated:
+            self.save()
         if not os.path.exists(self.path):
             self.update()
 

@@ -174,8 +174,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def company_names(self):
         return self.company.names()
 
-    def jd_get(self, name):
-        return self.jobdescription.get(name)
+    def jd_get(self, hex_id):
+        return self.jobdescription.get(hex_id)
 
     def jd_add(self, company, name, description, committer, status=None):
         try:

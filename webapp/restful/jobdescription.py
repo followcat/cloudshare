@@ -19,7 +19,7 @@ class JobDescriptionAPI(Resource):
 
     def get(self, id):
         project = args['project']
-        result = self.svc_mult_cv.getproject(project).jd_get(id + '.yaml')
+        result = self.svc_mult_cv.getproject(project).jd_get(id)
         return { 'code': 200, 'data': result }
 
     def put(self, id):

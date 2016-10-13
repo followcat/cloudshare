@@ -42,7 +42,8 @@ class JobDescription(services.base.Service):
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
-    def get(self, name):
+    def get(self, hex_id):
+        name = self.filename(hex_id)
         path_name = os.path.join(self.path, name)
         yaml_str = self.interface.get(path_name)
         return yaml.load(yaml_str)

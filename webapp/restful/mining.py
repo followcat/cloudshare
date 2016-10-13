@@ -188,7 +188,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id+'.yaml')
+        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id)
         doc = jd_yaml['description']
         uses = [project] + args['uses'] if args['uses'] else [project]
         filterdict = args['filterdict'] if args['filterdict'] else {}
@@ -292,7 +292,7 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id+'.yaml')
+        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id)
         doc = jd_yaml['description']
         result = self._get(doc, project)
         return { 'code': 200, 'data': result }
@@ -325,7 +325,7 @@ class ValuableAPI(ValuablebaseAPI):
         args = self.reqparse.parse_args()
         project = args['project']
         if args['id']:
-            jd_yaml = self.svc_mult_cv.getproject(project).jd_get(args['id'] + '.yaml')
+            jd_yaml = self.svc_mult_cv.getproject(project).jd_get(args['id'])
             doc = jd_yaml['description']
         elif args['doc']:
             doc = args['doc']

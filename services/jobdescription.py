@@ -92,6 +92,7 @@ class JobDescription(services.base.Service):
         results = []
         for pathfile in glob.glob(os.path.join(self.repo_path, '*.yaml')):
             filename = pathfile.split('/')[-1]
-            data = self.get(filename)
+            hex_id = os.path.splitext(filename)[0]
+            data = self.get(hex_id)
             results.append(data)
         return results

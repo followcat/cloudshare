@@ -21,7 +21,7 @@ TCO = re.compile(u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'(('+ASP+u'?[:�
 PCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
 
 PJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<project>.+)\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')$', re.M)
-WYJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<position>'+POSITION+u')'+ASP+u'+\|'+ASP+u'+(?P<dpt>\S+)\n'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'(?(cit)\*)?$', re.M)
+WYJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<position>'+POSITION+u')'+ASP+u'*\|'+ASP+u'*(?P<dpt>\S+)\n'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'(?(cit)\*)?$', re.M)
 
 # Avoid conflict in group names when combining *CO and *PO
 APERIOD = PERIOD.replace('from', 'afrom').replace('to', 'ato')
@@ -35,7 +35,7 @@ TACOMODELCOPY = TACOMODEL.replace('company', 'ccompany').replace('position', 'cp
 # Add line begin for safer searching
 PATTERN = u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+APERIOD+ur'[:：]?'+ASP+u'*'+TACOMODELCOPY+ASP+u'*'+ABDURATION+u'?(\n(公司介绍：\n.+?\n)?所属行业：\n(?P<cbusiness>\S+))?$'
 # Duration required
-DRPOSITION = POSITION+u'('+POSITION.replace('\\n', '').replace('+', '*')+u')?'
+DRPOSITION = POSITION+u'('+POSITION.replace('\\n', '').replace('\\*', '').replace('+', '*')+u')?'
 DRTACOMODEL = u'(\\\\\*)*(?P<company>__COMPANY__)__SEP__'+ASP+u'*(__ITEM____SEP__'+ASP+u'*){0,2}(?P<position>'+DRPOSITION+u'?(（.*?） 兼'+ASP+u'*'+DRPOSITION+u'?)*)'
 DRPATTERN = PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+DRTACOMODEL+ASP+u'*(\|'+ASP+u'*)?'+BDURATION+u'(\n(公司介绍：\n.+?\n)?所属行业：\n(?P<business>\S+))?$'
 # Not use for searching but only for matching (see the code)
@@ -276,16 +276,20 @@ def work_xp_zhilian(text):
         ...     u'视觉应用工程师\\n（7年5个月）')))
         >>> assert u'软件' in name(position_1(work_xp_zhilian(u'2013年8月  --  2014年11月 有限公司  |  linux c++\\n中级软件工程师  （1年3个月）')))
         >>> assert '2006.07' == position_1(work_xp_zhilian(u'91261-11\\n2006年7月-至今\\n中国银行\\n| 人力资源部\\n|  其他\\n（3个月）'))['date_from']
+        >>> assert 'Master' in name(position_1(work_xp_zhilian(u'2010年7月 -- 至今 医科达 | 软件质量*工程师*/Scrum\\nMaster   （6年3个月）\\n\\n'
+        ...         u'所属行业：\\n\\n医疗设备/器械')))
+
     """
     pos = 0
     out = {'company': [], 'position': []}
-    if TACO.search(text):
+    if DRTACO.search(text):
         for r in DRTACO.finditer(text):
             pos += 1
             company_output(out, r.groupdict())
             d = r.groupdict()
             d['position'] = re.compile(u'（.*?） 兼'+ASP+u'*').sub('/', d['position'])
             position_output(out, d)
+    elif TACO.search(text):
         if not pos:
             # Support missing pipe in company definition by using NOPIPETACO
             for r in ALLTACO.finditer(text):
@@ -311,8 +315,14 @@ def work_xp_jingying(text):
         ...         u'所属行业：  医疗设备/器械\\n车间\\*采购部\\*品质部    操作工\\*库房管理员\\*检验员\\*包装员')))
         >>> assert u'****' in name(company_1(work_xp_jingying(u'    2013/3 -- 2016/8： \*\*\*\*集团公司（ 1000-5000人） [ 3年5个月 ]\\n'
         ...         u'所属行业：   法律\\n          法务   法务部诉讼经理\\n    主要负责集团诉讼')))
+
+    WYJCO related tests:
+        >>> business = lambda x: x['business']
         >>> assert u'台湾' in name(company_1(work_xp_jingying(u'2008/3-2010/11         业务推广 | 光电事业处\\n\\n'
         ...         u'台湾汉唐集成股份有限公司 [2年 8个月 ]\\n\\n多元化业务集团公司|150-500人|外资(非欧美)\\n')))
+        >>> assert u'医疗' in business(company_1(work_xp_jingying(u'2011/6-2015/6          项目经理|投资部\\n\\n'
+        ...         u'有限公司 [4年 ]\\n\\n医疗/护理/卫生|150-500人|民营公司\\n')))
+
     """
     pos = 0
     out = {'company': [], 'position': []}
@@ -494,7 +504,7 @@ def work_xp(text):
                     if r.group('position'):
                         pos +=1
                         position_output(out, r.groupdict())
-        elif TACO.search(text):
+        elif DRTACO.search(text) or TACO.search(text):
             pos, out = work_xp_zhilian(text)
         elif PCO.search(text):
             out = {'company': [], 'position': []}

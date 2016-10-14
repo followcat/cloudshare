@@ -119,7 +119,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
             else:
                 projectinfo[key] = value
                 self.saveinfo(id, projectinfo,
-                              'Update %s key %s to %s.' % (id, key, value), committer)
+                              'Update %s key %s.' % (id, key), committer)
         return data
 
     def _infoframe(self, value, username):

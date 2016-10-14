@@ -38,6 +38,8 @@ def initialize(app):
                      endpoint = 'curriculumvitaemd')
     api.add_resource(CurrivulumvitaeYAMLAPI, '/api/cvyaml/<string:id>',
                      endpoint = 'curriculumvitaeyaml')
+    api.add_resource(UpdateCurrivulumvitaeInformation, '/api/cv/updateinfo',
+                     endpoint = 'updatecurrivulumvitaeinformation')
 
     api.add_resource(UploadCVAPI, '/api/uploadcv', endpoint = 'uploadcv')
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv', endpoint = 'uploadengcv')

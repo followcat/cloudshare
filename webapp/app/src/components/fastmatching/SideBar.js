@@ -1,12 +1,13 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Icon, Card, Form, Button, Tag, Modal } from 'antd';
+import { Icon, Card, Form, Button, Modal } from 'antd';
 
 import Competency from '../common/analyse/Competency';
 import Experience from '../common/analyse/Experience';
 import HistorySelection from '../common/analyse/HistorySelection';
 import RadarChart from '../common/analyse/RadarChart';
+import Tag from '../common/Tag';
 
 import classNames from 'classnames';
 
@@ -42,6 +43,7 @@ export default class SideBar extends Component {
     };
     this.handleSidebarBtnClick = this.handleSidebarBtnClick.bind(this);
     this.handleTagClose = this.handleTagClose.bind(this);
+    this.renderSelectionDOM = this.renderSelectionDOM.bind(this);
   }
 
   handleSidebarBtnClick() {
@@ -70,8 +72,21 @@ export default class SideBar extends Component {
     });
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.selection.id === this.props.id;
+  shouldUpdateComponent(nextProps, nextState) {
+    return nextProps.visible === nextState.visible;
+  }
+
+  renderSelectionDOM() {
+    let dom = this.props.selection.map((item, index) => {
+      return (
+        <Tag
+          key={index}
+          text={item.get('name') ? item.get('name') : item.get('id')}
+          onClick={() => this.handleTagClose(item.get('id'), item.get('name'))}
+        />
+      );
+    });
+    return dom;
   }
 
   render() {
@@ -118,17 +133,7 @@ export default class SideBar extends Component {
                 <h4>Selection</h4>
               </div>
               <div className="selection-container">
-                {this.props.selection.map((item, index) => {
-                  return (
-                    <Tag
-                      key={index}
-                      closable={true}
-                      afterClose={() => this.handleTagClose(item.get('id'), item.get('name'))}
-                    >
-                      {item.get('name') ? item.get('name') : item.get('id')}
-                    </Tag>
-                  );
-                })}
+                {this.renderSelectionDOM()}
               </div>
             </div>
           </div>

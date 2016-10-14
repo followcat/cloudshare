@@ -21,6 +21,19 @@ class CurriculumVitae(services.base.Service):
         self._nums = 0
 
     def exists(self, filename):
+        """
+            >>> import interface.basefs
+            >>> import services.curriculumvitae
+            >>> DIR = 'repo'
+            >>> DB = interface.basefs.BaseFSInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.exists('blr6dter.yaml')
+
+            >>> import interface.gitinterface
+            >>> DB = interface.gitinterface.GitInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.exists('blr6dter.yaml')
+        """
         path_name = os.path.join(self.path, filename)
         result = self.interface.exists(path_name)
         return result
@@ -117,6 +130,19 @@ class CurriculumVitae(services.base.Service):
         return True
 
     def yamls(self):
+        """
+            >>> import interface.basefs
+            >>> import services.curriculumvitae
+            >>> DIR = 'repo'
+            >>> DB = interface.basefs.BaseFSInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert not SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')   #FIXME
+
+            >>> import interface.gitinterface
+            >>> DB = interface.gitinterface.GitInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')
+        """
         yamls = self.interface.lsfiles(self.path, '*.yaml')
         for each in yamls:
             yield os.path.split(each)[-1]
@@ -148,6 +174,19 @@ class CurriculumVitae(services.base.Service):
         return result
 
     def getmd(self, name):
+        """
+            >>> import interface.basefs
+            >>> import services.curriculumvitae
+            >>> DIR = 'repo'
+            >>> DB = interface.basefs.BaseFSInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.getmd('blr6dter.yaml')
+
+            >>> import interface.gitinterface
+            >>> DB = interface.gitinterface.GitInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.getmd('blr6dter.yaml')
+        """
         result = unicode()
         md = core.outputstorage.ConvertName(name).md
         path_name = os.path.join(self.path, md)

@@ -57,7 +57,7 @@ def initialize(app):
 
     api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
 
-    api.add_resource(SimilarAPI, '/api/mining/similar/<string:id>', endpoint = 'similar')
+    api.add_resource(SimilarAPI, '/api/mining/similar', endpoint = 'similar')
 
     api.add_resource(ValuableAPI, '/api/mining/valuable')
 

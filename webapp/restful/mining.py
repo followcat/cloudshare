@@ -241,19 +241,24 @@ class SimilarAPI(Resource):
         super(SimilarAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('doc', location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
-    def get(self, id):
-        doc = self.svc_mult_cv.getmd(id)
+    def post(self):
+        args = self.reqparse.parse_args()
+        doc = args['doc']
+        project = args['project']
         datas = []
-        for name, score in self.miner.probability(doc)[:7]:
+        for name, score in self.miner.probability(project, doc)[:7]:
             yaml_info = self.svc_mult_cv.getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
                 'match': score
             }
-            datas.append([name, yaml_info, info])
-        return { 'result': datas }
+            datas.append({ 'id': name, 'yaml_info': yaml_info, 'info': info })
+        return { 'code': 200, 'data': datas }
 
 
 class ValuablebaseAPI(Resource):

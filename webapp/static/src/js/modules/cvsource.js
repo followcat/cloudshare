@@ -261,20 +261,23 @@ require([
 
   //Get similar person data.
   $.ajax({
-    url: "/analysis/similar",
+    url: "/api/mining/similar",
     type: "post",
-    data: {
-      "doc": $("#cvContent").text()
-    },
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify({
+      "doc": $("#cvContent").text(),
+      "project": localStorage.getItem('_pj')
+    }),
     success: function(response) {
-      var datas = response.result;
+      var datas = response.data;
       for (var i = 0, len = datas.length; i < len; i++) {
         var _index = datas[i];
-        var name = _index.name !== "" ? _index.name : _index.id;
+        var name = _index.yaml_info.name !== "" ? _index.yaml_info.name : _index.yaml_info.id;
 
-        $("#similarContent").append("<div class='similar-item'><a href='/show/" + _index.md_filename + "' target='_blank'>" +
-          name + " | " + _index.position + " | " +
-          _index.age + " | " + _index.gender + " | " + _index.education + "</a></div>"
+        $("#similarContent").append("<div class='similar-item'><a href='/show/" + _index.id + "' target='_blank'>" +
+          name + " | " + _index.yaml_info.position + " | " +
+          _index.yaml_info.age + " | " + _index.yaml_info.gender + " | " + _index.yaml_info.education + "</a></div>"
         );
       }
     }

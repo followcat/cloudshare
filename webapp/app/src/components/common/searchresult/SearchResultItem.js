@@ -43,6 +43,8 @@ export default class SearchResultItem extends Component {
           expectationMoney = expectation.salary ? expectation.salary.yearly : '',
           expectationPlacesList = expectation.places ? expectation.places : [];
 
+    const linkColor = this.props.gradient ? { color: this.props.gradient[parseInt(props.info.match*100)] } : {};
+
     return (
       <Card className="cs-ls-i">
         <div className="basic-info">
@@ -59,7 +61,7 @@ export default class SearchResultItem extends Component {
               <a
                 href={`/show/${props.cv_id}`}
                 target="_blank"
-                style={{ color: this.props.gradient[parseInt(props.info.match*100)] }}
+                style={linkColor}
               >
                 {this.renderNameText()}
               </a>

@@ -41,8 +41,7 @@ export default class SearchResult extends Component {
         'Content-Type': 'application/json',
       },
       body: Generator.getPostData({
-        // 'search_text': searchText,
-        'search_text': 'software engineer',
+        'search_text': searchText,
       })
     })
     .then(response => response.json())

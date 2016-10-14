@@ -104,8 +104,8 @@ class LSImodel(object):
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
-        #self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
-        #                                no_above=self.no_above)
+        self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
+                                        no_above=self.no_above)
 
     def set_corpus(self):
         for text in self.texts:
@@ -126,7 +126,7 @@ class LSImodel(object):
             >>> import compiler.ast
             >>> model = SVC_MIN.lsi_model['medical']
             >>> topics = model.lsi.show_topics(formatted=False)
-            >>> words = topic_words_list(topics)
+            >>> words, weights = topic_words_list(topics)
             >>> fatten_words = compiler.ast.flatten(words)
 
         Some words happen to appear in the most significant topics from time

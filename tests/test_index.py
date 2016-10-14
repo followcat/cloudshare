@@ -25,7 +25,7 @@ def mapping_topic_words(doc, model, num_topics=10, num_words=10):
     vec = model.probability(doc)
     mapping_vec = sorted(vec, key=lambda item: abs(item[1]), reverse=True)
     topics = model.lsi.show_topics(num_words=num_words, formatted=False)
-    words = topic_words_list(topics, mapping_vec[:num_topics])
+    words, weights = topic_words_list(topics, mapping_vec[:num_topics])
     return compiler.ast.flatten(words)
 
 def topic_words_list(topics, mapping_vec=None):
@@ -35,7 +35,7 @@ def topic_words_list(topics, mapping_vec=None):
         >>> import compiler.ast
         >>> model = SVC_MIN.lsi_model['medical']
         >>> topics = model.lsi.show_topics(formatted=False)
-        >>> words = topic_words_list(topics)
+        >>> words, weights = topic_words_list(topics)
         >>> fatten_words = compiler.ast.flatten(words)
         >>> assert u'品质' in fatten_words
     """
@@ -46,14 +46,14 @@ def topic_words_list(topics, mapping_vec=None):
     else:
         m_topics = mapping_topics(mapping_vec, topics)
     for topic in m_topics:
+        _words = []
+        _weights = []
         for _word, _weight in topic[1]:
-            words.append(_word)
-            weights.append(_weight)
-    return words
+            _words.append(_word)
+            _weights.append(_weight)
+        words.append(_words)
+        weights.append(_weights)
+    return words, weights
 
 def mapping_topics(mapping_vec, topics):
-    ret_topics = []
-    for id, score in mapping_vec:
-        topic = topics[id]
-        ret_topics.append(topic)
-    return ret_topics
+    return [topics[id] for id, score in mapping_vec]

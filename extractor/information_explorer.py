@@ -148,7 +148,7 @@ def get_experience(stream, name=None):
     return result
 
 
-def get_classify(experience, company_knowledge, classify):
+def get_classify(experience, company_knowledge=None, classify=[]):
     return extractor.extract_experience.match_classify(experience, company_knowledge, classify)
 
 

@@ -213,6 +213,7 @@ def company_knowledge(SVC_CV, knowledge):
     del knowledge['']
     
 def initclassify(SVC_CV, knowledge=None):
+    import collections
     import utils.builtin
 
     if knowledge is None:
@@ -220,13 +221,8 @@ def initclassify(SVC_CV, knowledge=None):
         
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
-        try:
-            classify = info['classify']
-        except KeyError:
-            classify = []
-        info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge, classify)
-        if info['classify']:
-            utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
+        info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge)
+        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
 
 
 def initproject(SVC_CV_REPO, SVC_PRJ):

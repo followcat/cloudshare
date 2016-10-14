@@ -11,9 +11,9 @@ class Similar(flask.views.MethodView):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         miner = flask.current_app.config['SVC_MIN']
         doc = flask.request.form['doc']
-        basemodel = svc_mult_cv.default.name
+        project = flask.request.form['project']
         datas = []
-        for name, score in miner.probability(basemodel, doc)[1:6]:
+        for name, score in miner.probability(project, doc)[1:6]:
             cname = core.outputstorage.ConvertName(name)
             yaml_info = svc_mult_cv.getyaml(cname.yaml)
             info = {

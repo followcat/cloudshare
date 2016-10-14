@@ -93,9 +93,9 @@ class Edit(flask.views.MethodView):
 class ShowEnglish(flask.views.MethodView):
 
     @flask.ext.login.login_required
-    def get(self, id):
+    def get(self, project, id):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        md = svc_mult_cv.default.getmd_en(id)
+        md = svc_mult_cv.getproject(project).getmd_en(id)
         return flask.render_template('edit.html', markdown=md)
 
 

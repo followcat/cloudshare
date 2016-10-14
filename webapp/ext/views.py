@@ -94,11 +94,6 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/analysis/similar',
-        view_func=webapp.views.mining.Similar.as_view('mining_similar'),
-        )
-
-    app.add_url_rule(
         '/edit/<path:filename>',
         view_func=webapp.views.views.Edit.as_view('edit'),
         )
@@ -119,11 +114,6 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/updateinfo',
-        view_func=webapp.views.views.UpdateInfo.as_view('updateinfo'),
-        )
-
-    app.add_url_rule(
         '/',
         view_func=webapp.views.views.Index.as_view('index'),
         )
@@ -141,9 +131,4 @@ def configure(app):
     app.add_url_rule(
         '/delbookmark',
         view_func=webapp.views.views.DelBookmark.as_view('delbookmark'),
-        )
-
-    app.add_url_rule(
-        '/resumetojd/<path:filename>/<status>',
-        view_func=webapp.views.jobdescription.ResumeToJobDescription.as_view('resumetojd'),
         )

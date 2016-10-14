@@ -93,9 +93,9 @@ class Edit(flask.views.MethodView):
 class ShowEnglish(flask.views.MethodView):
 
     @flask.ext.login.login_required
-    def get(self, id):
+    def get(self, project, id):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        md = svc_mult_cv.default.getmd_en(id)
+        md = svc_mult_cv.getproject(project).getmd_en(id)
         return flask.render_template('edit.html', markdown=md)
 
 
@@ -132,28 +132,6 @@ class Preview(flask.views.MethodView):
         md_data = flask.request.form['mddata']
         md = core.converterutils.md_to_html(md_data)
         return flask.render_template('preview.html', markdown=md)
-
-
-class UpdateInfo(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        response = dict()
-        result = True
-        user = flask.ext.login.current_user
-        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        filename = flask.request.json['filename']
-        updateinfo = flask.request.json['yamlinfo']
-        id = core.outputstorage.ConvertName(filename).base
-        for key, value in updateinfo.iteritems():
-            data = svc_mult_cv.default.updateinfo(id, key, value, user.id)
-            response = { 'result': result, 'data': data }
-            if data is None:
-                result = False
-                response = { 'result': result, 'msg': 'Update information error.'}
-                break
-        return flask.jsonify(response)
-
 
 class Index(flask.views.MethodView):
 

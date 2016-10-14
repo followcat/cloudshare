@@ -7,6 +7,8 @@ import SearchResultHeader from './SearchResultHeader';
 import SearchResultItem from './SearchResultItem';
 import SearchResultPagination from './SearchResultPagination';
 
+import ColorGrad from '../../../utils/color_grad';
+
 import classNames from 'classnames';
 import './searchresult.less';
 
@@ -14,7 +16,9 @@ export default class SearchResultBox extends Component {
 
   constructor(props) {
     super(props);
-
+    this.state = {
+      gradient: [],
+    };
     this.renderResultDOM = this.renderResultDOM.bind(this);
   }
 
@@ -39,10 +43,18 @@ export default class SearchResultBox extends Component {
             key={index}
             selection={this.props.selection}
             onToggleSelection={this.props.onToggleSelection}
+            gradient={this.state.gradient}
           />
         );
       });
     }
+  }
+
+  componentDidMount() {
+    const colorGrad = new ColorGrad();
+    this.setState({
+      gradient: colorGrad.gradient(),
+    });
   }
 
   render() {

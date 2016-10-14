@@ -136,7 +136,7 @@ class CurriculumVitae(services.base.Service):
             >>> DIR = 'repo'
             >>> DB = interface.basefs.BaseFSInterface(DIR)
             >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert not SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')   #FIXME
+            >>> assert SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')
 
             >>> import interface.gitinterface
             >>> DB = interface.gitinterface.GitInterface(DIR)
@@ -238,8 +238,9 @@ class CurriculumVitaeStorage(CurriculumVitae):
             self.interface.add(os.path.join(self.path, cn_id.html), rawdata)
         return True
 
-    def lsids(self, *args, **kwargs):
-        return [f.split('.')[0] for f in self.interface.lsfiles()]
+    def lsids(self):
+        return [os.path.splitext(f)[0]
+                for f in self.interface.lsfiles(self.path, '*.yaml')]
 
 
 class CurriculumVitaeObject(object):

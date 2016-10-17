@@ -26,11 +26,11 @@ class SearchbyTextAPI(Resource):
         project = args['project']
         text = args['search_text']
         cur_page = args['page']
-        result = self.svc_mult_cv.search(text, project)
-        yaml_result = self.svc_mult_cv.search_yaml(text, project)
-        results = list(set(result+yaml_result))
+        results = self.svc_mult_cv.search(text, project)
+        yaml_results = self.svc_mult_cv.search_yaml(text, project)
+        results.update(yaml_results)
         count = 20
-        datas, pages = self.paginate(results, cur_page, count)
+        datas, pages = self.paginate(list(results), cur_page, count)
         return { 
             'code': 200,
             'data': {

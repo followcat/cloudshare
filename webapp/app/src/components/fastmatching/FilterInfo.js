@@ -8,10 +8,16 @@ export default class FilterInfo extends Component {
   }
 
   render() {
+    const style = this.props.visible ? { display: 'block' } : { display: 'none' };
     return (
-      <div>
+      <div style={style}>
         <p>About {this.props.total} results.</p>
       </div>
     );
   }
 }
+
+FilterInfo.propTypes = {
+  visible: PropTypes.bool,
+  total: PropTypes.number,
+};

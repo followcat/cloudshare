@@ -14,10 +14,11 @@ class MultiCV(object):
         if name is not None:
             assert name in self.projects
             projectcv = self.projects[name]
-        projectcv = self.default
+        else:
+            projectcv = self.default
         return projectcv
 
-    def add(self, cvobj, committer=None, unique=True, projectname=None):
+    def add(self, cvobj, committer=None, projectname=None, unique=True):
         if projectname is None:
             projectname = self.default.name
         result = self.repodb.add(cvobj, committer, unique)
@@ -93,4 +94,15 @@ class MultiCV(object):
         for svc_cv in self.svcls:
             result[svc_cv.name] = svc_cv.NUMS
             result['total'] += svc_cv.NUMS
+        return result
+
+    def getprjnums(self, projectname):
+        result = dict()
+        result['total'] = 0
+        cvservice = self.getproject(projectname)
+        classifies = cvservice.getclassify()
+        for svc_cv in self.svcls:
+            if svc_cv.name in classifies or svc_cv.name == projectname:
+                result[svc_cv.name] = svc_cv.NUMS
+                result['total'] += svc_cv.NUMS
         return result

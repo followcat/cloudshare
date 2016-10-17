@@ -138,22 +138,7 @@ define(['jquery', 'formvalidate', 'Upload'], function($, formvalidate, Upload){
   header.UploadDiv($(".upload"));
 
   header.getModelList = function() {
-    $.ajax({
-      url: "/modellist",
-      type: "POST",
-      success: function(response) {
-        var data = response.model_list,
-            model = localStorage.model ? localStorage.model : '';
-
-        for (var i = 0, len = data.length; i < len; i++) {
-          if (model === data[i] && model !== "") {
-            $("#modelMenu").append("<p>"+ data[i] +"</p>");
-          } else {
-            $("#modelMenu").append("<p>"+ data[i] +"</p>");
-          }
-        }
-      }
-    })
+    return localStorage.getItem('_pj');
   };
   header.getModelList();
 

@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 
 import Storage from '../../utils/storage';
+import Generator from '../../utils/generator';
 import 'whatwg-fetch';
 import './databasebox.less';
 
@@ -20,7 +21,13 @@ export default class DataBaseBox extends Component {
 
   loadDB() {
     fetch(`/api/dbnumbers`, {
-      method: 'GET',
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Storage.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: Generator.getPostData()
     })
     .then(response => response.json())
     .then((json) => {

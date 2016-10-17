@@ -75,15 +75,15 @@ NOBRPOS = POSITION.replace(u'：', u'（）：'+ENDLINESEP)
 YIPOSITION = NOBRPOS+u'(?P<lbr>[\(（])?(?(lbr)'+NOBRPOS+u'[\)）]('+NOBRPOS+u')?)'
 YICO = re.compile(u'^((?P<position>'+YIPOSITION+u')'+ASP+u'+)?'+PERIOD+ASP+u'+(?P<company>'+COMPANY+u')('+ASP+u'+(?#Skip anything until field)[\S\s]*?所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*(?P<field>.+)('+ASP+u'+(?P<dpt>'+PODEPARTMENT+u'))?)?('+ASP+u'+'+SALARY+u')?$', re.M)
 
-COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营'
+COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\(非欧美\)'
 COMPANY_TYPE = u'(([^/\|\n\- ：]*?('+COMPANY_TYPE_KEYWORD+u')[^/\|\n\- ]*)|(其他))'
 pos_company_business = lambda RE:RE.pattern+u'(\n'+ASP+u'*(?!所属行业：)'+POASP+u'*(((?P<title>企业性质：)?'+COMPANY_TYPE+u')|('+POASP+u'*\|'+POASP+u'*)|(?P<business>[^\|\n\-： ]+?)(?=[\|\n ])){1,3}(?(title)('+POASP+u'*\|'+POASP+u'*(规模：)?'+AEMPLOYEES+u')?|('+POASP+u'*\|'+POASP+u'*(规模：)?'+AAEMPLOYEES+u'))\n)?'
 
-company_business = lambda RE:RE.pattern+u'(\n'+ASP+u'*\-{3}\-*\n('+POASP+u'*'+COMPANY_TYPE+POASP+u'*\|)?'+POASP+u'*(?P<business>[^\|\n\-： ]+?)('+POASP+u'*\|'+POASP+u'*'+AEMPLOYEES+u')?\n)?'
+company_business = lambda RE:RE.pattern+u'(\n+'+ASP+u'*\-{3}\-*\n('+POASP+u'*'+COMPANY_TYPE+POASP+u'*\|)?'+POASP+u'*(?P<business>[^\|\n\-： ]+?)('+POASP+u'*\|'+POASP+u'*'+AEMPLOYEES+u')?\n)?'
 
-company_business_noborder_strong = lambda RE:RE.pattern+u'\n'+u'(?!所属行业：)'+POASP+u'*((((企业性质|公司性质)：)?'+COMPANY_TYPE+u')?('+POASP+u'*\|'+POASP+u'*)?((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))('+POASP+u'*\|'+POASP+u'*)(((公司)?规模：)?'+AEMPLOYEES+u'))\n'
+company_business_noborder_strong = lambda RE:RE.pattern+u'\n+'+u'(?!所属行业：)'+POASP+u'*((((企业性质|公司性质)：)?'+COMPANY_TYPE+u')?('+POASP+u'*\|'+POASP+u'*)?((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))('+POASP+u'*\|'+POASP+u'*)(((公司)?规模：)?'+AEMPLOYEES+u'))\n'
 
-company_business_noborder = lambda RE:RE.pattern+u'\n'+POASP+u'*((((企业性质|公司性质)：)?'+COMPANY_TYPE+u')|('+POASP+u'*\|'+POASP+u'*)|((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))|(((公司)?规模：)?'+AEMPLOYEES+u')){1,5}\n'
+company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*((((企业性质|公司性质)：)?'+COMPANY_TYPE+u')|('+POASP+u'*\|'+POASP+u'*)|((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))|(((公司)?规模：)?'+AEMPLOYEES+u')){1,5}\n'
 
 EMP = re.compile(BEMPLOYEES)
 
@@ -352,11 +352,6 @@ def work_xp_jingying(text):
     out = {'company': [], 'position': []}
     res = WYJCO.search(text)
     if res:
-        AEMPLOYEES = EMPLOYEES.replace('employees', 'aemployees')
-        AAEMPLOYEES = EMPLOYEES.replace('employees', 'aaemployees')
-        COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\(非欧美\)'
-        COMPANY_TYPE = u'(([^/\|\n\- ：]*?('+COMPANY_TYPE_KEYWORD+u')[^/\|\n\- ]*)|(其他))'
-        company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*((((企业性质|公司性质)：)?'+COMPANY_TYPE+u')|('+POASP+u'*\|'+POASP+u'*)|((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))|(((公司)?规模：)?'+AEMPLOYEES+u')){1,5}\n'
         RE = re.compile(company_business_noborder(WYJCO), re.M)
         for r in RE.finditer(text):
             pos +=1
@@ -499,11 +494,6 @@ def work_xp(text):
             company_output(out, r.groupdict())
             position_output(out, r.groupdict())
     if not pos:
-        AEMPLOYEES = EMPLOYEES.replace('employees', 'aemployees')
-        AAEMPLOYEES = EMPLOYEES.replace('employees', 'aaemployees')
-        COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\(非欧美\)'
-        COMPANY_TYPE = u'(([^/\|\n\- ：]*?('+COMPANY_TYPE_KEYWORD+u')[^/\|\n\- ]*)|(其他))'
-        company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*((((企业性质|公司性质)：)?'+COMPANY_TYPE+u')|('+POASP+u'*\|'+POASP+u'*)|((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))|(((公司)?规模：)?'+AEMPLOYEES+u')){1,5}\n'
         out = {'company': [], 'position': []}
         RE = re.compile(company_business_noborder(re.compile(BDURATION, re.M)), re.M)
         res = RE.search(text)
@@ -623,7 +613,7 @@ def table_based_xp(text):
     return pos, out
 
 
-def match_classify(experience, d=[]):
+def match_classify(experience, companies=None, d=[]):
     u"""
         >>> import yaml
         >>> experience = yaml.load(u'company:\\n'
@@ -662,11 +652,20 @@ def match_classify(experience, d=[]):
                         if m:
                             output.add(k)
             except KeyError:
+                if companies:
+                    try:
+                        for b in set(companies[c['name']]):
+                            for (k, v) in CLASSIFY.items():
+                                m = v.match(b)
+                                if m:
+                                    output.add(k)
+                    except KeyError:
+                        pass
                 continue
     except KeyError:
         pass
     finally:
-        return list(output)
+        return sorted(list(output))
 
 
 def fix_output(processed):

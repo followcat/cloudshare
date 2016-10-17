@@ -153,16 +153,20 @@ class ProjectCV(services.simulationcv.SimulationCV):
         return data
 
     def search(self, keyword):
-        allmd = self.repo.search(keyword)
-        result = []
-        for md in allmd:
-            name = core.outputstorage.ConvertName(md).base
-            if name in self.cvids:
-                result.append(md)
-        return result
+        results = set()
+        allfile = self.repo.search(keyword)
+        for filename in allfile:
+            id = core.outputstorage.ConvertName(filename).base
+            if id in self.cvids:
+                results.add(id)
+        return results
 
     def search_yaml(self, keyword):
-        results = self.interface.grep_yaml(keyword, self.YAML_DIR)
+        results = set()
+        allfile = self.interface.grep(keyword, self.YAML_DIR)
+        for filename in allfile:
+            id = core.outputstorage.ConvertName(filename).base
+            results.add(id)
         return results
 
     def company_add(self, name, introduction, committer):

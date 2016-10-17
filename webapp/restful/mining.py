@@ -95,11 +95,13 @@ class AbilityAPI(BaseAPI):
         args = self.reqparse.parse_args()
         result = []
         for id in args['md_ids']:
+            month = 0
+            doclen = 0
+            actpoint = 0
             stream = self.svc_mult_cv.getmd(id)
             capacitys = core.mining.info.capacity(stream)
-            month = 0
-            actpoint = 0
-            doclen = 0
+            if not capacitys:
+                doclen = 100000
             for capacity in capacitys:
                 if (len(capacity['begin']) and len(capacity['end'])):
                     month += self.calculate_work_month(capacity['begin'][0], capacity['begin'][1], capacity['end'][0], capacity['end'][1])

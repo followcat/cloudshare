@@ -39,10 +39,7 @@ class LSIsimilarity(object):
                 names.append(name)
                 words = self.lsi_model.slicer(doc)
                 corpus.append(self.lsi_model.dictionary.doc2bow(words))
-        if len(names) > 0:
-            self.setup(names, corpus)
-            return True
-        return False
+        self.setup(names, corpus)
 
     def setup(self, names, corpus):
         self.names = names

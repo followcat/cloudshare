@@ -13,18 +13,21 @@ class CompanyAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('coname', location = 'json')
         self.reqparse.add_argument('introduction', location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         super(CompanyAPI, self).__init__()
 
     def get(self, name):
-        result = self.svc_mult_cv.default.company_get(name)
+        project = args['project']
+        result = self.svc_mult_cv.getproject(project).company_get(name)
         return { 'result': result }
 
     def post(self):
         args = self.reqparse.parse_args()
+        project = args['project']
         coname = args['coname']
         introduction = args['introduction']
         user = flask.ext.login.current_user
-        result = self.svc_mult_cv.default.company_add(coname, introduction, user.id)
+        result = self.svc_mult_cv.getproject(project).company_add(coname, introduction, user.id)
         return { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
 
 
@@ -35,11 +38,15 @@ class CompanyListAPI(Resource):
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         super(CompanyListAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', location = 'json')
 
-    def get(self):
-        result = self.svc_mult_cv.default.company_names()
+    def post(self):
+        args = self.reqparse.parse_args()
+        project = args['project']
+        result = self.svc_mult_cv.getproject(project).company_names()
         data = []
         for coname in result:
-            co = self.svc_mult_cv.default.company_get(coname)
+            co = self.svc_mult_cv.getproject(project).company_get(coname)
             data.append(co)
         return { 'code': 200, 'data': data }

@@ -1,5 +1,9 @@
 @import '../components/global.less';
 
+html, body {
+  height: auto;
+}
+
 .cs-layout-top {
   position: relative;
 }
@@ -7,4 +11,63 @@
 .pd-lr-30 {
   padding-left: 30px;
   padding-right: 30px;
+}
+
+.sidebar {
+  position: fixed;
+  width: 200px;
+  height: 100%;
+  top: 0;
+  right: -200px;
+
+  .sidebar-button {
+    width: 40px;
+    height: 40px;
+    background-color: #337ab7;
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    left: -40px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+  }
+
+  .sidebar-button i {
+    color: #fff;
+    font-size: 24px;
+  }
+
+  .sidebar-container {
+    height: inherit;
+
+    .analyse {
+      padding-bottom: 24px;
+    }
+
+    .title {
+      border-left: 4px solid #c2c2c2;
+      padding: 4px 0 4px 6px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .selection-box {
+      padding: 12px 0;
+
+      .selection-title {
+        padding-left: 8px;
+        border-bottom: 2px solid #c2c2c2;
+      }
+
+      .selection-container {
+        margin-top: 12px;
+      }
+    }
+  }
 }

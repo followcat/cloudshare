@@ -23,64 +23,6 @@ class LoginRedirect(flask.views.MethodView):
     def get(self):
         return flask.render_template('gotologin.html')
 
-
-class Search(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def get(self):
-        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        if 'search_text' in flask.request.args:
-            search_text = flask.request.args['search_text']
-            cur_page = flask.request.args.get('page', '1')
-            cur_page = int(cur_page)
-            result = svc_mult_cv.search(search_text)
-            yaml_result = svc_mult_cv.search_yaml(search_text)
-            results = list()
-            for name in result+yaml_result:
-                cname = core.outputstorage.ConvertName(name).base
-                if cname not in results:
-                    results.append(cname)
-            count = 20
-            datas, pages = self.paginate(svc_mult_cv, results, cur_page, count)
-            return flask.render_template('search_result.html',
-                                         search_key=search_text,
-                                         result=datas,
-                                         cur_page = cur_page,
-                                         pages = pages,
-                                         nums=len(results))
-        else:
-            return flask.render_template('search.html')
-
-    def paginate(self, svc_mult_cv, results, cur_page, eve_count):
-        if not cur_page:
-            cur_page = 1
-        sum = len(results)
-        if sum%eve_count != 0:
-            pages = sum/eve_count + 1
-        else:
-            pages = sum/eve_count
-        datas = []
-        names = []
-        for each in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            base, suffix = os.path.splitext(each)
-            name = core.outputstorage.ConvertName(base).md
-            if name not in names:
-                names.append(name)
-            else:
-                continue
-            try:
-                yaml_data = svc_mult_cv.getyaml(base)
-            except IOError:
-                names.remove(name)
-                continue
-            info = {
-                'author': yaml_data['committer'],
-                'time': utils.builtin.strftime(yaml_data['date'], '%Y-%m-%d'),
-            }
-            datas.append([name, yaml_data, info])
-        return datas, pages
-
-
 class Upload(flask.views.MethodView):
 
     @flask.ext.login.login_required
@@ -151,9 +93,9 @@ class Edit(flask.views.MethodView):
 class ShowEnglish(flask.views.MethodView):
 
     @flask.ext.login.login_required
-    def get(self, id):
+    def get(self, project, id):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        md = svc_mult_cv.default.getmd_en(id)
+        md = svc_mult_cv.getproject(project).getmd_en(id)
         return flask.render_template('edit.html', markdown=md)
 
 
@@ -190,28 +132,6 @@ class Preview(flask.views.MethodView):
         md_data = flask.request.form['mddata']
         md = core.converterutils.md_to_html(md_data)
         return flask.render_template('preview.html', markdown=md)
-
-
-class UpdateInfo(flask.views.MethodView):
-
-    @flask.ext.login.login_required
-    def post(self):
-        response = dict()
-        result = True
-        user = flask.ext.login.current_user
-        svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        filename = flask.request.json['filename']
-        updateinfo = flask.request.json['yamlinfo']
-        id = core.outputstorage.ConvertName(filename).base
-        for key, value in updateinfo.iteritems():
-            data = svc_mult_cv.default.updateinfo(id, key, value, user.id)
-            response = { 'result': result, 'data': data }
-            if data is None:
-                result = False
-                response = { 'result': result, 'msg': 'Update information error.'}
-                break
-        return flask.jsonify(response)
-
 
 class Index(flask.views.MethodView):
 
@@ -271,3 +191,31 @@ class UserInfo(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         return flask.render_template('userinfo.html')
+
+#Render listjd page of RESTful
+class ListJD(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('listjd.html')
+
+#Render fastmatching page of RESTful
+class FastMatching(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('fastmatching.html')
+
+#Render search page of RESTful
+class Search(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('search.html')
+
+#Render search page of RESTful
+class SearchResult(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('result.html')

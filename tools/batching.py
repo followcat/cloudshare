@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import shutil
 
@@ -86,11 +88,27 @@ yaml.SafeDumper = utils._yaml.SafeDumper
 
 import extractor.information_explorer
 
+def get_explorer_name(svc_cv, yamlname):
+    obj = svc_cv.getyaml(yamlname)
+    if obj['origin'] == u'无忧精英爬取':
+        explorer_name = 'jingying'
+    elif obj['origin'] == u'智联卓聘爬取':
+        explorer_name = 'zhilian'
+    elif obj['origin'] == u'中华英才爬取':
+        explorer_name = 'yingcai'
+    elif obj['origin'] == u'猎聘爬取':
+        explorer_name = 'liepin'
+    else:
+        explorer_name = svc_cv.name
+    return explorer_name
+
 def update_selected(svc_cv, yamlname, selected):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    explorer_name = get_explorer_name(svc_cv, yamlname)
+
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
-                                                         selected, svc_cv.name)
+                                                         selected, explorer_name)
     obj.update(info)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
@@ -99,8 +117,10 @@ def update_selected(svc_cv, yamlname, selected):
 def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    explorer_name = get_explorer_name(svc_cv, yamlname)
+
     extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname),
-                                                                   svc_cv.name)
+                                                                   explorer_name)
     obj.update(extracted_data)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
@@ -175,6 +195,34 @@ def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
                 path_filename = os.path.join(REPO_DB.path, SVC_CV_REPO.path, each)
                 with open(path_filename, 'w') as fp:
                     fp.write(yaml.safe_dump(yaml_info, allow_unicode=True))
+
+
+def company_knowledge(SVC_CV, knowledge):
+    for y in SVC_CV.yamls():
+        info = SVC_CV.getyaml(y)
+        try:
+            for c in info['experience']['company']:
+                try:
+                    knowledge[c['name']].append(c['business'])
+                except KeyError:
+                    continue
+        except KeyError:
+            continue
+        except TypeError:
+            pass
+    del knowledge['']
+    
+def initclassify(SVC_CV, knowledge=None):
+    import collections
+    import utils.builtin
+
+    if knowledge is None:
+        knowledge = collections.defaultdict(list)
+        
+    for y in SVC_CV.yamls():
+        info = SVC_CV.getyaml(y)
+        info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge)
+        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
 
 
 def initproject(SVC_CV_REPO, SVC_PRJ):

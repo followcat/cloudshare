@@ -11,15 +11,20 @@ import jieba
 import jieba.posseg
 
 
+def industrytopath(industry):
+    return industry.replace('/', '-')
+
+
 def md5(text):
     m = hashlib.md5()
     m.update(text)
     return unicode(m.hexdigest())
 
 
-def save_yaml(infodict, path, filename):
+def save_yaml(infodict, path, filename, default_flow_style=None):
     with open(os.path.join(path, filename), 'w') as f:
-        f.write(yaml.dump(infodict, Dumper=utils._yaml.SafeDumper, allow_unicode=True))
+        f.write(yaml.dump(infodict, Dumper=utils._yaml.SafeDumper,
+                          allow_unicode=True, default_flow_style=default_flow_style))
 
 
 def load_yaml(path, filename):
@@ -29,8 +34,8 @@ def load_yaml(path, filename):
     return yaml_info
 
 
-def save_json(data, path, filename):
-    ujson.dump(data, open(os.path.join(path, filename), 'w'))
+def save_json(data, path, filename, indent=0):
+    ujson.dump(data, open(os.path.join(path, filename), 'w'), indent=indent)
 
 
 def load_json(path, filename):

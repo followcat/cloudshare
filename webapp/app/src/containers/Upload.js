@@ -7,7 +7,18 @@ import Uploader from '../components/upload/Uploader';
 import PreviewList from '../components/upload/PreviewList';
 import ComfirmResult from '../components/upload/ComfirmResult';
 
+import Generator from '../utils/generator';
+
 import './upload.less';
+
+const findIndexOf = (key, object, array) => {
+  for (let i = 0, len = array.length; i < len; i++) {
+    if (array[i][key] === object[key]) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 export default class Upload extends Component {
 
@@ -60,8 +71,9 @@ export default class Upload extends Component {
     let fileList = info.fileList,
         completedFileList = this.state.completedFileList;
 
-    fileList = fileList.filter((file) => {
-      if (file.response && file.state !== 'done') {
+    fileList = fileList.map((file) => {
+      if (file.response && file.status === 'done' && !file.flag) {
+        file.flag = true;
         fetch(`/api/uploadcv/preview`, {
           method: 'POST',
           credentials: 'include',
@@ -80,16 +92,15 @@ export default class Upload extends Component {
         .then((json) => {
           if (json.code === 200) {
             file.response.data = Object.assign(file.response.data, json.data);
-            file.state = 'done';
+            file.id = json.data.id;
             completedFileList.push(file.response.data);
             this.setState({
               completedFileList: completedFileList,
             });
           }
-        });
-        return file;
+        })
       }
-      return true;
+      return file;
     });
 
     this.setState({
@@ -114,9 +125,14 @@ export default class Upload extends Component {
   handlePrevPreview(value) {
     let current = this.state.currentPreview,
         comfirm = this.state.comfirmList;
-    if (!this.isObjectExisted(comfirm, value.id)) {
+
+    const index = findIndexOf('id', value, comfirm);
+    if (index > -1) {
+      comfirm[index] = Object.assign(comfirm[index], value);
+    } else {
       comfirm.push(value);
     }
+
     this.setState({
       currentPreview: current - 1,
       comfirmList: comfirm,
@@ -126,9 +142,14 @@ export default class Upload extends Component {
   handleNextPreview(value) {
     let current = this.state.currentPreview,
         comfirm = this.state.comfirmList;
-    if (!this.isObjectExisted(comfirm, value.id)) {
+
+    const index = findIndexOf('id', value, comfirm);
+    if (index > -1) {
+      comfirm[index] = Object.assign(comfirm[index], value);
+    } else {
       comfirm.push(value);
     }
+
     this.setState({
       currentPreview: current + 1,
       comfirmList: comfirm,
@@ -137,7 +158,8 @@ export default class Upload extends Component {
 
   handleComfirmUpload(value) {
     let comfirm = this.state.comfirmList;
-    if (!this.isObjectExisted(comfirm, value.id)) {
+
+    if (findIndexOf('id', value, comfirm) === -1) {
       comfirm.push(value);
     }
 
@@ -155,7 +177,7 @@ export default class Upload extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         updates: comfirm
       })
     })
@@ -185,13 +207,13 @@ export default class Upload extends Component {
       headers: {
         'Authorization': `Basic ${localStorage.token}`
       },
-      multiple: false,
+      multiple: true,
       onChange: this.handleChange,
     };
 
     return (
       <div>
-        <Header />
+        <Header fixed={true} />
         <div className="container" style={{ minHeight: h }}>
           <Uploader uploadProps={uploadProps} />
           <PreviewList

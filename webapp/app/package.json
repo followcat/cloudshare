@@ -19,6 +19,7 @@
   "dependencies": {
     "antd": "^1.9.1",
     "classnames": "^2.2.5",
+    "echarts": "^3.2.3",
     "marked": "^0.3.6",
     "normalize.css": "^4.2.0",
     "react": "^15.3.0",

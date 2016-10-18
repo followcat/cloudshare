@@ -204,8 +204,8 @@ class Mining(object):
                 try:
                     index.load()
                 except IOError:
-                    if index.build([svc]):
-                        index.save()
+                    index.build([svc])
+                    index.save()
                 self.sim[modelname][svc_name] = index
 
     def make_lsi(self, services):

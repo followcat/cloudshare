@@ -48,12 +48,6 @@ class ProjectCV(services.simulationcv.SimulationCV):
                                   message='Create new project %s.'%self.name,
                                   committer=committer)
 
-    def save(self):
-        utils.builtin.save_yaml(self.config, self.path, self.config_file,
-                                default_flow_style=False)
-        utils.builtin.save_json(self.cvids, self.path, self.ids_file,
-                                indent=4)
-
     def add(self, id, committer):
         result = False
         if not self.exists(id):
@@ -62,7 +56,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
             info['committer'] = committer
             name = core.outputstorage.ConvertName(id).yaml
             utils.builtin.save_yaml(info, self.cvpath, name)
-            utils.builtin.save_json(self.cvids, self.path, self.ids_file)
+            utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
+                                    indent=4)
             self.interface.add_files([bytes(self.ids_file),
                                       bytes(os.path.join(self.YAML_DIR, name))],
                                       message='Add new cv %s.'%id,

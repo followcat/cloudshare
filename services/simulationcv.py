@@ -33,7 +33,8 @@ class SimulationCV(object):
     def save(self):
         utils.builtin.save_yaml(self.config, self.path, self.config_file,
                                 default_flow_style=False)
-        utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file)
+        utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
+                                indent=4)
 
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base

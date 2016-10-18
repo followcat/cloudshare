@@ -113,7 +113,7 @@ export default class SearchResult extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: Generator.get({
+      body: Generator.getPostData({
         'search_text': searchText,
       })
     })

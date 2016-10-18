@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const config = require('../config');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const getHtml = function() {
   let entryPath = path.resolve(config.PATHS.SRC_PATH, 'entry');
@@ -16,7 +17,7 @@ const getHtml = function() {
     if (matchs) {
       eachFile = new HtmlWebpackPlugin({
         hash: false,
-        title: 'Willendare',
+        title: 'Cloudshare - Willendare',
         template: path.join(config.PATHS.SRC_PATH, '/template.html'),  // html模板文件
         inject: true,  // 允许修改的内容
         chunks: [matchs[1]],
@@ -35,7 +36,7 @@ const getHtml = function() {
 module.exports = {
   output: {
     path: config.PATHS.BUILD_PATH,
-    filename: '[name].bundle[hash].js',
+    filename: '[name].js',
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -44,6 +45,7 @@ module.exports = {
       },
       __DEVELOPMENT__: true,
     }),
+    new ExtractTextPlugin('[name].css'),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
   ].concat(getHtml()),

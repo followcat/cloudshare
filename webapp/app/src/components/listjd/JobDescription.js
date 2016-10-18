@@ -87,7 +87,11 @@ class JobDescription extends Component {
         dataIndex: 'status',
         key: 'status',
         width: 80,
-        render: (text) => <span style={text === 'Opening' ? { color: 'green' } : { color: 'red' }}>{text}</span>,
+        render: (text) => {
+          return (
+            text === 'Opening' ? <span style={{ color: 'green' }}>Open</span> : <span style={{ color: 'red' }}>{text}</span>
+          );
+        },
       },
       {
         title: 'Operation',
@@ -117,6 +121,7 @@ class JobDescription extends Component {
           onModalOpen={this.props.onModalOpen}
           onModalCancel={this.props.onModalCancel}
           onCreateNewJobDescription={this.props.onCreateNewJobDescription}
+          onSelectFilter={this.props.onSelectFilter}
         />
         <Table
           columns={columns}
@@ -187,7 +192,7 @@ class JobDescription extends Component {
                 {...getFieldProps('statusSelect')}
               >
                 <Select.Option key={0} value="Opening">Opening</Select.Option>
-                <Select.Option key={0} value="Closed">Closed</Select.Option>
+                <Select.Option key={1} value="Closed">Closed</Select.Option>
               </Select>
             </Form.Item>
           </Form>

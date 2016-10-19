@@ -157,6 +157,10 @@ def fix(d):
         >>> assert gender(fix(u'1.  姓名： 张   |  女  |  11 年工作经验   | MBA')) == u'女'
         >>> assert gender(fix(u'    1.  姓名： 蒋   |  女  |  7 年工作经验   | 硕士')) == u'女'
         >>> assert gender(fix(u'2.  3.  姓名： 杨   |  男  |  11 年工作经验   | 大专')) == u'男'
+        >>> try:
+        ...     assert not fix('?'*10000)
+        ... except:
+        ...     raise Exception("LBLPIPEGEN failed on time for fix('?'*10000)")
         >>> assert gender(fix(u'男 | 24岁(1990年6月17日) | 1年工作经验 | 173cm')) == u'男'
         >>> assert gender(fix(u'男 | 23岁(1991年2月14日) | 本科| 1年工作经验')) == u'男'
         >>> assert marital_status(fix(u'男 | 28岁(1986年10月5日) | 硕士| 一年以下工作经验 | 176cm | 未婚')) == u'未婚'

@@ -19,11 +19,11 @@ PXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?项目经历'+ UNIBRARIGHT +u'?(
 ECO = re.compile(u'^(?P<position>(\S[\S ]+\n)*)\n+(?P<company>(\S[\S ]+\n)*)\n+' + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
 CO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
 CCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
-TCO = re.compile(u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
+TCO = re.compile(u'^'+PREFIX+u'*'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
 PCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
 
-PJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<project>.+)\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')$', re.M)
-WYJCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'*(?P<position>'+POSITION+u')'+ASP+u'*\|'+ASP+u'*(?P<dpt>\S+)\n'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'(?(cit)\*)?$', re.M)
+PJCO = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'*(?P<project>.+)\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')$', re.M)
+WYJCO = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'*(?P<position>'+POSITION+u')'+ASP+u'*\|'+ASP+u'*(?P<dpt>\S+)\n'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'(?(cit)\*)?$', re.M)
 
 # Avoid conflict in group names when combining *CO and *PO
 AEMPLOYEES = EMPLOYEES.replace('employees', 'aemployees')
@@ -34,22 +34,22 @@ AAEMPLOYEES = EMPLOYEES.replace('employees', 'aaemployees')
 
 # TACO related grammar
 TACOMODEL = u'(\\\\\*)*(?P<company>__COMPANY__)__SEP__'+ASP+u'*(__ITEM____SEP__'+ASP+u'*){0,2}(?P<position>'+POSITION+u'?)'
-PATTERN = PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+TACOMODEL+ASP+u'*'+BDURATION+u'?(\n+(公司介绍：\n*.+?\n+)?所属行业：\n*(?P<business>\S+))?$'
+PATTERN = PREFIX+u'*'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+TACOMODEL+ASP+u'*'+BDURATION+u'?(\n+(公司介绍：\n*.+?\n+)?所属行业：\n*(?P<business>\S+))?$'
 TACO = re.compile(PATTERN.replace('__COMPANY__', u'('+COMPANY+u'\n)?'+COMPANY+u'?'+ASP+u'*').replace('__SEP__', '\|').replace('__ITEM__', u'[^\|（\(\[【]+('+COMPANYTAIL+u'[^\|（\(\[【]*)?'), re.DOTALL+re.M)
 TACOMODELCOPY = TACOMODEL.replace('company', 'ccompany').replace('position', 'cposition')
 # Add line begin for safer searching
-PATTERN = u'^'+PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+APERIOD+ur'[:：]?'+ASP+u'*'+TACOMODELCOPY+ASP+u'*'+ABDURATION+u'?(\n+(公司介绍：\n*.+?\n+)?所属行业：\n*(?P<cbusiness>\S+))?$'
+PATTERN = u'^'+PREFIX+u'*'+CONTEXT+u'?'+ASP+u'*'+APERIOD+ur'[:：]?'+ASP+u'*'+TACOMODELCOPY+ASP+u'*'+ABDURATION+u'?(\n+(公司介绍：\n*.+?\n+)?所属行业：\n*(?P<cbusiness>\S+))?$'
 # Duration required
 DRPOSITION = POSITION+u'('+POSITION.replace('\\n', '').replace('\\*', '').replace('+', '*')+u')?'
 DRTACOMODEL = u'(\\\\\*)*(?P<company>__COMPANY__)__SEP__'+ASP+u'*(__ITEM____SEP__'+ASP+u'*){0,2}(?P<position>'+DRPOSITION+u'?(（.*?） 兼'+ASP+u'*'+DRPOSITION+u'?)*)'
-DRPATTERN = PREFIX+u'?'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+DRTACOMODEL+ASP+u'*(\|'+ASP+u'*)?'+BDURATION+u'(\n+(公司介绍：\n*.+?\n+)?所属行业：\n*(?P<business>\S+))?$'
+DRPATTERN = PREFIX+u'*'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+DRTACOMODEL+ASP+u'*(\|'+ASP+u'*)?'+BDURATION+u'(\n+(公司介绍：\n*.+?\n+)?所属行业：\n*(?P<business>\S+))?$'
 # Not use for searching but only for matching (see the code)
 DRTACO = re.compile(DRPATTERN.replace('__COMPANY__', u'('+COMPANY+u'\n)?'+COMPANY+u'?'+ASP+u'*').replace('__SEP__', '\|').replace('__ITEM__', u'([^\|（\(\[【]+'+COMPANYTAIL+u')*([^\|（\(\[【]*)'), re.DOTALL+re.M)
 NOPIPETACO = re.compile(PATTERN.replace('__COMPANY__', '\S+'+ASP+u'*').replace('__SEP__', ' ').replace('__ITEM__', '\S+'), re.M)
 ALLTACO = re.compile(u'((?P<pip>'+TACO.pattern+u')|(?P<nop>'+NOPIPETACO.pattern+u'))', re.M)
 
 # Combine presence of duration and bracket around period for safer searching
-RCO = re.compile(u'^'+PREFIX+u'?■?'+CONTEXT+u'?'+ASP+u'*(?P<company>[^\n:：'+SP+u'\u2013\-]+)'+ASP+u'+((?P<position>[^\n:：'+SP+u'\u2013\-]+)'+ASP+u'+)?(('+UNIBRALEFT+u'?'+PERIOD+UNIBRARIGHT+u'?)|('+BDURATION+u'))', re.M)
+RCO = re.compile(u'^'+PREFIX+u'*■?'+CONTEXT+u'?'+ASP+u'*(?P<company>[^\n:：'+SP+u'\u2013\-]+)'+ASP+u'+((?P<position>[^\n:：'+SP+u'\u2013\-]+)'+ASP+u'+)?(('+UNIBRALEFT+u'?'+PERIOD+UNIBRARIGHT+u'?)|('+BDURATION+u'))', re.M)
 HCO = re.compile(u'((((公司)|(企业))名称[:：]?'+ASP+u'*\*?(?P<company>'+COMPANY+u')\*?'+ASP+u'*(所在地区[:：]?'+ASP+u'*\S+'+ASP+u'*)?)|(((起止)|(任职))?时间[:：]?'+ASP+u'*\*?'+PERIOD+'\*?'+ASP+u'*)){2}$', re.M)
 
 TABLECO = re.compile(u'^工作时间'+ASP+u'+岗位职能'+ASP+u'+公司名称'+ASP+u'*$', re.M)

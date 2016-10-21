@@ -54,7 +54,7 @@ class LSImodel(object):
                 name, doc = data
                 names.append(name)
                 texts.append(doc)
-        if len(names) > 10:
+        if len(names) > 5:
             self.setup(names, texts)
             return True
         return False
@@ -104,20 +104,100 @@ class LSImodel(object):
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
-        self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
-                                        no_above=self.no_above)
+        #self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
+        #                                no_above=self.no_above)
 
     def set_corpus(self):
         for text in self.texts:
             self.corpus.append(self.dictionary.doc2bow(text))
 
     def set_tfidf(self):
-        self.tfidf = models.TfidfModel(self.corpus)
+        u"""
+            >>> from tests.multi_models import *
+            >>> from tests.test_index import *
+            >>> jds = [_jd for _jd, _cvs in datas.items() if len(_cvs) > 4]
+            >>> models = build_models(jds)
+            >>> model = models['80ce049a320711e6ac1f4ccc6a30cd76']
+            >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
+            >>> m_topics = [
+            ...     [u'显控', u'监控', u'监测'],
+            ...     [u'物理', u'电表', u'相变'],
+            ...     [u'成像', u'分析仪', u'控制器'],
+            ...     [u'货运', u'铁路', u'机械'],
+            ... ]
+            >>> assert match_topics(m_topics, topics, 2)
+            >>> model = models['7cadbda40b5d11e699956c3be51cefca']
+            >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
+            >>> m_topics = [
+            ...     [u'医药', u'区域', u'销售', u'客户'],
+            ...     [u'医用', u'ct', u'机房'],
+            ...     [u'核反应堆', u'辐射', u'防护', u'监测'],
+            ... ]
+            >>> assert match_topics(m_topics, topics, 2)
+
+            >>> model = models['e9f415f653e811e6945a4ccc6a30cd76']
+            >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
+            >>> m_topics = [
+            ...     [u'加速器', u'射频'],
+            ...     [u'放疗', u'束流'],
+            ...     [u'digital', u'electrical', u'electronic'],
+            ... ]
+            >>> assert match_topics(m_topics, topics, 1)
+            >>> model = models['86119050313711e69b804ccc6a30cd76']
+            >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
+            >>> m_topics = [
+            ...     [u'质子', u'治疗'],
+            ...     [u'船舶', u'轮机', u'管轮'],
+            ... ]
+            >>> words, weights = topic_words_list(topics)
+            >>> assert match_topics(m_topics, topics, 2)
+
+        test on merge 2 group of similar cvs:
+            >>> jds = ['86119050313711e69b804ccc6a30cd76', 'e9f415f653e811e6945a4ccc6a30cd76']
+            >>> model = build_model(jds, name='sim')
+            >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
+            >>> m_topics = [
+            ...     [u'加速器', u'质子', u'束流'],
+            ...     [u'船舶', u'轮机', u'管轮'],
+            ... ]
+            >>> assert match_topics(m_topics, topics, 2)
+
+        test on merge 2 group of different cvs:
+            >>> model = models['07ea1a8018be11e684026c3be51cefca']
+            >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
+            >>> m_topics = [
+            ...     [u'sap', u'运维', u'搜索'],
+            ...     [u'microsoft', u'visual', u'it'],
+            ... ]
+            >>> assert match_topics(m_topics, topics, 2)
+            >>> jds = ['86119050313711e69b804ccc6a30cd76', '07ea1a8018be11e684026c3be51cefca']
+            >>> topics = build_model(jds, name='diff').lsi.show_topics(formatted=False, num_words=15)
+            >>> m_topics = [
+            ...     [u'质子', u'治疗'],
+            ...     [u'船舶', u'轮机', u'管轮'],
+            ...     [u'sap', u'运维', u'搜索'],
+            ...     [u'microsoft', u'visual', u'it'],
+            ... ]
+            >>> assert match_topics(m_topics, topics, 3)
+            >>> jds = ['86119050313711e69b804ccc6a30cd76', 'e9f415f653e811e6945a4ccc6a30cd76', '07ea1a8018be11e684026c3be51cefca']
+            >>> topics = build_model(jds, name='mixed').lsi.show_topics(formatted=False, num_words=15)
+            >>> m_topics = [
+            ...     [u'加速器', u'质子', u'束流'],
+            ...     [u'船舶', u'轮机', u'管轮'],
+            ...     [u'dr', u'放射', u'放疗'],
+            ...     [u'microsoft', u'visual', u'it'],
+            ... ]
+            >>> assert match_topics(m_topics, topics, 2)
+        """
+        import math
+        lf = lambda i: math.log(math.sqrt(i), 10)
+        gf = lambda doc_freq, totaldocs: math.log(totaldocs/doc_freq, 2)
+        self.tfidf = models.TfidfModel(self.corpus, wlocal=lf)
         self.corpus_tfidf = self.tfidf[self.corpus]
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=6, extra_samples=300)
+                                   num_topics=self.topics, power_iters=6, extra_samples=0)
 
     def probability(self, doc):
         u"""

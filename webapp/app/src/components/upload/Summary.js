@@ -14,8 +14,8 @@ export default class Summary extends Component {
   getCompanyNameById(companyList, id) {
     for (let i = 0, len = companyList.length; i < len; i++) {
       if (companyList[i].id === id) {
-          return companyList[i].name;
-        }
+        return companyList[i].name;
+      }
     }
     return '';
   }

@@ -59,14 +59,22 @@ export default class Summary extends Component {
           </Col>
           <Col span={12}>
             <Col span={8} className="summary-label">
+              <label>Marital Status: </label>
+            </Col>
+            <Col span={16}>
+              <span>{props.marital_status}</span>
+            </Col>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <Col span={8} className="summary-label">
               <label>Education: </label>
             </Col>
             <Col span={16}>
               <span>{props.education}</span>
             </Col>
           </Col>
-        </Row>
-        <Row>
           <Col span={12}>
             <Col span={8} className="summary-label">
               <label>University: </label>
@@ -75,6 +83,8 @@ export default class Summary extends Component {
               <span>{props.school}</span>
             </Col>
           </Col>
+        </Row>
+        <Row>
           <Col span={12}>
             <Col span={8} className="summary-label">
               <label>Position: </label>
@@ -83,19 +93,9 @@ export default class Summary extends Component {
               <span>{props.position}</span>
             </Col>
           </Col>
-        </Row>
-        <Row>
           <Col span={12}>
             <Col span={8} className="summary-label">
               <label>Company: </label>
-            </Col>
-            <Col span={16}>
-              <span>{props.name}</span>
-            </Col>
-          </Col>
-          <Col span={12}>
-            <Col span={8} className="summary-label">
-              <label>Gender: </label>
             </Col>
             <Col span={16}>
               <span>{props.company}</span>

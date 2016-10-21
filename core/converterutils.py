@@ -239,7 +239,7 @@ class FileProcesser():
             self.yamlinfo["filename"] = self.base.base
             self.yamlinfo['id'] = self.name.base
             utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)
-            logger.info('Success')
+            logger.info(' '.join([self.base.base, self.name.base, 'Success']))
             self.resultcode = 0
             return True
         else:

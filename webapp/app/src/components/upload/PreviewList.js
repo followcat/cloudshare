@@ -5,6 +5,7 @@ import { Button, Icon } from 'antd';
 
 import Preview from './Preview';
 import ResumeTitle from './ResumeTitle';
+import Summary from './Summary';
 
 import './previewlist.less';
 
@@ -42,6 +43,7 @@ export default class PreviewList extends Component {
           return (
             <div key={index} className={this.isActive(index)}>
               <ResumeTitle {...resumeProps}/>
+              <Summary dataSource={previewItem.yaml_info}/>
               <Preview markdown={previewItem.markdown} />
             </div>
           );

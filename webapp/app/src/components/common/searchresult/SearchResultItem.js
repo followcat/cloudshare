@@ -57,7 +57,7 @@ export default class SearchResultItem extends Component {
                 checked={props.selection.findIndex(v => v.get('id') === props.yaml_info.id ) > -1 ? true : false}
               />
             </Col>}
-            <Col span={this.props.type === 'default' ? 4 : 3}>
+            <Col span={this.props.type === 'default' ? 4 : 3} className="omit">
               <a
                 href={`/show/${props.cv_id}`}
                 target="_blank"
@@ -66,14 +66,14 @@ export default class SearchResultItem extends Component {
                 {this.renderNameText()}
               </a>
             </Col>
-            <Col span={1}>{props.yaml_info.gender}</Col>
-            <Col span={1}>{props.yaml_info.age}</Col>
-            <Col span={2}>{props.yaml_info.marital_status}</Col>
-            <Col span={3}>{props.yaml_info.education}</Col>
-            <Col span={3}>{props.yaml_info.school}</Col>
-            <Col span={3}>{props.yaml_info.position}</Col>
-            <Col span={4}>{props.yaml_info.company}</Col>
-            <Col span={3}>{props.info.author ? props.info.author : 'null'}, {props.info.time.split(' ')[0].replace(/\-/g, '/')}</Col>
+            <Col span={1} className="omit">{props.yaml_info.gender}</Col>
+            <Col span={1} className="omit">{props.yaml_info.age}</Col>
+            <Col span={2} className="omit">{props.yaml_info.marital_status}</Col>
+            <Col span={3} className="omit">{props.yaml_info.education}</Col>
+            <Col span={3} className="omit" title={props.yaml_info.school}>{props.yaml_info.school}</Col>
+            <Col span={3} className="omit" title={props.yaml_info.position}>{props.yaml_info.position}</Col>
+            <Col span={4} className="omit" title={props.yaml_info.company}>{props.yaml_info.company}</Col>
+            <Col span={3} className="omit">{props.info.author ? props.info.author : 'null'}, {props.info.time.split(' ')[0].replace(/\-/g, '/')}</Col>
           </Row>
         </div>
         <div className="extend-info">

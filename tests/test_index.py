@@ -55,6 +55,9 @@ def topic_words_list(topics, mapping_vec=None):
         weights.append(_weights)
     return words, weights
 
+def mapping_topics(mapping_vec, topics):
+    return [topics[id] for id, score in mapping_vec]
+
 def match_topics(words_list, topics, num=1):
     t_words, t_weights = topic_words_list(topics)
     count = 0

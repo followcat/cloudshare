@@ -1,11 +1,6 @@
-"""
-    To use:
-        cd $CLOUDSHARE_HOME
-        nosetests tests/test_model.py
-"""
-
 import json
 import yaml
+
 
 kgr_file = 'tests/known_good_jd_cv_mapping.yaml'
 with open(kgr_file) as f:

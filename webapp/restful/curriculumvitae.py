@@ -14,11 +14,17 @@ class CurrivulumvitaeAPI(Resource):
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
-    def get(self, id):
-        md = self.svc_mult_cv.getmd(id)
-        yaml = self.svc_mult_cv.getyaml(id)
-        return { 'result': { 'md': md, 'yaml': yaml } }
+    def post(self):
+        args = self.reqparse.parse_args()
+        id = args['id']
+        project = args['project']
+        html = self.svc_mult_cv.getproject(project).gethtml(id)
+        yaml = self.svc_mult_cv.getproject(project).getyaml(id)
+        return { 'code': 200, 'data': { 'html': html, 'yaml_info': yaml } }
 
 
 class CurrivulumvitaeMDAPI(CurrivulumvitaeAPI):

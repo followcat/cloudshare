@@ -333,4 +333,4 @@ def tf_cal(term_freq):
         >>> '%.3f'%(tf_cal(10) - tf_cal(1))
         '0.500'
     """
-    return math.log(math.sqrt(term_freq), 10)
+    return math.log(1.01*math.sqrt(term_freq), 10)

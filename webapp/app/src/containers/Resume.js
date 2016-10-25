@@ -23,11 +23,17 @@ export default class Resume extends Component {
       html: '',
       dataSource: {},
       collected: false,
+      extendInfo: {
+        tag: [],
+        tracking: [],
+        comment: [],
+      },
     };
 
     this.loadData = this.loadData.bind(this);
     this.handleModifyTitle = this.handleModifyTitle.bind(this);
     this.handleCollection = this.handleCollection.bind(this);
+    this.handleSubmitTag = this.handleSubmitTag.bind(this);
   }
 
   /**
@@ -89,6 +95,40 @@ export default class Resume extends Component {
     })
   }
 
+  /**
+   * 增加简历标签事件方法
+   * @param  {[object]} fieldValue [表单数据对象]
+   * @return {[void]}
+   */
+  handleSubmitTag(fieldValue) {
+    let oldTagList = this.state.extendInfo.tag;
+    fetch(`/api/cv/updateinfo`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Basic ${StorageUtil.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: Generator.getPostData({
+        id: this.state.id,
+        update_info: fieldValue,
+      })
+    })
+    .then(response => response.json())
+    .then(json => {
+      if (json.code === 200) {
+        oldTagList.push(json.data);
+        this.setState({
+          extendInfo: {
+            tag: oldTagList
+          },
+        });
+      } else {
+        message.error(json.message);
+      }
+    })
+  }
+
   loadData(id) {
     fetch(`/api/resume`, {
       method: 'POST',
@@ -103,10 +143,16 @@ export default class Resume extends Component {
     .then(response => response.json())
     .then(json => {
       if (json.code === 200) {
+        const yamlInfo = json.data.yaml_info;
         this.setState({
           html: json.data.html,
-          dataSource: json.data.yaml_info,
-          collected: json.data.yaml_info.collected,
+          dataSource: yamlInfo,
+          collected: yamlInfo.collected,
+          extendInfo: {
+            tag: yamlInfo.tag,
+            tracking: yamlInfo.tracking,
+            comment: yamlInfo.comment,
+          },
         });
       }
     })
@@ -114,7 +160,8 @@ export default class Resume extends Component {
 
   componentDidMount() {
     const hrefArr = location.href.split('/'),
-          id = hrefArr[hrefArr.length-1];
+          id = '03owtfzq';
+          // id = hrefArr[hrefArr.length-1];
     this.setState({
       id: id,
     });
@@ -132,6 +179,10 @@ export default class Resume extends Component {
             onModifyTitle={this.handleModifyTitle}
             collected={this.state.collected}
             onCollection={this.handleCollection}
+          />
+          <ResumeExtension
+            dataSource={this.state.extendInfo}
+            onSubmitTag={this.handleSubmitTag}
           />
         </div>
       </div>

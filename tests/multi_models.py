@@ -24,7 +24,7 @@ def build_lsimodel(path, slicer, names=None, texts=None):
         m.save()
     return m
 
-def build_model(jds, name=None):
+def build_model(jds, name=None, path='tests/lsimodel'):
     names = []
     texts = []
     for jd_id in jds:
@@ -35,7 +35,7 @@ def build_model(jds, name=None):
                 continue
             names.append(id)
             texts.append(t)
-    path = 'tests/lsimodel/%s/model'%name
+    path = path + '/%s/model'%name
     model = build_lsimodel(path, services.mining.silencer, names, texts)
     return model
 

@@ -24,6 +24,12 @@ class CurrivulumvitaeAPI(Resource):
         project = args['project']
         html = self.svc_mult_cv.getproject(project).gethtml(id)
         yaml = self.svc_mult_cv.getproject(project).getyaml(id)
+        user = flask.ext.login.current_user
+        result = user.getbookmark()
+        if yaml['id'] in result:
+            yaml['collected'] = True
+        else:
+            yaml['collected'] = False
         return { 'code': 200, 'data': { 'html': html, 'yaml_info': yaml } }
 
 

@@ -3,9 +3,9 @@ import React, { Component, PropTypes } from 'react';
 
 import { Button, Icon } from 'antd';
 
-import Preview from './Preview';
 import ResumeTitle from './ResumeTitle';
-import Summary from './Summary';
+import Summary from '../common/Summary';
+import ResumeContent from '../common/ResumeContent';
 
 import './previewlist.less';
 
@@ -44,7 +44,7 @@ export default class PreviewList extends Component {
             <div key={index} className={this.isActive(index)}>
               <ResumeTitle {...resumeProps}/>
               <Summary dataSource={previewItem.yaml_info}/>
-              <Preview markdown={previewItem.markdown} />
+              <ResumeContent html={previewItem.markdown} />
             </div>
           );
         })}

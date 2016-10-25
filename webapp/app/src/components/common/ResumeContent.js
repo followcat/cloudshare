@@ -14,7 +14,9 @@ export default class ResumeContent extends Component {
 
   render() {
     return (
-      <div id="cv" ref="cv" dangerouslySetInnerHTML={{ __html: this.props.html }}></div>
+      <div className="cv-wrapper">
+        <div id="cv" ref="cv" dangerouslySetInnerHTML={{ __html: this.props.html }}></div>
+      </div>
     );
   }
 }

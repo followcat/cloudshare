@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 
 import { Row, Col, Card } from 'antd';
 
+import './summary.less';
+
 export default class Summary extends Component {
 
   constructor(props) {
@@ -12,12 +14,13 @@ export default class Summary extends Component {
   }
 
   getCompanyNameById(companyList, id) {
+    let name = '';
     for (let i = 0, len = companyList.length; i < len; i++) {
       if (companyList[i].id === id) {
-        return companyList[i].name;
+        name = companyList[i].name;
       }
     }
-    return '';
+    return name;
   }
 
 
@@ -27,9 +30,7 @@ export default class Summary extends Component {
           companyList = props.experience.company ? props.experience.company : [];
 
     return (
-      <Card
-        title="Summary"
-      >
+      <Card style={this.props.style}>
         <Row>
           <Col span={12}>
             <Col span={8} className="summary-label">
@@ -103,25 +104,25 @@ export default class Summary extends Component {
           </Col>
         </Row>
         <Row>
-          <Col span={4} className="summary-label">
+          <Col span={6} className="summary-label">
             <label>Education Experience: </label>
           </Col>
-          <Col span={20}>
-            {props.education_history.map(item => {
+          <Col span={18}>
+            {props.education_history.map((item, index) => {
               return (
-                <div>{item.date_from} - {item.date_to} | {item.education} | {item.major} | {item.school}</div>
+                <div key={index}>{item.date_from} - {item.date_to} | {item.education} | {item.major} | {item.school}</div>
               );
             })}
           </Col>
         </Row>
         <Row>
-          <Col span={4} className="summary-label">
+          <Col span={6} className="summary-label">
             <label>Work Experience: </label>
           </Col>
-          <Col span={20}>
-            {workExperience.map(item => {
+          <Col span={18}>
+            {workExperience.map((item, index) => {
               return (
-                <div>{item.date_from} - {item.date_to} | {item.name} | {this.getCompanyNameById(companyList, item.at_company)} | {item.duration}</div>
+                <div key={index}>{item.date_from} - {item.date_to} | {item.name} | {this.getCompanyNameById(companyList, item.at_company)} | {item.duration}</div>
               );
             })}
           </Col>

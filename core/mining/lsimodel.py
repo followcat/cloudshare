@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import math
 import ujson
 
 from gensim import corpora, models
@@ -104,8 +105,8 @@ class LSImodel(object):
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
-        #self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
-        #                                no_above=self.no_above)
+        self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
+                                        no_above=self.no_above)
 
     def set_corpus(self):
         for text in self.texts:
@@ -189,15 +190,12 @@ class LSImodel(object):
             ... ]
             >>> assert match_topics(m_topics, topics, 2)
         """
-        import math
-        lf = lambda i: math.log(math.sqrt(i), 10)
-        gf = lambda doc_freq, totaldocs: math.log(totaldocs/doc_freq, 2)
-        self.tfidf = models.TfidfModel(self.corpus, wlocal=lf)
+        self.tfidf = models.TfidfModel(self.corpus, wlocal=tf_cal)
         self.corpus_tfidf = self.tfidf[self.corpus]
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=6, extra_samples=0)
+                                   num_topics=self.topics, power_iters=6, extra_samples=300)
 
     def probability(self, doc):
         u"""
@@ -325,3 +323,14 @@ class LSImodel(object):
     @texts.setter
     def texts(self, value):
         self._texts = value
+
+
+def tf_cal(term_freq):
+    """
+        >>> from core.mining.lsimodel import *
+        >>> '%.3f'%(tf_cal(30) - tf_cal(10))
+        '0.239'
+        >>> '%.3f'%(tf_cal(10) - tf_cal(1))
+        '0.500'
+    """
+    return math.log(math.sqrt(term_freq), 10)

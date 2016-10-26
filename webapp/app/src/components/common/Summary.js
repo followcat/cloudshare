@@ -1,5 +1,5 @@
 'usr strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Row, Col, Card } from 'antd';
 
@@ -25,9 +25,16 @@ export default class Summary extends Component {
 
 
   render() {
-    const props = this.props.dataSource,
-          workExperience = props.experience.position ? props.experience.position : [],
-          companyList = props.experience.company ? props.experience.company : [];
+    const props = this.props.dataSource;
+
+    let workExperience = [],
+        companyList = [],
+        educationExperience = props.education_history ? props.education_history : [];
+
+    if (props.experience) {
+      workExperience = props.experience.hasOwnProperty('position') ? props.experience.position : [],
+      companyList = props.experience.hasOwnProperty('company') ? props.experience.company : [];
+    }
 
     return (
       <Card style={this.props.style}>
@@ -108,7 +115,7 @@ export default class Summary extends Component {
             <label>Education Experience: </label>
           </Col>
           <Col span={18}>
-            {props.education_history.map((item, index) => {
+            {educationExperience.map((item, index) => {
               return (
                 <div key={index}>{item.date_from} - {item.date_to} | {item.education} | {item.major} | {item.school}</div>
               );
@@ -131,3 +138,46 @@ export default class Summary extends Component {
     );
   }
 }
+
+Summary.propTypes = {
+  style: PropTypes.object,
+  dataSource: PropTypes.shape({
+    name: PropTypes.string,
+    gender: PropTypes.string,
+    age: PropTypes.string,
+    marital_status: PropTypes.string,
+    education: PropTypes.string,
+    school: PropTypes.string,
+    position: PropTypes.string,
+    company: PropTypes.string,
+    experience: PropTypes.shape({
+      position: PropTypes.arrayOf(
+        PropTypes.shape({
+          at_company: PropTypes.number,
+          date_from: PropTypes.string,
+          date_to: PropTypes.string,
+          duration: PropTypes.string,
+          name: PropTypes.string,
+        })
+      ),
+      company: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number,
+          date_from: PropTypes.string,
+          date_to: PropTypes.string,
+          duration: PropTypes.string,
+          name: PropTypes.string,
+        })
+      ),
+    }),
+    education_history: PropTypes.arrayOf(
+      PropTypes.shape({
+        date_from: PropTypes.string,
+        date_to: PropTypes.string,
+        education: PropTypes.string,
+        major: PropTypes.string,
+        school: PropTypes.string,
+      })
+    )
+  })
+};

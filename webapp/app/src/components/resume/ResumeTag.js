@@ -36,7 +36,7 @@ class ResumeTag extends Component {
         title="Tag"
       >
         {this.props.dataSource.map((item, index) => {
-          return (<Tag key={index} color="blue">{item.content}</Tag>)
+          return (<Tag key={index} color="blue" size="small">{item.content}</Tag>)
         })}
         <a
           style={{ display: 'block' }}

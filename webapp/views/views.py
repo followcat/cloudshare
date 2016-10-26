@@ -219,3 +219,10 @@ class SearchResult(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         return flask.render_template('result.html')
+
+#Render resume page of RESTful
+class Resume(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self, id):
+        return flask.render_template('resume.html')

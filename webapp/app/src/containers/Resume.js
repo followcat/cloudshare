@@ -256,8 +256,7 @@ export default class Resume extends Component {
 
   componentDidMount() {
     const hrefArr = location.href.split('/'),
-          id = '03owtfzq';
-          // id = hrefArr[hrefArr.length-1];
+          id = hrefArr[hrefArr.length-1];
     this.setState({
       id: id,
     });

@@ -4,7 +4,7 @@ import re
 from extractor.utils_parsing import *
 
 
-with_prefix = lambda x: u'^'+ASP+u'*'+PREFIX+ASP+u'*'+ x.pattern[1:]
+with_prefix = lambda x: u'^'+ASP+u'*'+PREFIX+u'+'+ASP+u'*'+ x.pattern[1:]
 
 # We check for braket to avoid catching title 教育/培训/学术/科研/院校
 ED = re.compile(ur'^'+ASP+u'*(?P<br>'+UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'*目)|((工'+ASP+u'*作'+ASP+u'*)|(实习)|(工作(与)?实践)))'+ASP+u'*经'+ASP+u'*[历验])|(实习与实践)|(背景)|(培训)|(语言((能力)|(技能)))|(所获奖项)|(校内职务)|(学生实践经验)|(技能证书)|(接受培训)|(社会经验))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
@@ -36,9 +36,9 @@ RVHDCTLMA = re.compile(u'^'+CONTEXT+u'?'+ SEPLIST.join(reversed(CTL))+ASP+u'*\n+
 PFXHDCTLMA = re.compile(with_prefix(HDCTLMA), re.M)
 PFXRVHDCTLMA = re.compile(with_prefix(RVHDCTLMA), re.M)
 
-NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
+NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
 SENSEDROP = u'((\S+)[\n'+SP+SENTENCESEP+u']*)?'
-RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'?'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+SENTENCESEP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u''+EDUCATION+u'[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u'$', re.M)
+RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+SENTENCESEP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u''+EDUCATION+u'[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u'$', re.M)
 
 TABHDRMAJ = u'^'+ASP+u'*时'+ASP+u'*间段?'+ASP+u'+[院学]'+ASP+u'*校('+ASP+u'*名'+ASP+u'*称)?'+ASP+u'+专'+ASP+u'*业'+ASP+u'+(获得证书/)?学'+ASP+u'*历(/学位)?('+ASP+u'+证'+ASP+u'*书)?('+ASP+u'+是否统招)?(?P<edu>.+)'
 
@@ -209,7 +209,7 @@ def education_xp(text, summary=None):
                 format_output(out, r.groupdict(), summary={'major': ''})
         out = sorted(out, key=lambda x: x['date_from'], reverse=True)
     if not maj and summary:
-        RE = re.compile(u'^'+PREFIX+u'?'+ASP+u'*'+PERIOD+ASP+u'+(?P<school>%s)' %
+        RE = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'+(?P<school>%s)' %
                 summary['school'].replace('(', '\(').replace(')', '\)').strip()+ASP+u'+(?P<major>%s)' % summary['major'].strip(), re.M)
         if RE.search(text):
             out = []

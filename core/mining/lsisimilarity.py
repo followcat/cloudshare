@@ -166,9 +166,11 @@ class LSIsimilarity(object):
         """
         results = []
         vec_lsi = self.lsi_model.probability(doc)
-        if self.index is not None:
+        try:
             sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
-            results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims)
+        except IndexError:
+            return results
+        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims)
         return results
 
     def probability_by_id(self, doc, id):

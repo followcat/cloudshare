@@ -8,6 +8,43 @@ import extractor.utils_parsing
 import extractor.extract_experience
 
 
+info_template = (
+    ("id",                  str),
+    ("name",                str),
+    ("filename",            str),
+    ("committer",           str),
+    ("date",                int),
+    ("origin",              str),
+    ("originid",            str),
+    ("phone",               str),
+    ("email",               str),
+    ("expectation",         dict),
+    ("current",             dict),
+    ("gender",              str),
+    ("marital_status",      str),
+    ("age",                 str),
+    ("birthdate",           str),
+    ("education_history",   dict),
+    ("education",           dict),
+    ("school",              str),
+    ("company",             str),
+    ("position",            str),
+    ("experience",          dict),
+    ("comment",             list),
+    ("tag",                 list),
+    ("tracking",            list),
+)
+
+
+def generate_info_template(template=None):
+    if template is None:
+        template = info_template
+    info = {}
+    for each in template:
+        info[each[0]] = each[1]()
+    return info
+
+
 def get_tagfromstring(tag, stream, rule=None):
     u"""
         >>> get_tagfromstring(u'姓名', u'姓名:followcat ')
@@ -224,3 +261,10 @@ def catch_selected(stream, selected, name=None):
         experience = get_experience(stream, name)
         info_dict["classify"] = get_classify(experience)
     return info_dict
+
+
+def catch_info(stream, name=None):
+    info = generate_info_template()
+    catchinfo = catch(stream)
+    info.update(catchinfo)
+    return info

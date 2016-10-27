@@ -42,39 +42,12 @@ class FileProcesser():
 
     converter = None
 
-    yaml_template = (
-        ("id",                  ''),
-        ("name",                ''),
-        ("filename",            ''),
-        ("committer",           ''),
-        ("date",                0),
-        ("origin",              ''),
-        ("originid",            ''),
-        ("phone",               ''),
-        ("email",               ''),
-        ("expectation",         {}),
-        ("current",             {}),
-        ("gender",              ''),
-        ("marital_status",      ''),
-        ("age",                 ''),
-        ("birthdate",           ''),
-        ("education_history",   {}),
-        ("education",           {}),
-        ("school",              ''),
-        ("company",             ''),
-        ("position",            ''),
-        ("experience",          {}),
-        ("comment",             []),
-        ("tag",                 []),
-        ("tracking",            []),
-    )
-
     def __init__(self, fileobj, name, output_base):
         if self.converter is None:
             self.__class__.converter = utils.unoconverter.DocumentConverter()
 
-        self.yamlinfo = {}
-        self.markdown_stream = ''
+        self.yamlinfo = dict()
+        self.markdown_stream = str()
 
         self.base = core.outputstorage.ConvertName(name)
         self.name = self.base.random
@@ -96,12 +69,6 @@ class FileProcesser():
 
         self.resultcode = None
         self.result = self.convert()
-
-    def generate_yaml_template(self):
-        yamlinfo = {}
-        for each in self.yaml_template:
-            yamlinfo[each[0]] = each[1]
-        return yamlinfo
 
     def mimetype(self):
         mimetype = mimetypes.guess_type(os.path.join(
@@ -169,7 +136,7 @@ class FileProcesser():
         e.write(position, encoding='utf-8')
 
     def file_docbook_to_markdown(self):
-        self.markdown_stream = ''
+        self.markdown_stream = str()
         input_file = os.path.join(self.docbook_path, self.name.xml)
         output_file = os.path.join(self.markdown_path, self.name.md)
         try:
@@ -232,10 +199,8 @@ class FileProcesser():
                 return False
             self.remove_note()
             self.file_docbook_to_markdown()
-            self.yamlinfo = self.generate_yaml_template()
-            catchinfo = extractor.information_explorer.catch(
-                        self.markdown_stream.decode('utf8'))
-            self.yamlinfo.update(catchinfo)
+            self.yamlinfo = extractor.information_explorer.catch_info(
+                            self.markdown_stream.decode('utf8'))
             self.yamlinfo["filename"] = self.base.base
             self.yamlinfo['id'] = self.name.base
             utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)

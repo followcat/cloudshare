@@ -42,10 +42,11 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
-                self.svc_mult_cv.add(cvobj, user.id, project_name, unique=True)
-                names.append(cvobj.name.md)
-                documents.append(cvobj.markdown())
-                status = 'success'
+                result = self.svc_mult_cv.add(cvobj, user.id, project_name, unique=True)
+                if result is True:
+                    names.append(cvobj.name.md)
+                    documents.append(cvobj.markdown())
+                    status = 'success'
             results.append({ 'id': id,
                              'status': status,
                              'filename': item['filename'] })

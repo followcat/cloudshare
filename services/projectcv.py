@@ -16,10 +16,10 @@ class ProjectCV(services.simulationcv.SimulationCV):
     YAML_DIR = "CV"
 
     YAML_TEMPLATE = (
-        ("committer",           []),
-        ("comment",             []),
-        ("tag",                 []),
-        ("tracking",            []),
+        ("committer",           list),
+        ("comment",             list),
+        ("tag",                 list),
+        ("tracking",            list),
     )
 
     def __init__(self, interface, repo, name):
@@ -68,7 +68,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def generate_info_template(self):
         info = {}
         for each in self.YAML_TEMPLATE:
-            info[each[0]] = each[1]
+            info[each[0]] = each[1]()
         return info
 
     def getmd_en(self, id):

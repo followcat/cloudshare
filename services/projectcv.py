@@ -16,10 +16,10 @@ class ProjectCV(services.simulationcv.SimulationCV):
     YAML_DIR = "CV"
 
     YAML_TEMPLATE = (
-        ("committer",           list()),
-        ("comment",             list()),
-        ("tag",                 list()),
-        ("tracking",            list()),
+        ("committer",           list),
+        ("comment",             list),
+        ("tag",                 list),
+        ("tracking",            list),
     )
 
     def __init__(self, interface, repo, name):

@@ -42,33 +42,6 @@ class FileProcesser():
 
     converter = None
 
-    yaml_template = (
-        ("id",                  str),
-        ("name",                str),
-        ("filename",            str),
-        ("committer",           str),
-        ("date",                int),
-        ("origin",              str),
-        ("originid",            str),
-        ("phone",               str),
-        ("email",               str),
-        ("expectation",         dict),
-        ("current",             dict),
-        ("gender",              str),
-        ("marital_status",      str),
-        ("age",                 str),
-        ("birthdate",           str),
-        ("education_history",   dict),
-        ("education",           dict),
-        ("school",              str),
-        ("company",             str),
-        ("position",            str),
-        ("experience",          dict),
-        ("comment",             list),
-        ("tag",                 list),
-        ("tracking",            list),
-    )
-
     def __init__(self, fileobj, name, output_base):
         if self.converter is None:
             self.__class__.converter = utils.unoconverter.DocumentConverter()
@@ -96,12 +69,6 @@ class FileProcesser():
 
         self.resultcode = None
         self.result = self.convert()
-
-    def generate_yaml_template(self):
-        yamlinfo = {}
-        for each in self.yaml_template:
-            yamlinfo[each[0]] = each[1]()
-        return yamlinfo
 
     def mimetype(self):
         mimetype = mimetypes.guess_type(os.path.join(
@@ -232,10 +199,8 @@ class FileProcesser():
                 return False
             self.remove_note()
             self.file_docbook_to_markdown()
-            self.yamlinfo = self.generate_yaml_template()
-            catchinfo = extractor.information_explorer.catch(
-                        self.markdown_stream.decode('utf8'))
-            self.yamlinfo.update(catchinfo)
+            self.yamlinfo = extractor.information_explorer.catch_info(
+                            self.markdown_stream.decode('utf8'))
             self.yamlinfo["filename"] = self.base.base
             self.yamlinfo['id'] = self.name.base
             utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)

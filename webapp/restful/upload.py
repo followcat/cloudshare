@@ -36,6 +36,7 @@ class UploadCVAPI(Resource):
         for item in updates:
             id = ''
             status = 'fail'
+            message = 'The contact information is existend.'
             cvobj = upload[user.id].pop(item['filename'])
             if cvobj is not None:
                 id = cvobj.metadata['id']
@@ -47,10 +48,12 @@ class UploadCVAPI(Resource):
                     names.append(cvobj.name.md)
                     documents.append(cvobj.markdown())
                     status = 'success'
+                    message = 'Upload success.'
             results.append({ 'id': id,
                              'status': status,
+                             'message': message,
                              'filename': item['filename'] })
-        self.svc_min.sim[def_cv_name][def_cv_name].add_documents(names, documents)
+        self.svc_min.sim[project_name][project_name].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):
@@ -58,8 +61,8 @@ class UploadCVAPI(Resource):
         if user.id not in upload:
             upload[user.id] = dict()
         network_file = flask.request.files['files']
-        filename = network_file.filename.encode('utf-8')
-        filepro = core.converterutils.FileProcesser(network_file, filename,
+        filename = network_file.filename
+        filepro = core.converterutils.FileProcesser(network_file, filename.encode('utf-8'),
                                                     flask.current_app.config['UPLOAD_TEMP'])
         cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
                                                                filepro.markdown_stream,
@@ -68,7 +71,6 @@ class UploadCVAPI(Resource):
         name = ''
         if filepro.result is True:
             if not cvobj.metadata['name']:
-                #u_filename = filename.encode('utf-8')
                 cvobj.metadata['name'] = utils.chsname.name_from_filename(filename)
             name = cvobj.metadata['name']
             upload[user.id][filename] = cvobj
@@ -129,13 +131,13 @@ class UploadCVPreviewAPI(Resource):
     def __init__(self):
         super(UploadCVPreviewAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('filename', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        id = args['id']
-        upobj = upload[user.id][id]
-        md = upobj.preview_markdown()
-        yaml_info = upobj.filepro.yamlinfo
-        return { 'code': 200, 'data': { 'id': id, 'markdown': md, 'yaml_info': yaml_info } }
+        filename = args['filename']
+        cvobj = upload[user.id][filename]
+        md = cvobj.preview_markdown()
+        yaml_info = cvobj.metadata
+        return { 'code': 200, 'data': { 'filename': filename, 'markdown': md, 'yaml_info': yaml_info } }

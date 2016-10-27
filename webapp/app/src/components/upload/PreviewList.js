@@ -31,7 +31,7 @@ export default class PreviewList extends Component {
             length: previewListLength,
             classify: previewItem.yaml_info.classify,
             name: previewItem.name,
-            id: previewItem.id,
+            filename: previewItem.filename,
             onPrevPreview: this.props.onPrevPreview,
             onNextPreview: this.props.onNextPreview,
             onComfirmUpload: this.props.onComfirmUpload,

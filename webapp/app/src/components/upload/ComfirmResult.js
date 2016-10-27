@@ -10,14 +10,17 @@ export default class ComfirmResult extends Component {
         title: 'File Name',
         dataIndex: 'filename',
         key: 'filename',
-      },
-      {
+      }, {
         title: 'Status',
         dataIndex: 'status',
         key: 'status',
         render: (text) => text === 'success' ? <span style={{ color: 'green' }}>{text}</span> : <span style={{ color: 'red' }}>{text}</span>
-      },
-      {
+      }, {
+        title: 'Message',
+        dataIndex: 'message',
+        key: 'message',
+        render: (text) => <span>{text}</span>
+      }, {
         title: 'Operation',
         key: 'operation',
         render: (record) => <a href={`/show/${record.id}.md`} target="_blank" disabled={record.status !== 'success' ? true : false}>Check</a>

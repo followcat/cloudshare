@@ -43,38 +43,38 @@ class FileProcesser():
     converter = None
 
     yaml_template = (
-        ("id",                  ''),
-        ("name",                ''),
-        ("filename",            ''),
-        ("committer",           ''),
-        ("date",                0),
-        ("origin",              ''),
-        ("originid",            ''),
-        ("phone",               ''),
-        ("email",               ''),
-        ("expectation",         {}),
-        ("current",             {}),
-        ("gender",              ''),
-        ("marital_status",      ''),
-        ("age",                 ''),
-        ("birthdate",           ''),
-        ("education_history",   {}),
-        ("education",           {}),
-        ("school",              ''),
-        ("company",             ''),
-        ("position",            ''),
-        ("experience",          {}),
-        ("comment",             []),
-        ("tag",                 []),
-        ("tracking",            []),
+        ("id",                  str),
+        ("name",                str),
+        ("filename",            str),
+        ("committer",           str),
+        ("date",                int),
+        ("origin",              str),
+        ("originid",            str),
+        ("phone",               str),
+        ("email",               str),
+        ("expectation",         dict),
+        ("current",             dict),
+        ("gender",              str),
+        ("marital_status",      str),
+        ("age",                 str),
+        ("birthdate",           str),
+        ("education_history",   dict),
+        ("education",           dict),
+        ("school",              str),
+        ("company",             str),
+        ("position",            str),
+        ("experience",          dict),
+        ("comment",             list),
+        ("tag",                 list),
+        ("tracking",            list),
     )
 
     def __init__(self, fileobj, name, output_base):
         if self.converter is None:
             self.__class__.converter = utils.unoconverter.DocumentConverter()
 
-        self.yamlinfo = {}
-        self.markdown_stream = ''
+        self.yamlinfo = dict()
+        self.markdown_stream = str()
 
         self.base = core.outputstorage.ConvertName(name)
         self.name = self.base.random
@@ -100,7 +100,7 @@ class FileProcesser():
     def generate_yaml_template(self):
         yamlinfo = {}
         for each in self.yaml_template:
-            yamlinfo[each[0]] = each[1]
+            yamlinfo[each[0]] = each[1]()
         return yamlinfo
 
     def mimetype(self):
@@ -169,7 +169,7 @@ class FileProcesser():
         e.write(position, encoding='utf-8')
 
     def file_docbook_to_markdown(self):
-        self.markdown_stream = ''
+        self.markdown_stream = str()
         input_file = os.path.join(self.docbook_path, self.name.xml)
         output_file = os.path.join(self.markdown_path, self.name.md)
         try:

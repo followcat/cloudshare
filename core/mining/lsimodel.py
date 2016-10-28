@@ -189,13 +189,32 @@ class LSImodel(object):
             ...     [u'microsoft', u'visual', u'it'],
             ... ]
             >>> assert match_topics(m_topics, topics, 2)
+
+        test on uav classify model
+            >>> cvs = datas['UAV']
+            >>> jds = ['UAV']
+            >>> model = build_model(jds, name='mixed', path='tests/lsimodel_words')
+            >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
+            >>> uav_topic1 = [u'飞行', u'频段', u'航拍']
+            >>> uav_topic2 = [u'解算', u'航姿']
+            >>> uav_topic1_index = match_topic_index(uav_topic1, topics)
+            >>> uav_topic2_index = match_topic_index(uav_topic2, topics)
+            >>> match_cvs = ['2471572', '6gja28pi', '1587957595', '10978947', '1565799600', '2471572', '4782048', '5223250', '5346432', '6730128', '6gja28pi', 'c16q7ylp', 'ryzvspix']
+            >>> for cv in cvs:
+            ...     cv_doc = get_cv_md(cv)
+            ...     vec_cv = model.probability(cv_doc)
+            ...     cv_mapping_vec = sorted(vec_cv, key=lambda item: abs(item[1]), reverse=True)
+            ...     cv_match_topics = [item[0] for item in cv_mapping_vec]
+            ...     if cv_match_topics.index(0) == 0:
+            ...         if (uav_topic1_index != -1 and cv_match_topics.index(uav_topic1_index) < 2):
+            ...             (cv, cv in match_cvs)
         """
         self.tfidf = models.TfidfModel(self.corpus, wlocal=tf_cal)
         self.corpus_tfidf = self.tfidf[self.corpus]
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=6, extra_samples=300)
+                                   num_topics=self.topics, power_iters=6, extra_samples=0)
 
     def probability(self, doc):
         u"""

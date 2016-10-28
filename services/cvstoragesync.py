@@ -74,4 +74,6 @@ class CVStorageSync(object):
         for key in catchinfo:
             if catchinfo[key] or (selected is not None and key in selected):
                 obj[key] = catchinfo[key]
+            elif key not in obj:
+                obj[key] = catchinfo[key]
         return obj

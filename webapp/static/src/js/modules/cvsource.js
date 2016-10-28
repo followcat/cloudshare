@@ -38,6 +38,13 @@ require([
   "bootstrap",
 ],function($, cvdeal, datetimepicker, Upload, ColorGrad, History) {
 
+  $("#enCV").click(function() {
+    var id = $(this).attr("data-id"),
+        project = localStorage._pj;
+    var newHref = "/showeng/" + project + "/" + id;
+    location.href = newHref;
+  });
+
   cvdeal.cvDeal("cvContent", function() {
     $("#loading").css("display", "none");
   });

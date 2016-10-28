@@ -104,7 +104,7 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/showeng/<path:id>',
+        '/showeng/<path:project>/<path:id>',
         view_func=webapp.views.views.ShowEnglish.as_view('showenglish'),
         )
 

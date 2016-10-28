@@ -58,6 +58,13 @@ def topic_words_list(topics, mapping_vec=None):
 def mapping_topics(mapping_vec, topics):
     return [topics[id] for id, score in mapping_vec]
 
+def match_topic_index(words, topics):
+    t_words, t_weights = topic_words_list(topics)
+    for index, ws in enumerate(t_words):
+        if set(words).issubset(set(ws)):
+            return index
+    return -1
+
 def match_topics(words_list, topics, num=1):
     t_words, t_weights = topic_words_list(topics)
     count = 0

@@ -13,6 +13,7 @@ import services.jobdescription
 
 class ProjectCV(services.simulationcv.SimulationCV):
 
+    config_file = 'config.yaml'
     YAML_DIR = "CV"
 
     YAML_TEMPLATE = (
@@ -30,10 +31,21 @@ class ProjectCV(services.simulationcv.SimulationCV):
         self.cvpath = os.path.join(self.path, self.YAML_DIR)
         self.company = services.company.Company(interface)
         self.jobdescription = services.jobdescription.JobDescription(interface)
+        self.config = dict()
         try:
             self.load()
         except IOError:
             pass
+
+    def load(self):
+        self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
+        self.config = utils.builtin.load_yaml(self.path, self.config_file)
+
+    def save(self):
+        utils.builtin.save_yaml(self.config, self.path, self.config_file,
+                                default_flow_style=False)
+        utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
+                                indent=4)
 
     def setup(self, classify, committer=None):
         if not os.path.exists(self.cvpath):
@@ -44,9 +56,6 @@ class ProjectCV(services.simulationcv.SimulationCV):
             os.makedirs(self.cvpath)
         self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
         self.save()
-        self.interface.add_files([bytes(self.config_file), bytes(self.ids_file)],
-                                  message='Create new project %s.'%self.name,
-                                  committer=committer)
 
     def add(self, id, committer):
         result = False

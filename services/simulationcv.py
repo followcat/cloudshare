@@ -6,33 +6,22 @@ import core.outputstorage
 
 class SimulationCV(object):
 
-    config_file = 'config.yaml'
     ids_file = 'names.json'
 
     def __init__(self, name, path, cvstorage):
         self.name = name
         self.path = os.path.join(path, name)
         self.cvids = set()
-        self.config = dict()
         self.cvstorage = cvstorage
         try:
             self.load()
         except IOError:
             pass
 
-    def setup(self):
-        pass
-
-    def update(self):
-        pass
-
     def load(self):
-        self.config = utils.builtin.load_yaml(self.path, self.config_file)
         self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
 
     def save(self):
-        utils.builtin.save_yaml(self.config, self.path, self.config_file,
-                                default_flow_style=False)
         utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
                                 indent=4)
 

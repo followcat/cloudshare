@@ -12,19 +12,18 @@ class ClassifyCV(services.simulationcv.SimulationCV):
 
     def __init__(self, name, path, cvstorage):
         classifypath = utils.builtin.industrytopath(name)
-        super(ClassifyCV, self).__init__(classifypath, path, cvstorage)
+        super(ClassifyCV, self).__init__(os.path.join(path, classifypath), cvstorage)
         self.name = name
         self.config = dict()
 
     def load(self):
-        self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
         self.config = utils.builtin.load_yaml(self.path, self.config_file)
+        super(ClassifyCV, self).load()
 
     def save(self):
         utils.builtin.save_yaml(self.config, self.path, self.config_file,
                                 default_flow_style=False)
-        utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
-                                indent=4)
+        super(ClassifyCV, self).save()
 
     def setup(self, update=True):
         if not os.path.exists(self.path):

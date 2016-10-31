@@ -1,7 +1,5 @@
 import os
-import time
 
-import utils.issue
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
@@ -14,15 +12,13 @@ import services.jobdescription
 class ProjectCV(services.simulationcv.SimulationCV):
 
     config_file = 'config.yaml'
-    YAML_DIR = "CV"
 
     def __init__(self, interface, repo, name):
-        super(ProjectCV, self).__init__(self.YAML_DIR, interface.path, repo)
+        super(ProjectCV, self).__init__(interface.path, repo, interface)
         self.name = name
         self.interface = interface
         self.repo = repo
         self.path = interface.path
-        self.cvpath = os.path.join(self.path, self.YAML_DIR)
         self.company = services.company.Company(interface)
         self.jobdescription = services.jobdescription.JobDescription(interface)
         self.config = dict()
@@ -32,117 +28,32 @@ class ProjectCV(services.simulationcv.SimulationCV):
             pass
 
     def load(self):
-        self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
         self.config = utils.builtin.load_yaml(self.path, self.config_file)
+        super(ProjectCV, self).load()
 
     def save(self):
         utils.builtin.save_yaml(self.config, self.path, self.config_file,
                                 default_flow_style=False)
-        utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
-                                indent=4)
+        super(ProjectCV, self).save()
 
     def setup(self, classify, committer=None):
-        if not os.path.exists(self.cvpath):
+        if not os.path.exists(self.path):
             self.update(classify, committer)
 
     def update(self, classify, committer=None):
-        if not os.path.exists(self.cvpath):
-            os.makedirs(self.cvpath)
         self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
         self.save()
 
     def add(self, id, committer):
-        result = False
-        if not self.exists(id):
-            self._add(id)
-            info = self.generate_info_template()
-            info['committer'] = committer
-            name = core.outputstorage.ConvertName(id).yaml
-            utils.builtin.save_yaml(info, self.cvpath, name)
-            utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
-                                    indent=4)
-            self.interface.add_files([bytes(self.ids_file),
-                                      bytes(os.path.join(self.YAML_DIR, name))],
-                                      message='Add new cv %s.'%id,
-                                      committer=committer)
-            result = True
-        return result
+        return super(ProjectCV, self).add(id, committer, yamlfile=True)
 
     def getmd_en(self, id):
         yamlinfo = self.getyaml(id)
         veren = yamlinfo['enversion']
         return self.repo.gethtml(veren)
 
-    def getinfo(self, id):
-        if not self.exists(id):
-            return None
-        name = core.outputstorage.ConvertName(id).yaml
-        return utils.builtin.load_yaml(self.cvpath, name)
-
-    def getyaml(self, id):
-        yaml = super(ProjectCV, self).getyaml(id)
-        if yaml is not None:
-            info = self.getinfo(id)
-            yaml.update(info)
-        return yaml
-
     def getclassify(self):
         return self.config['classify']
-
-    def saveinfo(self, id, info, message, committer):
-        name = core.outputstorage.ConvertName(id).yaml
-        utils.builtin.save_yaml(info, self.cvpath, name)
-        self.interface.add_files([bytes(os.path.join(self.YAML_DIR, name))],
-                                  message=message, committer=committer)
-
-    @utils.issue.fix_issue('issues/update_name.rst')
-    def updateinfo(self, id, key, value, committer):
-        data = None
-        projectinfo = self.getinfo(id)
-        baseinfo = self.getyaml(id)
-        if projectinfo is not None and (key in projectinfo or key in baseinfo):
-            data = { key: value }
-            if key == 'tag':
-                data = self.addtag(id, value, committer)
-            elif key == 'tracking':
-                data = self.addtracking(id, value, committer)
-            elif key == 'comment':
-                data = self.addcomment(id, value, committer)
-            else:
-                projectinfo[key] = value
-                self.saveinfo(id, projectinfo,
-                              'Update %s key %s.' % (id, key), committer)
-        return data
-
-    def _infoframe(self, value, username):
-        data = {'author': username,
-                'content': value,
-                'date': time.strftime('%Y-%m-%d %H:%M:%S')}
-        return data
-
-    def addtag(self, id, tag, committer):
-        assert self.exists(id)
-        info = self.getinfo(id)
-        data = self._infoframe(tag, committer)
-        info['tag'].insert(0, data)
-        self.saveinfo(id, info, 'Add %s tag.'%id, committer)
-        return data
-
-    def addcomment(self, id, comment, committer):
-        assert self.exists(id)
-        info = self.getinfo(id)
-        data = self._infoframe(comment, committer)
-        info['comment'].insert(0, data)
-        self.saveinfo(id, info, 'Add %s comment.'%id, committer)
-        return data
-
-    def addtracking(self, id, tracking, committer):
-        assert self.exists(id)
-        info = self.getinfo(id)
-        data = self._infoframe(tracking, committer)
-        info['tracking'].insert(0, data)
-        self.saveinfo(id, info, 'Add %s tracking.'%id, committer)
-        return data
 
     def search(self, keyword):
         results = set()

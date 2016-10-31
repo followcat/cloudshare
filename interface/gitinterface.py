@@ -78,7 +78,7 @@ class GitInterface(interface.base.Interface):
         commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
         return commit_id
 
-    def add_files(self, filenames, message=None, committer=None):
+    def add_files(self, filenames, filedatas, message=None, committer=None):
         """
             >>> import shutil
             >>> import interface.gitinterface
@@ -92,7 +92,15 @@ class GitInterface(interface.base.Interface):
             True
             >>> shutil.rmtree(repo_name)
         """
-        self.repo.stage(filenames)
+        assert len(filenames) == len(filedatas)
+        for filename, filedata in zip(filenames, filedatas):
+            full_path = os.path.join(self.path, filename)
+            path, name = os.path.split(full_path)
+            if not os.path.exists(path):
+                os.makedirs(path)
+            with open(full_path, 'w') as fp:
+                fp.write(filedata)
+            self.repo.stage(filename)
         committer = self.committer(committer)
         if message is None:
             message = ""

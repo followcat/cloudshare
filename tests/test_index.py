@@ -74,3 +74,9 @@ def match_topics(words_list, topics, num=1):
                 count += 1
                 break
     return count >= num
+
+def doc_match_topic(doc, model, match_topic, match_range=2):
+    vec = model.probability(doc)
+    mapping_vec = sorted(vec, key=lambda item: abs(item[1]), reverse=True)
+    match_topics = [item[0] for item in mapping_vec]
+    return match_topics.index(match_topic) < match_range

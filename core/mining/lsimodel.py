@@ -199,15 +199,9 @@ class LSImodel(object):
             >>> uav_topic2 = [u'解算', u'航姿']
             >>> uav_topic1_index = match_topic_index(uav_topic1, topics)
             >>> uav_topic2_index = match_topic_index(uav_topic2, topics)
-            >>> match_cvs = ['2471572', '6gja28pi', '1587957595', '10978947', '1565799600', '2471572', '4782048', '5223250', '5346432', '6730128', '6gja28pi', 'c16q7ylp', 'ryzvspix']
-            >>> for cv in cvs:
-            ...     cv_doc = get_cv_md(cv)
-            ...     vec_cv = model.probability(cv_doc)
-            ...     cv_mapping_vec = sorted(vec_cv, key=lambda item: abs(item[1]), reverse=True)
-            ...     cv_match_topics = [item[0] for item in cv_mapping_vec]
-            ...     if cv_match_topics.index(0) == 0:
-            ...         if (uav_topic1_index != -1 and cv_match_topics.index(uav_topic1_index) < 2):
-            ...             (cv, cv in match_cvs)
+            >>> assert doc_match_topic(get_cv_md('2471572'), model, uav_topic2_index, match_range=2)
+            >>> assert doc_match_topic(get_cv_md('6gja28pi'), model, uav_topic2_index, match_range=2)
+            >>> assert doc_match_topic(get_cv_md('1587957595'), model, uav_topic1_index, match_range=2)
         """
         self.tfidf = models.TfidfModel(self.corpus, wlocal=tf_cal)
         self.corpus_tfidf = self.tfidf[self.corpus]

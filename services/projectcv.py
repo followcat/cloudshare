@@ -16,15 +16,9 @@ class ProjectCV(services.simulationcv.SimulationCV):
     config_file = 'config.yaml'
     YAML_DIR = "CV"
 
-    YAML_TEMPLATE = (
-        ("committer",           list),
-        ("comment",             list),
-        ("tag",                 list),
-        ("tracking",            list),
-    )
-
     def __init__(self, interface, repo, name):
-        super(ProjectCV, self).__init__(name, interface.path, repo)
+        super(ProjectCV, self).__init__(self.YAML_DIR, interface.path, repo)
+        self.name = name
         self.interface = interface
         self.repo = repo
         self.path = interface.path
@@ -73,12 +67,6 @@ class ProjectCV(services.simulationcv.SimulationCV):
                                       committer=committer)
             result = True
         return result
-
-    def generate_info_template(self):
-        info = {}
-        for each in self.YAML_TEMPLATE:
-            info[each[0]] = each[1]()
-        return info
 
     def getmd_en(self, id):
         yamlinfo = self.getyaml(id)

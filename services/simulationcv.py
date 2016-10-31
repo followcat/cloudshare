@@ -8,9 +8,15 @@ class SimulationCV(object):
 
     ids_file = 'names.json'
 
-    def __init__(self, name, path, cvstorage):
-        self.name = name
-        self.path = os.path.join(path, name)
+    YAML_TEMPLATE = (
+        ("committer",           list),
+        ("comment",             list),
+        ("tag",                 list),
+        ("tracking",            list),
+    )
+
+    def __init__(self, savedir, path, cvstorage):
+        self.path = os.path.join(path, savedir)
         self.cvids = set()
         self.cvstorage = cvstorage
         try:
@@ -24,6 +30,12 @@ class SimulationCV(object):
     def save(self):
         utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
                                 indent=4)
+
+    def generate_info_template(self):
+        info = {}
+        for each in self.YAML_TEMPLATE:
+            info[each[0]] = each[1]()
+        return info
 
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base

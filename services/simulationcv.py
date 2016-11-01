@@ -80,6 +80,23 @@ class SimulationCV(object):
         id = core.outputstorage.ConvertName(name).base
         self.cvids.add(id)
 
+    def search(self, keyword):
+        results = set()
+        allfile = self.cvstorage.search(keyword)
+        for filename in allfile:
+            id = core.outputstorage.ConvertName(filename).base
+            if id in self.cvids:
+                results.add(id)
+        return results
+
+    def search_yaml(self, keyword):
+        results = set()
+        allfile = self.interface.grep(keyword, self.YAML_DIR)
+        for filename in allfile:
+            id = core.outputstorage.ConvertName(filename).base
+            results.add(id)
+        return results
+
     def yamls(self):
         for id in self.cvids:
             yield core.outputstorage.ConvertName(id).yaml
@@ -92,6 +109,11 @@ class SimulationCV(object):
         if not self.exists(name):
             return None
         return self.cvstorage.getmd(name)
+
+    def getmd_en(self, id):
+        yamlinfo = self.getyaml(id)
+        veren = yamlinfo['enversion']
+        return self.cvstorage.gethtml(veren)
 
     def getinfo(self, id):
         if not self.exists(id):

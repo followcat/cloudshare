@@ -47,30 +47,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def add(self, id, committer):
         return super(ProjectCV, self).add(id, committer, yamlfile=True)
 
-    def getmd_en(self, id):
-        yamlinfo = self.getyaml(id)
-        veren = yamlinfo['enversion']
-        return self.repo.gethtml(veren)
-
     def getclassify(self):
         return self.config['classify']
-
-    def search(self, keyword):
-        results = set()
-        allfile = self.repo.search(keyword)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            if id in self.cvids:
-                results.add(id)
-        return results
-
-    def search_yaml(self, keyword):
-        results = set()
-        allfile = self.interface.grep(keyword, self.YAML_DIR)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            results.add(id)
-        return results
 
     def company_add(self, name, introduction, committer):
         return self.company.add(name, introduction, committer)

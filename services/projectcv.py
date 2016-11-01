@@ -9,16 +9,17 @@ import services.simulationcv
 import services.jobdescription
 
 
-class ProjectCV(services.simulationcv.SimulationCV):
+class ProjectCV(object):
 
     config_file = 'config.yaml'
 
     def __init__(self, interface, repo, name):
-        super(ProjectCV, self).__init__(interface.path, repo, interface)
         self.name = name
         self.interface = interface
         self.repo = repo
         self.path = interface.path
+        self.curriculumvitae = services.simulationcv.SimulationCV(name, interface.path,
+                                                                  repo, interface)
         self.company = services.company.Company(interface)
         self.jobdescription = services.jobdescription.JobDescription(interface)
         self.config = dict()
@@ -29,12 +30,10 @@ class ProjectCV(services.simulationcv.SimulationCV):
 
     def load(self):
         self.config = utils.builtin.load_yaml(self.path, self.config_file)
-        super(ProjectCV, self).load()
 
     def save(self):
         utils.builtin.save_yaml(self.config, self.path, self.config_file,
                                 default_flow_style=False)
-        super(ProjectCV, self).save()
 
     def setup(self, classify, committer=None):
         if not os.path.exists(self.path):
@@ -49,6 +48,45 @@ class ProjectCV(services.simulationcv.SimulationCV):
 
     def getclassify(self):
         return self.config['classify']
+
+    def cv_add(self, id):
+        return self.curriculumvitae.add(id, committer, yamlfile=True)
+
+    def cv_yamls(self):
+        return self.curriculumvitae.yamls()
+
+    def cv_names(self):
+        return self.curriculumvitae.names()
+
+    def cv_datas(self):
+        return self.curriculumvitae.datas()
+
+    def cv_search(self, keyword):
+        return self.curriculumvitae.search(keyword)
+
+    def cv_search_yaml(self, keyword):
+        return self.curriculumvitae.search_yaml(keyword)
+
+    def cv_gethtml(self, id):
+        return self.curriculumvitae.gethtml(id)
+
+    def cv_getmd(self, id):
+        return self.curriculumvitae.getmd(id)
+
+    def cv_getmd_en(self, id):
+        return self.curriculumvitae.getmd_en(id)
+
+    def cv_getyaml(self, id):
+        return self.curriculumvitae.getyaml(id)
+
+    def cv_numbers(self):
+        return self.curriculumvitae.NUMS
+
+    def cv_history(self, author=None, entries=10, skip=0):
+        return self.curriculumvitae.history(author, entries, skip)
+
+    def cv_updateyaml(self, id, key, value, userid):
+        return self.curriculumvitae.updateinfo(id, key, value, userid)
 
     def company_add(self, name, introduction, committer):
         return self.company.add(name, introduction, committer)

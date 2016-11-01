@@ -12,8 +12,7 @@ class ClassifyCV(services.simulationcv.SimulationCV):
 
     def __init__(self, name, path, cvstorage):
         classifypath = utils.builtin.industrytopath(name)
-        super(ClassifyCV, self).__init__(os.path.join(path, classifypath), cvstorage)
-        self.name = name
+        super(ClassifyCV, self).__init__(name, os.path.join(path, classifypath), cvstorage)
         self.config = dict()
 
     def load(self):

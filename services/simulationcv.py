@@ -22,7 +22,8 @@ class SimulationCV(object):
         ("tracking",            list),
     )
 
-    def __init__(self, path, cvstorage, storage=None):
+    def __init__(self, name, path, cvstorage, storage=None):
+        self.name = name
         self.path = path
         self.cvids = set()
         self.cvstorage = cvstorage
@@ -104,6 +105,9 @@ class SimulationCV(object):
     def names(self):
         for id in self.cvids:
             yield core.outputstorage.ConvertName(id).md
+
+    def history(self, author=None, entries=10, skip=0):
+        return self.interface.history(author=author, max_commits=entries, skip=skip)
 
     def getmd(self, name):
         if not self.exists(name):

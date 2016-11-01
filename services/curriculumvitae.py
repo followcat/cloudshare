@@ -20,7 +20,7 @@ class CurriculumVitae(services.base.Service):
         self.info = ""
         self._nums = 0
 
-    def exists(self, filename):
+    def exists(self, id):
         """
             >>> import interface.basefs
             >>> import services.curriculumvitae
@@ -34,7 +34,8 @@ class CurriculumVitae(services.base.Service):
             >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
             >>> assert SVC_CV.exists('blr6dter.yaml')
         """
-        path_name = os.path.join(self.path, filename)
+        yamlname = core.outputstorage.ConvertName(id).yaml
+        path_name = os.path.join(self.path, yamlname)
         result = self.interface.exists(path_name)
         return result
 

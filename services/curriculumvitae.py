@@ -38,7 +38,7 @@ class CurriculumVitae(services.base.Service):
         result = self.interface.exists(path_name)
         return result
 
-    def add(self, cvobj, committer=None, unique=True):
+    def add(self, cvobj, committer=None, unique=True, yamlfile=True):
         """
             >>> import glob
             >>> import shutil
@@ -83,14 +83,15 @@ class CurriculumVitae(services.base.Service):
         if unique is True and self.unique_checker.unique(cvobj.metadata) is False:
             self.info = "Exists File"
             return False
-        cvobj.metadata['committer'] = committer
-        cvobj.metadata['date'] = time.time()
         name = core.outputstorage.ConvertName(cvobj.name)
         self.interface.add(os.path.join(self.path, name.md),
                            cvobj.markdown(), committer=committer)
-        self.interface.add(os.path.join(self.path, name.yaml),
-                           yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
-                           committer=committer)
+        if yamlfile is True:
+            cvobj.metadata['committer'] = committer
+            cvobj.metadata['date'] = time.time()
+            self.interface.add(os.path.join(self.path, name.yaml),
+                               yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
+                               committer=committer)
         self._nums += 1
         return True
 
@@ -230,6 +231,11 @@ class CurriculumVitae(services.base.Service):
             self._nums = len(list(self.yamls()))
         return self._nums
 
+    @property
+    def cvids(self):
+        return [os.path.splitext(f)[0]
+                for f in self.interface.lsfiles(self.path, '*.yaml')]
+
 
 class CurriculumVitaeStorage(CurriculumVitae):
 
@@ -242,10 +248,6 @@ class CurriculumVitaeStorage(CurriculumVitae):
         if rawdata is not None:
             self.interface.add(os.path.join(self.path, cn_id.html), rawdata)
         return True
-
-    def lsids(self):
-        return [os.path.splitext(f)[0]
-                for f in self.interface.lsfiles(self.path, '*.yaml')]
 
 
 class CurriculumVitaeObject(object):

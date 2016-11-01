@@ -2,6 +2,7 @@ import os
 
 import utils.builtin
 import services.simulationcv
+import services.curriculumvitae
 
 
 class ClassifyCV(object):
@@ -29,19 +30,22 @@ class ClassifyCV(object):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
             self.config['classify'] = self.name
+            self.save()
             if update:
                 self.update()
 
     def update(self):
         for y in self.cvstorage.yamls():
             if not self.exists(y):
-                info = self.cvstorage.getyaml(y)
+                data = self.cvstorage.getmd(y)
+                matedata = self.cvstorage.getyaml(y)
                 if self.name in info['classify']:
-                    self._add(y)
-        self.save()
+                    cvobj = services.curriculumvitae.CurriculumVitaeObject(name, data,
+                                                                           matedata)
+                    self.add(cvobj, yamlfile=False)
 
-    def add(self, id, committer):
-        return self.curriculumvitae.add(id, committer)
+    def add(self, cvobj, committer=None, unique=True, yamlfile=True):
+        return self.curriculumvitae.add(cvobj, committer, unique, yamlfile)
 
     def exists(self, id):
         return self.curriculumvitae.exists(id)

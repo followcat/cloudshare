@@ -43,9 +43,10 @@ class SimulationCV(object):
         utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
                                 indent=4)
 
-    def add(self, id, committer, yamlfile=False):
+    def add(self, cvobj, committer=None, unique=True, yamlfile=False):
         result = False
-        if not self.exists(id):
+        id = cvobj.ID
+        if (unique and not self.exists(id)) or not unique:
             self._add(id)
             filenames = []
             filedatas = []

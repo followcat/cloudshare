@@ -42,14 +42,11 @@ class Project(object):
         self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
         self.save()
 
-    def add(self, id, committer):
-        return super(Project, self).add(id, committer, yamlfile=True)
-
     def getclassify(self):
         return self.config['classify']
 
-    def cv_add(self, id):
-        return self.curriculumvitae.add(id, committer, yamlfile=True)
+    def cv_add(self, cvobj, committer=None, unique=True, yamlfile=True):
+        return self.curriculumvitae.add(cvobj, committer, unique, yamlfile)
 
     def cv_yamls(self):
         return self.curriculumvitae.yamls()

@@ -35,7 +35,7 @@ class Project(object):
                                 default_flow_style=False)
 
     def setup(self, classify, committer=None):
-        if not os.path.exists(self.path):
+        if not os.path.exists(os.path.join(self.path, self.config_file)):
             self.update(classify, committer)
 
     def update(self, classify, committer=None):
@@ -83,6 +83,9 @@ class Project(object):
 
     def cv_updateyaml(self, id, key, value, userid):
         return self.curriculumvitae.updateinfo(id, key, value, userid)
+
+    def cv_ids(self):
+        return self.curriculumvitae.cvids
 
     def company_add(self, name, introduction, committer):
         return self.company.add(name, introduction, committer)

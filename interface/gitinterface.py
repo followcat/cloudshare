@@ -84,9 +84,7 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> with open('interface/test_repo/test_file', 'w') as file:
-            ...     file.write('test')
-            >>> commit_id = interface.add_files(['test_file'],
+            >>> commit_id = interface.add_files(['test_file'], ['test'],
             ... 'Test commit', 'test<test@test.com>')
             >>> commit_id == interface.repo.head()
             True

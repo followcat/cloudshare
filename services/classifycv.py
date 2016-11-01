@@ -27,8 +27,7 @@ class ClassifyCV(object):
                                 default_flow_style=False)
 
     def setup(self, update=True):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        if not os.path.exists(os.path.join(self.path, self.config_file)):
             self.config['classify'] = self.name
             self.save()
             if update:

@@ -173,10 +173,10 @@ class Mining(object):
         self.lsi_model = dict()
         self.projects = cvsvc.projects
         self.additionals = cvsvc.additionals
-        self.services = {'default': cvsvc.projects,
+        self.services = {'default': cvsvc.projectscv,
                          'classify': dict(),
                          'all': dict()}
-        self.services['all'].update(cvsvc.projects)
+        self.services['all'].update(cvsvc.projectscv)
         self.services['all'].update(cvsvc.additionals)
         self.services['classify'].update(cvsvc.additionals)
         if not os.path.exists(self.path):

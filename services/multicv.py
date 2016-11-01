@@ -4,6 +4,7 @@ class MultiCV(object):
         self.default = projects[0]
         self.repodb = repodb
         self.projects = dict([tuple([p.name, p]) for p in projects])
+        self.projectscv = dict([tuple([p.name, p.curriculumvitae]) for p in projects])
         if additionals is None:
             self.additionals = dict()
         else:
@@ -24,7 +25,7 @@ class MultiCV(object):
         result = self.repodb.add(cvobj, committer, unique)
         if result is True:
             project = self.getproject(projectname)
-            result = project.cv_add(cvobj.name, committer)
+            result = project.cv_add(cvobj, committer)
         return result
 
     def add_md(self, cvobj, committer=None):

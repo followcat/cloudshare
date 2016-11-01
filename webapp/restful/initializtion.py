@@ -32,7 +32,7 @@ def initialize(app):
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
                      endpoint = 'jobdescriptionlist')
 
-    api.add_resource(CurrivulumvitaeAPI, '/api/cv/<string:id>',
+    api.add_resource(CurrivulumvitaeAPI, '/api/resume',
                      endpoint = 'curriculumvitae')
     api.add_resource(CurrivulumvitaeMDAPI, '/api/cvmd/<string:id>',
                      endpoint = 'curriculumvitaemd')

@@ -98,8 +98,7 @@ gulp.task("rev", ["scripts", "style"], function(){
                   "!../templates/lsipage.html",
                   "!../templates/makechart.html",
                   "!../templates/search.html",
-                  "!../templates/serach_result.html",
-                  "!../templates/upload_preview.html",])
+                  "!../templates/serach_result.html"])
     .pipe(revCollector({
       replaceReved: true,
       dirReplacements: {

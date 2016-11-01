@@ -59,7 +59,7 @@
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="download">Download</a>
         <a type="button" class="btn btn-default btn-xs" target="_blank" id="uploadEn" data-toggle="modal" data-target=".upload-en-modal">Add English CV</a>
         {% if yaml.enversion %}
-        <a href="/showeng/{{ yaml.id }}" target="_blank">English CV</a>
+        <a href="javascript:;" id="enCV" data-id="{{ yaml.id }}">English CV</a>
         {% endif %}
       </div>
       <div class="cv-title-wrap" id="cvTitleWrap">

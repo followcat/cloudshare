@@ -72,7 +72,7 @@ export default class HistorySelection extends Component {
         >
           <Table 
             columns={columns}
-            dataSource={this.state.data}
+            dataSource={this.state.data.reverse()}
             rowSelection={rowSelection}
             size="small"
           />

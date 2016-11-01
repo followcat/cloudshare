@@ -21,12 +21,15 @@ export default class Resume extends Component {
     this.state = {
       id: '',
       html: '',
+      enHtml: '',
       dataSource: {},
       collected: false,
       tag: [],
       tracking: [],
       comment: [],
       similar: [],
+      fileList: [],
+      enComfirmLoading: false,
     };
 
     this.loadData = this.loadData.bind(this);
@@ -36,6 +39,8 @@ export default class Resume extends Component {
     this.handleSubmitTag = this.handleSubmitTag.bind(this);
     this.handleSubmitFollowUp = this.handleSubmitFollowUp.bind(this);
     this.handleComment = this.handleComment.bind(this);
+    this.handleUploadChange = this.handleUploadChange.bind(this);
+    this.handleEnComfirmLoading = this.handleEnComfirmLoading.bind(this);
   }
 
   /**
@@ -195,6 +200,66 @@ export default class Resume extends Component {
   }
 
   /**
+   * 上传英文简历事件方法
+   * @return {[object]} info [上传组件对象]
+   * @return {[void]}
+   */
+  handleUploadChange(info) {
+    let fileList = info.fileList;
+    fileList = fileList.map((file) => {
+      if (file.response) {
+        file.url = file.response.data.url;
+      }
+      return file;
+    });
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} Upload success.`);
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} Upload faild.`);
+    }
+
+    this.setState({ fileList });
+  }
+
+  /**
+   * 英文简历上传确认事件方法
+   * @return {[void]}
+   */
+  handleEnComfirmLoading() {
+    this.setState({
+      enComfirmLoading: true,
+    });
+
+    fetch(`/api/uploadengcv`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        Authorization: `Basic ${StorageUtil.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: Generator.getPostData({
+        id: this.state.id,
+      })
+    })
+    .then(response => response.json())
+    .then(json => {
+      if (json.code === 200) {
+        this.setState({
+          enComfirmLoading: false,
+          fileList: [],
+          enHtml: json.data.en_html,
+        });
+      } else {
+        this.setState({
+          enComfirmLoading: true,
+        });
+        message.error('English CV Comfirm Faild.')
+      }
+    })
+  }
+
+  /**
    * 初始加载简历信息数据
    * @param  {[string]} id [简历ID值]
    * @return {[void]}
@@ -216,6 +281,7 @@ export default class Resume extends Component {
         const yamlInfo = json.data.yaml_info;
         this.setState({
           html: json.data.html,
+          enHtml: json.data.en_html,
           dataSource: yamlInfo,
           collected: yamlInfo.collected,
           tag: yamlInfo.tag,
@@ -271,6 +337,15 @@ export default class Resume extends Component {
       comment: this.state.comment,
     };
 
+    const uploadProps = {
+      name: 'file',
+      action: '/api/uploadengcv',
+      headers: {
+        Authorization: `Basic ${StorageUtil.get('token')}`,
+      },
+      onChange: this.handleUploadChange,
+    };
+
     return (
       <div>
         <Header fixed={false} />
@@ -278,9 +353,14 @@ export default class Resume extends Component {
           <ResumeWrapper
             dataSource={this.state.dataSource}
             html={this.state.html}
+            enHtml={this.state.enHtml}
             onModifyTitle={this.handleModifyTitle}
             collected={this.state.collected}
             onCollection={this.handleCollection}
+            upload={uploadProps}
+            fileList={this.state.fileList}
+            enComfirmLoading={this.state.enComfirmLoading}
+            onEnComfirmLoading={this.handleEnComfirmLoading}
           />
           <ResumeExtension
             dataSource={extendInfo}

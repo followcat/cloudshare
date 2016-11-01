@@ -1,7 +1,7 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
-import { Icon, Checkbox, Button } from 'antd';
+import { Icon, Checkbox, Button, Tabs } from 'antd';
 
 import ResumeToolMenu from './ResumeToolMenu';
 import Summary from '../common/Summary';
@@ -44,11 +44,49 @@ export default class ResumeWrapper extends Component {
           </div>
         </div>
         <div className="cv-resume-content">
-          <ResumeToolMenu onModifyTitle={this.props.onModifyTitle} dataSource={this.props.dataSource} />
+          <ResumeToolMenu
+            dataSource={this.props.dataSource}
+            upload={this.props.upload}
+            fileList={this.props.fileList}
+            enComfirmLoading={this.props.enComfirmLoading}
+            onModifyTitle={this.props.onModifyTitle}
+            onEnComfirmLoading={this.props.onEnComfirmLoading}
+          />
           <Summary dataSource={this.props.dataSource} style={{ marginTop: 4 }} />
-          <ResumeContent html={this.props.html} />
+          <Tabs defaultActiveKey="1">
+            <Tabs.TabPane
+              tab="Chinese"
+              key="1"
+            >
+              <ResumeContent html={this.props.html} />
+            </Tabs.TabPane>
+            <Tabs.TabPane
+              tab="English"
+              key="2"
+              disabled={!this.props.enHtml}
+            >
+              <ResumeContent html={this.props.enHtml} />
+            </Tabs.TabPane>
+          </Tabs>
+          
         </div>
       </div>
     );
   }
 }
+
+ResumeWrapper.propTypes = {
+  collected: PropTypes.bool,
+  dataSource: PropTypes.shape({
+    id: PropTypes.string,
+    origin: PropTypes.string,
+    committer: PropTypes.string,
+  }),
+  upload: PropTypes.object,
+  fileList: PropTypes.array,
+  enComfirmLoading: PropTypes.bool,
+  onModifyTitle: PropTypes.func.isRequired,
+  onEnComfirmLoading: PropTypes.func.isRequired,
+  html: PropTypes.string.isRequired,
+  enHtml: PropTypes.string,
+};

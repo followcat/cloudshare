@@ -206,3 +206,20 @@ class SimulationCV(object):
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(os.path.join(self.cvpath, name), dumpinfo,
                               message=message, committer=committer)
+
+    def dump(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        def storage(filepath, stream):
+            with open(filepath, 'w') as f:
+                f.write(stream.encode('utf-8'))
+        for i in self.cvids:
+            name = core.outputstorage.ConvertName(i)
+            mdpath = os.path.join(path, name.md)
+            mdstream = self.cvstorage.getmd(i)
+            storage(mdpath, mdstream)
+            htmlpath = os.path.join(path, name.html)
+            htmlstream = self.cvstorage.gethtml(i)
+            storage(htmlpath, htmlstream)
+            yamlinfo = self.cvstorage.getyaml(i)
+            utils.builtin.save_yaml(yamlinfo, path, name.yaml)

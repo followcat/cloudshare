@@ -13,10 +13,10 @@ class MultiCV(object):
     def getproject(self, name=None):
         if name is not None:
             assert name in self.projects
-            projectcv = self.projects[name]
+            project = self.projects[name]
         else:
-            projectcv = self.default
-        return projectcv
+            project = self.default
+        return project
 
     def add(self, cvobj, committer=None, projectname=None, unique=True):
         if projectname is None:

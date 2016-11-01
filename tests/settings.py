@@ -4,7 +4,7 @@ import shutil
 import services.mining
 import services.account
 import services.multicv
-import services.projectcv
+import services.project
 import services.curriculumvitae
 import core.converterutils
 import interface.gitinterface
@@ -38,9 +38,9 @@ class Config(object):
 
         self.PRJ_DB = interface.gitinterface.GitInterface(os.path.join(self.PRJ_PATH,
                                                           'project_test'))
-        self.SVC_PRJ_MED = services.projectcv.ProjectCV(self.PRJ_DB,
-                                                        self.SVC_CV_REPO,
-                                                        'project_test')
+        self.SVC_PRJ_MED = services.project.Project(self.PRJ_DB,
+                                                    self.SVC_CV_REPO,
+                                                    'project_test')
         self.SVC_PRJ_MED.setup([])
 
         self.SVC_MULT_CV = services.multicv.MultiCV([self.SVC_PRJ_MED],

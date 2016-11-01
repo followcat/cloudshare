@@ -9,14 +9,13 @@ import services.simulationcv
 import services.jobdescription
 
 
-class ProjectCV(object):
+class Project(object):
 
     config_file = 'config.yaml'
 
     def __init__(self, interface, repo, name):
         self.name = name
         self.interface = interface
-        self.repo = repo
         self.path = interface.path
         self.curriculumvitae = services.simulationcv.SimulationCV(name, interface.path,
                                                                   repo, interface)
@@ -44,7 +43,7 @@ class ProjectCV(object):
         self.save()
 
     def add(self, id, committer):
-        return super(ProjectCV, self).add(id, committer, yamlfile=True)
+        return super(Project, self).add(id, committer, yamlfile=True)
 
     def getclassify(self):
         return self.config['classify']

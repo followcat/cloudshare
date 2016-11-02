@@ -15,7 +15,7 @@ class Account(services.base.Service):
         >>> import interface.gitinterface
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> svc_account = services.account.Account(interface)
+        >>> svc_account = services.account.Account(interface.path)
         >>> svc_account.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> svc_account.add('root', 'admin', 'password')

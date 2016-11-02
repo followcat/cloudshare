@@ -26,12 +26,12 @@ class CurriculumVitae(services.base.Service):
             >>> import services.curriculumvitae
             >>> DIR = 'repo'
             >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
             >>> assert SVC_CV.exists('blr6dter.yaml')
 
             >>> import interface.gitinterface
             >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
             >>> assert SVC_CV.exists('blr6dter.yaml')
         """
         yamlname = core.outputstorage.ConvertName(id).yaml
@@ -49,7 +49,7 @@ class CurriculumVitae(services.base.Service):
             >>> repo_name = 'services/test_repo'
             >>> test_path = 'services/test_output'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
@@ -84,13 +84,11 @@ class CurriculumVitae(services.base.Service):
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(cvobj.name)
-        self.interface.add(os.path.join(self.path, name.md),
-                           cvobj.markdown(), committer=committer)
+        self.interface.add(name.md, cvobj.markdown(), committer=committer)
         if yamlfile is True:
             cvobj.metadata['committer'] = committer
             cvobj.metadata['date'] = time.time()
-            self.interface.add(os.path.join(self.path, name.yaml),
-                               yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
+            self.interface.add(name.yaml, yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
                                committer=committer)
         self._nums += 1
         return True
@@ -107,7 +105,7 @@ class CurriculumVitae(services.base.Service):
             >>> test_path = "webapp/views/test_output"
             >>> repo_name = 'webapp/views/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
             >>> fp1 = core.converterutils.FileProcesser(obj, name, test_path)
@@ -126,13 +124,11 @@ class CurriculumVitae(services.base.Service):
             >>> shutil.rmtree(test_path)
         """
         name = core.outputstorage.ConvertName(cvobj.name)
-        self.interface.add(os.path.join(self.path, name.md),
-                           cvobj.markdown(), committer=committer)
+        self.interface.add(name.md, cvobj.markdown(), committer=committer)
         return True
 
     def modify(self, filename, stream, message=None, committer=None):
-        path_filename = os.path.join(self.path, filename)
-        self.interface.modify(path_filename, stream, message, committer)
+        self.interface.modify(filename, stream, message, committer)
         return True
 
     def yamls(self):
@@ -141,13 +137,13 @@ class CurriculumVitae(services.base.Service):
             >>> import services.curriculumvitae
             >>> DIR = 'repo'
             >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, DIR)
+            >>> assert SVC_CV.interface.lsfiles('.', 'blr6dter.yaml')
 
             >>> import interface.gitinterface
             >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, DIR)
+            >>> assert SVC_CV.interface.lsfiles('.', 'blr6dter.yaml')
         """
         yamls = self.interface.lsfiles(self.path, '*.yaml')
         for each in yamls:
@@ -193,12 +189,12 @@ class CurriculumVitae(services.base.Service):
             >>> import services.curriculumvitae
             >>> DIR = 'repo'
             >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
             >>> assert SVC_CV.getmd('blr6dter.yaml')
 
             >>> import interface.gitinterface
             >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
             >>> assert SVC_CV.getmd('blr6dter.yaml')
         """
         result = unicode()
@@ -219,7 +215,7 @@ class CurriculumVitae(services.base.Service):
             >>> import interface.predator
             >>> import services.curriculumvitae
             >>> P = interface.predator.PredatorInterface('/tmp')
-            >>> PS = services.curriculumvitae.CurriculumVitae(P)
+            >>> PS = services.curriculumvitae.CurriculumVitae(P.path)
             >>> PS.getyaml('CV.md')
             Traceback (most recent call last):
             ...

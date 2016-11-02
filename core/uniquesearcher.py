@@ -18,10 +18,10 @@ class UniqueSearcher(object):
             >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
             >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(fp1.name,
             ...         fp1.markdown_stream, fp1.yamlinfo)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> fp1.result
             True
-            >>> us = core.uniquesearcher.UniqueSearcher(svc_cv.repo_path)
+            >>> us = core.uniquesearcher.UniqueSearcher(svc_cv.path)
             >>> us.unique(cv1.metadata)
             True
             >>> svc_cv.add(cv1)

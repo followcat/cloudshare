@@ -13,7 +13,7 @@ class Company(services.base.Service):
         >>> import interface.gitinterface
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> svc_co = services.company.Company(interface)
+        >>> svc_co = services.company.Company(interface.path)
         >>> svc_co.COMPANYS
         []
         >>> svc_co.add('CompanyA', 'This is Co.A', 'Dever')

@@ -17,7 +17,7 @@ class JobDescription(services.base.Service):
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
 
-        >>> svc_jd = services.jobdescription.JobDescription(interface)
+        >>> svc_jd = services.jobdescription.JobDescription(interface.path)
         >>> svc_jd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
         >>> results = svc_jd.search('JD-A')

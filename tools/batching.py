@@ -107,7 +107,7 @@ def get_explorer_name(svc_cv, yamlname):
 
 def update_selected(svc_cv, yamlname, selected):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
@@ -119,7 +119,7 @@ def update_selected(svc_cv, yamlname, selected):
 
 def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname),
@@ -131,14 +131,14 @@ def update_xp(svc_cv, yamlname):
 
 def safeyaml(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
 def originid(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     if 'originid' not in obj:
         id_str, suffix = os.path.splitext(yamlname)
         obj['originid'] = obj['id']
@@ -225,7 +225,7 @@ def initclassify(SVC_CV, knowledge=None):
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
         info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge)
-        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
+        utils.builtin.save_yaml(info, SVC_CV.path , y)
 
 
 def initproject(SVC_CV_REPO, SVC_PRJ):
@@ -238,6 +238,6 @@ def initproject(SVC_CV_REPO, SVC_PRJ):
         convert_info['tracking'] = info.pop('tracking')
         convert_info['committer'] = info['committer']
         SVC_PRJ._add(y)
-        utils.builtin.save_yaml(info, SVC_CV_REPO.repo_path , y)
+        utils.builtin.save_yaml(info, SVC_CV_REPO.path , y)
         utils.builtin.save_yaml(convert_info, SVC_PRJ.cvpath , y)
         SVC_PRJ.save()

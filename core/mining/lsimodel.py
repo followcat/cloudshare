@@ -18,7 +18,7 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, no_above=1./8, topics=100, slicer=None):
+    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300, slicer=None):
         self.path = savepath
         self.topics = topics
         self.no_above = no_above
@@ -26,6 +26,7 @@ class LSImodel(object):
             self.slicer = slicer
         else:
             self.slicer = lambda x:x.split('\n')
+        self.extra_samples = extra_samples
         self.names = []
         self._texts = []
         self._corpus = []
@@ -99,7 +100,7 @@ class LSImodel(object):
         corpu_tfidf = tfidf[[corpu]]
         if self.lsi is None:
             self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
-                            num_topics=self.topics, power_iters=6, extra_samples=300)
+                            num_topics=self.topics, power_iters=6, extra_samples=self.extra_samples)
         else:
             self.lsi.add_documents(corpu_tfidf)
 
@@ -196,11 +197,8 @@ class LSImodel(object):
             >>> model = build_model(jds, name='mixed', path='tests/lsimodel_words')
             >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
             >>> uav_topic1 = [u'飞行', u'频段', u'航拍']
-            >>> uav_topic2 = [u'解算', u'航姿']
             >>> uav_topic1_index = match_topic_index(uav_topic1, topics)
-            >>> uav_topic2_index = match_topic_index(uav_topic2, topics)
-            >>> assert doc_match_topic(get_cv_md('2471572'), model, uav_topic2_index, match_range=2)
-            >>> assert doc_match_topic(get_cv_md('6gja28pi'), model, uav_topic2_index, match_range=2)
+            >>> assert uav_topic1_index != -1
             >>> assert doc_match_topic(get_cv_md('1587957595'), model, uav_topic1_index, match_range=2)
         """
         self.tfidf = models.TfidfModel(self.corpus, wlocal=tf_cal)
@@ -208,7 +206,7 @@ class LSImodel(object):
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=6, extra_samples=0)
+                                   num_topics=self.topics, power_iters=6, extra_samples=self.extra_samples)
 
     def probability(self, doc):
         u"""

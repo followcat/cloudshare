@@ -20,7 +20,7 @@ def build_lsimodel(path, slicer, names=None, texts=None, no_above=2./2):
         topics = 5
     elif 10 <= len(names) < 40:
         topics = 10
-    m = core.mining.lsimodel.LSImodel(path, no_above=no_above, topics=topics, slicer=slicer)
+    m = core.mining.lsimodel.LSImodel(path, no_above=no_above, topics=topics, extra_samples=0, slicer=slicer)
     try:
         m.load()
     except IOError:

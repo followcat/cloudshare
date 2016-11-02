@@ -3,24 +3,31 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
+import services.base
 import services.company
 import services.exception
 import services.simulationcv
+import services.curriculumvitae
 import services.jobdescription
 
 
-class Project(object):
+class Project(services.base.Service):
 
     config_file = 'config.yaml'
 
-    def __init__(self, interface, repo, name):
-        self.name = name
-        self.interface = interface
-        self.path = interface.path
-        self.curriculumvitae = services.simulationcv.SimulationCV(name, interface.path,
-                                                                  repo, interface)
-        self.company = services.company.Company(interface)
-        self.jobdescription = services.jobdescription.JobDescription(interface)
+    def __init__(self, path, repo, name, iotype='git'):
+        super(Project, self).__init__(path, name, iotype)
+        self.path = path
+        if os.path.exists(os.path.join(path,
+                          services.simulationcv.SimulationCV.YAML_DIR)) and not (
+        os.path.exists(os.path.join(path,
+                       services.simulationcv.SimulationCV.ids_file))):
+            self.curriculumvitae = services.curriculumvitae.CurriculumVitae(self.path)
+        else:
+            self.curriculumvitae = services.simulationcv.SimulationCV(name, path,
+                                                                      repo, self.interface)
+        self.company = services.company.Company(path)
+        self.jobdescription = services.jobdescription.JobDescription(path)
         self.config = dict()
         try:
             self.load()

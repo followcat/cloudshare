@@ -30,15 +30,12 @@ class Config(object):
         if not os.path.exists(self.PRJ_PATH):
             os.mkdir(self.PRJ_PATH)
 
-        self.ACCOUNT_DB = interface.gitinterface.GitInterface(self.ACCOUNT_DB_NAME)
-        self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB)
+        self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB_NAME)
+        self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB_NAME,
+                                                                    'cloudshare')
 
-        self.REPO_DB = interface.gitinterface.GitInterface(self.REPO_DB_NAME)
-        self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB, 'cloudshare')
-
-        self.PRJ_DB = interface.gitinterface.GitInterface(os.path.join(self.PRJ_PATH,
-                                                          'project_test'))
-        self.SVC_PRJ_MED = services.project.Project(self.PRJ_DB,
+        self.SVC_PRJ_MED = services.project.Project(os.path.join(self.PRJ_PATH,
+                                                                 'project_test'),
                                                     self.SVC_CV_REPO,
                                                     'project_test')
         self.SVC_PRJ_MED.setup([])

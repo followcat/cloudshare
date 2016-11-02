@@ -22,8 +22,8 @@ class CurrivulumvitaeAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        html = self.svc_mult_cv.getproject(project).gethtml(id)
-        yaml = self.svc_mult_cv.getproject(project).getyaml(id)
+        html = self.svc_mult_cv.getproject(project).cv_gethtml(id)
+        yaml = self.svc_mult_cv.getproject(project).cv_getyaml(id)
         user = flask.ext.login.current_user
         result = user.getbookmark()
         if yaml['id'] in result:

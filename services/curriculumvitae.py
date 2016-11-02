@@ -11,11 +11,11 @@ import core.uniquesearcher
 
 class CurriculumVitae(services.base.Service):
 
-    path = 'CV'
+    YAML_DIR = 'CV'
 
-    def __init__(self, interface, name=None):
-        super(CurriculumVitae, self).__init__(interface, name)
-        self.repo_path = self.interface.path + "/" + self.path
+    def __init__(self, path, name=None):
+        self.path = os.path.join(path, self.YAML_DIR)
+        super(CurriculumVitae, self).__init__(self.path, name)
         self.unique_checker = None
         self.info = ""
         self._nums = 0
@@ -35,8 +35,7 @@ class CurriculumVitae(services.base.Service):
             >>> assert SVC_CV.exists('blr6dter.yaml')
         """
         yamlname = core.outputstorage.ConvertName(id).yaml
-        path_name = os.path.join(self.path, yamlname)
-        result = self.interface.exists(path_name)
+        result = self.interface.exists(yamlname)
         return result
 
     def add(self, cvobj, committer=None, unique=True, yamlfile=True):
@@ -63,10 +62,10 @@ class CurriculumVitae(services.base.Service):
             True
             >>> svc_cv.add(cv2)
             True
-            >>> md_files = glob.glob(os.path.join(svc_cv.repo_path, '*.md'))
+            >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))
             >>> len(md_files)
             2
-            >>> yaml_files = glob.glob(os.path.join(svc_cv.repo_path, '*.yaml'))
+            >>> yaml_files = glob.glob(os.path.join(svc_cv.path, '*.yaml'))
             >>> len(yaml_files)
             2
             >>> svc_cv.add(cv1)
@@ -79,7 +78,7 @@ class CurriculumVitae(services.base.Service):
             >>> shutil.rmtree(test_path)
         """
         if self.unique_checker is None:
-            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
+            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
         self.unique_checker.update()
         if unique is True and self.unique_checker.unique(cvobj.metadata) is False:
             self.info = "Exists File"
@@ -116,10 +115,10 @@ class CurriculumVitae(services.base.Service):
             ...         fp1.markdown_stream, fp1.yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
-            >>> md_files = glob.glob(os.path.join(svc_cv.repo_path, '*.md'))
+            >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))
             >>> len(md_files)
             1
-            >>> yaml_files = glob.glob(os.path.join(svc_cv.repo_path, '*.yaml'))
+            >>> yaml_files = glob.glob(os.path.join(svc_cv.path, '*.yaml'))
             >>> len(yaml_files)
             0
             >>> obj.close()
@@ -164,11 +163,19 @@ class CurriculumVitae(services.base.Service):
             yield name, text
 
     def search(self, keyword):
-        results = self.interface.grep(keyword, self.path)
+        results = set()
+        allfile = self.interface.grep(keyword)
+        for filename in allfile:
+            id = core.outputstorage.ConvertName(filename).base
+            results.add(id)
         return results
 
     def search_yaml(self, keyword):
-        results = self.interface.grep_yaml(keyword, self.path)
+        results = set()
+        allfile = self.interface.grep_yaml(keyword)
+        for filename in allfile:
+            id = core.outputstorage.ConvertName(filename).base
+            results.add(id)
         return results
 
     def gethtml(self, name):
@@ -196,8 +203,7 @@ class CurriculumVitae(services.base.Service):
         """
         result = unicode()
         md = core.outputstorage.ConvertName(name).md
-        path_name = os.path.join(self.path, md)
-        markdown = self.interface.get(path_name)
+        markdown = self.interface.get(md)
         if markdown is None:
             result = None
         elif isinstance(markdown, unicode):
@@ -220,8 +226,7 @@ class CurriculumVitae(services.base.Service):
             IOError
         """
         name = core.outputstorage.ConvertName(id).yaml
-        path_name = os.path.join(self.path, name)
-        yaml_str = self.interface.get(path_name)
+        yaml_str = self.interface.get(name)
         if yaml_str is None:
             raise IOError
         return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)

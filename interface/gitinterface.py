@@ -133,7 +133,7 @@ class GitInterface(interface.base.Interface):
         commit_id = self.repo.do_commit(message, committer=bytes(committer))
         return commit_id
 
-    def grep(self, restrings, path, files=None):
+    def grep(self, restrings, path='', files=None):
         if files is None:
             files = []
         files_list = ' '.join(files)
@@ -171,7 +171,7 @@ class GitInterface(interface.base.Interface):
             lsfiles = []
         return lsfiles
 
-    def grep_yaml(self, restrings, path):
+    def grep_yaml(self, restrings, path=''):
         """
             >>> import yaml
             >>> import shutil

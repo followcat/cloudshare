@@ -79,7 +79,7 @@ class BaseFSInterface(interface.base.Interface):
         return [os.path.split(f)[1] for f in glob.glob(
                 os.path.join(self.path, prefix, filterfile))]
 
-    def grep(self, restrings, path):
+    def grep(self, restrings, path=''):
         grep_list = []
         keywords = restrings.split()
         if keywords:
@@ -99,7 +99,7 @@ class BaseFSInterface(interface.base.Interface):
                     grep_list.append(each)
         return grep_list
 
-    def grep_yaml(self, restrings, path):
+    def grep_yaml(self, restrings, path=''):
         grep_list = []
         keywords = restrings.split()
         if keywords:

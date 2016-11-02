@@ -50,25 +50,23 @@ class SearchbyTextAPI(Resource):
         else:
             pages = sum/eve_count
         datas = []
-        names = []
-        for each in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            base, suffix = os.path.splitext(each)
-            name = core.outputstorage.ConvertName(base)
-            if name not in names:
-                names.append(name)
+        ids = []
+        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
+            if id not in ids:
+                ids.append(id)
             else:
                 continue
             try:
-                yaml_info = self.svc_mult_cv.getyaml(base)
+                yaml_info = self.svc_mult_cv.getyaml(id)
             except IOError:
-                names.remove(name)
+                names.remove(id)
                 continue
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
             }
             yaml_info['experience'] = self.experience_process(yaml_info['experience'])
-            datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
+            datas.append({ 'cv_id': id, 'yaml_info': yaml_info, 'info': info})
         return datas, pages
 
     def experience_process(self, experience):

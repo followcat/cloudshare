@@ -4,6 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import { Row, Col, Checkbox, Button, Input, Form } from 'antd';
 
 import EnglishResumeAddition from './EnglishResumeAddition';
+import DrawChart from './DrawChart';
 
 class ResumeToolMenu extends Component {
 
@@ -47,6 +48,13 @@ class ResumeToolMenu extends Component {
             fileList={this.props.fileList}
             enComfirmLoading={this.props.enComfirmLoading}
             onEnComfirmLoading={this.props.onEnComfirmLoading}
+          />
+          <DrawChart
+            style={{ display: 'inline-block', marginLeft: 4 }}
+            jdList={this.props.jdList}
+            radarOption={this.props.radarOption}
+            onDrawChartOpen={this.props.onDrawChartOpen}
+            onDrawChartSubmit={this.props.onDrawChartSubmit}
           />
         </div>
         <Form className="title-form pd-lr-8" style={style}>

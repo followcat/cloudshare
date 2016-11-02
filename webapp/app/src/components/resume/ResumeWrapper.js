@@ -48,9 +48,13 @@ export default class ResumeWrapper extends Component {
             dataSource={this.props.dataSource}
             upload={this.props.upload}
             fileList={this.props.fileList}
+            jdList={this.props.jdList}
+            radarOption={this.props.radarOption}
             enComfirmLoading={this.props.enComfirmLoading}
             onModifyTitle={this.props.onModifyTitle}
             onEnComfirmLoading={this.props.onEnComfirmLoading}
+            onDrawChartOpen={this.props.onDrawChartOpen}
+            onDrawChartSubmit={this.props.onDrawChartSubmit}
           />
           <Summary dataSource={this.props.dataSource} style={{ marginTop: 4 }} />
           <Tabs defaultActiveKey="1">

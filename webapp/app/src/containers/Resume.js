@@ -10,6 +10,7 @@ import ResumeExtension from '../components/resume/ResumeExtension';
 import 'whatwg-fetch';
 import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
+import { getRadarOption } from '../utils/chart_option';
 
 import './resume.less';
 
@@ -30,6 +31,8 @@ export default class Resume extends Component {
       similar: [],
       fileList: [],
       enComfirmLoading: false,
+      jdList: [],
+      radarOption: {},
     };
 
     this.loadData = this.loadData.bind(this);
@@ -41,6 +44,8 @@ export default class Resume extends Component {
     this.handleComment = this.handleComment.bind(this);
     this.handleUploadChange = this.handleUploadChange.bind(this);
     this.handleEnComfirmLoading = this.handleEnComfirmLoading.bind(this);
+    this.handleDrawChartOpen = this.handleDrawChartOpen.bind(this);
+    this.handleDrawChartSubmit = this.handleDrawChartSubmit.bind(this);
   }
 
   /**
@@ -234,7 +239,7 @@ export default class Resume extends Component {
       method: 'PUT',
       credentials: 'include',
       headers: {
-        Authorization: `Basic ${StorageUtil.get('token')}`,
+        'Authorization': `Basic ${StorageUtil.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -255,6 +260,60 @@ export default class Resume extends Component {
           enComfirmLoading: true,
         });
         message.error('English CV Comfirm Faild.')
+      }
+    })
+  }
+
+  /**
+   * 画图功能模态框开启事件方法,请求JD API
+   * @return {[type]} [description]
+   */
+  handleDrawChartOpen() {
+    fetch(`/api/jdlist`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${StorageUtil.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: Generator.getPostData()
+    })
+    .then(response => response.json())
+    .then(json => {
+      if (json.code === 200) {
+        this.setState({
+          jdList: json.data.filter(item => item.status === 'Opening'),
+        });
+      }
+    })
+  }
+
+  /**
+   * 绘画候选人雷达图
+   * @param  {[object]} object [传入数据对象]
+   * @return {[void]} 
+   */
+  handleDrawChartSubmit(object) {
+    const requestParam = object.type === 'id' ? { id: object.value } : { doc: object.value },
+          cvId = this.state.id;
+    fetch(`/api/mining/valuable`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${StorageUtil.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: Generator.getPostData(Object.assign(requestParam, {
+        name_list: [`${cvId}.md`],
+      }))
+    })
+    .then(response => response.json())
+    .then(json => {
+      if (json.code === 200) {
+        const option = getRadarOption(json.data.max, json.data.result);
+        this.setState({
+          radarOption: option,
+        });
       }
     })
   }
@@ -359,8 +418,12 @@ export default class Resume extends Component {
             onCollection={this.handleCollection}
             upload={uploadProps}
             fileList={this.state.fileList}
+            jdList={this.state.jdList}
+            radarOption={this.state.radarOption}
             enComfirmLoading={this.state.enComfirmLoading}
             onEnComfirmLoading={this.handleEnComfirmLoading}
+            onDrawChartOpen={this.handleDrawChartOpen}
+            onDrawChartSubmit={this.handleDrawChartSubmit}
           />
           <ResumeExtension
             dataSource={extendInfo}

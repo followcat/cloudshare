@@ -7,6 +7,7 @@ from baseapp.datadbs import *
 
 kgr_file = 'tests/known_good_jd_cv_mapping.yaml'
 uav_file = 'tests/uav.yaml'
+sw_file = 'tests/sw.yaml'
 
 with open(kgr_file) as f:
     datas = yaml.load(f)
@@ -14,11 +15,14 @@ with open(kgr_file) as f:
 with open(uav_file) as f:
     datas.update(yaml.load(f))
 
+with open(sw_file) as f:
+    datas.update(yaml.load(f))
+
 def build_lsimodel(path, slicer, names=None, texts=None, no_above=2./2):
     topics = 100
     if len(names) < 10:
         topics = 5
-    elif 10 <= len(names) < 40:
+    elif 10 <= len(names) < 100:
         topics = 10
     m = core.mining.lsimodel.LSImodel(path, no_above=no_above, topics=topics, extra_samples=0, slicer=slicer)
     try:

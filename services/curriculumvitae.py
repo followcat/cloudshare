@@ -242,11 +242,6 @@ class CurriculumVitae(services.base.Service):
         return [os.path.splitext(f)[0]
                 for f in self.interface.lsfiles(self.path, '*.yaml')]
 
-
-class CurriculumVitaeStorage(CurriculumVitae):
-
-    path = ''
-
     def addcv(self, id, data, yamldata, rawdata=None):
         cn_id = core.outputstorage.ConvertName(id)
         self.interface.add(os.path.join(self.path, cn_id.md), data)

@@ -11,7 +11,7 @@ import interface.gitinterface
 
 SVC_ACCOUNT = services.account.Account('account')
 SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo', 'cloudshare')
-SVC_CV_STO = services.curriculumvitae.CurriculumVitaeStorage('cvstorage', 'cvstorage')
+SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage', 'cvstorage')
 
 RAW_DIR = 'raw'
 RAW_DB = dict()

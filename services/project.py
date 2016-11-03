@@ -15,7 +15,7 @@ class Project(services.base.Service):
 
     config_file = 'config.yaml'
 
-    def __init__(self, path, repo, name, iotype='git'):
+    def __init__(self, path, corepo, cvrepo, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
         if os.path.exists(os.path.join(path,
@@ -25,8 +25,8 @@ class Project(services.base.Service):
             self.curriculumvitae = services.curriculumvitae.CurriculumVitae(self.path)
         else:
             self.curriculumvitae = services.simulationcv.SimulationCV(name, path,
-                                                                      repo, self.interface)
-        self.company = services.company.Company(path)
+                                                                      cvrepo, self.interface)
+        self.company = corepo
         self.jobdescription = services.jobdescription.JobDescription(path)
         self.config = dict()
         try:
@@ -94,11 +94,11 @@ class Project(services.base.Service):
     def cv_ids(self):
         return self.curriculumvitae.cvids
 
-    def company_add(self, name, introduction, committer):
-        return self.company.add(name, introduction, committer)
+    def company_add(self, cvobj, committer=None, unique=True, yamlfile=True):
+        return self.company.add(cvobj, committer, unique, yamlfile)
 
     def company_get(self, name):
-        return self.company.company(name)
+        return self.company.getyaml(name)
 
     def company_names(self):
         return self.company.names()

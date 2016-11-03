@@ -3,6 +3,8 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
+import core.basedata
+
 
 class CompanyAPI(Resource):
 
@@ -22,12 +24,20 @@ class CompanyAPI(Resource):
         return { 'result': result }
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         project = args['project']
-        coname = args['coname']
+        coname = args['coname'].encode('utf-8')
         introduction = args['introduction']
-        user = flask.ext.login.current_user
-        result = self.svc_mult_cv.getproject(project).company_add(coname, introduction, user.id)
+        if introduction is None:
+            introduction = ""
+        metadata = {
+            'name': coname,
+            'committer': user.id,
+            'introduction': introduction,
+        }
+        coobj = core.basedata.DataObject(coname, introduction, metadata)
+        result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)
         return { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
 
 

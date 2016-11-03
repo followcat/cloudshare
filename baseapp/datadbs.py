@@ -3,6 +3,7 @@ import os
 import services.account
 import services.multiclsify
 import services.cvstoragesync
+import services.company
 import services.curriculumvitae
 import interface.basefs
 import interface.predator
@@ -11,6 +12,7 @@ import interface.gitinterface
 
 SVC_ACCOUNT = services.account.Account('account')
 SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo', 'cloudshare')
+SVC_CO_REPO = services.company.Company('repo', 'corepo')
 SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage', 'cvstorage')
 
 RAW_DIR = 'raw'

@@ -15,9 +15,9 @@ UAV_needed = sources.industry_id.needed_uav
 
 
 SVC_PRJ_MED = services.project.Project(os.path.join(PRJ_PATH, 'medical'),
-                                       SVC_CV_REPO, 'medical')
+                                       SVC_CO_REPO, SVC_CV_REPO, 'medical')
 SVC_PRJ_MED.setup(MED_needed)
 
 SVC_PRJ_UAV = services.project.Project(os.path.join(PRJ_PATH, 'UAV'),
-                                       SVC_CV_REPO, 'UAV')
+                                       SVC_CO_REPO, SVC_CV_REPO, 'UAV')
 SVC_PRJ_UAV.setup(UAV_needed)

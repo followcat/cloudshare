@@ -83,12 +83,14 @@ class CurriculumVitae(services.base.Service):
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(cvobj.name)
-        self.interface.add(name.md, cvobj.data, committer=committer)
+        message = "Add CV: %s data." % name
+        self.interface.add(name.md, cvobj.data, message=message, committer=committer)
         if yamlfile is True:
             cvobj.metadata['committer'] = committer
             cvobj.metadata['date'] = time.time()
+            message = "Add company: %s metadata." % name
             self.interface.add(name.yaml, yaml.safe_dump(cvobj.metadata, allow_unicode=True),
-                               committer=committer)
+                               message=message, committer=committer)
         self._nums += 1
         return True
 
@@ -144,7 +146,7 @@ class CurriculumVitae(services.base.Service):
             >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, DIR)
             >>> assert SVC_CV.interface.lsfiles('.', 'blr6dter.yaml')
         """
-        yamls = self.interface.lsfiles(self.path, '*.yaml')
+        yamls = self.interface.lsfiles('.', '*.yaml')
         for each in yamls:
             yield os.path.split(each)[-1]
 
@@ -235,12 +237,12 @@ class CurriculumVitae(services.base.Service):
     @property
     def cvids(self):
         return [os.path.splitext(f)[0]
-                for f in self.interface.lsfiles(self.path, '*.yaml')]
+                for f in self.interface.lsfiles('.', '*.yaml')]
 
     def addcv(self, id, data, yamldata, rawdata=None):
         cn_id = core.outputstorage.ConvertName(id)
-        self.interface.add(os.path.join(self.path, cn_id.md), data)
-        self.interface.add(os.path.join(self.path, cn_id.yaml), yamldata)
+        self.interface.add(cn_id.md, data)
+        self.interface.add(cn_id.yaml, yamldata)
         if rawdata is not None:
-            self.interface.add(os.path.join(self.path, cn_id.html), rawdata)
+            self.interface.add(cn_id.html, rawdata)
         return True

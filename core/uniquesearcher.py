@@ -17,8 +17,7 @@ class UniqueSearcher(object):
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
-            >>> cv1 = core.basedata.CurriculumVitaeObject(fp1.name,
-            ...         fp1.markdown_stream, fp1.yamlinfo)
+            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, fp1.yamlinfo)
             >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> fp1.result
             True

@@ -55,10 +55,9 @@ class Config(object):
         f = open(os.path.join('core/test', filename))
         filepro = core.converterutils.FileProcesser(f, filename,
                                                     self.UPLOAD_TEMP)
-        cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
-                                                               filepro.markdown_stream,
-                                                               filepro.yamlinfo)
-        self.SVC_MULT_CV.add(cvobj, projectname='project_test')
+        dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
+                                           filepro.yamlinfo)
+        self.SVC_MULT_CV.add(dataobj, projectname='project_test')
 
     def rebuild(self):
         self.destory()

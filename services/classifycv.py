@@ -39,12 +39,11 @@ class ClassifyCV(object):
                 data = self.cvstorage.getmd(y)
                 matedata = self.cvstorage.getyaml(y)
                 if self.name in info['classify']:
-                    cvobj = core.basedata.CurriculumVitaeObject(name, data,
-                                                                           matedata)
-                    self.add(cvobj, yamlfile=False)
+                    dataobj = core.basedata.DataObject(name, data, matedata)
+                    self.add(dataobj, yamlfile=False)
 
-    def add(self, cvobj, committer=None, unique=True, yamlfile=True):
-        return self.curriculumvitae.add(cvobj, committer, unique, yamlfile)
+    def add(self, dataobj, committer=None, unique=True, yamlfile=True):
+        return self.curriculumvitae.add(dataobj, committer, unique, yamlfile)
 
     def exists(self, id):
         return self.curriculumvitae.exists(id)

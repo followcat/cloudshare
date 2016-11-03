@@ -55,10 +55,8 @@ class CurriculumVitae(services.base.Service):
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
             >>> fp2 = core.converterutils.FileProcesser(f2, 'cv_2.doc', test_path)
-            >>> cv1 = core.basedata.CurriculumVitaeObject(fp1.name,
-            ...         fp1.markdown_stream, fp1.yamlinfo)
-            >>> cv2 = core.basedata.CurriculumVitaeObject(fp2.name,
-            ...         fp2.markdown_stream, fp2.yamlinfo)
+            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, fp1.yamlinfo)
+            >>> cv2 = core.basedata.DataObject(fp2.name, fp2.markdown_stream, fp2.yamlinfo)
             >>> svc_cv.add(cv1)
             True
             >>> svc_cv.add(cv2)
@@ -85,11 +83,11 @@ class CurriculumVitae(services.base.Service):
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(cvobj.name)
-        self.interface.add(name.md, cvobj.markdown(), committer=committer)
+        self.interface.add(name.md, cvobj.data, committer=committer)
         if yamlfile is True:
             cvobj.metadata['committer'] = committer
             cvobj.metadata['date'] = time.time()
-            self.interface.add(name.yaml, yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
+            self.interface.add(name.yaml, yaml.safe_dump(cvobj.metadata, allow_unicode=True),
                                committer=committer)
         self._nums += 1
         return True
@@ -111,8 +109,7 @@ class CurriculumVitae(services.base.Service):
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
             >>> fp1 = core.converterutils.FileProcesser(obj, name, test_path)
-            >>> cv1 = core.basedata.CurriculumVitaeObject(fp1.name,
-            ...         fp1.markdown_stream, fp1.yamlinfo)
+            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, fp1.yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
             >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))
@@ -126,7 +123,7 @@ class CurriculumVitae(services.base.Service):
             >>> shutil.rmtree(test_path)
         """
         name = core.outputstorage.ConvertName(cvobj.name)
-        self.interface.add(name.md, cvobj.markdown(), committer=committer)
+        self.interface.add(name.md, cvobj.data, committer=committer)
         return True
 
     def modify(self, filename, stream, message=None, committer=None):

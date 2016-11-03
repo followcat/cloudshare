@@ -32,10 +32,9 @@ class Upload(flask.views.MethodView):
         filepro = core.converterutils.FileProcesser(network_file,
                                                     network_file.filename.encode('utf-8'),
                                                     flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
-                                                               filepro.markdown_stream,
-                                                               filepro.yamlinfo)
-        flask.session[user.id]['upload'] = cvobj
+        dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
+                                           filepro.yamlinfo)
+        flask.session[user.id]['upload'] = dataobj
         flask.session.modified = True
         return str(filepro.result)
 
@@ -45,9 +44,9 @@ class UploadPreview(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         user = flask.ext.login.current_user
-        cvobj = flask.session[user.id]['upload']
-        output = cvobj.preview_markdown()
-        yaml_info = cvobj.yaml()
+        dataobj = flask.session[user.id]['upload']
+        output = dataobj.preview_data()
+        yaml_info = dataobj.metadata
         return flask.render_template('upload_preview.html', markdown=output, yaml=yaml_info)
 
 
@@ -59,9 +58,9 @@ class ConfirmEnglish(flask.views.MethodView):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         name = core.outputstorage.ConvertName(flask.request.form['name'])
         yaml_data = svc_mult_cv.getyaml(name)
-        cvobj = flask.session[user.id]['upload']
-        result = svc_mult_cv.add_md(cvobj, user.id)
-        yaml_data['enversion'] = cvobj.name
+        dataobj = flask.session[user.id]['upload']
+        result = svc_mult_cv.add_md(dataobj, user.id)
+        yaml_data['enversion'] = dataobj.ID
         svc_mult_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
                            committer=user.id)
         return flask.jsonify(result=result, filename=yaml_data['id']+'.md')
@@ -125,9 +124,9 @@ class Preview(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         user = flask.ext.login.current_user
-        cvobj = flask.session[user.id]['upload']
-        output = cvobj.preview_markdown()
-        _id = cvobj.yaml()['id']
+        dataobj = flask.session[user.id]['upload']
+        output = dataobj.preview_data()
+        _id = dataobj.metadata['id']
         return flask.render_template('upload_preview.html', markdown=output, id=_id)
 
     @flask.ext.login.login_required

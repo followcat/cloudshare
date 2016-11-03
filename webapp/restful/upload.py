@@ -46,7 +46,7 @@ class UploadCVAPI(Resource):
                 result = self.svc_mult_cv.add(cvobj, user.id, project_name, unique=True)
                 if result is True:
                     names.append(cvobj.name.md)
-                    documents.append(cvobj.markdown())
+                    documents.append(cvobj.data)
                     status = 'success'
                     message = 'Upload success.'
             results.append({ 'id': id,
@@ -64,16 +64,15 @@ class UploadCVAPI(Resource):
         filename = network_file.filename
         filepro = core.converterutils.FileProcesser(network_file, filename.encode('utf-8'),
                                                     flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
-                                                               filepro.markdown_stream,
-                                                               filepro.yamlinfo)
+        dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
+                                           filepro.yamlinfo)
         upload[user.id][filename] = None
         name = ''
         if filepro.result is True:
-            if not cvobj.metadata['name']:
-                cvobj.metadata['name'] = utils.chsname.name_from_filename(filename)
-            name = cvobj.metadata['name']
-            upload[user.id][filename] = cvobj
+            if not dataobj.metadata['name']:
+                dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
+            name = dataobj.metadata['name']
+            upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
                                         'name': name, 'filename': filename } }
@@ -92,8 +91,8 @@ class UploadEnglishCVAPI(Resource):
 
     def get(self):
         user = flask.ext.login.current_user
-        cvobj = uploadeng[user.id]
-        md = cvobj.preview_markdown()
+        dataobj = uploadeng[user.id]
+        md = dataobj.preview_data()
         return { 'result': { 'markdown': md } }
 
     def put(self):
@@ -101,9 +100,9 @@ class UploadEnglishCVAPI(Resource):
         args = self.reqparse.parse_args()
         name = core.outputstorage.ConvertName(args['name'])
         yaml_data = self.svc_mult_cv.getyaml(name)
-        cvobj = uploadeng[user.id]
-        result = self.svc_mult_cv.add_md(cvobj, user.id)
-        yaml_data['enversion'] = cvobj.name.md
+        dataobj = uploadeng[user.id]
+        result = self.svc_mult_cv.add_md(dataobj, user.id)
+        yaml_data['enversion'] = dataobj.ID.md
         svc_mult_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
                       committer=user.id)
         user.uploadeng = None
@@ -117,10 +116,9 @@ class UploadEnglishCVAPI(Resource):
         filepro = core.converterutils.FileProcesser(network_file,
                                                     filename.encode('utf-8'),
                                                     flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
-                                                               filepro.markdown_stream,
-                                                               filepro.yamlinfo)
-        uploadeng[user.id] = cvobj
+        dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
+                                           filepro.yamlinfo)
+        uploadeng[user.id] = dataobj
         return { 'result': filepro.result }
 
 
@@ -137,7 +135,7 @@ class UploadCVPreviewAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         filename = args['filename']
-        cvobj = upload[user.id][filename]
-        md = cvobj.preview_markdown()
-        yaml_info = cvobj.metadata
+        dataobj = upload[user.id][filename]
+        md = dataobj.preview_data()
+        yaml_info = dataobj.metadata
         return { 'code': 200, 'data': { 'filename': filename, 'markdown': md, 'yaml_info': yaml_info } }

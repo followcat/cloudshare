@@ -57,9 +57,8 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
             f = open(os.path.join(root, filename), 'r')
             filepro = core.converterutils.FileProcesser(filename, f,
                                                         temp_output)
-            cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
-                                                                   filepro.markdown_stream,
-                                                                   filepro.yamlinfo)
+            cvobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
+                                             filepro.yamlinfo)
             if origin is not None:
                 cvobj.metadata['origin'] = origin
             if not cvobj.metadata['name']:

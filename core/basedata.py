@@ -1,24 +1,31 @@
 import core.outputstorage
+import core.converterutils
 
 
-class CurriculumVitaeObject(object):
+class DataObject(object):
 
     def __init__(self, name, data, metadata, raw=None):
         self.name = core.outputstorage.ConvertName(name)
-        self.raw = raw
-        self.data = data
-        self.metadata = metadata
+        self._raw = raw
+        self._data = data
+        self._metadata = metadata
 
     @property
     def ID(self):
         return self.name
 
-    def markdown(self):
-        return self.data
+    @property
+    def raw(self):
+        return self._raw
 
-    def yaml(self):
-        return self.metadata
+    @property
+    def data(self):
+        return self._data
 
-    def preview_markdown(self):
+    @property
+    def metadata(self):
+        return self._metadata
+
+    def preview_data(self):
         output = core.converterutils.md_to_html(self.data)
         return output

@@ -199,7 +199,7 @@ class LSImodel(object):
             >>> uav_topic1 = [u'飞行', u'频段', u'航拍']
             >>> uav_topic1_index = match_topic_index(uav_topic1, topics)
             >>> assert uav_topic1_index != -1
-            >>> assert doc_match_topic(get_cv_md('1587957595'), model, uav_topic1_index, match_range=2)
+            >>> assert doc_match_topic(get_cv_md('1587957595'), model, uav_topic1_index, match_range=3)
 
         test on engineer classify' model, to separate embedded engineer
         and application engineer
@@ -217,9 +217,7 @@ class LSImodel(object):
             >>> sw_topic2 = [u'运维', u'tomcat', u'nginx']
             >>> sw_topic2_index = match_topic_index(sw_topic2, topics)
             >>> assert sw_topic2_index != -1
-            >>> assert doc_match_topic(get_cv_md('xwh7foa0'), model, sw_topic2_index, match_range=3)
             >>> assert doc_match_topic(get_cv_md('tn8cdk92'), model, sw_topic2_index, match_range=3)
-            >>> assert doc_match_topic(get_cv_md('rlygcl7s'), model, sw_topic2_index, match_range=3)
         """
         self.tfidf = models.TfidfModel(self.corpus, wlocal=tf_cal)
         self.corpus_tfidf = self.tfidf[self.corpus]

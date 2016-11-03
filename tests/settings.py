@@ -1,6 +1,7 @@
 import os
 import shutil
 
+import core.basedata
 import services.mining
 import services.account
 import services.multicv
@@ -54,7 +55,7 @@ class Config(object):
         f = open(os.path.join('core/test', filename))
         filepro = core.converterutils.FileProcesser(f, filename,
                                                     self.UPLOAD_TEMP)
-        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
+        cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
                                                                filepro.markdown_stream,
                                                                filepro.yamlinfo)
         self.SVC_MULT_CV.add(cvobj, projectname='project_test')

@@ -43,6 +43,7 @@ class CurriculumVitae(services.base.Service):
             >>> import glob
             >>> import shutil
             >>> import os.path
+            >>> import core.basedata
             >>> import core.converterutils
             >>> import services.curriculumvitae
             >>> import interface.gitinterface
@@ -54,9 +55,9 @@ class CurriculumVitae(services.base.Service):
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
             >>> fp2 = core.converterutils.FileProcesser(f2, 'cv_2.doc', test_path)
-            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(fp1.name,
+            >>> cv1 = core.basedata.CurriculumVitaeObject(fp1.name,
             ...         fp1.markdown_stream, fp1.yamlinfo)
-            >>> cv2 = services.curriculumvitae.CurriculumVitaeObject(fp2.name,
+            >>> cv2 = core.basedata.CurriculumVitaeObject(fp2.name,
             ...         fp2.markdown_stream, fp2.yamlinfo)
             >>> svc_cv.add(cv1)
             True
@@ -98,6 +99,7 @@ class CurriculumVitae(services.base.Service):
             >>> import glob
             >>> import shutil
             >>> import os.path
+            >>> import core.basedata
             >>> import services.curriculumvitae
             >>> import interface.gitinterface
             >>> root = "core/test"
@@ -109,7 +111,7 @@ class CurriculumVitae(services.base.Service):
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
             >>> fp1 = core.converterutils.FileProcesser(obj, name, test_path)
-            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(fp1.name,
+            >>> cv1 = core.basedata.CurriculumVitaeObject(fp1.name,
             ...         fp1.markdown_stream, fp1.yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
@@ -245,26 +247,3 @@ class CurriculumVitae(services.base.Service):
         if rawdata is not None:
             self.interface.add(os.path.join(self.path, cn_id.html), rawdata)
         return True
-
-
-class CurriculumVitaeObject(object):
-
-    def __init__(self, name, data, metadata, raw=None):
-        self.name = core.outputstorage.ConvertName(name)
-        self.raw = raw
-        self.data = data
-        self.metadata = metadata
-
-    @property
-    def ID(self):
-        return self.name
-
-    def markdown(self):
-        return self.data
-
-    def yaml(self):
-        return self.metadata
-
-    def preview_markdown(self):
-        output = core.converterutils.md_to_html(self.data)
-        return output

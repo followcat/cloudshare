@@ -4,8 +4,8 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.chsname
+import core.basedata
 import core.converterutils
-import services.curriculumvitae
 
 
 upload = dict()
@@ -64,7 +64,7 @@ class UploadCVAPI(Resource):
         filename = network_file.filename
         filepro = core.converterutils.FileProcesser(network_file, filename.encode('utf-8'),
                                                     flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
+        cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
                                                                filepro.markdown_stream,
                                                                filepro.yamlinfo)
         upload[user.id][filename] = None
@@ -117,7 +117,7 @@ class UploadEnglishCVAPI(Resource):
         filepro = core.converterutils.FileProcesser(network_file,
                                                     filename.encode('utf-8'),
                                                     flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
+        cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
                                                                filepro.markdown_stream,
                                                                filepro.yamlinfo)
         uploadeng[user.id] = cvobj

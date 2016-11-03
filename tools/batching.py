@@ -49,7 +49,7 @@ def filter(processer, origin_path, filename):
 
 
 def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origin=None):
-    import services.curriculumvitae
+    import core.basedata
     if not os.path.exists(temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
@@ -57,7 +57,7 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
             f = open(os.path.join(root, filename), 'r')
             filepro = core.converterutils.FileProcesser(filename, f,
                                                         temp_output)
-            cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
+            cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
                                                                    filepro.markdown_stream,
                                                                    filepro.yamlinfo)
             if origin is not None:

@@ -1,8 +1,8 @@
 import os
 
 import utils.builtin
+import core.basedata
 import services.simulationcv
-import services.curriculumvitae
 
 
 class ClassifyCV(object):
@@ -39,7 +39,7 @@ class ClassifyCV(object):
                 data = self.cvstorage.getmd(y)
                 matedata = self.cvstorage.getyaml(y)
                 if self.name in info['classify']:
-                    cvobj = services.curriculumvitae.CurriculumVitaeObject(name, data,
+                    cvobj = core.basedata.CurriculumVitaeObject(name, data,
                                                                            matedata)
                     self.add(cvobj, yamlfile=False)
 

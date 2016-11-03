@@ -9,7 +9,7 @@ import flask.ext.login
 
 import utils.builtin
 import utils.chsname
-import services.curriculumvitae
+import core.basedata
 import core.outputstorage
 import core.converterutils
 import webapp.views.account
@@ -32,7 +32,7 @@ class Upload(flask.views.MethodView):
         filepro = core.converterutils.FileProcesser(network_file,
                                                     network_file.filename.encode('utf-8'),
                                                     flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
+        cvobj = core.basedata.CurriculumVitaeObject(filepro.name,
                                                                filepro.markdown_stream,
                                                                filepro.yamlinfo)
         flask.session[user.id]['upload'] = cvobj

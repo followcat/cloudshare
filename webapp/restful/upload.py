@@ -1,3 +1,5 @@
+import yaml
+
 import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
@@ -83,11 +85,12 @@ class UploadEnglishCVAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        super(UploadEnglishCV, self).__init__()
+        super(UploadEnglishCVAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('file', type = str, location = 'json')
-        self.reqparse.add_argument('name', type = str, location = 'json')
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
     def get(self):
         user = flask.ext.login.current_user
@@ -98,20 +101,21 @@ class UploadEnglishCVAPI(Resource):
     def put(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        name = core.outputstorage.ConvertName(args['name'])
-        yaml_data = self.svc_mult_cv.getyaml(name)
+        id = args['id']
+        project = args['project']
+        yaml_data = self.svc_mult_cv.getproject(project).getyaml(id)
         dataobj = uploadeng[user.id]
         result = self.svc_mult_cv.add_md(dataobj, user.id)
         yaml_data['enversion'] = dataobj.ID.md
-        svc_mult_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
-                      committer=user.id)
+        self.svc_mult_cv.modify(id + '.yaml', yaml.safe_dump(yaml_data, allow_unicode=True),
+                                committer=user.id)
         user.uploadeng = None
-        return { 'result': result }
+        en_html = self.svc_mult_cv.getproject(project).getmd_en(id)
+        return { 'code': 200, 'data': { 'status': result, 'en_html': en_html } }
 
     def post(self):
         user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        network_file = args['file']
+        network_file = flask.request.files['file']
         filename = network_file.filename
         filepro = core.converterutils.FileProcesser(network_file,
                                                     filename.encode('utf-8'),
@@ -119,7 +123,7 @@ class UploadEnglishCVAPI(Resource):
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
                                            filepro.yamlinfo)
         uploadeng[user.id] = dataobj
-        return { 'result': filepro.result }
+        return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/preview' } }
 
 
 class UploadCVPreviewAPI(Resource):

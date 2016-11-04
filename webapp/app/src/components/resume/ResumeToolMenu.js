@@ -1,7 +1,10 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Row, Col, Checkbox, Button, Input, Form } from 'antd';
+
+import EnglishResumeAddition from './EnglishResumeAddition';
+import DrawChart from './DrawChart';
 
 class ResumeToolMenu extends Component {
 
@@ -39,7 +42,20 @@ class ResumeToolMenu extends Component {
         <div className="tool-menu pd-lr-8">
           <Checkbox onChange={this.handleSwitchChange}>Switch to Modify Title</Checkbox>
           <Button type="ghost" size="small">Download</Button>
-          <Button type="ghost" size="small" style={{ marginLeft: 4 }}>Add English CV</Button>
+          <EnglishResumeAddition
+            style={{ display: 'inline-block', marginLeft: 4 }}
+            upload={this.props.upload}
+            fileList={this.props.fileList}
+            enComfirmLoading={this.props.enComfirmLoading}
+            onEnComfirmLoading={this.props.onEnComfirmLoading}
+          />
+          <DrawChart
+            style={{ display: 'inline-block', marginLeft: 4 }}
+            jdList={this.props.jdList}
+            radarOption={this.props.radarOption}
+            onDrawChartOpen={this.props.onDrawChartOpen}
+            onDrawChartSubmit={this.props.onDrawChartSubmit}
+          />
         </div>
         <Form className="title-form pd-lr-8" style={style}>
           <Row>
@@ -89,3 +105,16 @@ class ResumeToolMenu extends Component {
 }
 
 export default ResumeToolMenu = Form.create({})(ResumeToolMenu);
+
+ResumeToolMenu.propTypes = {
+  upload: PropTypes.object,
+  dataSource: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    origin: PropTypes.string,
+  }),
+  fileList: PropTypes.array,
+  enComfirmLoading: PropTypes.bool,
+  onEnComfirmLoading: PropTypes.func.isRequired,
+  onModifyTitle: PropTypes.func.isRequired,
+};

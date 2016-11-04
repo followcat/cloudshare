@@ -30,7 +30,10 @@ class CurrivulumvitaeAPI(Resource):
             yaml['collected'] = True
         else:
             yaml['collected'] = False
-        return { 'code': 200, 'data': { 'html': html, 'yaml_info': yaml } }
+        en_html = ''
+        if 'enversion' in yaml:
+            en_html = self.svc_mult_cv.getproject(project).getmd_en(id)
+        return { 'code': 200, 'data': { 'html': html, 'en_html': en_html, 'yaml_info': yaml } }
 
 
 class CurrivulumvitaeMDAPI(CurrivulumvitaeAPI):

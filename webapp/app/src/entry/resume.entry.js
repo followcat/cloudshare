@@ -8,7 +8,7 @@ import { LocaleProvider } from 'antd';
 import Resume from '../containers/Resume';
 
 ReactDOM.render(
-  <LocaleProvider local={enUS}>
+  <LocaleProvider locale={enUS}>
     <Resume />
   </LocaleProvider>,
   document.getElementById('app')

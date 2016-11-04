@@ -15,12 +15,12 @@ export default class ResumeContent extends Component {
   render() {
     return (
       <div className="cv-wrapper">
-        <div id="cv" ref="cv" dangerouslySetInnerHTML={{ __html: this.props.html }}></div>
+        <div className="cv" ref="cv" dangerouslySetInnerHTML={{ __html: this.props.html }}></div>
       </div>
     );
   }
 }
 
 ResumeContent.propTypes = {
-  html: PropTypes.string,
+  html: PropTypes.string.isRequired,
 };

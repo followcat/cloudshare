@@ -16,6 +16,7 @@ class SimulationCV(services.base.Service):
     ids_file = 'names.json'
 
     SAVE_DIR = 'CV'
+    YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
         ("committer",           list),
         ("comment",             list),
@@ -24,25 +25,28 @@ class SimulationCV(services.base.Service):
     )
 
     def __init__(self, path, name, cvstorage, storage=None):
-        super(SimulationCV, self).__init__(os.path.join(path, self.SAVE_DIR), name)
-        self.name = name
-        self.path = path
+        self.path = os.path.join(path, self.SAVE_DIR)
+        super(SimulationCV, self).__init__(self.path, name)
         self.cvids = set()
         self.cvstorage = cvstorage
+        self.yamlpath = os.path.join(self.path, self.YAML_DIR)
         if storage is not None:
             self.interface = storage
-        self.cvpath = self.SAVE_DIR
+            self.path = os.path.join(self.interface.path, self.SAVE_DIR)
+            self.yamlpath = os.path.join(self.SAVE_DIR, self.YAML_DIR)
+            self.ids_file = os.path.join(self.SAVE_DIR, self.ids_file)
         try:
             self.load()
         except IOError:
             pass
 
     def load(self):
-        self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
+        stream = self.interface.get(self.ids_file)
+        self.cvids = ujson.loads(stream)
 
     def save(self):
-        utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
-                                indent=4)
+        stream = ujson.dumps(sorted(self.cvids), indent=4)
+        self.interface.add(self.ids_file, stream)
 
     def add(self, cvobj, committer=None, unique=True, yamlfile=False):
         result = False
@@ -59,13 +63,12 @@ class SimulationCV(services.base.Service):
                 name = core.outputstorage.ConvertName(id).yaml
                 dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                      allow_unicode=True, default_flow_style=False)
-                filenames.append(bytes(os.path.join(self.cvpath, name)))
+                filenames.append(bytes(os.path.join(self.yamlpath, name)))
                 filedatas.append(dumpinfo)
             self.interface.add_files(filenames, filedatas,
                                      message='Add new cv %s.'%id,
                                      committer=committer)
-            utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
-                                    indent=4)
+            self.interface.modify(self.ids_file, ujson.dumps(sorted(self.cvids), indent=4))
             result = True
         return result
 
@@ -125,7 +128,7 @@ class SimulationCV(services.base.Service):
         if not self.exists(id):
             return None
         name = core.outputstorage.ConvertName(id).yaml
-        yamlstream = self.interface.get(os.path.join(self.cvpath, name))
+        yamlstream = self.interface.get(os.path.join(self.yamlpath, name))
         if yamlstream is None:
             yamlstream = '{}'
         return yaml.load(yamlstream, Loader=utils._yaml.Loader)
@@ -206,7 +209,7 @@ class SimulationCV(services.base.Service):
         name = core.outputstorage.ConvertName(id).yaml
         dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
-        self.interface.modify(os.path.join(self.cvpath, name), dumpinfo,
+        self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
                               message=message, committer=committer)
 
     def dump(self, path):

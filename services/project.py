@@ -18,10 +18,9 @@ class Project(services.base.Service):
     def __init__(self, path, corepo, cvrepo, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
-        if os.path.exists(os.path.join(path,
-                          services.simulationcv.SimulationCV.SAVE_DIR)) and not (
-        os.path.exists(os.path.join(path,
-                       services.simulationcv.SimulationCV.ids_file))):
+        cvpath = os.path.join(path, services.simulationcv.SimulationCV.SAVE_DIR)
+        idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
+        if os.path.exists(cvpath) and not os.path.exists(idsfile):
             self.curriculumvitae = services.curriculumvitae.CurriculumVitae(self.path)
         else:
             self.curriculumvitae = services.simulationcv.SimulationCV(name, path,

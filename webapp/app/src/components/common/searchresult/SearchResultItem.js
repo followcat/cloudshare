@@ -77,7 +77,7 @@ export default class SearchResultItem extends Component {
           </Row>
         </div>
         <div className="extend-info">
-          <Row gutter={16}>
+          <Row>
             <Col span={18}>
               <EducationExperience education={education}/>
               <WorkExperience experience={experience}/>
@@ -85,13 +85,13 @@ export default class SearchResultItem extends Component {
 
             <Col span={6}>
               <div>Current:</div>
-              <Row className="extend-info-r-row" gutter={8}>
+              <Row className="extend-info-r-row">
                 <Col className="extend-info-label" span={4}>
                   <label>Money:</label>
                 </Col>
                 <Col span={20}>{currentMoney}</Col>
               </Row>
-              <Row className="extend-info-r-row" gutter={8}>
+              <Row className="extend-info-r-row">
                 <Col className="extend-info-label" span={4}>
                   <label>Place:</label>
                 </Col>
@@ -99,13 +99,13 @@ export default class SearchResultItem extends Component {
               </Row>
 
               <div>Expectation:</div>
-              <Row className="extend-info-row" gutter={8}>
+              <Row className="extend-info-row">
                 <Col className="extend-info-label" span={4}>
                   <label>Money:</label>
                 </Col>
                 <Col span={20}>{expectationMoney}</Col>
               </Row>
-              <Row className="extend-info-row" gutter={8}>
+              <Row className="extend-info-row">
                 <Col className="extend-info-label" span={4}>
                   <label>Place:</label>
                 </Col>

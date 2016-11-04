@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 import { Button, Modal, Table } from 'antd';
 
-import StorageUtil from '../../../utils/storage';
+import History from '../../../utils/history';
 
 export default class HistorySelection extends Component {
   
@@ -22,7 +22,7 @@ export default class HistorySelection extends Component {
   handleClick() {
     this.setState({
       visible: true,
-      data: StorageUtil.get('history'),
+      data: History.read(),
     });
   }
 
@@ -72,7 +72,7 @@ export default class HistorySelection extends Component {
         >
           <Table 
             columns={columns}
-            dataSource={this.state.data.reverse()}
+            dataSource={this.state.data}
             rowSelection={rowSelection}
             size="small"
           />

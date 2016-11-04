@@ -10,6 +10,7 @@ import ResumeExtension from '../components/resume/ResumeExtension';
 import 'whatwg-fetch';
 import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
+import History from '../utils/history';
 import { getRadarOption } from '../utils/chart_option';
 
 import './resume.less';
@@ -346,6 +347,11 @@ export default class Resume extends Component {
           tag: yamlInfo.tag,
           tracking: yamlInfo.tracking,
           comment: yamlInfo.comment,
+        });
+
+        History.write({
+          id: id,
+          name: yamlInfo.name
         });
       }
     })

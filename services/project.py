@@ -23,8 +23,8 @@ class Project(services.base.Service):
         if os.path.exists(cvpath) and not os.path.exists(idsfile):
             self.curriculumvitae = services.curriculumvitae.CurriculumVitae(self.path)
         else:
-            self.curriculumvitae = services.simulationcv.SimulationCV(name, path,
-                                                                      cvrepo, self.interface)
+            self.curriculumvitae = services.simulationcv.SimulationCV(self.path, name,
+                                                                      cvrepo)
         self.company = corepo
         self.jobdescription = services.jobdescription.JobDescription(path)
         self.config = dict()

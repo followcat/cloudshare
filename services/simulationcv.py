@@ -24,17 +24,12 @@ class SimulationCV(services.base.Service):
         ("tracking",            list),
     )
 
-    def __init__(self, path, name, cvstorage, storage=None):
+    def __init__(self, path, name, cvstorage):
         self.path = os.path.join(path, self.SAVE_DIR)
         super(SimulationCV, self).__init__(self.path, name)
         self.cvids = set()
         self.cvstorage = cvstorage
-        self.yamlpath = os.path.join(self.path, self.YAML_DIR)
-        if storage is not None:
-            self.interface = storage
-            self.path = os.path.join(self.interface.path, self.SAVE_DIR)
-            self.yamlpath = os.path.join(self.SAVE_DIR, self.YAML_DIR)
-            self.ids_file = os.path.join(self.SAVE_DIR, self.ids_file)
+        self.yamlpath = self.YAML_DIR
         try:
             self.load()
         except IOError:
@@ -58,6 +53,8 @@ class SimulationCV(services.base.Service):
             filenames.append(bytes(self.ids_file))
             filedatas.append(ujson.dumps(sorted(self.cvids), indent=4))
             if yamlfile is True:
+                if not os.path.exists(os.path.join(self.path, self.yamlpath)):
+                    os.makedirs(os.path.join(self.path, self.yamlpath))
                 info = self.generate_info_template()
                 info['committer'] = committer
                 name = core.outputstorage.ConvertName(id).yaml

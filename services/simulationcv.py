@@ -94,7 +94,7 @@ class SimulationCV(services.base.Service):
 
     def search_yaml(self, keyword):
         results = set()
-        allfile = self.interface.grep(keyword, self.SAVE_DIR)
+        allfile = self.interface.grep(keyword, self.YAML_DIR)
         for filename in allfile:
             id = core.outputstorage.ConvertName(filename).base
             results.add(id)

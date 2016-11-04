@@ -30,9 +30,8 @@ class BaseFSInterface(interface.base.Interface):
     def get(self, filename):
         data = None
         path_file = os.path.join(self.path, filename)
-        if os.path.exists(path_file):
-            with open(path_file) as fp:
-                data = fp.read()
+        with open(path_file) as fp:
+            data = fp.read()
         return data
 
     def getraw(self, filename):

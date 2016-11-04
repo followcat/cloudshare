@@ -49,8 +49,9 @@ class GitInterface(interface.base.Interface):
         """
         data = None
         result = self.repo.get_named_file(os.path.join('../', filename))
-        if result is not None:
-            data = result.read()
+        if result is None:
+            raise IOError(filename)
+        data = result.read()
         return data
 
     def add(self, filename, filedata, message=None, committer=None):

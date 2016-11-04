@@ -104,8 +104,8 @@ class CurriculumVitae(services.base.Service):
             >>> import interface.gitinterface
             >>> root = "core/test"
             >>> name = "cv_1.doc"
-            >>> test_path = "webapp/views/test_output"
-            >>> repo_name = 'webapp/views/test_repo'
+            >>> test_path = "services/test_output"
+            >>> repo_name = 'services/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> obj = open(os.path.join(root, name))
@@ -217,15 +217,13 @@ class CurriculumVitae(services.base.Service):
             >>> import services.curriculumvitae
             >>> P = interface.predator.PredatorInterface('/tmp')
             >>> PS = services.curriculumvitae.CurriculumVitae(P.path)
-            >>> PS.getyaml('CV.md')
+            >>> PS.getyaml('CV.md') # doctest: +ELLIPSIS
             Traceback (most recent call last):
             ...
-            IOError
+            IOError...
         """
         name = core.outputstorage.ConvertName(id).yaml
         yaml_str = self.interface.get(name)
-        if yaml_str is None:
-            raise IOError
         return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
     @property

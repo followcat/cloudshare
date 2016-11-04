@@ -8,6 +8,43 @@ import extractor.utils_parsing
 import extractor.extract_experience
 
 
+info_template = (
+    ("id",                  str),
+    ("name",                str),
+    ("filename",            str),
+    ("committer",           str),
+    ("date",                int),
+    ("origin",              str),
+    ("originid",            str),
+    ("phone",               str),
+    ("email",               str),
+    ("expectation",         dict),
+    ("current",             dict),
+    ("gender",              str),
+    ("marital_status",      str),
+    ("age",                 str),
+    ("birthdate",           str),
+    ("education_history",   dict),
+    ("education",           dict),
+    ("school",              str),
+    ("company",             str),
+    ("position",            str),
+    ("experience",          dict),
+    ("comment",             list),
+    ("tag",                 list),
+    ("tracking",            list),
+)
+
+
+def generate_info_template(template=None):
+    if template is None:
+        template = info_template
+    info = {}
+    for each in template:
+        info[each[0]] = each[1]()
+    return info
+
+
 def get_tagfromstring(tag, stream, rule=None):
     u"""
         >>> get_tagfromstring(u'姓名', u'姓名:followcat ')
@@ -92,10 +129,14 @@ def get_expectation(stream):
 
 def get_experience(stream, name=None):
     u"""
-        >>> get_experience(u"2015.03 - 2015.05   XXCOM")['experience']
-        [(u'2015.03', u'2015.05', u'XXCOM')]
-        >>> get_experience(u"2015/03 - 2015/05   XXCOM")['experience']
-        [(u'2015/03', u'2015/05', u'XXCOM')]
+        >>> xp = get_experience(u"工作经历\\n2010.03 - 2015.05 公司")['experience']['company'][0]
+        >>> xp['date_from'], xp['date_to']
+        (u'2010.03', u'2015.05')
+        >>> assert xp['name'] == u'公司'
+        >>> xp = get_experience(u"工作经历\\n2010/03 - 2015/05 公司")['experience']['company'][0]
+        >>> xp['date_from'], xp['date_to']
+        (u'2010.03', u'2015.05')
+        >>> assert xp['name'] == u'公司'
         >>> assert get_experience(u"2015/03 - 至今   XXCOM")
         >>> assert get_experience(u"2015/03 - 至今   XXCOM XXX")
     """
@@ -144,6 +185,10 @@ def get_experience(stream, name=None):
     return result
 
 
+def get_classify(experience, company_knowledge=None, classify=[]):
+    return extractor.extract_experience.match_classify(experience, company_knowledge, classify)
+
+
 def get_name(stream):
     name = get_tagfromstring(u'姓名', stream)
     namelist = get_infofromrestr(name, u'^[\u4E00-\u9FA5\w]*$')
@@ -189,6 +234,7 @@ def catch(stream, name=None):
     info_dict["email"] = get_email(stream)
     info_dict.update(get_education(stream, name))     # education_history, education, school
     info_dict.update(get_experience(stream, name))    # experience, company, position
+    info_dict["classify"] = get_classify(info_dict['experience'])
     info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                 # age
     return info_dict
@@ -211,4 +257,14 @@ def catch_selected(stream, selected, name=None):
         info_dict.update(get_experience(stream, name))
     if 'expectation' in selected:
         info_dict.update(get_expectation(stream))
+    if 'classify' in selected:
+        experience = get_experience(stream, name)
+        info_dict["classify"] = get_classify(experience)
     return info_dict
+
+
+def catch_info(stream, name=None):
+    info = generate_info_template()
+    catchinfo = catch(stream)
+    info.update(catchinfo)
+    return info

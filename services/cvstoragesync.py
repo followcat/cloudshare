@@ -7,7 +7,6 @@ import pypandoc
 
 import utils._yaml
 import interface.predator
-import sources.industry_id
 import services.curriculumvitae
 import extractor.information_explorer
 
@@ -74,5 +73,7 @@ class CVStorageSync(object):
             catchinfo = extractor.information_explorer.catch_selected(md, selected, name)
         for key in catchinfo:
             if catchinfo[key] or (selected is not None and key in selected):
+                obj[key] = catchinfo[key]
+            elif key not in obj:
                 obj[key] = catchinfo[key]
         return obj

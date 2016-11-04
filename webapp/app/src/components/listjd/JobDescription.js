@@ -15,6 +15,7 @@ class JobDescription extends Component {
     };
 
     this.handleClick = this.handleClick.bind(this);
+    this.handleFastMatchingClick = this.handleFastMatchingClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleModalOk = this.handleModalOk.bind(this);
   }
@@ -29,6 +30,10 @@ class JobDescription extends Component {
     this.setState({
       visible: true,
     });
+  }
+
+  handleFastMatchingClick(record) {
+    window.open(`/fastmatching?jd_id=${record.id}`);
   }
 
   handleCancel() {
@@ -82,14 +87,18 @@ class JobDescription extends Component {
         dataIndex: 'status',
         key: 'status',
         width: 80,
-        render: (text) => <span style={text === 'Opening' ? { color: 'green' } : { color: 'red' }}>{text}</span>,
+        render: (text) => {
+          return (
+            text === 'Opening' ? <span style={{ color: 'green' }}>Open</span> : <span style={{ color: 'red' }}>{text}</span>
+          );
+        },
       },
       {
         title: 'Operation',
         key: 'operation',
         render: (record) => (
           <div>
-            <Button type="primary" size="small">CV Fast Matching</Button>
+            <Button type="primary" size="small" onClick={() => this.handleFastMatchingClick(record)}>CV Fast Matching</Button>
             <Button type="ghost" size="small" onClick={() => this.handleClick(record)}>Edit Job Description</Button>
           </div>
         )
@@ -112,6 +121,7 @@ class JobDescription extends Component {
           onModalOpen={this.props.onModalOpen}
           onModalCancel={this.props.onModalCancel}
           onCreateNewJobDescription={this.props.onCreateNewJobDescription}
+          onSelectFilter={this.props.onSelectFilter}
         />
         <Table
           columns={columns}
@@ -182,7 +192,7 @@ class JobDescription extends Component {
                 {...getFieldProps('statusSelect')}
               >
                 <Select.Option key={0} value="Opening">Opening</Select.Option>
-                <Select.Option key={0} value="Closed">Closed</Select.Option>
+                <Select.Option key={1} value="Closed">Closed</Select.Option>
               </Select>
             </Form.Item>
           </Form>

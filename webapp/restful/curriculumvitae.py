@@ -14,11 +14,26 @@ class CurrivulumvitaeAPI(Resource):
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
-    def get(self, id):
-        md = self.svc_mult_cv.getmd(id)
-        yaml = self.svc_mult_cv.getyaml(id)
-        return { 'result': { 'md': md, 'yaml': yaml } }
+    def post(self):
+        args = self.reqparse.parse_args()
+        id = args['id']
+        project = args['project']
+        html = self.svc_mult_cv.getproject(project).gethtml(id)
+        yaml = self.svc_mult_cv.getproject(project).getyaml(id)
+        user = flask.ext.login.current_user
+        result = user.getbookmark()
+        if yaml['id'] in result:
+            yaml['collected'] = True
+        else:
+            yaml['collected'] = False
+        en_html = ''
+        if 'enversion' in yaml:
+            en_html = self.svc_mult_cv.getproject(project).getmd_en(id)
+        return { 'code': 200, 'data': { 'html': html, 'en_html': en_html, 'yaml_info': yaml } }
 
 
 class CurrivulumvitaeMDAPI(CurrivulumvitaeAPI):
@@ -78,3 +93,31 @@ class CurrivulumvitaeYAMLAPI(CurrivulumvitaeAPI):
                                     yaml.safe_dump(yamlinfo, allow_unicode=True),
                                     commit_string.encode('utf-8'), user.id)
         return { 'result': result }
+
+
+class UpdateCurrivulumvitaeInformation(Resource):
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(UpdateCurrivulumvitaeInformation, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('update_info', type = dict, location = 'json')
+
+    def put(self):
+        args = self.reqparse.parse_args()
+        user = flask.ext.login.current_user
+        id = args['id']
+        project = args['project']
+        update_info = args['update_info']
+
+        for key, value in update_info.iteritems():
+            data = self.svc_mult_cv.getproject(project).updateinfo(id, key, value, user.id)
+            if data is not None:
+                response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
+            else:
+                response = { 'code': 400, 'message': 'Update information error.'}
+                break
+        return response

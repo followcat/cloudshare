@@ -32,29 +32,38 @@ def initialize(app):
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
                      endpoint = 'jobdescriptionlist')
 
-    api.add_resource(CurrivulumvitaeAPI, '/api/cv/<string:id>',
+    api.add_resource(CurrivulumvitaeAPI, '/api/resume',
                      endpoint = 'curriculumvitae')
     api.add_resource(CurrivulumvitaeMDAPI, '/api/cvmd/<string:id>',
                      endpoint = 'curriculumvitaemd')
     api.add_resource(CurrivulumvitaeYAMLAPI, '/api/cvyaml/<string:id>',
                      endpoint = 'curriculumvitaeyaml')
+    api.add_resource(UpdateCurrivulumvitaeInformation, '/api/cv/updateinfo',
+                     endpoint = 'updatecurrivulumvitaeinformation')
 
     api.add_resource(UploadCVAPI, '/api/uploadcv', endpoint = 'uploadcv')
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv', endpoint = 'uploadengcv')
     api.add_resource(UploadCVPreviewAPI, '/api/uploadcv/preview')
 
-    api.add_resource(SearchbyTextAPI, '/api/search/<string:text>', endpoint = 'searchbytext')
+    # api.add_resource(SearchbyTextAPI, '/api/search/<string:text>', endpoint = 'searchbytext')
+    api.add_resource(SearchbyTextAPI, '/api/searchbytext', endpoint = 'searchbytext')
 
     api.add_resource(RegionAPI, '/api/mining/region', endpoint = 'region')
     api.add_resource(CapacityAPI, '/api/mining/capacity', endpoint = 'capacity')
-    api.add_resource(PositionAPI, '/api/mining/position/<string:text>', endpoint = 'position')
+    api.add_resource(PositionAPI, '/api/mining/position', endpoint = 'position')
+
+    api.add_resource(AbilityAPI, '/api/mining/ability', endpoint = 'ability')
+    api.add_resource(ExperienceAPI, '/api/mining/experience', endpoint = 'experience')
 
     api.add_resource(LSIbydocAPI, '/api/mining/lsibydoc', endpoint = 'lsibydoc')
-    api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid/<string:id>', endpoint = 'lsibyjdid')
 
-    api.add_resource(SimilarAPI, '/api/mining/similar/<string:id>', endpoint = 'similar')
+    api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
 
-    api.add_resource(ValuablebyJDidAPI, '/api/mining/valuablebyjdid/<string:id>',
+    api.add_resource(SimilarAPI, '/api/mining/similar', endpoint = 'similar')
+
+    api.add_resource(ValuableAPI, '/api/mining/valuable')
+
+    api.add_resource(ValuablebyJDidAPI, '/api/mining/valuablebyjdid',
                                         endpoint = 'valuablebyjdid')
     api.add_resource(ValuablebydocAPI, '/api/mining/valuablebydoc',
                                         endpoint = 'valuablebydoc')

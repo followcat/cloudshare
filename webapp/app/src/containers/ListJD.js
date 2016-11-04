@@ -4,9 +4,9 @@ import { Link } from 'react-router';
 import { Menu, message } from 'antd';
 import 'whatwg-fetch';
 
-
 import Header from '../components/common/Header';
-
+import Storage from '../utils/storage';
+import Generator from '../utils/generator';
 import './manage.less';
 
 export default class ListJD extends Component {
@@ -17,6 +17,10 @@ export default class ListJD extends Component {
       current: 'jobdescription',
       jobDescriptionData: [],
       searchData: [],
+      filter: {
+        'keyword': '',
+        'status': '',
+      },
       companyData: [],
       height: 0,
       confirmLoading: false,
@@ -31,6 +35,8 @@ export default class ListJD extends Component {
     this.handleModalOpen = this.handleModalOpen.bind(this);
     this.handleModalCancel = this.handleModalCancel.bind(this);
     this.handleCreateNewCompany = this.handleCreateNewCompany.bind(this);
+    this.handleOnSelectFilter = this.handleOnSelectFilter.bind(this);
+    this.updateFilter = this.updateFilter.bind(this);
   }
 
   /**
@@ -38,10 +44,13 @@ export default class ListJD extends Component {
    */
   loadJobDescription() {
     fetch(`/api/jdlist`, {
-      method: 'GET',
+      method: 'POST',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${Storage.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
+      body: Generator.getPostData(),
     })
     .then((response) => {
       return response.json();
@@ -69,10 +78,13 @@ export default class ListJD extends Component {
    */
   loadCompany() {
     fetch(`/api/companylist`, {
-      method: 'GET',
+      method: 'POST',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${Storage.get('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
+      body: Generator.getPostData(),
     })
     .then((response) => {
       return response.json();
@@ -104,30 +116,75 @@ export default class ListJD extends Component {
   }
 
   /**
+   * 根据过滤条件筛选data
+   * @return {void}
+   */
+  updateFilter() {
+    const jdData = this.state.jobDescriptionData,
+          filter = this.state.filter;
+
+    let filterResult = [],
+        keyword = filter.keyword,
+        status = filter.status;
+
+    switch (true) {
+      case keyword !== '' && status !== '':
+        let firstFilter = jdData.filter(item => item.status === status);
+        filterResult = firstFilter.filter((item) => {
+          for (let key in item) {
+            if (typeof item[key] === 'string' && item[key].indexOf(keyword) > -1) {
+              return true;
+            }
+          }
+          return false;
+        });
+        break;
+      case keyword !== '' && status === '':
+        filterResult = jdData.filter((item) => {
+          for (let key in item) {
+            if (typeof item[key] === 'string' && item[key].indexOf(keyword) > -1) {
+              return true;
+            }
+          }
+          return false;
+        });
+        break;
+      case keyword === '' && status !== '':
+        filterResult = jdData.filter(item => item.status === status);
+        break;
+      default:
+        filterResult = [];
+    }
+
+    this.setState({
+      searchData: filterResult,
+    });
+  }
+
+  /**
    * 表格数据搜索
    * @param  {[string]} value [获取Input的值]
    * @return {[type]}  None
    */
   handleSearch(value) {
-    let jdData = this.state.jobDescriptionData;
-    if (value !== '') {
-      let searchResultArray = [];
-      for (let item of jdData) {
-        for (let key in item) {
-          if (typeof item[key] === 'string' && item[key].indexOf(value) > -1) {
-            searchResultArray.push(item);
-            break;
-          }
-        }
-      }
-      this.setState({
-        searchData: searchResultArray,
-      });
-    } else {
-      this.setState({
-        searchData: [],
-      });
-    }
+    const filter = this.state.filter;
+    this.setState({
+      filter: Object.assign(filter, { keyword: value })
+    });
+    this.updateFilter();
+  }
+
+  /**
+   * 根据Select选择器选择的值过滤表格结果
+   * @param  {string} value [status选择的值]
+   * @return {void}
+   */
+  handleOnSelectFilter(value) {
+    const filter = this.state.filter;
+    this.setState({
+      filter: Object.assign(filter, { status: value })
+    });
+    this.updateFilter();
   }
 
   /**
@@ -145,11 +202,11 @@ export default class ListJD extends Component {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Authorization': `Basic ${localStorage.token}`,
+        'Authorization': `Basic ${Storage.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         jd_name: obj.jdName,
         co_name: obj.companySelection,
         jd_description: obj.jdContent,
@@ -182,11 +239,11 @@ export default class ListJD extends Component {
       method: 'PUT',
       credentials: 'include',
       headers: {
-        'Authroization': `Basic ${localStorage.token}`,
+        'Authroization': `Basic ${Storage.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         status: value.statusSelect,
         coname: value.companyName,
         description: value.jdContent,
@@ -219,11 +276,11 @@ export default class ListJD extends Component {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Authroization': `Basic ${localStorage.token}`,
+        'Authroization': `Basic ${Storage.get('token')}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: Generator.getPostData({
         coname: value.companyName,
         introduction: value.introduction,
       }),
@@ -263,8 +320,8 @@ export default class ListJD extends Component {
   render() {
     return (
       <div>
-        <div id="viewport">
-          <Header />
+        <div id="viewport" className="pd-top">
+          <Header fixed={true} />
           <div className="cs-layout-bottom">
             <div className="cs-layout-wrapper" ref="wrapper">
               <div className="cs-layout-sider">
@@ -292,6 +349,7 @@ export default class ListJD extends Component {
                     onCreateNewJobDescription: this.handleCreateNewJobDescription,
                     onSubmitEditJD: this.handleSubmitEditJD,
                     onCreateNewCompany: this.handleCreateNewCompany,
+                    onSelectFilter: this.handleOnSelectFilter,
                   })}
               </div>
             </div>

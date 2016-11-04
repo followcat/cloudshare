@@ -21,6 +21,19 @@ class CurriculumVitae(services.base.Service):
         self._nums = 0
 
     def exists(self, filename):
+        """
+            >>> import interface.basefs
+            >>> import services.curriculumvitae
+            >>> DIR = 'repo'
+            >>> DB = interface.basefs.BaseFSInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.exists('blr6dter.yaml')
+
+            >>> import interface.gitinterface
+            >>> DB = interface.gitinterface.GitInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.exists('blr6dter.yaml')
+        """
         path_name = os.path.join(self.path, filename)
         result = self.interface.exists(path_name)
         return result
@@ -30,6 +43,7 @@ class CurriculumVitae(services.base.Service):
             >>> import glob
             >>> import shutil
             >>> import os.path
+            >>> import core.converterutils
             >>> import services.curriculumvitae
             >>> import interface.gitinterface
             >>> repo_name = 'services/test_repo'
@@ -38,8 +52,12 @@ class CurriculumVitae(services.base.Service):
             >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
-            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject('cv_1.doc', f1, test_path)
-            >>> cv2 = services.curriculumvitae.CurriculumVitaeObject('cv_2.doc', f2, test_path)
+            >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
+            >>> fp2 = core.converterutils.FileProcesser(f2, 'cv_2.doc', test_path)
+            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(fp1.name,
+            ...         fp1.markdown_stream, fp1.yamlinfo)
+            >>> cv2 = services.curriculumvitae.CurriculumVitaeObject(fp2.name,
+            ...         fp2.markdown_stream, fp2.yamlinfo)
             >>> svc_cv.add(cv1)
             True
             >>> svc_cv.add(cv2)
@@ -59,19 +77,18 @@ class CurriculumVitae(services.base.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        if cvobj.result is False:
-            return False
         if self.unique_checker is None:
             self.unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
         self.unique_checker.update()
-        if unique is True and self.unique_checker.unique(cvobj.filepro.yamlinfo) is False:
+        if unique is True and self.unique_checker.unique(cvobj.metadata) is False:
             self.info = "Exists File"
             return False
-        cvobj.filepro.yamlinfo['committer'] = committer
-        cvobj.filepro.yamlinfo['date'] = time.time()
-        self.interface.add(os.path.join(self.path, cvobj.filepro.name.md),
+        cvobj.metadata['committer'] = committer
+        cvobj.metadata['date'] = time.time()
+        name = core.outputstorage.ConvertName(cvobj.name)
+        self.interface.add(os.path.join(self.path, name.md),
                            cvobj.markdown(), committer=committer)
-        self.interface.add(os.path.join(self.path, cvobj.filepro.name.yaml),
+        self.interface.add(os.path.join(self.path, name.yaml),
                            yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
                            committer=committer)
         self._nums += 1
@@ -92,7 +109,9 @@ class CurriculumVitae(services.base.Service):
             >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
-            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(name, obj, test_path)
+            >>> fp1 = core.converterutils.FileProcesser(obj, name, test_path)
+            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(fp1.name,
+            ...         fp1.markdown_stream, fp1.yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
             >>> md_files = glob.glob(os.path.join(svc_cv.repo_path, '*.md'))
@@ -105,9 +124,8 @@ class CurriculumVitae(services.base.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        if cvobj.result is False:
-            return False
-        self.interface.add(os.path.join(self.path, cvobj.filepro.name.md),
+        name = core.outputstorage.ConvertName(cvobj.name)
+        self.interface.add(os.path.join(self.path, name.md),
                            cvobj.markdown(), committer=committer)
         return True
 
@@ -117,6 +135,19 @@ class CurriculumVitae(services.base.Service):
         return True
 
     def yamls(self):
+        """
+            >>> import interface.basefs
+            >>> import services.curriculumvitae
+            >>> DIR = 'repo'
+            >>> DB = interface.basefs.BaseFSInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')
+
+            >>> import interface.gitinterface
+            >>> DB = interface.gitinterface.GitInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')
+        """
         yamls = self.interface.lsfiles(self.path, '*.yaml')
         for each in yamls:
             yield os.path.split(each)[-1]
@@ -148,6 +179,19 @@ class CurriculumVitae(services.base.Service):
         return result
 
     def getmd(self, name):
+        """
+            >>> import interface.basefs
+            >>> import services.curriculumvitae
+            >>> DIR = 'repo'
+            >>> DB = interface.basefs.BaseFSInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.getmd('blr6dter.yaml')
+
+            >>> import interface.gitinterface
+            >>> DB = interface.gitinterface.GitInterface(DIR)
+            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
+            >>> assert SVC_CV.getmd('blr6dter.yaml')
+        """
         result = unicode()
         md = core.outputstorage.ConvertName(name).md
         path_name = os.path.join(self.path, md)
@@ -199,71 +243,29 @@ class CurriculumVitaeStorage(CurriculumVitae):
             self.interface.add(os.path.join(self.path, cn_id.html), rawdata)
         return True
 
-    def lsids(self, *args, **kwargs):
-        return [f.split('.')[0] for f in self.interface.lsfiles()]
+    def lsids(self):
+        return [os.path.splitext(f)[0]
+                for f in self.interface.lsfiles(self.path, '*.yaml')]
 
 
 class CurriculumVitaeObject(object):
 
-    def __init__(self, filename, fileobject, path):
-        """
-            >>> import os
-            >>> import shutil
-            >>> import os.path
-            >>> import services.curriculumvitae
-            >>> root = "core/test"
-            >>> name = "cv_1.doc"
-            >>> obj = open(os.path.join(root, name))
-            >>> test_path = "webapp/views/test_output"
-            >>> os.makedirs(test_path)
-            >>> up = services.curriculumvitae.CurriculumVitaeObject(name, obj, test_path)
-            >>> up.result
-            True
-            >>> up.remove()
-            >>> shutil.rmtree(test_path)
-        """
-        self.result = False
-        self.tmp_path = path
-        self.convertname = core.outputstorage.ConvertName(
-            filename.encode('utf-8'))
-        self.filepro = core.converterutils.FileProcesser(fileobject,
-                                                         self.convertname,
-                                                         self.tmp_path)
-        self.result = self.filepro.result
-        self.resultid = self.filepro.resultcode
+    def __init__(self, name, data, metadata, raw=None):
+        self.name = core.outputstorage.ConvertName(name)
+        self.raw = raw
+        self.data = data
+        self.metadata = metadata
 
     @property
     def ID(self):
-        return self.filepro.name.base
+        return self.name
 
     def markdown(self):
-        return self.filepro.markdown_stream
+        return self.data
 
     def yaml(self):
-        return self.filepro.yamlinfo
+        return self.metadata
 
     def preview_markdown(self):
-        output = core.converterutils.md_to_html(self.filepro.markdown_stream)
+        output = core.converterutils.md_to_html(self.data)
         return output
-
-    def remove(self):
-        """
-            >>> import os
-            >>> import shutil
-            >>> import os.path
-            >>> import services.curriculumvitae
-            >>> root = "core/test"
-            >>> name = "cv_1.doc"
-            >>> obj = open(os.path.join(root, name))
-            >>> test_path = "webapp/views/test_output"
-            >>> os.makedirs(test_path)
-            >>> up = services.curriculumvitae.CurriculumVitaeObject(name, obj, test_path)
-            >>> fn = os.path.join(up.filepro.markdown_path, up.filepro.name.md)
-            >>> os.path.exists(fn)
-            True
-            >>> up.remove()
-            >>> os.path.exists(fn)
-            False
-            >>> shutil.rmtree(test_path)
-        """
-        self.filepro.deleteconvert()

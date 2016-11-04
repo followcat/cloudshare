@@ -119,9 +119,10 @@ class AccountHistoryAPI(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         super(AccountHistoryAPI, self).__init__()
 
-    def get(self):
+    def get(self, project):
         user = flask.ext.login.current_user
-        info_list = self.svc_mult_cv.getproject().interface.history(user.id, max_commits=10)
+        info_list = self.svc_mult_cv.getproject(project).interface.history(user.id,
+                                                                           max_commits=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:

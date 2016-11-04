@@ -16,10 +16,10 @@ class ProjectCV(services.simulationcv.SimulationCV):
     YAML_DIR = "CV"
 
     YAML_TEMPLATE = (
-        ("committer",           []),
-        ("comment",             []),
-        ("tag",                 []),
-        ("tracking",            []),
+        ("committer",           list),
+        ("comment",             list),
+        ("tag",                 list),
+        ("tracking",            list),
     )
 
     def __init__(self, interface, repo, name):
@@ -37,12 +37,16 @@ class ProjectCV(services.simulationcv.SimulationCV):
 
     def setup(self, classify, committer=None):
         if not os.path.exists(self.cvpath):
+            self.update(classify, committer)
+
+    def update(self, classify, committer=None):
+        if not os.path.exists(self.cvpath):
             os.makedirs(self.cvpath)
-            self.config['classify'] = classify
-            self.save()
-            self.interface.add_files([bytes(self.config_file), bytes(self.ids_file)],
-                                      message='Create new project %s.'%self.name,
-                                      committer=committer)
+        self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
+        self.save()
+        self.interface.add_files([bytes(self.config_file), bytes(self.ids_file)],
+                                  message='Create new project %s.'%self.name,
+                                  committer=committer)
 
     def add(self, id, committer):
         result = False
@@ -52,7 +56,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
             info['committer'] = committer
             name = core.outputstorage.ConvertName(id).yaml
             utils.builtin.save_yaml(info, self.cvpath, name)
-            utils.builtin.save_json(self.cvids, self.path, self.ids_file)
+            utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
+                                    indent=4)
             self.interface.add_files([bytes(self.ids_file),
                                       bytes(os.path.join(self.YAML_DIR, name))],
                                       message='Add new cv %s.'%id,
@@ -63,7 +68,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def generate_info_template(self):
         info = {}
         for each in self.YAML_TEMPLATE:
-            info[each[0]] = each[1]
+            info[each[0]] = each[1]()
         return info
 
     def getmd_en(self, id):
@@ -109,7 +114,7 @@ class ProjectCV(services.simulationcv.SimulationCV):
             else:
                 projectinfo[key] = value
                 self.saveinfo(id, projectinfo,
-                              'Update %s key %s to %s.' % (id, key, value), committer)
+                              'Update %s key %s.' % (id, key), committer)
         return data
 
     def _infoframe(self, value, username):
@@ -143,16 +148,20 @@ class ProjectCV(services.simulationcv.SimulationCV):
         return data
 
     def search(self, keyword):
-        allmd = self.repo.search(keyword)
-        result = []
-        for md in allmd:
-            name = core.outputstorage.ConvertName(md).base
-            if name in self.cvids:
-                result.append(md)
-        return result
+        results = set()
+        allfile = self.repo.search(keyword)
+        for filename in allfile:
+            id = core.outputstorage.ConvertName(filename).base
+            if id in self.cvids:
+                results.add(id)
+        return results
 
     def search_yaml(self, keyword):
-        results = self.interface.grep_yaml(keyword, self.YAML_DIR)
+        results = set()
+        allfile = self.interface.grep(keyword, self.YAML_DIR)
+        for filename in allfile:
+            id = core.outputstorage.ConvertName(filename).base
+            results.add(id)
         return results
 
     def company_add(self, name, introduction, committer):
@@ -164,8 +173,8 @@ class ProjectCV(services.simulationcv.SimulationCV):
     def company_names(self):
         return self.company.names()
 
-    def jd_get(self, name):
-        return self.jobdescription.get(name)
+    def jd_get(self, hex_id):
+        return self.jobdescription.get(hex_id)
 
     def jd_add(self, company, name, description, committer, status=None):
         try:

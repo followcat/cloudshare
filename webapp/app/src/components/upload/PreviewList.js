@@ -3,8 +3,9 @@ import React, { Component, PropTypes } from 'react';
 
 import { Button, Icon } from 'antd';
 
-import Preview from './Preview';
 import ResumeTitle from './ResumeTitle';
+import Summary from '../common/Summary';
+import ResumeContent from '../common/ResumeContent';
 
 import './previewlist.less';
 
@@ -28,8 +29,9 @@ export default class PreviewList extends Component {
             index: index,
             current: this.props.currentPreview,
             length: previewListLength,
+            classify: previewItem.yaml_info.classify,
             name: previewItem.name,
-            id: previewItem.id,
+            filename: previewItem.filename,
             onPrevPreview: this.props.onPrevPreview,
             onNextPreview: this.props.onNextPreview,
             onComfirmUpload: this.props.onComfirmUpload,
@@ -41,7 +43,8 @@ export default class PreviewList extends Component {
           return (
             <div key={index} className={this.isActive(index)}>
               <ResumeTitle {...resumeProps}/>
-              <Preview markdown={previewItem.markdown} />
+              <Summary dataSource={previewItem.yaml_info}/>
+              <ResumeContent html={previewItem.markdown} />
             </div>
           );
         })}

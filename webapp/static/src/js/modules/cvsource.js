@@ -38,6 +38,13 @@ require([
   "bootstrap",
 ],function($, cvdeal, datetimepicker, Upload, ColorGrad, History) {
 
+  $("#enCV").click(function() {
+    var id = $(this).attr("data-id"),
+        project = localStorage._pj;
+    var newHref = "/showeng/" + project + "/" + id;
+    location.href = newHref;
+  });
+
   cvdeal.cvDeal("cvContent", function() {
     $("#loading").css("display", "none");
   });
@@ -45,7 +52,9 @@ require([
   var c = {
     currentUser: $("#name").text().trim(),
 
-    filename: function() {
+    project: localStorage.getItem('_pj'),
+
+    id: function() {
       var url = String(window.location.href);
       var arr = url.split("/");
       return arr[arr.length - 1];
@@ -106,22 +115,23 @@ require([
       $("#tagText").focus();
     } else {
       $.ajax({
-        type: "POST",
-        url: "/updateinfo",
+        type: "PUT",
+        url: "/api/cv/updateinfo",
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
-          "filename": c.filename,
-          "yamlinfo": {
+          "id": c.id,
+          "project": c.project,
+          "update_info": {
             "tag": tagText
           }
         }),
         success: function(response) {
-          if (response.result) {
+          if (response.code === 200) {
             $("#tagContainer").prepend("<span class='label label-primary' title='"+ c.currentUser +"'>"+ tagText +"</span>");
             $("#tagText").val("");
           } else {
-            alert("Add tag failed");
+            alert(response.message);
           }
         }
       });
@@ -137,25 +147,26 @@ require([
       $("#trackingInput").focus();
     } else {
       $.ajax({
-        type: "POST",
-        url: "/updateinfo",
+        type: "PUT",
+        url: "/api/cv/updateinfo",
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
-          "filename": c.filename,
-          "yamlinfo": {
+          "id": c.id,
+          "project": c.project,
+          "update_info": {
             "tracking": {
               "date": date,
               "text": trackingText
             }
           }
         }),
-        success: function(result) {
-          if (result.result) {
+        success: function(response) {
+          if (response.code === 200) {
             $("#trackingContent").prepend("<div class='tracking-item'><em>"+ c.currentUser +" / "+ date +"</em><p>"+ trackingText +"</p></div>");
             $("#trackingInput").val("");
           } else {
-            alert("Failed");
+            alert(response.message);
           }
         }
       });
@@ -170,22 +181,23 @@ require([
       $("#commentInput").focus();
     } else {
       $.ajax({
-        type: "POST",
-        url: "/updateinfo",
+        type: "PUT",
+        url: "/api/cv/updateinfo",
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
-          "filename": c.filename,
-          "yamlinfo": {
+          "id": c.id,
+          "project": c.project,
+          "update_info": {
             "comment": commentText
           }
         }),
         success: function(response) {
-          if (response.result) {
+          if (response.code === 200) {
             $("#commentContent").prepend("<div class='comment-item'><em>"+ c.currentUser + " / " + response.data.date +"</em><p>" + response.data.content + "</p></div>");
             $("#commentInput").val("");
           } else {
-            alert("Failed");
+            alert(response.message);
           }
         }
       });
@@ -194,15 +206,15 @@ require([
 
   //Add url into the link button
   function Route() {
-    $("#download").attr("href", "/download/" + c.filename.split(".")[0] + ".doc");
-    $("#modify").attr("href", "/modify/" + c.filename);
-    $("#match").attr("href", "/resumetojd/" + c.filename + "/Opening");
+    $("#download").attr("href", "/download/" + c.id + ".doc");
+    $("#modify").attr("href", "/modify/" + c.id + ".md");
+    // $("#match").attr("href", "/resumetojd/" + c.filename + "/Opening");
   }
   Route();
 
   //upload english file
   $("#enUploadSubmit").on("click", function() {
-    localStorage.name = c.filename.split(".")[0];
+    localStorage.name = c.id;
 
     var uploader = new Upload("enUploadForm");
     uploader.Uploadfile(function() {
@@ -237,23 +249,24 @@ require([
   //Title Button Handle
   $("#titleBtn").on("click", function() {
     $.ajax({
-      url: "/updateinfo",
-      type: "post",
+      url: "/api/cv/updateinfo",
+      type: "PUT",
       dataType: "json",
       contentType: "application/json",
       data: JSON.stringify({
-        "filename": c.filename,
-        "yamlinfo": {
+        "id": c.id,
+        "project": c.project,
+        "update_info": {
           "id": $("#titleId").val().trim(),
           "name": $("#titleName").val().trim(),
           "origin": $("#titleOrigin").val().trim(),
         }
       }),
       success: function(response) {
-        if (response.result) {
+        if (response.code === 200) {
           window.location.reload();
         } else {
-          alert("Failed to submit");
+          alert(response.message);
         }
       }
     });
@@ -261,20 +274,23 @@ require([
 
   //Get similar person data.
   $.ajax({
-    url: "/analysis/similar",
+    url: "/api/mining/similar",
     type: "post",
-    data: {
-      "doc": $("#cvContent").text()
-    },
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify({
+      "doc": $("#cvContent").text(),
+      "project": localStorage.getItem('_pj')
+    }),
     success: function(response) {
-      var datas = response.result;
+      var datas = response.data;
       for (var i = 0, len = datas.length; i < len; i++) {
         var _index = datas[i];
-        var name = _index.name !== "" ? _index.name : _index.id;
+        var name = _index.yaml_info.name !== "" ? _index.yaml_info.name : _index.yaml_info.id;
 
-        $("#similarContent").append("<div class='similar-item'><a href='/show/" + _index.md_filename + "' target='_blank'>" +
-          name + " | " + _index.position + " | " +
-          _index.age + " | " + _index.gender + " | " + _index.education + "</a></div>"
+        $("#similarContent").append("<div class='similar-item'><a href='/show/" + _index.id + "' target='_blank'>" +
+          name + " | " + _index.yaml_info.position + " | " +
+          _index.yaml_info.age + " | " + _index.yaml_info.gender + " | " + _index.yaml_info.education + "</a></div>"
         );
       }
     }
@@ -284,7 +300,7 @@ require([
   var history = new History();
   history.writeHistory({
     name: $("#titleName").val(),
-    filename: c.filename,
+    filename: c.id + ".md",
     id: $("#titleId").val(),
   });
 
@@ -307,7 +323,7 @@ require([
   //收藏简历请求
   $("#collect").on("click", function() {
     var _this = $(this),
-        cvId = c.filename.split(".")[0],
+        cvId = c.id,
         collected = _this.attr("data-collected");
 
     if (collected === "true") {

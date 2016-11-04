@@ -6,6 +6,7 @@ import services.account
 import services.multicv
 import services.projectcv
 import services.curriculumvitae
+import core.converterutils
 import interface.gitinterface
 
 class Config(object):
@@ -49,14 +50,17 @@ class Config(object):
         self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].no_above = 1
         self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].setup('first.md',
             ['here is a text for testing.'])
-        self.SVC_MIN.setup('default')
+        self.SVC_MIN.setup()
 
     def init_samplecv(self):
         filename = 'cv_1.doc'
         f = open(os.path.join('core/test', filename))
-        upobj = services.curriculumvitae.CurriculumVitaeObject(filename, f,
-                                                               self.UPLOAD_TEMP)
-        self.SVC_MULT_CV.add(upobj, projectname='project_test')
+        filepro = core.converterutils.FileProcesser(f, filename,
+                                                    self.UPLOAD_TEMP)
+        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
+                                                               filepro.markdown_stream,
+                                                               filepro.yamlinfo)
+        self.SVC_MULT_CV.add(cvobj, projectname='project_test')
 
     def rebuild(self):
         self.destory()

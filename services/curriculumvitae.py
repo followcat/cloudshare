@@ -11,10 +11,10 @@ import core.uniquesearcher
 
 class CurriculumVitae(services.base.Service):
 
-    YAML_DIR = 'CV'
+    SAVE_DIR = 'CV'
 
     def __init__(self, path, name=None):
-        self.path = os.path.join(path, self.YAML_DIR)
+        self.path = os.path.join(path, self.SAVE_DIR)
         super(CurriculumVitae, self).__init__(self.path, name)
         self.unique_checker = None
         self.info = ""

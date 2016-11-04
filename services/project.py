@@ -19,7 +19,7 @@ class Project(services.base.Service):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
         if os.path.exists(os.path.join(path,
-                          services.simulationcv.SimulationCV.YAML_DIR)) and not (
+                          services.simulationcv.SimulationCV.SAVE_DIR)) and not (
         os.path.exists(os.path.join(path,
                        services.simulationcv.SimulationCV.ids_file))):
             self.curriculumvitae = services.curriculumvitae.CurriculumVitae(self.path)

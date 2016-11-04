@@ -6,15 +6,16 @@ import ujson
 import utils._yaml
 import utils.issue
 import utils.builtin
+import services.base
 import interface.basefs
 import core.outputstorage
 
 
-class SimulationCV(object):
+class SimulationCV(services.base.Service):
 
     ids_file = 'names.json'
 
-    YAML_DIR = 'CV'
+    SAVE_DIR = 'CV'
     YAML_TEMPLATE = (
         ("committer",           list),
         ("comment",             list),
@@ -22,15 +23,15 @@ class SimulationCV(object):
         ("tracking",            list),
     )
 
-    def __init__(self, name, path, cvstorage, storage=None):
+    def __init__(self, path, name, cvstorage, storage=None):
+        super(SimulationCV, self).__init__(os.path.join(path, self.SAVE_DIR), name)
         self.name = name
         self.path = path
         self.cvids = set()
         self.cvstorage = cvstorage
-        if storage is None:
-            storage = interface.basefs.BaseFSInterface(path)
-        self.interface = storage
-        self.cvpath = self.YAML_DIR
+        if storage is not None:
+            self.interface = storage
+        self.cvpath = self.SAVE_DIR
         try:
             self.load()
         except IOError:
@@ -93,7 +94,7 @@ class SimulationCV(object):
 
     def search_yaml(self, keyword):
         results = set()
-        allfile = self.interface.grep(keyword, self.YAML_DIR)
+        allfile = self.interface.grep(keyword, self.SAVE_DIR)
         for filename in allfile:
             id = core.outputstorage.ConvertName(filename).base
             results.add(id)

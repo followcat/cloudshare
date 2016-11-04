@@ -12,7 +12,7 @@ class ClassifyCV(object):
     def __init__(self, name, path, cvstorage):
         self.name = name
         self.path = os.path.join(path, utils.builtin.industrytopath(name))
-        self.curriculumvitae = services.simulationcv.SimulationCV(name, self.path, cvstorage)
+        self.curriculumvitae = services.simulationcv.SimulationCV(self.path, name, cvstorage)
         self.config = dict()
         try:
             self.load()

@@ -342,6 +342,7 @@ class ValuableAPI(ValuablebaseAPI):
     def post(self):
         args = self.reqparse.parse_args()
         project = args['project']
+        doc = ''
         if args['id']:
             jd_yaml = self.svc_mult_cv.getproject(project).jd_get(args['id'])
             doc = jd_yaml['description']

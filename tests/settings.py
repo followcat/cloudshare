@@ -6,6 +6,7 @@ import services.mining
 import services.account
 import services.multicv
 import services.project
+import services.company
 import services.curriculumvitae
 import core.converterutils
 import interface.gitinterface
@@ -34,10 +35,11 @@ class Config(object):
         self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB_NAME)
         self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB_NAME,
                                                                     'cloudshare')
+        self.SVC_CO_REPO = services.company.Company(self.REPO_DB_NAME, 'corepo')
 
         self.SVC_PRJ_MED = services.project.Project(os.path.join(self.PRJ_PATH,
                                                                  'project_test'),
-                                                    self.SVC_CV_REPO,
+                                                    self.SVC_CO_REPO, self.SVC_CV_REPO,
                                                     'project_test')
         self.SVC_PRJ_MED.setup([])
 

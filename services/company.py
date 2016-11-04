@@ -12,22 +12,29 @@ class Company(services.base.Service):
     """
         >>> import shutil
         >>> import services.company
+        >>> import core.basedata
         >>> import interface.gitinterface
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> svc_co = services.company.Company(interface.path)
-        >>> svc_co.add('CompanyA', 'This is Co.A', 'Dever')
+        >>> name, committer, introduction = 'CompanyA', 'tester', 'This is Co.A'
+        >>> metadata = {
+        ... 'name': name,
+        ... 'committer': committer,
+        ... 'introduction': introduction,}
+        >>> coobj = core.basedata.DataObject(name, introduction, metadata)
+        >>> svc_co.add(coobj, 'Dever')
         True
         >>> co = svc_co.getyaml('CompanyA')
         >>> co['name']
         'CompanyA'
         >>> co['introduction']
         'This is Co.A'
-        >>> svc_co.add('CompanyA', 'This is Co.A', 'Dever') # doctest: +ELLIPSIS
+        >>> svc_co.add(coobj, 'Dever') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ExistsCompany: CompanyA
-        >>> svc_co.names()
+        >>> list(svc_co.names())
         ['CompanyA']
         >>> svc_co.getyaml('CompanyB') # doctest: +ELLIPSIS
         Traceback (most recent call last):
@@ -76,9 +83,12 @@ class Company(services.base.Service):
 
     def getyaml(self, id):
         name = core.outputstorage.ConvertName(id).yaml
-        yaml_str = self.interface.get(name)
-        if yaml_str is None:
-            raise IOError
+        try:
+            yaml_str = self.interface.get(name)
+            if yaml_str is None:
+                raise IOError
+        except IOError:
+            raise services.exception.NotExistsCompany
         return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
     def yamls(self):
@@ -88,7 +98,7 @@ class Company(services.base.Service):
 
     def names(self):
         for each in self.yamls():
-            yield core.outputstorage.ConvertName(each)
+            yield core.outputstorage.ConvertName(each).base
 
     def datas(self):
         for name in self.names():

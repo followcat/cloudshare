@@ -117,10 +117,23 @@ require(
       return datas;
     }
 
+    function setJobDescriptionById(id) {
+      $.ajax({
+        url: '/api/jd/' + id,
+        method: 'GET',
+        success: function(response) {
+          if (response.code === 200) {
+            $("textarea[name='jdContent']").val(response.data.description);
+          } else {
+            console.log('Get jd fail.');
+          }
+        }
+      });
+    }
+
     //编辑JD模块封装
-    function EditJD(jdId, jdContent, companyName, creator, userName, status) {
+    function EditJD(jdId, companyName, creator, userName, status) {
       this.jdId = jdId,
-      this.jdContent = jdContent,
       this.companyName = companyName,
       this.userName = userName,
       this.status = status,
@@ -130,7 +143,6 @@ require(
     EditJD.prototype.setValue = function(){
       $("input[name='companyName']").val(this.companyName);
       $("input[name='jdId']").val(this.jdId);
-      $("textarea[name='jdContent']").val(this.jdContent);
       $("select[name='status']").val(this.status);
     }
 
@@ -142,13 +154,13 @@ require(
 
         var companyName = $(tdElements[0]).text(),
             jdId = $(tdElements[2]).attr("data-id"),
-            jdContent = $(tdElements[2]).attr("title"),
             creator = $(tdElements[3]).text(),
             status = $(tdElements[4]).text(),
             userName = $("#name").text().trim();
 
-        var editJdObj = new EditJD(jdId, jdContent, companyName, creator, userName, status);
+        var editJdObj = new EditJD(jdId, companyName, creator, userName, status);
         editJdObj.setValue();
+        setJobDescriptionById(jdId);
         $('#modifyJDModal').modal('show');
       });
     }
@@ -230,12 +242,13 @@ require(
       "click .edit-jd": function(e, value, row, index) {
         var companyName = row[0],
             jdId = row["_2_data"].id,
-            jdContent = row[2],
             creator = row[3],
             status = row[4],
             userName = $("#name").text().trim();
-        var editJdObj = new EditJD(jdId, jdContent, companyName, creator, userName, status);
+
+        var editJdObj = new EditJD(jdId, companyName, creator, userName, status);
         editJdObj.setValue();
+        setJobDescriptionById(jdId);
         $('#modifyJDModal').modal('show');
       }
     };

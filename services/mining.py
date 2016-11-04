@@ -4,7 +4,7 @@ import re
 import core.mining.lsimodel
 import core.mining.lsisimilarity
 
-from utils.builtin import jieba_cut, pos_extract
+from utils.builtin import jieba_cut, pos_extract, industrytopath
 
 
 REJECT = re.compile('(('+')|('.join([
@@ -33,8 +33,9 @@ SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
 FLAGS = ['x', # spaces
          'm', # number and date
          #'a', # adverb
+         'ad', 'an',
          'c', # conjunction
-         'd', # adverb
+         'd', 'df', # adverb
          'e', # interjection
          'f', # noun of locality
          'g', # morpheme word
@@ -42,17 +43,19 @@ FLAGS = ['x', # spaces
          'i', # idiom
          #'j', # abbreviation
          'k', # suffix
-         'nrt', 'nr', 'ng', #'nz', fails on myjnoee7.md
+         'm', 'mq',
+         'nrt', 'nr', 'ng', 'nrfg', 'ngrf', #'nz', fails on myjnoee7.md
          'o', # onomatopoeia
          'p', # preposition
          'q', # quantifier
-         'r', # pronoun
-         'tg', # time root word
-         'u', # unclassified (eg. etc)
-         'vg', # verb morpheme word
+         'r', 'rg', 'rr', # pronoun
+         's', #space
+         't', 'tg', # time root word
+         'u', 'ug', # unclassified (eg. etc)
+         'vi', 'vd', 'vg', 'vq',  # verb morpheme word
          #'v', # verb
          'y', # statement label designator
-         'z', # State word
+         'z', 'zg', # State word
          #'ns', # city and country
         ]
 
@@ -162,14 +165,20 @@ def silencer(document):
 
 class Mining(object):
 
+    SIMS_PATH = 'all'
+
     def __init__(self, path, cvsvc, slicer=None):
         self.sim = {}
         self.path = path
         self.lsi_model = dict()
+        self.projects = cvsvc.projects
         self.additionals = cvsvc.additionals
-        self.services = {'default': cvsvc.projects, 'all': dict()}
+        self.services = {'default': cvsvc.projects,
+                         'classify': dict(),
+                         'all': dict()}
         self.services['all'].update(cvsvc.projects)
         self.services['all'].update(cvsvc.additionals)
+        self.services['classify'].update(cvsvc.additionals)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
@@ -178,9 +187,26 @@ class Mining(object):
             self.slicer = slicer
         self.make_lsi(self.services['default'])
 
-    def setup(self, name):
-        assert name in self.services
-        self.add(self.services[name], name)
+    def setup(self):
+        assert self.lsi_model
+        for modelname in self.lsi_model:
+            if not self.lsi_model[modelname].names:
+                continue
+            model = self.lsi_model[modelname]
+            save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
+            self.sim[modelname] = dict()
+            service_names = [modelname] + self.projects[modelname].getclassify()
+            for svc_name in service_names:
+                svc = self.services['all'][svc_name]
+                industrypath = industrytopath(svc_name)
+                index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
+                                                                industrypath), model)
+                try:
+                    index.load()
+                except IOError:
+                    index.build([svc])
+                    index.save()
+                self.sim[modelname][svc_name] = index
 
     def make_lsi(self, services):
         self.lsi_model = dict()
@@ -194,25 +220,6 @@ class Mining(object):
                 if lsi.build([service]):
                     lsi.save()
             self.lsi_model[name] = lsi
-
-    def add(self, services, name):
-        assert self.lsi_model
-        for modelname in self.lsi_model:
-            if not self.lsi_model[modelname].names:
-                continue
-            model = self.lsi_model[modelname]
-            save_path = os.path.join(self.path, modelname, name)
-            self.sim[modelname] = dict()
-            for svc_name in services:
-                svc = services[svc_name]
-                index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
-                                                                svc_name), model)
-                try:
-                    index.load()
-                except IOError:
-                    if index.build([svc]):
-                        index.save()
-                self.sim[modelname][svc_name] = index
 
     def update_model(self):
         for modelname in self.lsi_model:
@@ -234,7 +241,8 @@ class Mining(object):
         for name in uses:
             sim = self.sim[basemodel][name]
             result.extend(sim.probability(doc))
-        return sorted(result, key=lambda x:float(x[1]), reverse=True)
+        results_set = set(result)
+        return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
 
     def probability_by_id(self, basemodel, doc, id, uses=None):
         if uses is None:

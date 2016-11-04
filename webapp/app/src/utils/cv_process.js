@@ -14,8 +14,8 @@ function Process(element) {
 Process.prototype.deleteHrTag = function() {
   let hrs = this.__cvElement__.getElementsByTagName('hr');
 
-  for (let i = 0, len = hrs.length; i < len; i++) {
-    hrs[i].remove();
+  for (let i = hrs.length - 1; i >= 0; i--) {
+    hrs[i].parentNode.removeChild(hrs[i]);
   }
 };
 
@@ -27,10 +27,10 @@ Process.prototype.deleteSectionTag = function() {
   let reg = /section-\d+|section/,
       h2s = this.__cvElement__.getElementsByTagName("h2");
 
-  for (let i = 0, len = h2s.length; i < len; i++) {
+  for (let i = h2s.length - 1; i >= 0; i--) {
     let _id = h2s[i].getAttribute('id');
     if (reg.test(_id)) {
-      h2s[i].remove();
+      h2s[i].parentNode.removeChild(h2s[i]);
     }
   }
 };
@@ -53,7 +53,7 @@ Process.prototype.deleteLinkOnParagraph = function() {
   let reg = /[\u4e00-\u9fa5]+/,
       ps = this.__cvElement__.getElementsByTagName('p');
   
-  for (let i = 0, len = ps.length; i < len; i++) {
+  for (let i = ps.length - 1; i >= 0; i--) {
     let aObj = getChildrenLink(ps[i]),
         text = aObj ? aObj.textContent : null;
     if (text && reg.test(text)) {
@@ -91,19 +91,20 @@ Process.prototype.deleteLine = function() {
       ths = this.__cvElement__.getElementsByTagName("th"),
       tds = this.__cvElement__.getElementsByTagName("td");
 
-  for (let i = 0, len = ths.length; i < len; i++) {
+  for (let i = ths.length - 1; i >= 0; i--) {
     let text = (ths[i] && ths[i].textContent) ? ths[i].textContent : '';
     if (pattern.test(text)) {
-      ths[i].parentElement.remove();
+      let _this = ths[i].parentElement;
+      _this.parentNode.removeChild(_this);
     }
   }
 
-  for (let i = 0, len = ps.length; i < len; i++) {
+  for (let i = ps.length - 1; i >= 0; i--) {
     let reg = /^(&nbsp;)(&nbsp;)*(&nbsp;)$/,
         _this = ps[i];
 
     if (reg.test(_this.innerHTML)) {
-      _this.remove();
+      _this.parentNode.removeChild(_this);
     }
 
     addBrOnText(_this);

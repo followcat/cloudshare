@@ -18,11 +18,17 @@ gulp.task("clean", function(){
 
 //js打包任务
 gulp.task('scripts', function(){
-  return gulp.src(["src/js/modules/*.js",
-                  "!src/js/modules/batchupload.js",
-                  "!src/js/modules/index.js",
-                  "!src/js/modules/urm_home.js",
-                  "!src/js/modules/urm_setting.js"])
+  // return gulp.src(["src/js/modules/*.js",
+  //                 "!src/js/modules/batchupload.js",
+  //                 "!src/js/modules/index.js",
+  //                 "!src/js/modules/urm_home.js",
+  //                 "!src/js/modules/urm_setting.js",
+  //                 "!src/js/modules/search.js"])
+  return gulp.src([
+      // "src/js/modules/cvsource.js",
+      // "src/js/modules/edit.js",
+      // "src/js/modules/modify.js",
+    ])
     .pipe(requirejsOptimize({
       paths: {
         jquery: __dirname + '/lib/js/jquery',
@@ -85,9 +91,16 @@ gulp.task("style", function(){
 gulp.task("rev", ["scripts", "style"], function(){
   return gulp.src(["./rev/**/*.json",
                   "../templates/**/*.html",
+                  "!../templates/batchupload.html",
+                  "!../templates/companyview.html",
                   "!../templates/index.html",
-                  "!../templates/urm.html",
-                  "!../templates/urmsetting.html"])
+                  "!../templates/jdview.html",
+                  "!../templates/lsipage.html",
+                  "!../templates/makechart.html",
+                  "!../templates/search.html",
+                  "!../templates/serach_result.html",
+                  "!../templates/upload_preview.html",
+                  "!../templates/cv_refactor.html"])
     .pipe(revCollector({
       replaceReved: true,
       dirReplacements: {
@@ -97,10 +110,7 @@ gulp.task("rev", ["scripts", "style"], function(){
     }))
     .pipe(gulp.dest("../templates_dist/"))
 });
-    // .pipe(minifyHTML({
-    //   empty: true,
-    //   spare: true
-    // }))
+
 gulp.task("build", ["scripts", "style", "rev"]);
 
 //js错误检测任务

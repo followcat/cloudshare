@@ -10,20 +10,41 @@ class ResumeTitle extends Component {
     super(props);
     this.handlePrevClick = this.handlePrevClick.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
+    this.handleResumeComfirmClick = this.handleResumeComfirmClick.bind(this);
   }
 
   handlePrevClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.id });
+    let value = Object.assign(fieldsValue, { filename: this.props.filename });
     this.props.onPrevPreview(value);
   }
 
   handleNextClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.id });
+    let value = Object.assign(fieldsValue, { filename: this.props.filename });
     this.props.onNextPreview(value);
+  }
+
+  handleResumeComfirmClick(e) {
+    e.preventDefault();
+
+    const nameValue = this.props.form.getFieldValue('name'),
+          sourceValue = this.props.form.getFieldProps('source').value;
+
+    this.props.form.validateFields((errors, values) => {
+      if (!!errors) {
+        return;
+      } else {
+        let value = {
+          name: nameValue,
+          source: sourceValue,
+          filename: this.props.filename,
+        };
+        this.props.onComfirmUpload(value);
+      }
+    });
   }
 
   render() {
@@ -42,6 +63,10 @@ class ResumeTitle extends Component {
     ];
 
     const isLastPreview = this.props.current === this.props.length - 1;
+
+    const classifySelectionValue = this.props.classify.filter((item) => {
+      return this.props.classifyList.indexOf(item) > -1;
+    });
 
     return (
       <div className="cs-preview-top">
@@ -92,23 +117,22 @@ class ResumeTitle extends Component {
             >
               <Select
                 {...getFieldProps('classify', {
-                  rules: [{ required: true, message: 'Classify is required.'},]
+                  rules: [{ type: 'array', message: 'Classify is required.'},]
                 })}
-                showSearch
+                multiple
                 style={{ width: 160 }}
                 placeholder="Select a classify"
-                optionFilterProp="children"
-                notFoundContent="Not found"
+                value={classifySelectionValue}
               >
                 {this.props.classifyList.map((item, index) => {
                   return (
-                    <Select.Option key={index} value={item}>{item}</Select.Option>
+                    <Select.Option key={index} value={item} disabled>{item}</Select.Option>
                   );
                 })}
               </Select>
             </Form.Item>
             <Form.Item>
-              {isLastPreview ? <ResumeComfirm {...this.props} /> : ''}
+              {isLastPreview ? <ResumeComfirm {...this.props} onClick={this.handleResumeComfirmClick} /> : ''}
             </Form.Item>
           </div>
           <Form.Item
@@ -130,7 +154,7 @@ class ResumeTitle extends Component {
 }
 
 ResumeTitle.propTypes = {
-  id: PropTypes.string,
+  filename: PropTypes.string,
   current: PropTypes.number,
   length: PropTypes.number,
   index: PropTypes.number,

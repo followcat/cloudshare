@@ -6,7 +6,7 @@ import core.outputstorage
 
 class SimulationCV(object):
 
-    config_file = 'config.json'
+    config_file = 'config.yaml'
     ids_file = 'names.json'
 
     def __init__(self, name, path, cvstorage):
@@ -27,12 +27,14 @@ class SimulationCV(object):
         pass
 
     def load(self):
-        self.config = utils.builtin.load_json(self.path, self.config_file)
+        self.config = utils.builtin.load_yaml(self.path, self.config_file)
         self.cvids = set(utils.builtin.load_json(self.path, self.ids_file))
 
     def save(self):
-        utils.builtin.save_json(self.config, self.path, self.config_file)
-        utils.builtin.save_json(self.cvids, self.path, self.ids_file)
+        utils.builtin.save_yaml(self.config, self.path, self.config_file,
+                                default_flow_style=False)
+        utils.builtin.save_json(sorted(self.cvids), self.path, self.ids_file,
+                                indent=4)
 
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base

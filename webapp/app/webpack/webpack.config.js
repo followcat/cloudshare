@@ -1,10 +1,12 @@
 'use strict';
 const path = require('path');
 const fs = require('fs');
-// const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const merge = require('webpack-merge');
 
 const config = require('../config');
+const theme = require('../cloudshare-theme-default');
 
 const development = require('./dev.config');
 const production = require('./prod.config');
@@ -26,7 +28,7 @@ const getEntry = function() {
   return files;
 };
 
-const webpackConfig = {
+let webpackConfig = {
   entry: getEntry(),
 
   // output: {},
@@ -44,12 +46,38 @@ const webpackConfig = {
         include: config.PATHS.SRC_PATH,
       },
       {
-        test: /\.css$/,
-        loader: 'style-loader!css-loader?modules',
+        test(filePath) {
+          return /\.css$/.test(filePath) && !/\.module\.css$/.test(filePath);
+        },
+        loader: ExtractTextPlugin.extract(
+          'css?sourceMap&-restructuring!' +
+          'postcss'
+        ),
       },
       {
-        test: /\.less$/,
-        loader: "style!css!less"
+        test: /\.module\.css$/,
+        loader: ExtractTextPlugin.extract(
+          'css?sourceMap&-restructuring&modules&localIdentName=[local]___[hash:base64:5]!' +
+          'postcss'
+        ),
+      },
+      {
+        test(filePath) {
+          return /\.less$/.test(filePath) && !/\.module\.less$/.test(filePath);
+        },
+        loader: ExtractTextPlugin.extract(
+          'css?sourceMap!' +
+          'postcss!' +
+          `less-loader?{"sourceMap":true,"modifyVars":${JSON.stringify(theme)}}`
+        ),
+      },
+      {
+        test: /\.module\.less$/,
+        loader: ExtractTextPlugin.extract(
+          'css?sourceMap&modules&localIdentName=[local]___[hash:base64:5]!!' +
+          'postcss!' +
+          `less-loader?{"sourceMap":true,"modifyVars":${JSON.stringify(theme)}}`
+        ),
       },
       {
         test: /\.(png|jpg)$/,
@@ -57,6 +85,8 @@ const webpackConfig = {
       },
     ],
   },
+
+  postcss: [require('autoprefixer'), require('precss')],
 
 };
 

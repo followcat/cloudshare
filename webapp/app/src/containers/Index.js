@@ -7,6 +7,8 @@ import { message } from 'antd';
 import Header from '../components/index/Header';
 import Login from '../components/index/Login';
 
+import StorageUtil from '../utils/storage';
+
 import './index.less';
 
 export default class Index extends Component {
@@ -32,8 +34,11 @@ export default class Index extends Component {
     })
     .then((json) => {
       if (json.code === 200) {
-        localStorage.token = json.token;
-        localStorage.user = json.user;
+        StorageUtil.setAll({
+          _pj: user.project,
+          token: json.token,
+          user: json.user
+        });
         location.href = json.redirect_url;
       } else {
         message.error(json.message);

@@ -55,17 +55,20 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
     for root, dirs, files in os.walk(path):
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
-            upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
-                                                                   f, temp_output)
+            filepro = core.converterutils.FileProcesser(filename, f,
+                                                        temp_output)
+            cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
+                                                                   filepro.markdown_stream,
+                                                                   filepro.yamlinfo)
             if origin is not None:
-                upobj.filepro.yamlinfo['origin'] = origin
-            if not upobj.filepro.yamlinfo['name']:
+                cvobj.metadata['origin'] = origin
+            if not cvobj.metadata['name']:
                 name = '' # name_from_51job(processfile.markdown_stream)
-                upobj.filepro.yamlinfo['name'] = name
-                if not upobj.filepro.yamlinfo['name']:
-                    upobj.filepro.yamlinfo['name'] = '' # name_from_filename(filename)
+                cvobj.metadata['name'] = name
+                if not cvobj.metadata['name']:
+                    cvobj.metadata['name'] = '' # name_from_filename(filename)
             try:
-                result = svc_cv.add(upobj, unique=False, projectname=projectname)
+                result = svc_cv.add(cvobj, unique=False, projectname=projectname)
             except core.exception.DuplicateException as error:
                 continue
 

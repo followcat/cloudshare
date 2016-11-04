@@ -83,7 +83,7 @@ export default class Upload extends Component {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            id: file.response.data.id,
+            filename: file.response.data.filename,
           }),
         })
         .then((response) => {
@@ -92,7 +92,7 @@ export default class Upload extends Component {
         .then((json) => {
           if (json.code === 200) {
             file.response.data = Object.assign(file.response.data, json.data);
-            file.id = json.data.id;
+            file.filename = json.data.filename;
             completedFileList.push(file.response.data);
             this.setState({
               completedFileList: completedFileList,
@@ -126,7 +126,7 @@ export default class Upload extends Component {
     let current = this.state.currentPreview,
         comfirm = this.state.comfirmList;
 
-    const index = findIndexOf('id', value, comfirm);
+    const index = findIndexOf('filename', value, comfirm);
     if (index > -1) {
       comfirm[index] = Object.assign(comfirm[index], value);
     } else {
@@ -143,7 +143,7 @@ export default class Upload extends Component {
     let current = this.state.currentPreview,
         comfirm = this.state.comfirmList;
 
-    const index = findIndexOf('id', value, comfirm);
+    const index = findIndexOf('filename', value, comfirm);
     if (index > -1) {
       comfirm[index] = Object.assign(comfirm[index], value);
     } else {
@@ -159,7 +159,7 @@ export default class Upload extends Component {
   handleComfirmUpload(value) {
     let comfirm = this.state.comfirmList;
 
-    if (findIndexOf('id', value, comfirm) === -1) {
+    if (findIndexOf('filename', value, comfirm) === -1) {
       comfirm.push(value);
     }
 

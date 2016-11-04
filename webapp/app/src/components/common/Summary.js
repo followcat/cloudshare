@@ -1,7 +1,9 @@
 'usr strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Row, Col, Card } from 'antd';
+
+import './summary.less';
 
 export default class Summary extends Component {
 
@@ -12,24 +14,30 @@ export default class Summary extends Component {
   }
 
   getCompanyNameById(companyList, id) {
+    let name = '';
     for (let i = 0, len = companyList.length; i < len; i++) {
       if (companyList[i].id === id) {
-          return companyList[i].name;
-        }
+        name = companyList[i].name;
+      }
     }
-    return '';
+    return name;
   }
 
 
   render() {
-    const props = this.props.dataSource,
-          workExperience = props.experience.position ? props.experience.position : [],
-          companyList = props.experience.company ? props.experience.company : [];
+    const props = this.props.dataSource;
+
+    let workExperience = [],
+        companyList = [],
+        educationExperience = props.education_history ? props.education_history : [];
+
+    if (props.experience) {
+      workExperience = props.experience.hasOwnProperty('position') ? props.experience.position : [],
+      companyList = props.experience.hasOwnProperty('company') ? props.experience.company : [];
+    }
 
     return (
-      <Card
-        title="Summary"
-      >
+      <Card style={this.props.style}>
         <Row>
           <Col span={12}>
             <Col span={8} className="summary-label">
@@ -103,25 +111,25 @@ export default class Summary extends Component {
           </Col>
         </Row>
         <Row>
-          <Col span={4} className="summary-label">
+          <Col span={6} className="summary-label">
             <label>Education Experience: </label>
           </Col>
-          <Col span={20}>
-            {props.education_history.map(item => {
+          <Col span={18}>
+            {educationExperience.map((item, index) => {
               return (
-                <div>{item.date_from} - {item.date_to} | {item.education} | {item.major} | {item.school}</div>
+                <div key={index}>{item.date_from} - {item.date_to} | {item.education} | {item.major} | {item.school}</div>
               );
             })}
           </Col>
         </Row>
         <Row>
-          <Col span={4} className="summary-label">
+          <Col span={6} className="summary-label">
             <label>Work Experience: </label>
           </Col>
-          <Col span={20}>
-            {workExperience.map(item => {
+          <Col span={18}>
+            {workExperience.map((item, index) => {
               return (
-                <div>{item.date_from} - {item.date_to} | {item.name} | {this.getCompanyNameById(companyList, item.at_company)} | {item.duration}</div>
+                <div key={index}>{item.date_from} - {item.date_to} | {item.name} | {this.getCompanyNameById(companyList, item.at_company)} | {item.duration}</div>
               );
             })}
           </Col>
@@ -130,3 +138,46 @@ export default class Summary extends Component {
     );
   }
 }
+
+Summary.propTypes = {
+  style: PropTypes.object,
+  dataSource: PropTypes.shape({
+    name: PropTypes.string,
+    gender: PropTypes.string,
+    age: PropTypes.string,
+    marital_status: PropTypes.string,
+    education: PropTypes.string,
+    school: PropTypes.string,
+    position: PropTypes.string,
+    company: PropTypes.string,
+    experience: PropTypes.shape({
+      position: PropTypes.arrayOf(
+        PropTypes.shape({
+          at_company: PropTypes.number,
+          date_from: PropTypes.string,
+          date_to: PropTypes.string,
+          duration: PropTypes.string,
+          name: PropTypes.string,
+        })
+      ),
+      company: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number,
+          date_from: PropTypes.string,
+          date_to: PropTypes.string,
+          duration: PropTypes.string,
+          name: PropTypes.string,
+        })
+      ),
+    }),
+    education_history: PropTypes.arrayOf(
+      PropTypes.shape({
+        date_from: PropTypes.string,
+        date_to: PropTypes.string,
+        education: PropTypes.string,
+        major: PropTypes.string,
+        school: PropTypes.string,
+      })
+    )
+  })
+};

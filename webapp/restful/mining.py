@@ -244,22 +244,18 @@ class SimilarAPI(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('doc', location = 'json')
+        self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
-        doc = args['doc']
+        id = args['id']
         project = args['project']
+        doc = self.svc_mult_cv.getmd(id)
         datas = []
         for name, score in self.miner.probability(project, doc)[:7]:
             yaml_info = self.svc_mult_cv.getyaml(name)
-            info = {
-                'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
-                'match': score
-            }
-            datas.append({ 'id': name, 'yaml_info': yaml_info, 'info': info })
+            datas.append({ 'id': name, 'yaml_info': yaml_info })
         return { 'code': 200, 'data': datas }
 
 
@@ -346,6 +342,7 @@ class ValuableAPI(ValuablebaseAPI):
     def post(self):
         args = self.reqparse.parse_args()
         project = args['project']
+        doc = ''
         if args['id']:
             jd_yaml = self.svc_mult_cv.getproject(project).jd_get(args['id'])
             doc = jd_yaml['description']

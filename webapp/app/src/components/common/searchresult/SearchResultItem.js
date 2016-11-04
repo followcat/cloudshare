@@ -59,7 +59,7 @@ export default class SearchResultItem extends Component {
             </Col>}
             <Col span={this.props.type === 'default' ? 4 : 3} className="omit">
               <a
-                href={`/show/${props.cv_id}`}
+                href={`/resume/${props.cv_id}`}
                 target="_blank"
                 style={linkColor}
               >

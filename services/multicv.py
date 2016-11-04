@@ -24,7 +24,7 @@ class MultiCV(object):
         result = self.repodb.add(cvobj, committer, unique)
         if result is True:
             project = self.getproject(projectname)
-            project.add(cvobj.filepro.name.base, committer)
+            result = project.add(cvobj.name, committer)
         return result
 
     def add_md(self, cvobj, committer=None):

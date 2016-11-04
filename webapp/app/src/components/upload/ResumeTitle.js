@@ -16,14 +16,14 @@ class ResumeTitle extends Component {
   handlePrevClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.id });
+    let value = Object.assign(fieldsValue, { filename: this.props.filename });
     this.props.onPrevPreview(value);
   }
 
   handleNextClick(e) {
     e.preventDefault();
     const fieldsValue = this.props.form.getFieldsValue();
-    let value = Object.assign(fieldsValue, { id: this.props.id });
+    let value = Object.assign(fieldsValue, { filename: this.props.filename });
     this.props.onNextPreview(value);
   }
 
@@ -40,7 +40,7 @@ class ResumeTitle extends Component {
         let value = {
           name: nameValue,
           source: sourceValue,
-          id: this.props.id,
+          filename: this.props.filename,
         };
         this.props.onComfirmUpload(value);
       }
@@ -154,7 +154,7 @@ class ResumeTitle extends Component {
 }
 
 ResumeTitle.propTypes = {
-  id: PropTypes.string,
+  filename: PropTypes.string,
   current: PropTypes.number,
   length: PropTypes.number,
   index: PropTypes.number,

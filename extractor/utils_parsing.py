@@ -7,7 +7,7 @@ TODAY = u'(?:(?:至今)|(?:目前)|(?:现在)|今|(?:[Pp]resent)|(?:[Nn]ow))'
 CHNUMBERS = u'一二三四五六七八九十'
 SP = u'\s\xa0\ufffd\u2028\u3000'
 ASP = u'[' + SP + u']'
-SEP = u'\-\u2013\u2014\u2015\u4e00\\\\·,~～/'
+SEP = u'\-\uff0d\u2013\u2014\u2015\u4e00\\\\·,~～/'
 UNIBRALEFT = ur'[（\(\[【]'
 UNIBRARIGHT = ur'[）\)\]】]'
 DATESEP = u'['+SEP+SP+u'至]+'
@@ -36,6 +36,16 @@ COMPANY = ur'([^' + SENTENCESEP + u'=\n\*\u2013]+?(\\\\\*)+)?(((\\\\\*){3})|([^'
 SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|\u2013\u2015]+'
 
+JYCVSRC = re.compile(u'^'+ASP+u'*精英网用户$', re.M)
+LPCVSRC = re.compile(u'^(:?(个人信息\n(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n(On job, open for new job|Dimission, seeking for new job) ,)) ， ', re.M)
+ZLCVSRC = re.compile(u'^(简历ID：RCC|Resume ID：REC)00\d{8}\n'+ASP+u'*[^\n\uf0b7]')
+YCCVSRC = re.compile(u'^更新时间：(\d{4}-\d{2}-\d{2}|今天|昨天)\n(简历编号：)?')
+
+is_jycv = lambda cv:JYCVSRC.search(cv)
+is_lpcv = lambda cv:LPCVSRC.search(cv)
+is_zlcv = lambda cv:ZLCVSRC.search(cv)
+is_yccv = lambda cv:YCCVSRC.search(cv)
+
 education_list = {
     0: (u'初中', ),
     1: (u'中技', u'中专', u'高中', u'高职'),
@@ -59,8 +69,8 @@ GENDER = u'(?P<gender>男|女)'
 MARITALSTATUS = u'(?P<marital_status>(未婚)|(已婚))'
 AGEANDBIRTH = u'('+AGE+ u'|((?P<abbr>'+UNIBRALEFT+u')?(?P<birthdate>' +FULLDATE+ u'|'+DATE+u')生?(?(abbr)' +UNIBRARIGHT + u')))+'
 
-SALARY = u'((月薪(（税前）)?[:：]?)?'+ASP+u'*((?P<salary>\d[\- \d\|]*(月/月)?((元/月)|元|(/月))(以[上下])?)'+ASP+u'*(\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?)|((年薪(（税前）)?[:：]?)?'+ASP+u'*(?P<yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
-EMPLOYEES = u'((?:(?P<employees>(少于)?\d[\d '+SEP+u']*人(以[上下])?)|未填写)([' + SENTENCESEP + u'].*?)?)'
+SALARY = u'((?P<salabel>月薪(（税前）)?[:：]?)?'+ASP+u'*((?P<salary>\d[\-到 \d\|]*(月/月)?(?(salabel)((元/月)|元|(/月))?|((元/月)|元|(/月)))(以[上下])?)'+ASP+u'*(\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?|保密)|((年薪(（税前）)?[:：]?)?'+ASP+u'*(?P<yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
+EMPLOYEES = u'((?:(?P<employees>(少于)?\d+([ '+SEP+u']+\d+)?'+ASP+u'*人(以[上下])?)|未填写)([' + SENTENCESEP + u'].*?)?)'
 BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + UNIBRARIGHT +u')'
 BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + DURATION + u'(?(br)[\n'+SP+u']*' +UNIBRARIGHT + u'(?(dit)\*)))'
 
@@ -79,9 +89,13 @@ fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, fix_st
 fix_name = lambda x: re.compile(ASP+'+').sub(' ', fix_escape(x)).strip()
 fix_duration = lambda x: re.compile(ASP+'+').sub('', x).strip()
 
+range_repl = lambda x: x.group('low')+'-'+x.group('high')+u'元/月'
+salary_range = lambda x: re.compile(u'(?P<low>\d+)到(?P<high>\d+)').sub(range_repl, x)
 ten_thousands = lambda x: re.compile(u'(?<=\d)'+ASP+u'*W').sub(u'万', x)
 salary_unit = lambda x: re.compile(u'(?<=\d)/(?=[年月])').sub(u'元/', x)
-fix_salary = lambda x: salary_unit(ten_thousands(re.compile(ASP+'+').sub('', x)))
+fix_salary = lambda x: salary_unit(ten_thousands(salary_range(re.compile(ASP+'+').sub('', x))))
+
+fix_employees = lambda x: re.compile(u'[ '+SEP+u']+').sub(u'-', x)
 
 
 WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)$'

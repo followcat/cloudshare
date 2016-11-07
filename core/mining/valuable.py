@@ -103,13 +103,6 @@ def rankvalue(rank, total):
     return rankvalue
 
 def mine_education(svc_cv, text, name_list):
-    def education_rate(education):
-        for (k, RE) in EDUCATION_LIST.items():
-            if RE.match(education):
-                return k
-        else:
-            return 0
-
     assert text
     assert name_list
     datas = []

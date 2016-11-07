@@ -62,6 +62,19 @@ LIST_SEPARATOR = u')|(?:'
 EDUCATION_LIST = {}
 for k,v in education_list.items():
     EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))')
+
+def education_rate(education):
+    u"""
+        >>> assert 0 == education_rate(u'初中')
+        >>> assert education_rate(u'本科') > education_rate(u'大专')
+        >>> assert education_rate(u'硕士') == education_rate(u'EMBA')
+    """
+    for (k, RE) in EDUCATION_LIST.items():
+        if RE.match(education):
+            return k
+    else:
+        return 0
+
 EDUCATION = u'(?P<education>(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))' for v in education_list.values()]) +u'))'
 SCHOOL = u'(?P<school>(\s?\w)+|([^'+SP+FIELDSEP+u']+'+ASP+u'*'+exclude_with_parenthesis('')+u'?))'
 
@@ -76,10 +89,11 @@ BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + 
 
 PLACES = u'(?:(\S+)['+SENTENCESEP+SEP+']?)+'
 
+month_to_str = lambda x: str.zfill(str(x), 2)
 fix_today = lambda x: re.compile('^'+TODAY+'$').sub(u'至今', x)
 fix_sep = lambda x: re.compile(u'['+SP+SEP+u'\.．年]+').sub('.', x)
 fix_trail = lambda x: x.replace(u'月', '').strip()
-zero_date = lambda x: str.zfill(str(x.group()), 2)
+zero_date = lambda x: month_to_str(x.group())
 fix_trailing = lambda x: re.compile(ur'\d+$').sub(zero_date, x)
 fix_date = lambda x: fix_trailing(fix_sep(fix_trail(fix_today(x))))
 
@@ -101,6 +115,40 @@ fix_employees = lambda x: re.compile(u'[ '+SEP+u']+').sub(u'-', x)
 WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)$'
 STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P<major>'+POSITION+u'?)[：:\| ]*'+EDUCATION+u'?$'
 
+
+break_date = lambda x: tuple([int(i) for i in x.split('.')])
+
+def compute_period(date_from, date_to, today=u'至今'):
+    u"""
+        >>> assert (11, -1) == compute_period('2002.08', '2002.07')
+        >>> assert (2, 4) == compute_period('2002.08', '2006.10')
+        >>> assert (0, -1) == compute_period(u'至今', '2006.10')
+    """
+    if date_from == u'至今':
+        if date_to == u'至今':
+            return (0, 0)
+        else:
+            return (0, -1)
+    time_from = time.mktime(break_date(date_from)+(1,0,0,0,0,0,0))
+    if date_to == u'至今':
+        if today == u'至今':
+            time_to = time.time()
+        else:
+            time_to = time.mktime(break_date(today)+(1,0,0,0,0,0,0))
+    else:
+        time_to = time.mktime(break_date(date_to)+(1,0,0,0,0,0,0))
+    duration_tuple = time.gmtime(time_to - time_from)
+    zerotime_tuple = time.gmtime(0)
+    if zerotime_tuple[1] > duration_tuple[1]:
+        year_offset = 1
+        period_month = duration_tuple[1]+12 - zerotime_tuple[1]
+    else:
+        year_offset = 0
+        period_month = duration_tuple[1] - zerotime_tuple[1]
+    period_year = duration_tuple[0] -  zerotime_tuple[0] - year_offset
+    return (period_month, period_year)
+
+
 def compute_duration(date_from, date_to):
     u"""
         >>> print(compute_duration(u'至今', '2006.10'))
@@ -116,25 +164,9 @@ def compute_duration(date_from, date_to):
         >>> print(compute_duration('2014.03', '2016.03'))
         2年
     """
-    if date_from == u'至今':
-        return u'一个月内'
-    break_date = lambda x: tuple([int(i) for i in x.split('.')])
-    time_from = time.mktime(break_date(date_from)+(1,0,0,0,0,0,0))
-    if date_to == u'至今':
-        time_to = time.time()
-    else:
-        time_to = time.mktime(break_date(date_to)+(1,0,0,0,0,0,0))
-    duration_tuple = time.gmtime(time_to - time_from)
-    zerotime_tuple = time.gmtime(0)
-    if zerotime_tuple[1] > duration_tuple[1]:
-        year_offset = 1
-        period_month = duration_tuple[1]+12 - zerotime_tuple[1]
-    else:
-        year_offset = 0
-        period_month = duration_tuple[1] - zerotime_tuple[1]
-    period_year = duration_tuple[0] -  zerotime_tuple[0] - year_offset
+    (period_month, period_year) = compute_period(date_from, date_to)
     if period_year < 0:
-        duration = None
+        duration = u'一个月内'
     elif period_year == 0:
         if period_month <= 0:
             duration = u'一个月内'
@@ -147,3 +179,19 @@ def compute_duration(date_from, date_to):
             duration = u'%d年%d个月' % (period_year, period_month)
     return duration
 
+def add_months(date, increment):
+    u"""
+        >>> assert u'至今' == add_months(u'至今', 3)
+        >>> assert '2017.02' == add_months('2016.11', 3)
+        >>> assert '2016.02' == add_months('2014.11', 15)
+    """
+    if date == u'至今':
+        return date
+    year, month = break_date(date)
+    year_inc, month_inc = divmod(increment, 12)
+    month += month_inc
+    year += year_inc
+    if month > 12:
+        month -= 12
+        year += 1
+    return '.'.join((str(year), month_to_str(month)))

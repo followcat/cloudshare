@@ -225,6 +225,35 @@ def initclassify(SVC_CV, knowledge=None):
         utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
 
 
+def inituniqueid(SVC_CV, with_report=False, with_diff=False):
+    import difflib
+    import utils.builtin
+    import extractor.unique_id
+
+    path_prefix = lambda x: os.path.join(SVC_CV.repo_path, x)
+    unique_ids = {}
+    for y in SVC_CV.yamls():
+        info = SVC_CV.getyaml(y)
+        info = extractor.unique_id.unique_id(info)
+        try:
+            assert info['unique_id'] not in unique_ids
+            unique_ids[info['unique_id']] = y
+        except KeyError:
+            pass
+        except AssertionError:
+            if with_report:
+                print(info['unique_id'], path_prefix(y) + ' ' + path_prefix(unique_ids[info['unique_id']]))
+                if with_diff:
+                    print('++++\n')
+                    old = path_prefix(unique_ids[info['unique_id']])
+                    new = path_prefix(y)
+                    for l in difflib.unified_diff(file(old).readlines(), file(new).readlines(), old, new):
+                        print(l.rstrip())
+                    print('\n++++\n')
+        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
+
+
+
 def initproject(SVC_CV_REPO, SVC_PRJ):
     import utils.builtin
     for y in SVC_CV_REPO.yamls():

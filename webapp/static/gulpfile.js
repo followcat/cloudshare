@@ -25,9 +25,9 @@ gulp.task('scripts', function(){
   //                 "!src/js/modules/urm_setting.js",
   //                 "!src/js/modules/search.js"])
   return gulp.src([
-      "src/js/modules/cvsource.js",
-      "src/js/modules/edit.js",
-      "src/js/modules/modify.js",
+      // "src/js/modules/cvsource.js",
+      // "src/js/modules/edit.js",
+      // "src/js/modules/modify.js",
     ])
     .pipe(requirejsOptimize({
       paths: {
@@ -99,7 +99,8 @@ gulp.task("rev", ["scripts", "style"], function(){
                   "!../templates/makechart.html",
                   "!../templates/search.html",
                   "!../templates/serach_result.html",
-                  "!../templates/upload_preview.html",])
+                  "!../templates/upload_preview.html",
+                  "!../templates/cv_refactor.html"])
     .pipe(revCollector({
       replaceReved: true,
       dirReplacements: {

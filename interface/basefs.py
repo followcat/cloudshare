@@ -30,9 +30,8 @@ class BaseFSInterface(interface.base.Interface):
     def get(self, filename):
         data = None
         path_file = os.path.join(self.path, filename)
-        if os.path.exists(path_file):
-            with open(path_file) as fp:
-                data = fp.read()
+        with open(path_file) as fp:
+            data = fp.read()
         return data
 
     def getraw(self, filename):
@@ -79,7 +78,7 @@ class BaseFSInterface(interface.base.Interface):
         return [os.path.split(f)[1] for f in glob.glob(
                 os.path.join(self.path, prefix, filterfile))]
 
-    def grep(self, restrings, path):
+    def grep(self, restrings, path=''):
         grep_list = []
         keywords = restrings.split()
         if keywords:
@@ -99,7 +98,7 @@ class BaseFSInterface(interface.base.Interface):
                     grep_list.append(each)
         return grep_list
 
-    def grep_yaml(self, restrings, path):
+    def grep_yaml(self, restrings, path=''):
         grep_list = []
         keywords = restrings.split()
         if keywords:
@@ -119,8 +118,13 @@ class BaseFSInterface(interface.base.Interface):
                     grep_list.append(each)
         return grep_list
 
-    def add(self, filepath, filedate):
+    def add(self, filepath, filedate, message=None, committer=None):
         path = os.path.join(self.path, filepath)
         with open(path, 'w') as f:
             f.write(filedate)
         return True
+
+    def add_files(self, filenames, filedatas, message=None, committer=None):
+        assert len(filenames) == len(filedatas)
+        for filename, filedata in zip(filenames, filedatas):
+            self.add(filename, filedata)

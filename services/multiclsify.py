@@ -12,8 +12,7 @@ class MultiClassify(object):
         self.classifies = dict()
         self.cvstorage = cvstorage
         for name in sources.industry_id.industryID.keys():
-            cls_cv = services.classifycv.ClassifyCV(name, self.CLASSIFY_DIR,
-                                                    cvstorage)
+            cls_cv = services.classifycv.ClassifyCV(name, self.CLASSIFY_DIR, cvstorage)
             cls_cv.setup()
             self.classifies[name] = cls_cv
 

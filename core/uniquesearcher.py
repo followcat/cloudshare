@@ -8,26 +8,28 @@ class UniqueSearcher(object):
     def __init__(self, path):
         """
             >>> import shutil
-            >>> import services.curriculumvitae
+            >>> import core.basedata
             >>> import core.uniquesearcher
             >>> import interface.gitinterface
+            >>> import services.curriculumvitae
             >>> repo_name = 'core/test_repo'
             >>> test_path = 'core/test_output'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject('cv_1.doc', f1, test_path)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
-            >>> cv1.result
+            >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
+            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, fp1.yamlinfo)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
+            >>> fp1.result
             True
-            >>> us = core.uniquesearcher.UniqueSearcher(svc_cv.repo_path)
-            >>> us.unique(cv1.filepro.yamlinfo)
+            >>> us = core.uniquesearcher.UniqueSearcher(svc_cv.path)
+            >>> us.unique(cv1.metadata)
             True
             >>> svc_cv.add(cv1)
             True
-            >>> us.unique(cv1.filepro.yamlinfo)
+            >>> us.unique(cv1.metadata)
             True
             >>> us.reload()
-            >>> us.unique(cv1.filepro.yamlinfo)
+            >>> us.unique(cv1.metadata)
             False
             >>> svc_cv.add(cv1)
             False

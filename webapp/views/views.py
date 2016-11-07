@@ -1,5 +1,4 @@
 import time
-import pickle
 import codecs
 import os.path
 
@@ -10,8 +9,9 @@ import flask.ext.login
 
 import utils.builtin
 import utils.chsname
-import services.curriculumvitae
+import core.basedata
 import core.outputstorage
+import core.converterutils
 import webapp.views.account
 import services.exception
 
@@ -29,12 +29,14 @@ class Upload(flask.views.MethodView):
     def post(self):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
-        upobj = services.curriculumvitae.CurriculumVitaeObject(network_file.filename,
-                                                network_file,
-                                                flask.current_app.config['UPLOAD_TEMP'])
-        flask.session[user.id]['upload'] = pickle.dumps(upobj)
+        filepro = core.converterutils.FileProcesser(network_file,
+                                                    network_file.filename.encode('utf-8'),
+                                                    flask.current_app.config['UPLOAD_TEMP'])
+        dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
+                                           filepro.yamlinfo)
+        flask.session[user.id]['upload'] = dataobj
         flask.session.modified = True
-        return str(upobj.result)
+        return str(filepro.result)
 
 
 class UploadPreview(flask.views.MethodView):
@@ -42,9 +44,9 @@ class UploadPreview(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         user = flask.ext.login.current_user
-        upobj = pickle.loads(flask.session[user.id]['upload'])
-        output = upobj.preview_markdown()
-        yaml_info = upobj.filepro.yamlinfo
+        dataobj = flask.session[user.id]['upload']
+        output = dataobj.preview_data()
+        yaml_info = dataobj.metadata
         return flask.render_template('upload_preview.html', markdown=output, yaml=yaml_info)
 
 
@@ -56,9 +58,9 @@ class ConfirmEnglish(flask.views.MethodView):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         name = core.outputstorage.ConvertName(flask.request.form['name'])
         yaml_data = svc_mult_cv.getyaml(name)
-        upobj = pickle.loads(flask.session[user.id]['upload'])
-        result = svc_mult_cv.add_md(upobj, user.id)
-        yaml_data['enversion'] = upobj.filepro.name.md
+        dataobj = flask.session[user.id]['upload']
+        result = svc_mult_cv.add_md(dataobj, user.id)
+        yaml_data['enversion'] = dataobj.ID
         svc_mult_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
                            committer=user.id)
         return flask.jsonify(result=result, filename=yaml_data['id']+'.md')
@@ -95,7 +97,7 @@ class ShowEnglish(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self, project, id):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        md = svc_mult_cv.getproject(project).getmd_en(id)
+        md = svc_mult_cv.getproject(project).cv_getmd_en(id)
         return flask.render_template('edit.html', markdown=md)
 
 
@@ -122,9 +124,9 @@ class Preview(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         user = flask.ext.login.current_user
-        upobj = pickle.loads(flask.session[user.id]['upload'])
-        output = upobj.preview_markdown()
-        _id = upobj.filepro.yamlinfo['id']
+        dataobj = flask.session[user.id]['upload']
+        output = dataobj.preview_data()
+        _id = dataobj.metadata['id']
         return flask.render_template('upload_preview.html', markdown=output, id=_id)
 
     @flask.ext.login.login_required
@@ -219,3 +221,10 @@ class SearchResult(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         return flask.render_template('result.html')
+
+#Render resume page of RESTful
+class Resume(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self, id):
+        return flask.render_template('resume.html')

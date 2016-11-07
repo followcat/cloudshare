@@ -49,23 +49,25 @@ def filter(processer, origin_path, filename):
 
 
 def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origin=None):
-    import services.curriculumvitae
+    import core.basedata
     if not os.path.exists(temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
-            upobj = services.curriculumvitae.CurriculumVitaeObject(filename,
-                                                                   f, temp_output)
+            filepro = core.converterutils.FileProcesser(filename, f,
+                                                        temp_output)
+            cvobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
+                                             filepro.yamlinfo)
             if origin is not None:
-                upobj.filepro.yamlinfo['origin'] = origin
-            if not upobj.filepro.yamlinfo['name']:
+                cvobj.metadata['origin'] = origin
+            if not cvobj.metadata['name']:
                 name = '' # name_from_51job(processfile.markdown_stream)
-                upobj.filepro.yamlinfo['name'] = name
-                if not upobj.filepro.yamlinfo['name']:
-                    upobj.filepro.yamlinfo['name'] = '' # name_from_filename(filename)
+                cvobj.metadata['name'] = name
+                if not cvobj.metadata['name']:
+                    cvobj.metadata['name'] = '' # name_from_filename(filename)
             try:
-                result = svc_cv.add(upobj, unique=False, projectname=projectname)
+                result = svc_cv.add(cvobj, unique=False, projectname=projectname)
             except core.exception.DuplicateException as error:
                 continue
 
@@ -104,7 +106,7 @@ def get_explorer_name(svc_cv, yamlname):
 
 def update_selected(svc_cv, yamlname, selected):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
@@ -116,7 +118,7 @@ def update_selected(svc_cv, yamlname, selected):
 
 def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname),
@@ -128,14 +130,14 @@ def update_xp(svc_cv, yamlname):
 
 def safeyaml(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
 def originid(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     if 'originid' not in obj:
         id_str, suffix = os.path.splitext(yamlname)
         obj['originid'] = obj['id']
@@ -222,7 +224,7 @@ def initclassify(SVC_CV, knowledge=None):
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
         info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge)
-        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
+        utils.builtin.save_yaml(info, SVC_CV.path , y)
 
 
 def inituniqueid(SVC_CV, with_report=False, with_diff=False):
@@ -264,6 +266,6 @@ def initproject(SVC_CV_REPO, SVC_PRJ):
         convert_info['tracking'] = info.pop('tracking')
         convert_info['committer'] = info['committer']
         SVC_PRJ._add(y)
-        utils.builtin.save_yaml(info, SVC_CV_REPO.repo_path , y)
+        utils.builtin.save_yaml(info, SVC_CV_REPO.path , y)
         utils.builtin.save_yaml(convert_info, SVC_PRJ.cvpath , y)
         SVC_PRJ.save()

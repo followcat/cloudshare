@@ -1,46 +1,72 @@
 import os
 
 import utils.builtin
-import core.outputstorage
-import sources.industry_id
+import core.basedata
 import services.simulationcv
 
 
-class ClassifyCV(services.simulationcv.SimulationCV):
+class ClassifyCV(object):
+
+    config_file = 'config.yaml'
 
     def __init__(self, name, path, cvstorage):
-        classifypath = utils.builtin.industrytopath(name)
-        super(ClassifyCV, self).__init__(classifypath, path, cvstorage)
         self.name = name
+        self.path = os.path.join(path, utils.builtin.industrytopath(name))
+        self.curriculumvitae = services.simulationcv.SimulationCV(self.path, name, cvstorage)
+        self.config = dict()
+        try:
+            self.load()
+        except IOError:
+            pass
+
+    def load(self):
+        self.config = utils.builtin.load_yaml(self.path, self.config_file)
+
+    def save(self):
+        utils.builtin.save_yaml(self.config, self.path, self.config_file,
+                                default_flow_style=False)
 
     def setup(self, update=True):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        if not os.path.exists(os.path.join(self.path, self.config_file)):
             self.config['classify'] = self.name
+            self.save()
             if update:
                 self.update()
 
     def update(self):
         for y in self.cvstorage.yamls():
             if not self.exists(y):
-                info = self.cvstorage.getyaml(y)
+                data = self.cvstorage.getmd(y)
+                matedata = self.cvstorage.getyaml(y)
                 if self.name in info['classify']:
-                    self._add(y)
-        self.save()
+                    dataobj = core.basedata.DataObject(name, data, matedata)
+                    self.add(dataobj, yamlfile=False)
 
-    def dump(self, path):
-        if not os.path.exists(path):
-            os.makedirs(path)
-        def storage(filepath, stream):
-            with open(filepath, 'w') as f:
-                f.write(stream.encode('utf-8'))
-        for i in self.cvids:
-            name = core.outputstorage.ConvertName(i)
-            mdpath = os.path.join(path, name.md)
-            mdstream = self.cvstorage.getmd(i)
-            storage(mdpath, mdstream)
-            htmlpath = os.path.join(path, name.html)
-            htmlstream = self.cvstorage.gethtml(i)
-            storage(htmlpath, htmlstream)
-            yamlinfo = self.cvstorage.getyaml(i)
-            utils.builtin.save_yaml(yamlinfo, path, name.yaml)
+    def add(self, dataobj, committer=None, unique=True, yamlfile=True):
+        return self.curriculumvitae.add(dataobj, committer, unique, yamlfile)
+
+    def exists(self, id):
+        return self.curriculumvitae.exists(id)
+
+    def yamls(self):
+        return self.curriculumvitae.yamls()
+
+    def names(self):
+        return self.curriculumvitae.names()
+
+    def datas(self):
+        return self.curriculumvitae.datas()
+
+    def getmd(self, id):
+        return self.curriculumvitae.getmd(id)
+
+    def getyaml(self, id):
+        return self.curriculumvitae.getyaml(id)
+
+    def gethtml(self, id):
+        return self.curriculumvitae.gethtml(id)
+
+    @property
+    def NUMS(self):
+        return self.curriculumvitae.NUMS
+

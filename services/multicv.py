@@ -4,19 +4,20 @@ class MultiCV(object):
         self.default = projects[0]
         self.repodb = repodb
         self.projects = dict([tuple([p.name, p]) for p in projects])
+        self.projectscv = dict([tuple([p.name, p.curriculumvitae]) for p in projects])
         if additionals is None:
             self.additionals = dict()
         else:
             self.additionals = additionals
-        self.svcls = projects + self.additionals.values()
+        self.svcls = [p.curriculumvitae for p in projects] + self.additionals.values()
 
     def getproject(self, name=None):
         if name is not None:
             assert name in self.projects
-            projectcv = self.projects[name]
+            project = self.projects[name]
         else:
-            projectcv = self.default
-        return projectcv
+            project = self.default
+        return project
 
     def add(self, cvobj, committer=None, projectname=None, unique=True):
         if projectname is None:
@@ -24,7 +25,7 @@ class MultiCV(object):
         result = self.repodb.add(cvobj, committer, unique)
         if result is True:
             project = self.getproject(projectname)
-            project.add(cvobj.filepro.name.base, committer)
+            result = project.cv_add(cvobj, committer)
         return result
 
     def add_md(self, cvobj, committer=None):
@@ -35,23 +36,23 @@ class MultiCV(object):
 
     def yamls(self, projectname=None):
         cvservice = self.getproject(projectname)
-        return cvservice.yamls()
+        return cvservice.cv_yamls()
 
     def datas(self, projectname=None):
         cvservice = self.getproject(projectname)
-        return cvservice.datas()
+        return cvservice.cv_datas()
 
     def search(self, keyword, projectname=None):
         cvservice = self.getproject(projectname)
-        return cvservice.search(keyword)
+        return cvservice.cv_search(keyword)
 
     def search_yaml(self, keyword, projectname=None):
         cvservice = self.getproject(projectname)
-        return cvservice.search_yaml(keyword)
+        return cvservice.cv_search_yaml(keyword)
 
     def gethtml(self, id, projectname=None):
         cvservice = self.getproject(projectname)
-        result = cvservice.gethtml(id)
+        result = cvservice.cv_gethtml(id)
         if result is None:
             for each in self.additionals.values():
                 result = each.gethtml(id)
@@ -61,7 +62,7 @@ class MultiCV(object):
 
     def getmd(self, id, projectname=None):
         cvservice = self.getproject(projectname)
-        result = cvservice.getmd(id)
+        result = cvservice.cv_getmd(id)
         if result is None:
             for each in self.additionals.values():
                 result = each.getmd(id)
@@ -72,7 +73,7 @@ class MultiCV(object):
     def getyaml(self, id, projectname=None):
         cvservice = self.getproject(projectname)
         try:
-            result = cvservice.getyaml(id)
+            result = cvservice.cv_getyaml(id)
         except IOError:
             result = None
         if result is None:

@@ -68,6 +68,12 @@ def configure(app):
         view_func=webapp.views.views.SearchResult.as_view('searchresult')
     )
 
+    #RESTful Resume page entrance
+    app.add_url_rule(
+        '/resume/<path:id>',
+        view_func=webapp.views.views.Resume.as_view('resume')
+    )
+
     app.add_url_rule(
         '/gotologin',
         view_func=webapp.views.views.LoginRedirect.as_view('gotologin'),
@@ -104,7 +110,7 @@ def configure(app):
         )
 
     app.add_url_rule(
-        '/showeng/<path:id>',
+        '/showeng/<path:project>/<path:id>',
         view_func=webapp.views.views.ShowEnglish.as_view('showenglish'),
         )
 

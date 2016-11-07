@@ -4,6 +4,7 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import core.basedata
+import extractor.information_explorer
 
 
 class CompanyAPI(Resource):
@@ -29,13 +30,7 @@ class CompanyAPI(Resource):
         project = args['project']
         coname = args['coname'].encode('utf-8')
         introduction = args['introduction']
-        if introduction is None:
-            introduction = ""
-        metadata = {
-            'name': coname,
-            'committer': user.id,
-            'introduction': introduction,
-        }
+        metadata = extractor.information_explorer.catch_coinfo(coname, user.id, introduction)
         coobj = core.basedata.DataObject(coname, introduction, metadata)
         result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)
         return { 'code': 200, 'data': result, 'message': 'Create new company successed.' }

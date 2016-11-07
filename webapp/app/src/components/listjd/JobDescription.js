@@ -114,6 +114,7 @@ class JobDescription extends Component {
     return (
       <div>
         <ToolBar
+          filter={this.props.filter}
           onSearch={this.props.onSearch}
           companyData={this.props.companyData}
           confirmLoading={this.props.confirmLoading}

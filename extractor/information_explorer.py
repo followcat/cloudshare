@@ -262,9 +262,10 @@ def catch_selected(stream, selected, name=None):
         info_dict["classify"] = get_classify(experience)
     return info_dict
 
-
-def catch_info(stream, name=None):
+def catch_cvinfo(stream, filename, id, name=None):
     info = generate_info_template()
     catchinfo = catch(stream)
     info.update(catchinfo)
+    info['id'] = id
+    info["filename"] = filename
     return info

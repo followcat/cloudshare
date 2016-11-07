@@ -8,12 +8,10 @@ import flask.views
 import flask.ext.login
 
 import utils.builtin
-import utils.chsname
 import core.basedata
 import core.outputstorage
 import core.converterutils
-import webapp.views.account
-import services.exception
+import extractor.information_explorer
 
 import json
 
@@ -32,8 +30,11 @@ class Upload(flask.views.MethodView):
         filepro = core.docprocessor.Processor(network_file,
                                               network_file.filename.encode('utf-8'),
                                               flask.current_app.config['UPLOAD_TEMP'])
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                              filepro.markdown_stream.decode('utf8'),
+                                              filepro.base.base, filepro.name.base)
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
-                                           filepro.yamlinfo)
+                                           yamlinfo)
         flask.session[user.id]['upload'] = dataobj
         flask.session.modified = True
         return str(filepro.result)

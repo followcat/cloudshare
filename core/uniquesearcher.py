@@ -12,12 +12,15 @@ class UniqueSearcher(object):
             >>> import core.uniquesearcher
             >>> import interface.gitinterface
             >>> import services.curriculumvitae
+            >>> import extractor.information_explorer
             >>> repo_name = 'core/test_repo'
             >>> test_path = 'core/test_output'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
-            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, fp1.yamlinfo)
+            >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
+            ...     fp1.markdown_stream.decode('utf8'), fp1.base.base, fp1.name.base)
+            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, yamlinfo)
             >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> fp1.result
             True

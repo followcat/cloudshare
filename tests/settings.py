@@ -8,8 +8,9 @@ import services.multicv
 import services.project
 import services.company
 import services.curriculumvitae
-import core.converterutils
 import interface.gitinterface
+import core.converterutils
+import extractor.information_explorer
 
 class Config(object):
 
@@ -56,8 +57,11 @@ class Config(object):
         filename = 'cv_1.doc'
         f = open(os.path.join('core/test', filename))
         filepro = core.docprocessor.Processor(f, filename, self.UPLOAD_TEMP)
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                    filepro.markdown_stream.decode('utf8'),
+                                    filepro.base.base, filepro.name.base)
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
-                                           filepro.yamlinfo)
+                                           yamlinfo)
         self.SVC_MULT_CV.add(dataobj, projectname='project_test')
 
     def rebuild(self):

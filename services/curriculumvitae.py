@@ -45,8 +45,9 @@ class CurriculumVitae(services.base.Service):
             >>> import os.path
             >>> import core.basedata
             >>> import core.converterutils
-            >>> import services.curriculumvitae
             >>> import interface.gitinterface
+            >>> import services.curriculumvitae
+            >>> import extractor.information_explorer
             >>> repo_name = 'services/test_repo'
             >>> test_path = 'services/test_output'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
@@ -54,9 +55,13 @@ class CurriculumVitae(services.base.Service):
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
+            >>> yamlinfo1 = extractor.information_explorer.catch_cvinfo(
+            ...     fp1.markdown_stream.decode('utf8'), fp1.base.base, fp1.name.base)
             >>> fp2 = core.docprocessor.Processor(f2, 'cv_2.doc', test_path)
-            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, fp1.yamlinfo)
-            >>> cv2 = core.basedata.DataObject(fp2.name, fp2.markdown_stream, fp2.yamlinfo)
+            >>> yamlinfo2 = extractor.information_explorer.catch_cvinfo(
+            ...     fp2.markdown_stream.decode('utf8'), fp2.base.base, fp2.name.base)
+            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, yamlinfo1)
+            >>> cv2 = core.basedata.DataObject(fp2.name, fp2.markdown_stream, yamlinfo2)
             >>> svc_cv.add(cv1)
             True
             >>> svc_cv.add(cv2)
@@ -100,8 +105,9 @@ class CurriculumVitae(services.base.Service):
             >>> import shutil
             >>> import os.path
             >>> import core.basedata
-            >>> import services.curriculumvitae
             >>> import interface.gitinterface
+            >>> import services.curriculumvitae
+            >>> import extractor.information_explorer
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> test_path = "services/test_output"
@@ -111,7 +117,9 @@ class CurriculumVitae(services.base.Service):
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
             >>> fp1 = core.docprocessor.Processor(obj, name, test_path)
-            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, fp1.yamlinfo)
+            >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
+            ...     fp1.markdown_stream.decode('utf8'), fp1.base.base, fp1.name.base)
+            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
             >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))

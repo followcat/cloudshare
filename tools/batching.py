@@ -6,6 +6,7 @@ import shutil
 import utils.chsname
 import core.exception
 import core.converterutils
+import extractor.information_explorer
 
 
 def move_file(path, origin_path, filename):
@@ -17,7 +18,7 @@ def move_file(path, origin_path, filename):
                 os.path.join(des_path, filename))
 
 
-def filter(processer, origin_path, filename):
+def filter(processer, yamlinfo, origin_path, filename):
     def mustjudge(d):
         return (d['email'] or d['phone'])
 
@@ -25,7 +26,7 @@ def filter(processer, origin_path, filename):
         path = "NotConvert"
         move_file(path, origin_path, filename)
         return
-    info = processer.yamlinfo
+    info = yamlinfo
     if mustjudge(info):
         if info['name']:
             path = "OK"
@@ -56,8 +57,11 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
             filepro = core.docprocessor.Processor(filename, f, temp_output)
+            yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                        filepro.markdown_stream.decode('utf8'),
+                                        filepro.base.base, filepro.name.base)
             cvobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
-                                             filepro.yamlinfo)
+                                             yamlinfo)
             if origin is not None:
                 cvobj.metadata['origin'] = origin
             if not cvobj.metadata['name']:
@@ -76,8 +80,11 @@ def classify(path, temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for name in files:
-            processfile = core.docprocessor.Processor(root, name, temp_output)
-            filter(processfile, root, name)
+            filepro = core.docprocessor.Processor(root, name, temp_output)
+            yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                        filepro.markdown_stream.decode('utf8'),
+                                        filepro.base.base, filepro.name.base)
+            filter(filepro, yamlinfo, root, name)
 
 
 import yaml

@@ -55,8 +55,7 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
     for root, dirs, files in os.walk(path):
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
-            filepro = core.converterutils.FileProcesser(filename, f,
-                                                        temp_output)
+            filepro = core.docprocessor.Processor(filename, f, temp_output)
             cvobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
                                              filepro.yamlinfo)
             if origin is not None:
@@ -77,7 +76,7 @@ def classify(path, temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for name in files:
-            processfile = core.converterutils.FileProcesser(root, name, temp_output)
+            processfile = core.docprocessor.Processor(root, name, temp_output)
             filter(processfile, root, name)
 
 

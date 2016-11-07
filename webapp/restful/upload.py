@@ -64,8 +64,8 @@ class UploadCVAPI(Resource):
             upload[user.id] = dict()
         network_file = flask.request.files['files']
         filename = network_file.filename
-        filepro = core.converterutils.FileProcesser(network_file, filename.encode('utf-8'),
-                                                    flask.current_app.config['UPLOAD_TEMP'])
+        filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
+                                              flask.current_app.config['UPLOAD_TEMP'])
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
                                            filepro.yamlinfo)
         upload[user.id][filename] = None
@@ -117,9 +117,9 @@ class UploadEnglishCVAPI(Resource):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
         filename = network_file.filename
-        filepro = core.converterutils.FileProcesser(network_file,
-                                                    filename.encode('utf-8'),
-                                                    flask.current_app.config['UPLOAD_TEMP'])
+        filepro = core.docprocessor.Processor(network_file,
+                                              filename.encode('utf-8'),
+                                              flask.current_app.config['UPLOAD_TEMP'])
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
                                            filepro.yamlinfo)
         uploadeng[user.id] = dataobj

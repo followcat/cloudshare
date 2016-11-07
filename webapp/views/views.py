@@ -29,9 +29,9 @@ class Upload(flask.views.MethodView):
     def post(self):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
-        filepro = core.converterutils.FileProcesser(network_file,
-                                                    network_file.filename.encode('utf-8'),
-                                                    flask.current_app.config['UPLOAD_TEMP'])
+        filepro = core.docprocessor.Processor(network_file,
+                                              network_file.filename.encode('utf-8'),
+                                              flask.current_app.config['UPLOAD_TEMP'])
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
                                            filepro.yamlinfo)
         flask.session[user.id]['upload'] = dataobj

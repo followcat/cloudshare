@@ -31,7 +31,7 @@ def md_to_html(stream):
     return md
 
 
-class FileProcesser():
+class Processor():
     """
         result code:
             0 - success
@@ -81,7 +81,7 @@ class FileProcesser():
             >>> import core.converterutils
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
+            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> ori = cv1.name
@@ -158,7 +158,7 @@ class FileProcesser():
             >>> import xml.etree.ElementTree
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
+            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> e = xml.etree.ElementTree.parse(os.path.join(
@@ -219,7 +219,7 @@ class FileProcesser():
             >>> import core.converterutils
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
+            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> os.path.isfile(os.path.join(cv1.markdown_path,

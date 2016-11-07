@@ -55,8 +55,7 @@ class Config(object):
     def init_samplecv(self):
         filename = 'cv_1.doc'
         f = open(os.path.join('core/test', filename))
-        filepro = core.converterutils.FileProcesser(f, filename,
-                                                    self.UPLOAD_TEMP)
+        filepro = core.docprocessor.Processor(f, filename, self.UPLOAD_TEMP)
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
                                            filepro.yamlinfo)
         self.SVC_MULT_CV.add(dataobj, projectname='project_test')

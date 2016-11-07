@@ -91,7 +91,7 @@ class Project(services.base.Service):
         return self.curriculumvitae.updateinfo(id, key, value, userid)
 
     def cv_ids(self):
-        return self.curriculumvitae.cvids
+        return self.curriculumvitae.ids
 
     def company_add(self, cvobj, committer=None, unique=True, yamlfile=True):
         return self.company.add(cvobj, committer, unique, yamlfile)

@@ -36,7 +36,7 @@ class CVStorageSync(object):
 
         for dbname in interfaces:
             raw_db = interfaces[dbname]
-            for id in set(raw_db.lsid_raw())-set(self.cv_storage.cvids):
+            for id in set(raw_db.lsid_raw())-set(self.cv_storage.ids):
                 raw_html = raw_db.getraw(id+'.html')
                 raw_yaml = raw_db.getraw(id+'.yaml')
                 md = self.generate_md(raw_html)

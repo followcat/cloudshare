@@ -233,7 +233,7 @@ class CurriculumVitae(services.base.Service):
         return self._nums
 
     @property
-    def cvids(self):
+    def ids(self):
         return [os.path.splitext(f)[0]
                 for f in self.interface.lsfiles('.', '*.yaml')]
 

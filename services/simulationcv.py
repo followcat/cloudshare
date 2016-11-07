@@ -27,7 +27,7 @@ class SimulationCV(services.base.Service):
     def __init__(self, path, name, cvstorage):
         self.path = os.path.join(path, self.SAVE_DIR)
         super(SimulationCV, self).__init__(self.path, name)
-        self.cvids = set()
+        self.ids = set()
         self.cvstorage = cvstorage
         self.yamlpath = self.YAML_DIR
         try:
@@ -37,10 +37,10 @@ class SimulationCV(services.base.Service):
 
     def load(self):
         stream = self.interface.get(self.ids_file)
-        self.cvids = ujson.loads(stream)
+        self.ids = ujson.loads(stream)
 
     def save(self):
-        stream = ujson.dumps(sorted(self.cvids), indent=4)
+        stream = ujson.dumps(sorted(self.ids), indent=4)
         self.interface.add(self.ids_file, stream)
 
     def add(self, cvobj, committer=None, unique=True, yamlfile=False):
@@ -51,7 +51,7 @@ class SimulationCV(services.base.Service):
             filenames = []
             filedatas = []
             filenames.append(bytes(self.ids_file))
-            filedatas.append(ujson.dumps(sorted(self.cvids), indent=4))
+            filedatas.append(ujson.dumps(sorted(self.ids), indent=4))
             if yamlfile is True:
                 if not os.path.exists(os.path.join(self.path, self.yamlpath)):
                     os.makedirs(os.path.join(self.path, self.yamlpath))
@@ -65,7 +65,7 @@ class SimulationCV(services.base.Service):
             self.interface.add_files(filenames, filedatas,
                                      message='Add new cv %s.'%id,
                                      committer=committer)
-            self.interface.modify(self.ids_file, ujson.dumps(sorted(self.cvids), indent=4))
+            self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))
             result = True
         return result
 
@@ -77,18 +77,18 @@ class SimulationCV(services.base.Service):
 
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base
-        return id in self.cvids
+        return id in self.ids
 
     def _add(self, name):
         id = core.outputstorage.ConvertName(name).base
-        self.cvids.add(id)
+        self.ids.add(id)
 
     def search(self, keyword):
         results = set()
         allfile = self.cvstorage.search(keyword)
         for filename in allfile:
             id = core.outputstorage.ConvertName(filename).base
-            if id in self.cvids:
+            if id in self.ids:
                 results.add(id)
         return results
 
@@ -101,11 +101,11 @@ class SimulationCV(services.base.Service):
         return results
 
     def yamls(self):
-        for id in self.cvids:
+        for id in self.ids:
             yield core.outputstorage.ConvertName(id).yaml
 
     def names(self):
-        for id in self.cvids:
+        for id in self.ids:
             yield core.outputstorage.ConvertName(id).md
 
     def history(self, author=None, entries=10, skip=0):
@@ -151,7 +151,7 @@ class SimulationCV(services.base.Service):
 
     @property
     def NUMS(self):
-        return len(self.cvids)
+        return len(self.ids)
 
     @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
@@ -215,7 +215,7 @@ class SimulationCV(services.base.Service):
         def storage(filepath, stream):
             with open(filepath, 'w') as f:
                 f.write(stream.encode('utf-8'))
-        for i in self.cvids:
+        for i in self.ids:
             name = core.outputstorage.ConvertName(i)
             mdpath = os.path.join(path, name.md)
             mdstream = self.cvstorage.getmd(i)

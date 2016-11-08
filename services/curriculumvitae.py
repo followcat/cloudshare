@@ -27,16 +27,14 @@ class CurriculumVitae(services.base.Service):
             >>> DIR = 'repo'
             >>> DB = interface.basefs.BaseFSInterface(DIR)
             >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
-            >>> assert SVC_CV.exists('blr6dter.yaml')
+            >>> assert SVC_CV.exists('blr6dter')
 
             >>> import interface.gitinterface
             >>> DB = interface.gitinterface.GitInterface(DIR)
             >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
-            >>> assert SVC_CV.exists('blr6dter.yaml')
+            >>> assert SVC_CV.exists('blr6dter')
         """
-        yamlname = core.outputstorage.ConvertName(id).yaml
-        result = self.interface.exists(yamlname)
-        return result
+        return id in self.ids
 
     def add(self, cvobj, committer=None, unique=True, yamlfile=True):
         """

@@ -7,10 +7,7 @@ from flask.ext.restful import Resource
 
 import utils.chsname
 import core.basedata
-<<<<<<< HEAD
-=======
 import core.docprocessor
->>>>>>> fc1cdc32fe06167ea7f367bb4238100734f270f1
 import extractor.information_explorer
 
 

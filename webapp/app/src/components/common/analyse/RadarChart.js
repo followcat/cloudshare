@@ -5,10 +5,10 @@ import { Button, Modal } from 'antd';
 
 import Charts from '../Charts';
 
-import Immutable from 'immutable';
-
 import Storage from '../../../utils/storage';
 import Generator from '../../../utils/generator';
+import { getRadarOption } from '../../../utils/chart_option';
+
 import 'whatwg-fetch';
 
 export default class RadarChart extends Component {
@@ -20,71 +20,8 @@ export default class RadarChart extends Component {
       option: {},
     };
 
-    this.getOption = this.getOption.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
-  }
-
-  getOption(data) {
-    const result = data.result;
-    const legend = result[0].value.map(item => {
-      return item.name ? item.name : item.id;
-    });
-
-    const indicator = [],
-          seriesData = {};
-
-    for (let i = 0, rLen = result.length; i < rLen; i++) {
-      let current = result[i],
-          value = [];
-
-      indicator.push({ name: current.description, max: data.max });
-
-      for (let j = 0,  cLen = current.value.length; j < cLen; j++) {
-        let name = current.value[j].name ? current.value[j].name : current.value[j].id;
-        let value = seriesData[name] ? seriesData[name] : [];
-        value.push(current.value[j].match);
-        seriesData[name] = value;
-      }
-    }
-
-    const option = {
-      title: {
-        text: 'Charts',
-      },
-      tooltip: {
-        trigger: 'item',
-        position: 'bottom',
-      },
-      legend: {
-        orient: 'horizontal',
-        x: 'right',
-        y: 'bottom',
-        data: legend,
-      },
-      toolbox: {
-        show: true,
-        feature: {
-          saveAsImage: {
-            show: true,
-            pixelRatio: 1.5,
-          },
-        },
-      },
-      radar: {
-        indicator: indicator,
-      },
-      textStyle: {
-        fontStyle: 'bolder',
-        fontSize: 14
-      },
-      calculable: true,
-      series: [{
-        type: 'radar',
-        data: legend.map(item => { return { name: item, value: seriesData[item] } }),
-      }],
-    };
-    return option;
   }
 
   handleClick() {
@@ -114,7 +51,7 @@ export default class RadarChart extends Component {
       if (json.code === 200) {
         _this.setState({
           data: json.data.result,
-          option: _this.getOption(json.data),
+          option: getRadarOption(json.data.max, json.data.result),
         });
       }
     })

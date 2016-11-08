@@ -5,7 +5,7 @@ import shutil
 
 import utils.chsname
 import core.exception
-import core.converterutils
+import core.docprocessor
 import extractor.information_explorer
 
 

@@ -4,7 +4,7 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import core.outputstorage
-import core.converterutils
+import core.docprocessor
 
 
 class CurrivulumvitaeAPI(Resource):
@@ -46,7 +46,7 @@ class CurrivulumvitaeMDAPI(CurrivulumvitaeAPI):
 
     def get(self, id):
         md = self.svc_mult_cv.getmd(id)
-        html = core.converterutils.md_to_html(md)
+        html = core.docprocessor.md_to_html(md)
         return { 'result': html }
 
     def put(self, id):

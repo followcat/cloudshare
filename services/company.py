@@ -92,18 +92,21 @@ class Company(services.base.Service):
         return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
     def yamls(self):
-        yamls = self.interface.lsfiles('.', '*.yaml')
-        for each in yamls:
-            yield os.path.split(each)[-1]
+        for id in self.ids:
+            yield core.outputstorage.ConvertName(id).yaml
 
     def names(self):
-        for each in self.yamls():
-            yield core.outputstorage.ConvertName(each).base
+        return self.ids
 
     def datas(self):
-        for name in self.names():
-            text = self.getmd(name)
-            yield name, text
+        for id in self.ids:
+            text = self.getmd(id)
+            yield id, text
+
+    @property
+    def ids(self):
+        return [os.path.splitext(f)[0]
+                for f in self.interface.lsfiles('.', '*.yaml')]
 
     @property
     def NUMS(self):

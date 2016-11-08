@@ -10,7 +10,7 @@ import flask.ext.login
 import utils.builtin
 import core.basedata
 import core.outputstorage
-import core.converterutils
+import core.docprocessor
 import extractor.information_explorer
 
 import json
@@ -133,7 +133,7 @@ class Preview(flask.views.MethodView):
     @flask.ext.login.login_required
     def post(self):
         md_data = flask.request.form['mddata']
-        md = core.converterutils.md_to_html(md_data)
+        md = core.docprocessor.md_to_html(md_data)
         return flask.render_template('preview.html', markdown=md)
 
 class Index(flask.views.MethodView):

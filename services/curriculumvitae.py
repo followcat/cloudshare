@@ -5,7 +5,7 @@ import os.path
 import utils._yaml
 import services.base
 import core.outputstorage
-import core.converterutils
+import core.docprocessor
 import core.uniquesearcher
 
 
@@ -44,7 +44,6 @@ class CurriculumVitae(services.base.Service):
             >>> import shutil
             >>> import os.path
             >>> import core.basedata
-            >>> import core.converterutils
             >>> import interface.gitinterface
             >>> import services.curriculumvitae
             >>> import extractor.information_explorer
@@ -189,7 +188,7 @@ class CurriculumVitae(services.base.Service):
         if result is None:
             md = self.getmd(name)
             if md is not None:
-                result = core.converterutils.md_to_html(md)
+                result = core.docprocessor.md_to_html(md)
         return result
 
     def getmd(self, name):

@@ -73,7 +73,6 @@ class Processor():
     def copy(self, des=None, name=None):
         """
             >>> import shutil
-            >>> import core.converterutils
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
             >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
@@ -149,7 +148,6 @@ class Processor():
         """
             >>> import os
             >>> import shutil
-            >>> import core.converterutils
             >>> import xml.etree.ElementTree
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
@@ -206,7 +204,6 @@ class Processor():
         """
             >>> import shutil
             >>> import os.path
-            >>> import core.converterutils
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
             >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)

@@ -1,5 +1,5 @@
 import core.outputstorage
-import core.converterutils
+import core.docprocessor
 
 
 class DataObject(object):
@@ -27,5 +27,5 @@ class DataObject(object):
         return self._metadata
 
     def preview_data(self):
-        output = core.converterutils.md_to_html(self.data)
+        output = core.docprocessor.md_to_html(self.data)
         return output

@@ -44,6 +44,10 @@ class CurriculumVitae(services.base.Service):
             >>> import shutil
             >>> import os.path
             >>> import core.basedata
+<<<<<<< HEAD
+=======
+            >>> import core.docprocessor
+>>>>>>> fc1cdc32fe06167ea7f367bb4238100734f270f1
             >>> import interface.gitinterface
             >>> import services.curriculumvitae
             >>> import extractor.information_explorer

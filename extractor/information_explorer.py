@@ -8,7 +8,7 @@ import extractor.utils_parsing
 import extractor.extract_experience
 
 
-info_template = (
+cv_template = (
     ("id",                  str),
     ("name",                str),
     ("filename",            str),
@@ -35,10 +35,14 @@ info_template = (
     ("tracking",            list),
 )
 
+co_template = (
+    ("name",                  str),
+    ("committer",             str),
+    ("introduction",          str),
+)
 
-def generate_info_template(template=None):
-    if template is None:
-        template = info_template
+
+def generate_info_template(template):
     info = {}
     for each in template:
         info[each[0]] = each[1]()
@@ -263,8 +267,18 @@ def catch_selected(stream, selected, name=None):
     return info_dict
 
 
-def catch_info(stream, name=None):
-    info = generate_info_template()
+def catch_cvinfo(stream, filename, id, name=None):
+    info = generate_info_template(cv_template)
     catchinfo = catch(stream)
     info.update(catchinfo)
+    info['id'] = id
+    info["filename"] = filename
+    return info
+
+
+def catch_coinfo(name, committer, introduction):
+    info = generate_info_template(co_template)
+    info['name'] = name
+    info['committer'] = committer
+    info['introduction'] = introduction
     return info

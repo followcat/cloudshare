@@ -8,6 +8,7 @@ from flask.ext.restful import Resource
 import utils.chsname
 import core.basedata
 import core.converterutils
+import extractor.information_explorer
 
 
 upload = dict()
@@ -64,10 +65,13 @@ class UploadCVAPI(Resource):
             upload[user.id] = dict()
         network_file = flask.request.files['files']
         filename = network_file.filename
-        filepro = core.converterutils.FileProcesser(network_file, filename.encode('utf-8'),
-                                                    flask.current_app.config['UPLOAD_TEMP'])
+        filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
+                                              flask.current_app.config['UPLOAD_TEMP'])
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                              filepro.markdown_stream.decode('utf8'),
+                                              filepro.base.base, filepro.name.base)
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
-                                           filepro.yamlinfo)
+                                           yamlinfo)
         upload[user.id][filename] = None
         name = ''
         if filepro.result is True:
@@ -117,11 +121,14 @@ class UploadEnglishCVAPI(Resource):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
         filename = network_file.filename
-        filepro = core.converterutils.FileProcesser(network_file,
-                                                    filename.encode('utf-8'),
-                                                    flask.current_app.config['UPLOAD_TEMP'])
+        filepro = core.docprocessor.Processor(network_file,
+                                              filename.encode('utf-8'),
+                                              flask.current_app.config['UPLOAD_TEMP'])
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                              filepro.markdown_stream.decode('utf8'),
+                                              filepro.base.base, filepro.name.base)
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
-                                           filepro.yamlinfo)
+                                           yamlinfo)
         uploadeng[user.id] = dataobj
         return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/preview' } }
 

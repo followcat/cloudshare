@@ -9,11 +9,8 @@ import xml.etree.ElementTree
 import pypandoc
 import emaildata.text
 
-import utils.builtin
 import utils.unoconverter
-import core.exception
 import core.outputstorage
-import extractor.information_explorer
 
 
 logging.config.fileConfig("core/logger.conf")
@@ -31,7 +28,7 @@ def md_to_html(stream):
     return md
 
 
-class FileProcesser():
+class Processor():
     """
         result code:
             0 - success
@@ -46,7 +43,6 @@ class FileProcesser():
         if self.converter is None:
             self.__class__.converter = utils.unoconverter.DocumentConverter()
 
-        self.yamlinfo = dict()
         self.markdown_stream = str()
 
         self.base = core.outputstorage.ConvertName(name)
@@ -57,7 +53,6 @@ class FileProcesser():
         self.source_path = self.output_path.source
         self.docx_path = self.output_path.docx
         self.html_path = self.output_path.html
-        self.yaml_path = self.output_path.yaml
         self.docbook_path = self.output_path.docbook
         self.markdown_path = self.output_path.markdown
 
@@ -81,7 +76,7 @@ class FileProcesser():
             >>> import core.converterutils
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
+            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> ori = cv1.name
@@ -158,7 +153,7 @@ class FileProcesser():
             >>> import xml.etree.ElementTree
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
+            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> e = xml.etree.ElementTree.parse(os.path.join(
@@ -199,11 +194,6 @@ class FileProcesser():
                 return False
             self.remove_note()
             self.file_docbook_to_markdown()
-            self.yamlinfo = extractor.information_explorer.catch_info(
-                            self.markdown_stream.decode('utf8'))
-            self.yamlinfo["filename"] = self.base.base
-            self.yamlinfo['id'] = self.name.base
-            utils.builtin.save_yaml(self.yamlinfo, self.yaml_path, self.name.yaml)
             logger.info(' '.join([self.base.base, self.name.base, 'Success']))
             self.resultcode = 0
             return True
@@ -219,7 +209,7 @@ class FileProcesser():
             >>> import core.converterutils
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.converterutils.FileProcesser(f, 'cv_1.doc', basepath)
+            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> os.path.isfile(os.path.join(cv1.markdown_path,
@@ -236,9 +226,6 @@ class FileProcesser():
         if os.path.isfile(filename):
             os.remove(filename)
         filename = os.path.join(self.html_path, self.name.html)
-        if os.path.isfile(filename):
-            os.remove(filename)
-        filename = os.path.join(self.yaml_path, self.name.yaml)
         if os.path.isfile(filename):
             os.remove(filename)
         filename = os.path.join(self.docbook_path, self.name.xml)

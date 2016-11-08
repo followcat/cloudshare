@@ -9,10 +9,7 @@ import services.project
 import services.company
 import services.curriculumvitae
 import interface.gitinterface
-<<<<<<< HEAD
-=======
 import core.docprocessor
->>>>>>> fc1cdc32fe06167ea7f367bb4238100734f270f1
 import extractor.information_explorer
 
 class Config(object):

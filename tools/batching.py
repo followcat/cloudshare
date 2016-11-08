@@ -5,10 +5,7 @@ import shutil
 
 import utils.chsname
 import core.exception
-<<<<<<< HEAD
-=======
 import core.docprocessor
->>>>>>> fc1cdc32fe06167ea7f367bb4238100734f270f1
 import extractor.information_explorer
 
 

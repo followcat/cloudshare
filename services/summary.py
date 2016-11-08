@@ -4,10 +4,6 @@ import os.path
 
 import services.base
 import core.outputstorage
-<<<<<<< HEAD
-=======
-import core.docprocessor
->>>>>>> fc1cdc32fe06167ea7f367bb4238100734f270f1
 import core.uniquesearcher
 
 

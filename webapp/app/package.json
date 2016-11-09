@@ -19,6 +19,7 @@
   "dependencies": {
     "antd": "^1.9.1",
     "babel-plugin-transform-object-assign": "^6.8.0",
+    "babel-polyfill": "^6.16.0",
     "classnames": "^2.2.5",
     "echarts": "^3.2.3",
     "marked": "^0.3.6",

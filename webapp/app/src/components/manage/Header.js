@@ -42,8 +42,10 @@ export default class Header extends Component {
         </Menu.Item>
       </Menu>
     );
+
+    const fixCls = this.props.fixed ? 'cs-layout-top fixed' : 'cs-layout-top';
     return (
-      <div className="cs-layout-top">
+      <div className={fixCls}>
         <div className="cs-layout-herader">
           <div className="cs-layout-wrapper">
             <div className="cs-layout-logo">

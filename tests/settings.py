@@ -79,5 +79,3 @@ class Config(object):
             shutil.rmtree(self.LSI_PATH)
         if os.path.exists(self.PRJ_PATH):
             shutil.rmtree(self.PRJ_PATH)
-
-config = Config()

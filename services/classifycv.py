@@ -34,12 +34,12 @@ class ClassifyCV(object):
                 self.update()
 
     def update(self):
-        for y in self.cvstorage.yamls():
-            if not self.exists(y):
-                data = self.cvstorage.getmd(y)
-                matedata = self.cvstorage.getyaml(y)
-                if self.name in info['classify']:
-                    dataobj = core.basedata.DataObject(name, data, matedata)
+        for id in self.cvstorage.ids:
+            if not self.exists(id):
+                data = self.cvstorage.getmd(id)
+                metadata = self.cvstorage.getyaml(id)
+                if self.name in metadata['classify']:
+                    dataobj = core.basedata.DataObject(id, data, metadata)
                     self.add(dataobj, yamlfile=False)
 
     def add(self, dataobj, committer=None, unique=True, yamlfile=True):

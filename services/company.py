@@ -50,9 +50,7 @@ class Company(services.base.Service):
         self._nums = 0
 
     def exists(self, id):
-        yamlname = core.outputstorage.ConvertName(id).yaml
-        result = self.interface.exists(yamlname)
-        return result
+        return id in self.ids
 
     def add(self, coobj, committer=None, unique=True, yamlfile=True):
         if unique is True and self.exists(coobj.name):

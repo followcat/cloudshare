@@ -153,7 +153,6 @@ class SimulationCV(services.base.Service):
     def NUMS(self):
         return len(self.ids)
 
-    @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
         data = None
         projectinfo = self.getinfo(id)

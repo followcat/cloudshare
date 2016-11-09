@@ -260,6 +260,8 @@ export default class ListJD extends Component {
         }
         message.success(json.message);
         _this.loadJobDescription();
+      } else {
+        message.error(json.message);
       }
     })
   }

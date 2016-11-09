@@ -68,8 +68,8 @@ class UploadCVAPI(Resource):
         filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
                                               flask.current_app.config['UPLOAD_TEMP'])
         yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                              filepro.markdown_stream.decode('utf8'),
-                                              filepro.base.base, filepro.name.base)
+                                              stream=filepro.markdown_stream.decode('utf8'),
+                                              filename=filepro.base.base, id=filepro.name.base)
         dataobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
                                            yamlinfo)
         upload[user.id][filename] = None

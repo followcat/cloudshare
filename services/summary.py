@@ -4,7 +4,6 @@ import os.path
 
 import services.base
 import core.outputstorage
-import core.docprocessor
 import core.uniquesearcher
 
 

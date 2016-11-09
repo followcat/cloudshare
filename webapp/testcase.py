@@ -24,7 +24,7 @@ class OldTest(object):
     def create_app(self):
         self.app = flask.Flask(__name__)
         self.app.config.from_object(self.config)
-        self.repo_db = self.app.config['REPO_DB']
+        self.repo_db = self.app.config['SVC_CV_REPO'].interface
         self.upload_tmp = self.app.config['UPLOAD_TEMP']
         self.svc_mult_cv = self.app.config['SVC_MULT_CV']
         self.app.jinja_env.add_extension(jinja2.ext.loopcontrols)

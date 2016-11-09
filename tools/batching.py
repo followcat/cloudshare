@@ -58,8 +58,8 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
             f = open(os.path.join(root, filename), 'r')
             filepro = core.docprocessor.Processor(filename, f, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                        filepro.markdown_stream.decode('utf8'),
-                                        filepro.base.base, filepro.name.base)
+                                        stream=filepro.markdown_stream.decode('utf8'),
+                                        filename=filepro.base.base, id=filepro.name.base)
             cvobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
                                              yamlinfo)
             if origin is not None:
@@ -82,8 +82,8 @@ def classify(path, temp_output):
         for name in files:
             filepro = core.docprocessor.Processor(root, name, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                        filepro.markdown_stream.decode('utf8'),
-                                        filepro.base.base, filepro.name.base)
+                                        stream=filepro.markdown_stream.decode('utf8'),
+                                        filename=filepro.base.base, id=filepro.name.base)
             filter(filepro, yamlinfo, root, name)
 
 
@@ -231,6 +231,35 @@ def initclassify(SVC_CV, knowledge=None):
         info = SVC_CV.getyaml(y)
         info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge)
         utils.builtin.save_yaml(info, SVC_CV.path , y)
+
+
+def inituniqueid(SVC_CV, with_report=False, with_diff=False):
+    import difflib
+    import utils.builtin
+    import extractor.unique_id
+
+    path_prefix = lambda x: os.path.join(SVC_CV.repo_path, x)
+    unique_ids = {}
+    for y in SVC_CV.yamls():
+        info = SVC_CV.getyaml(y)
+        info = extractor.unique_id.unique_id(info)
+        try:
+            assert info['unique_id'] not in unique_ids
+            unique_ids[info['unique_id']] = y
+        except KeyError:
+            pass
+        except AssertionError:
+            if with_report:
+                print(info['unique_id'], path_prefix(y) + ' ' + path_prefix(unique_ids[info['unique_id']]))
+                if with_diff:
+                    print('++++\n')
+                    old = path_prefix(unique_ids[info['unique_id']])
+                    new = path_prefix(y)
+                    for l in difflib.unified_diff(file(old).readlines(), file(new).readlines(), old, new):
+                        print(l.rstrip())
+                    print('\n++++\n')
+        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
+
 
 
 def initproject(SVC_CV_REPO, SVC_PRJ):

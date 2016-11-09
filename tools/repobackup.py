@@ -10,9 +10,9 @@ import dulwich.porcelain
 
 backup_folders = baseapp.backup.BACKUP_DIRS
 ISOTIMEFORMAT = '%Y-%m-%d-%X'
-source_repo = baseapp.datadbs.REPO_DB.repo
-account_repo = baseapp.datadbs.ACCOUNT_DB.repo
-medical_repo = baseapp.projects.MED_DB.repo
+source_repo = baseapp.datadbs.SVC_CV_REPO
+account_repo = baseapp.datadbs.SVC_ACCOUNT
+medical_repo = baseapp.projects.SVC_PRJ_MED
 
 
 def assure_path_exists(path):

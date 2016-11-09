@@ -19,7 +19,7 @@ export default class ListJD extends Component {
       searchData: [],
       filter: {
         'keyword': '',
-        'status': '',
+        'status': 'Opening',
       },
       companyData: [],
       height: 0,
@@ -67,6 +67,7 @@ export default class ListJD extends Component {
         this.setState({
           jobDescriptionData: data,
         });
+        this.updateFilter();
       } else {
         console.log('Get jd error.');
       }
@@ -259,6 +260,8 @@ export default class ListJD extends Component {
         }
         message.success(json.message);
         _this.loadJobDescription();
+      } else {
+        message.error(json.message);
       }
     })
   }
@@ -343,6 +346,7 @@ export default class ListJD extends Component {
                     height: this.state.height,
                     confirmLoading: this.state.confirmLoading,
                     visible: this.state.visible,
+                    filter: this.state.filter,
                     onModalOpen: this.handleModalOpen,
                     onModalCancel: this.handleModalCancel,
                     onSearch: this.handleSearch,

@@ -58,35 +58,33 @@ def report_issue(filename, failed=1):
     """
         >>> import os
         >>> import doctest
-        >>> import checkmate._issue
+        >>> import utils.issue
         >>> filename = 'dt1.rst'
+        >>> filepath = os.path.join('tests', filename)
 
     Hardcoded failed doctest:
-        >>> with open(os.sep.join([os.getenv('CHECKMATE_HOME'),
-        ...             filename]), 'w') as f:
+        >>> with open(filepath, 'w') as f:
         ...     n = f.write(\">>> print(False)\\nFalse\")
         ... 
-        >>> @checkmate._issue.report_issue(filename)
+        >>> @utils.issue.report_issue(filepath)
         ... def func():
         ...     pass
-        >>> _r = checkmate._issue.Runner(verbose=False)
+        >>> _r = utils.issue.Runner(verbose=False)
         >>> test = doctest.DocTestParser().get_doctest(func.__doc__,
         ...             locals(), func.__name__, None, None)
         >>> _r.run(test) # doctest: +ELLIPSIS
         TestResults(failed=1, ...
 
     Hardcoded successful doctest:
-        >>> with open(os.sep.join([os.getenv('CHECKMATE_HOME'),
-        ...             filename]), 'w') as f:
+        >>> with open(filepath, 'w') as f:
         ...     n = f.write(\">>> print(True)\\nFalse\")
         ... 
-        >>> @checkmate._issue.report_issue(filename)
+        >>> @utils.issue.report_issue(filepath)
         ... def func():
         ...     pass
         ... 
         >>> doctest.run_docstring_examples(func, locals())
-        >>> os.remove(os.sep.join([os.getenv('CHECKMATE_HOME'),
-        ...             filename]))
+        >>> os.remove(filepath)
     """
     return _add_issue_doctest(filename, failed)
 
@@ -94,35 +92,33 @@ def fix_issue(filename):
     """
         >>> import os
         >>> import doctest
-        >>> import checkmate._issue
+        >>> import utils.issue
         >>> filename = 'dt1.rst'
+        >>> filepath = os.path.join('tests', filename)
 
     Hardcoded successful doctest:
-        >>> with open(os.sep.join([os.getenv('CHECKMATE_HOME'),
-        ...             filename]), 'w') as f:
+        >>> with open(filepath, 'w') as f:
         ...     n = f.write(\">>> print(False)\\nFalse\")
         ... 
-        >>> @checkmate._issue.fix_issue(filename)
+        >>> @utils.issue.fix_issue(filepath)
         ... def func():
         ...     pass
         ... 
         >>> doctest.run_docstring_examples(func, locals())
 
     Hardcoded failed doctest:
-        >>> with open(os.sep.join([os.getenv('CHECKMATE_HOME'),
-        ...             filename]), 'w') as f:
+        >>> with open(filepath, 'w') as f:
         ...     n = f.write(\">>> print(True)\\nFalse\")
         ... 
-        >>> @checkmate._issue.fix_issue(filename)
+        >>> @utils.issue.fix_issue(filepath)
         ... def func():
         ...     pass
-        >>> _r = checkmate._issue.Runner(verbose=False)
+        >>> _r = utils.issue.Runner(verbose=False)
         >>> test = doctest.DocTestParser().get_doctest(func.__doc__,
         ...             locals(), func.__name__, None, None)
         >>> _r.run(test) # doctest: +ELLIPSIS
         TestResults(failed=1, ...
-        >>> os.remove(os.sep.join([os.getenv('CHECKMATE_HOME'),
-        ...             filename]))
+        >>> os.remove(filepath)
     """
     return _add_issue_doctest(filename)
 

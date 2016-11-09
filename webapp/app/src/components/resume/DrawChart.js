@@ -21,6 +21,7 @@ export default class DrawChart extends Component {
     this.handleCollapseChange = this.handleCollapseChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleOk = this.handleOk.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
   }
 
@@ -29,6 +30,12 @@ export default class DrawChart extends Component {
       visible: true,
     });
     this.props.onDrawChartOpen();
+  }
+
+  handleOk() {
+    this.setState({
+      visible: false,
+    });
   }
 
   handleCancel() {
@@ -103,7 +110,8 @@ export default class DrawChart extends Component {
           title="Draw Chart"
           visible={this.state.visible}
           style={{ top: 12 }}
-          width={720}
+          width={980}
+          onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
           <Collapse

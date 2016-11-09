@@ -7,22 +7,24 @@ import jinja2.ext
 import flask.ext.testing
 
 import ext.views
+import tests.settings
 
 
-class Test(flask.ext.testing.TestCase):
+#class OldTest(flask.ext.testing.TestCase):
+class OldTest(object):
+
+    config = tests.settings.Config()
 
     def setUp(self):
-        self.config['REBUILD']()
+        self.app.config['REBUILD']()
 
     def tearDown(self):
-        self.config['DESTORY']()
+        self.app.config['DESTORY']()
 
     def create_app(self):
         self.app = flask.Flask(__name__)
-        self.app.config.from_object('tests.settings.config')
-        self.config = self.app.config
+        self.app.config.from_object(self.config)
         self.repo_db = self.app.config['REPO_DB']
-        self.account_db = self.app.config['ACCOUNT_DB']
         self.upload_tmp = self.app.config['UPLOAD_TEMP']
         self.svc_mult_cv = self.app.config['SVC_MULT_CV']
         self.app.jinja_env.add_extension(jinja2.ext.loopcontrols)
@@ -102,7 +104,7 @@ class Test(flask.ext.testing.TestCase):
         ))
 
 
-class TestLoginoutSuperAdminTest(Test):
+class OldTestLoginoutSuperAdminTest(OldTest):
 
     def test_superadmin_login_logout(self):
         rv = self.login('root', 'password')
@@ -119,7 +121,7 @@ class TestLoginoutSuperAdminTest(Test):
         self.logout()
 
 
-class User(Test):
+class User(OldTest):
 
     user_name = 'username'
     user_password = 'userpassword'
@@ -130,7 +132,7 @@ class User(Test):
         self.logout()
 
 
-class TestLoginoutUser(User):
+class OldTestLoginoutUser(User):
 
     def test_login_user(self):
         self.init_user()
@@ -170,7 +172,7 @@ class UploadFile(User):
         assert(json.loads(rv.data)['result'] is True)
 
 
-class TestUploadFile(UploadFile):
+class OldTestUploadFile(UploadFile):
 
     def test_upload(self):
         self.init_upload()
@@ -183,7 +185,7 @@ class TestUploadFile(UploadFile):
         assert(yaml_obj['id'] in yamlname)
 
 
-class TestSearch(UploadFile):
+class OldTestSearch(UploadFile):
 
     def test_searchresult(self):
         self.init_upload()
@@ -200,7 +202,7 @@ class ShowCV(UploadFile):
         self.name = self.yamlname.replace('yaml', 'md')
 
 
-class TestShowCV(ShowCV):
+class OldTestShowCV(ShowCV):
 
     def test_showcv(self):
         self.init_showcv()
@@ -256,7 +258,7 @@ class SVCCompany(User):
         self.init_user()
         self.login(self.user_name, self.user_password)
 
-class TestSVCCompany(SVCCompany):
+class OldTestSVCCompany(SVCCompany):
 
     def test_addcompany(self):
         self.init_svccompany()

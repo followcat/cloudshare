@@ -32,7 +32,7 @@ export default class ToolBar extends Component {
           <label>Status: </label>
           <Select
             style={{ width: 100 }}
-            defaultValue=""
+            defaultValue={this.props.filter.status || ''}
             onChange={this.handleSelectChange}
           >
             <Select.Option key={0} value="">All</Select.Option>

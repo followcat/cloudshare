@@ -2,6 +2,7 @@ import yaml
 
 import services.mining
 import core.mining.lsimodel
+import core.mining.lsisimilarity
 from baseapp.datadbs import *
 
 
@@ -69,3 +70,12 @@ def build_models(jds):
     for jd_id in jds:
         models[jd_id] = build_model([jd_id], name=jd_id)
     return models
+
+def build_sim(path, model, svcs):
+    sim = core.mining.lsisimilarity.LSIsimilarity(path, model)
+    try:
+        sim.load()
+    except IOError:
+        sim.build(svcs)
+        sim.save()
+    return sim

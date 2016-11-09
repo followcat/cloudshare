@@ -194,7 +194,8 @@ class LSImodel(object):
         test on uav classify model
             >>> cvs = datas['UAV']
             >>> jds = ['UAV']
-            >>> model = build_model(jds, name='mixed', path='tests/lsimodel_words')
+            >>> path = 'tests/lsimodel_words'
+            >>> model = build_model(jds, name='uav', path='tests/lsimodel_words')
             >>> topics = model.lsi.show_topics(formatted=False, num_words=15)
             >>> uav_topic1 = [u'飞行', u'频段', u'航拍']
             >>> uav_topic1_index = match_topic_index(uav_topic1, topics)

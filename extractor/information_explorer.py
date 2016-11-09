@@ -229,21 +229,10 @@ def get_age(stream):
     return result
 
 
-def catch(stream, name=None):
-    info_dict = dict()
-    info_dict["name"] = get_name(stream)
-    info_dict["originid"] = get_originid(stream)
-    info_dict["age"] = get_age(stream)
-    info_dict["phone"] = get_phone(stream)
-    info_dict["email"] = get_email(stream)
-    info_dict.update(get_education(stream, name))     # education_history, education, school
-    info_dict.update(get_experience(stream, name))    # experience, company, position
-    info_dict["classify"] = get_classify(info_dict['experience'])
-    info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
-                                                # age
-    return info_dict
+all_selected = ('name', 'originid', 'age', 'phone', 'email', 'education', 'experience', 'expectation', 'classify')
 
 def catch_selected(stream, selected, name=None):
+    assert set(selected).issubset(set(all_selected))
     info_dict = dict()
     if 'name' in selected:
         info_dict["name"] = get_name(stream)
@@ -256,15 +245,18 @@ def catch_selected(stream, selected, name=None):
     if 'email' in selected:
         info_dict["email"] = get_email(stream)
     if 'education' in selected:
-        info_dict.update(get_education(stream, name))
+        info_dict.update(get_education(stream, name))     # education_history, education, school
     if 'experience' in selected:
-        info_dict.update(get_experience(stream, name))
+        info_dict.update(get_experience(stream, name))    # experience, company, position
     if 'expectation' in selected:
-        info_dict.update(get_expectation(stream))
+        info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
+                                                    # age
     if 'classify' in selected:
         experience = get_experience(stream, name)
         info_dict["classify"] = get_classify(experience)
     return info_dict
+
+catch = functools.partial(catch_selected, selected=all_selected)
 
 
 def catch_cvinfo(stream, filename, id, name=None):

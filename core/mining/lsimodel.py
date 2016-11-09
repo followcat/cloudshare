@@ -18,7 +18,7 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300, slicer=None):
+    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300, tfidf_local=None, slicer=None):
         self.path = savepath
         self.topics = topics
         self.no_above = no_above
@@ -27,6 +27,7 @@ class LSImodel(object):
         else:
             self.slicer = lambda x:x.split('\n')
         self.extra_samples = extra_samples
+        self.tfidf_local = tfidf_local
         self.names = []
         self._texts = []
         self._corpus = []
@@ -220,7 +221,10 @@ class LSImodel(object):
             >>> assert sw_topic2_index != -1
             >>> assert doc_match_topic(get_cv_md('tn8cdk92'), model, sw_topic2_index, match_range=3)
         """
-        self.tfidf = models.TfidfModel(self.corpus, wlocal=tf_cal)
+        if self.tfidf_local is None:
+            self.tfidf = models.TfidfModel(self.corpus)
+        else:
+            self.tfidf = models.TfidfModel(self.corpus, wlocal=self.tfidf_local)
         self.corpus_tfidf = self.tfidf[self.corpus]
 
     def set_lsimodel(self):

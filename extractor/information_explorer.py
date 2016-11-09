@@ -268,6 +268,12 @@ def catch_selected(stream, selected, name=None):
 
 
 def catch_cvinfo(stream, filename, id, name=None):
+    """
+        >>> import core.outputstorage
+        >>> st = 'curriculum vitea'
+        >>> name = core.outputstorage.ConvertName('name.docx')
+        >>> assert catch_cvinfo(stream=st, filename=name.base, id='xxx')['filename'] == name.base
+    """
     info = generate_info_template(cv_template)
     catchinfo = catch(stream)
     info.update(catchinfo)
@@ -276,9 +282,12 @@ def catch_cvinfo(stream, filename, id, name=None):
     return info
 
 
-def catch_coinfo(name, committer, introduction):
+def catch_coinfo(name, introduction):
+    """
+        >>> intro = 'introduction'
+        >>> assert catch_coinfo(name='company', introduction=intro)['introduction'] == intro
+    """
     info = generate_info_template(co_template)
     info['name'] = name
-    info['committer'] = committer
     info['introduction'] = introduction
     return info

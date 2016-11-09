@@ -30,7 +30,11 @@ class JobDescriptionAPI(Resource):
         co_name = args['coname']
         description = args['description']
         result = self.svc_mult_cv.getproject(project).jd_modify(id, description, status, user.id)
-        return { 'code': 200, 'data': result, 'message': 'Update job description successed.' }
+        if result: 
+            response = { 'code': 200, 'data': result, 'message': 'Update job description successed.' }
+        else:
+            response = { 'code': 400, 'data': result, 'message': 'Update job description failed. You are not the committer.' }
+        return response
 
 
 class JobDescriptionUploadAPI(Resource):

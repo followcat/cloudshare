@@ -4,6 +4,7 @@ import string
 import random
 import os.path
 import functools
+import extractor.unique_id
 import extractor.education
 import extractor.expectation
 import extractor.utils_parsing
@@ -38,9 +39,10 @@ cv_template = (
 )
 
 co_template = (
-    ("name",                  str),
-    ("committer",             str),
-    ("introduction",          str),
+    ("name",                str),
+    ("committer",           str),
+    ("date",                int),
+    ("introduction",        str),
 )
 
 
@@ -276,12 +278,17 @@ def catch_cvinfo(stream, filename, name=None):
     return info
 
 
-def catch_coinfo(name, introduction):
+def catch_coinfo(stream, name):
     """
-        >>> intro = 'introduction'
-        >>> assert catch_coinfo(name='company', introduction=intro)['introduction'] == intro
+        >>> intro = {'introduction': 'introduction'}
+        >>> assert catch_coinfo(name='company', stream=intro)['introduction'] == intro['introduction']
     """
     info = generate_info_template(co_template)
     info['name'] = name
-    info['introduction'] = introduction
+    info['id'] = extractor.unique_id.company_id(name)
+    if isinstance(stream, dict):
+        try:
+            info['introduction'] = stream['introduction']
+        except KeyError:
+            pass
     return info

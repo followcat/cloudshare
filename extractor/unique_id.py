@@ -261,3 +261,6 @@ def unique_id(cv_yaml, to_date=u'至今'):
         except IndexError:
             pass
     return cv_yaml
+
+def company_id(name):
+    return hashlib.sha1(name.encode('utf8')).hexdigest()

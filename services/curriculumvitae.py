@@ -56,12 +56,12 @@ class CurriculumVitae(services.base.Service):
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
             >>> yamlinfo1 = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base, id=fp1.name.base)
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
             >>> fp2 = core.docprocessor.Processor(f2, 'cv_2.doc', test_path)
             >>> yamlinfo2 = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base, id=fp2.name.base)
-            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, yamlinfo1)
-            >>> cv2 = core.basedata.DataObject(fp2.name, fp2.markdown_stream, yamlinfo2)
+            ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base)
+            >>> cv1 = core.basedata.DataObject(yamlinfo1['id'], fp1.markdown_stream, yamlinfo1)
+            >>> cv2 = core.basedata.DataObject(yamlinfo2['id'], fp2.markdown_stream, yamlinfo2)
             >>> svc_cv.add(cv1)
             True
             >>> svc_cv.add(cv2)
@@ -81,13 +81,14 @@ class CurriculumVitae(services.base.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
+        assert cvobj.metadata['id']
         if self.unique_checker is None:
             self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
         self.unique_checker.update()
         if unique is True and self.unique_checker.unique(cvobj.metadata) is False:
             self.info = "Exists File"
             return False
-        name = core.outputstorage.ConvertName(cvobj.name)
+        name = core.outputstorage.ConvertName(cvobj.metadata['id'])
         message = "Add CV: %s data." % name
         self.interface.add(name.md, cvobj.data, message=message, committer=committer)
         if yamlfile is True:
@@ -118,8 +119,8 @@ class CurriculumVitae(services.base.Service):
             >>> os.makedirs(test_path)
             >>> fp1 = core.docprocessor.Processor(obj, name, test_path)
             >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base, id=fp1.name.base)
-            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, yamlinfo)
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
+            >>> cv1 = core.basedata.DataObject(yamlinfo['id'], fp1.markdown_stream, yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
             >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))
@@ -132,7 +133,7 @@ class CurriculumVitae(services.base.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        name = core.outputstorage.ConvertName(cvobj.name)
+        name = core.outputstorage.ConvertName(cvobj.metadata['id'])
         self.interface.add(name.md, cvobj.data, committer=committer)
         return True
 

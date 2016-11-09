@@ -19,8 +19,8 @@ class UniqueSearcher(object):
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
             >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base, id=fp1.name.base)
-            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, yamlinfo)
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
+            >>> cv1 = core.basedata.DataObject(yamlinfo['id'], fp1.markdown_stream, yamlinfo)
             >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> fp1.result
             True

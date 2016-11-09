@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
+import string
+import random
 import os.path
 import functools
 import extractor.education
@@ -259,17 +261,17 @@ def catch_selected(stream, selected, name=None):
 catch = functools.partial(catch_selected, selected=all_selected)
 
 
-def catch_cvinfo(stream, filename, id, name=None):
+def catch_cvinfo(stream, filename, name=None):
     """
         >>> import core.outputstorage
         >>> st = 'curriculum vitea'
         >>> name = core.outputstorage.ConvertName('name.docx')
-        >>> assert catch_cvinfo(stream=st, filename=name.base, id='xxx')['filename'] == name.base
+        >>> assert catch_cvinfo(stream=st, filename=name.base)['filename'] == name.base
     """
     info = generate_info_template(cv_template)
     catchinfo = catch(stream)
     info.update(catchinfo)
-    info['id'] = id
+    info['id'] = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
     info["filename"] = filename
     return info
 

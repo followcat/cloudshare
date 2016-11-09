@@ -59,8 +59,8 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
             filepro = core.docprocessor.Processor(filename, f, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
-                                        filename=filepro.base.base, id=filepro.name.base)
-            cvobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
+                                        filename=filepro.base.base)
+            cvobj = core.basedata.DataObject(yamlinfo['id'], filepro.markdown_stream,
                                              yamlinfo)
             if origin is not None:
                 cvobj.metadata['origin'] = origin
@@ -83,7 +83,7 @@ def classify(path, temp_output):
             filepro = core.docprocessor.Processor(root, name, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
-                                        filename=filepro.base.base, id=filepro.name.base)
+                                        filename=filepro.base.base)
             filter(filepro, yamlinfo, root, name)
 
 

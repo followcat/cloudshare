@@ -23,7 +23,8 @@ with open(sw_file) as f:
 with open(mix_file) as f:
     datas.update(yaml.load(f))
 
-def build_lsimodel(path, slicer, names=None, texts=None, no_above=1., extra_samples=0, tfidf_local=None):
+def build_lsimodel(path, slicer, names=None, texts=None, no_above=1.,
+                    extra_samples=0, tfidf_local=None):
     topics = 100
     if len(names) < 10:
         topics = 5
@@ -62,7 +63,8 @@ def build_model(jds, name=None, path='tests/lsimodel'):
             names.append(id)
             texts.append(t)
     path = path + '/%s/model'%name
-    model = build_lsimodel(path, services.mining.silencer, names, texts)
+    model = build_lsimodel(path, services.mining.silencer, names, texts,
+                            tfidf_local=core.mining.lsimodel.tf_cal)
     return model
 
 def build_models(jds):

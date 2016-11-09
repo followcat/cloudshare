@@ -253,7 +253,7 @@ class LSImodel(object):
         On the other hand, some words do not appear in any of the topics
         at all.
             >>> topics = model.lsi.show_topics(num_topics=100, num_words=10, formatted=False)
-            >>> words = topic_words_list(topics)
+            >>> words, weights = topic_words_list(topics)
             >>> fatten_words = compiler.ast.flatten(words)
             >>> assert u'飞机' in model.dictionary.values()
             >>> assert u'航天' in model.dictionary.values()

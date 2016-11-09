@@ -22,7 +22,7 @@ with open(sw_file) as f:
 with open(mix_file) as f:
     datas.update(yaml.load(f))
 
-def build_lsimodel(path, slicer, names=None, texts=None, no_above=2./2):
+def build_lsimodel(path, slicer, names=None, texts=None, no_above=1., extra_samples=0, tfidf_local=None):
     topics = 100
     if len(names) < 10:
         topics = 5
@@ -30,7 +30,12 @@ def build_lsimodel(path, slicer, names=None, texts=None, no_above=2./2):
         topics = 10
     elif 100 <= len(names) < 200:
         topics = 30
-    m = core.mining.lsimodel.LSImodel(path, no_above=no_above, topics=topics, extra_samples=0, slicer=slicer)
+    m = core.mining.lsimodel.LSImodel(path,
+                                      no_above=no_above,
+                                      topics=topics,
+                                      extra_samples=0,
+                                      tfidf_local=tfidf_local,
+                                      slicer=slicer)
     try:
         m.load()
     except IOError:

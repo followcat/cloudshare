@@ -273,7 +273,11 @@ def catch_cvinfo(stream, filename, name=None):
     info = generate_info_template(cv_template)
     catchinfo = catch(stream)
     info.update(catchinfo)
-    info['id'] = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
+    extractor.unique_id.unique_id(info)
+    try:
+        info['id'] = info['unique_id']
+    except KeyError:
+        info['id'] = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
     info["filename"] = filename
     return info
 

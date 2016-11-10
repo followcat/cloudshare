@@ -59,6 +59,12 @@ class UniqueSearcher(object):
     def unique(self, yamldict):
         phone = yamldict['phone']
         email = yamldict['email']
+        try:
+            unique_id = yamldict['unique_id']
+            if unique_id in self.yaml_datas:
+                return False
+        except KeyError:
+            pass
         if len(phone) == 0 and len(email) == 0:
             return False
         for each in self.yaml_datas.values():

@@ -70,8 +70,8 @@ class UploadCVAPI(Resource):
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
                                               filename=filepro.base.base)
-        dataobj = core.basedata.DataObject(yamlinfo['id'], filepro.markdown_stream,
-                                           yamlinfo)
+        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                           metadata=yamlinfo)
         upload[user.id][filename] = None
         name = ''
         if filepro.result is True:
@@ -127,8 +127,8 @@ class UploadEnglishCVAPI(Resource):
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
                                               filename=filepro.base.base)
-        dataobj = core.basedata.DataObject(yamlinfo['id'], filepro.markdown_stream,
-                                           yamlinfo)
+        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                           metadata=yamlinfo)
         uploadeng[user.id] = dataobj
         return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/preview' } }
 

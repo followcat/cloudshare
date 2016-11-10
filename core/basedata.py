@@ -4,11 +4,18 @@ import core.docprocessor
 
 class DataObject(object):
 
-    def __init__(self, name, data, metadata, raw=None):
-        self.name = core.outputstorage.ConvertName(name)
+    def __init__(self, metadata, data, raw=None):
+        assert 'id' in metadata
+        self.name = core.outputstorage.ConvertName(metadata['id'])
         self._raw = raw
         self._data = data
         self._metadata = metadata
+
+    def __str__(self):
+        try:
+            return self._metadata['name']
+        except KeyError:
+            return self.ID
 
     @property
     def ID(self):

@@ -33,8 +33,8 @@ class Upload(flask.views.MethodView):
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
                                               filename=filepro.base.base)
-        dataobj = core.basedata.DataObject(yamlinfo['id'], filepro.markdown_stream,
-                                           yamlinfo)
+        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                           metadata=yamlinfo)
         flask.session[user.id]['upload'] = dataobj
         flask.session.modified = True
         return str(filepro.result)

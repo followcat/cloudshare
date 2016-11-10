@@ -24,6 +24,6 @@ class TagsCurriculumVitae(services.simulationcv.SimulationCV):
                     for each in yamlinfo[key].values():
                         keyset.update(each)
                     if keyset.intersection(values_set):
-                        dataobj = core.basedata.DataObject(id, data, metadata)
+                        dataobj = core.basedata.DataObject(metadata, data)
                         self.add(dataobj)
         self.save()

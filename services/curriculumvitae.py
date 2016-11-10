@@ -58,8 +58,8 @@ class CurriculumVitae(services.base.Service):
             >>> fp2 = core.docprocessor.Processor(f2, 'cv_2.doc', test_path)
             >>> yamlinfo2 = extractor.information_explorer.catch_cvinfo(
             ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base)
-            >>> cv1 = core.basedata.DataObject(yamlinfo1['id'], fp1.markdown_stream, yamlinfo1)
-            >>> cv2 = core.basedata.DataObject(yamlinfo2['id'], fp2.markdown_stream, yamlinfo2)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo1)
+            >>> cv2 = core.basedata.DataObject(data=fp2.markdown_stream, metadata=yamlinfo2)
             >>> svc_cv.add(cv1)
             True
             >>> svc_cv.add(cv2)
@@ -118,7 +118,7 @@ class CurriculumVitae(services.base.Service):
             >>> fp1 = core.docprocessor.Processor(obj, name, test_path)
             >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
             ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
-            >>> cv1 = core.basedata.DataObject(yamlinfo['id'], fp1.markdown_stream, yamlinfo)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
             >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))

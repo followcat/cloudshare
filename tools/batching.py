@@ -60,8 +60,8 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
                                         filename=filepro.base.base)
-            cvobj = core.basedata.DataObject(yamlinfo['id'], filepro.markdown_stream,
-                                             yamlinfo)
+            cvobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                             metadata=yamlinfo)
             if origin is not None:
                 cvobj.metadata['origin'] = origin
             if not cvobj.metadata['name']:

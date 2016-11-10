@@ -60,8 +60,8 @@ class Config(object):
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                     stream=filepro.markdown_stream.decode('utf8'),
                                     filename=filepro.base.base)
-        dataobj = core.basedata.DataObject(yamlinfo['id'], filepro.markdown_stream,
-                                           yamlinfo)
+        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                           metadata=yamlinfo)
         self.SVC_MULT_CV.add(dataobj, projectname='project_test')
 
     def rebuild(self):

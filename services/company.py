@@ -14,18 +14,16 @@ class Company(services.base.Service):
         >>> import services.company
         >>> import core.basedata
         >>> import interface.gitinterface
+        >>> import extractor.information_explorer
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
         >>> svc_co = services.company.Company(interface.path)
         >>> name, committer, introduction = 'CompanyA', 'tester', 'This is Co.A'
-        >>> metadata = {
-        ... 'name': name,
-        ... 'committer': committer,
-        ... 'introduction': introduction,}
-        >>> coobj = core.basedata.DataObject(name, introduction, metadata)
+        >>> metadata = extractor.information_explorer.catch_coinfo({'introduction': introduction,}, name)
+        >>> coobj = core.basedata.DataObject(metadata, data=introduction)
         >>> svc_co.add(coobj, 'Dever')
         True
-        >>> co = svc_co.getyaml('CompanyA')
+        >>> co = svc_co.getyaml(metadata['id'])
         >>> co['name']
         'CompanyA'
         >>> co['introduction']
@@ -35,7 +33,7 @@ class Company(services.base.Service):
         ...
         ExistsCompany: CompanyA
         >>> list(svc_co.names())
-        ['CompanyA']
+        ['4de25a98bc371bf87220e500215317f4b2c24933']
         >>> svc_co.getyaml('CompanyB') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
@@ -54,7 +52,7 @@ class Company(services.base.Service):
 
     def add(self, coobj, committer=None, unique=True, yamlfile=True):
         if unique is True and self.exists(coobj.name):
-            raise services.exception.ExistsCompany(coobj.name)
+            raise services.exception.ExistsCompany('%s' % coobj)
         name = core.outputstorage.ConvertName(coobj.name)
         message = "Add company: %s data." % name
         self.interface.add(name.md, coobj.data, message=message, committer=committer)

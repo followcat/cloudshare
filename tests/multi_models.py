@@ -67,10 +67,10 @@ def build_model(jds, name=None, path='tests/lsimodel'):
                             tfidf_local=core.mining.lsimodel.tf_cal)
     return model
 
-def build_models(jds):
+def build_models(jds, path):
     models = {}
     for jd_id in jds:
-        models[jd_id] = build_model([jd_id], name=jd_id)
+        models[jd_id] = build_model([jd_id], name=jd_id, path=path)
     return models
 
 def build_sim(path, model, svcs):

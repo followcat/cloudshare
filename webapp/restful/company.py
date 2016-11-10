@@ -30,7 +30,7 @@ class CompanyAPI(Resource):
         project = args['project']
         coname = args['coname'].encode('utf-8')
         metadata = extractor.information_explorer.catch_coinfo(name=coname, stream=args)
-        coobj = core.basedata.DataObject(coname, args['introduction'], metadata)
+        coobj = core.basedata.DataObject(metadata['id'], args['introduction'], metadata)
         result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)
         return { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
 

@@ -281,7 +281,7 @@ def catch_cvinfo(stream, filename, name=None):
 def catch_coinfo(stream, name):
     """
         >>> intro = {'introduction': 'introduction'}
-        >>> assert catch_coinfo(name='company', stream=intro)['introduction'] == intro['introduction']
+        >>> assert catch_coinfo(name='sgwgewtgqe', stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
     """
     info = generate_info_template(co_template)
     info['name'] = name

@@ -31,9 +31,7 @@ class Company(services.base.Service):
         >>> co['introduction']
         'This is Co.A'
         >>> svc_co.add(coobj, 'Dever') # doctest: +ELLIPSIS
-        Traceback (most recent call last):
-        ...
-        ExistsCompany: CompanyA
+        False
         >>> list(svc_co.names())
         ['CompanyA']
         >>> svc_co.getyaml('CompanyB') # doctest: +ELLIPSIS
@@ -43,25 +41,32 @@ class Company(services.base.Service):
         >>> shutil.rmtree(repo_name)
     """
     CO_DIR = 'CO'
+    messageinfo = 'Company'
 
     def __init__(self, path, name=None):
         self.path = os.path.join(path, self.CO_DIR)
         super(Company, self).__init__(self.path, name)
+        self.unique_checker = None
+        self.info = ""
         self._nums = 0
+
+    def unique(self, data):
+        return self.exists(data)
 
     def exists(self, id):
         return id in self.ids
 
     def add(self, coobj, committer=None, unique=True, yamlfile=True):
-        if unique is True and self.exists(coobj.name):
-            raise services.exception.ExistsCompany(coobj.name)
+        if unique is True and self.unique(coobj.name):
+            self.info = "Exists File"
+            return False
         name = core.outputstorage.ConvertName(coobj.name)
-        message = "Add company: %s data." % name
+        message = "Add %s: %s data." % (self.messageinfo, name)
         self.interface.add(name.md, coobj.data, message=message, committer=committer)
         if yamlfile is True:
             coobj.metadata['committer'] = committer
             coobj.metadata['date'] = time.time()
-            message = "Add company: %s metadata." % name
+            message = "Add %s: %s metadata." % (self.messageinfo, name)
             self.interface.add(name.yaml, yaml.safe_dump(coobj.metadata, allow_unicode=True),
                                message=message, committer=committer)
         self._nums += 1

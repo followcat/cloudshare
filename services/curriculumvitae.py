@@ -12,6 +12,7 @@ import core.uniquesearcher
 class CurriculumVitae(services.base.Service):
 
     SAVE_DIR = 'CV'
+    messageinfo = 'CurriculumVitae'
 
     def __init__(self, path, name=None):
         self.path = os.path.join(path, self.SAVE_DIR)
@@ -35,6 +36,12 @@ class CurriculumVitae(services.base.Service):
             >>> assert SVC_CV.exists('blr6dter')
         """
         return id in self.ids
+
+    def unique(self, data):
+        if self.unique_checker is None:
+            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
+        self.unique_checker.update()
+        return self.unique_checker.unique(data)
 
     def add(self, cvobj, committer=None, unique=True, yamlfile=True):
         """
@@ -79,19 +86,16 @@ class CurriculumVitae(services.base.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        if self.unique_checker is None:
-            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
-        self.unique_checker.update()
-        if unique is True and self.unique_checker.unique(cvobj.metadata) is False:
+        if unique is True and self.unique(cvobj.metadata) is False:
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(cvobj.name)
-        message = "Add CV: %s data." % name
+        message = "Add %s: %s data." % (self.messageinfo, name)
         self.interface.add(name.md, cvobj.data, message=message, committer=committer)
         if yamlfile is True:
             cvobj.metadata['committer'] = committer
             cvobj.metadata['date'] = time.time()
-            message = "Add company: %s metadata." % name
+            message = "Add %s: %s metadata." % (self.messageinfo, name)
             self.interface.add(name.yaml, yaml.safe_dump(cvobj.metadata, allow_unicode=True),
                                message=message, committer=committer)
         self._nums += 1

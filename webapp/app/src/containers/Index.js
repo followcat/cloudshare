@@ -7,7 +7,7 @@ import SignIn from '../components/signin';
 import Header from '../components/index/Header';
 import Feature from '../components/feature';
 import StorageUtil from '../utils/storage';
-import 'whatwg-fetch';
+import { signIn, getFeature, getProject } from '../request';
 
 export default class Index extends Component {
   constructor() {
@@ -44,22 +44,10 @@ export default class Index extends Component {
   }
 
   handleSignInSubmit(feildValue) {
-    fetch(`/api/session`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: feildValue.account,
-        password: feildValue.password,
-      }),
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
+    signIn({
+      username: feildValue.account,
+      password: feildValue.password,
+    }, (json) => {
       if (json.code === 200) {
         StorageUtil.setAll({
           _pj: feildValue.project,
@@ -74,31 +62,23 @@ export default class Index extends Component {
   }
 
   getFeatureData() {
-    fetch(`/api/feature`, {
-      method: 'GET',
-    })
-    .then(response => response.json())
-    .then(json => {
+    getFeature((json) => {
       if (json.code === 200) {
         this.setState({
           dataSource: json.data,
         });
       }
-    })
+    });
   }
 
   getProjectData() {
-    fetch(`/api/projectnames`, {
-      method: 'GET',
-    })
-    .then(response => response.json())
-    .then(json => {
+    getProject((json) => {
       if (json.code === 200) {
         this.setState({
           projects: json.data,
         });
       }
-    })
+    });
   }
 
   render() {

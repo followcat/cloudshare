@@ -59,9 +59,9 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
             filepro = core.docprocessor.Processor(filename, f, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
-                                        filename=filepro.base.base, id=filepro.name.base)
-            cvobj = core.basedata.DataObject(filepro.name, filepro.markdown_stream,
-                                             yamlinfo)
+                                        filename=filepro.base.base)
+            cvobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                             metadata=yamlinfo)
             if origin is not None:
                 cvobj.metadata['origin'] = origin
             if not cvobj.metadata['name']:
@@ -83,7 +83,7 @@ def classify(path, temp_output):
             filepro = core.docprocessor.Processor(root, name, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
-                                        filename=filepro.base.base, id=filepro.name.base)
+                                        filename=filepro.base.base)
             filter(filepro, yamlinfo, root, name)
 
 
@@ -238,11 +238,11 @@ def inituniqueid(SVC_CV, with_report=False, with_diff=False):
     import utils.builtin
     import extractor.unique_id
 
-    path_prefix = lambda x: os.path.join(SVC_CV.repo_path, x)
+    path_prefix = lambda x: os.path.join(SVC_CV.path, x)
     unique_ids = {}
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
-        info = extractor.unique_id.unique_id(info)
+        extractor.unique_id.unique_id(info)
         try:
             assert info['unique_id'] not in unique_ids
             unique_ids[info['unique_id']] = y
@@ -258,7 +258,7 @@ def inituniqueid(SVC_CV, with_report=False, with_diff=False):
                     for l in difflib.unified_diff(file(old).readlines(), file(new).readlines(), old, new):
                         print(l.rstrip())
                     print('\n++++\n')
-        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
+        utils.builtin.save_yaml(info, SVC_CV.path , y)
 
 
 

@@ -37,7 +37,7 @@ class SimulationCV(services.base.service.Service):
 
     def load(self):
         stream = self.interface.get(self.ids_file)
-        self.ids = ujson.loads(stream)
+        self.ids = set(ujson.loads(stream))
 
     def save(self):
         stream = ujson.dumps(sorted(self.ids), indent=4)

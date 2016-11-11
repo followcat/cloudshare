@@ -33,12 +33,12 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
             >>> yamlinfo1 = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base, id=fp1.name.base)
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
             >>> fp2 = core.docprocessor.Processor(f2, 'cv_2.doc', test_path)
             >>> yamlinfo2 = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base, id=fp2.name.base)
-            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, yamlinfo1)
-            >>> cv2 = core.basedata.DataObject(fp2.name, fp2.markdown_stream, yamlinfo2)
+            ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo1)
+            >>> cv2 = core.basedata.DataObject(data=fp2.markdown_stream, metadata=yamlinfo2)
             >>> svc_bssto.add(cv1)
             True
             >>> svc_bssto.add(cv2)
@@ -58,6 +58,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
+        assert baseobject.metadata['id']
         if self.unique_checker is None:
             self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
         self.unique_checker.update()
@@ -82,8 +83,8 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> os.makedirs(test_path)
             >>> fp1 = core.docprocessor.Processor(obj, name, test_path)
             >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base, id=fp1.name.base)
-            >>> cv1 = core.basedata.DataObject(fp1.name, fp1.markdown_stream, yamlinfo)
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
             >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))
@@ -96,7 +97,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        name = core.outputstorage.ConvertName(cvobj.name)
+        name = core.outputstorage.ConvertName(cvobj.metadata['id'])
         self.interface.add(name.md, cvobj.data, committer=committer)
         return True
 

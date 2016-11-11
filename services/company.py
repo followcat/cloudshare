@@ -38,7 +38,7 @@ class Company(services.base.storage.BaseStorage):
         NotExistsCompany
         >>> shutil.rmtree(repo_name)
     """
-    CO_DIR = 'CO'
+    SAVE_DIR = 'CO'
     commitinfo = 'Company'
 
     def getyaml(self, id):

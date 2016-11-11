@@ -6,12 +6,12 @@ import ujson
 import utils._yaml
 import utils.issue
 import utils.builtin
-import services.base
 import interface.basefs
 import core.outputstorage
+import services.base.service
 
 
-class SimulationCV(services.base.Service):
+class SimulationCV(services.base.service.Service):
 
     ids_file = 'names.json'
 

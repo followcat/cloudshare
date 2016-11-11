@@ -4,10 +4,10 @@ import os.path
 
 import yaml
 
-import services.base
+import services.base.service
 
 
-class JobDescription(services.base.Service):
+class JobDescription(services.base.service.Service):
     """
         >>> import shutil
         >>> import services.company

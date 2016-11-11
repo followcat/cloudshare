@@ -3,15 +3,15 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
-import services.base
 import services.company
 import services.exception
+import services.base.service
 import services.simulationcv
 import services.curriculumvitae
 import services.jobdescription
 
 
-class Project(services.base.Service):
+class Project(services.base.service.Service):
 
     config_file = 'config.yaml'
 
@@ -100,7 +100,7 @@ class Project(services.base.Service):
         return self.company.getyaml(name)
 
     def company_names(self):
-        return self.company.names()
+        return self.company.ids
 
     def jd_get(self, hex_id):
         return self.jobdescription.get(hex_id)

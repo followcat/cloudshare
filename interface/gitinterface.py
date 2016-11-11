@@ -4,6 +4,7 @@ import os.path
 import subprocess
 
 import dulwich.repo
+import dulwich.porcelain
 
 import utils.builtin
 import interface.base
@@ -277,3 +278,6 @@ class GitInterface(interface.base.Interface):
         elif '@' not in committer:
             result = committer+'<%s@email.com>'%committer
         return result
+
+    def backup(self, path, bare=False):
+        dulwich.porcelain.clone(self.path, path, bare=bare)

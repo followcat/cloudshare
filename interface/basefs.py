@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import io
+import os
 import glob
-import os.path
+import tarfile
 import subprocess
 import xml.etree.ElementTree
 
@@ -131,3 +132,11 @@ class BaseFSInterface(interface.base.Interface):
         assert len(filenames) == len(filedatas)
         for filename, filedata in zip(filenames, filedatas):
             self.add(filename, filedata)
+
+    def backup(self, path, bare=False):
+        tar=tarfile.open(os.path.join(path, 'backup.tar.gz'), 'w:gz')
+        for root, dir, files in os.walk(self.path):
+            for file in files:
+                fullpath=os.path.join(root, file)
+                tar.add(fullpath, arcname=file)
+        tar.close()

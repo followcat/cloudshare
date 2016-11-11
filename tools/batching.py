@@ -205,32 +205,37 @@ def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
                     fp.write(yaml.safe_dump(yaml_info, allow_unicode=True))
 
 
-def company_knowledge(SVC_CV, knowledge):
+def company_knowledge(SVC_CV, SVC_CO):
+    import core.basedata
+    import core.outputstorage
+    import services.exception
+
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
         try:
-            for c in info['experience']['company']:
+            for c in [c for c in info['experience']['company'] if c['name']]:
+                company = extractor.information_explorer.catch_coinfo(name=c['name'], stream=c)
+                coobj = core.basedata.DataObject(company, data='')
                 try:
-                    knowledge[c['name']].append(c['business'])
-                except KeyError:
-                    continue
+                    result = SVC_CO.add(coobj)
+                except services.exception.ExistsCompany:
+                    coinfo = SVC_CO.getyaml(core.outputstorage.ConvertName(company['id']))
+                    coinfo['business'] = sorted(set(coinfo['business']).union(set(company['business'])))
+                    utils.builtin.save_yaml(coinfo, SVC_CO.path , y)
         except KeyError:
             continue
         except TypeError:
             pass
-    del knowledge['']
-    
-def initclassify(SVC_CV, knowledge=None):
+
+def initclassify(SVC_CV, SVC_CO=None):
     import collections
     import utils.builtin
 
-    if knowledge is None:
-        knowledge = collections.defaultdict(list)
-        
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
-        info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge)
-        utils.builtin.save_yaml(info, SVC_CV.path , y)
+        info['classify'] = extractor.information_explorer.get_classify(info['experience'], SVC_CO)
+        if info['classify']:
+            utils.builtin.save_yaml(info, SVC_CV.path , y)
 
 
 def inituniqueid(SVC_CV, with_report=False, with_diff=False):

@@ -43,6 +43,7 @@ co_template = (
     ("committer",           str),
     ("date",                int),
     ("introduction",        str),
+    ("business",            list),
 )
 
 
@@ -193,8 +194,8 @@ def get_experience(stream, name=None):
     return result
 
 
-def get_classify(experience, company_knowledge=None, classify=[]):
-    return extractor.extract_experience.match_classify(experience, company_knowledge, classify)
+def get_classify(experience, company_knowledge=None):
+    return extractor.extract_experience.match_classify(experience, company_knowledge)
 
 
 def get_name(stream):
@@ -293,6 +294,10 @@ def catch_coinfo(stream, name):
     if isinstance(stream, dict):
         try:
             info['introduction'] = stream['introduction']
+        except KeyError:
+            pass
+        try:
+            info['business'].append(stream['business'])
         except KeyError:
             pass
     return info

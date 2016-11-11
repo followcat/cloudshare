@@ -4,6 +4,7 @@ import re
 import sources.industry_id
 
 from extractor.utils_parsing import *
+import extractor.unique_id
 
 
 XP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'?目)|(教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|(培训)))|(工作内容（医疗器械经验）))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
@@ -642,7 +643,7 @@ def table_based_xp(text):
     return pos, out
 
 
-def match_classify(experience, companies=None, d=[]):
+def match_classify(experience, company_service=None):
     u"""
         >>> import yaml
         >>> experience = yaml.load(u'company:\\n'
@@ -667,9 +668,7 @@ def match_classify(experience, companies=None, d=[]):
         ... u'      id: 0, name: 东莞电厂}')
         >>> assert len(match_classify(experience)) == 2
     """
-    if isinstance(d, (str, unicode)):
-        d = [d]
-    output = set(d)
+    output = set()
     try:
         company = experience['company']
         for c in company:
@@ -681,16 +680,17 @@ def match_classify(experience, companies=None, d=[]):
                         if m:
                             output.add(k)
             except KeyError:
-                if companies:
+                if company_service and company_service.exists(extractor.unique_id.company_id(c['name'])):
                     try:
-                        for b in set(companies[c['name']]):
+                        for b in company_service.getyaml(extractor.unique_id.company_id(c['name']))['business']:
                             for (k, v) in CLASSIFY.items():
                                 m = v.match(b)
                                 if m:
                                     output.add(k)
                     except KeyError:
                         pass
-                continue
+            finally:
+                pass
     except KeyError:
         pass
     finally:

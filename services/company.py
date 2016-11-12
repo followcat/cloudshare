@@ -51,9 +51,9 @@ class Company(services.base.Service):
         return id in self.ids
 
     def add(self, coobj, committer=None, unique=True, yamlfile=True):
-        if unique is True and self.exists(coobj.name):
+        name = core.outputstorage.ConvertName(coobj.metadata['id'])
+        if unique is True and self.exists(name.base):
             raise services.exception.ExistsCompany('%s' % coobj)
-        name = core.outputstorage.ConvertName(coobj.name)
         message = "Add company: %s data." % name
         self.interface.add(name.md, coobj.data, message=message, committer=committer)
         if yamlfile is True:

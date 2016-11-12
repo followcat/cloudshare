@@ -219,9 +219,10 @@ def company_knowledge(SVC_CV, SVC_CO):
                 try:
                     result = SVC_CO.add(coobj)
                 except services.exception.ExistsCompany:
-                    coinfo = SVC_CO.getyaml(core.outputstorage.ConvertName(company['id']))
-                    coinfo['business'] = sorted(set(coinfo['business']).union(set(company['business'])))
-                    utils.builtin.save_yaml(coinfo, SVC_CO.path , y)
+                    name = core.outputstorage.ConvertName(coobj.metadata['id'])
+                    coinfo = SVC_CO.getyaml(name)
+                    coinfo['business'] = sorted(set(coinfo['business']).union(set(coobj.metadata['business'])))
+                    utils.builtin.save_yaml(coinfo, SVC_CO.path , name.yaml)
         except KeyError:
             continue
         except TypeError:

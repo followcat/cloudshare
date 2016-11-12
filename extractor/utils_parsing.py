@@ -26,7 +26,7 @@ SENTENCESEP = FIELDSEP+ENDLINESEP
 exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
-PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'{2})|◆|·|\?|(\uf0d8\xa0)|\uf0b7|\uf075)'
+PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'{2})|◆|·|\?|(\uf0d8\xa0)|\uf0b7|\uf075|\u258c)'
 
 # Exclude date related characters to avoid eating duration
 COMPANYTAIL = exclude_with_parenthesis(u'人年月')
@@ -34,7 +34,7 @@ COMPANYTAIL = exclude_with_parenthesis(u'人年月')
 # \u2014, \u2015 and \u4e00 are found in company
 COMPANY = ur'([^' + SENTENCESEP + u'=\n\*\u2013]+?(\\\\\*)+)?(((\\\\\*){3})|([^' + SENTENCESEP + u'=\n\*\u2013]+?))('+COMPANYTAIL+u')?'
 SENTENCESEP = SENTENCESEP+ur'，'
-POSITION = ur'[^=\n\*：:\|\u2013\u2015]+'
+POSITION = ur'[^=\n\*：:\|\u2013\u2015\uff1b]+'
 
 JYCVSRC = re.compile(u'^'+ASP+u'*精英网用户$', re.M)
 LPCVSRC = re.compile(u'^(:?(个人信息\n(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n(On job, open for new job|Dimission, seeking for new job) ,)) ， ', re.M)

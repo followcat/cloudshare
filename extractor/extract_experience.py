@@ -460,7 +460,6 @@ def work_xp(text):
         >>> assert u'3G' not in name(position_1(work_xp(u'3G\\n\\nEngineer\\n\\nTelecom\\n\\n2012年4月–至今 (9 个月)中国')))
         >>>     # TODO re.compile(u'^(?P<company>\S+)'+ASP+u'+(?P<position>\S+)'+ASP+u'*'+PERIOD+ASP+u'+(\S*)?$', re.M)
         >>> assert work_xp(u'有限公司 工程师 2013/07\~2014/08  广州')[0]
-        >>> assert companies(work_xp(u'■医院 （2012-04 \~ 至今）\\n公司性质：\\n担任职位：英语翻译'))
         >>> assert companies(work_xp(u'2011年8月—2014年12月 中国海运集团\\n职位：航运部  轮机工程师'))
         >>> assert not companies(work_xp(u'2014年10月——2014年11月   技工学校    实习班主任、老师'))  #FIXME
         >>>     #TODO use NOPIPETACO
@@ -513,6 +512,10 @@ def work_xp(text):
     RESPPO related
         >>> assert u'建筑' in business(company_1(work_xp(u'2015/08 - 2016/03   有限公司\\n职责：工程管理\\n'
         ...     u'房地产/建筑/建材/工程| 企业性质：民营| 规模：1000-9999人')))
+
+    RCO related
+        >>> assert companies(work_xp(u'■医院 （2012-04 \~ 至今）\\n公司性质：\\n担任职位：英语翻译'))
+        >>> assert u'研发项目经理' == name(position_1(work_xp(u'▌2000-11 ～ 2010-04  有限公司\\n\\n担任职位：\\n研发项目经理；从事大')))
     """
     RE = None
     pos = 0

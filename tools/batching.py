@@ -222,6 +222,8 @@ def company_knowledge(SVC_CV, SVC_CO):
                     name = core.outputstorage.ConvertName(coobj.metadata['id'])
                     coinfo = SVC_CO.getyaml(name)
                     coinfo['business'] = sorted(set(coinfo['business']).union(set(coobj.metadata['business'])))
+                    if 'total_employees' in coobj.metadata and coobj.metadata['total_employees']:
+                        coinfo['total_employees'] = coobj.metadata['total_employees']
                     utils.builtin.save_yaml(coinfo, SVC_CO.path , name.yaml)
         except KeyError:
             continue

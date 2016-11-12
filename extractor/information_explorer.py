@@ -44,6 +44,7 @@ co_template = (
     ("date",                int),
     ("introduction",        str),
     ("business",            list),
+    ("total_employees",     str),
 )
 
 
@@ -292,10 +293,11 @@ def catch_coinfo(stream, name):
     info['name'] = name
     info['id'] = extractor.unique_id.company_id(name)
     if isinstance(stream, dict):
-        try:
-            info['introduction'] = stream['introduction']
-        except KeyError:
-            pass
+        for key in ('introduction', 'total_employees'):
+            try:
+                info[key] = stream[key]
+            except KeyError:
+                pass
         try:
             info['business'].append(stream['business'])
         except KeyError:

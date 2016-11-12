@@ -21,7 +21,7 @@ ECO = re.compile(u'^(?P<position>(\S[\S ]+\n)*)\n+(?P<company>(\S[\S ]+\n)*)\n+'
 CO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
 CCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)'+BEMPLOYEES+'?(?(cit)\*)?'+ASP+u'*'+BDURATION+'(?(cit)\*)?'+ASP+u'*$', re.DOTALL+re.M)
 TCO = re.compile(u'^'+PREFIX+u'*'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'?(?(cit)\*)?$', re.DOTALL+re.M)
-PCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+'$', re.DOTALL+re.M)
+PCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*(?P<cit>\*)?))(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)(?(cit)\*)'+ASP+u'*\|('+ASP+u'*(?P<dpt>\S+)'+ASP+u'*\|)?'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+u'(\n+(公司介绍：\n*.+?\n+)?所属行业：\n*(?P<business>\S+))?$', re.DOTALL+re.M)
 
 PJCO = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'*(?P<project>.+)\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')$', re.M)
 WYJCO = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'*(?P<position>'+POSITION+u')'+ASP+u'*\|'+ASP+u'*(?P<dpt>\S+)\n'+ASP+u'*(?P<cit>\*)?(?P<company>'+COMPANY+u')'+ASP+u'*'+BDURATION+'(?(cit)\*)?$', re.M)
@@ -489,10 +489,6 @@ def work_xp(text):
         ...     u'2013.01 - 2016.04软件工程师'))['duration']
         >>> assert u'股' in name(company_1(work_xp(u'2014/01 – 2014/11\\n\\n股有限公司 | | 法务主管  ')))
 
-    SPO related tests:
-        >>> assert companies(work_xp(u'2015.07-至今  设备有限公司\\n项目职务： 技术主管\\n所在部门： 研究院'))
-        >>> assert positions(work_xp(u'2015.07-至今  设备有限公司\\n项目职务： 技术主管\\n所在部门： 研究院'))
-        >>> assert positions(work_xp(u'2008.07-2011.03 电力有限公司   职务：工艺技术员/工艺倒班主管\\n工作职责：\\n技术员'))
         >>> assert u'机械' in business(company_1(work_xp(u'2010.08 - 至今有限公司 (5年10个月)\\n----\\n中外合营 | 机械制造/机电/重工 | 500-999人\\n'
         ...     u'2010.08 - 至今财务负责人\\n汇报对象：总经理 | 下属人数：10 | 所在地区：长沙 | 所在部门：财务部''')))
         >>> assert u'政府' in business(company_1(work_xp(u'2012.04 - 至今\\n\\n环保部核安全中心 (4年4个月)\\n\\n'
@@ -508,6 +504,11 @@ def work_xp(text):
         >>> assert u'互联网' in business(company_1(work_xp(u'2012.03 - 至今 有限公司 （1年1个月）\\n软件工程师\\n互联网 | 企业性质：民营\\n')))
         >>> assert u'自动化' in business(company_1(work_xp(u'搜索同事2015.01 - 至今有限公司(SFAE) (1年7个月)\\n\\n'
         ...     u'外商独资·外企办事处  |  仪器/仪表/工业自动化/电气  |  10000人以上\\n\\n2015.01 - 至今IPM Project Manager & BD22000元/月')))
+
+    SPO related tests:
+        >>> assert companies(work_xp(u'2015.07-至今  设备有限公司\\n项目职务： 技术主管\\n所在部门： 研究院'))
+        >>> assert positions(work_xp(u'2015.07-至今  设备有限公司\\n项目职务： 技术主管\\n所在部门： 研究院'))
+        >>> assert positions(work_xp(u'2008.07-2011.03 电力有限公司   职务：工艺技术员/工艺倒班主管\\n工作职责：\\n技术员'))
 
     RESPPO related
         >>> assert u'建筑' in business(company_1(work_xp(u'2015/08 - 2016/03   有限公司\\n职责：工程管理\\n'

@@ -16,25 +16,25 @@ FDSEP = u'(?P<fromsep>['+SEP+u'\.．年])'
 DATE = _PDATE.replace('__DATE_SEP__', FDSEP.replace('P<fromsep>', ':'))
 SDSEP = u'(?P=fromsep)'
 PERIOD = u'(?P<from>' + _PDATE.replace('__DATE_SEP__', FDSEP) + ur')' + DATESEP + ASP+ u'*(?P<to>' + _PDATE.replace('__DATE_SEP__', SDSEP) + ')(?:'+UNIBRALEFT+u'含[^（\(\[【]+?期'+UNIBRARIGHT+u')?'
-DURATION = ur'(?P<duration>(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
+DURATION = ur'(?P<duration>(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(?:['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
 FIELDSEP = ur'、：:；;\|'
 ENDLINESEP = u'。'
 SENTENCESEP = FIELDSEP+ENDLINESEP
 
-exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
+exclude_with_parenthesis = lambda x: u'(?:'+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
 PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'{2})|◆|·|\?|(\uf0d8\xa0)|\uf0b7|\uf075|\u258c)'
 
 # Exclude date related characters to avoid eating duration
-COMPANYTAIL = exclude_with_parenthesis(u'人年月')
+COMPANYTAIL = u'(?:、[^' + SENTENCESEP + u'=\n\*\u2013]+?)?'+exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
 # \u2014, \u2015 and \u4e00 are found in company
-COMPANY = ur'([^' + SENTENCESEP + u'=\n\*\u2013]+?(\\\\\*)+)?(((\\\\\*){3})|([^' + SENTENCESEP + u'=\n\*\u2013]+?))('+COMPANYTAIL+u')?'
+COMPANY = ur'(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?(?:\\\\\*)+)?(?:(?:(?:\\\\\*){3})|(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?))(?:'+COMPANYTAIL+u')?'
 SENTENCESEP = SENTENCESEP+ur'，'
-POSITION = ur'[^=\n\*：:\|\u2013\u2015\uff1b]+'
+POSITION = ur'[^=\n\*：:\|\u2013\u2015\u3002\uff1b]+'
 
 JYCVSRC = re.compile(u'^'+ASP+u'*精英网用户$', re.M)
 LPCVSRC = re.compile(u'^(:?(个人信息\n(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n(On job, open for new job|Dimission, seeking for new job) ,)) ， ', re.M)

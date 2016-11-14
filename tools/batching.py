@@ -275,3 +275,13 @@ def initproject(SVC_CV_REPO, SVC_PRJ):
         utils.builtin.save_yaml(info, SVC_CV_REPO.path , y)
         utils.builtin.save_yaml(convert_info, SVC_PRJ.cvpath , y)
         SVC_PRJ.save()
+
+
+def convert_oldcompany(SVC_CO_REPO, filepath, filename):
+    import core.basedata
+    yamls = utils.builtin.load_yaml(filepath, filename)
+    for y in yamls:
+        args = y
+        metadata = extractor.information_explorer.catch_coinfo(name=args['name'], stream=args)
+        coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
+        SVC_CO_REPO.add(coobj)

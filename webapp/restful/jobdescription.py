@@ -11,7 +11,7 @@ class JobDescriptionAPI(Resource):
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('coname', location = 'json')
+        self.reqparse.add_argument('co_id', location = 'json')
         self.reqparse.add_argument('status', location = 'json')
         self.reqparse.add_argument('description', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -30,7 +30,7 @@ class JobDescriptionAPI(Resource):
         args = self.reqparse.parse_args()
         project = args['project']
         status = args['status']
-        co_name = args['coname']
+        co_id = args['co_id']
         description = args['description']
         result = self.svc_mult_cv.getproject(project).jd_modify(id, description, status, user.id)
         if result: 
@@ -48,7 +48,7 @@ class JobDescriptionUploadAPI(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_name', location = 'json')
-        self.reqparse.add_argument('co_name', location = 'json')
+        self.reqparse.add_argument('co_id', location = 'json')
         self.reqparse.add_argument('jd_description', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         super(JobDescriptionUploadAPI, self).__init__()
@@ -57,10 +57,10 @@ class JobDescriptionUploadAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         project = args['project']
-        co_name = args['co_name']
+        co_id = args['co_id']
         jd_name = args['jd_name']
         description = args['jd_description']
-        result = self.svc_mult_cv.getproject(project).jd_add(co_name, jd_name, description, user.id)
+        result = self.svc_mult_cv.getproject(project).jd_add(co_id, jd_name, description, user.id)
         return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 

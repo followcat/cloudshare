@@ -4,7 +4,7 @@ import { message } from 'antd';
 import Home from '../components/index/Home';
 import HomeMain from '../components/index/HomeMain';
 import SignIn from '../components/signin';
-import Header from '../components/index/Header';
+import Header from '../components/header';
 import Feature from '../components/feature';
 import StorageUtil from '../utils/storage';
 import { signIn } from '../request/sign';
@@ -86,7 +86,7 @@ export default class Index extends Component {
   render() {
     return (
       <Home>
-        <Header>
+        <Header logoMode="center">
           <Feature
             visible={this.state.visible}
             dataSource={this.state.dataSource}

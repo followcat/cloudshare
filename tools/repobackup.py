@@ -15,11 +15,6 @@ account_repo = baseapp.datadbs.SVC_ACCOUNT
 medical_repo = baseapp.projects.SVC_PRJ_MED
 
 
-def assure_path_exists(path):
-    dir = os.path.dirname(path)
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-
 if __name__ == '__main__':
     backup_name = time.strftime(ISOTIMEFORMAT, time.localtime())
     for folder in backup_folders:
@@ -29,6 +24,6 @@ if __name__ == '__main__':
         assure_path_exists(data_backup_path)
         assure_path_exists(account_backup_path)
         assure_path_exists(medical_backup_path)
-        dulwich.porcelain.clone(source_repo.path, data_backup_path, bare=True)
-        dulwich.porcelain.clone(account_repo.path, account_backup_path, bare=True)
-        dulwich.porcelain.clone(medical_repo.path, medical_backup_path, bare=True)
+        source_repo.backup(data_backup_path, bare=True)
+        account_repo.backup(data_backup_path, bare=True)
+        medical_repo.backup(data_backup_path, bare=True)

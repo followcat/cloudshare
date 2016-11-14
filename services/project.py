@@ -120,3 +120,17 @@ class Project(services.base.service.Service):
 
     def jd_lists(self):
         return self.jobdescription.lists()
+
+    def backup(self, path, bare=True):
+        project_path = os.path.join(path, 'project')
+        cv_path = os.path.join(path, 'curriculumvitae')
+        jd_path = os.path.join(path, 'jobdescription')
+        co_path = os.path.join(path, 'company')
+        utils.builtin.assure_path_exists(project_path)
+        utils.builtin.assure_path_exists(cv_path)
+        utils.builtin.assure_path_exists(jd_path)
+        utils.builtin.assure_path_exists(co_path)
+        self.interface.backup(project_path, bare=bare)
+        self.curriculumvitae.backup(cv_path, bare=bare)
+        self.jobdescription.backup(jd_path, bare=bare)
+        self.company.backup(co_path, bare=bare)

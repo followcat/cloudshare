@@ -38,7 +38,7 @@ class User(flask.ext.login.UserMixin):
             >>> import interface.gitinterface
             >>> repo_name = 'webapp/views/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_account = services.account.Account(interface)
+            >>> svc_account = services.account.Account(interface.path)
             >>> user = webapp.views.account.User.get('root', svc_account)
             >>> user.id
             'root'

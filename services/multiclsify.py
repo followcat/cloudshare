@@ -12,8 +12,7 @@ class MultiClassify(object):
         self.classifies = dict()
         self.cvstorage = cvstorage
         for name in sources.industry_id.industryID.keys():
-            cls_cv = services.classifycv.ClassifyCV(name, self.CLASSIFY_DIR,
-                                                    cvstorage)
+            cls_cv = services.classifycv.ClassifyCV(name, self.CLASSIFY_DIR, cvstorage)
             cls_cv.setup()
             self.classifies[name] = cls_cv
 
@@ -28,9 +27,11 @@ class MultiClassify(object):
             classify.save()
 
     def update(self):
-        for y in self.cvstorage.yamls():
-            info = self.cvstorage.getyaml(y)
-            for c in info['classify']:
-                if not self.classifies[c].exists(y):
-                    self.classifies[c]._add(y)
+        for id in self.cvstorage.ids:
+            metadata = self.cvstorage.getyaml(id)
+            data = self.cvstorage.getmd(id)
+            for c in metadata['classify']:
+                if not self.classifies[c].exists(id):
+                    dataobj = core.basedata.DataObject(metadata, data)
+                    self.classifies[c].add(dataobj)
         self.save()

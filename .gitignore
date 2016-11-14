@@ -17,10 +17,12 @@ repo/
 Index/
 account/
 lsimodel/
+raw
 raw/
 tags/
 projects/
 classify/
+storage/
 cvstorage/
 additional/
 webapp/static/node_modules/

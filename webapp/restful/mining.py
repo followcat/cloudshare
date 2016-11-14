@@ -42,7 +42,7 @@ class PositionAPI(BaseAPI):
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            searches = self.svc_mult_cv.getproject(project).search(text)
+            searches = self.svc_mult_cv.getproject(project).cv_search(text)
         result = []
         for name in searches:
             positions = []

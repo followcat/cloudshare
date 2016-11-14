@@ -66,8 +66,8 @@ class JobDescription extends Component {
     const columns = [
       {
         title: 'Company Name',
-        dataIndex: 'company',
-        key: 'company',
+        dataIndex: 'company_name',
+        key: 'company_name',
         width: 160,
       },  
       {
@@ -141,11 +141,11 @@ class JobDescription extends Component {
         <Modal
           title="Edit Job Description"
           okText="Submit"
-          wrapClassName="vertical-center-modal"
           comfirmLoading={this.state.comfirmLoading}
           visible={this.state.visible}
           onCancel={this.handleCancel}
           onOk={this.handleModalOk}
+          style={{ top: 20 }}
         >
           <Form horizontal style={{ width: '88%', margin: '0 auto' }}>
             <Form.Item
@@ -156,12 +156,13 @@ class JobDescription extends Component {
                 {...getFieldProps('companyName')}
                 optionFilterProp="value"
                 notFoundContent="Not found"
+                disabled={true}
               >
                 {this.props.companyData.map((item, index) => {
                   return (
                     <Select.Option
                       key={index}
-                      value={item.name}
+                      value={item.id}
                     >
                       {item.name}
                     </Select.Option>

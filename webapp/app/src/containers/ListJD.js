@@ -209,7 +209,7 @@ export default class ListJD extends Component {
       },
       body: Generator.getPostData({
         jd_name: obj.jdName,
-        co_name: obj.companySelection,
+        co_id: obj.companySelection,
         jd_description: obj.jdContent,
       }),
     })
@@ -246,7 +246,7 @@ export default class ListJD extends Component {
       },
       body: Generator.getPostData({
         status: value.statusSelect,
-        coname: value.companyName,
+        co_id: value.companyName,
         description: value.jdContent,
       }),
     })
@@ -260,6 +260,8 @@ export default class ListJD extends Component {
         }
         message.success(json.message);
         _this.loadJobDescription();
+      } else {
+        message.error(json.message);
       }
     })
   }

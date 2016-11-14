@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-import ujson
 import hashlib
 
 import yaml
@@ -9,6 +8,11 @@ import utils._yaml
 
 import jieba
 import jieba.posseg
+
+
+def assure_path_exists(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def industrytopath(industry):
@@ -32,14 +36,6 @@ def load_yaml(path, filename):
         yaml_data = yf.read()
     yaml_info = yaml.load(yaml_data, Loader=utils._yaml.Loader)
     return yaml_info
-
-
-def save_json(data, path, filename, indent=0):
-    ujson.dump(data, open(os.path.join(path, filename), 'w'), indent=indent)
-
-
-def load_json(path, filename):
-    return ujson.load(open(os.path.join(path, filename)))
 
 
 try:

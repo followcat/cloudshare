@@ -20,6 +20,9 @@ class JobDescriptionAPI(Resource):
     def get(self, id):
         project = args['project']
         result = self.svc_mult_cv.getproject(project).jd_get(id)
+        co_id = result['company']
+        co_name = self.svc_mult_cv.getproject(project).company_get(co_id)['name']
+        result['company'] = co_name
         return { 'code': 200, 'data': result }
 
     def put(self, id):
@@ -75,5 +78,9 @@ class JobDescriptionListAPI(Resource):
         args = self.reqparse.parse_args()
         project = args['project']
         result = self.svc_mult_cv.getproject(project).jd_lists()
+        for jd in result:
+            co_id = jd['company']
+            co_name = self.svc_mult_cv.getproject(project).company_get(co_id)['name']
+            jd['company'] = co_name
         return { 'code': 200, 'data': result }
 

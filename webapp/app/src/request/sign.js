@@ -1,13 +1,8 @@
 'use strict';
 import StorageUtil from '../utils/storage';
 import { API } from './api';
+import { callbackFunction } from './callback';
 import 'whatwg-fetch';
-
-const callbackFunction = (callback, json) => {
-  if (callback && typeof callback === 'function') {
-    callback(json);
-  }
-}
 
 /**
  * 用户登陆请求
@@ -16,7 +11,6 @@ const callbackFunction = (callback, json) => {
  * @return {function} fetch    异步请求方法
  */
 export const signIn = (params, callback) => {
-  console.log(params)
   return fetch(API.SESSION_API, {
     method: 'POST',
     credentials: 'include',
@@ -33,31 +27,20 @@ export const signIn = (params, callback) => {
 };
 
 /**
- * 获取feature数据请求
+ * 用户登出请求
  * @param  {function} callback 回调函数
  * @return {function} fetch    异步请求方法
  */
-export const getFeature = (callback) => {
-  return fetch(API.FEATURE_API, {
-    method: 'GET',
+export const signOut = (callback) => {
+  return fetch(API.SESSION_API, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`
+    }
   })
   .then(response => response.json())
   .then(json => {
     callbackFunction(callback, json);
-  });
-};
-
-/**
- * 获取project列表数据请求
- * @param  {function} callback 回调函数
- * @return {function} fetch    异步请求方法
- */
-export const getProject = (callback) => {
-  return fetch(API.PROJECTS_API, {
-    method: 'GET',
   })
-  .then(response => response.json())
-  .then(json => {
-    callbackFunction(callback, json);
-  });
 };

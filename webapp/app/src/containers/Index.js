@@ -7,7 +7,9 @@ import SignIn from '../components/signin';
 import Header from '../components/index/Header';
 import Feature from '../components/feature';
 import StorageUtil from '../utils/storage';
-import { signIn, getFeature, getProject } from '../request';
+import { signIn } from '../request/sign';
+import { getFeature } from '../request/feature';
+import { getProject } from '../request/project';
 
 export default class Index extends Component {
   constructor() {

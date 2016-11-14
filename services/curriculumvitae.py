@@ -3,171 +3,106 @@ import yaml
 import os.path
 
 import utils._yaml
-import services.base
+import core.docprocessor
 import core.outputstorage
-import core.converterutils
 import core.uniquesearcher
+import services.base.storage
 
 
-class CurriculumVitae(services.base.Service):
+class CurriculumVitae(services.base.storage.BaseStorage):
 
-    path = 'CV'
+    commitinfo = 'CurriculumVitae'
 
-    def __init__(self, interface, name=None):
-        super(CurriculumVitae, self).__init__(interface, name)
-        self.repo_path = self.interface.path + "/" + self.path
-        self.unique_checker = None
-        self.info = ""
-        self._nums = 0
-
-    def exists(self, filename):
-        """
-            >>> import interface.basefs
-            >>> import services.curriculumvitae
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert SVC_CV.exists('blr6dter.yaml')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert SVC_CV.exists('blr6dter.yaml')
-        """
-        path_name = os.path.join(self.path, filename)
-        result = self.interface.exists(path_name)
-        return result
-
-    def add(self, cvobj, committer=None, unique=True):
+    @utils.issue.fix_issue('issues/update_name.rst')
+    def unique(self, baseobject):
         """
             >>> import glob
             >>> import shutil
             >>> import os.path
-            >>> import core.converterutils
-            >>> import services.curriculumvitae
+            >>> import core.basedata
+            >>> import core.docprocessor
             >>> import interface.gitinterface
+            >>> import services.curriculumvitae
+            >>> import extractor.information_explorer
             >>> repo_name = 'services/test_repo'
             >>> test_path = 'services/test_output'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> svc_bssto = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
-            >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
-            >>> fp2 = core.converterutils.FileProcesser(f2, 'cv_2.doc', test_path)
-            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(fp1.name,
-            ...         fp1.markdown_stream, fp1.yamlinfo)
-            >>> cv2 = services.curriculumvitae.CurriculumVitaeObject(fp2.name,
-            ...         fp2.markdown_stream, fp2.yamlinfo)
-            >>> svc_cv.add(cv1)
+            >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
+            >>> yamlinfo1 = extractor.information_explorer.catch_cvinfo(
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
+            >>> fp2 = core.docprocessor.Processor(f2, 'cv_2.doc', test_path)
+            >>> yamlinfo2 = extractor.information_explorer.catch_cvinfo(
+            ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo1)
+            >>> cv2 = core.basedata.DataObject(data=fp2.markdown_stream, metadata=yamlinfo2)
+            >>> svc_bssto.add(cv1)
             True
-            >>> svc_cv.add(cv2)
+            >>> svc_bssto.add(cv2)
             True
-            >>> md_files = glob.glob(os.path.join(svc_cv.repo_path, '*.md'))
+            >>> md_files = glob.glob(os.path.join(svc_bssto.path, '*.md'))
             >>> len(md_files)
             2
-            >>> yaml_files = glob.glob(os.path.join(svc_cv.repo_path, '*.yaml'))
+            >>> yaml_files = glob.glob(os.path.join(svc_bssto.path, '*.yaml'))
             >>> len(yaml_files)
             2
-            >>> svc_cv.add(cv1)
+            >>> svc_bssto.add(cv1)
             False
-            >>> svc_cv.info
+            >>> svc_bssto.info
             'Exists File'
             >>> f1.close()
             >>> f2.close()
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
+        assert baseobject.metadata['id']
         if self.unique_checker is None:
-            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.repo_path)
+            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
         self.unique_checker.update()
-        if unique is True and self.unique_checker.unique(cvobj.metadata) is False:
-            self.info = "Exists File"
-            return False
-        cvobj.metadata['committer'] = committer
-        cvobj.metadata['date'] = time.time()
-        name = core.outputstorage.ConvertName(cvobj.name)
-        self.interface.add(os.path.join(self.path, name.md),
-                           cvobj.markdown(), committer=committer)
-        self.interface.add(os.path.join(self.path, name.yaml),
-                           yaml.safe_dump(cvobj.yaml(), allow_unicode=True),
-                           committer=committer)
-        self._nums += 1
-        return True
+        return self.unique_checker.unique(baseobject.metadata)
 
     def add_md(self, cvobj, committer=None):
         """
             >>> import glob
             >>> import shutil
             >>> import os.path
-            >>> import services.curriculumvitae
+            >>> import core.basedata
             >>> import interface.gitinterface
+            >>> import services.curriculumvitae
+            >>> import extractor.information_explorer
             >>> root = "core/test"
             >>> name = "cv_1.doc"
-            >>> test_path = "webapp/views/test_output"
-            >>> repo_name = 'webapp/views/test_repo'
+            >>> test_path = "services/test_output"
+            >>> repo_name = 'services/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
-            >>> fp1 = core.converterutils.FileProcesser(obj, name, test_path)
-            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(fp1.name,
-            ...         fp1.markdown_stream, fp1.yamlinfo)
+            >>> fp1 = core.docprocessor.Processor(obj, name, test_path)
+            >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)
             >>> svc_cv.add_md(cv1)
             True
-            >>> md_files = glob.glob(os.path.join(svc_cv.repo_path, '*.md'))
+            >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))
             >>> len(md_files)
             1
-            >>> yaml_files = glob.glob(os.path.join(svc_cv.repo_path, '*.yaml'))
+            >>> yaml_files = glob.glob(os.path.join(svc_cv.path, '*.yaml'))
             >>> len(yaml_files)
             0
             >>> obj.close()
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        name = core.outputstorage.ConvertName(cvobj.name)
-        self.interface.add(os.path.join(self.path, name.md),
-                           cvobj.markdown(), committer=committer)
+        name = core.outputstorage.ConvertName(cvobj.metadata['id'])
+        self.interface.add(name.md, cvobj.data, committer=committer)
         return True
 
     def modify(self, filename, stream, message=None, committer=None):
-        path_filename = os.path.join(self.path, filename)
-        self.interface.modify(path_filename, stream, message, committer)
+        self.interface.modify(filename, stream, message, committer)
         return True
-
-    def yamls(self):
-        """
-            >>> import interface.basefs
-            >>> import services.curriculumvitae
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert SVC_CV.interface.lsfiles(SVC_CV.path, 'blr6dter.yaml')
-        """
-        yamls = self.interface.lsfiles(self.path, '*.yaml')
-        for each in yamls:
-            yield os.path.split(each)[-1]
-
-    def names(self):
-        for each in self.yamls():
-            yield core.outputstorage.ConvertName(each).md
-
-    def datas(self):
-        for name in self.names():
-            text = self.getmd(name)
-            yield name, text
-
-    def search(self, keyword):
-        results = self.interface.grep(keyword, self.path)
-        return results
-
-    def search_yaml(self, keyword):
-        results = self.interface.grep_yaml(keyword, self.path)
-        return results
 
     def gethtml(self, name):
         htmlname = core.outputstorage.ConvertName(name).html
@@ -175,33 +110,7 @@ class CurriculumVitae(services.base.Service):
         if result is None:
             md = self.getmd(name)
             if md is not None:
-                result = core.converterutils.md_to_html(md)
-        return result
-
-    def getmd(self, name):
-        """
-            >>> import interface.basefs
-            >>> import services.curriculumvitae
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert SVC_CV.getmd('blr6dter.yaml')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB, 'repo')
-            >>> assert SVC_CV.getmd('blr6dter.yaml')
-        """
-        result = unicode()
-        md = core.outputstorage.ConvertName(name).md
-        path_name = os.path.join(self.path, md)
-        markdown = self.interface.get(path_name)
-        if markdown is None:
-            result = None
-        elif isinstance(markdown, unicode):
-            result = markdown
-        else:
-            result = unicode(str(markdown), 'utf-8')
+                result = core.docprocessor.md_to_html(md)
         return result
 
 
@@ -211,61 +120,77 @@ class CurriculumVitae(services.base.Service):
             >>> import interface.predator
             >>> import services.curriculumvitae
             >>> P = interface.predator.PredatorInterface('/tmp')
-            >>> PS = services.curriculumvitae.CurriculumVitae(P)
-            >>> PS.getyaml('CV.md')
+            >>> PS = services.curriculumvitae.CurriculumVitae(P.path)
+            >>> PS.getyaml('CV.md') # doctest: +ELLIPSIS
             Traceback (most recent call last):
             ...
-            IOError
+            IOError...
         """
         name = core.outputstorage.ConvertName(id).yaml
-        path_name = os.path.join(self.path, name)
-        yaml_str = self.interface.get(path_name)
-        if yaml_str is None:
-            raise IOError
+        yaml_str = self.interface.get(name)
         return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
-    @property
-    def NUMS(self):
-        if not self._nums:
-            self._nums = len(list(self.yamls()))
-        return self._nums
+    def updateinfo(self, id, key, value, committer):
+        data = None
+        projectinfo = self.getinfo(id)
+        baseinfo = self.getyaml(id)
+        if projectinfo is not None and (key in projectinfo or key in baseinfo):
+            data = { key: value }
+            if key == 'tag':
+                data = self.addtag(id, value, committer)
+            elif key == 'tracking':
+                data = self.addtracking(id, value, committer)
+            elif key == 'comment':
+                data = self.addcomment(id, value, committer)
+            else:
+                projectinfo[key] = value
+                self.saveinfo(id, projectinfo,
+                              'Update %s key %s.' % (id, key), committer)
+        return data
 
+    def _infoframe(self, value, username):
+        data = {'author': username,
+                'content': value,
+                'date': time.strftime('%Y-%m-%d %H:%M:%S')}
+        return data
 
-class CurriculumVitaeStorage(CurriculumVitae):
+    def addtag(self, id, tag, committer):
+        assert self.exists(id)
+        info = self.getinfo(id)
+        data = self._infoframe(tag, committer)
+        info['tag'].insert(0, data)
+        self.saveinfo(id, info, 'Add %s tag.'%id, committer)
+        return data
 
-    path = ''
+    def addcomment(self, id, comment, committer):
+        assert self.exists(id)
+        info = self.getinfo(id)
+        data = self._infoframe(comment, committer)
+        info['comment'].insert(0, data)
+        self.saveinfo(id, info, 'Add %s comment.'%id, committer)
+        return data
+
+    def addtracking(self, id, tracking, committer):
+        assert self.exists(id)
+        info = self.getinfo(id)
+        data = self._infoframe(tracking, committer)
+        info['tracking'].insert(0, data)
+        self.saveinfo(id, info, 'Add %s tracking.'%id, committer)
+        return data
+
+    def getinfo(self, id):
+        return self.getyaml(id)
+
+    def saveinfo(self, id, info, message, committer):
+        name = core.outputstorage.ConvertName(id).yaml
+        dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
+                             allow_unicode=True, default_flow_style=False)
+        self.interface.modify(name, dumpinfo, message=message, committer=committer)
 
     def addcv(self, id, data, yamldata, rawdata=None):
         cn_id = core.outputstorage.ConvertName(id)
-        self.interface.add(os.path.join(self.path, cn_id.md), data)
-        self.interface.add(os.path.join(self.path, cn_id.yaml), yamldata)
+        self.interface.add(cn_id.md, data)
+        self.interface.add(cn_id.yaml, yamldata)
         if rawdata is not None:
-            self.interface.add(os.path.join(self.path, cn_id.html), rawdata)
+            self.interface.add(cn_id.html, rawdata)
         return True
-
-    def lsids(self):
-        return [os.path.splitext(f)[0]
-                for f in self.interface.lsfiles(self.path, '*.yaml')]
-
-
-class CurriculumVitaeObject(object):
-
-    def __init__(self, name, data, metadata, raw=None):
-        self.name = core.outputstorage.ConvertName(name)
-        self.raw = raw
-        self.data = data
-        self.metadata = metadata
-
-    @property
-    def ID(self):
-        return self.name
-
-    def markdown(self):
-        return self.data
-
-    def yaml(self):
-        return self.metadata
-
-    def preview_markdown(self):
-        output = core.converterutils.md_to_html(self.data)
-        return output

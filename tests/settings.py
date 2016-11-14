@@ -1,13 +1,16 @@
 import os
 import shutil
 
+import core.basedata
 import services.mining
 import services.account
 import services.multicv
-import services.projectcv
+import services.project
+import services.company
 import services.curriculumvitae
-import core.converterutils
 import interface.gitinterface
+import core.docprocessor
+import extractor.information_explorer
 
 class Config(object):
 
@@ -30,17 +33,15 @@ class Config(object):
         if not os.path.exists(self.PRJ_PATH):
             os.mkdir(self.PRJ_PATH)
 
-        self.ACCOUNT_DB = interface.gitinterface.GitInterface(self.ACCOUNT_DB_NAME)
-        self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB)
+        self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB_NAME)
+        self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB_NAME,
+                                                                    'cloudshare')
+        self.SVC_CO_REPO = services.company.Company(self.REPO_DB_NAME, 'corepo')
 
-        self.REPO_DB = interface.gitinterface.GitInterface(self.REPO_DB_NAME)
-        self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB, 'cloudshare')
-
-        self.PRJ_DB = interface.gitinterface.GitInterface(os.path.join(self.PRJ_PATH,
-                                                          'project_test'))
-        self.SVC_PRJ_MED = services.projectcv.ProjectCV(self.PRJ_DB,
-                                                        self.SVC_CV_REPO,
-                                                        'project_test')
+        self.SVC_PRJ_MED = services.project.Project(os.path.join(self.PRJ_PATH,
+                                                                 'project_test'),
+                                                    self.SVC_CO_REPO, self.SVC_CV_REPO,
+                                                    'project_test')
         self.SVC_PRJ_MED.setup([])
 
         self.SVC_MULT_CV = services.multicv.MultiCV([self.SVC_PRJ_MED],
@@ -55,12 +56,13 @@ class Config(object):
     def init_samplecv(self):
         filename = 'cv_1.doc'
         f = open(os.path.join('core/test', filename))
-        filepro = core.converterutils.FileProcesser(f, filename,
-                                                    self.UPLOAD_TEMP)
-        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
-                                                               filepro.markdown_stream,
-                                                               filepro.yamlinfo)
-        self.SVC_MULT_CV.add(cvobj, projectname='project_test')
+        filepro = core.docprocessor.Processor(f, filename, self.UPLOAD_TEMP)
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                    stream=filepro.markdown_stream.decode('utf8'),
+                                    filename=filepro.base.base)
+        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                           metadata=yamlinfo)
+        self.SVC_MULT_CV.add(dataobj, projectname='project_test')
 
     def rebuild(self):
         self.destory()
@@ -77,5 +79,3 @@ class Config(object):
             shutil.rmtree(self.LSI_PATH)
         if os.path.exists(self.PRJ_PATH):
             shutil.rmtree(self.PRJ_PATH)
-
-config = Config()

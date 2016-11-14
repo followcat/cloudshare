@@ -4,6 +4,7 @@ import os.path
 import subprocess
 
 import dulwich.repo
+import dulwich.porcelain
 
 import utils.builtin
 import interface.base
@@ -49,8 +50,9 @@ class GitInterface(interface.base.Interface):
         """
         data = None
         result = self.repo.get_named_file(os.path.join('../', filename))
-        if result is not None:
-            data = result.read()
+        if result is None:
+            raise IOError(filename)
+        data = result.read()
         return data
 
     def add(self, filename, filedata, message=None, committer=None):
@@ -78,21 +80,27 @@ class GitInterface(interface.base.Interface):
         commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
         return commit_id
 
-    def add_files(self, filenames, message=None, committer=None):
+    def add_files(self, filenames, filedatas, message=None, committer=None):
         """
             >>> import shutil
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> with open('interface/test_repo/test_file', 'w') as file:
-            ...     file.write('test')
-            >>> commit_id = interface.add_files(['test_file'],
+            >>> commit_id = interface.add_files(['test_file'], ['test'],
             ... 'Test commit', 'test<test@test.com>')
             >>> commit_id == interface.repo.head()
             True
             >>> shutil.rmtree(repo_name)
         """
-        self.repo.stage(filenames)
+        assert len(filenames) == len(filedatas)
+        for filename, filedata in zip(filenames, filedatas):
+            full_path = os.path.join(self.path, filename)
+            path, name = os.path.split(full_path)
+            if not os.path.exists(path):
+                os.makedirs(path)
+            with open(full_path, 'w') as fp:
+                fp.write(filedata)
+            self.repo.stage(filename)
         committer = self.committer(committer)
         if message is None:
             message = ""
@@ -127,7 +135,7 @@ class GitInterface(interface.base.Interface):
         commit_id = self.repo.do_commit(message, committer=bytes(committer))
         return commit_id
 
-    def grep(self, restrings, path, files=None):
+    def grep(self, restrings, path='', files=None):
         if files is None:
             files = []
         files_list = ' '.join(files)
@@ -165,7 +173,7 @@ class GitInterface(interface.base.Interface):
             lsfiles = []
         return lsfiles
 
-    def grep_yaml(self, restrings, path):
+    def grep_yaml(self, restrings, path=''):
         """
             >>> import yaml
             >>> import shutil
@@ -270,3 +278,6 @@ class GitInterface(interface.base.Interface):
         elif '@' not in committer:
             result = committer+'<%s@email.com>'%committer
         return result
+
+    def backup(self, path, bare=False):
+        dulwich.porcelain.clone(self.path, path, bare=bare)

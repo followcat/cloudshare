@@ -8,12 +8,10 @@ import flask.views
 import flask.ext.login
 
 import utils.builtin
-import utils.chsname
-import services.curriculumvitae
+import core.basedata
 import core.outputstorage
-import core.converterutils
-import webapp.views.account
-import services.exception
+import core.docprocessor
+import extractor.information_explorer
 
 import json
 
@@ -29,13 +27,15 @@ class Upload(flask.views.MethodView):
     def post(self):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
-        filepro = core.converterutils.FileProcesser(network_file,
-                                                    network_file.filename.encode('utf-8'),
-                                                    flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
-                                                               filepro.markdown_stream,
-                                                               filepro.yamlinfo)
-        flask.session[user.id]['upload'] = cvobj
+        filepro = core.docprocessor.Processor(network_file,
+                                              network_file.filename.encode('utf-8'),
+                                              flask.current_app.config['UPLOAD_TEMP'])
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                              stream=filepro.markdown_stream.decode('utf8'),
+                                              filename=filepro.base.base)
+        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                           metadata=yamlinfo)
+        flask.session[user.id]['upload'] = dataobj
         flask.session.modified = True
         return str(filepro.result)
 
@@ -45,9 +45,9 @@ class UploadPreview(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         user = flask.ext.login.current_user
-        cvobj = flask.session[user.id]['upload']
-        output = cvobj.preview_markdown()
-        yaml_info = cvobj.yaml()
+        dataobj = flask.session[user.id]['upload']
+        output = dataobj.preview_data()
+        yaml_info = dataobj.metadata
         return flask.render_template('upload_preview.html', markdown=output, yaml=yaml_info)
 
 
@@ -59,9 +59,9 @@ class ConfirmEnglish(flask.views.MethodView):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         name = core.outputstorage.ConvertName(flask.request.form['name'])
         yaml_data = svc_mult_cv.getyaml(name)
-        cvobj = flask.session[user.id]['upload']
-        result = svc_mult_cv.add_md(cvobj, user.id)
-        yaml_data['enversion'] = cvobj.name
+        dataobj = flask.session[user.id]['upload']
+        result = svc_mult_cv.add_md(dataobj, user.id)
+        yaml_data['enversion'] = dataobj.ID
         svc_mult_cv.modify(name.yaml, yaml.safe_dump(yaml_data, allow_unicode=True),
                            committer=user.id)
         return flask.jsonify(result=result, filename=yaml_data['id']+'.md')
@@ -98,7 +98,7 @@ class ShowEnglish(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self, project, id):
         svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        md = svc_mult_cv.getproject(project).getmd_en(id)
+        md = svc_mult_cv.getproject(project).cv_getmd_en(id)
         return flask.render_template('edit.html', markdown=md)
 
 
@@ -125,15 +125,15 @@ class Preview(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         user = flask.ext.login.current_user
-        cvobj = flask.session[user.id]['upload']
-        output = cvobj.preview_markdown()
-        _id = cvobj.yaml()['id']
+        dataobj = flask.session[user.id]['upload']
+        output = dataobj.preview_data()
+        _id = dataobj.metadata['id']
         return flask.render_template('upload_preview.html', markdown=output, id=_id)
 
     @flask.ext.login.login_required
     def post(self):
         md_data = flask.request.form['mddata']
-        md = core.converterutils.md_to_html(md_data)
+        md = core.docprocessor.md_to_html(md_data)
         return flask.render_template('preview.html', markdown=md)
 
 class Index(flask.views.MethodView):

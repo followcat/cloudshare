@@ -32,7 +32,7 @@ export default class SearchResultItem extends Component {
 
   render() {
     const props = {...this.props};
-    const education = props.yaml_info.education_history;
+    const education = props.yaml_info.education_history || [];
     const experience = props.yaml_info.experience;
 
     const current = props.yaml_info.current ? props.yaml_info.current : {},

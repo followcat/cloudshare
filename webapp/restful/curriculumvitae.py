@@ -4,7 +4,7 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import core.outputstorage
-import core.converterutils
+import core.docprocessor
 
 
 class CurrivulumvitaeAPI(Resource):
@@ -22,8 +22,8 @@ class CurrivulumvitaeAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        html = self.svc_mult_cv.getproject(project).gethtml(id)
-        yaml = self.svc_mult_cv.getproject(project).getyaml(id)
+        html = self.svc_mult_cv.getproject(project).cv_gethtml(id)
+        yaml = self.svc_mult_cv.getproject(project).cv_getyaml(id)
         user = flask.ext.login.current_user
         result = user.getbookmark()
         if yaml['id'] in result:
@@ -46,7 +46,7 @@ class CurrivulumvitaeMDAPI(CurrivulumvitaeAPI):
 
     def get(self, id):
         md = self.svc_mult_cv.getmd(id)
-        html = core.converterutils.md_to_html(md)
+        html = core.docprocessor.md_to_html(md)
         return { 'result': html }
 
     def put(self, id):
@@ -114,7 +114,7 @@ class UpdateCurrivulumvitaeInformation(Resource):
         update_info = args['update_info']
 
         for key, value in update_info.iteritems():
-            data = self.svc_mult_cv.getproject(project).updateinfo(id, key, value, user.id)
+            data = self.svc_mult_cv.getproject(project).cv_updateyaml(id, key, value, user.id)
             if data is not None:
                 response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
             else:

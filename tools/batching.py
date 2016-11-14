@@ -5,7 +5,8 @@ import shutil
 
 import utils.chsname
 import core.exception
-import core.converterutils
+import core.docprocessor
+import extractor.information_explorer
 
 
 def move_file(path, origin_path, filename):
@@ -17,7 +18,7 @@ def move_file(path, origin_path, filename):
                 os.path.join(des_path, filename))
 
 
-def filter(processer, origin_path, filename):
+def filter(processer, yamlinfo, origin_path, filename):
     def mustjudge(d):
         return (d['email'] or d['phone'])
 
@@ -25,7 +26,7 @@ def filter(processer, origin_path, filename):
         path = "NotConvert"
         move_file(path, origin_path, filename)
         return
-    info = processer.yamlinfo
+    info = yamlinfo
     if mustjudge(info):
         if info['name']:
             path = "OK"
@@ -49,17 +50,18 @@ def filter(processer, origin_path, filename):
 
 
 def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origin=None):
-    import services.curriculumvitae
+    import core.basedata
     if not os.path.exists(temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
-            filepro = core.converterutils.FileProcesser(filename, f,
-                                                        temp_output)
-            cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
-                                                                   filepro.markdown_stream,
-                                                                   filepro.yamlinfo)
+            filepro = core.docprocessor.Processor(filename, f, temp_output)
+            yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                        stream=filepro.markdown_stream.decode('utf8'),
+                                        filename=filepro.base.base)
+            cvobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                             metadata=yamlinfo)
             if origin is not None:
                 cvobj.metadata['origin'] = origin
             if not cvobj.metadata['name']:
@@ -78,8 +80,11 @@ def classify(path, temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for name in files:
-            processfile = core.converterutils.FileProcesser(root, name, temp_output)
-            filter(processfile, root, name)
+            filepro = core.docprocessor.Processor(root, name, temp_output)
+            yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                        stream=filepro.markdown_stream.decode('utf8'),
+                                        filename=filepro.base.base)
+            filter(filepro, yamlinfo, root, name)
 
 
 import yaml
@@ -107,7 +112,7 @@ def get_explorer_name(svc_cv, yamlname):
 
 def update_selected(svc_cv, yamlname, selected):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
@@ -119,7 +124,7 @@ def update_selected(svc_cv, yamlname, selected):
 
 def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname),
@@ -131,14 +136,14 @@ def update_xp(svc_cv, yamlname):
 
 def safeyaml(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
 def originid(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.repo_path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
     if 'originid' not in obj:
         id_str, suffix = os.path.splitext(yamlname)
         obj['originid'] = obj['id']
@@ -225,7 +230,36 @@ def initclassify(SVC_CV, knowledge=None):
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
         info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge)
-        utils.builtin.save_yaml(info, SVC_CV.repo_path , y)
+        utils.builtin.save_yaml(info, SVC_CV.path , y)
+
+
+def inituniqueid(SVC_CV, with_report=False, with_diff=False):
+    import difflib
+    import utils.builtin
+    import extractor.unique_id
+
+    path_prefix = lambda x: os.path.join(SVC_CV.path, x)
+    unique_ids = {}
+    for y in SVC_CV.yamls():
+        info = SVC_CV.getyaml(y)
+        extractor.unique_id.unique_id(info)
+        try:
+            assert info['unique_id'] not in unique_ids
+            unique_ids[info['unique_id']] = y
+        except KeyError:
+            pass
+        except AssertionError:
+            if with_report:
+                print(info['unique_id'], path_prefix(y) + ' ' + path_prefix(unique_ids[info['unique_id']]))
+                if with_diff:
+                    print('++++\n')
+                    old = path_prefix(unique_ids[info['unique_id']])
+                    new = path_prefix(y)
+                    for l in difflib.unified_diff(file(old).readlines(), file(new).readlines(), old, new):
+                        print(l.rstrip())
+                    print('\n++++\n')
+        utils.builtin.save_yaml(info, SVC_CV.path , y)
+
 
 
 def initproject(SVC_CV_REPO, SVC_PRJ):
@@ -238,6 +272,16 @@ def initproject(SVC_CV_REPO, SVC_PRJ):
         convert_info['tracking'] = info.pop('tracking')
         convert_info['committer'] = info['committer']
         SVC_PRJ._add(y)
-        utils.builtin.save_yaml(info, SVC_CV_REPO.repo_path , y)
+        utils.builtin.save_yaml(info, SVC_CV_REPO.path , y)
         utils.builtin.save_yaml(convert_info, SVC_PRJ.cvpath , y)
         SVC_PRJ.save()
+
+
+def convert_oldcompany(SVC_CO_REPO, filepath, filename):
+    import core.basedata
+    yamls = utils.builtin.load_yaml(filepath, filename)
+    for y in yamls:
+        args = y
+        metadata = extractor.information_explorer.catch_coinfo(name=args['name'], stream=args)
+        coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
+        SVC_CO_REPO.add(coobj)

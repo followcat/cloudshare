@@ -1,5 +1,6 @@
 import os
 
+import core.basedata
 import services.simulationcv
 
 
@@ -12,9 +13,10 @@ class TagsCurriculumVitae(services.simulationcv.SimulationCV):
         self.update()
 
     def update(self):
-        for yamlname in self.cvstorage.yamls():
-            if not self.exists(yamlname):
-                yamlinfo = self.cvstorage.getyaml(yamlname)
+        for id in self.cvstorage.ids:
+            if not self.exists(id):
+                data = self.cvstorage.getyaml(id)
+                metadata = self.cvstorage.getyaml(id)
                 key = self.config['selected']['key']
                 values_set = self.config['selected']['value']
                 if key in yamlinfo:
@@ -22,5 +24,6 @@ class TagsCurriculumVitae(services.simulationcv.SimulationCV):
                     for each in yamlinfo[key].values():
                         keyset.update(each)
                     if keyset.intersection(values_set):
-                        self._add(yamlname, name)
+                        dataobj = core.basedata.DataObject(metadata, data)
+                        self.add(dataobj)
         self.save()

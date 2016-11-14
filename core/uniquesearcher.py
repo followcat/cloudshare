@@ -8,20 +8,23 @@ class UniqueSearcher(object):
     def __init__(self, path):
         """
             >>> import shutil
-            >>> import services.curriculumvitae
+            >>> import core.basedata
             >>> import core.uniquesearcher
             >>> import interface.gitinterface
+            >>> import services.curriculumvitae
+            >>> import extractor.information_explorer
             >>> repo_name = 'core/test_repo'
             >>> test_path = 'core/test_output'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> fp1 = core.converterutils.FileProcesser(f1, 'cv_1.doc', test_path)
-            >>> cv1 = services.curriculumvitae.CurriculumVitaeObject(fp1.name,
-            ...         fp1.markdown_stream, fp1.yamlinfo)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface)
+            >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
+            >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> fp1.result
             True
-            >>> us = core.uniquesearcher.UniqueSearcher(svc_cv.repo_path)
+            >>> us = core.uniquesearcher.UniqueSearcher(svc_cv.path)
             >>> us.unique(cv1.metadata)
             True
             >>> svc_cv.add(cv1)
@@ -56,6 +59,12 @@ class UniqueSearcher(object):
     def unique(self, yamldict):
         phone = yamldict['phone']
         email = yamldict['email']
+        try:
+            unique_id = yamldict['unique_id']
+            if unique_id in self.yaml_datas:
+                return False
+        except KeyError:
+            pass
         if len(phone) == 0 and len(email) == 0:
             return False
         for each in self.yaml_datas.values():

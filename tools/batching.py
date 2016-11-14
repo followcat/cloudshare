@@ -285,3 +285,21 @@ def convert_oldcompany(SVC_CO_REPO, filepath, filename):
         metadata = extractor.information_explorer.catch_coinfo(name=args['name'], stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         SVC_CO_REPO.add(coobj)
+
+
+def update_jd_co_id(SVC_JD, SVC_CO):
+    import yaml
+    co_dict = {}
+    for id in SVC_CO.ids:
+        co_info = SVC_CO.getyaml(id)
+        co_dict[co_info['name']] = co_info
+
+    for jd in SVC_JD.lists():
+        jd_id = jd['id']
+        jd_company = jd['company']
+        if jd_company in co_dict:
+            jd['company'] = co_dict[jd_company]['id']
+            dump_data = yaml.safe_dump(jd, allow_unicode=True)
+            filename = SVC_JD.filename(jd_id)
+            with open(os.path.join(SVC_JD.path, filename), 'w') as f:
+                f.write(dump_data)

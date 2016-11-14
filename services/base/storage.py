@@ -10,11 +10,10 @@ import services.base.service
 
 class BaseStorage(services.base.service.Service):
 
-    SAVE_DIR = ''
     commitinfo = 'BaseData'
 
     def __init__(self, path, name=None):
-        self.path = os.path.join(path, self.SAVE_DIR)
+        self.path = path
         super(BaseStorage, self).__init__(self.path, name)
         self.unique_checker = None
         self.info = ""
@@ -22,19 +21,10 @@ class BaseStorage(services.base.service.Service):
 
     def exists(self, id):
         """
-            >>> import interface.basefs
             >>> import services.base.storage
-            >>> services.base.storage.BaseStorage.SAVE_DIR = 'CV'
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_BSSTO = services.base.storage.BaseStorage(DB.path, 'repo')
+            >>> DIR = 'repo/CV'
+            >>> SVC_BSSTO = services.base.storage.BaseStorage(DIR)
             >>> assert SVC_BSSTO.exists('blr6dter')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_BSSTO = services.base.storage.BaseStorage(DB.path, 'repo')
-            >>> assert SVC_BSSTO.exists('blr6dter')
-            >>> services.base.storage.BaseStorage.SAVE_DIR = ''
         """
         return id in self.ids
 
@@ -60,19 +50,10 @@ class BaseStorage(services.base.service.Service):
 
     def getmd(self, name):
         """
-            >>> import interface.basefs
             >>> import services.base.storage
-            >>> services.base.storage.BaseStorage.SAVE_DIR = 'CV'
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_BSSTO = services.base.storage.BaseStorage(DB.path, 'repo')
+            >>> DIR = 'repo/CV'
+            >>> SVC_BSSTO = services.base.storage.BaseStorage(DIR)
             >>> assert SVC_BSSTO.getmd('blr6dter.yaml')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_BSSTO = services.base.storage.BaseStorage(DB.path, 'repo')
-            >>> assert SVC_BSSTO.getmd('blr6dter.yaml')
-            >>> services.base.storage.BaseStorage.SAVE_DIR = ''
         """
         result = unicode()
         md = core.outputstorage.ConvertName(name).md
@@ -118,19 +99,10 @@ class BaseStorage(services.base.service.Service):
     @property
     def ids(self):
         """
-            >>> import interface.basefs
             >>> import services.base.storage
-            >>> services.base.storage.BaseStorage.SAVE_DIR = 'CV'
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_BSSTO = services.base.storage.BaseStorage(DB.path, DIR)
+            >>> DIR = 'repo/CV'
+            >>> SVC_BSSTO = services.base.storage.BaseStorage(DIR)
             >>> assert SVC_BSSTO.interface.lsfiles('.', 'blr6dter.yaml')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_BSSTO = services.base.storage.BaseStorage(DB.path, DIR)
-            >>> assert SVC_BSSTO.interface.lsfiles('.', 'blr6dter.yaml')
-            >>> services.base.storage.BaseStorage.SAVE_DIR = ''
         """
         return [os.path.splitext(f)[0]
                 for f in self.interface.lsfiles('.', '*.yaml')]

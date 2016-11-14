@@ -11,7 +11,6 @@ import services.base.storage
 
 class CurriculumVitae(services.base.storage.BaseStorage):
 
-    SAVE_DIR = 'CV'
     commitinfo = 'CurriculumVitae'
 
     @utils.issue.fix_issue('issues/update_name.rst')

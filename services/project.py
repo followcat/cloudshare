@@ -13,20 +13,23 @@ import services.jobdescription
 
 class Project(services.base.service.Service):
 
+    CV_PATH = 'CV'
+    JD_PATH = 'JD'
     config_file = 'config.yaml'
 
     def __init__(self, path, corepo, cvrepo, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
-        cvpath = os.path.join(path, services.simulationcv.SimulationCV.SAVE_DIR)
+        cvpath = os.path.join(path, self.CV_PATH)
+        jdpath = os.path.join(path, self.JD_PATH)
         idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
         if os.path.exists(cvpath) and not os.path.exists(idsfile):
-            self.curriculumvitae = services.curriculumvitae.CurriculumVitae(self.path)
+            self.curriculumvitae = services.curriculumvitae.CurriculumVitae(cvpath)
         else:
-            self.curriculumvitae = services.simulationcv.SimulationCV(self.path, name,
+            self.curriculumvitae = services.simulationcv.SimulationCV(cvpath, name,
                                                                       cvrepo)
         self.company = corepo
-        self.jobdescription = services.jobdescription.JobDescription(path)
+        self.jobdescription = services.jobdescription.JobDescription(jdpath)
         self.config = dict()
         try:
             self.load()

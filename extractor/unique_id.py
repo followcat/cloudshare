@@ -96,7 +96,7 @@ def history(cv_yaml, to_date=u'至今'):
     u"""
         >>> import interface.gitinterface
         >>> import services.curriculumvitae
-        >>> SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo', 'cloudshare')
+        >>> SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare')
         >>> yaml = SVC_CV_REPO.getyaml('0mlcw5kf.yaml')
         >>> assert yaml['education_history'][-1]['education'] == u'中专'
         >>> assert not is_education(history(yaml)[0])

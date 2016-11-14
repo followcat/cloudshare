@@ -17,9 +17,10 @@ PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
 SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+ASP+u'*[\n'+SP+FIELDSEP+u']*'+SCHOOL+u'[\n'+SP+FIELDSEP+u']+(?P<major>[^'+SP+u'\n]+)[\n'+SP+FIELDSEP+u']+'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
-SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+FIELDSEP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
-NOSCSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+u'((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+)'+EDUCATION+ASP+u'*', re.M)
-UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+FIELDSEP+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
+SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
+NOSCSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+u'((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+)'+EDUCATION+ASP+u'*', re.M)
+UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
+RVSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+EDUCATION+u'[\n'+SP+u']+'+SCHOOL+u'[\n'+SP+u']+(?P<major>[^'+SP+u']+)[\n'+SP+u']+', re.M)
 
 PFXSENSEMA = re.compile(with_prefix(SENSEMA), re.M)
 PFXSPSOLMA = re.compile(with_prefix(SPSOLMA), re.M)
@@ -189,6 +190,22 @@ def education_xp(text, summary=None):
                 format_output(out, r.groupdict(), summary)
             else:
                 format_output(out, r.groupdict(), summary={'major': ''})
+    if not maj:
+        if SENSEMA.search(text):
+            out = []
+            for r in SENSEMA.finditer(text):
+                maj +=1
+                format_output(out, r.groupdict())
+        elif PFXSENSEMA.search(text):
+            out = []
+            for r in PFXSENSEMA.finditer(text):
+                maj +=1
+                format_output(out, r.groupdict())
+        elif RVSENSEMA.search(text):
+            out = []
+            for r in RVSENSEMA.finditer(text):
+                maj +=1
+                format_output(out, r.groupdict())
     if not maj and (PFXSPSOLMA.search(text) or SPSOLMA.search(text)):
         out = []
         for r in PFXSPSOLMA.finditer(text):
@@ -215,6 +232,17 @@ def education_xp(text, summary=None):
             else:
                 format_output(out, r.groupdict(), summary={'major': ''})
         out = sorted(out, key=lambda x: x['date_from'], reverse=True)
+    if not maj and RVSPSOLMA.search(text):
+        out = []
+        for r in RVSPSOLMA.finditer(text):
+            if r.group('major'):
+                maj +=1
+                format_output(out, r.groupdict())
+            elif summary:
+                maj +=1
+                format_output(out, r.groupdict(), summary)
+            else:
+                format_output(out, r.groupdict(), summary={'major': ''})
     if not maj and summary:
         RE = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'+(?P<school>%s)' %
                 summary['school'].replace('(', '\(').replace(')', '\)').strip()+ASP+u'+(?P<major>%s)' % summary['major'].strip(), re.M)
@@ -223,22 +251,6 @@ def education_xp(text, summary=None):
         for r in RE.finditer(text):
             maj +=1
             format_output(out, r.groupdict())
-    if not maj:
-        if SENSEMA.search(text):
-            out = []
-            for r in SENSEMA.finditer(text):
-                maj +=1
-                format_output(out, r.groupdict())
-        elif PFXSENSEMA.search(text):
-            out = []
-            for r in PFXSENSEMA.finditer(text):
-                maj +=1
-                format_output(out, r.groupdict())
-        elif RVSENSEMA.search(text):
-            out = []
-            for r in RVSENSEMA.finditer(text):
-                maj +=1
-                format_output(out, r.groupdict())
     return maj, out
 
 

@@ -22,7 +22,7 @@ class JobDescriptionAPI(Resource):
         result = self.svc_mult_cv.getproject(project).jd_get(id)
         co_id = result['company']
         co_name = self.svc_mult_cv.getproject(project).company_get(co_id)['name']
-        result['company'] = co_name
+        result['company_name'] = co_name
         return { 'code': 200, 'data': result }
 
     def put(self, id):
@@ -81,6 +81,6 @@ class JobDescriptionListAPI(Resource):
         for jd in result:
             co_id = jd['company']
             co_name = self.svc_mult_cv.getproject(project).company_get(co_id)['name']
-            jd['company'] = co_name
+            jd['company_name'] = co_name
         return { 'code': 200, 'data': result }
 

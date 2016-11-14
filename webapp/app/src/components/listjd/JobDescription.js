@@ -66,8 +66,8 @@ class JobDescription extends Component {
     const columns = [
       {
         title: 'Company Name',
-        dataIndex: 'company',
-        key: 'company',
+        dataIndex: 'company_name',
+        key: 'company_name',
         width: 160,
       },  
       {

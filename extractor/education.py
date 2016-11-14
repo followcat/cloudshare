@@ -6,6 +6,7 @@ from extractor.utils_parsing import *
 
 with_prefix = lambda x: u'^'+ASP+u'*'+PREFIX+u'+'+ASP+u'*'+ x.pattern[1:]
 
+ED_PERIOD = u'(('+PERIOD+u')|(?P<ato>'+DATE+u'))'
 # We check for braket to avoid catching title 教育/培训/学术/科研/院校
 ED = re.compile(ur'^'+ASP+u'*(?P<br>'+UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'*目)|((工'+ASP+u'*作'+ASP+u'*)|(实习)|(工作(与)?实践)))'+ASP+u'*经'+ASP+u'*[历验])|(实习与实践)|(背景)|(培训)|(语言((能力)|(技能)))|(所获奖项)|(校内职务)|(学生实践经验)|(技能证书)|(接受培训)|(社会经验))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
 AED = re.compile(ur'^'+ASP+u'*(?P<br>'+ UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*)', re.DOTALL+re.M)
@@ -13,7 +14,7 @@ PFXED = re.compile(with_prefix(ED), re.DOTALL+re.M)
 PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
 
 
-SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+ASP+u'*[\n'+SP+SENTENCESEP+u']*'+SCHOOL+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
+SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+ASP+u'*[\n'+SP+FIELDSEP+u']*'+SCHOOL+u'[\n'+SP+FIELDSEP+u']+(?P<major>[^'+SP+u'\n]+)[\n'+SP+FIELDSEP+u']+'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
 SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+FIELDSEP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
@@ -37,8 +38,8 @@ PFXHDCTLMA = re.compile(with_prefix(HDCTLMA), re.M)
 PFXRVHDCTLMA = re.compile(with_prefix(RVHDCTLMA), re.M)
 
 NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
-SENSEDROP = u'((\S+)[\n'+SP+SENTENCESEP+u']*)?'
-RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+SENTENCESEP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u''+EDUCATION+u'[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u'$', re.M)
+SENSEDROP = u'((\S+)[\n'+SP+FIELDSEP+u']*)?'
+RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+FIELDSEP+u']+(?P<major>[^'+SP+FIELDSEP+u'\n]+)[\n'+SP+FIELDSEP+u']+'+SENSEDROP+u''+EDUCATION+u'[\n'+SP+FIELDSEP+u']+'+SENSEDROP+u'$', re.M)
 
 TABHDRMAJ = u'^'+ASP+u'*时'+ASP+u'*间段?'+ASP+u'+[院学]'+ASP+u'*校('+ASP+u'*名'+ASP+u'*称)?'+ASP+u'+专'+ASP+u'*业'+ASP+u'+(获得证书/)?学'+ASP+u'*历(/学位)?('+ASP+u'+证'+ASP+u'*书)?('+ASP+u'+是否统招)?(?P<edu>.+)'
 
@@ -66,6 +67,12 @@ def format_output(output, groupdict, summary=None):
         result['date_to'] = fix_date(groupdict['ato'])
     try:
         result['education'] = groupdict['education'].strip()
+        if groupdict['shorted4']:
+            result['education'] = groupdict['shorted4']
+        elif groupdict['shorted6']:
+            result['education'] = groupdict['shorted6']
+        elif groupdict['shorted7']:
+            result['education'] = groupdict['shorted7']
     except KeyError:
         if summary:
             result['education'] = summary['education'].strip()

@@ -42,7 +42,7 @@ class PositionAPI(BaseAPI):
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            searches = self.svc_mult_cv.getproject(project).search(text)
+            searches = self.svc_mult_cv.getproject(project).cv_search(text)
         result = []
         for name in searches:
             positions = []
@@ -253,7 +253,7 @@ class SimilarAPI(Resource):
         project = args['project']
         doc = self.svc_mult_cv.getmd(id)
         datas = []
-        for name, score in self.miner.probability(project, doc)[:7]:
+        for name, score in self.miner.probability(project, doc)[1:7]:
             yaml_info = self.svc_mult_cv.getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
         return { 'code': 200, 'data': datas }

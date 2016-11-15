@@ -6,8 +6,9 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.chsname
-import core.converterutils
-import services.curriculumvitae
+import core.basedata
+import core.docprocessor
+import extractor.information_explorer
 
 
 upload = dict()
@@ -48,7 +49,7 @@ class UploadCVAPI(Resource):
                 result = self.svc_mult_cv.add(cvobj, user.id, project_name, unique=True)
                 if result is True:
                     names.append(cvobj.name.md)
-                    documents.append(cvobj.markdown())
+                    documents.append(cvobj.data)
                     status = 'success'
                     message = 'Upload success.'
             results.append({ 'id': id,
@@ -64,18 +65,20 @@ class UploadCVAPI(Resource):
             upload[user.id] = dict()
         network_file = flask.request.files['files']
         filename = network_file.filename
-        filepro = core.converterutils.FileProcesser(network_file, filename.encode('utf-8'),
-                                                    flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
-                                                               filepro.markdown_stream,
-                                                               filepro.yamlinfo)
+        filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
+                                              flask.current_app.config['UPLOAD_TEMP'])
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                              stream=filepro.markdown_stream.decode('utf8'),
+                                              filename=filepro.base.base)
+        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                           metadata=yamlinfo)
         upload[user.id][filename] = None
         name = ''
         if filepro.result is True:
-            if not cvobj.metadata['name']:
-                cvobj.metadata['name'] = utils.chsname.name_from_filename(filename)
-            name = cvobj.metadata['name']
-            upload[user.id][filename] = cvobj
+            if not dataobj.metadata['name']:
+                dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
+            name = dataobj.metadata['name']
+            upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
                                         'name': name, 'filename': filename } }
@@ -95,8 +98,8 @@ class UploadEnglishCVAPI(Resource):
 
     def get(self):
         user = flask.ext.login.current_user
-        cvobj = uploadeng[user.id]
-        md = cvobj.preview_markdown()
+        dataobj = uploadeng[user.id]
+        md = dataobj.preview_data()
         return { 'result': { 'markdown': md } }
 
     def put(self):
@@ -105,25 +108,28 @@ class UploadEnglishCVAPI(Resource):
         id = args['id']
         project = args['project']
         yaml_data = self.svc_mult_cv.getproject(project).getyaml(id)
-        cvobj = uploadeng[user.id]
-        result = self.svc_mult_cv.add_md(cvobj, user.id)
-        yaml_data['enversion'] = cvobj.name.md
-        self.svc_mult_cv.modify(id + '.yaml', yaml.safe_dump(yaml_data, allow_unicode=True), committer=user.id)
+        dataobj = uploadeng[user.id]
+        result = self.svc_mult_cv.add_md(dataobj, user.id)
+        yaml_data['enversion'] = dataobj.ID.md
+        self.svc_mult_cv.modify(id + '.yaml', yaml.safe_dump(yaml_data, allow_unicode=True),
+                                committer=user.id)
         user.uploadeng = None
-        en_html = self.svc_mult_cv.getproject(project).getmd_en(id)
+        en_html = self.svc_mult_cv.getproject(project).cv_getmd_en(id)
         return { 'code': 200, 'data': { 'status': result, 'en_html': en_html } }
 
     def post(self):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
         filename = network_file.filename
-        filepro = core.converterutils.FileProcesser(network_file,
-                                                    filename.encode('utf-8'),
-                                                    flask.current_app.config['UPLOAD_TEMP'])
-        cvobj = services.curriculumvitae.CurriculumVitaeObject(filepro.name,
-                                                               filepro.markdown_stream,
-                                                               filepro.yamlinfo)
-        uploadeng[user.id] = cvobj
+        filepro = core.docprocessor.Processor(network_file,
+                                              filename.encode('utf-8'),
+                                              flask.current_app.config['UPLOAD_TEMP'])
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                                              stream=filepro.markdown_stream.decode('utf8'),
+                                              filename=filepro.base.base)
+        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
+                                           metadata=yamlinfo)
+        uploadeng[user.id] = dataobj
         return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/preview' } }
 
 
@@ -140,7 +146,7 @@ class UploadCVPreviewAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         filename = args['filename']
-        cvobj = upload[user.id][filename]
-        md = cvobj.preview_markdown()
-        yaml_info = cvobj.metadata
+        dataobj = upload[user.id][filename]
+        md = dataobj.preview_data()
+        yaml_info = dataobj.metadata
         return { 'code': 200, 'data': { 'filename': filename, 'markdown': md, 'yaml_info': yaml_info } }

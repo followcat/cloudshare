@@ -7,7 +7,7 @@ from extractor.utils_parsing import *
 import extractor.unique_id
 
 
-XP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'?目)|(教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|((?P<slash>/)?培训(?(slash)背景))))|(工作内容（医疗器械经验）))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+XP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|((工作与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'?目)|(教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|((?P<slash>/)?培训(?(slash)背景))))|(工作内容（医疗器械经验）))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
 AXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(实习)|(工作(与)?实践))经'+ASP+u'?[历验])|(实习与实践))'+ UNIBRARIGHT +u'?[:：]?'+ASP+u'*'+DURATION+'?'+ASP+u'*?\n(?P<expe>.*)', re.DOTALL+re.M)
 TXP = re.compile(ur'-{9}[\-'+SP+u']*(?P<expe>'+PERIOD+ur'.*?)(?=-{9}[\-'+SP+u']*)', re.DOTALL)
 
@@ -517,6 +517,10 @@ def work_xp(text):
     RCO related
         >>> assert companies(work_xp(u'■医院 （2012-04 \~ 至今）\\n公司性质：\\n担任职位：英语翻译'))
         >>> assert u'研发项目经理' == name(position_1(work_xp(u'▌2000-11 ～ 2010-04  有限公司\\n\\n担任职位：\\n研发项目经理；从事大')))
+
+    PCO related
+        >>> assert companies(work_xp(u'2008年11月  --  2010年12月\\n公司、集团有限公司（中国建材）  |  EHS部  |\\n 安全业务经理  （2年1个月）'))
+
     """
     RE = None
     pos = 0

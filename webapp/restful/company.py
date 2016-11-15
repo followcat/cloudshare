@@ -29,6 +29,8 @@ class CompanyAPI(Resource):
         args = self.reqparse.parse_args()
         project = args['project']
         coname = args['coname']
+        if args['introduction'] is None:
+            args['introduction'] = str()
         metadata = extractor.information_explorer.catch_coinfo(name=coname, stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)

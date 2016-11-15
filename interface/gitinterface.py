@@ -55,6 +55,9 @@ class GitInterface(interface.base.Interface):
         data = result.read()
         return data
 
+    def getraw(self, filename):
+        raise IOError
+
     def add(self, filename, filedata, message=None, committer=None):
         """
             >>> import shutil

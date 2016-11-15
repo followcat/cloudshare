@@ -106,8 +106,9 @@ class CurriculumVitae(services.base.storage.BaseStorage):
 
     def gethtml(self, name):
         htmlname = core.outputstorage.ConvertName(name).html
-        result = self.interface.getraw(htmlname)
-        if result is None:
+        try:
+            result = self.interface.getraw(htmlname)
+        except IOError:
             md = self.getmd(name)
             if md is not None:
                 result = core.docprocessor.md_to_html(md)

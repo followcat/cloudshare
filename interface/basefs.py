@@ -55,10 +55,7 @@ class BaseFSInterface(interface.base.Interface):
                         elem.tag = elem.tag[nsl:]
             return xml.etree.ElementTree.tostring(e, encoding='utf-8')
 
-        try:
-            result = self.get(filename)
-        except IOError:
-            result = None
+        result = self.get(filename)
         if result is not None:
             try:
                 namespaces = get_namespaces(result)

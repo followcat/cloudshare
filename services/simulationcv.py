@@ -124,8 +124,9 @@ class SimulationCV(services.base.service.Service):
         if not self.exists(id):
             return None
         name = core.outputstorage.ConvertName(id).yaml
-        yamlstream = self.interface.get(os.path.join(self.yamlpath, name))
-        if yamlstream is None:
+        try:
+            yamlstream = self.interface.get(os.path.join(self.yamlpath, name))
+        except IOError:
             yamlstream = '{}'
         return yaml.load(yamlstream, Loader=utils._yaml.Loader)
 

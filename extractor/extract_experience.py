@@ -63,7 +63,7 @@ PODEPARTMENT = u'([^\n:：'+SP+u']|('+POASP+u'[^\n'+SP+u']))+'
 POFIELD = u'(?(nl)(([^\n:：'+SP+u'](\n+/)?)+)|([^\n'+SP+u']|('+POASP+u'[^\n'+SP+u']))+)'
 PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*(?P<field>'+POFIELD+u')'+POASP+u'*\n+(?:(?:'+ASP+u'*(?='+APERIOD+u')|(?:\-{3})|(?:下属人数)|(?:所在地区)|(?:汇报对象)|(?:所在部门))|(?:'+POASP+u'*((?P<dpt>'+PODEPARTMENT+u'(（离职原因：.*?）)?)(?(nl)()|(?:'+POASP+u'+)))?(?(nl)(?:'+POASP+u'*(\n+|('+POASP+u'+))))(主管：)?(?P<aposition>(?(dpt)(?:[^=\n:：]+)|(?:[^= \n:：]+)))(（汇报对象：.*?）)?$))', re.M)
 
-IXPO = re.compile(u'所属行业[:：]'+ASP+u'*(?P<field>.+)\n+'+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+'+ASP+u'*职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*$', re.M)
+IXPO = re.compile(u'(所属行业[:：]'+ASP+u'*(?P<field>.+)\n+)?('+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+)?'+ASP+u'*职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*(\uff1b.*)?$', re.M)
 APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
 TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*'+APERIOD+''+ASP+u'*$', re.M)
 TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)((('+SALARY+u')?\*?'+ASP+u'*)|(\uff1b.*))$', re.M)
@@ -207,6 +207,9 @@ def find_xp(RE, text):
         >>> assert companies(find_xp(CO, u'2013-8 至 今  工作经历（IT服务行业）*---* 1年5个月'))
         >>> assert companies(find_xp(TCO, u'2013年04月——至今（含三个月实习期）   器械质量监督检验所（湛江检验室）'))
         >>> assert companies(find_xp(TCO, u'2011年7月—2014年5月 ：广州仁爱医院 [2年10月 ]'))
+        >>> assert positions(find_xp(TCO, u'2011/5\~2015/2\\n欧文斯科宁复合材料（中国）有限公司\\n职位：质量经理'))
+        >>> assert len(positions(find_xp(TCO, u'2015/03\~    \\n微泰医疗器械（杭州）有限公司\\n职位：质量经理'))) == 0
+        >>> assert positions(find_xp(TCO, u'2000-11 ～ 2010-04  深圳安科高技术股份有限公司\\n担任职位：\\n 研发项目经理；从事大'))
     """
     pos = 0
     if not pos:
@@ -219,8 +222,13 @@ def find_xp(RE, text):
                 dfrom, dto = r.group('from'), r.group('to')
                 company_output(out, r.groupdict())
             else:
+                # No date, no company
+                if not dfrom:
+                    continue
                 pos +=1
                 position_output(out, r.groupdict(), begin=dfrom, end=dto)
+                dto = ''
+                dfrom = ''
     if not pos:
         out = {'company': [], 'position': []}
         MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+APO.pattern+u'))', re.M)

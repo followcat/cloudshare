@@ -63,7 +63,7 @@ PODEPARTMENT = u'([^\n:：'+SP+u']|('+POASP+u'[^\n'+SP+u']))+'
 POFIELD = u'(?(nl)(([^\n:：'+SP+u'](\n+/)?)+)|([^\n'+SP+u']|('+POASP+u'[^\n'+SP+u']))+)'
 PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*(?P<field>'+POFIELD+u')'+POASP+u'*\n+(?:(?:'+ASP+u'*(?='+APERIOD+u')|(?:\-{3})|(?:下属人数)|(?:所在地区)|(?:汇报对象)|(?:所在部门))|(?:'+POASP+u'*((?P<dpt>'+PODEPARTMENT+u'(（离职原因：.*?）)?)(?(nl)()|(?:'+POASP+u'+)))?(?(nl)(?:'+POASP+u'*(\n+|('+POASP+u'+))))(主管：)?(?P<aposition>(?(dpt)(?:[^=\n:：]+)|(?:[^= \n:：]+)))(（汇报对象：.*?）)?$))', re.M)
 
-IXPO = re.compile(u'(所属行业[:：]'+ASP+u'*(?P<field>.+)\n+)?('+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+)?'+ASP+u'*职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*(\uff1b.*)?$', re.M)
+IXPO = re.compile(u'^(所属行业[:：]'+ASP+u'*(?P<field>.+)\n+)?('+ASP+u'*(所属)?部'+ASP+u'*门[:：].*\n+)?'+ASP+u'*(担任)?职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*(\uff1b.*)?$', re.M)
 APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
 TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*'+APERIOD+''+ASP+u'*$', re.M)
 TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)((('+SALARY+u')?\*?'+ASP+u'*)|(\uff1b.*))$', re.M)
@@ -509,6 +509,8 @@ def work_xp(text):
         ...     u'公司介绍：加速器医疗设备\\n\\n所属行业：医疗设备/器械')))
         >>> assert u'重工业' in business(company_1(work_xp(u'2013.08 - 2016.06 有限公司  （2年10个月）\\n 工程师 | 10001-15000元/月\\n\\n'
         ...     u'大型设备/机电设备/重工业 | 企业性质：外商独资 | 规模：20-99人\\n\\n')))
+        >>> assert u'财务经理' == name(position_1(work_xp(u'2006.02 - 2009.12  沃茨水工业集团  （3年10个月）\\n财务部 | 财务经理 | 15000元/月\\n'
+        ...     u'加工制造（原料加工/模具） | 企业性质：外商独资\\n工作描述：    1.职位： （1）刚加入集团时')))
         >>> assert u'互联网' in business(company_1(work_xp(u'2012.03 - 至今 有限公司 （1年1个月）\\n软件工程师\\n互联网 | 企业性质：民营\\n')))
         >>> assert u'自动化' in business(company_1(work_xp(u'搜索同事2015.01 - 至今有限公司(SFAE) (1年7个月)\\n\\n'
         ...     u'外商独资·外企办事处  |  仪器/仪表/工业自动化/电气  |  10000人以上\\n\\n2015.01 - 至今IPM Project Manager & BD22000元/月')))

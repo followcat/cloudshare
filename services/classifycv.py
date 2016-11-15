@@ -8,11 +8,14 @@ import services.simulationcv
 class ClassifyCV(object):
 
     config_file = 'config.yaml'
+    SAVE_DIR = 'CV'
 
     def __init__(self, name, path, cvstorage):
         self.name = name
         self.path = os.path.join(path, utils.builtin.industrytopath(name))
-        self.curriculumvitae = services.simulationcv.SimulationCV(self.path, name, cvstorage)
+        self.curriculumvitae = services.simulationcv.SimulationCV(os.path.join(self.path,
+                                                                  self.SAVE_DIR),
+                                                                  name, cvstorage)
         self.config = dict()
         try:
             self.load()

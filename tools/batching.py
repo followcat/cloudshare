@@ -283,3 +283,31 @@ def initproject(SVC_CV_REPO, SVC_PRJ):
         utils.builtin.save_yaml(info, SVC_CV_REPO.path , y)
         utils.builtin.save_yaml(convert_info, SVC_PRJ.cvpath , y)
         SVC_PRJ.save()
+
+
+def convert_oldcompany(SVC_CO_REPO, filepath, filename):
+    import core.basedata
+    yamls = utils.builtin.load_yaml(filepath, filename)
+    for y in yamls:
+        args = y
+        metadata = extractor.information_explorer.catch_coinfo(name=args['name'], stream=args)
+        coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
+        SVC_CO_REPO.add(coobj)
+
+
+def update_jd_co_id(SVC_JD, SVC_CO):
+    import yaml
+    co_dict = {}
+    for id in SVC_CO.ids:
+        co_info = SVC_CO.getyaml(id)
+        co_dict[co_info['name']] = co_info
+
+    for jd in SVC_JD.lists():
+        jd_id = jd['id']
+        jd_company = jd['company']
+        if jd_company in co_dict:
+            jd['company'] = co_dict[jd_company]['id']
+            dump_data = yaml.safe_dump(jd, allow_unicode=True)
+            filename = SVC_JD.filename(jd_id)
+            with open(os.path.join(SVC_JD.path, filename), 'w') as f:
+                f.write(dump_data)

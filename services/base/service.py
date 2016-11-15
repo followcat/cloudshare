@@ -22,3 +22,6 @@ class Service(object):
             self.interface = interface.basefs.BaseFSInterface(path)
         else:
             raise Exception("Not support iotype.")
+
+    def backup(self, path, bare=False):
+        self.interface.backup(path, bare=bare)

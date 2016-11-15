@@ -1,0 +1,37 @@
+@import '../default.less';
+@featurePrefixCls: cs-feature;
+@featureWidth: 100px;
+@textColor: #FFF;
+
+.@{featurePrefixCls} {
+  width: @featureWidth;
+  height: inherit;
+  line-height: inherit;
+  background-color: @backgroundColor;
+  text-align: center;
+  cursor: pointer;
+
+  &-text {
+    color: @textColor;
+    font-weight: bold;
+  }
+
+  &:hover {
+    background-color: @hoverBackgroundColor;
+  }
+}
+
+.ant-modal-body {
+  max-height: 460px;
+  overflow-y: scroll;
+}
+
+.vertical-center-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-center-modal .ant-modal {
+  top: 0;
+}

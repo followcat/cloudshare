@@ -6,16 +6,15 @@ import ujson
 import utils._yaml
 import utils.issue
 import utils.builtin
-import services.base
 import interface.basefs
 import core.outputstorage
+import services.base.service
 
 
-class SimulationCV(services.base.Service):
+class SimulationCV(services.base.service.Service):
 
     ids_file = 'names.json'
 
-    SAVE_DIR = 'CV'
     YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
         ("committer",           list),
@@ -25,7 +24,7 @@ class SimulationCV(services.base.Service):
     )
 
     def __init__(self, path, name, cvstorage):
-        self.path = os.path.join(path, self.SAVE_DIR)
+        self.path = path
         super(SimulationCV, self).__init__(self.path, name)
         self.ids = set()
         self.cvstorage = cvstorage

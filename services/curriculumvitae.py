@@ -3,40 +3,18 @@ import yaml
 import os.path
 
 import utils._yaml
-import services.base
-import core.outputstorage
 import core.docprocessor
+import core.outputstorage
 import core.uniquesearcher
+import services.base.storage
 
 
-class CurriculumVitae(services.base.Service):
+class CurriculumVitae(services.base.storage.BaseStorage):
 
-    SAVE_DIR = 'CV'
+    commitinfo = 'CurriculumVitae'
 
-    def __init__(self, path, name=None):
-        self.path = os.path.join(path, self.SAVE_DIR)
-        super(CurriculumVitae, self).__init__(self.path, name)
-        self.unique_checker = None
-        self.info = ""
-        self._nums = 0
-
-    def exists(self, id):
-        """
-            >>> import interface.basefs
-            >>> import services.curriculumvitae
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
-            >>> assert SVC_CV.exists('blr6dter')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
-            >>> assert SVC_CV.exists('blr6dter')
-        """
-        return id in self.ids
-
-    def add(self, cvobj, committer=None, unique=True, yamlfile=True):
+    @utils.issue.fix_issue('issues/update_name.rst')
+    def unique(self, baseobject):
         """
             >>> import glob
             >>> import shutil
@@ -49,7 +27,7 @@ class CurriculumVitae(services.base.Service):
             >>> repo_name = 'services/test_repo'
             >>> test_path = 'services/test_output'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
+            >>> svc_bssto = services.curriculumvitae.CurriculumVitae(interface.path)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
@@ -60,43 +38,30 @@ class CurriculumVitae(services.base.Service):
             ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base)
             >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo1)
             >>> cv2 = core.basedata.DataObject(data=fp2.markdown_stream, metadata=yamlinfo2)
-            >>> svc_cv.add(cv1)
+            >>> svc_bssto.add(cv1)
             True
-            >>> svc_cv.add(cv2)
+            >>> svc_bssto.add(cv2)
             True
-            >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))
+            >>> md_files = glob.glob(os.path.join(svc_bssto.path, '*.md'))
             >>> len(md_files)
             2
-            >>> yaml_files = glob.glob(os.path.join(svc_cv.path, '*.yaml'))
+            >>> yaml_files = glob.glob(os.path.join(svc_bssto.path, '*.yaml'))
             >>> len(yaml_files)
             2
-            >>> svc_cv.add(cv1)
+            >>> svc_bssto.add(cv1)
             False
-            >>> svc_cv.info
+            >>> svc_bssto.info
             'Exists File'
             >>> f1.close()
             >>> f2.close()
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        assert cvobj.metadata['id']
+        assert baseobject.metadata['id']
         if self.unique_checker is None:
             self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
         self.unique_checker.update()
-        if unique is True and self.unique_checker.unique(cvobj.metadata) is False:
-            self.info = "Exists File"
-            return False
-        name = core.outputstorage.ConvertName(cvobj.metadata['id'])
-        message = "Add CV: %s data." % name
-        self.interface.add(name.md, cvobj.data, message=message, committer=committer)
-        if yamlfile is True:
-            cvobj.metadata['committer'] = committer
-            cvobj.metadata['date'] = time.time()
-            message = "Add company: %s metadata." % name
-            self.interface.add(name.yaml, yaml.safe_dump(cvobj.metadata, allow_unicode=True),
-                               message=message, committer=committer)
-        self._nums += 1
-        return True
+        return self.unique_checker.unique(baseobject.metadata)
 
     def add_md(self, cvobj, committer=None):
         """
@@ -139,49 +104,6 @@ class CurriculumVitae(services.base.Service):
         self.interface.modify(filename, stream, message, committer)
         return True
 
-    def yamls(self):
-        """
-            >>> import interface.basefs
-            >>> import services.curriculumvitae
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, DIR)
-            >>> assert SVC_CV.interface.lsfiles('.', 'blr6dter.yaml')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, DIR)
-            >>> assert SVC_CV.interface.lsfiles('.', 'blr6dter.yaml')
-        """
-        yamls = self.interface.lsfiles('.', '*.yaml')
-        for each in yamls:
-            yield os.path.split(each)[-1]
-
-    def names(self):
-        for each in self.yamls():
-            yield core.outputstorage.ConvertName(each).md
-
-    def datas(self):
-        for name in self.names():
-            text = self.getmd(name)
-            yield name, text
-
-    def search(self, keyword):
-        results = set()
-        allfile = self.interface.grep(keyword)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            results.add(id)
-        return results
-
-    def search_yaml(self, keyword):
-        results = set()
-        allfile = self.interface.grep_yaml(keyword)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            results.add(id)
-        return results
-
     def gethtml(self, name):
         htmlname = core.outputstorage.ConvertName(name).html
         result = self.interface.getraw(htmlname)
@@ -189,31 +111,6 @@ class CurriculumVitae(services.base.Service):
             md = self.getmd(name)
             if md is not None:
                 result = core.docprocessor.md_to_html(md)
-        return result
-
-    def getmd(self, name):
-        """
-            >>> import interface.basefs
-            >>> import services.curriculumvitae
-            >>> DIR = 'repo'
-            >>> DB = interface.basefs.BaseFSInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
-            >>> assert SVC_CV.getmd('blr6dter.yaml')
-
-            >>> import interface.gitinterface
-            >>> DB = interface.gitinterface.GitInterface(DIR)
-            >>> SVC_CV = services.curriculumvitae.CurriculumVitae(DB.path, 'repo')
-            >>> assert SVC_CV.getmd('blr6dter.yaml')
-        """
-        result = unicode()
-        md = core.outputstorage.ConvertName(name).md
-        markdown = self.interface.get(md)
-        if markdown is None:
-            result = None
-        elif isinstance(markdown, unicode):
-            result = markdown
-        else:
-            result = unicode(str(markdown), 'utf-8')
         return result
 
 
@@ -233,13 +130,6 @@ class CurriculumVitae(services.base.Service):
         yaml_str = self.interface.get(name)
         return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
-    @property
-    def NUMS(self):
-        if not self._nums:
-            self._nums = len(list(self.yamls()))
-        return self._nums
-
-    @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
         data = None
         projectinfo = self.getinfo(id)
@@ -296,11 +186,6 @@ class CurriculumVitae(services.base.Service):
         dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(name, dumpinfo, message=message, committer=committer)
-
-    @property
-    def ids(self):
-        return [os.path.splitext(f)[0]
-                for f in self.interface.lsfiles('.', '*.yaml')]
 
     def addcv(self, id, data, yamldata, rawdata=None):
         cn_id = core.outputstorage.ConvertName(id)

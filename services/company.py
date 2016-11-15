@@ -4,11 +4,11 @@ import yaml
 
 import utils._yaml
 import core.outputstorage
-import services.base
 import services.exception
+import services.base.storage
 
 
-class Company(services.base.Service):
+class Company(services.base.storage.BaseStorage):
     """
         >>> import shutil
         >>> import services.company
@@ -29,10 +29,8 @@ class Company(services.base.Service):
         >>> co['introduction']
         'This is Co.A'
         >>> svc_co.add(coobj, 'Dever') # doctest: +ELLIPSIS
-        Traceback (most recent call last):
-        ...
-        ExistsCompany: CompanyA
-        >>> list(svc_co.names())
+        False
+        >>> list(svc_co.ids)
         ['4de25a98bc371bf87220e500215317f4b2c24933']
         >>> svc_co.getyaml('CompanyB') # doctest: +ELLIPSIS
         Traceback (most recent call last):
@@ -40,42 +38,7 @@ class Company(services.base.Service):
         NotExistsCompany
         >>> shutil.rmtree(repo_name)
     """
-    CO_DIR = 'CO'
-
-    def __init__(self, path, name=None):
-        self.path = os.path.join(path, self.CO_DIR)
-        super(Company, self).__init__(self.path, name)
-        self._nums = 0
-
-    def exists(self, id):
-        return id in self.ids
-
-    def add(self, coobj, committer=None, unique=True, yamlfile=True):
-        name = core.outputstorage.ConvertName(coobj.metadata['id'])
-        if unique is True and self.exists(name.base):
-            raise services.exception.ExistsCompany('%s' % coobj)
-        message = "Add company: %s data." % name
-        self.interface.add(name.md, coobj.data, message=message, committer=committer)
-        if yamlfile is True:
-            coobj.metadata['committer'] = committer
-            coobj.metadata['date'] = time.time()
-            message = "Add company: %s metadata." % name
-            self.interface.add(name.yaml, yaml.safe_dump(coobj.metadata, allow_unicode=True),
-                               message=message, committer=committer)
-        self._nums += 1
-        return True
-
-    def getmd(self, name):
-        result = unicode()
-        md = core.outputstorage.ConvertName(name).md
-        markdown = self.interface.get(md)
-        if markdown is None:
-            result = None
-        elif isinstance(markdown, unicode):
-            result = markdown
-        else:
-            result = unicode(str(markdown), 'utf-8')
-        return result
+    commitinfo = 'Company'
 
     def getyaml(self, id):
         name = core.outputstorage.ConvertName(id).yaml
@@ -86,26 +49,3 @@ class Company(services.base.Service):
         except IOError:
             raise services.exception.NotExistsCompany
         return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
-
-    def yamls(self):
-        for id in self.ids:
-            yield core.outputstorage.ConvertName(id).yaml
-
-    def names(self):
-        return self.ids
-
-    def datas(self):
-        for id in self.ids:
-            text = self.getmd(id)
-            yield id, text
-
-    @property
-    def ids(self):
-        return [os.path.splitext(f)[0]
-                for f in self.interface.lsfiles('.', '*.yaml')]
-
-    @property
-    def NUMS(self):
-        if not self._nums:
-            self._nums = len(list(self.yamls()))
-        return self._nums

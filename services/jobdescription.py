@@ -4,10 +4,10 @@ import os.path
 
 import yaml
 
-import services.base
+import services.base.service
 
 
-class JobDescription(services.base.Service):
+class JobDescription(services.base.service.Service):
     """
         >>> import shutil
         >>> import services.company
@@ -34,18 +34,14 @@ class JobDescription(services.base.Service):
         ('CompanyA', 'JD-B description')
         >>> shutil.rmtree(repo_name)
     """
-    path = 'JD'
 
     def __init__(self, interface, name=None):
         super(JobDescription, self).__init__(interface, name)
-        self.repo_path = self.interface.repo.path + "/" + self.path
-        if not os.path.exists(self.repo_path):
-            os.makedirs(self.repo_path)
+        self.path = self.interface.path
 
     def get(self, hex_id):
         name = self.filename(hex_id)
-        path_name = os.path.join(self.path, name)
-        yaml_str = self.interface.get(path_name)
+        yaml_str = self.interface.get(name)
         return yaml.load(yaml_str)
 
     def add(self, company, name, description, committer, status=None):
@@ -63,8 +59,7 @@ class JobDescription(services.base.Service):
             'status': status
         }
         filename = self.filename(hex_id)
-        file_path = os.path.join(self.repo_path, filename)
-        self.interface.add(os.path.join(self.path, filename),
+        self.interface.add(filename,
                            yaml.safe_dump(data, allow_unicode=True),
                            "Add job description file: " + filename)
         return True
@@ -77,7 +72,7 @@ class JobDescription(services.base.Service):
         data['status'] = status
         data['description'] = description
         dump_data = yaml.safe_dump(data, allow_unicode=True)
-        self.interface.modify(os.path.join(self.path, filename), dump_data,
+        self.interface.modify(filename, dump_data,
                               message="Modify job description: " + filename,
                               committer=committer)
         return True
@@ -87,13 +82,13 @@ class JobDescription(services.base.Service):
 
     def search(self, keyword):
         results = list()
-        for name in self.interface.grep_yaml(keyword, self.path):
+        for name in self.interface.grep_yaml(keyword):
             results.append(os.path.splitext(name)[0])
         return results
 
     def lists(self):
         results = []
-        for pathfile in glob.glob(os.path.join(self.repo_path, '*.yaml')):
+        for pathfile in glob.glob(os.path.join(self.path, '*.yaml')):
             filename = pathfile.split('/')[-1]
             hex_id = os.path.splitext(filename)[0]
             data = self.get(hex_id)

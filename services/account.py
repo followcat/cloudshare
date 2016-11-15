@@ -3,12 +3,12 @@ import os.path
 import yaml
 
 import utils.builtin
-import services.base
+import services.base.service
 import services.exception
 import core.outputstorage
 
 
-class Account(services.base.Service):
+class Account(services.base.service.Service):
     """
         >>> import shutil
         >>> import services.account

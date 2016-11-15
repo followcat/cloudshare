@@ -3,30 +3,33 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
-import services.base
 import services.company
 import services.exception
+import services.base.service
 import services.simulationcv
 import services.curriculumvitae
 import services.jobdescription
 
 
-class Project(services.base.Service):
+class Project(services.base.service.Service):
 
+    CV_PATH = 'CV'
+    JD_PATH = 'JD'
     config_file = 'config.yaml'
 
     def __init__(self, path, corepo, cvrepo, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
-        cvpath = os.path.join(path, services.simulationcv.SimulationCV.SAVE_DIR)
+        cvpath = os.path.join(path, self.CV_PATH)
+        jdpath = os.path.join(path, self.JD_PATH)
         idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
         if os.path.exists(cvpath) and not os.path.exists(idsfile):
-            self.curriculumvitae = services.curriculumvitae.CurriculumVitae(self.path)
+            self.curriculumvitae = services.curriculumvitae.CurriculumVitae(cvpath)
         else:
-            self.curriculumvitae = services.simulationcv.SimulationCV(self.path, name,
+            self.curriculumvitae = services.simulationcv.SimulationCV(cvpath, name,
                                                                       cvrepo)
         self.company = corepo
-        self.jobdescription = services.jobdescription.JobDescription(path)
+        self.jobdescription = services.jobdescription.JobDescription(jdpath)
         self.config = dict()
         try:
             self.load()
@@ -100,7 +103,7 @@ class Project(services.base.Service):
         return self.company.getyaml(name)
 
     def company_names(self):
-        return self.company.names()
+        return self.company.ids
 
     def jd_get(self, hex_id):
         return self.jobdescription.get(hex_id)
@@ -120,3 +123,17 @@ class Project(services.base.Service):
 
     def jd_lists(self):
         return self.jobdescription.lists()
+
+    def backup(self, path, bare=True):
+        project_path = os.path.join(path, 'project')
+        cv_path = os.path.join(path, 'curriculumvitae')
+        jd_path = os.path.join(path, 'jobdescription')
+        co_path = os.path.join(path, 'company')
+        utils.builtin.assure_path_exists(project_path)
+        utils.builtin.assure_path_exists(cv_path)
+        utils.builtin.assure_path_exists(jd_path)
+        utils.builtin.assure_path_exists(co_path)
+        self.interface.backup(project_path, bare=bare)
+        self.curriculumvitae.backup(cv_path, bare=bare)
+        self.jobdescription.backup(jd_path, bare=bare)
+        self.company.backup(co_path, bare=bare)

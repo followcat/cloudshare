@@ -10,6 +10,11 @@ import jieba
 import jieba.posseg
 
 
+def assure_path_exists(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 def industrytopath(industry):
     return industry.replace('/', '-')
 

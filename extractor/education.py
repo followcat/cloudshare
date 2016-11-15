@@ -14,7 +14,9 @@ PFXED = re.compile(with_prefix(ED), re.DOTALL+re.M)
 PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
 
 
-SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+ASP+u'*[\n'+SP+FIELDSEP+u']*'+SCHOOL+u'[\n'+SP+FIELDSEP+u']+(?P<major>[^'+SP+u'\n]+)[\n'+SP+FIELDSEP+u']+'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
+SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+u'[\n'+SP+FIELDSEP+u']+'+SCHOOL+ASP+u'*(?P<sep>['+FIELDSEP+u'])'+ASP+u'*(?P<major>[^'+FIELDSEP+u'\n]+)'+ASP+u'*(?P=sep)'+ASP+u'*'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
+SENSEDROP = u'((\S+)[\n'+SP+FIELDSEP+u']*)?'
+RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+FIELDSEP+u']+'+u'(?P<major>[^'+FIELDSEP+u'\n]+)'+ASP+u'*(?P<sep>['+FIELDSEP+u'])'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*(?P=sep)'+ASP+u'*'+SENSEDROP+u'$', re.M)
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
 SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
@@ -39,8 +41,6 @@ PFXHDCTLMA = re.compile(with_prefix(HDCTLMA), re.M)
 PFXRVHDCTLMA = re.compile(with_prefix(RVHDCTLMA), re.M)
 
 NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
-SENSEDROP = u'((\S+)[\n'+SP+FIELDSEP+u']*)?'
-RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+FIELDSEP+u']+'+ASP+u'*(?P<major>[^'+SP+FIELDSEP+u']+)'+ASP+u'*['+FIELDSEP+u']'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*['+FIELDSEP+u']'+ASP+u'*'+SENSEDROP+u'$', re.M)
 
 TABHDRMAJ = u'^'+ASP+u'*时'+ASP+u'*间段?'+ASP+u'+[院学]'+ASP+u'*校('+ASP+u'*名'+ASP+u'*称)?'+ASP+u'+专'+ASP+u'*业'+ASP+u'+(获得证书/)?学'+ASP+u'*历(/学位)?('+ASP+u'+证'+ASP+u'*书)?('+ASP+u'+是否统招)?(?P<edu>.+)'
 

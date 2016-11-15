@@ -114,7 +114,7 @@ class UploadEnglishCVAPI(Resource):
         self.svc_mult_cv.modify(id + '.yaml', yaml.safe_dump(yaml_data, allow_unicode=True),
                                 committer=user.id)
         user.uploadeng = None
-        en_html = self.svc_mult_cv.getproject(project).getmd_en(id)
+        en_html = self.svc_mult_cv.getproject(project).cv_getmd_en(id)
         return { 'code': 200, 'data': { 'status': result, 'en_html': en_html } }
 
     def post(self):

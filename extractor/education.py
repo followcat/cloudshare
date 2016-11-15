@@ -40,7 +40,7 @@ PFXRVHDCTLMA = re.compile(with_prefix(RVHDCTLMA), re.M)
 
 NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
 SENSEDROP = u'((\S+)[\n'+SP+FIELDSEP+u']*)?'
-RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+FIELDSEP+u']+(?P<major>[^'+SP+FIELDSEP+u'\n]+)[\n'+SP+FIELDSEP+u']+'+SENSEDROP+u''+EDUCATION+u'[\n'+SP+FIELDSEP+u']+'+SENSEDROP+u'$', re.M)
+RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+FIELDSEP+u']+'+ASP+u'*(?P<major>[^'+SP+FIELDSEP+u']+)'+ASP+u'*['+FIELDSEP+u']'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*['+FIELDSEP+u']'+ASP+u'*'+SENSEDROP+u'$', re.M)
 
 TABHDRMAJ = u'^'+ASP+u'*时'+ASP+u'*间段?'+ASP+u'+[院学]'+ASP+u'*校('+ASP+u'*名'+ASP+u'*称)?'+ASP+u'+专'+ASP+u'*业'+ASP+u'+(获得证书/)?学'+ASP+u'*历(/学位)?('+ASP+u'+证'+ASP+u'*书)?('+ASP+u'+是否统招)?(?P<edu>.+)'
 
@@ -137,6 +137,7 @@ def education_xp(text, summary=None):
         >>>     #TODO 本科 学士 makes one for education and the other for major
         >>> assert not education_xp(u'2003年9月---2008年6月：华北煤炭医学院')[1]  #FIXME
         >>> assert not education_xp(u'最高学位：硕士 2009年11月\\n\\n毕业院校：巴斯大学（英国）中英口笔译')[0]  #FIXME
+        >>> assert 2 == education_xp(u'2010.09 - 2013.07  能科学研究院  原子核物理\\n 硕士2006.09 - 2010.07  理工大学  飞行器设计  本科')[0]
     """
     maj = 0
     out = []

@@ -22,8 +22,8 @@ class CurrivulumvitaeAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        html = self.svc_mult_cv.getproject(project).cv_gethtml(id)
-        yaml = self.svc_mult_cv.getproject(project).cv_getyaml(id)
+        html = self.svc_mult_cv.gethtml(id, projectname=project)
+        yaml = self.svc_mult_cv.getyaml(id, projectname=project)
         user = flask.ext.login.current_user
         result = user.getbookmark()
         if yaml['id'] in result:
@@ -32,7 +32,7 @@ class CurrivulumvitaeAPI(Resource):
             yaml['collected'] = False
         en_html = ''
         if 'enversion' in yaml:
-            en_html = self.svc_mult_cv.getproject(project).getmd_en(id)
+            en_html = self.svc_mult_cv.getproject(project).cv_getmd_en(id)
         return { 'code': 200, 'data': { 'html': html, 'en_html': en_html, 'yaml_info': yaml } }
 
 

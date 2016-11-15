@@ -14,9 +14,9 @@ PFXED = re.compile(with_prefix(ED), re.DOTALL+re.M)
 PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
 
 
-SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+u'[\n'+SP+FIELDSEP+u']*'+SCHOOL+ASP+u'*(?P<sep>['+FIELDSEP+u'])'+ASP+u'*(?P<major>[^'+FIELDSEP+u'\n]+)'+ASP+u'*(?P=sep)'+ASP+u'*'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
-SENSEDROP = u'((\S+)[\n'+SP+FIELDSEP+u']*)?'
-RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+FIELDSEP+u']*'+u'(?P<major>[^'+FIELDSEP+u'\n]+)'+ASP+u'*(?P<sep>['+FIELDSEP+u'])'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*(?P=sep)'+ASP+u'*'+SENSEDROP+u'$', re.M)
+SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+SCHOOL+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P=sep)'+ASP+u'*'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
+SENSEDROP = u'((\S+)[\n'+SP+EDUFIELDSEP+u']*)?'
+RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+u'(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*(?P=sep)'+ASP+u'*'+SENSEDROP+u'$', re.M)
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
 SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
@@ -131,6 +131,8 @@ def education_xp(text, summary=None):
         >>> assert u'广' in name(school_1(education_xp(u'''2001.09-2004.06        广东省广宁中学           高中''')))
         >>> assert education_xp(u'2010-9 至 2014-7   软件工程中山大学\\n\\n本科 丨GPA：3.7 丨班级名次：前30名')[1]
         >>> assert '|' not in major(school_1(education_xp(u'''工业学院\\n\\n2001年9月-2005年7月\\n\\n 无机非金属材料| 材料类| 本科 |济南''')))
+        >>> assert education_xp(u'1.  2006年9月—2010年7 月，天津科技大学，机械设计制造及自动化，本科')
+        >>> assert education_xp(u'2007/09-2010/03 天津科技大学，农产品加工及贮藏工程， 硕士学位')
         >>> assert not education_xp(u'''2005.09-2009.07         湖南工程学院      大学本科\\n其自动化''')[0]    #FIXME
         >>> assert not education_xp(u'2001 /9--2005 /7   华中农业大学   计算机科学与技术')[0]  #FIXME
         >>> assert not education_xp(u'2005 /9--2009 /7   广东药学院   生物技术（制药方向）')[0] #FIXME

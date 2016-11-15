@@ -19,9 +19,10 @@ PERIOD = u'(?P<from>' + _PDATE.replace('__DATE_SEP__', FDSEP) + ur')' + DATESEP 
 DURATION = ur'(?P<duration>(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(?:['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
-FIELDSEP = ur'、，：:；;\|'
+FIELDSEP = ur'、：:；;\|'
 ENDLINESEP = u'。'
 SENTENCESEP = FIELDSEP+ENDLINESEP
+EDUFIELDSEP = u'，'+FIELDSEP
 
 exclude_with_parenthesis = lambda x: u'(?:'+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
@@ -61,7 +62,7 @@ education_list = {
 LIST_SEPARATOR = u')|(?:'
 EDUCATION_LIST = {}
 for k,v in education_list.items():
-    EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))')
+    EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ LIST_SEPARATOR.join([_v+u'(学位)?' for _v in v]) +u'))')
 
 def education_rate(education):
     u"""
@@ -75,8 +76,8 @@ def education_rate(education):
     else:
         return 0
 
-EDUCATION = u'(?P<education>(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))' for v in education_list.values()]) +u'))'
-SCHOOL = u'(?P<school>(\s?\w)+|([^'+SP+FIELDSEP+u']+'+ASP+u'*'+exclude_with_parenthesis('')+u'?))'
+EDUCATION = u'(?P<education>(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join([_v+u'(学位)?' for _v in v]) +u'))' for v in education_list.values()]) +u'))'
+SCHOOL = u'(?P<school>(\s?\w)+|([^'+SP+EDUFIELDSEP+u']+'+ASP+u'*'+exclude_with_parenthesis('')+u'?))'
 
 GENDER = u'(?P<gender>男|女)'
 MARITALSTATUS = u'(?P<marital_status>(未婚)|(已婚))'

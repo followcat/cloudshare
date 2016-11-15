@@ -141,7 +141,6 @@ class GitInterface(interface.base.Interface):
     def grep(self, restrings, path='', files=None):
         if files is None:
             files = []
-        files_list = ' '.join(files)
         grep_list = []
         keywords = restrings.split()
         if keywords:
@@ -149,7 +148,7 @@ class GitInterface(interface.base.Interface):
             for each in keywords:
                 command.append('-e')
                 command.append(each.encode('utf-8'))
-            command.append(files_list)
+            command.extend(files)
             p = subprocess.Popen(command,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,

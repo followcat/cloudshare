@@ -72,8 +72,6 @@ BPO = re.compile(u'^(?P<aposition>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'
 LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\n'+ASP+u'*((下属人数)|(所在地区)|(汇报对象)|(所在部门))：.*$', re.M)
 RESPPO = re.compile(u'^职责：(?P<position>'+POSITION+u')\n(?P<field>\S+?)\| 企业性质：\S+?\| 规模：'+AEMPLOYEES+'$', re.M)
 
-COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\(非欧美\)|代表处|股份制'
-COMPANY_TYPE = u'(([^/\|\n\- ：]*?(('+COMPANY_TYPE_KEYWORD+u')[^\|\n\- ]*)+)|(其他))'
 pos_company_business = lambda RE:RE.pattern+u'(\n'+ASP+u'*(?!所属行业：)'+POASP+u'*(((?P<title>企业性质：)?'+COMPANY_TYPE+u')|('+POASP+u'*\|'+POASP+u'*)|(?P<business>[^\|\n\-： ]+?)(?=[\|\n ])){1,3}(?(title)('+POASP+u'*\|'+POASP+u'*(规模：)?'+AEMPLOYEES+u')?|('+POASP+u'*\|'+POASP+u'*(规模：)?'+AAEMPLOYEES+u'))\n)?'
 
 NOBRPOS = POSITION.replace(u'：', u'（）：'+ENDLINESEP)

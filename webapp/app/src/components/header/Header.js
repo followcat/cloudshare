@@ -26,9 +26,7 @@ class Header extends Component {
           <div className={`${props.prefixCls}-logo`} style={this.getLogoStyle()}>
             <img src={LogoImg} alt="logo" />
           </div>
-          <div className={`${props.prefixCls}-right`}>
-            {props.children}
-          </div>
+          {props.children}
         </div>
       </div>
     );

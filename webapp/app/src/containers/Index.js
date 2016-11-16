@@ -88,6 +88,7 @@ export default class Index extends Component {
       <Home>
         <Header logoMode="center">
           <Feature
+            style={{ position: 'absolute', right: 0, top: 0 }}
             visible={this.state.visible}
             dataSource={this.state.dataSource}
             onClick={this.handleFeatureClick}

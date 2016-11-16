@@ -7,6 +7,8 @@ import ResumeToolMenu from './ResumeToolMenu';
 import Summary from '../common/Summary';
 import ResumeContent from '../common/ResumeContent';
 
+import { getSourceURL } from '../../utils/source';
+
 export default class ResumeWrapper extends Component {
 
   constructor(props) {
@@ -41,6 +43,12 @@ export default class ResumeWrapper extends Component {
           <div className="cs-resume-header-info">
             <label>Uploader: </label>
             <span>{this.props.dataSource.committer}</span>
+          </div>
+          <div className="cs-resume-header-info">
+            {this.props.dataSource.committer === 'SCRAPPY'
+              ? <a href={getSourceURL(this.props.dataSource.origin, this.props.dataSource.filename)}>Click to the source cv</a>
+              : null
+            }
           </div>
         </div>
         <div className="cv-resume-content">

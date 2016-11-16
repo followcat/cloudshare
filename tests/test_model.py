@@ -17,7 +17,7 @@ with open(kgr_file) as f:
     datas = yaml.load(f)
 
 
-def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterdict=None, percentage=100):
+def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterdict=None, percentage=100, above_allow=False):
     """
         >>> from tests.test_model import *
         >>> from webapp.settings import *
@@ -25,6 +25,7 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
         >>> sim = SVC_MIN.sim['medical']['medical']
         >>> assert kgr_perfect('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim)
         >>> assert kgr_good('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
+        >>> assert kgr_poor('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim, above_allow=True)
         >>> assert kgr_poor('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim)
         >>> assert kgr_bad('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim)
         >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=33)
@@ -41,13 +42,13 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
     if percentage == PERFECT:
         return success_count == len(cvs)
     elif percentage == GOOD:
-        return len(cvs)*0.5 <= success_count < len(cvs)
+        return len(cvs)*0.5 <= success_count and (success_count < len(cvs) or above_allow)
     elif percentage == POOR:
-        return len(cvs)*0.25 <= success_count < len(cvs)*0.5
+        return len(cvs)*0.25 <= success_count and (success_count < len(cvs)*0.5 or above_allow)
     elif percentage == BAD:
-        return success_count == 0
+        return success_count == 0 or above_allow
     elif 0 < percentage < 100:
-        return len(cvs)*float(percentage)/100 <= success_count < len(cvs)
+        return len(cvs)*float(percentage)/100 <= success_count and (success_count < len(cvs) or above_allow)
 
 kgr_perfect = functools.partial(kgr_percentage, percentage=PERFECT)
 kgr_good = functools.partial(kgr_percentage, percentage=GOOD)

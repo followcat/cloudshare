@@ -17,7 +17,7 @@ class Header extends Component {
 
     let classes = props.prefixCls;
     if (props.fixed) {
-      classes += `${props.prefixCls}-fixed`;
+      classes = `${classes} ${props.prefixCls}-fixed`;
     }
 
     return (

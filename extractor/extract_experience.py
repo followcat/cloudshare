@@ -210,6 +210,8 @@ def find_xp(RE, text):
         >>> assert positions(find_xp(TCO, u'2000-11 ～ 2010-04  深圳安科高技术股份有限公司\\n担任职位：\\n 研发项目经理；从事大'))
         >>> assert positions(find_xp(TCO, u'2012/03-2014/03     武汉维斯第医用科技有限公司\\n部门：南区办事处       职位：分销专员'))
         >>> assert positions(find_xp(TCO, u'2005/04-2008/12       浙江省衢州市衢江区人民医院(二甲)\\n科室：手外科    职位：手外科医师'))
+        >>> assert 1 == len(companies(find_xp(TCO, u'2005/11 - 2010/3：DELL（500-1000人）\\n所属行业：计算机硬件\\n职位：系统测试\\n'
+        ...     u'  2005/11—2010/3 ｜ DELL ｜系统测试工程师')))
     """
     pos = 0
     if not pos:

@@ -136,7 +136,6 @@ class LSIsimilarity(object):
             >>> assert kgr_bad('8c43b5343c4511e680994ccc6a30cd76', jd_service, sim)
 
         HHMT new:
-            >>> assert kgr_bad('2fe1c53a231b11e6b7096c3be51cefca', jd_service, sim, cvs=['3hffapdz', '2x5wx4aa'])
             >>> assert kgr_bad('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim, cvs=['2hw11q81', '8z3fxnr7', 'ltpyt2hp'])
             >>> assert kgr_bad('2898a70a3f6111e6b68d4ccc6a30cd76', jd_service, sim, cvs=['mjm6vl3k'])
             >>> assert kgr_bad('437958560b5b11e6aaa86c3be51cefca', jd_service, sim, cvs=['hy24julz'])

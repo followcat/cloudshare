@@ -45,6 +45,11 @@ co_template = (
     ("introduction",        str),
 )
 
+peop_template = (
+    ("id",                  str),
+    ("cv",                  list),
+)
+
 
 def generate_info_template(template):
     info = {}
@@ -293,6 +298,21 @@ def catch_coinfo(stream, name):
     if isinstance(stream, dict):
         try:
             info['introduction'] = stream['introduction']
+        except KeyError:
+            pass
+    return info
+
+def catch_peopinfo(stream, name):
+    """
+        >>> intro = {'id': '00yd4ww2', 'unique_id': 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'}
+        >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['id'] == 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'
+        >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['cv'] == ['00yd4ww2']
+    """
+    info = generate_info_template(peop_template)
+    info['id'] = name
+    if isinstance(stream, dict):
+        try:
+            info['cv'].append(stream['id'])
         except KeyError:
             pass
     return info

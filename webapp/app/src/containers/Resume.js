@@ -298,6 +298,10 @@ export default class Resume extends Component {
    * @return {[void]} 
    */
   handleDrawChartSubmit(object) {
+    if (!object.value) {
+      message.error('Please select a job description!');
+      return;
+    }
     const requestParam = object.type === 'id' ? { id: object.value } : { doc: object.value },
           cvId = this.state.id;
     fetch(`/api/mining/valuable`, {

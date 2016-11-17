@@ -18,9 +18,10 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300, tfidf_local=None, slicer=None):
+    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300, power_iters=6, tfidf_local=None, slicer=None):
         self.path = savepath
         self.topics = topics
+        self.power_iters = power_iters
         self.no_above = no_above
         if slicer:
             self.slicer = slicer
@@ -101,7 +102,7 @@ class LSImodel(object):
         corpu_tfidf = tfidf[[corpu]]
         if self.lsi is None:
             self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
-                            num_topics=self.topics, power_iters=6, extra_samples=self.extra_samples)
+                            num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
         else:
             self.lsi.add_documents(corpu_tfidf)
 
@@ -229,7 +230,7 @@ class LSImodel(object):
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=6, extra_samples=self.extra_samples)
+                                   num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
 
     def probability(self, doc):
         u"""

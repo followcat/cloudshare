@@ -37,7 +37,7 @@ def build_lsimodel(path, slicer, names=None, texts=None, no_above=1.,
     m = core.mining.lsimodel.LSImodel(path,
                                       no_above=no_above,
                                       topics=topics,
-                                      extra_samples=0,
+                                      extra_samples=extra_samples,
                                       tfidf_local=tfidf_local,
                                       slicer=slicer)
     try:

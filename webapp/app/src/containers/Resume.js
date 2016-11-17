@@ -134,6 +134,7 @@ export default class Resume extends Component {
         this.setState({
           tag: tagList,
         });
+        message.success(json.message);
       } else {
         message.error(json.message);
       }
@@ -167,6 +168,7 @@ export default class Resume extends Component {
         this.setState({
           tracking: followUpList,
         });
+        message.success(json.message);
       } else {
         message.error(json.message);
       }
@@ -199,6 +201,7 @@ export default class Resume extends Component {
         this.setState({
           comment: commentList,
         });
+        message.success(json.message);
       } else {
         message.error(json.message);
       }

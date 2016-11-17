@@ -107,7 +107,7 @@ class UploadEnglishCVAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        yaml_data = self.svc_mult_cv.getproject(project).getyaml(id)
+        yaml_data = self.svc_mult_cv.getproject(project).cv_getyaml(id)
         dataobj = uploadeng[user.id]
         result = self.svc_mult_cv.add_md(dataobj, user.id)
         yaml_data['enversion'] = dataobj.ID.md

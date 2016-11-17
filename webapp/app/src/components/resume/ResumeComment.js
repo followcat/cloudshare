@@ -37,6 +37,7 @@ class ResumeComment extends Component {
       }
       this.props.onSubmitComment(values);
     });
+    this.props.form.resetFields();
   }
 
   render() {

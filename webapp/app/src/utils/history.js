@@ -43,12 +43,13 @@ const dateFormat = (fmt, date) => {
  * @return {int} index [返回的索引位置,未找到返回-1]
  */
 const findIndexWithId = (id, storage) => {
-  storage.forEach((item, index) => {
+  let index = -1;
+  storage.forEach((item, i) => {
     if (item.id === id) {
-      return index;
+      index = i;
     }
   });
-  return -1;
+  return index;
 };
 
 const History = {
@@ -60,7 +61,6 @@ const History = {
   write: (object) => {
     let historyStorage = (localStorage.getItem('history') && JSON.parse(localStorage.getItem('history'))) || [];
 
-    console.log(new Date());
     object.time = dateFormat('yyyy-MM-dd hh:mm:ss', new Date());
 
     const index = findIndexWithId(object.id, historyStorage);

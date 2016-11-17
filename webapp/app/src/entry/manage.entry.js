@@ -8,7 +8,7 @@ import 'babel-polyfill';
 import enUS from 'antd/lib/locale-provider/en_US';
 import { LocaleProvider } from 'antd';
 
-import Manage from '../containers/Manage';
+import Manage from '../views/Manage';
 import UserList from '../components/manage/UserList';
 import Setting from '../components/manage/Setting';
 

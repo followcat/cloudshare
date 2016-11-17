@@ -8,7 +8,7 @@ import 'babel-polyfill';
 import enUS from 'antd/lib/locale-provider/en_US';
 import { LocaleProvider } from 'antd';
 
-import ListJD from '../containers/ListJD';
+import ListJD from '../views/ListJD';
 import JobDescription from '../components/listjd/JobDescription';
 import Company from '../components/listjd/Company';
 

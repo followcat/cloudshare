@@ -48,6 +48,21 @@ class BaseStorage(services.base.service.Service):
         self._nums += 1
         return True
 
+    def getyaml(self, id):
+        """
+        Expects an IOError exception if file not found.
+            >>> import services.base.storage
+            >>> DIR = 'services/test_repo'
+            >>> SVC_BSSTO = services.base.storage.BaseStorage(DIR)
+            >>> SVC_BSSTO.getyaml('CV') # doctest: +ELLIPSIS
+            Traceback (most recent call last):
+            ...
+            IOError...
+        """
+        name = core.outputstorage.ConvertName(id).yaml
+        yaml_str = self.interface.get(name)
+        return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
+
     def getmd(self, name):
         """
             >>> import services.base.storage

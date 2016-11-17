@@ -253,7 +253,7 @@ class LSImodel(object):
             >>> assert not fatten_words.count(u'通用电气') < 13 #FIXME
             >>> assert not fatten_words.count(u'常州') < 14 #FIXME
             >>> assert not fatten_words.count(u'加速器') < 13 #FIXME
-            >>> assert not fatten_words.count(u'ge') < 13 #FIXME
+            >>> assert fatten_words.count(u'ge') < 13
             >>> assert not fatten_words.count(u'大专') < 13 #FIXME
             >>> assert not fatten_words.count(u'南京') < 13 #FIXME
 
@@ -264,10 +264,10 @@ class LSImodel(object):
             >>> fatten_words = compiler.ast.flatten(words)
             >>> assert u'飞机' in model.dictionary.values()
             >>> assert u'航天' in model.dictionary.values()
-            >>> assert not u'航空' in model.dictionary.values() #FIXME
+            >>> assert u'航空' in model.dictionary.values() #FIXME
             >>> assert not u'飞机' in fatten_words #FIXME
             >>> assert not u'航天' in fatten_words #FIXME
-            >>> assert not u'航空' in fatten_words #FIXME
+            >>> assert u'航空' in fatten_words #FIXME
             >>> assert u'物流' in model.dictionary.values()
             >>> assert u'物流' in fatten_words
             >>> assert u'律师' in model.dictionary.values()

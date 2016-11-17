@@ -110,6 +110,11 @@ class CurriculumVitae(services.base.storage.BaseStorage):
                 result = core.docprocessor.md_to_html(md)
         return result
 
+    def getmd_en(self, id):
+        yamlinfo = self.getyaml(id)
+        veren = yamlinfo['enversion']
+        return self.gethtml(veren)
+
     def updateinfo(self, id, key, value, committer):
         data = None
         projectinfo = self.getinfo(id)

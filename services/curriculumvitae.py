@@ -21,13 +21,11 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> import os.path
             >>> import core.basedata
             >>> import core.docprocessor
-            >>> import interface.gitinterface
             >>> import services.curriculumvitae
             >>> import extractor.information_explorer
-            >>> repo_name = 'services/test_repo'
+            >>> DIR = 'services/test_repo'
             >>> test_path = 'services/test_output'
-            >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_bssto = services.curriculumvitae.CurriculumVitae(interface.path)
+            >>> svc_bssto = services.curriculumvitae.CurriculumVitae(DIR)
             >>> f1 = open('core/test/cv_1.doc', 'r')
             >>> f2 = open('core/test/cv_2.doc', 'r')
             >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
@@ -54,7 +52,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             'Exists File'
             >>> f1.close()
             >>> f2.close()
-            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(DIR)
             >>> shutil.rmtree(test_path)
         """
         assert baseobject.metadata['id']
@@ -69,15 +67,13 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> import shutil
             >>> import os.path
             >>> import core.basedata
-            >>> import interface.gitinterface
             >>> import services.curriculumvitae
             >>> import extractor.information_explorer
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> test_path = "services/test_output"
-            >>> repo_name = 'services/test_repo'
-            >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
+            >>> DIR = 'services/test_repo'
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(DIR)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
             >>> fp1 = core.docprocessor.Processor(obj, name, test_path)
@@ -93,7 +89,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> len(yaml_files)
             0
             >>> obj.close()
-            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(DIR)
             >>> shutil.rmtree(test_path)
         """
         name = core.outputstorage.ConvertName(cvobj.metadata['id'])
@@ -113,23 +109,6 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             if md is not None:
                 result = core.docprocessor.md_to_html(md)
         return result
-
-
-    def getyaml(self, id):
-        """
-        MultiCV expects an IOError exception if file not found.
-            >>> import interface.predator
-            >>> import services.curriculumvitae
-            >>> P = interface.predator.PredatorInterface('/tmp')
-            >>> PS = services.curriculumvitae.CurriculumVitae(P.path)
-            >>> PS.getyaml('CV.md') # doctest: +ELLIPSIS
-            Traceback (most recent call last):
-            ...
-            IOError...
-        """
-        name = core.outputstorage.ConvertName(id).yaml
-        yaml_str = self.interface.get(name)
-        return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
     def updateinfo(self, id, key, value, committer):
         data = None

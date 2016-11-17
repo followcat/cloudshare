@@ -162,9 +162,10 @@ def get_experience(stream, name=None):
     experiences = []
     current_company = None
     current_position = None
-    if name is None:
+    try:
+        assert name in fix_func
+    except AssertionError:
         name = 'default'
-    assert name in fix_func
 
     extracted_data = fix_func[name]()
     if extracted_data:

@@ -98,16 +98,20 @@ import extractor.information_explorer
 
 def get_explorer_name(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    if obj['origin'] == u'无忧精英爬取':
-        explorer_name = 'jingying'
-    elif obj['origin'] == u'智联卓聘爬取':
-        explorer_name = 'zhilian'
-    elif obj['origin'] == u'中华英才爬取':
-        explorer_name = 'yingcai'
-    elif obj['origin'] == u'猎聘爬取':
-        explorer_name = 'liepin'
-    else:
-        explorer_name = svc_cv.name
+    explorer_name = svc_cv.name
+    try:
+        if obj['origin'] == u'无忧精英爬取':
+            explorer_name = 'jingying'
+        elif obj['origin'] == u'智联卓聘爬取':
+            explorer_name = 'zhilian'
+        elif obj['origin'] == u'中华英才爬取':
+            explorer_name = 'yingcai'
+        elif obj['origin'] == u'猎聘爬取':
+            explorer_name = 'liepin'
+    except TypeError:
+        pass
+    except KeyError:
+        pass
     return explorer_name
 
 def update_selected(svc_cv, yamlname, selected):
@@ -117,7 +121,10 @@ def update_selected(svc_cv, yamlname, selected):
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
                                                          selected, explorer_name)
-    obj.update(info)
+    try:
+        obj.update(info)
+    except AttributeError:
+        obj = info
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)

@@ -14,6 +14,7 @@ import { resetPassword } from '../request/password';
 import { signOut } from '../request/sign';
 import { URL } from '../request/api';
 import { getMenu, getCurrentActive } from '../utils/sider-menu-list';
+import History from '../utils/history';
 import './user-info.less';
 
 export default class UserInfo extends Component {
@@ -92,7 +93,7 @@ export default class UserInfo extends Component {
   }
 
   getStorage() {
-    const storage = localStorage.getItem('history') && JSON.parse(localStorage.getItem('history'));
+    const storage = History.read();
     this.setState({
       storage: storage,
     });

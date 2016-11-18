@@ -11,6 +11,10 @@ export const API = {
   ADDITIONALS_API: `${HOST}/api/additionnames`,
 };
 
+export const getAPI = {
+  BOOKMARK_API: (id) => { return `${API.ACCOUNTS_API}/${id}/bookmark` },
+}
+
 export const URL = {
   getResumeURL: (id) => {
     return `/resume/${id}`; 

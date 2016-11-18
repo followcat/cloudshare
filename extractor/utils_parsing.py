@@ -40,12 +40,13 @@ SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|\u2013\u2015\u3002]+'
 
 JYCVSRC = re.compile(u'^'+ASP+u'*精英网用户$', re.M)
+NLPCVSRC = re.compile(u'^'+ASP+u'*-{9}[-'+SP+u']+\n+(.+\n+)?简历编号：'+ASP+u'*\S+'+ASP+u'*最新登录：'+ASP+u'*\S+'+ASP+u'*-{9}[-'+SP+u']+\n')
 LPCVSRC = re.compile(u'^(:?(个人信息\n(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n(On job, open for new job|Dimission, seeking for new job) ,)) ， ', re.M)
 ZLCVSRC = re.compile(u'^(简历ID：RCC|Resume ID：REC)00\d{8}\n'+ASP+u'*[^\n\uf0b7]')
 YCCVSRC = re.compile(u'^更新时间：(\d{4}-\d{2}-\d{2}|今天|昨天)\n(简历编号：)?')
 
 is_jycv = lambda cv:JYCVSRC.search(cv)
-is_lpcv = lambda cv:LPCVSRC.search(cv)
+is_lpcv = lambda cv:LPCVSRC.search(cv) or NLPCVSRC.search(cv)
 is_zlcv = lambda cv:ZLCVSRC.search(cv)
 is_yccv = lambda cv:YCCVSRC.search(cv)
 

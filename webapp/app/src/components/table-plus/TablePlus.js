@@ -62,7 +62,7 @@ TablePlus.defaultProps = {
   className: '',
   toolbar: false,
   columns: [],
-  rowSelection: {},
+  rowSelection: null,
   size: 'default',
   loading: false,
   bordered: false,

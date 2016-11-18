@@ -24,7 +24,22 @@ class Header extends Component {
       <div className={classes}>
         <div className={`${props.prefixCls}-container`}>
           <div className={`${props.prefixCls}-logo`} style={this.getLogoStyle()}>
-            <img src={LogoImg} alt="logo" />
+            {props.logoLink
+              ? (
+                  <a href={props.logoLink}>
+                    <img
+                      src={LogoImg}
+                      alt="logo"
+                    />
+                  </a>
+                )
+              : (
+                  <img
+                    src={LogoImg}
+                    alt="logo"
+                  />
+                )
+            }
           </div>
           {props.children}
         </div>
@@ -37,12 +52,14 @@ Header.defaultProps = {
   fixed: false,
   prefixCls: 'cs-header',
   logoMode: 'left',
+  logoLink: null,
 };
 
 Header.propTypes = {
   fixed: PropTypes.bool,
   prefixCls: PropTypes.string,
   logoMode: PropTypes.string,
+  logoLink: PropTypes.string,
 };
 
 export default Header;

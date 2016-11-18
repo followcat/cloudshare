@@ -1,125 +1,87 @@
 'use strict';
 import React, { Component } from 'react';
-import { Link } from 'react-router';
-import { Menu, message } from 'antd';
-import 'whatwg-fetch';
-
-import Header from '../components/common/Header';
-
-import './manage.less';
+import ReactDOM from 'react-dom';
+import Viewport from '../components/viewport';
+import Header from '../components/header';
+import CommonNavigation from './CommonNavigation';
+import ShowCard from '../components/show-card';
+import Container from '../components/container';
+import SiderMenu from '../components/sider-menu';
+import Content from '../components/content';
+import { message, Popconfirm } from 'antd';
+import { getBookmark, deleteBookmark } from '../request/bookmark';
+import { resetPassword } from '../request/password';
+import { signOut } from '../request/sign';
+import { URL } from '../request/api';
+import { getMenu, getCurrentActive } from '../utils/sider-menu-list';
+import './user-info.less';
 
 export default class UserInfo extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      current: 'browsingHistory',
+      current: getCurrentActive(props),
+      storage: [],
+      bookmarkList: [],
       historyHeight: 0,
       bookmarkHeight: 0,
-      historyList: [],
-      bookmarkList: [],
+    };
+    this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
+    this.handleChangePasswordSubmit = this.handleChangePasswordSubmit.bind(this);
+    this.getStorage = this.getStorage.bind(this);
+    this.getBookmarkList = this.getBookmarkList.bind(this);
+    this.getColumns = this.getColumns.bind(this);
+  }
+
+  componentDidMount() {
+    this.getStorage();
+    this.getBookmarkList();
+    const eleShowCard = ReactDOM.findDOMNode(this.refs.showCard),
+          historyBoxHeight = eleShowCard.offsetHeight - 2*eleShowCard.offsetTop - 48,
+          bookmarkBoxHeight = eleShowCard.offsetHeight - 2*eleShowCard.offsetTop - 169;
+
+    this.setState({
+      historyHeight: historyBoxHeight,
+      bookmarkHeight: bookmarkBoxHeight,
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.location.pathname !== this.props.location.pathname) {
+      this.setState({
+        current: getCurrentActive(this.props, nextProps),
+      });
+    }
+  }
+
+  handleDeleteConfirm(bookmarkId) {
+    deleteBookmark({
+      bookmark_id: bookmarkId,
+    }, (json) => {
+      if (json.code === 200) {
+        this.getBookmarkList();
+        message.success(json.message);
+      } else {
+        message.error(json.message);
+      }
+    });
+  }
+
+  handleChangePasswordSubmit(value) {
+    const params = {
+      oldpassword: value.oldPassword,
+      newpassword: value.reNewPassword,
     };
 
-    this.loadBrowsingHistory = this.loadBrowsingHistory.bind(this);
-    this.loadBookmark = this.loadBookmark.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.onDeleteBookmark = this.onDeleteBookmark.bind(this);
-  }
-
-  loadBrowsingHistory() {
-    let history = localStorage.history ? JSON.parse(localStorage.history) : [];
-    this.setState({
-      historyList: history,
-    });
-  }
-
-  loadBookmark() {
-    fetch(`/api/accounts/${localStorage.user}/bookmark`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Basic ${localStorage.token}`,
-      }
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      if (json.code === 200) {
-        this.setState({
-          bookmarkList: json.data,  
-        });
-      } else {
-        message.error(json.message);
-      }
-    });
-  }
-
-  onDeleteBookmark(id) {
-    let _this = this;
-    fetch(`/api/accounts/${localStorage.user}/bookmark`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Basic ${localStorage.token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        bookmark_id: id,
-      })
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      if (json.code === 200) {
-        message.success(json.message);
-        _this.loadBookmark();
-      } else {
-        message.error(json.message);
-      }
-    })
-  }
-
-  handleClick(e) {
-    this.setState({
-      current: e.key,
-    });
-  }
-
-  handleChangePassword(pwd) {
-    fetch(`/api/accounts/${localStorage.user}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Basic ${localStorage.token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        oldpassword: pwd.oldPwd,
-        newpassword: pwd.reNewPwd,
-      }),
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
+    resetPassword(params, (json) => {
       if (json.code === 200) {
         message.success(json.message);
         setTimeout(() => {
-          fetch(`/api/session`, {
-            method: 'DELETE',
-            credentials: 'include',
-            headers: {
-              'Authorization': `Basic ${localStorage.token}`,
-            },
-          })
-          .then((response) => {
-            return response.json();
-          })
-          .then((json) => {
-            if (json.code === 200) {
+          signOut((response) => {
+            if (response.code === 200) {
               localStorage.removeItem('token');
               localStorage.removeItem('user');
-              location.href = json.redirect_url;
+              location.href = response.redirect_url;
             }
           });
         }, 1000);
@@ -129,51 +91,98 @@ export default class UserInfo extends Component {
     });
   }
 
-  componentDidMount() {
-    this.loadBrowsingHistory();
-    this.loadBookmark();
-    const height = parseInt(this.refs.wrapper.offsetHeight);
-    let historyHeight = height - 120,
-        bookmarkHeight = height - 180;
+  getStorage() {
+    const storage = localStorage.getItem('history') && JSON.parse(localStorage.getItem('history'));
     this.setState({
-      historyHeight: historyHeight,
-      bookmarkHeight: bookmarkHeight,
+      storage: storage,
     });
+  }
+
+  getBookmarkList() {
+    getBookmark((json) => {
+      if (json.code === 200) {
+        this.setState({
+          bookmarkList: json.data,
+        });
+      }
+    });
+  }
+
+  getColumns() {
+    const columns = [{
+      title: 'Name',
+      dataIndex: 'name',
+      width: 150,
+      key: 'name',
+      render: (text, record) => (
+        <a href={URL.getResumeURL(record.id)}>
+          {text || record.id}
+        </a>
+      )
+    }, {
+      title: 'Gender',
+      dataIndex: 'gender',
+      width: 120,
+      key: 'gender',
+    }, {
+      title: 'Age',
+      dataIndex: 'age',
+      width: 120,
+      key: 'age',
+    }, {
+      title: 'Position',
+      dataIndex: 'position',
+      key: 'position',
+      width: 240,
+    }, {
+      title: 'Operation',
+      key: 'operation',
+      render: (text, record) => (
+        <Popconfirm
+          title="Are you sure to delete this bookmark?"
+          placement="left"
+          onConfirm={() => this.handleDeleteConfirm(record.id)}
+        >
+          <a href="#">Delete</a>
+        </Popconfirm>
+      ),
+    }];
+
+    return columns;
   }
 
   render() {
     return (
-      <div>
-        <div id="viewport" className="pd-top">
-          <Header fixed={true} />
-          <div className="cs-layout-bottom">
-            <div className="cs-layout-wrapper" ref="wrapper">
-              <div className="cs-layout-sider">
-                <Menu
-                  mode="inline"
-                  selectedKeys={[this.state.current]}
-                  onClick={this.handleClick}
-                >
-                  <Menu.Item key="browsingHistory"><Link to="/browsingHistory">Browsing History</Link></Menu.Item>
-                  <Menu.Item key="bookmark"><Link to="/bookmark">Bookmark</Link></Menu.Item>
-                  <Menu.Item key="setting"><Link to="/setting">Setting</Link></Menu.Item>
-                </Menu>
-              </div>
-              <div className="cs-layout-content">
-                {this.props.children && React.cloneElement(
-                  this.props.children, {
-                    historyHeight: this.state.historyHeight,
-                    bookmarkHeight: this.state.bookmarkHeight,
-                    historyList: this.state.historyList,
-                    bookmarkList: this.state.bookmarkList,
-                    onDeleteBookmark: this.onDeleteBookmark,
-                    onSubmitChangePassword: this.handleChangePassword,
-                  })}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Viewport>
+        <Header 
+          fixed={true}
+          logoLink={URL.getSearchURL()}
+        >
+          <CommonNavigation />
+        </Header>
+        <Container>
+          <ShowCard ref="showCard">
+            <SiderMenu
+              selectedKeys={[this.state.current]}
+              menus={getMenu(this.props.route.childRoutes)}
+            />
+            <Content>
+              {this.props.children && React.cloneElement(this.props.children, {
+                storage: this.state.storage,
+                bodyStyle: {
+                  height: this.state.historyHeight,
+                  overflowY: 'scroll',
+                },
+                scroll: { y: this.state.bookmarkHeight },
+                columns: this.getColumns(),
+                bookmarkList: this.state.bookmarkList,
+                settingPrefixCls: 'cs-setting',
+                onSubmit: this.handleChangePasswordSubmit
+              })}
+            </Content>
+          </ShowCard>
+        </Container>
+      </Viewport>
     );
   }
 }

@@ -14,6 +14,7 @@ import { message, Popconfirm, Menu, Modal } from 'antd';
 import { getAccounts, createAccount, deleteAccount } from '../request/account';
 import { resetPassword } from '../request/password';
 import { signOut } from '../request/sign';
+import { getMenu, getCurrentActive } from '../utils/sider-menu-list';
 import './manage.less';
 
 const MenuItem = Menu.Item,
@@ -22,15 +23,13 @@ const MenuItem = Menu.Item,
 export default class Manage extends Component {
   constructor(props) {
     super(props);
-    const pathname = props.location.pathname.split('/')[1];
     this.state = {
-      current: pathname || props.route.indexRoute.name,
+      current: getCurrentActive(props),
       dataSource: [],
       visible: false,
       confirmLoading: false,
       height: 0,
     };
-    this.handleMenuClick = this.handleMenuClick.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleCreate = this.handleCreate.bind(this);
     this.handleModalCancel = this.handleModalCancel.bind(this);
@@ -39,7 +38,7 @@ export default class Manage extends Component {
     this.handleSignOutConfirm = this.handleSignOutConfirm.bind(this);
     this.getUserList = this.getUserList.bind(this);
     this.getRender = this.getRender.bind(this);
-    this.getMenus = this.getMenus.bind(this);
+    this.getColumns = this.getColumns.bind(this);
   }
 
   componentDidMount() {
@@ -55,15 +54,9 @@ export default class Manage extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.location.pathname !== this.props.location.pathname) {
       this.setState({
-        current: nextProps.location.pathname.split('/')[1] || this.props.route.indexRoute.name,
+        current: getCurrentActive(this.props, nextProps),
       });
     }
-  }
-
-  handleMenuClick(e) {
-    this.setState({
-      current: e.key,
-    });
   }
 
   handleButtonClick() {
@@ -190,23 +183,7 @@ export default class Manage extends Component {
     return render;
   }
 
-  getMenus() {
-    const childRoutes = this.props.route.childRoutes;
-
-    let menus = childRoutes.map((item) => {
-      return {
-        key: item.name,
-        url: item.path,
-        text: item.title,
-      };
-    })
-
-    return menus;
-  }
-
-  render() {
-    const menus = this.getMenus();
-
+  getColumns() {
     const columns = [{
       title: 'Name',
       dataIndex: 'name',
@@ -227,6 +204,10 @@ export default class Manage extends Component {
       )
     }];
 
+    return columns;
+  }
+
+  render() {
     const dropdownMenu = (
       <Menu>
         <MenuItem key="0">
@@ -258,13 +239,12 @@ export default class Manage extends Component {
           <ShowCard ref="showCard">
             <SiderMenu
               selectedKeys={[this.state.current]}
-              menus={menus}
-              onClick={this.handleMenuClick}
+              menus={getMenu(this.props.route.childRoutes)}
             />
             <Content>
               {this.props.children && React.cloneElement(this.props.children, {
                 dataSource: this.state.dataSource,
-                columns: columns,
+                columns: this.getColumns(),
                 toolbar: true,
                 render: this.getRender(),
                 scroll: { y: this.state.height },

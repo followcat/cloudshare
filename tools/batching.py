@@ -98,16 +98,20 @@ import extractor.information_explorer
 
 def get_explorer_name(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
-    if obj['origin'] == u'无忧精英爬取':
-        explorer_name = 'jingying'
-    elif obj['origin'] == u'智联卓聘爬取':
-        explorer_name = 'zhilian'
-    elif obj['origin'] == u'中华英才爬取':
-        explorer_name = 'yingcai'
-    elif obj['origin'] == u'猎聘爬取':
-        explorer_name = 'liepin'
-    else:
-        explorer_name = svc_cv.name
+    explorer_name = svc_cv.name
+    try:
+        if obj['origin'] == u'无忧精英爬取':
+            explorer_name = 'jingying'
+        elif obj['origin'] == u'智联卓聘爬取':
+            explorer_name = 'zhilian'
+        elif obj['origin'] == u'中华英才爬取':
+            explorer_name = 'yingcai'
+        elif obj['origin'] == u'猎聘爬取':
+            explorer_name = 'liepin'
+    except TypeError:
+        pass
+    except KeyError:
+        pass
     return explorer_name
 
 def update_selected(svc_cv, yamlname, selected):
@@ -117,7 +121,10 @@ def update_selected(svc_cv, yamlname, selected):
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
                                                          selected, explorer_name)
-    obj.update(info)
+    try:
+        obj.update(info)
+    except AttributeError:
+        obj = info
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
@@ -205,32 +212,40 @@ def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
                     fp.write(yaml.safe_dump(yaml_info, allow_unicode=True))
 
 
-def company_knowledge(SVC_CV, knowledge):
+def company_knowledge(SVC_CV, SVC_CO):
+    import core.basedata
+    import core.outputstorage
+    import services.exception
+
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
         try:
-            for c in info['experience']['company']:
+            for c in [c for c in info['experience']['company'] if c['name']]:
+                company = extractor.information_explorer.catch_coinfo(name=c['name'], stream=c)
+                coobj = core.basedata.DataObject(company, data='')
                 try:
-                    knowledge[c['name']].append(c['business'])
-                except KeyError:
-                    continue
+                    result = SVC_CO.add(coobj)
+                except services.exception.ExistsCompany:
+                    name = core.outputstorage.ConvertName(coobj.metadata['id'])
+                    coinfo = SVC_CO.getyaml(name)
+                    coinfo['business'] = sorted(set(coinfo['business']).union(set(coobj.metadata['business'])))
+                    if 'total_employees' in coobj.metadata and coobj.metadata['total_employees']:
+                        coinfo['total_employees'] = coobj.metadata['total_employees']
+                    utils.builtin.save_yaml(coinfo, SVC_CO.path , name.yaml)
         except KeyError:
             continue
         except TypeError:
             pass
-    del knowledge['']
-    
-def initclassify(SVC_CV, knowledge=None):
+
+def initclassify(SVC_CV, SVC_CO=None):
     import collections
     import utils.builtin
 
-    if knowledge is None:
-        knowledge = collections.defaultdict(list)
-        
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
-        info['classify'] = extractor.information_explorer.get_classify(info['experience'], knowledge)
-        utils.builtin.save_yaml(info, SVC_CV.path , y)
+        info['classify'] = extractor.information_explorer.get_classify(info['experience'], SVC_CO)
+        if info['classify']:
+            utils.builtin.save_yaml(info, SVC_CV.path , y)
 
 
 def inituniqueid(SVC_CV, with_report=False, with_diff=False):

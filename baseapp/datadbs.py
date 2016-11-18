@@ -13,11 +13,11 @@ import interface.gitinterface
 
 SVC_ACCOUNT = services.account.Account('account')
 
-SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare')
 SVC_CO_REPO = services.company.Company('repo/CO', 'corepo')
+SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare')
 
-SVC_PEO_STO = services.people.People('storage/PEO', 'peoprepo')
 SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')
+SVC_PEO_STO = services.people.People('storage/PEO', [SVC_CV_REPO, SVC_CV_STO])
 
 RAW_DIR = 'raw'
 RAW_DB = dict()

@@ -10,6 +10,26 @@ class People(services.base.storage.BaseStorage):
 
     commitinfo = 'People'
 
+    def __init__(self, path, storages):
+        super(People, self).__init__(path)
+        self.storages = storages
+
+    def getmd(self, id):
+        info = self.getyaml(id)
+        for id in info['cv']:
+            for sto in self.storages:
+                if sto.exists(id):
+                    yield sto.getmd(id)
+                    break
+
+    def getinfo(self, id):
+        info = self.getyaml(id)
+        for id in info['cv']:
+            for sto in self.storages:
+                if sto.exists(id):
+                    yield sto.getyaml(id)
+                    break
+
     def add(self, peopobj, committer=None, unique=True, yamlfile=True):
         name = core.outputstorage.ConvertName(peopobj.name)
         if self.unique(peopobj) is not True:

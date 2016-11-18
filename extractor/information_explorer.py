@@ -45,7 +45,7 @@ co_template = (
     ("introduction",        str),
 )
 
-peop_template = (
+peo_template = (
     ("id",                  str),
     ("cv",                  list),
 )
@@ -308,7 +308,7 @@ def catch_peopinfo(stream, name):
         >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['id'] == 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'
         >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['cv'] == ['00yd4ww2']
     """
-    info = generate_info_template(peop_template)
+    info = generate_info_template(peo_template)
     info['id'] = name
     if isinstance(stream, dict):
         try:

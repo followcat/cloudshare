@@ -305,7 +305,7 @@ def update_jd_co_id(SVC_JD, SVC_CO):
                 f.write(dump_data)
 
 
-def init_people(SVC_CV, SVC_PEOP):
+def init_people(SVC_CV, SVC_PEO):
     import core.basedata
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
@@ -313,4 +313,4 @@ def init_people(SVC_CV, SVC_PEOP):
             continue
         peopmeta = extractor.information_explorer.catch_peopinfo(info, info['unique_id'])
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-        SVC_PEOP.add(peopobj)
+        SVC_PEO.add(peopobj)

@@ -185,7 +185,9 @@ def position_output(output, groupdict, begin='', end=''):
             for c in output['company']:
                 if c['id'] == result['at_company'] and 'business' not in c:
                     c['business'] = groupdict['field']
-
+        # Double hack: 1. limit is a guess (sure thing: 50 not enough) - 2. position is still counted
+        if len(result['name']) > 100:
+            return
         format_salary(result, groupdict)
         output['position'].append(result)
 

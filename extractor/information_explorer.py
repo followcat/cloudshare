@@ -43,6 +43,8 @@ co_template = (
     ("committer",           str),
     ("date",                int),
     ("introduction",        str),
+    ("business",            list),
+    ("total_employees",     str),
 )
 
 peo_template = (
@@ -165,9 +167,10 @@ def get_experience(stream, name=None):
     experiences = []
     current_company = None
     current_position = None
-    if name is None:
+    try:
+        assert name in fix_func
+    except AssertionError:
         name = 'default'
-    assert name in fix_func
 
     extracted_data = fix_func[name]()
     if extracted_data:
@@ -198,8 +201,8 @@ def get_experience(stream, name=None):
     return result
 
 
-def get_classify(experience, company_knowledge=None, classify=[]):
-    return extractor.extract_experience.match_classify(experience, company_knowledge, classify)
+def get_classify(experience, company_knowledge=None):
+    return extractor.extract_experience.match_classify(experience, company_knowledge)
 
 
 def get_name(stream):
@@ -296,8 +299,13 @@ def catch_coinfo(stream, name):
     info['name'] = name
     info['id'] = extractor.unique_id.company_id(name)
     if isinstance(stream, dict):
+        for key in ('introduction', 'total_employees'):
+            try:
+                info[key] = stream[key]
+            except KeyError:
+                pass
         try:
-            info['introduction'] = stream['introduction']
+            info['business'].append(stream['business'])
         except KeyError:
             pass
     return info

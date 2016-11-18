@@ -16,33 +16,37 @@ FDSEP = u'(?P<fromsep>['+SEP+u'\.．年])'
 DATE = _PDATE.replace('__DATE_SEP__', FDSEP.replace('P<fromsep>', ':'))
 SDSEP = u'(?P=fromsep)'
 PERIOD = u'(?P<from>' + _PDATE.replace('__DATE_SEP__', FDSEP) + ur')' + DATESEP + ASP+ u'*(?P<to>' + _PDATE.replace('__DATE_SEP__', SDSEP) + ')(?:'+UNIBRALEFT+u'含[^（\(\[【]+?期'+UNIBRARIGHT+u')?'
-DURATION = ur'(?P<duration>(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
+DURATION = ur'(?P<duration>(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(?:['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
-FIELDSEP = ur'、：:；;\|'
+FIELDSEP = ur'、：:；;\|\uff5c'
 ENDLINESEP = u'。'
 SENTENCESEP = FIELDSEP+ENDLINESEP
+EDUFIELDSEP = u'，'+FIELDSEP
 
-exclude_with_parenthesis = lambda x: u'('+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
+exclude_with_parenthesis = lambda x: u'(?:'+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
-PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'{2})|◆|·|\?|(\uf0d8\xa0)|\uf0b7|\uf075)'
+PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'{2})|◆|·|\?|(\uf0d8\xa0)|\uf0b7|\uf075|\u258c)'
 
+COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\([非欧美]+\)|代表处|股份制'
+COMPANY_TYPE = u'(([^/\|\n\- ：]*?(('+COMPANY_TYPE_KEYWORD+u')[^\|\n\- ]*)+)|(其他))'
 # Exclude date related characters to avoid eating duration
-COMPANYTAIL = exclude_with_parenthesis(u'人年月')
+COMPANYTAIL = u'(?:、[^' + SENTENCESEP + u'=\n\*\u2013]+?)?'+exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
 # \u2014, \u2015 and \u4e00 are found in company
-COMPANY = ur'([^' + SENTENCESEP + u'=\n\*\u2013]+?(\\\\\*)+)?(((\\\\\*){3})|([^' + SENTENCESEP + u'=\n\*\u2013]+?))('+COMPANYTAIL+u')?'
+COMPANY = ur'(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?(?:\\\\\*)+)?(?:(?:(?:\\\\\*){3})|(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?))(?:'+COMPANYTAIL+u')?'
 SENTENCESEP = SENTENCESEP+ur'，'
-POSITION = ur'[^=\n\*：:\|\u2013\u2015]+'
+POSITION = ur'[^=\n\*：:\|\u2013\u2015\u3002]+'
 
 JYCVSRC = re.compile(u'^'+ASP+u'*精英网用户$', re.M)
+NLPCVSRC = re.compile(u'^'+ASP+u'*-{9}[-'+SP+u']+\n+(.+\n+)?简历编号：'+ASP+u'*\S+'+ASP+u'*最新登录：'+ASP+u'*\S+'+ASP+u'*-{9}[-'+SP+u']+\n')
 LPCVSRC = re.compile(u'^(:?(个人信息\n(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n(On job, open for new job|Dimission, seeking for new job) ,)) ， ', re.M)
 ZLCVSRC = re.compile(u'^(简历ID：RCC|Resume ID：REC)00\d{8}\n'+ASP+u'*[^\n\uf0b7]')
 YCCVSRC = re.compile(u'^更新时间：(\d{4}-\d{2}-\d{2}|今天|昨天)\n(简历编号：)?')
 
 is_jycv = lambda cv:JYCVSRC.search(cv)
-is_lpcv = lambda cv:LPCVSRC.search(cv)
+is_lpcv = lambda cv:LPCVSRC.search(cv) or NLPCVSRC.search(cv)
 is_zlcv = lambda cv:ZLCVSRC.search(cv)
 is_yccv = lambda cv:YCCVSRC.search(cv)
 
@@ -51,17 +55,17 @@ education_list = {
     1: (u'中技', u'中专', u'高中', u'高职'),
     2: (u'大专', ),
     #3: Show clearly step before graduate
-    4: (u'本科', u'金融学学士', u'文学学士', u'全日制本科', u'统招本科', u'学士'),
+    4: (u'本科', u'\S{0,5}(?P<shorted4>学士)', u'全日制本科', u'统招本科'),
     5: (u'在职硕士', ),
-    6: (u'硕士', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA'),
-    7: (u'博士', u'博士研究生'),
+    6: (u'\S{0,5}(?P<shorted6>硕士)', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA'),
+    7: (u'\S{0,5}(?P<shorted7>博士)', u'博士研究生'),
     8: (u'博士后', )
     }
 
 LIST_SEPARATOR = u')|(?:'
 EDUCATION_LIST = {}
 for k,v in education_list.items():
-    EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))')
+    EDUCATION_LIST[k] = re.compile(u'(?:(?:'+ LIST_SEPARATOR.join([_v+u'(学位)?' for _v in v]) +u'))')
 
 def education_rate(education):
     u"""
@@ -75,16 +79,17 @@ def education_rate(education):
     else:
         return 0
 
-EDUCATION = u'(?P<education>(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join(v) +u'))' for v in education_list.values()]) +u'))'
-SCHOOL = u'(?P<school>(\s?\w)+|([^'+SP+FIELDSEP+u']+'+ASP+u'*'+exclude_with_parenthesis('')+u'?))'
+EDUCATION = u'(?P<education>(?:'+ LIST_SEPARATOR.join([u'(?:(?:'+ LIST_SEPARATOR.join([_v+u'(学位)?' for _v in v]) +u'))' for v in education_list.values()]) +u'))'
+SCHOOL = u'(?P<school>(\s?\w)+|([^'+SP+EDUFIELDSEP+u']+'+ASP+u'*'+exclude_with_parenthesis('')+u'?))'
 
 GENDER = u'(?P<gender>男|女)'
 MARITALSTATUS = u'(?P<marital_status>(未婚)|(已婚))'
 AGEANDBIRTH = u'('+AGE+ u'|((?P<abbr>'+UNIBRALEFT+u')?(?P<birthdate>' +FULLDATE+ u'|'+DATE+u')生?(?(abbr)' +UNIBRARIGHT + u')))+'
 
 SALARY = u'((?P<salabel>月薪(（税前）)?[:：]?)?'+ASP+u'*((?P<salary>\d[\-到 \d\|]*(月/月)?(?(salabel)((元/月)|元|(/月))?|((元/月)|元|(/月)))(以[上下])?)'+ASP+u'*(\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?|保密)|((年薪(（税前）)?[:：]?)?'+ASP+u'*(?P<yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
-EMPLOYEES = u'((?:(?P<employees>(少于)?\d+([ '+SEP+u']+\d+)?'+ASP+u'*人(以[上下])?)|未填写)([' + SENTENCESEP + u'].*?)?)'
-BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + UNIBRARIGHT +u')'
+EMPLOYEES = u'((?:(?P<employees>(少于)?\d+([ '+SEP+u']+\d+)?'+ASP+u'*人(以[上下])?)|未填写))'
+BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + u'(['+FIELDSEP+u']('+COMPANY_TYPE+u'))?' + UNIBRARIGHT +u')'
+BEMPLOYEES = u'('+ BEMPLOYEES + u'('+BEMPLOYEES.replace('P<employees>', ':')+u')?)'
 BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + DURATION + u'(?(br)[\n'+SP+u']*' +UNIBRARIGHT + u'(?(dit)\*)))'
 
 PLACES = u'(?:(\S+)['+SENTENCESEP+SEP+']?)+'

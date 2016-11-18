@@ -340,7 +340,8 @@ def work_xp_zhilian(text):
         >>> assert '2006.07' == position_1(work_xp_zhilian(u'91261-11\\n2006年7月-至今\\n中国银行\\n| 人力资源部\\n|  其他\\n（3个月）'))['date_from']
         >>> assert 'Master' in name(position_1(work_xp_zhilian(u'2010年7月 -- 至今 医科达 | 软件质量*工程师*/Scrum\\nMaster   （6年3个月）\\n\\n'
         ...         u'所属行业：\\n\\n医疗设备/器械')))
-
+        >>> assert u'。' not in name(position_1(work_xp_zhilian(u'2008年5月  --  2011年10月\\n伟创力电源系统（北京）有限公司\\n|  行政人事部\\n'
+        ...         u'|  目前主要从事薪资、保险、职员入职、离职、劳动合同管理。\\n（3年5个月）\\n所属行业：\\ 电子技术/半导体/集成电路')))
     """
     pos = 0
     out = {'company': [], 'position': []}
@@ -386,7 +387,8 @@ def work_xp_jingying(text):
         ...         u'台湾汉唐集成股份有限公司 [2年 8个月 ]\\n\\n多元化业务集团公司|150-500人|外资(非欧美)\\n')))
         >>> assert u'医疗' in business(company_1(work_xp_jingying(u'2011/6-2015/6          项目经理|投资部\\n\\n'
         ...         u'有限公司 [4年 ]\\n\\n医疗/护理/卫生|150-500人|民营公司\\n')))
-
+        >>> assert companies(work_xp_jingying(u'   2011/5 -- 2012/10： 有限公司 [ 1000-5000人、合资]（ 1000-5000人） [ 1年5个月 ]\\n\\n'
+        ...         u'   所属行业：    检测，认证\\n\\n      食品部       微生物测试工程师'))
     """
     pos = 0
     out = {'company': [], 'position': []}

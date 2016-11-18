@@ -1,6 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'antd';
+import { URL } from '../../request/api';
 
 class HistoryItem extends Component {
   render() {
@@ -16,7 +17,7 @@ class HistoryItem extends Component {
       <Row style={rowStyle}>
         <Col span={8}>{props.time}</Col>
         <Col span={16}>
-          <a href={props.id} target="_block">{props.name}</a>
+          <a href={URL.getResumeURL(props.id)} target="_block">{props.name}</a>
         </Col>
       </Row>
     );

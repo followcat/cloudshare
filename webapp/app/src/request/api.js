@@ -16,7 +16,23 @@ export const getAPI = {
 }
 
 export const URL = {
+  getSearchURL: () => {
+    return `/search`;
+  },
+
   getResumeURL: (id) => {
     return `/resume/${id}`; 
   },
+
+  getUserInfoURL: () => {
+    return `/userinfo`;
+  },
+
+  getUploaderURL: () => {
+    return `/uplodaer`;
+  },
+
+  getListJDURL: () => {
+    return `/listjd`;
+  }
 };

@@ -53,6 +53,7 @@ class ResumeToolMenu extends Component {
             style={{ display: 'inline-block', marginLeft: 4 }}
             jdList={this.props.jdList}
             radarOption={this.props.radarOption}
+            chartSpinning={this.props.chartSpinning}
             onDrawChartOpen={this.props.onDrawChartOpen}
             onDrawChartSubmit={this.props.onDrawChartSubmit}
           />

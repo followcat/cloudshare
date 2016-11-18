@@ -73,7 +73,22 @@ const getRadarOption = (max, data, cutNumber = 20) => {
     },
     tooltip: {
       trigger: 'item',
-      position: 'bottom',
+      position: 'inside',
+      formatter: function (param, ticket, callback) {
+        const value = param.value;
+        let content = '';
+        for ( let i = 0; i < indicator.length; i++) {
+          let name = indicator[i].name;
+          if (name.length > 50) {
+            name = `${name.substr(0, 50)}...`;
+          }
+          content += `${name}: ${Math.round(value[i])} <br />`;
+        }
+        return content;
+      },
+      textStyle: {
+        fontSize: 12,
+      },
     },
     legend: {
       orient: 'horizontal',

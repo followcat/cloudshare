@@ -34,6 +34,7 @@ export default class Resume extends Component {
       enComfirmLoading: false,
       jdList: [],
       radarOption: {},
+      chartSpinning: false,
     };
 
     this.loadData = this.loadData.bind(this);
@@ -302,6 +303,9 @@ export default class Resume extends Component {
       message.error('Please select a job description!');
       return;
     }
+    this.setState({
+      chartSpinning: true,
+    });
     const requestParam = object.type === 'id' ? { id: object.value } : { doc: object.value },
           cvId = this.state.id;
     fetch(`/api/mining/valuable`, {
@@ -321,6 +325,7 @@ export default class Resume extends Component {
         const option = getRadarOption(json.data.max, json.data.result);
         this.setState({
           radarOption: option,
+          chartSpinning: false,
         });
       }
     })
@@ -394,7 +399,8 @@ export default class Resume extends Component {
 
   componentDidMount() {
     const hrefArr = location.href.split('/'),
-          id = hrefArr[hrefArr.length-1];
+          id = 'awt7enxf';
+          // id = hrefArr[hrefArr.length-1];
     this.setState({
       id: id,
     });
@@ -433,6 +439,7 @@ export default class Resume extends Component {
             fileList={this.state.fileList}
             jdList={this.state.jdList}
             radarOption={this.state.radarOption}
+            chartSpinning={this.state.chartSpinning}
             enComfirmLoading={this.state.enComfirmLoading}
             onEnComfirmLoading={this.handleEnComfirmLoading}
             onDrawChartOpen={this.handleDrawChartOpen}

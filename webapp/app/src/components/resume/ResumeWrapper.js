@@ -59,6 +59,7 @@ export default class ResumeWrapper extends Component {
             jdList={this.props.jdList}
             radarOption={this.props.radarOption}
             enComfirmLoading={this.props.enComfirmLoading}
+            chartSpinning={this.props.chartSpinning}
             onModifyTitle={this.props.onModifyTitle}
             onEnComfirmLoading={this.props.onEnComfirmLoading}
             onDrawChartOpen={this.props.onDrawChartOpen}

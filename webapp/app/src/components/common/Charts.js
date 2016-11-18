@@ -11,12 +11,14 @@ export default class Charts extends Component {
 
   init() {
     this.charts = echarts.init(this.refs.charts);
+    this.charts.showLoading();
     this.setOption();
   }
 
   setOption() {
+    // this.charts.showLoading();
     if(this.props.option) {
-      this.charts.showLoading();
+      // this.charts.showLoading();
       this.charts.setOption(this.props.option);
       this.charts.hideLoading();
     }

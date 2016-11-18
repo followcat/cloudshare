@@ -37,7 +37,7 @@ COMPANYTAIL = u'(?:、[^' + SENTENCESEP + u'=\n\*\u2013]+?)?'+exclude_with_paren
 # \u2014, \u2015 and \u4e00 are found in company
 COMPANY = ur'(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?(?:\\\\\*)+)?(?:(?:(?:\\\\\*){3})|(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?))(?:'+COMPANYTAIL+u')?'
 SENTENCESEP = SENTENCESEP+ur'，'
-POSITION = ur'[^=\n\*：:\|\u2013\u2015\u3002\uff1b]+'
+POSITION = ur'[^=\n\*：:\|\u2013\u2015\u3002]+'
 
 JYCVSRC = re.compile(u'^'+ASP+u'*精英网用户$', re.M)
 LPCVSRC = re.compile(u'^(:?(个人信息\n(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n(On job, open for new job|Dimission, seeking for new job) ,)) ， ', re.M)

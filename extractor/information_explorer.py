@@ -118,7 +118,7 @@ def get_education(stream, name=None):
         assert name in fix_func
     except AssertionError:
         name = 'default'
-    result = dict(education='', school='', education_history=[])
+    result = dict()
     education_result = fix_func[name](stream)
     result.update(education_result)
     if 'education_history' in education_result:

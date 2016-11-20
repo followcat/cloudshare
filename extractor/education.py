@@ -409,10 +409,7 @@ def fix_yingcai(d):
             maj +=1
             format_output(processed, res)
         else:
-            try:
-                processed.append(edu.groupdict())
-            except AttributeError:
-                pass
+            summary['education'] = edu.group('education')
     return fix_output(processed)
 
 def fix(d):

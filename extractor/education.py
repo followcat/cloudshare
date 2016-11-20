@@ -260,7 +260,15 @@ def education_xp(text, summary=None):
 
 def fix_output(processed):
     result = {}
+    training = []
     if processed:
+        for e in processed:
+            if e['education'] == u'初中及以下':
+                training.append(e)
+        if training:
+            result['training_history'] = sorted(training, key=lambda x:x['date_from'], reverse=True)
+            for e in training:
+                processed.remove(e)
         result['education_history'] = processed
     return result
 

@@ -330,7 +330,13 @@ def fix_zhilian(d):
 def fix_jingying(d):
     u"""
         >>> assert u'云南' in fix_jingying(u'教育经历\\n   2010/9 -- 2012/12   云南师范大学   工商管理    硕士')['education_history'][0]['school']
-        >>> assert u'药学' in fix_jingying(u'教育经历\\n ----------------------------------------------------------- ---------------- ------ ------\\n'
+        >>> assert 2 == len(fix_jingying(u'教育经历\\n2000/9 -- 2003/6   湖南省衡阳师范学院           教育学   大专\\n'
+        ...     u'1997/9 -- 2000/7   湖南省衡阳市衡南县第二中学   理科     高中')['education_history'])
+        >>> assert u'生物' in fix_jingying(u'教育经历\\n2009/9 -- 2013/6  北京联合大学生物化学工程学院   生物工程   本科\\n'
+        ...     u'本科课程涉及生物化学')['education_history'][0]['major']
+        >>> assert not u'科学' in fix_jingying(u'教育经历\\n2000/7 -- 2003/7   江苏大学   计算机科学   本科\\n学士学位')['education_history'][0]['major']   #FIXME
+        >>> assert not u'法学' in fix_jingying(u'教育经历\\n2010/3-- 2013/3   苏州大学   法学   硕士\\n在职法律硕士')['education_history'][0]['major']  #FIXME
+        >>> assert u'药学' in fix_jingying(u'教育经历\\n ----------------------------------------------------------- ------------ ------ ------\\n'
         ...     u'2006/9-- 2009/7                                             北京中医药大学   药学   大专')['education_history'][0]['major']
         >>> assert u'无' in fix_jingying(u'教育经历\\n\\n2001/12 -- 2006/12   陕西中学   边防检查   大专\\n'
         ...     u'1998/9 -- 2001/7     商洛中学   无         高中')['education_history'][1]['major']
@@ -340,7 +346,7 @@ def fix_jingying(d):
     maj = 0
     processed = []
     summary = {}
-    MA = re.compile(u'^('+SPSOLHDR+u')?'+SPSOLMA.pattern[1:], re.M)
+    MA = re.compile(u'^('+SPSOLHDR+u')?'+SPSOLMA.pattern[1:]+'$', re.M)
     for RE in [ED, AED]:
         res = RE.search(d)
         if res:

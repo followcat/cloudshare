@@ -19,8 +19,8 @@ SENSEDROP = u'((\S+)[\n'+SP+EDUFIELDSEP+u']*)?'
 RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+u'(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*(?P=sep)'+ASP+u'*'+SENSEDROP+u'$', re.M)
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
-SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
-NOSCSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+u'((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+)'+EDUCATION+ASP+u'*$', re.M)
+SPSOLHDR = ASP+u'*(?P<col1>-{5,}) (?:-{5,}) (?:-{5,}) (?:-{5,})\n'
+SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?(?P<period>'+PERIOD+ur'[:：]?'+ASP+u'*)'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
 UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
 RVSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+EDUCATION+u'[\n'+SP+u']+'+SCHOOL+u'[\n'+SP+u']+(?P<major>[^'+SP+u']+)[\n'+SP+u']+', re.M)
 
@@ -330,15 +330,17 @@ def fix_zhilian(d):
 def fix_jingying(d):
     u"""
         >>> assert u'云南' in fix_jingying(u'教育经历\\n   2010/9 -- 2012/12   云南师范大学   工商管理    硕士')['education_history'][0]['school']
-        >>> assert u'经济' in fix_jingying(u'教育经历\\n   2007/4 -- 2009/3    国际经济与贸易   硕士')['education_history'][0]['major']
+        >>> assert u'药学' in fix_jingying(u'教育经历\\n ----------------------------------------------------------- ---------------- ------ ------\\n'
+        ...     u'2006/9-- 2009/7                                             北京中医药大学   药学   大专')['education_history'][0]['major']
         >>> assert u'无' in fix_jingying(u'教育经历\\n\\n2001/12 -- 2006/12   陕西中学   边防检查   大专\\n'
         ...     u'1998/9 -- 2001/7     商洛中学   无         高中')['education_history'][1]['major']
+        >>> assert u'江南' in fix_jingying(u'教育经历\\n----------------- ---------------------- ------------------ ------\\n'
+        ...     u'2004/9-- 2008/7   黑龙江省江南职责学院                      本科')['education_history'][0]['school']
     """
     maj = 0
     processed = []
     summary = {}
-    MA = re.compile(SPSOLMA.pattern[1:], re.M)
-    NSMA = re.compile(u'(?P<school>)'+NOSCSPSOLMA.pattern[1:], re.M)
+    MA = re.compile(u'^('+SPSOLHDR+u')?'+SPSOLMA.pattern[1:], re.M)
     for RE in [ED, AED]:
         res = RE.search(d)
         if res:
@@ -346,19 +348,19 @@ def fix_jingying(d):
             if SUMMARYMAJOR.search(remainer) and SUMMARYSCHOOL.search(remainer):
                 summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
                 summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
-            for r in NSMA.finditer(res.group('edu')):
-                maj +=1
-                format_output(processed, r.groupdict(), summary)
-            else:
-                if maj:
-                    return fix_output(processed)
+            col1 = 999
             for r in MA.finditer(res.group('edu')):
+                if r.group('col1'):
+                    col1 = len(r.group('col1'))
                 maj +=1
-                format_output(processed, r.groupdict(), summary)
+                out = r.groupdict().copy()
+                if len(r.group('period')) > col1+1:
+                    out['major'] = r.groupdict()['school']
+                    out['school'] = ''
+                format_output(processed, out)
             else:
                 if maj:
-                    return fix_output(processed)
-            break
+                    break
     return fix_output(processed)
 
 def fix_yingcai(d):

@@ -51,7 +51,7 @@ is_zlcv = lambda cv:ZLCVSRC.search(cv)
 is_yccv = lambda cv:YCCVSRC.search(cv)
 
 education_list = {
-    0: (u'初中', ),
+    0: (u'初中', u'初中及以下'),
     1: (u'中技', u'中专', u'高中', u'高职'),
     2: (u'大专', ),
     #3: Show clearly step before graduate

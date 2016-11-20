@@ -122,13 +122,15 @@ def get_education(stream, name=None):
     education_result = fix_func[name](stream)
     result.update(education_result)
     if 'education_history' in education_result:
+        highest_education = -1
         for edu in education_result['education_history']:
-            result['education'] = edu['education']
-            try:
-                result['school'] = edu['school']
-            except KeyError:
-                pass
-            break
+            if extractor.utils_parsing.education_rate(edu['education']) > highest_education:
+                highest_education = extractor.utils_parsing.education_rate(edu['education'])
+                result['education'] = edu['education']
+                try:
+                    result['school'] = edu['school']
+                except KeyError:
+                    pass
     return result
 
 

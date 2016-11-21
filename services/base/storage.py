@@ -28,7 +28,7 @@ class BaseStorage(services.base.service.Service):
         """
         return id in self.ids
 
-    def unique(self, baseobject):
+    def unique(self, id):
         """
             >>> import shutil
             >>> import core.basedata
@@ -44,11 +44,11 @@ class BaseStorage(services.base.service.Service):
             >>> svc_cv = services.base.storage.BaseStorage(repo_name)
             >>> fp1.result
             True
-            >>> svc_cv.unique(cv1)
+            >>> svc_cv.unique(cv1.name)
             True
             >>> svc_cv.add(cv1)
             True
-            >>> svc_cv.unique(cv1)
+            >>> svc_cv.unique(cv1.name)
             False
             >>> svc_cv.add(cv1)
             False
@@ -56,11 +56,10 @@ class BaseStorage(services.base.service.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        name = core.outputstorage.ConvertName(baseobject.name)
-        return not self.exists(name.base)
+        return not self.exists(id)
 
     def add(self, bsobj, committer=None, unique=True, yamlfile=True):
-        if unique is True and self.unique(bsobj) is False:
+        if unique is True and self.unique(bsobj.name) is False:
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(bsobj.name)

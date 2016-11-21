@@ -14,6 +14,10 @@ class People(services.base.storage.BaseStorage):
         super(People, self).__init__(path)
         self.storages = storages
 
+    def exists(self, id):
+        id_yaml = core.outputstorage.ConvertName(id).yaml
+        return self.interface.exists(id_yaml)
+
     def getmd(self, id):
         info = self.getyaml(id)
         for id in info['cv']:
@@ -32,7 +36,7 @@ class People(services.base.storage.BaseStorage):
 
     def add(self, peopobj, committer=None, unique=True, yamlfile=True):
         name = core.outputstorage.ConvertName(peopobj.name)
-        if self.unique(peopobj) is not True:
+        if unique is True and self.unique(peopobj.name) is not True:
             savedobj = self.getyaml(name)
             if peopobj.metadata['cv'][0] in savedobj['cv']:
                 return False

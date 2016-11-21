@@ -20,6 +20,7 @@ class UploadCVAPI(Resource):
 
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         self.svc_min = flask.current_app.config['SVC_MIN']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -74,6 +75,7 @@ class UploadCVAPI(Resource):
                                            metadata=yamlinfo)
         upload[user.id][filename] = None
         name = ''
+        unique_peo = self.svc_peo.exists(dataobj.metadata['unique_id'])
         if filepro.result is True:
             if not dataobj.metadata['name']:
                 dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
@@ -81,6 +83,7 @@ class UploadCVAPI(Resource):
             upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
+                                        'unique_': unique_peo,
                                         'name': name, 'filename': filename } }
 
 
@@ -138,6 +141,7 @@ class UploadCVPreviewAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         super(UploadCVPreviewAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('filename', location = 'json')
@@ -149,4 +153,12 @@ class UploadCVPreviewAPI(Resource):
         dataobj = upload[user.id][filename]
         md = dataobj.preview_data()
         yaml_info = dataobj.metadata
-        return { 'code': 200, 'data': { 'filename': filename, 'markdown': md, 'yaml_info': yaml_info } }
+        try:
+            people_info = self.scv_peo.getyaml(yaml_info['unique_id'])
+            cvs = people_info['cv']
+        except IOError:
+            cvs = []
+        return { 'code': 200, 'data': { 'filename': filename,
+                                        'markdown': md,
+                                        'yaml_info': yaml_info,
+                                        'cv': cvs } }

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
 import string
-import random
 import os.path
 import functools
 import extractor.unique_id
@@ -285,7 +284,7 @@ def catch_cvinfo(stream, filename, name=None):
     try:
         info['id'] = info['unique_id']
     except KeyError:
-        info['id'] = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
+        info['id'] = extractor.unique_id.cv_id(stream)
     info["filename"] = filename
     return info
 

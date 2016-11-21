@@ -29,6 +29,33 @@ class BaseStorage(services.base.service.Service):
         return id in self.ids
 
     def unique(self, baseobject):
+        """
+            >>> import shutil
+            >>> import core.basedata
+            >>> import services.base.storage
+            >>> import extractor.information_explorer
+            >>> repo_name = 'core/test_repo'
+            >>> test_path = 'core/test_output'
+            >>> f1 = open('core/test/cv_1.doc', 'r')
+            >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
+            >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)
+            >>> svc_cv = services.base.storage.BaseStorage(repo_name)
+            >>> fp1.result
+            True
+            >>> svc_cv.unique(cv1)
+            True
+            >>> svc_cv.add(cv1)
+            True
+            >>> svc_cv.unique(cv1)
+            False
+            >>> svc_cv.add(cv1)
+            False
+            >>> f1.close()
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(test_path)
+        """
         name = core.outputstorage.ConvertName(baseobject.name)
         return not self.exists(name.base)
 

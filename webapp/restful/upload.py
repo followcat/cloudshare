@@ -47,6 +47,7 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
+                result = self.svc_peo.add(cvobj, user.id)
                 result = self.svc_mult_cv.add(cvobj, user.id, project_name, unique=True)
                 if result is True:
                     names.append(cvobj.name.md)

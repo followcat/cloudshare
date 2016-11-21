@@ -73,7 +73,7 @@ SEPRTED = lambda l:u'(?:(?:'+POASP+u'*__SEP__'+POASP+u'*)|(?:'+u')|(?:'.join([_+
 PIPESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '\|')
 SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ' ')
 
-NLIEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*'+SPACESEPRTED([u'所在地区：'+ASP+u'*\S+', u'所在部门：'+ASP+u'*\S+', u'汇报对象：'+ASP+u'*\S+', u'下属人数：'+ASP+u'*\d+', u'薪酬情况：'+ASP+u'*'+SALARY])+u'{1,9}'+ASP+u'*$', re.M)
+NLIEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*'+SPACESEPRTED([u'所在地区：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬情况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
 # Force use of ascii space to avoid matching new line and step over TCO in predator results
 LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\n'+ASP+u'*((下属人数)|(所在地区)|(汇报对象)|(所在部门))：.*$', re.M)
 RESPPO = re.compile(u'^职责：(?P<position>'+POSITION+u')\n(?P<field>\S+?)\| 企业性质：\S+?\| 规模：'+AEMPLOYEES+'$', re.M)
@@ -265,6 +265,8 @@ def work_xp_liepin(text):
         >>> assert '1000' in company_1(work_xp_liepin(u'2009/07-至今   强生上海医疗器材有限公司\\n'
         ...     u'    公司性质： 外商独资·外企办事处 | 公司规模： 1000-2000人 | 公司行业： 医疗设备/器械\\n   产品经理   2014/09 - 至今  \\n'
         ...     u'    所在地区：北京    所在部门：杨森诊断中国事业部   汇报对象：事业部经理\\n下属人数： 0   薪酬情况： 22000'))['total_employees']
+        >>> assert positions(work_xp_liepin(u'2010/04-2016/07   华为技术有限公司\\n        公司行业： 通信(设备/运营/增值)\\n'
+        ...     u'    软件工程师      2010/04 - 2011/08\\n        所在地区：深圳      所在部门：\\n下属人数： 0      薪酬情况： 保密'))
     """
     pos = 0
     out = {'company': [], 'position': []}

@@ -73,7 +73,7 @@ SEPRTED = lambda l:u'(?:(?:'+POASP+u'*__SEP__'+POASP+u'*)|(?:'+u')|(?:'.join([_+
 PIPESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '\|')
 SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ' ')
 
-NLIEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*'+SPACESEPRTED([u'所在地区：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬情况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
+NLIEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*?\n'+ASP+u'*'+SPACESEPRTED([u'所在地区：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬情况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
 # Force use of ascii space to avoid matching new line and step over TCO in predator results
 LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\n'+ASP+u'*((下属人数)|(所在地区)|(汇报对象)|(所在部门))：.*$', re.M)
 RESPPO = re.compile(u'^职责：(?P<position>'+POSITION+u')\n(?P<field>\S+?)\| 企业性质：\S+?\| 规模：'+AEMPLOYEES+'$', re.M)
@@ -86,9 +86,9 @@ YICO = re.compile(u'^((?P<position>'+YIPOSITION+u')'+ASP+u'+)?'+PERIOD+ASP+u'*?\
 
 company_business = lambda RE:RE.pattern+u'(\n+'+ASP+u'*\-{3}\-*\n('+POASP+u'*'+COMPANY_TYPE+POASP+u'*\|)?'+POASP+u'*(?P<business>[^\|\n\-： ]+?)('+POASP+u'*\|'+POASP+u'*'+AEMPLOYEES+u')?\n)?'
 
-company_business_noborder_strong = lambda RE:RE.pattern+u'\n+'+POASP+u'*(?!所属行业：)'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)?'+POASP+u'*'+COMPANY_TYPE+u')', u'((公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')'])+u'{5}'+POASP+u'*$'
+company_business_noborder_strong = lambda RE:RE.pattern+u'\n+'+POASP+u'*(?!所属行业：)'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)'+POASP+u'*'+COMPANY_TYPE+u')', u'((公司行业：)'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)'+POASP+u'*'+AEMPLOYEES+u')'])+u'{5}'+POASP+u'*$'
 
-company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)?'+COMPANY_TYPE+u')', u'((公司行业：)?(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)?'+AEMPLOYEES+u')'])+u'{1,5}\n'
+company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)'+POASP+u'*'+COMPANY_TYPE+u')', u'((公司行业：)'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)'+POASP+u'*'+AEMPLOYEES+u')'])+u'{1,5}'+POASP+u'*$'
 
 EMP = re.compile(BEMPLOYEES)
 
@@ -272,7 +272,7 @@ def work_xp_liepin(text):
     out = {'company': [], 'position': []}
     for RE in [CCO, CO, TCO]:
         if (RE == TCO or re.compile(BDURATION).search(text)) and RE.search(text):
-            pattern = company_business_noborder_strong(RE)
+            pattern = company_business_noborder(RE)
             MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+NLIEPO.pattern+u'))', re.M)
             for r in MA.finditer(text):
                 if r.group('co'):

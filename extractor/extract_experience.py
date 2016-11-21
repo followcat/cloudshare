@@ -86,9 +86,9 @@ YICO = re.compile(u'^((?P<position>'+YIPOSITION+u')'+ASP+u'+)?'+PERIOD+ASP+u'*?\
 
 company_business = lambda RE:RE.pattern+u'(\n+'+ASP+u'*\-{3}\-*\n('+POASP+u'*'+COMPANY_TYPE+POASP+u'*\|)?'+POASP+u'*(?P<business>[^\|\n\-： ]+?)('+POASP+u'*\|'+POASP+u'*'+AEMPLOYEES+u')?\n)?'
 
-company_business_noborder_strong = lambda RE:RE.pattern+u'\n+'+POASP+u'*(?!所属行业：)'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)'+POASP+u'*'+COMPANY_TYPE+u')', u'((公司行业：)'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)'+POASP+u'*'+AEMPLOYEES+u')'])+u'{5}'+POASP+u'*$'
+company_business_noborder_strong = lambda RE:RE.pattern+u'\n+'+POASP+u'*(?!所属行业：)'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)?'+POASP+u'*('+COMPANY_TYPE+u'|未填写))', u'((公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')'])+u'{5}'+POASP+u'*$'
 
-company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)'+POASP+u'*'+COMPANY_TYPE+u')', u'((公司行业：)'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)'+POASP+u'*'+AEMPLOYEES+u')'])+u'{1,5}'+POASP+u'*$'
+company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)?'+POASP+u'*('+COMPANY_TYPE+u'|未填写))', u'((公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')'])+u'{1,5}'+POASP+u'*$'
 
 EMP = re.compile(BEMPLOYEES)
 
@@ -449,7 +449,7 @@ def work_xp(text):
         >>> assert positions(work_xp(u'有限公司 招聘主管 2009/03 至 2013/03 （ 4\\n年） 保密'))
         >>> assert work_xp(u'有限公司  加速器工程师  2013/07\~2014/08  广州\\n\\n公司  技术研发工程师  2014/08至今  上海')[0] == 2
         >>> assert work_xp(u'有限公司 招聘主管 2015/03 至今（ 1 年 1 个月） 保密')[0] == 1
-        >>> assert not not work_xp(u'2015年5月～至今  有限公司\\n  人力资源总监')[0] == 1  #FIXME
+        >>> assert not positions(work_xp(u'2015年5月～至今  有限公司\\n  人力资源总监'))  #FIXME
         >>> assert work_xp(u'2014年2月 -- 至今 管理（中国）有限公司\\n | 人力资源总监 （2年3个月）')[0]
         >>> assert companies(work_xp(u'（海外）2011/3 -\\n2014/7：有限公司（5000-10000人）'))
         >>> assert companies(work_xp(u'1.  2013.8——至今 有限公司'))

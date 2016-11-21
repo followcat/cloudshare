@@ -11,12 +11,48 @@ class TablePlus extends Component {
       search: '',
     };
     this.handleSearch = this.handleSearch.bind(this);
+    this.updateFilterData = this.updateFilterData.bind(this);
+    this.getDataSource = this.getDataSource.bind(this);
   }
 
   handleSearch(value) {
     this.setState({
       search: value,
     });
+    this.updateFilterData(value);
+  }
+
+  updateFilterData(value) {
+    const dataSource = this.props.dataSource;
+    let filterResult = [];
+
+    if (value) {
+      filterResult = dataSource.filter(item => {
+        for (let key in item) {
+          if (typeof item[key] === 'string' && item[key].indexOf(value) > -1) {
+            return true;
+          }
+        }
+        return false;
+      });
+    }
+    this.setState({
+      filterData: filterResult,
+    });
+  }
+
+  getDataSource() {
+    const { isSearched, dataSource } = this.props;
+
+    if (isSearched) {
+      if (this.state.search || this.state.filterData.length) {
+        return this.state.filterData;
+      } else {
+        return dataSource;
+      }
+    } else {
+      return dataSource;
+    }
   }
 
   render() {
@@ -29,9 +65,9 @@ class TablePlus extends Component {
 
     return (
       <div className={classes}>
-        {(props.toolbar)
+        {(props.isToolbarShowed)
           ? <TableToolbar
-              search={props.search}
+              isSearched={props.isSearched}
               searchCol={props.searchCol}
               searchPlaceholder={props.searchPlaceholder}
               render={props.render}
@@ -40,14 +76,15 @@ class TablePlus extends Component {
           : null
         }
         <Table
-          dataSource={props.dataSource}
+          rowKey={props.rowKey}
+          dataSource={this.getDataSource()}
           columns={props.columns}
           rowSelection={props.rowSelection}
           pagination={props.pagination}
           size={props.pagination}
           loading={props.loading}
           bordered={props.bordered}
-          expandedRowKeys={props.expandedRowKeys}
+          expandedRowRender={props.expandedRowRender}
           onChange={props.onChange}
           onRowClick={props.onRowClick}
           scroll={props.scroll}
@@ -60,13 +97,14 @@ class TablePlus extends Component {
 TablePlus.defaultProps = {
   prefixCls: 'cs-table',
   className: '',
-  toolbar: false,
+  isToolbarShowed: false,
+  isSearched: false,
+  searchPlaceholder: 'search',
   columns: [],
   rowSelection: null,
   size: 'default',
   loading: false,
   bordered: false,
-  expandedRowKeys: [],
   onChange() {},
   onRowClick() {},
 };
@@ -74,7 +112,8 @@ TablePlus.defaultProps = {
 TablePlus.propTypes = {
   prefixCls: PropTypes.string,
   className: PropTypes.string,
-  toolbar: PropTypes.bool,
+  isToolbarShowed: PropTypes.bool,
+  rowKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   dataSource: PropTypes.array,
   columns: PropTypes.array,
   rowSelection: PropTypes.object,
@@ -82,10 +121,14 @@ TablePlus.propTypes = {
   size: PropTypes.string,
   loading: PropTypes.bool,
   bordered: PropTypes.bool,
-  expandedRowKeys: PropTypes.array,
   scroll: PropTypes.object,
   onChange: PropTypes.func,
   onRowClick: PropTypes.func,
+  isSearched: PropTypes.bool,
+  searchCol: PropTypes.object,
+  searchPlaceholder: PropTypes.string,
+  render: PropTypes.element,
+  expandedRowRender: PropTypes.func,
 };
 
 export default TablePlus;

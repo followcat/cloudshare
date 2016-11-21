@@ -245,7 +245,7 @@ export default class Manage extends Component {
               {this.props.children && React.cloneElement(this.props.children, {
                 dataSource: this.state.dataSource,
                 columns: this.getColumns(),
-                toolbar: true,
+                isToolbarShowed: true,
                 render: this.getRender(),
                 scroll: { y: this.state.height },
                 style: { paddingTop: 40 },

@@ -51,7 +51,7 @@ ALLTACO = re.compile(u'((?P<pip>'+TACO.pattern+u')|(?P<nop>'+NOPIPETACO.pattern+
 
 # Combine presence of duration and bracket around period for safer searching
 RCO = re.compile(u'^'+PREFIX+u'*■?'+CONTEXT+u'?'+ASP+u'*(?P<company>[^\n:：'+SP+u'\u2013\-]+)'+ASP+u'+((?P<position>[^\n:：'+SP+u'\u2013\-]+)'+ASP+u'+)?(('+UNIBRALEFT+u'?'+PERIOD+UNIBRARIGHT+u'?)|('+BDURATION+u'))', re.M)
-HCO = re.compile(u'((((公司)|(企业))名称[:：]?'+ASP+u'*\*?(?P<company>'+COMPANY+u')\*?'+ASP+u'*(所在地区[:：]?'+ASP+u'*\S+'+ASP+u'*)?)|(((起止)|(任职))?时间[:：]?'+ASP+u'*\*?'+PERIOD+'\*?'+ASP+u'*)){2}$', re.M)
+HCO = re.compile(u'^'+PREFIX+u'?'+ASP+u'*(((((公司)|(企业))名称|任职公司)[:：]?'+ASP+u'*\*?(?P<company>'+COMPANY+u')\*?'+ASP+u'*(所在地区[:：]?'+ASP+u'*\S+'+ASP+u'*)?)|(((起止)|(任职))?时间[:：]?'+ASP+u'*\*?'+PERIOD+'\*?'+ASP+u'*)){2}$', re.M)
 
 TABLECO = re.compile(u'^工作时间'+ASP+u'+岗位职能'+ASP+u'+公司名称'+ASP+u'*$', re.M)
 TABLEPO = re.compile(u'^'+PERIOD+ASP+u'+(?P<position>'+POSITION+u'?)'+ASP+u'+(?P<company>'+COMPANY+u')'+ASP+u'*$', re.M)
@@ -66,7 +66,7 @@ PO = re.compile(u'所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*(?P<field
 IXPO = re.compile(u'^(所属行业[:：]'+ASP+u'*(?P<field>.+)\n+)?('+ASP+u'*科室[:：]\S*)?('+ASP+u'*(所属)?部'+ASP+u'*门[:：].*?)?'+ASP+u'*([所担]任)?职'+ASP+u'*位[:：]'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*(\uff1b.*)?$', re.M)
 APO = re.compile(u'^(其中)?'+APERIOD+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\*?$', re.M)
 TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'*'+APERIOD+''+ASP+u'*$', re.M)
-TAPO = re.compile(u'^([所担]任)?职[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)((('+SALARY+u')?\*?'+ASP+u'*)|(\uff1b.*))$', re.M)
+TAPO = re.compile(u'^([所担]任)?职'+ASP+u'*[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)((('+SALARY+u')?\*?'+ASP+u'*)|(\uff1b.*))$', re.M)
 BPO = re.compile(u'^(?P<aposition>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'*(?P<second>[^元/月'+SP+u']+)'+ASP+u'*)?($|(\|'+ASP+u'*('+SALARY+u')$))', re.M)
 
 SEPRTED = lambda l:u'(?:(?:'+POASP+u'*__SEP__'+POASP+u'*)|(?:'+u')|(?:'.join([_+u'(?=[__SEP__\n ])?' for _ in l])+u'))'
@@ -680,6 +680,8 @@ def table_based_xp(text):
     u"""
         >>> assert table_based_xp(u'''\\n公司名称 有限公司\\n时间  2013.06 ——2014.04\\n\\n职务 助理硬件工程师''')[0]
         >>> assert table_based_xp(u'''\\n任职时间 2013 年9月至2014年9月\\n企业名称 投资有限公司\\n职位  财务总监''')[0]
+        >>> assert table_based_xp(u'1、任职公司： （日资） 尼利可自动控制机器（上海）有限公司\\n任职时间：2013.05-至今\\n'
+        ...     u'公司背景：\\n职　　位：现场应用工程师，研发工程师''')[0]
     """
     pos = 0
     out = {'company': [], 'position': []}

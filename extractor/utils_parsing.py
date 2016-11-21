@@ -27,7 +27,7 @@ EDUFIELDSEP = u'，'+FIELDSEP
 exclude_with_parenthesis = lambda x: u'(?:'+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
-PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'{2})|◆|·|\?|(\uf0d8\xa0)|\uf0b7|\uf075|\u258c)'
+PREFIX = u'((\d+(['+SENTENCESEP+u'\.]|'+ASP+u'{2}))|◆|·|\?|(\uf0d8\xa0)|\uf0b7|\uf075|\u258c)'
 
 COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\([非欧美]+\)|代表处|股份制'
 COMPANY_TYPE = u'(([^/\|\n\- ：]*?(('+COMPANY_TYPE_KEYWORD+u')[^\|\n\- ]*)+)|(其他))'

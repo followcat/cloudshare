@@ -124,10 +124,9 @@ class CurriculumVitae(services.base.storage.BaseStorage):
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(name, dumpinfo, message=message, committer=committer)
 
-    def addcv(self, id, data, yamldata, rawdata=None):
-        cn_id = core.outputstorage.ConvertName(id)
-        self.interface.add(cn_id.md, data)
-        self.interface.add(cn_id.yaml, yamldata)
+    def addcv(self, bsobj, rawdata=None):
+        self.add(bsobj)
+        cn_id = core.outputstorage.ConvertName(bsobj.id)
         if rawdata is not None:
             self.interface.add(cn_id.html, rawdata)
         return True

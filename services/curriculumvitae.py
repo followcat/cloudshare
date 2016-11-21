@@ -5,61 +5,12 @@ import os.path
 import utils._yaml
 import core.docprocessor
 import core.outputstorage
-import core.uniquesearcher
 import services.base.storage
 
 
 class CurriculumVitae(services.base.storage.BaseStorage):
 
     commitinfo = 'CurriculumVitae'
-
-    @utils.issue.fix_issue('issues/update_name.rst')
-    def unique(self, baseobject):
-        """
-            >>> import glob
-            >>> import shutil
-            >>> import os.path
-            >>> import core.basedata
-            >>> import core.docprocessor
-            >>> import services.curriculumvitae
-            >>> import extractor.information_explorer
-            >>> DIR = 'services/test_repo'
-            >>> test_path = 'services/test_output'
-            >>> svc_bssto = services.curriculumvitae.CurriculumVitae(DIR)
-            >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> f2 = open('core/test/cv_2.doc', 'r')
-            >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
-            >>> yamlinfo1 = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
-            >>> fp2 = core.docprocessor.Processor(f2, 'cv_2.doc', test_path)
-            >>> yamlinfo2 = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base)
-            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo1)
-            >>> cv2 = core.basedata.DataObject(data=fp2.markdown_stream, metadata=yamlinfo2)
-            >>> svc_bssto.add(cv1)
-            True
-            >>> svc_bssto.add(cv2)
-            True
-            >>> md_files = glob.glob(os.path.join(svc_bssto.path, '*.md'))
-            >>> len(md_files)
-            2
-            >>> yaml_files = glob.glob(os.path.join(svc_bssto.path, '*.yaml'))
-            >>> len(yaml_files)
-            2
-            >>> svc_bssto.add(cv1)
-            False
-            >>> svc_bssto.info
-            'Exists File'
-            >>> f1.close()
-            >>> f2.close()
-            >>> shutil.rmtree(DIR)
-            >>> shutil.rmtree(test_path)
-        """
-        assert baseobject.metadata['id']
-        if self.unique_checker is None:
-            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
-        self.unique_checker.update()
-        return self.unique_checker.unique(baseobject.metadata)
 
     def add_md(self, cvobj, committer=None):
         """
@@ -115,6 +66,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
         veren = yamlinfo['enversion']
         return self.gethtml(veren)
 
+    @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
         data = None
         projectinfo = self.getinfo(id)

@@ -74,6 +74,7 @@ PIPESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '\|')
 SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ' ')
 
 NLIEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*?\n'+ASP+u'*'+SPACESEPRTED([u'所在地区：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬情况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
+PIPENLIEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*?\n'+ASP+u'*'+PIPESEPRTED([u'所在地区：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬情况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
 # Force use of ascii space to avoid matching new line and step over TCO in predator results
 LIEPPO = re.compile(u'(?<!\\\\\n)^'+ASP+u'*'+APERIOD+ur' +(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\n'+ASP+u'*((下属人数)|(所在地区)|(汇报对象)|(所在部门))：.*$', re.M)
 RESPPO = re.compile(u'^职责：(?P<position>'+POSITION+u')\n(?P<field>\S+?)\| 企业性质：\S+?\| 规模：'+AEMPLOYEES+'$', re.M)
@@ -267,19 +268,25 @@ def work_xp_liepin(text):
         ...     u'    所在地区：北京    所在部门：杨森诊断中国事业部   汇报对象：事业部经理\\n下属人数： 0   薪酬情况： 22000'))['total_employees']
         >>> assert positions(work_xp_liepin(u'2010/04-2016/07   华为技术有限公司\\n        公司行业： 通信(设备/运营/增值)\\n'
         ...     u'    软件工程师      2010/04 - 2011/08\\n        所在地区：深圳      所在部门：\\n下属人数： 0      薪酬情况： 保密'))
+        >>> assert u'专员' in position_1(work_xp_liepin(u'2013.02-至今       迈瑞生物医疗电子股份有限公司\\n\\n'
+        ...     u'    公司性质：未填写 | 公司规模： 未填写 | 公司行业：医疗设备/器械\\n\\n公司描述：未填写\\n\\n'
+        ...     u'国际市场专员                          2013.02 - 至今\\n\\n所在地区：广东省 | 所在部门：未填写'))['name']
     """
     pos = 0
     out = {'company': [], 'position': []}
     for RE in [CCO, CO, TCO]:
         if (RE == TCO or re.compile(BDURATION).search(text)) and RE.search(text):
             pattern = company_business_noborder(RE)
-            MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+NLIEPO.pattern+u'))', re.M)
-            for r in MA.finditer(text):
-                if r.group('co'):
-                    company_output(out, r.groupdict())
-                else:
-                    pos +=1
-                    position_output(out, r.groupdict())
+            for PO in [PIPENLIEPO, NLIEPO]:
+                MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+PO.pattern+u'))', re.M)
+                for r in MA.finditer(text):
+                    if r.group('co'):
+                        company_output(out, r.groupdict())
+                    else:
+                        pos +=1
+                        position_output(out, r.groupdict())
+                if pos:
+                    break
             if not pos:
                 pattern = company_business(RE)
                 MA = re.compile(u'((?P<po>'+LIEPPO.pattern+u')|(?P<co>'+pattern+u'))', re.M)

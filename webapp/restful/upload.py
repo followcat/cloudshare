@@ -47,13 +47,18 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
-                result = self.svc_peo.add(cvobj, user.id)
-                result = self.svc_mult_cv.add(cvobj, user.id, project_name, unique=True)
-                if result is True:
-                    names.append(cvobj.name.md)
-                    documents.append(cvobj.data)
-                    status = 'success'
-                    message = 'Upload success.'
+                peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata,
+                                                            cvobj.metadata['unique_id'])
+                peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+                peo_result = self.svc_peo.add(peopobj, user.id)
+                if peo_result is True:
+                    cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                     project_name, unique=True)
+                    if cv_result is True:
+                        names.append(cvobj.name.md)
+                        documents.append(cvobj.data)
+                        status = 'success'
+                        message = 'Upload success.'
             results.append({ 'id': id,
                              'status': status,
                              'message': message,
@@ -76,7 +81,7 @@ class UploadCVAPI(Resource):
                                            metadata=yamlinfo)
         upload[user.id][filename] = None
         name = ''
-        unique_peo = self.svc_peo.exists(dataobj.metadata['unique_id'])
+        unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
         if filepro.result is True:
             if not dataobj.metadata['name']:
                 dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
@@ -84,7 +89,7 @@ class UploadCVAPI(Resource):
             upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
-                                        'unique_': unique_peo,
+                                        'unique_peo': unique_peo,
                                         'name': name, 'filename': filename } }
 
 

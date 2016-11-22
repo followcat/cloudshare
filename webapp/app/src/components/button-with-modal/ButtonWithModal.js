@@ -9,6 +9,7 @@ class ButtonWithModal extends Component {
     return (
       <div className="cs-button-with-modal">
         <Button
+          style={props.buttonStyle}
           type={props.buttonType}
           size={props.buttonSize}
           loading={props.buttonLoading}
@@ -49,6 +50,7 @@ ButtonWithModal.defaultProps = {
 };  
 
 ButtonWithModal.propTypes = {
+  buttonStyle: PropTypes.object,
   buttonType: PropTypes.string,
   buttonSize: PropTypes.string,
   buttonLoading: PropTypes.bool,

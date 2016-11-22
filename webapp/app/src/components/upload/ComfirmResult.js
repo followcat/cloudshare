@@ -26,11 +26,14 @@ export default class ComfirmResult extends Component {
         render: (record) => <a href={`/resume/${record.id}`} target="_blank" disabled={record.status !== 'success' ? true : false}>Check</a>
       }
     ];
+
+    const dataSource = this.props.comfirmResult.concat(this.props.errorResult);
+
     return (
       <div style={{ width: 720, margin: '0 auto' }}>
         <Table
           columns={columns}
-          dataSource={this.props.comfirmResult}
+          dataSource={dataSource}
           pagination={false}
           bordered={true}
         />
@@ -39,6 +42,12 @@ export default class ComfirmResult extends Component {
   }
 }
 
+ComfirmResult.defaultProps = {
+  comfirmResult: [],
+  errorResult: [],
+};
+
 ComfirmResult.propTypes = {
   comfirmResult: PropTypes.arrayOf(PropTypes.object),
+  errorResult: PropTypes.arrayOf(PropTypes.object),
 };

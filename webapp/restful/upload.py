@@ -75,7 +75,7 @@ class UploadCVAPI(Resource):
                                  kwargs={'stream': filepro.markdown_stream.decode('utf8'),
                                          'filename': filepro.base.base})
         except utils.timeout.process.KilledExecTimeout as e:
-            return { 'code': 200, 'data': { 'result': False,
+            return { 'code': 401, 'data': { 'result': False,
                                             'resultid': '',
                                             'name': '', 'filename': filename } }
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,

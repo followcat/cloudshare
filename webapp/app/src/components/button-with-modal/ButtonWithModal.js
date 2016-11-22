@@ -19,7 +19,7 @@ class ButtonWithModal extends Component {
         </Button>
         <Modal
           visible={props.visible}
-          comfirmLoading={props.comfirmLoading}
+          confirmLoading={props.confirmLoading}
           title={props.modalTitle}
           width={props.modalWidth}
           okText={props.modalOkText}
@@ -42,7 +42,7 @@ ButtonWithModal.defaultProps = {
   buttonText: '',
   onButtonClick() {},
   visible: false,
-  comfirmLoading: false,
+  confirmLoading: false,
   modalOkText: 'Ok',
   modalCancelText: 'Cancel',
   onModalOk() {},
@@ -57,7 +57,7 @@ ButtonWithModal.propTypes = {
   buttonText: PropTypes.string,
   onButtonClick: PropTypes.func,
   visible: PropTypes.bool,
-  comfirmLoading: PropTypes.bool,
+  confirmLoading: PropTypes.bool,
   modalTitle: PropTypes.string,
   modalWidth: PropTypes.number,
   modalOkText: PropTypes.string,

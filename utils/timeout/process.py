@@ -61,7 +61,7 @@ def process_timeout_call(func, delay, kill=True, args=None, kwargs=None):
             queue.put(('success', result))
         except:
             e = sys.exc_info()
-            queue.put(('exception', e))
+            queue.put(('exception', e[0:1]))
 
     if args is None:
         if kwargs is None:
@@ -89,7 +89,7 @@ def process_timeout(delay, kill=True):
                 queue.put(('success', result))
             except:
                 e = sys.exc_info()
-                queue.put(('exception', e))
+                queue.put(('exception', e[0:1]))
         res = process_exec(inner_worker, delay, queue, kill=kill)
         return parse_return(res)
     return wrapper

@@ -70,7 +70,7 @@ class TablePlus extends Component {
               isSearched={props.isSearched}
               searchCol={props.searchCol}
               searchPlaceholder={props.searchPlaceholder}
-              render={props.render}
+              elements={props.elements}
               onSearch={this.handleSearch}
             />
           : null
@@ -127,7 +127,7 @@ TablePlus.propTypes = {
   isSearched: PropTypes.bool,
   searchCol: PropTypes.object,
   searchPlaceholder: PropTypes.string,
-  render: PropTypes.element,
+  elements: PropTypes.array,
   expandedRowRender: PropTypes.func,
 };
 

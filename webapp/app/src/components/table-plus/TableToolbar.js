@@ -26,9 +26,14 @@ class TableToolbar extends Component {
             </Col>
           : null
         }
-        {props.render.map((item, index) => {
+        {props.elements.map((item, index) => {
           return (
-            <Col key={index}>{item}</Col>
+            <Col
+              {...item.col}
+              key={index}
+            >
+              {item.render}
+            </Col>
           );
         })}
       </Row>
@@ -43,7 +48,7 @@ TableToolbar.defaultProps = {
     span: 6,
   },
   searchPlaceholder: "search",
-  render: [],
+  elements: [],
   onSearch() {},
 };
 
@@ -52,7 +57,10 @@ TableToolbar.propTypes = {
   isSearched: PropTypes.bool,
   searchCol: PropTypes.object,
   searchPlaceholder: PropTypes.string,
-  render: PropTypes.array,
+  elements: PropTypes.arrayOf(PropTypes.shape({
+    col: PropTypes.object,
+    render: PropTypes.element,
+  })),
   onSearch: PropTypes.func,
 };
 

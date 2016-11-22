@@ -37,7 +37,7 @@ export default class Manage extends Component {
     this.handleChangePasswordSubmit = this.handleChangePasswordSubmit.bind(this);
     this.handleSignOutConfirm = this.handleSignOutConfirm.bind(this);
     this.getUserList = this.getUserList.bind(this);
-    this.getRender = this.getRender.bind(this);
+    this.getElements = this.getElements.bind(this);
     this.getColumns = this.getColumns.bind(this);
   }
 
@@ -164,23 +164,28 @@ export default class Manage extends Component {
     });
   }
 
-  getRender() {
-    const render = [
-      <CreateNewUser
-        dataSource={this.state.dataSource}
-        buttonType="primary"
-        buttonText="Create new user"
-        onButtonClick={this.handleButtonClick}
-        modalTitle="Create new user"
-        modalOkText="Create"
-        visible={this.state.visible}
-        confirmLoading={this.state.confirmLoading}
-        onCreate={this.handleCreate}
-        onModalCancel={this.handleModalCancel}
-      />
-    ];
+  getElements() {
+    const elements = [{
+      col: {
+        span: 6
+      },
+      render: (
+        <CreateNewUser
+          dataSource={this.state.dataSource}
+          buttonType="primary"
+          buttonText="Create new user"
+          onButtonClick={this.handleButtonClick}
+          modalTitle="Create new user"
+          modalOkText="Create"
+          visible={this.state.visible}
+          confirmLoading={this.state.confirmLoading}
+          onCreate={this.handleCreate}
+          onModalCancel={this.handleModalCancel}
+        />
+      )
+    }];
 
-    return render;
+    return elements;
   }
 
   getColumns() {
@@ -246,7 +251,7 @@ export default class Manage extends Component {
                 dataSource: this.state.dataSource,
                 columns: this.getColumns(),
                 isToolbarShowed: true,
-                render: this.getRender(),
+                elements: this.getElements(),
                 scroll: { y: this.state.height },
                 style: { paddingTop: 40 },
                 onSubmit: this.handleChangePasswordSubmit

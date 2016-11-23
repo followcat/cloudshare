@@ -5,6 +5,7 @@ import { Row, Col, Input } from 'antd';
 class TableToolbar extends Component {
   constructor() {
     super();
+    this.handleSearchChange = this.handleSearchChange.bind(this);
   }
 
   handleSearchChange(e) {
@@ -16,18 +17,23 @@ class TableToolbar extends Component {
 
     return (
       <Row className={`${props.prefixCls}`}>
-        {(props.search)
+        {(props.isSearched)
           ? <Col {...props.searchCol}>
               <Input
-                searchPlaceholder={props.placeholder}
+                placeholder={props.searchPlaceholder}
                 onChange={this.handleSearchChange}
               />
             </Col>
           : null
         }
-        {props.render.map((item, index) => {
+        {props.elements.map((item, index) => {
           return (
-            <Col key={index}>{item}</Col>
+            <Col
+              {...item.col}
+              key={index}
+            >
+              {item.render}
+            </Col>
           );
         })}
       </Row>
@@ -37,21 +43,24 @@ class TableToolbar extends Component {
 
 TableToolbar.defaultProps = {
   prefixCls: 'cs-table-toolbar',
-  search: false,
+  isSearched: false,
   searchCol: {
     span: 6,
   },
   searchPlaceholder: "search",
-  render: [],
+  elements: [],
   onSearch() {},
 };
 
 TableToolbar.propTypes = {
   prefixCls: PropTypes.string,
-  search: PropTypes.bool,
+  isSearched: PropTypes.bool,
   searchCol: PropTypes.object,
   searchPlaceholder: PropTypes.string,
-  render: PropTypes.array,
+  elements: PropTypes.arrayOf(PropTypes.shape({
+    col: PropTypes.object,
+    render: PropTypes.element,
+  })),
   onSearch: PropTypes.func,
 };
 

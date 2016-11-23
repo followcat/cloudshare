@@ -9,6 +9,7 @@ class ButtonWithModal extends Component {
     return (
       <div className="cs-button-with-modal">
         <Button
+          style={props.buttonStyle}
           type={props.buttonType}
           size={props.buttonSize}
           loading={props.buttonLoading}
@@ -18,7 +19,7 @@ class ButtonWithModal extends Component {
         </Button>
         <Modal
           visible={props.visible}
-          comfirmLoading={props.comfirmLoading}
+          confirmLoading={props.confirmLoading}
           title={props.modalTitle}
           width={props.modalWidth}
           okText={props.modalOkText}
@@ -41,7 +42,7 @@ ButtonWithModal.defaultProps = {
   buttonText: '',
   onButtonClick() {},
   visible: false,
-  comfirmLoading: false,
+  confirmLoading: false,
   modalOkText: 'Ok',
   modalCancelText: 'Cancel',
   onModalOk() {},
@@ -49,13 +50,14 @@ ButtonWithModal.defaultProps = {
 };  
 
 ButtonWithModal.propTypes = {
+  buttonStyle: PropTypes.object,
   buttonType: PropTypes.string,
   buttonSize: PropTypes.string,
   buttonLoading: PropTypes.bool,
   buttonText: PropTypes.string,
   onButtonClick: PropTypes.func,
   visible: PropTypes.bool,
-  comfirmLoading: PropTypes.bool,
+  confirmLoading: PropTypes.bool,
   modalTitle: PropTypes.string,
   modalWidth: PropTypes.number,
   modalOkText: PropTypes.string,

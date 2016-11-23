@@ -10,6 +10,7 @@ import ResumeExtension from '../components/resume/ResumeExtension';
 import 'whatwg-fetch';
 import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
+import History from '../utils/history';
 import { getRadarOption } from '../utils/chart_option';
 
 import './resume.less';
@@ -133,6 +134,7 @@ export default class Resume extends Component {
         this.setState({
           tag: tagList,
         });
+        message.success(json.message);
       } else {
         message.error(json.message);
       }
@@ -166,6 +168,7 @@ export default class Resume extends Component {
         this.setState({
           tracking: followUpList,
         });
+        message.success(json.message);
       } else {
         message.error(json.message);
       }
@@ -198,6 +201,7 @@ export default class Resume extends Component {
         this.setState({
           comment: commentList,
         });
+        message.success(json.message);
       } else {
         message.error(json.message);
       }
@@ -294,6 +298,10 @@ export default class Resume extends Component {
    * @return {[void]} 
    */
   handleDrawChartSubmit(object) {
+    if (!object.value) {
+      message.error('Please select a job description!');
+      return;
+    }
     const requestParam = object.type === 'id' ? { id: object.value } : { doc: object.value },
           cvId = this.state.id;
     fetch(`/api/mining/valuable`, {
@@ -346,6 +354,11 @@ export default class Resume extends Component {
           tag: yamlInfo.tag,
           tracking: yamlInfo.tracking,
           comment: yamlInfo.comment,
+        });
+
+        History.write({
+          id: id,
+          name: yamlInfo.name
         });
       }
     })

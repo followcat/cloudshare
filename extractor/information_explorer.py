@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 import re
+import string
+import random
 import os.path
 import functools
+import extractor.unique_id
 import extractor.education
 import extractor.expectation
 import extractor.utils_parsing
 import extractor.extract_experience
 
 
-info_template = (
+cv_template = (
     ("id",                  str),
     ("name",                str),
     ("filename",            str),
@@ -35,10 +38,17 @@ info_template = (
     ("tracking",            list),
 )
 
+co_template = (
+    ("name",                str),
+    ("committer",           str),
+    ("date",                int),
+    ("introduction",        str),
+    ("business",            list),
+    ("total_employees",     str),
+)
 
-def generate_info_template(template=None):
-    if template is None:
-        template = info_template
+
+def generate_info_template(template):
     info = {}
     for each in template:
         info[each[0]] = each[1]()
@@ -152,9 +162,10 @@ def get_experience(stream, name=None):
     experiences = []
     current_company = None
     current_position = None
-    if name is None:
+    try:
+        assert name in fix_func
+    except AssertionError:
         name = 'default'
-    assert name in fix_func
 
     extracted_data = fix_func[name]()
     if extracted_data:
@@ -185,8 +196,8 @@ def get_experience(stream, name=None):
     return result
 
 
-def get_classify(experience, company_knowledge=None, classify=[]):
-    return extractor.extract_experience.match_classify(experience, company_knowledge, classify)
+def get_classify(experience, company_knowledge=None):
+    return extractor.extract_experience.match_classify(experience, company_knowledge)
 
 
 def get_name(stream):
@@ -225,21 +236,10 @@ def get_age(stream):
     return result
 
 
-def catch(stream, name=None):
-    info_dict = dict()
-    info_dict["name"] = get_name(stream)
-    info_dict["originid"] = get_originid(stream)
-    info_dict["age"] = get_age(stream)
-    info_dict["phone"] = get_phone(stream)
-    info_dict["email"] = get_email(stream)
-    info_dict.update(get_education(stream, name))     # education_history, education, school
-    info_dict.update(get_experience(stream, name))    # experience, company, position
-    info_dict["classify"] = get_classify(info_dict['experience'])
-    info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
-                                                # age
-    return info_dict
+all_selected = ('name', 'originid', 'age', 'phone', 'email', 'education', 'experience', 'expectation', 'classify')
 
 def catch_selected(stream, selected, name=None):
+    assert set(selected).issubset(set(all_selected))
     info_dict = dict()
     if 'name' in selected:
         info_dict["name"] = get_name(stream)
@@ -252,19 +252,55 @@ def catch_selected(stream, selected, name=None):
     if 'email' in selected:
         info_dict["email"] = get_email(stream)
     if 'education' in selected:
-        info_dict.update(get_education(stream, name))
+        info_dict.update(get_education(stream, name))     # education_history, education, school
     if 'experience' in selected:
-        info_dict.update(get_experience(stream, name))
+        info_dict.update(get_experience(stream, name))    # experience, company, position
     if 'expectation' in selected:
-        info_dict.update(get_expectation(stream))
+        info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
+                                                    # age
     if 'classify' in selected:
         experience = get_experience(stream, name)
         info_dict["classify"] = get_classify(experience)
     return info_dict
 
+catch = functools.partial(catch_selected, selected=all_selected)
 
-def catch_info(stream, name=None):
-    info = generate_info_template()
+
+def catch_cvinfo(stream, filename, name=None):
+    """
+        >>> import core.outputstorage
+        >>> st = 'curriculum vitea'
+        >>> name = core.outputstorage.ConvertName('name.docx')
+        >>> assert catch_cvinfo(stream=st, filename=name.base)['filename'] == name.base
+    """
+    info = generate_info_template(cv_template)
     catchinfo = catch(stream)
     info.update(catchinfo)
+    extractor.unique_id.unique_id(info)
+    try:
+        info['id'] = info['unique_id']
+    except KeyError:
+        info['id'] = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
+    info["filename"] = filename
+    return info
+
+
+def catch_coinfo(stream, name):
+    """
+        >>> intro = {'introduction': 'introduction'}
+        >>> assert catch_coinfo(name='sgwgewtgqe', stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
+    """
+    info = generate_info_template(co_template)
+    info['name'] = name
+    info['id'] = extractor.unique_id.company_id(name)
+    if isinstance(stream, dict):
+        for key in ('introduction', 'total_employees'):
+            try:
+                info[key] = stream[key]
+            except KeyError:
+                pass
+        try:
+            info['business'].append(stream['business'])
+        except KeyError:
+            pass
     return info

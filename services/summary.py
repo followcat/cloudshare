@@ -2,10 +2,9 @@ import time
 import yaml
 import os.path
 
-import services.base
 import core.outputstorage
-import core.converterutils
 import core.uniquesearcher
+import services.base.service
 
 
 def yaml_to_doc(d):
@@ -19,7 +18,7 @@ def yaml_to_doc(d):
     return output + k + '\n' + xp
 
 
-class CandidateSummary(services.base.Service):
+class CandidateSummary(services.base.service.Service):
 
     path = 'CV'
 

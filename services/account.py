@@ -3,19 +3,19 @@ import os.path
 import yaml
 
 import utils.builtin
-import services.base
+import services.base.service
 import services.exception
 import core.outputstorage
 
 
-class Account(services.base.Service):
+class Account(services.base.service.Service):
     """
         >>> import shutil
         >>> import services.account
         >>> import interface.gitinterface
         >>> repo_name = 'services/test_repo'
         >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> svc_account = services.account.Account(interface)
+        >>> svc_account = services.account.Account(interface.path)
         >>> svc_account.USERS
         {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
         >>> svc_account.add('root', 'admin', 'password')

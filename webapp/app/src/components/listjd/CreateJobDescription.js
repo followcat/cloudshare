@@ -86,7 +86,7 @@ class CreateJobDescription extends Component {
               >
                 {this.props.companyData.map((item, index) => {
                   return (
-                    <Select.Option key={index} value={item.name}>{item.name}</Select.Option>
+                    <Select.Option key={index} value={item.id}>{item.name}</Select.Option>
                   )
                 })}
               </Select>

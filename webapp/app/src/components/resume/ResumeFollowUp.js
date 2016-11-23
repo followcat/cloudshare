@@ -48,6 +48,7 @@ class ResumeFollowUp extends Component {
       values.date = dateValueFormat(values.date);
       this.props.onSubmitFollowUp(values);
     });
+    this.props.form.resetFields();
   }
 
   render() {

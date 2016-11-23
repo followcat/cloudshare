@@ -3,24 +3,17 @@ import os
 import services.account
 import services.multiclsify
 import services.cvstoragesync
+import services.company
 import services.curriculumvitae
 import interface.basefs
 import interface.predator
 import interface.gitinterface
 
 
-ACCOUNT_DB_NAME = 'account'
-ACCOUNT_DB = interface.gitinterface.GitInterface(ACCOUNT_DB_NAME)
-SVC_ACCOUNT = services.account.Account(ACCOUNT_DB)
-
-REPO_DB_NAME = 'repo'
-REPO_DB = interface.gitinterface.GitInterface(REPO_DB_NAME)
-SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(REPO_DB, 'cloudshare')
-
-
-CV_STORAGE_DIR = 'cvstorage'
-CV_STORAGE_DB = interface.basefs.BaseFSInterface(CV_STORAGE_DIR)
-SVC_CV_STO = services.curriculumvitae.CurriculumVitaeStorage(CV_STORAGE_DB, 'cvstorage')
+SVC_ACCOUNT = services.account.Account('account')
+SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare')
+SVC_CO_REPO = services.company.Company('repo/CO', 'corepo')
+SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')
 
 RAW_DIR = 'raw'
 RAW_DB = dict()

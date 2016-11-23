@@ -1,28 +1,40 @@
 'use strict';
-import React, { Component } from 'react';
-
-import Feature from './Feature';
-
+import React, { Component, PropTypes } from 'react';
 import './header.less';
-
 import LogoImg from '../../image/logo.png';
 
-export default class Header extends Component {
-
+class Header extends Component {
   render() {
+    const props = this.props;
+
+    let classes = props.prefixCls;
+    if (props.fixed) {
+      classes += `${props.prefixCls}-fixed`;
+    }
+
     return (
-      <div className="cs-layout-top">
-        <div className="cs-layout-herader">
-          <div className="cs-layout-wrapper">
-            <div className="cs-layout-logo">
-              <img src={LogoImg} alt="Logo" />
-            </div>
-            <div className="cs-layout-feature">
-              <Feature />
-            </div>
+      <div className={classes}>
+        <div className={`${props.prefixCls}-container`}>
+          <div className={`${props.prefixCls}-logo`}>
+            <img src={LogoImg} alt="logo" />
+          </div>
+          <div className={`${props.prefixCls}-right`}>
+            {props.children}
           </div>
         </div>
       </div>
     );
   }
 }
+
+Header.defaultProps = {
+  fixed: false,
+  prefixCls: 'cs-header',
+};
+
+Header.propTypes = {
+  fixed: PropTypes.bool,
+  prefixCls: PropTypes.string,
+};
+
+export default Header;

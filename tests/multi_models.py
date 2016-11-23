@@ -49,8 +49,9 @@ def build_lsimodel(path, slicer, names=None, texts=None, no_above=1.,
     return m
 
 def get_cv_md(id):
-    t = SVC_CV_REPO.getmd(id)
-    if t is None:
+    try:
+        t = SVC_CV_REPO.getmd(id)
+    except IOError:
         t = SVC_CV_STO.getmd(id)
     return t
 

@@ -15,13 +15,18 @@ export default class DrawChart extends Component {
       jdId: '',
       jdDoc: '',
       type: 'id',
+      selectedRowKeys: [],
     };
 
     this.handleClick = this.handleClick.bind(this);
     this.handleCollapseChange = this.handleCollapseChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleOk = this.handleOk.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
+    this.handleRowSelectionChange = this.handleRowSelectionChange.bind(this);
+    this.handlePaginationChange = this.handlePaginationChange.bind(this);
+    this.handleRowSelectionSelect = this.handleRowSelectionSelect.bind(this);
   }
 
   handleClick() {
@@ -29,6 +34,12 @@ export default class DrawChart extends Component {
       visible: true,
     });
     this.props.onDrawChartOpen();
+  }
+
+  handleOk() {
+    this.setState({
+      visible: false,
+    });
   }
 
   handleCancel() {
@@ -55,13 +66,32 @@ export default class DrawChart extends Component {
     this.props.onDrawChartSubmit(object);
   }
 
+  handleRowSelectionChange(selectedRowKeys, selectedRows) {
+    this.setState({
+      selectedRowKeys: selectedRowKeys,
+    });
+  }
+
+  handlePaginationChange() {
+    this.setState({
+      selectedRowKeys: [],
+      jdId: '',
+    });
+  }
+
+  handleRowSelectionSelect(record, selected, selectedRows) {
+    this.setState({
+      jdId: record.id,
+    });
+  }
+
   render() {
 
     const columns = [
       {
         title: 'Company Name',
-        dataIndex: 'company',
-        key: 'company',
+        dataIndex: 'company_name',
+        key: 'company_name',
         width: 120,
       }, {
         title: 'Position',
@@ -77,17 +107,16 @@ export default class DrawChart extends Component {
 
     const rowSelection = {
       type: 'radio',
-      onChange: (selectedRowKeys, selectedRows) => {
-        this.setState({
-          jdId: selectedRows[0].id,
-        });
-      },
+      selectedRowKeys: this.state.selectedRowKeys,
+      onChange: this.handleRowSelectionChange,
+      onSelect: this.handleRowSelectionSelect,
     };
 
     const pagination = {
       total: this.props.jdList.length,
       pageSize: 5,
       size: 'small',
+      onChange: this.handlePaginationChange
     };
 
     return (
@@ -103,7 +132,8 @@ export default class DrawChart extends Component {
           title="Draw Chart"
           visible={this.state.visible}
           style={{ top: 12 }}
-          width={720}
+          width={980}
+          onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
           <Collapse

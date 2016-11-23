@@ -6,6 +6,8 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.chsname
+import utils.timeout.process
+import utils.timeout.exception
 import core.basedata
 import core.docprocessor
 import extractor.information_explorer
@@ -74,9 +76,15 @@ class UploadCVAPI(Resource):
         filename = network_file.filename
         filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
                                               flask.current_app.config['UPLOAD_TEMP'])
-        yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                              stream=filepro.markdown_stream.decode('utf8'),
-                                              filename=filepro.base.base)
+        try:
+            yamlinfo = utils.timeout.process.process_timeout_call(
+                                 extractor.information_explorer.catch_cvinfo, 5,
+                                 kwargs={'stream': filepro.markdown_stream.decode('utf8'),
+                                         'filename': filepro.base.base})
+        except utils.timeout.process.KilledExecTimeout as e:
+            return { 'code': 401, 'data': { 'result': False,
+                                            'resultid': '',
+                                            'name': '', 'filename': filename } }
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
         upload[user.id][filename] = None

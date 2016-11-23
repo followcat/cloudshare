@@ -132,7 +132,13 @@ class ResumeTitle extends Component {
               </Select>
             </Form.Item>
             <Form.Item>
-              {isLastPreview ? <ResumeComfirm {...this.props} onClick={this.handleResumeComfirmClick} /> : ''}
+              {isLastPreview ?
+                  <ResumeComfirm
+                    loading={this.props.loading}
+                    onClick={this.handleResumeComfirmClick}
+                  /> :
+                  null
+              }
             </Form.Item>
           </div>
           <Form.Item

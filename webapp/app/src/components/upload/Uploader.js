@@ -12,7 +12,10 @@ export default class Uploader extends Component {
     return (
       <div>
         <div style={{ width: 720, minHeight: 180, margin: '0 auto' }}>
-          <Dragger {...this.props.uploadProps}>
+          <Dragger 
+            {...this.props.uploadProps}
+            fileList={this.props.fileList}
+          >
             <p className="ant-upload-drag-icon">
               <Icon type="inbox" />
             </p>

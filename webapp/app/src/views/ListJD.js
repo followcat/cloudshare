@@ -1,365 +1,404 @@
 'use strict';
-import React, { Component } from 'react';
-import { Link } from 'react-router';
-import { Menu, message } from 'antd';
-import 'whatwg-fetch';
+import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
+import Viewport from '../components/viewport';
+import Header  from '../components/header';
+import CommonNavigation from './CommonNavigation';
+import ShowCard from '../components/show-card';
+import SiderMenu from '../components/sider-menu';
+import Container from '../components/container';
+import Content from '../components/content';
+import CreateNewJobDescription from '../components/list-jd/CreateNewJobDescription';
+import Status from '../components/list-jd/Status';
+import EditJobDescription from '../components/list-jd/EditJobDescription';
+import CreateNewCompany from '../components/list-jd/CreateNewCompany';
+import { message } from 'antd';
+import { getMenu, getCurrentActive } from '../utils/sider-menu-list';
+import { getJobDescriptions, createJobDescription, updateJobDescription } from '../request/jobdescription';
+import { getCompanys, createCompany } from '../request/company';
+import { URL } from '../request/api';
+import './list-jd.less';
 
-import Header from '../components/common/Header';
-import Storage from '../utils/storage';
-import Generator from '../utils/generator';
-import './manage.less';
-
-export default class ListJD extends Component {
-  
+class ListJD extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      current: 'jobdescription',
-      jobDescriptionData: [],
-      searchData: [],
-      filter: {
-        'keyword': '',
-        'status': 'Opening',
-      },
-      companyData: [],
+      current: getCurrentActive(props),
+      statusValue: 'Opening',
+      jobDescriptionList: [],
+      filterList: [],
+      companyList: [],
       height: 0,
-      confirmLoading: false,
-      visible: false,
+      jdVisible: false,
+      jdConfirmLoading: false,
+      editConfirmLoading: false,
+      companyConfirmLoading: false,
+      companyVisible: false,
     };
-    this.loadJobDescription = this.loadJobDescription.bind(this);
-    this.loadCompany = this.loadCompany.bind(this);
-    this.handleMenuClick = this.handleMenuClick.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
-    this.handleCreateNewJobDescription = this.handleCreateNewJobDescription.bind(this);
-    this.handleSubmitEditJD = this.handleSubmitEditJD.bind(this);
-    this.handleModalOpen = this.handleModalOpen.bind(this);
-    this.handleModalCancel = this.handleModalCancel.bind(this);
-    this.handleCreateNewCompany = this.handleCreateNewCompany.bind(this);
-    this.handleOnSelectFilter = this.handleOnSelectFilter.bind(this);
-    this.updateFilter = this.updateFilter.bind(this);
-  }
-
-  /**
-   * 加载所有职位描述数据
-   */
-  loadJobDescription() {
-    fetch(`/api/jdlist`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${Storage.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData(),
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      if (json.code === 200) {
-        let data = [];
-        data = json.data.map((item, index) => {
-          if (!item.key) {
-            return Object.assign(item, { key: index });
-          }
-          return item;
-        });
-        this.setState({
-          jobDescriptionData: data,
-        });
-        this.updateFilter();
-      } else {
-        console.log('Get jd error.');
-      }
-    })
-  }
-
-  /**
-   * 加载所有公司数据
-   */
-  loadCompany() {
-    fetch(`/api/companylist`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${Storage.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData(),
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      if (json.code === 200) {
-        this.setState({
-          companyData: json.data,
-        });
-      } else {
-        console.log('Get company error.');
-      }
-    })
+    this.handleSiderMenuClick = this.handleSiderMenuClick.bind(this);
+    this.handleNewJDBtnClick = this.handleNewJDBtnClick.bind(this);
+    this.handleJDModalCancel = this.handleJDModalCancel.bind(this);
+    this.handleJobDescriptionCreate = this.handleJobDescriptionCreate.bind(this);
+    this.handleStatusChange = this.handleStatusChange.bind(this);
+    this.handleEditJDSubmit = this.handleEditJDSubmit.bind(this);
+    this.handleNewCompanyBtnClick = this.handleNewCompanyBtnClick.bind(this);
+    this.handleCompanyModalCancel = this.handleCompanyModalCancel.bind(this);
+    this.handleCompanyCreate = this.handleCompanyCreate.bind(this);
+    this.getjobDescriptionList = this.getjobDescriptionList.bind(this);
+    this.getCompanyList = this.getCompanyList.bind(this);
+    this.getExpandedRowRender = this.getExpandedRowRender.bind(this);
+    this.getJobDescriptionElements = this.getJobDescriptionElements.bind(this);
+    this.getJobDescriptionColumns = this.getJobDescriptionColumns.bind(this);
+    this.getCompanyElements = this.getCompanyElements.bind(this);
+    this.getCompanyColumns = this.getCompanyColumns.bind(this);
   }
 
   componentDidMount() {
-    this.loadJobDescription();
-    this.loadCompany();
-    const height = parseInt(this.refs.wrapper.offsetHeight) - 208;
+    this.getjobDescriptionList();
+    this.getCompanyList();
+    const eleShowCard = ReactDOM.findDOMNode(this.refs.showCard),
+          height = eleShowCard.offsetHeight - 2*eleShowCard.offsetTop - 169;
     this.setState({
       height: height,
     });
   }
 
-  handleMenuClick(e) {
+  // 侧边栏菜单点击切换光标
+  handleSiderMenuClick(e) {
     this.setState({
       current: e.key,
     });
   }
 
-  /**
-   * 根据过滤条件筛选data
-   * @return {void}
-   */
-  updateFilter() {
-    const jdData = this.state.jobDescriptionData,
-          filter = this.state.filter;
-
-    let filterResult = [],
-        keyword = filter.keyword,
-        status = filter.status;
-
-    switch (true) {
-      case keyword !== '' && status !== '':
-        let firstFilter = jdData.filter(item => item.status === status);
-        filterResult = firstFilter.filter((item) => {
-          for (let key in item) {
-            if (typeof item[key] === 'string' && item[key].indexOf(keyword) > -1) {
-              return true;
-            }
-          }
-          return false;
-        });
-        break;
-      case keyword !== '' && status === '':
-        filterResult = jdData.filter((item) => {
-          for (let key in item) {
-            if (typeof item[key] === 'string' && item[key].indexOf(keyword) > -1) {
-              return true;
-            }
-          }
-          return false;
-        });
-        break;
-      case keyword === '' && status !== '':
-        filterResult = jdData.filter(item => item.status === status);
-        break;
-      default:
-        filterResult = [];
-    }
-
+  // 点击职位描述创建按钮, 打开Modal
+  handleNewJDBtnClick() {
     this.setState({
-      searchData: filterResult,
+      jdVisible: true,
     });
   }
 
-  /**
-   * 表格数据搜索
-   * @param  {[string]} value [获取Input的值]
-   * @return {[type]}  None
-   */
-  handleSearch(value) {
-    const filter = this.state.filter;
+  // 关闭职位描述Modal
+  handleJDModalCancel() {
     this.setState({
-      filter: Object.assign(filter, { keyword: value })
+      jdVisible: false,
     });
-    this.updateFilter();
   }
 
-  /**
-   * 根据Select选择器选择的值过滤表格结果
-   * @param  {string} value [status选择的值]
-   * @return {void}
-   */
-  handleOnSelectFilter(value) {
-    const filter = this.state.filter;
+  // 提交创建职位项目
+  handleJobDescriptionCreate(value) {
     this.setState({
-      filter: Object.assign(filter, { status: value })
+      jdConfirmLoading: true,
     });
-    this.updateFilter();
-  }
-
-  /**
-   * 创建一个新的职位描述
-   * @param  {[type]} object [获取表单数据对象]
-   * @return {[type]} None
-   */
-  handleCreateNewJobDescription(obj) {
-    const _this = this;
-    this.setState({
-      confirmLoading: true,
-    });
-
-    fetch(`/api/uploadjd`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Authorization': `Basic ${Storage.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({
-        jd_name: obj.jdName,
-        co_id: obj.companySelection,
-        jd_description: obj.jdContent,
-      }),
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
+    createJobDescription({
+      co_id: value.companyName,
+      jd_name: value.jobDescriptionName,
+      jd_description: value.jobDescriptionContent,
+    }, (json) => {
       if (json.code === 200) {
         this.setState({
-          visible: false,
-          confirmLoading: false,
+          jdVisible: false,
+          jdConfirmLoading: false,
         });
         message.success(json.message);
-        _this.loadJobDescription();
-      }
-    })
-  }
-
-  /**
-   * 修改Job Description
-   * @param  {[object]}   value    [表单数据对象]
-   * @param  {Function} callback [回调函数: 为了修改子组件state]
-   * @return {[type]}  None
-   */
-  handleSubmitEditJD(value, callback) {
-    const _this = this;
-    fetch(`/api/jd/${value.jdId}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Authroization': `Basic ${Storage.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({
-        status: value.statusSelect,
-        co_id: value.companyName,
-        description: value.jdContent,
-      }),
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      if (json.code === 200) {
-        if (callback && typeof callback === 'function') {
-          callback();
-        }
-        message.success(json.message);
-        _this.loadJobDescription();
+        this.getjobDescriptionList();
       } else {
         message.error(json.message);
       }
-    })
+    });
   }
 
-  /**
-   * 创建公司
-   * @param  {[object]}   value    [表单数据对象]
-   * @param  {Function} callback [回调函数: 为了修改子组件state]
-   * @return {[type]}  None
-   */
-  handleCreateNewCompany(value, callback) {
-    const _this = this;
+  // 职位项目状态切换,过滤列表
+  handleStatusChange(value) {
+    const jobDescriptionList = this.state.jobDescriptionList;
+    let filterList = [];
 
-    fetch(`/api/company`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Authroization': `Basic ${Storage.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({
-        coname: value.companyName,
-        introduction: value.introduction,
-      }),
-    })
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
+    if (value) {
+      filterList = jobDescriptionList.filter(item => {
+        return item.status === value;
+      });
+    }
+
+    this.setState({
+      statusValue: value,
+      filterList: filterList,
+    });
+  }
+
+  // 提交修改职位信息
+  handleEditJDSubmit(value) {
+    this.setState({
+      editConfirmLoading: true,
+    });
+    const params = {
+      id: value.jobDescriptionID,
+      co_id: value.company,
+      description: value.jobDescriptionContent,
+      status: value.status,
+    };
+    updateJobDescription(params, (json) => {
       if (json.code === 200) {
-        if (callback && typeof callback === 'function') {
-          callback();
-        }
+        this.getjobDescriptionList();
+        this.setState({
+          editConfirmLoading: false,
+        });
         message.success(json.message);
-        _this.loadCompany();
+      } else {
+        message.error(json.message);
       }
-    })
-  }
-
-  /**
-   * Modal显示事件
-   */
-  handleModalOpen() {
-    this.setState({
-      visible: true,
     });
   }
 
-  /**
-   * Modal隐藏事件
-   */
-  handleModalCancel() {
+  // 点击公司创建按钮, 打开Modal
+  handleNewCompanyBtnClick() {
     this.setState({
-      visible: false,
+      companyVisible: true,
     });
+  }
+
+  // 关闭公司Modal
+  handleCompanyModalCancel() {
+    this.setState({
+      companyVisible: false,
+    });
+  }
+
+  // 提交创建公司
+  handleCompanyCreate(value) {
+    createCompany({
+      coname: value.companyName,
+      introduction: value.introduction,
+    }, (json) => {
+      if (json.code === 200) {
+        this.setState({
+          companyVisible: false,
+        });
+        message.success(json.message);
+        this.getCompanyList();
+      } else {
+        message.error(json.message);
+      }
+    });
+  }
+
+  // 获取所有职位描述列表
+  getjobDescriptionList() {
+    const statusValue = this.state.statusValue;
+
+    getJobDescriptions((json) => {
+      if (json.code === 200) {
+        this.setState({
+          jobDescriptionList: json.data,
+          filterList: json.data.filter(item => item.status === statusValue),
+        });
+      }
+    });
+  }
+
+  // 获取所有公司列表
+  getCompanyList() {
+    getCompanys((json) => {
+      if (json.code === 200) {
+        this.setState({
+          companyList: json.data,
+        });
+      }
+    });
+  }
+
+  // 获取渲染扩展职位描述展开行
+  getExpandedRowRender(record) {
+    return record.description.split('\n').map((item, index) => {
+      return <p key={index}>{item}</p>
+    });
+  }
+
+  // 获取职位描述组件toolbar所要渲染组件
+  getJobDescriptionElements() {
+    const statusList = [{
+      text: 'All',
+      value: '',
+    }, {
+      text: 'Open',
+      value: 'Opening',
+    }, {
+      text: 'Closed',
+      value: 'Closed',
+    }];
+
+    const elements = [{
+      col: {
+        span: 3,
+      },
+      render: (
+        <CreateNewJobDescription
+          buttonStyle={{ marginLeft: 10 }}
+          buttonType="primary"
+          buttonText="Create"
+          modalTitle="Create New Job Description"
+          modalOkText="Create"
+          confirmLoading={this.state.jdConfirmLoading}
+          companyList={this.state.companyList}
+          visible={this.state.jdVisible}
+          onButtonClick={this.handleNewJDBtnClick}
+          onModalCancel={this.handleJDModalCancel}
+          onCreate={this.handleJobDescriptionCreate}
+        />
+      ),
+    }, {
+      col: {
+        span: 4,
+      },
+      render: (
+        <Status
+          style={{ display: 'inline-block', marginLeft: 10 }}
+          dataSource={statusList}
+          width={120}
+          defaultValue={this.state.statusValue}
+          onChange={this.handleStatusChange}
+        />
+      )
+    }];
+
+    return elements;
+  }
+
+  // 获取职位描述列信息
+  getJobDescriptionColumns() {
+    const status = [{
+      text: 'Open',
+      value: 'Opening',
+    }, {
+      text: 'Closed',
+      value: 'Closed',
+    }];
+
+    const columns = [{
+      title: 'Company Name',
+      dataIndex: 'company_name',
+      key: 'company_name',
+      width: 160,
+    }, {
+      title: 'Position',
+      dataIndex: 'name',
+      key: 'position',
+      width: 240,
+    }, {
+      title: 'Creator',
+      dataIndex: 'committer',
+      key: 'creator',
+      width: 80,
+    }, {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 80,
+      render: (text) => {
+        return text === 'Opening' ?
+            <span style={{ color: 'green' }}>Open</span> :
+            <span style={{ color: 'red' }}>{text}</span>
+      }
+    }, {
+      title: 'Operation',
+      key: 'operation',
+      render: (record) => (
+        <div>
+          <a
+            href={URL.getFastMatching(record.id)}
+            target="_blank"
+          >
+            Fast Matching
+          </a>
+          <EditJobDescription
+            buttonText="Edit"
+            buttonSize="small"
+            modalTitle="Edit Job Description"
+            modalOkText="Submit"
+            modalStyle={{ top: 20 }}
+            record={record}
+            companyList={this.state.companyList}
+            status={status}
+            confirmLoading={this.state.editConfirmLoading}
+            onSubmit={this.handleEditJDSubmit}
+          />
+        </div>
+      )
+    }];
+    return columns;
+  }
+
+  // 获取公司组件toolbar所要渲染组件
+  getCompanyElements() {
+    const elements = [{
+      render: (
+        <CreateNewCompany
+          buttonType="primary"
+          buttonText="Create"
+          modalTitle="Create New Company"
+          modalOkText="Create"
+          confirmLoading={this.state.companyConfirmLoading}
+          visible={this.state.companyVisible}
+          onButtonClick={this.handleNewCompanyBtnClick}
+          onModalCancel={this.handleCompanyModalCancel}
+          onCreate={this.handleCompanyCreate}
+        />
+      ),
+    }];
+
+    return elements;
+  }
+
+  // 获取公司列信息
+  getCompanyColumns() {
+    const columns = [{
+      title: 'Company Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: 280,
+    },
+    {
+      title: 'Introduction',
+      dataIndex: 'introduction',
+      key: 'introduction',
+    }];
+
+    return columns;
   }
 
   render() {
     return (
-      <div>
-        <div id="viewport" className="pd-top">
-          <Header fixed={true} />
-          <div className="cs-layout-bottom">
-            <div className="cs-layout-wrapper" ref="wrapper">
-              <div className="cs-layout-sider">
-                <Menu
-                  mode="inline"
-                  selectedKeys={[this.state.current]}
-                  onClick={this.handleMenuClick}
-                >
-                  <Menu.Item key="jobdescription"><Link to="/jobdescription">Job Description</Link></Menu.Item>
-                  <Menu.Item key="company"><Link to="/company">Company</Link></Menu.Item>
-                </Menu>
-              </div>
-              <div className="cs-layout-content">
-                {this.props.children && React.cloneElement(
-                  this.props.children, {
-                    jobDescriptionData: this.state.jobDescriptionData,
-                    companyData: this.state.companyData,
-                    searchData: this.state.searchData,
-                    height: this.state.height,
-                    confirmLoading: this.state.confirmLoading,
-                    visible: this.state.visible,
-                    filter: this.state.filter,
-                    onModalOpen: this.handleModalOpen,
-                    onModalCancel: this.handleModalCancel,
-                    onSearch: this.handleSearch,
-                    onCreateNewJobDescription: this.handleCreateNewJobDescription,
-                    onSubmitEditJD: this.handleSubmitEditJD,
-                    onCreateNewCompany: this.handleCreateNewCompany,
-                    onSelectFilter: this.handleOnSelectFilter,
-                  })}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Viewport>
+        <Header 
+          fixed={true}
+          logoMode="left"
+        >
+          <CommonNavigation />
+        </Header>
+        <Container>
+          <ShowCard ref="showCard">
+            <SiderMenu
+              selectedKeys={[this.state.current]}
+              menus={getMenu(this.props.route.childRoutes)}
+              onClick={this.handleSiderMenuClick}
+            />
+            <Content>
+              {this.props.children && React.cloneElement(this.props.children, {
+                jobDescriptionList: this.state.filterList.length > 0 ?
+                    this.state.filterList :
+                    this.state.jobDescriptionList,
+                companyList: this.state.companyList,
+                jobDescriptionColumns: this.getJobDescriptionColumns(),
+                jobDescriptionElements: this.getJobDescriptionElements(),
+                companyColumns: this.getCompanyColumns(),
+                companyElements: this.getCompanyElements(),
+                getExpandedRowRender: this.getExpandedRowRender,
+                scroll: { y: this.state.height },
+              })}
+            </Content>
+          </ShowCard>
+        </Container>
+      </Viewport>
     );
   }
 }
+
+export default ListJD;

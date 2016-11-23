@@ -1,6 +1,7 @@
 import flask
 import flask.ext.restful
 
+from webapp.restful.people import *
 from webapp.restful.mining import *
 from webapp.restful.search import *
 from webapp.restful.upload import *
@@ -69,6 +70,10 @@ def initialize(app):
                                         endpoint = 'valuablebydoc')
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
+
+
+    api.add_resource(PeopleByIDAPI, '/api/projuectbyid', endpoint = 'projuectbyid')
+    api.add_resource(PeopleByUniqueIDAPI, '/api/projectbyuni', endpoint = 'projectbyuni')
 
     api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')
     api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')

@@ -6,6 +6,7 @@ import Header from '../components/common/Header';
 import Uploader from '../components/upload/Uploader';
 import PreviewList from '../components/upload/PreviewList';
 import ComfirmResult from '../components/upload/ComfirmResult';
+import { message } from 'antd';
 
 import Generator from '../utils/generator';
 
@@ -34,14 +35,17 @@ export default class Upload extends Component {
       disabled: false,
       classifyList: [],
       comfirmResult: [],
+      errorResult: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleRemove = this.handleRemove.bind(this);
     this.handlePrevPreview = this.handlePrevPreview.bind(this);
     this.handleNextPreview = this.handleNextPreview.bind(this);
     this.handleComfirmUpload = this.handleComfirmUpload.bind(this);
     this.isObjectExisted = this.isObjectExisted.bind(this);
     this.loadClassify = this.loadClassify.bind(this);
+    this.getComfirmResultRender = this.getComfirmResultRender.bind(this);
   }
 
   loadClassify() {
@@ -69,48 +73,114 @@ export default class Upload extends Component {
 
   handleChange(info) {
     let fileList = info.fileList,
-        completedFileList = this.state.completedFileList;
+        completedFileList = this.state.completedFileList,
+        errorResult = this.state.errorResult;
 
     fileList = fileList.map((file) => {
       if (file.response && file.status === 'done' && !file.flag) {
         file.flag = true;
-        fetch(`/api/uploadcv/preview`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Authorization': `Basic ${localStorage.token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            filename: file.response.data.filename,
-          }),
-        })
-        .then((response) => {
-          return response.json();
-        })
-        .then((json) => {
-          if (json.code === 200) {
-            file.response.data = Object.assign(file.response.data, json.data);
-            file.filename = json.data.filename;
-            completedFileList.push(file.response.data);
-            this.setState({
-              completedFileList: completedFileList,
-            });
-          }
-        })
+        if (file.response.code === 200) {
+          fetch(`/api/uploadcv/preview`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Authorization': `Basic ${localStorage.token}`,
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              filename: file.response.data.filename,
+            }),
+          })
+          .then((response) => {
+            return response.json();
+          })
+          .then((json) => {
+            if (json.code === 200) {
+              file.response.data = Object.assign(file.response.data, json.data);
+              file.filename = json.data.filename;
+              completedFileList.push(Object.assign({}, file.response.data, { uid: file.uid }));
+              this.setState({
+                completedFileList: completedFileList,
+              });
+            }
+          });
+        } else {
+          message.error(`Upload file ${file.name} failed.`, 3);
+          errorResult.push({
+            id: '',
+            status: 'error',
+            message: 'Timeout! System can not parse this file.',
+            filename: file.name,
+            uid: file.uid,
+          });
+          this.setState({
+            errorResult: errorResult,
+          });
+        }
       }
       return file;
     });
 
     this.setState({
       fileList: fileList,
-      comfirmResult: [],
+    });
+  }
+
+  handleRemove(file) {
+    const fileObject = file,
+          fileList = this.state.fileList,
+          comfirmResult = this.state.comfirmResult,
+          completedFileList = this.state.completedFileList,
+          errorResult = this.state.errorResult;
+
+    let index = -1;
+
+    index = findIndexOf('uid', fileObject, fileList);
+    if (index > -1) {
+      fileList.splice(index, 1);
+    }
+
+    index = findIndexOf('uid', fileObject, comfirmResult);
+    if (index > -1) {
+      comfirmResult.splice(index, 1);
+    }
+
+    index = findIndexOf('uid', fileObject, completedFileList);
+    if (index > -1) {
+      completedFileList.splice(index, 1);
+    }
+
+    index = findIndexOf('uid', fileObject, errorResult);
+    if (index > -1) {
+      errorResult.splice(index, 1);
+    }
+
+    this.setState({
+      fileList: fileList,
+      comfirmResult: comfirmResult,
+      errorResult: errorResult,
     });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextState.fileList.length === nextState.completedFileList.length;
+    if (nextState.fileList.length !== this.state.fileList.length) {
+      return true;
+    }
+
+    if (nextState.fileList.length === nextState.completedFileList.length) {
+      return true;
+    }
+
+    if (nextState.fileList.length === nextState.errorResult.length) {
+      return true; 
+    }
+
+    if (nextState.loading !== this.state.loading) {
+      return true;
+    }
+
+    return false;
   }
 
   isObjectExisted(array, targetId) {
@@ -198,6 +268,26 @@ export default class Upload extends Component {
     })
   }
 
+  getComfirmResultRender() {
+    const state = this.state;
+    if (state.errorResult.length > 0 && state.errorResult.length === state.fileList.length) {
+      return (
+        <ComfirmResult
+          errorResult={this.state.errorResult}
+        />
+      );
+    } else if (this.state.comfirmResult.length) {
+      return (
+        <ComfirmResult
+          comfirmResult={this.state.comfirmResult}
+          errorResult={this.state.errorResult}
+        />
+      );
+    } else {
+      return null;
+    }
+  }
+
   render() {
     const h = parseInt(document.body.offsetHeight) - 104;
 
@@ -209,13 +299,17 @@ export default class Upload extends Component {
       },
       multiple: true,
       onChange: this.handleChange,
+      onRemove: this.handleRemove,
     };
 
     return (
       <div>
         <Header fixed={true} />
         <div className="container" style={{ minHeight: h }}>
-          <Uploader uploadProps={uploadProps} />
+          <Uploader
+            uploadProps={uploadProps}
+            fileList={this.state.fileList}
+          />
           <PreviewList
             previewList={this.state.completedFileList}
             currentPreview={this.state.currentPreview}
@@ -226,7 +320,7 @@ export default class Upload extends Component {
             disabled={this.state.disabled}
             classifyList={this.state.classifyList}
           />
-          {this.state.comfirmResult.length !== 0 ? <ComfirmResult comfirmResult={this.state.comfirmResult}/> : ''}
+          {this.getComfirmResultRender()}
         </div>
         
       </div>

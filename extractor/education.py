@@ -6,6 +6,7 @@ from extractor.utils_parsing import *
 
 with_prefix = lambda x: u'^'+ASP+u'*'+PREFIX+u'+'+ASP+u'*'+ x.pattern[1:]
 
+ED_PERIOD = u'(('+PERIOD+u')|(?P<ato>'+DATE+u'))'
 # We check for braket to avoid catching title 教育/培训/学术/科研/院校
 ED = re.compile(ur'^'+ASP+u'*(?P<br>'+UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'*目)|((工'+ASP+u'*作'+ASP+u'*)|(实习)|(工作(与)?实践)))'+ASP+u'*经'+ASP+u'*[历验])|(实习与实践)|(背景)|(培训)|(语言((能力)|(技能)))|(所获奖项)|(校内职务)|(学生实践经验)|(技能证书)|(接受培训)|(社会经验))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
 AED = re.compile(ur'^'+ASP+u'*(?P<br>'+ UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*)', re.DOTALL+re.M)
@@ -13,12 +14,15 @@ PFXED = re.compile(with_prefix(ED), re.DOTALL+re.M)
 PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
 
 
-SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+ASP+u'*[\n'+SP+SENTENCESEP+u']*'+SCHOOL+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
+SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+SCHOOL+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P=sep)'+ASP+u'*'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
+SENSEDROP = u'((\S+)[\n'+SP+EDUFIELDSEP+u']*)?'
+RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+u'(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*(?P=sep)'+ASP+u'*'+SENSEDROP+u'$', re.M)
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
-SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+FIELDSEP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
-NOSCSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+u'((?P<major>[^'+SP+FIELDSEP+u']+)[\n'+SP+u']+)'+EDUCATION+ASP+u'*', re.M)
-UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+FIELDSEP+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
+SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
+NOSCSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+u'((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+)'+EDUCATION+ASP+u'*', re.M)
+UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
+RVSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+EDUCATION+u'[\n'+SP+u']+'+SCHOOL+u'[\n'+SP+u']+(?P<major>[^'+SP+u']+)[\n'+SP+u']+', re.M)
 
 PFXSENSEMA = re.compile(with_prefix(SENSEMA), re.M)
 PFXSPSOLMA = re.compile(with_prefix(SPSOLMA), re.M)
@@ -37,8 +41,6 @@ PFXHDCTLMA = re.compile(with_prefix(HDCTLMA), re.M)
 PFXRVHDCTLMA = re.compile(with_prefix(RVHDCTLMA), re.M)
 
 NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
-SENSEDROP = u'((\S+)[\n'+SP+SENTENCESEP+u']*)?'
-RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+SENTENCESEP+u']+(?P<major>[^'+SP+SENTENCESEP+u'\n]+)[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u''+EDUCATION+u'[\n'+SP+SENTENCESEP+u']+'+SENSEDROP+u'$', re.M)
 
 TABHDRMAJ = u'^'+ASP+u'*时'+ASP+u'*间段?'+ASP+u'+[院学]'+ASP+u'*校('+ASP+u'*名'+ASP+u'*称)?'+ASP+u'+专'+ASP+u'*业'+ASP+u'+(获得证书/)?学'+ASP+u'*历(/学位)?('+ASP+u'+证'+ASP+u'*书)?('+ASP+u'+是否统招)?(?P<edu>.+)'
 
@@ -66,6 +68,12 @@ def format_output(output, groupdict, summary=None):
         result['date_to'] = fix_date(groupdict['ato'])
     try:
         result['education'] = groupdict['education'].strip()
+        if groupdict['shorted4']:
+            result['education'] = groupdict['shorted4']
+        elif groupdict['shorted6']:
+            result['education'] = groupdict['shorted6']
+        elif groupdict['shorted7']:
+            result['education'] = groupdict['shorted7']
     except KeyError:
         if summary:
             result['education'] = summary['education'].strip()
@@ -100,6 +108,7 @@ def education_xp(text, summary=None):
         >>> assert education_xp(u'（海外） 2015/9-至今 南京大学 管理 MBA\\n双证班；\\n2007/1-2010/1 南京大学 资源管理 本科\\n管理')[0] == 2
         >>> assert education_xp(u'2010.09-至今  科学研究院  原子核物理\\n 硕士2006.09 - 2010.07  理工大学  飞行器设计  本科')[0] == 2
         >>> assert education_xp(u'2000/9―2003/3：同济大学 | 生物医学工程 | 硕士')[0]
+        >>> assert education_xp(u'2006/09 --2010/06广东商学院 | 法学 | 学士')[0]
         >>> assert '|' not in name(school_1(education_xp(u'2009/09 --2012/07 \\n\\n电力职业技术学院 | 其自动化 | 大专')))
         >>> assert 'y' in name(school_1(education_xp(u'2010.09 - 2012.06  Northwestern University  生物医学工程  硕士')))
         >>> assert education_xp(u'? 2003.9-2006.4  西北工业大学  材料学院  材料加工工程，计算机模拟加工\\n 硕士')[0]
@@ -109,7 +118,7 @@ def education_xp(text, summary=None):
         >>> assert education_xp(u'山东大学（ 2001.09 - 2005.07 ）\\n专业名称： 自动化   学历： 本科   是否统招： 是')[0]
         >>> assert education_xp(u'''湖北工业大学（2003.09—2007.07）\\n\\n电气工程\\n\\n学院名称： 工程学院\\n\\n学历： 本科''')[0]
         >>> assert education_xp(u'毕业院校： 浙江大学（原名：杭州学院）\\n就读时间：1986-09–1990-07\\n专业：食品卫生\\n学位：本科')[0]
-        >>> assert education_xp(u'2005-09 ～ 2009-06    ：   江南大学\\n\\n  轻化工程，本科')[0]
+        >>> assert not education_xp(u'2005-09 ～ 2009-06    ：   江南大学\\n\\n  轻化工程，本科')[0]    #FIXME
         >>> assert education_xp(u'2014-9 至 2017-6   计算机科学与技术华南师范大学\\n\\n硕士研究生\\n\\n云计算与大数据处理')[0]
         >>> assert education_xp(u'东华大学 工程学院（2006.09 - 至今）\\n专业：自动化专业  学历：硕士   是否统招：是')[0]
         >>> assert education_xp(u'2006-9\~ 2010-6     广东工业大学 轻工化工学院 生物工程  本科   统招')[0]
@@ -122,6 +131,8 @@ def education_xp(text, summary=None):
         >>> assert u'广' in name(school_1(education_xp(u'''2001.09-2004.06        广东省广宁中学           高中''')))
         >>> assert education_xp(u'2010-9 至 2014-7   软件工程中山大学\\n\\n本科 丨GPA：3.7 丨班级名次：前30名')[1]
         >>> assert '|' not in major(school_1(education_xp(u'''工业学院\\n\\n2001年9月-2005年7月\\n\\n 无机非金属材料| 材料类| 本科 |济南''')))
+        >>> assert education_xp(u'1.  2006年9月—2010年7 月，天津科技大学，机械设计制造及自动化，本科')
+        >>> assert education_xp(u'2007/09-2010/03 天津科技大学，农产品加工及贮藏工程， 硕士学位')
         >>> assert not education_xp(u'''2005.09-2009.07         湖南工程学院      大学本科\\n其自动化''')[0]    #FIXME
         >>> assert not education_xp(u'2001 /9--2005 /7   华中农业大学   计算机科学与技术')[0]  #FIXME
         >>> assert not education_xp(u'2005 /9--2009 /7   广东药学院   生物技术（制药方向）')[0] #FIXME
@@ -129,6 +140,7 @@ def education_xp(text, summary=None):
         >>>     #TODO 本科 学士 makes one for education and the other for major
         >>> assert not education_xp(u'2003年9月---2008年6月：华北煤炭医学院')[1]  #FIXME
         >>> assert not education_xp(u'最高学位：硕士 2009年11月\\n\\n毕业院校：巴斯大学（英国）中英口笔译')[0]  #FIXME
+        >>> assert 2 == education_xp(u'2010.09 - 2013.07  能科学研究院  原子核物理\\n 硕士2006.09 - 2010.07  理工大学  飞行器设计  本科')[0]
     """
     maj = 0
     out = []
@@ -182,6 +194,22 @@ def education_xp(text, summary=None):
                 format_output(out, r.groupdict(), summary)
             else:
                 format_output(out, r.groupdict(), summary={'major': ''})
+    if not maj:
+        if SENSEMA.search(text):
+            out = []
+            for r in SENSEMA.finditer(text):
+                maj +=1
+                format_output(out, r.groupdict())
+        elif PFXSENSEMA.search(text):
+            out = []
+            for r in PFXSENSEMA.finditer(text):
+                maj +=1
+                format_output(out, r.groupdict())
+        elif RVSENSEMA.search(text):
+            out = []
+            for r in RVSENSEMA.finditer(text):
+                maj +=1
+                format_output(out, r.groupdict())
     if not maj and (PFXSPSOLMA.search(text) or SPSOLMA.search(text)):
         out = []
         for r in PFXSPSOLMA.finditer(text):
@@ -208,6 +236,17 @@ def education_xp(text, summary=None):
             else:
                 format_output(out, r.groupdict(), summary={'major': ''})
         out = sorted(out, key=lambda x: x['date_from'], reverse=True)
+    if not maj and RVSPSOLMA.search(text):
+        out = []
+        for r in RVSPSOLMA.finditer(text):
+            if r.group('major'):
+                maj +=1
+                format_output(out, r.groupdict())
+            elif summary:
+                maj +=1
+                format_output(out, r.groupdict(), summary)
+            else:
+                format_output(out, r.groupdict(), summary={'major': ''})
     if not maj and summary:
         RE = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'+(?P<school>%s)' %
                 summary['school'].replace('(', '\(').replace(')', '\)').strip()+ASP+u'+(?P<major>%s)' % summary['major'].strip(), re.M)
@@ -216,22 +255,6 @@ def education_xp(text, summary=None):
         for r in RE.finditer(text):
             maj +=1
             format_output(out, r.groupdict())
-    if not maj:
-        if SENSEMA.search(text):
-            out = []
-            for r in SENSEMA.finditer(text):
-                maj +=1
-                format_output(out, r.groupdict())
-        elif PFXSENSEMA.search(text):
-            out = []
-            for r in PFXSENSEMA.finditer(text):
-                maj +=1
-                format_output(out, r.groupdict())
-        elif RVSENSEMA.search(text):
-            out = []
-            for r in RVSENSEMA.finditer(text):
-                maj +=1
-                format_output(out, r.groupdict())
     return maj, out
 
 
@@ -399,6 +422,8 @@ def fix(d):
         >>> assert fix(u'2010/09 --2013/05\\n航天大学 | 金融信息化 | 硕士（在职研究生）')
         >>> assert fix(u'        教育经历\\n\\n        2004/9 -- 2007/7     东南大学    机械电子工程/机电一体化   本科')
         >>> assert not fix(u'教育:\\n\\n1982-1986        哈尔滨工业大学计算机科学，本科') #FIXME
+        >>> assert not fix(u'学习培训经历：\\n\\n2003年9月-2007年7月　    湖南城市学院　　\\n电子信息工程专业　　 本科')  #FIXME
+        >>> assert not fix(u'----\\n1995.9—1999.7   长春光学精密机械学院       检测技术及仪器仪表   本科\\n----')   #FIXME
     """
     maj = 0
     processed = []

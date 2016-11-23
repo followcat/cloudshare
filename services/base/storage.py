@@ -28,12 +28,38 @@ class BaseStorage(services.base.service.Service):
         """
         return id in self.ids
 
-    def unique(self, baseobject):
-        name = core.outputstorage.ConvertName(baseobject.name)
-        return not self.exists(name.base)
+    def unique(self, id):
+        """
+            >>> import shutil
+            >>> import core.basedata
+            >>> import services.base.storage
+            >>> import extractor.information_explorer
+            >>> repo_name = 'core/test_repo'
+            >>> test_path = 'core/test_output'
+            >>> f1 = open('core/test/cv_1.doc', 'r')
+            >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
+            >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
+            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
+            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)
+            >>> svc_cv = services.base.storage.BaseStorage(repo_name)
+            >>> fp1.result
+            True
+            >>> svc_cv.unique(cv1.name)
+            True
+            >>> svc_cv.add(cv1)
+            True
+            >>> svc_cv.unique(cv1.name)
+            False
+            >>> svc_cv.add(cv1)
+            False
+            >>> f1.close()
+            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(test_path)
+        """
+        return not self.exists(id)
 
     def add(self, bsobj, committer=None, unique=True, yamlfile=True):
-        if unique is True and self.unique(bsobj) is False:
+        if unique is True and self.unique(bsobj.name) is False:
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(bsobj.name)
@@ -47,6 +73,21 @@ class BaseStorage(services.base.service.Service):
                                message=message, committer=committer)
         self._nums += 1
         return True
+
+    def getyaml(self, id):
+        """
+        Expects an IOError exception if file not found.
+            >>> import services.base.storage
+            >>> DIR = 'services/test_repo'
+            >>> SVC_BSSTO = services.base.storage.BaseStorage(DIR)
+            >>> SVC_BSSTO.getyaml('CV') # doctest: +ELLIPSIS
+            Traceback (most recent call last):
+            ...
+            IOError...
+        """
+        name = core.outputstorage.ConvertName(id).yaml
+        yaml_str = self.interface.get(name)
+        return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
     def getmd(self, name):
         """
@@ -95,6 +136,9 @@ class BaseStorage(services.base.service.Service):
             name = core.outputstorage.ConvertName(id).md
             text = self.getmd(id)
             yield name, text
+
+    def history(self, author=None, entries=10, skip=0):
+        return self.interface.history(author=author, max_commits=entries, skip=skip)
 
     @property
     def ids(self):

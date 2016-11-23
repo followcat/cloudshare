@@ -15,6 +15,12 @@ class TablePlus extends Component {
     this.getDataSource = this.getDataSource.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.dataSource.length !== this.props.dataSource.length) {
+      this.updateFilterData(this.state.search, nextProps);
+    }
+  }
+
   handleSearch(value) {
     this.setState({
       search: value,
@@ -22,8 +28,8 @@ class TablePlus extends Component {
     this.updateFilterData(value);
   }
 
-  updateFilterData(value) {
-    const dataSource = this.props.dataSource;
+  updateFilterData(value, nextProps=null) {
+    const dataSource = nextProps ? nextProps.dataSource : this.props.dataSource;
     let filterResult = [];
 
     if (value) {

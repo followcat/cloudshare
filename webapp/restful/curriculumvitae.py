@@ -13,6 +13,7 @@ class CurrivulumvitaeAPI(Resource):
 
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
+        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
@@ -67,7 +68,8 @@ class CurrivulumvitaeYAMLAPI(CurrivulumvitaeAPI):
 
     def get(self, id):
         yamlinfo = self.svc_mult_cv.getyaml(id)
-        return { 'result': yamlinfo }
+        peopleinfo = self.scv_peo.getyaml(yamlinfo['unique_id'])
+        return { 'result': yamlinfo, 'people': peopleinfo }
 
     def put(self, id):
         result = True

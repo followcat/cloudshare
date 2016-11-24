@@ -6,6 +6,8 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.chsname
+import utils.timeout.process
+import utils.timeout.exception
 import core.basedata
 import core.docprocessor
 import extractor.information_explorer
@@ -20,6 +22,7 @@ class UploadCVAPI(Resource):
 
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         self.svc_min = flask.current_app.config['SVC_MIN']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -46,12 +49,18 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
-                result = self.svc_mult_cv.add(cvobj, user.id, project_name, unique=True)
-                if result is True:
-                    names.append(cvobj.name.md)
-                    documents.append(cvobj.data)
-                    status = 'success'
-                    message = 'Upload success.'
+                peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata,
+                                                            cvobj.metadata['unique_id'])
+                peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+                peo_result = self.svc_peo.add(peopobj, user.id)
+                if peo_result is True:
+                    cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                     project_name, unique=True)
+                    if cv_result is True:
+                        names.append(cvobj.name.md)
+                        documents.append(cvobj.data)
+                        status = 'success'
+                        message = 'Upload success.'
             results.append({ 'id': id,
                              'status': status,
                              'message': message,
@@ -67,13 +76,20 @@ class UploadCVAPI(Resource):
         filename = network_file.filename
         filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
                                               flask.current_app.config['UPLOAD_TEMP'])
-        yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                              stream=filepro.markdown_stream.decode('utf8'),
-                                              filename=filepro.base.base)
+        try:
+            yamlinfo = utils.timeout.process.process_timeout_call(
+                                 extractor.information_explorer.catch_cvinfo, 30,
+                                 kwargs={'stream': filepro.markdown_stream.decode('utf8'),
+                                         'filename': filepro.base.base})
+        except utils.timeout.process.KilledExecTimeout as e:
+            return { 'code': 401, 'data': { 'result': False,
+                                            'resultid': '',
+                                            'name': '', 'filename': filename } }
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
         upload[user.id][filename] = None
         name = ''
+        unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
         if filepro.result is True:
             if not dataobj.metadata['name']:
                 dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
@@ -81,6 +97,7 @@ class UploadCVAPI(Resource):
             upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
+                                        'unique_peo': unique_peo,
                                         'name': name, 'filename': filename } }
 
 
@@ -138,6 +155,7 @@ class UploadCVPreviewAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         super(UploadCVPreviewAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('filename', location = 'json')
@@ -149,4 +167,12 @@ class UploadCVPreviewAPI(Resource):
         dataobj = upload[user.id][filename]
         md = dataobj.preview_data()
         yaml_info = dataobj.metadata
-        return { 'code': 200, 'data': { 'filename': filename, 'markdown': md, 'yaml_info': yaml_info } }
+        try:
+            people_info = self.svc_peo.getyaml(yaml_info['unique_id'])
+            cvs = people_info['cv']
+        except IOError:
+            cvs = []
+        return { 'code': 200, 'data': { 'filename': filename,
+                                        'markdown': md,
+                                        'yaml_info': yaml_info,
+                                        'cv': cvs } }

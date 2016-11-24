@@ -3,7 +3,6 @@ import yaml
 import os.path
 
 import core.outputstorage
-import core.uniquesearcher
 import services.base.service
 
 

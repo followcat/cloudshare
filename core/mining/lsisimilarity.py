@@ -91,7 +91,7 @@ class LSIsimilarity(object):
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 
-    def probability(self, doc):
+    def probability(self, doc, top=None):
         """
             >>> from tests.test_model import *
             >>> from webapp.settings import *
@@ -170,13 +170,15 @@ class LSIsimilarity(object):
             >>> assert kgr_bad('e3bd422a2d6411e6b5296c3be51cefca', jd_service, sim, cvs=['qsfmtebc'])
             >>> assert kgr_bad('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim, cvs=['fv51hvdy', 'je7d0xeg', 'v0gcrsow', 'sjk41azl', 'f280mmdm', 'cla50bo5'], above_allow=True)
         """
+        if top is None:
+            top = len(self.index)
         results = []
         vec_lsi = self.lsi_model.probability(doc)
         try:
             sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
         except IndexError:
             return results
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims)
+        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims[0:top])
         return results
 
     def probability_by_id(self, doc, id):

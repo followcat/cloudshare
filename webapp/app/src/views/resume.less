@@ -8,7 +8,37 @@
   margin-left: auto;
   margin-right: auto;
 
+  & > .ant-tabs-card {
+    & > .ant-tabs-content {
+      background: #fff;
+      padding: 8px;
+      height: auto;
+      min-height: 450px;
+      margin-top: -16px;
+    }
+
+    & > .ant-tabs-bar {
+        .ant-tabs-tab {
+        border-color: transparent;
+        border-top-width: 2px;
+        margin-right: 8px;
+        background-color: #fff;
+
+        & > .ant-tabs-tab-inner {
+          padding-top: 6px;
+        }
+      }
+
+      .ant-tabs-tab-active {
+        border-color: #fff;
+        border-top-style: solid;
+        border-top-color: @willendareColor;
+      }
+    }
+  }
+
   .cs-resume-wrapper {
+    float: left;
     width: 720px;
     background-color: #fff;
 
@@ -54,6 +84,10 @@
       }
     }
   }
+
+  .ant-spin-container {
+    overflow:hidden;
+  }
 }
 
 .pd-lr-8 {
@@ -85,12 +119,11 @@
 }
 
 .resume-side {
-  position: absolute;
-  top: 0;
-  right: 0;
   width: 340px;
   height: 100px;
-  
+  float: left;
+  margin-left: 4px;
+
   .ant-card-bordered {
     border-color: #ccc;
   }

@@ -65,5 +65,5 @@ EnglishResumeAddition.propTypes = {
   enComfirmLoading: PropTypes.bool,
   upload: PropTypes.object,
   fileList: PropTypes.array,
-  onEnComfirmLoading: PropTypes.func.isRequired,
+  onEnComfirmLoading: PropTypes.func,
 };

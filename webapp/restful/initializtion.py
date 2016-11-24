@@ -72,7 +72,7 @@ def initialize(app):
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
 
 
-    api.add_resource(PeopleByIDAPI, '/api/projuectbyid', endpoint = 'projuectbyid')
+    api.add_resource(PeopleByIDAPI, '/api/projuectbyid/<string:id>', endpoint = 'projuectbyid')
     api.add_resource(PeopleByUniqueIDAPI, '/api/projectbyuni', endpoint = 'projectbyuni')
 
     api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')

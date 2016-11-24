@@ -98,8 +98,8 @@ ResumeWrapper.propTypes = {
   upload: PropTypes.object,
   fileList: PropTypes.array,
   enComfirmLoading: PropTypes.bool,
-  onModifyTitle: PropTypes.func.isRequired,
-  onEnComfirmLoading: PropTypes.func.isRequired,
-  html: PropTypes.string.isRequired,
+  onModifyTitle: PropTypes.func,
+  onEnComfirmLoading: PropTypes.func,
+  html: PropTypes.string,
   enHtml: PropTypes.string,
 };

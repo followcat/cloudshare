@@ -270,7 +270,7 @@ def catch_selected(stream, selected, name=None):
 catch = functools.partial(catch_selected, selected=all_selected)
 
 
-def catch_cvinfo(stream, filename, catch=True):
+def catch_cvinfo(stream, filename, catch_info=True):
     """
         >>> import core.outputstorage
         >>> st = 'curriculum vitea'
@@ -278,7 +278,7 @@ def catch_cvinfo(stream, filename, catch=True):
         >>> assert catch_cvinfo(stream=st, filename=name.base)['filename'] == name.base
     """
     info = generate_info_template(cv_template)
-    if catch is True:
+    if catch_info is True:
         catchinfo = catch(stream)
         info.update(catchinfo)
     extractor.unique_id.unique_id(info)

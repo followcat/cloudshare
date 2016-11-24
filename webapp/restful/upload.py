@@ -143,7 +143,7 @@ class UploadEnglishCVAPI(Resource):
                                               flask.current_app.config['UPLOAD_TEMP'])
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
-                                              filename=filepro.base.base, catch=False)
+                                              filename=filepro.base.base, catch_info=False)
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
         uploadeng[user.id] = dataobj

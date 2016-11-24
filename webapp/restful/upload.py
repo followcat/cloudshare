@@ -168,7 +168,7 @@ class UploadCVPreviewAPI(Resource):
         md = dataobj.preview_data()
         yaml_info = dataobj.metadata
         try:
-            people_info = self.scv_peo.getyaml(yaml_info['unique_id'])
+            people_info = self.svc_peo.getyaml(yaml_info['unique_id'])
             cvs = people_info['cv']
         except IOError:
             cvs = []

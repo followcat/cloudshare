@@ -30,7 +30,7 @@ ResumeExtension.propTypes = {
     tracking: PropTypes.array,
     comment: PropTypes.array,
   }),
-  onSubmitTag: PropTypes.func.isRequired,
-  onSubmitFollowUp: PropTypes.func.isRequired,
-  onSubmitComment: PropTypes.func.isRequired,
+  onSubmitTag: PropTypes.func,
+  onSubmitFollowUp: PropTypes.func,
+  onSubmitComment: PropTypes.func,
 };

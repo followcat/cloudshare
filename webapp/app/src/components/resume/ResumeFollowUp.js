@@ -116,10 +116,10 @@ ResumeFollowUp.propTypes = {
   dataSource: PropTypes.arrayOf(
     PropTypes.shape({
       content: PropTypes.shape({
-        text: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
+        text: PropTypes.string,
+        date: PropTypes.string,
       })
     })
   ),
-  onSubmitFollowUp: PropTypes.func.isRequired
+  onSubmitFollowUp: PropTypes.func,
 };

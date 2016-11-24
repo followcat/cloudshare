@@ -78,7 +78,7 @@ class UploadCVAPI(Resource):
                                               flask.current_app.config['UPLOAD_TEMP'])
         try:
             yamlinfo = utils.timeout.process.process_timeout_call(
-                                 extractor.information_explorer.catch_cvinfo, 5,
+                                 extractor.information_explorer.catch_cvinfo, 30,
                                  kwargs={'stream': filepro.markdown_stream.decode('utf8'),
                                          'filename': filepro.base.base})
         except utils.timeout.process.KilledExecTimeout as e:

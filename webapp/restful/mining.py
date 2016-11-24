@@ -252,8 +252,9 @@ class SimilarAPI(Resource):
         id = args['id']
         project = args['project']
         doc = self.svc_mult_cv.getmd(id)
+        uses = [project] + self.svc_mult_cv.getyaml(id)['classify']
         datas = []
-        for name, score in self.miner.probability(project, doc, top=6)[1:6]:
+        for name, score in self.miner.probability(project, doc, uses=uses, top=6)[1:6]:
             yaml_info = self.svc_mult_cv.getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
         return { 'code': 200, 'data': datas }

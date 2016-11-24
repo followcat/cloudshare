@@ -29,6 +29,10 @@ class SimulationCV(services.curriculumvitae.CurriculumVitae):
         self.cvstorage = cvstorage
         self.yamlpath = self.YAML_DIR
 
+    def exists(self, name):
+        id = core.outputstorage.ConvertName(name).base
+        return id in self.ids
+
     def add(self, cvobj, committer=None, unique=True, yamlfile=False):
         result = False
         id = cvobj.ID

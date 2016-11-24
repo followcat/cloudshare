@@ -10,8 +10,8 @@ class People(services.base.storage.BaseStorage):
 
     commitinfo = 'People'
 
-    def __init__(self, path, storages):
-        super(People, self).__init__(path)
+    def __init__(self, path, storages, iotype):
+        super(People, self).__init__(path, iotype=iotype)
         self.storages = storages
 
     def exists(self, id):

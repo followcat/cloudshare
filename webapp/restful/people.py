@@ -15,8 +15,8 @@ class PeopleByUniqueIDAPI(Resource):
         self.reqparse.add_argument('uniqueid', type = str, location = 'json')
 
     def get(self, uniqueid):
-        peopleinfo = self.scv_peo.getyaml(uniqueid)
-        return { 'result': peopleinfo }
+        peopleinfo = self.svc_peo.getyaml(uniqueid)
+        return { 'code': 200, 'data': peopleinfo }
 
 
 class PeopleByIDAPI(Resource):
@@ -32,5 +32,5 @@ class PeopleByIDAPI(Resource):
 
     def get(self, id):
         yamlinfo = self.svc_mult_cv.getyaml(id)
-        peopleinfo = self.scv_peo.getyaml(yamlinfo['unique_id'])
-        return { 'result': peopleinfo }
+        peopleinfo = self.svc_peo.getyaml(yamlinfo['unique_id'])
+        return { 'code': 200, 'data': peopleinfo }

@@ -91,6 +91,11 @@ class SimulationCV(services.curriculumvitae.CurriculumVitae):
             return None
         return self.cvstorage.getmd(name)
 
+    def getmd_en(self, id):
+        yamlinfo = self.getyaml(id)
+        veren = yamlinfo['enversion']
+        return self.cvstorage.gethtml(veren)
+
     def getinfo(self, id):
         if not self.exists(id):
             return None

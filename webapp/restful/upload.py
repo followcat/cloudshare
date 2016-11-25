@@ -177,7 +177,7 @@ class UploadCVPreviewAPI(Resource):
         except IOError:
             cvs = []
         except KeyError:
-            cvs = [yaml_info['id']]
+            cvs = []
         return { 'code': 200, 'data': { 'filename': filename,
                                         'markdown': md,
                                         'yaml_info': yaml_info,

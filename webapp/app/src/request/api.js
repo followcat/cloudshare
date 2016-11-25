@@ -13,6 +13,7 @@ export const API = {
   CREATE_JOBDESCRIPTION_API: `${HOST}/api/uploadjd`,
   COMPANYLIST_API: `${HOST}/api/companylist`,
   COMPANY_API: `${HOST}/api/company`,
+  UPLOAD_ENGLISH_RESUME: `${HOST}/api/uploadengcv`,
 };
 
 export const getAPI = {
@@ -43,5 +44,9 @@ export const URL = {
 
   getFastMatching: (id) => {
     return `/fastmatching?jd_id=${id}`;
+  },
+
+  getPreview: () => {
+    return `/preview`;
   }
 };

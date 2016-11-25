@@ -14,6 +14,7 @@ export default class EnglishResumeAddition extends Component {
 
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
+    this.handleModalOk = this.handleModalOk.bind(this);
   }
 
   handleClick() {
@@ -26,6 +27,10 @@ export default class EnglishResumeAddition extends Component {
     this.setState({
       visible: false,
     });
+  }
+
+  handleModalOk(event) {
+    this.props.onEnComfirmLoading();
   }
 
   render() {
@@ -43,7 +48,7 @@ export default class EnglishResumeAddition extends Component {
           visible={this.state.visible}
           confirmLoading={this.props.enComfirmLoading}
           okText="Confirm"
-          onOk={this.props.onEnComfirmLoading}
+          onOk={this.handleModalOk}
           onCancel={this.handleCancel}
         >
           <Upload

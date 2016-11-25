@@ -45,9 +45,14 @@ export default class ResumeWrapper extends Component {
             <span>{this.props.dataSource.committer}</span>
           </div>
           <div className="cs-resume-header-info">
-            {this.props.dataSource.committer === 'SCRAPPY'
-              ? <a href={getSourceURL(this.props.dataSource.origin, this.props.dataSource.filename)}>Click to the source cv</a>
-              : null
+            {this.props.dataSource.committer === 'SCRAPPY' ?
+                <a
+                  href={getSourceURL(this.props.dataSource.origin, this.props.dataSource.filename)}
+                  target="_blank"
+                >
+                  Click to the source cv
+                </a> :
+                null
             }
           </div>
         </div>
@@ -59,6 +64,7 @@ export default class ResumeWrapper extends Component {
             jdList={this.props.jdList}
             radarOption={this.props.radarOption}
             enComfirmLoading={this.props.enComfirmLoading}
+            chartSpinning={this.props.chartSpinning}
             onModifyTitle={this.props.onModifyTitle}
             onEnComfirmLoading={this.props.onEnComfirmLoading}
             onDrawChartOpen={this.props.onDrawChartOpen}
@@ -97,8 +103,8 @@ ResumeWrapper.propTypes = {
   upload: PropTypes.object,
   fileList: PropTypes.array,
   enComfirmLoading: PropTypes.bool,
-  onModifyTitle: PropTypes.func.isRequired,
-  onEnComfirmLoading: PropTypes.func.isRequired,
-  html: PropTypes.string.isRequired,
+  onModifyTitle: PropTypes.func,
+  onEnComfirmLoading: PropTypes.func,
+  html: PropTypes.string,
   enHtml: PropTypes.string,
 };

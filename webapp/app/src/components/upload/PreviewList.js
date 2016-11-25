@@ -4,6 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import { Button, Icon } from 'antd';
 
 import ResumeTitle from './ResumeTitle';
+import ResumeVersion from './ResumeVersion';
 import Summary from '../common/Summary';
 import ResumeContent from '../common/ResumeContent';
 
@@ -43,6 +44,7 @@ export default class PreviewList extends Component {
           return (
             <div key={index} className={this.isActive(index)}>
               <ResumeTitle {...resumeProps}/>
+              <ResumeVersion dataSource={previewItem.cv}/>
               <Summary dataSource={previewItem.yaml_info}/>
               <ResumeContent html={previewItem.markdown} />
             </div>

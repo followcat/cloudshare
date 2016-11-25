@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Modal, Button, Collapse, Table, Input } from 'antd';
+import { Modal, Button, Collapse, Table, Input, Spin } from 'antd';
 
 import Charts from '../common/Charts';
 
@@ -16,6 +16,7 @@ export default class DrawChart extends Component {
       jdDoc: '',
       type: 'id',
       selectedRowKeys: [],
+      chartVisible: false,
     };
 
     this.handleClick = this.handleClick.bind(this);
@@ -63,6 +64,9 @@ export default class DrawChart extends Component {
   handleSubmit() {
     let value = this.state.type === 'id' ? this.state.jdId : this.state.jdDoc,
         object = { type: this.state.type, value: value };
+    this.setState({
+      chartVisible: true,
+    });
     this.props.onDrawChartSubmit(object);
   }
 
@@ -119,6 +123,12 @@ export default class DrawChart extends Component {
       onChange: this.handlePaginationChange
     };
 
+    const chartWrapperStyle = {
+      width: '100%',
+      height: 460,
+      marginTop: 10,
+    };
+
     return (
       <div style={this.props.style}>
         <Button
@@ -171,12 +181,16 @@ export default class DrawChart extends Component {
           >
             Submit
           </Button>
-          {Object.keys(this.props.radarOption).length > 0 ?
-            <Charts
-              option={this.props.radarOption}
-              style={{ width: '100%', height: 460, marginTop: 10 }}
-            />
-           : ''}
+          <Spin spinning={this.props.chartSpinning}>
+            <div style={Object.assign(chartWrapperStyle, { display: this.state.chartVisible ? 'block' : 'none' })}>
+              {Object.keys(this.props.radarOption).length > 0 ?
+                <Charts
+                  option={this.props.radarOption}
+                  style={chartWrapperStyle}
+                />
+               : ''}
+             </div>
+          </Spin>
         </Modal>
       </div>
     );

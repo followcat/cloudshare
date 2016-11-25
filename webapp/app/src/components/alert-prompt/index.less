@@ -1,0 +1,51 @@
+@featurePrefixCls: cs-alert-prompt;
+
+@successColor: #f3faf0;
+@infoColor: #eaf8fe;
+@warningColor: #fff7e6;
+@errorColor: #ffeee6;
+
+@successBorderColor: #e7f6e1;
+@infoBorderColor: #d5f1fd;
+@warningBorderColor: #fec;
+@errorBorderColor: #fdc;
+
+.@{featurePrefixCls} {
+  position: relative;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: #4A4A4A;
+  line-height: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  &-title {
+    display: inline-block;
+    font-weight: bold;
+  }
+
+  &-content {
+    margin-left: 8px;
+    display: inline-block;
+  }
+
+  &-success {
+    border: 1px solid @successBorderColor;
+    background-color: @successColor;
+  }
+
+  &-info {
+    border: 1px solid @infoBorderColor;
+    background-color: @infoColor;
+  }
+
+  &-warning {
+    border: 1px solid @warningBorderColor;
+    background-color: @warningColor;
+  }
+
+  &-error {
+    border: 1px solid @errorBorderColor;
+    background-color: @errorColor;
+  }
+}

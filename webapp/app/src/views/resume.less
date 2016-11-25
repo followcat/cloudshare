@@ -1,0 +1,177 @@
+@import '../components/global.less';
+
+.cs-layout-container {
+  position: relative;
+  width: 1080px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+
+  & > .ant-tabs-card {
+    & > .ant-tabs-content {
+      background: #fff;
+      padding: 8px;
+      height: auto;
+      min-height: 450px;
+      margin-top: -16px;
+    }
+
+    & > .ant-tabs-bar {
+        .ant-tabs-tab {
+        border-color: transparent;
+        border-top-width: 2px;
+        margin-right: 8px;
+        background-color: #fff;
+
+        & > .ant-tabs-tab-inner {
+          padding-top: 6px;
+        }
+      }
+
+      .ant-tabs-tab-active {
+        border-color: #fff;
+        border-top-style: solid;
+        border-top-color: @willendareColor;
+      }
+    }
+  }
+
+  .cs-resume-wrapper {
+    float: left;
+    width: 720px;
+    background-color: #fff;
+
+    .cs-resume-header {
+      height: 48px;
+      line-height: 48px;
+      background-color: #eee;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      border: 1px solid #ccc;
+      padding: 0 24px;
+
+      .cs-resume-header-info {
+        display: inline-block;
+        margin-left: 12px;
+        padding: 0 4px;
+
+        label {
+          font-weight: bold;
+        }
+      }
+    }
+
+    .cv-resume-content {
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      border-left: 1px solid #ccc;
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      padding: 12px 0;
+
+      .tool-menu {
+        padding-bottom: 12px;
+      }
+
+      .title-form {
+        border-top: 1px dotted #ccc;
+      }
+
+      .title-item-label {
+        text-align: center;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .ant-spin-container {
+    overflow:hidden;
+  }
+}
+
+.pd-lr-8 {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.mg-t-8 {
+  margin-top: 4px;
+}
+
+.bd-b-dotted {
+  border-bottom: 1px dotted #ccc;
+}
+
+.collect {
+  display: inline-block;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.title-wrapper {
+  padding: 4px;
+
+  .title-header {
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+.resume-side {
+  width: 340px;
+  height: 100px;
+  float: left;
+  margin-left: 4px;
+
+  .ant-card-bordered {
+    border-color: #ccc;
+  }
+
+  .ant-card-head {
+    height: 28px;
+    line-height: 28px;
+    background-color: #eee;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .ant-card-body {
+    padding: 8px 12px;
+  }
+  
+  .ant-tag {
+    height: 16px;
+    line-height: 16px;
+  }
+
+  .ant-form-item {
+    margin-bottom: -4px;
+  }
+
+  .submit-btn {
+    margin-left: 99px;
+  }
+
+  .contend-box {
+    width: 100%;
+    max-height: 80px;
+    margin-top: 4px;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    overflow-y: auto;
+
+    .content-item {
+      padding: 4px 8px;
+      border-bottom: 1px dotted #ccc;
+    }
+  }
+
+  .similar {
+    height: auto;
+
+    .similar-item {
+      padding: 4px 8px;
+      border-bottom: 1px dotted #ccc;
+    }
+  }
+}

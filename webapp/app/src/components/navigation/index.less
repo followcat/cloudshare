@@ -1,0 +1,25 @@
+@import '../default.less';
+@navigationPrefixCls: cs-nav;
+@navigationItemPrefixCls: cs-nav-item;
+@itemWidth: 88px;
+@itemColor: #FFF;
+
+.@{navigationPrefixCls} {
+  width: auto;
+  height: inherit;
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  .@{navigationItemPrefixCls} {
+    display: inline-block;
+    padding: 0 8px;
+    text-align: center;
+
+    a {
+      font-size: 16px;
+      color: @itemColor;
+      font-weight: bold;
+    }
+  }
+}

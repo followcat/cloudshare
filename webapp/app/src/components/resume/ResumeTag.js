@@ -62,7 +62,9 @@ class ResumeTag extends Component {
   }
 }
 
-export default ResumeTag = Form.create({})(ResumeTag);
+ResumeTag.defaultProps = {
+  dataSource: []
+};
 
 ResumeTag.propTypes = {
   dataSource: PropTypes.arrayOf(
@@ -72,3 +74,5 @@ ResumeTag.propTypes = {
   ),
   onSubmitTag: PropTypes.func.isRequired,
 };
+
+export default ResumeTag = Form.create({})(ResumeTag);

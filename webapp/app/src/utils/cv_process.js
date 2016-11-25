@@ -63,7 +63,7 @@ Process.prototype.deleteLinkOnParagraph = function() {
 };
 
 function addBrOnText(obj) {
-  let text = obj.textContent,
+  let text = obj && obj.textContent,
       chinesePattern = /[\u4e00-\u9fa5]{15,}/,
       linePattern = /-{3,}/g,
       br1 = /；|;/g,

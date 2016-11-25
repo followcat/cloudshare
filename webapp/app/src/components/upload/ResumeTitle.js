@@ -39,7 +39,7 @@ class ResumeTitle extends Component {
       } else {
         let value = {
           name: nameValue,
-          source: sourceValue,
+          origin: sourceValue,
           filename: this.props.filename,
         };
         this.props.onComfirmUpload(value);

@@ -133,6 +133,7 @@ export default class Upload extends Component {
         comfirmResult = this.state.comfirmResult,
         completedFileList = this.state.completedFileList,
         errorResult = this.state.errorResult,
+        comfirmList = this.state.comfirmList,
         currentPreview = this.state.currentPreview;
 
     let index = -1;
@@ -158,10 +159,16 @@ export default class Upload extends Component {
       errorResult.splice(index, 1);
     }
 
+    index = findIndexOf('filename', fileObject, comfirmList);
+    if (index > -1) {
+      comfirmList.splice(index, 1);
+    }
+
     this.setState({
       fileList: fileList,
       comfirmResult: comfirmResult,
       errorResult: errorResult,
+      comfirmList: comfirmList,
       currentPreview: currentPreview < 0 ? 0 : currentPreview,
     });
   }

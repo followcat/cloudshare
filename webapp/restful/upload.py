@@ -121,7 +121,7 @@ class UploadEnglishCVAPI(Resource):
         user = flask.ext.login.current_user
         dataobj = uploadeng[user.id]
         md = dataobj.preview_data()
-        return { 'result': { 'markdown': md } }
+        return { 'code': 200, 'data': { 'markdown': md } }
 
     def put(self):
         user = flask.ext.login.current_user
@@ -151,7 +151,7 @@ class UploadEnglishCVAPI(Resource):
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
         uploadeng[user.id] = dataobj
-        return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/preview' } }
+        return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/uploadpreview' } }
 
 
 class UploadCVPreviewAPI(Resource):

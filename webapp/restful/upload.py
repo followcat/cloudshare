@@ -89,12 +89,16 @@ class UploadCVAPI(Resource):
                                            metadata=yamlinfo)
         upload[user.id][filename] = None
         name = ''
-        unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
+        unique_peo = False
         if filepro.result is True:
             if not dataobj.metadata['name']:
                 dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
             name = dataobj.metadata['name']
             upload[user.id][filename] = dataobj
+            if 'unique_id' not in dataobj.metadata:
+                unique_peo = True
+            else:
+                unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
                                         'unique_peo': unique_peo,
@@ -172,6 +176,8 @@ class UploadCVPreviewAPI(Resource):
             cvs = people_info['cv']
         except IOError:
             cvs = []
+        except KeyError:
+            cvs = [yaml_info['id']]
         return { 'code': 200, 'data': { 'filename': filename,
                                         'markdown': md,
                                         'yaml_info': yaml_info,

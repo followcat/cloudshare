@@ -34,7 +34,7 @@ export const URL = {
   },
 
   getUploaderURL: () => {
-    return `/uplodaer`;
+    return `/uploader`;
   },
 
   getListJDURL: () => {

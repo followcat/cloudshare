@@ -78,7 +78,6 @@ export default class CommonNavigation extends Component {
         return (
           <a
             href={URL.getUploaderURL()}
-            target="_blank"
           >
             Uploader
           </a>
@@ -90,7 +89,6 @@ export default class CommonNavigation extends Component {
         return (
           <a
             href={URL.getListJDURL()}
-            target="_blank"
           >
             JD List
           </a>

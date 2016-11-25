@@ -45,9 +45,14 @@ export default class ResumeWrapper extends Component {
             <span>{this.props.dataSource.committer}</span>
           </div>
           <div className="cs-resume-header-info">
-            {this.props.dataSource.committer === 'SCRAPPY'
-              ? <a href={getSourceURL(this.props.dataSource.origin, this.props.dataSource.filename)}>Click to the source cv</a>
-              : null
+            {this.props.dataSource.committer === 'SCRAPPY' ?
+                <a
+                  href={getSourceURL(this.props.dataSource.origin, this.props.dataSource.filename)}
+                  target="_blank"
+                >
+                  Click to the source cv
+                </a> :
+                null
             }
           </div>
         </div>

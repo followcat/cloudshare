@@ -128,11 +128,12 @@ export default class Upload extends Component {
   }
 
   handleRemove(file) {
-    const fileObject = file,
-          fileList = this.state.fileList,
-          comfirmResult = this.state.comfirmResult,
-          completedFileList = this.state.completedFileList,
-          errorResult = this.state.errorResult;
+    let fileObject = file,
+        fileList = this.state.fileList,
+        comfirmResult = this.state.comfirmResult,
+        completedFileList = this.state.completedFileList,
+        errorResult = this.state.errorResult,
+        currentPreview = this.state.currentPreview;
 
     let index = -1;
 
@@ -149,6 +150,7 @@ export default class Upload extends Component {
     index = findIndexOf('uid', fileObject, completedFileList);
     if (index > -1) {
       completedFileList.splice(index, 1);
+      currentPreview--;
     }
 
     index = findIndexOf('uid', fileObject, errorResult);
@@ -160,6 +162,7 @@ export default class Upload extends Component {
       fileList: fileList,
       comfirmResult: comfirmResult,
       errorResult: errorResult,
+      currentPreview: currentPreview < 0 ? 0 : currentPreview,
     });
   }
 

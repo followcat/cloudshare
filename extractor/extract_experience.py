@@ -87,8 +87,6 @@ YICO = re.compile(u'^((?P<position>'+YIPOSITION+u')'+ASP+u'+)?'+PERIOD+ASP+u'*?\
 
 company_business = lambda RE:RE.pattern+u'(\n+'+ASP+u'*\-{3}\-*\n('+POASP+u'*'+COMPANY_TYPE+POASP+u'*\|)?'+POASP+u'*(?P<business>[^\|\n\-： ]+?)('+POASP+u'*\|'+POASP+u'*'+AEMPLOYEES+u')?\n)?'
 
-company_business_noborder_strong = lambda RE:RE.pattern+u'\n+'+POASP+u'*(?!所属行业：)'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)?'+POASP+u'*('+COMPANY_TYPE+u'|未填写))', u'((公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')'])+u'{5}'+POASP+u'*$'
-
 company_business_noborder = lambda RE:RE.pattern+u'\n+'+POASP+u'*'+PIPESEPRTED([u'(((企业|公司)性质：)?'+POASP+u'*('+COMPANY_TYPE+u'|未填写))', u'((公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u'))))', u'(((公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')'])+u'{1,5}'+POASP+u'*$'
 
 EMP = re.compile(BEMPLOYEES)
@@ -596,10 +594,8 @@ def work_xp(text):
                 return pos, out
             for RE in [CCO, CO, TCO]:
                 if (RE == TCO or re.compile(BDURATION).search(text)) and RE.search(text):
-                    MA = re.compile(company_business_noborder_strong(RE), re.M)
-                    if MA.search(text):
-                        MA = re.compile(company_business_noborder(RE), re.M)
-                    else:
+                    MA = re.compile(company_business_noborder(RE), re.M)
+                    if not MA.search(text):
                         # company_business always matches what RE matches
                         MA = re.compile(company_business(RE))
                     pos, out = find_xp(MA, text)

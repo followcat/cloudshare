@@ -38,7 +38,7 @@ export default class ResumeSimilar extends Component {
 ResumeSimilar.propTypes = {
   dataSource: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      id: PropTypes.string,
       yaml_info: PropTypes.shape({
         name: PropTypes.string,
         position: PropTypes.string,

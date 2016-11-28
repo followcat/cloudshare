@@ -7,7 +7,7 @@ import 'babel-polyfill';
 import enUS from 'antd/lib/locale-provider/en_US';
 import { LocaleProvider } from 'antd';
 
-import Resume from '../containers/Resume';
+import Resume from '../views/Resume';
 
 ReactDOM.render(
   <LocaleProvider locale={enUS}>

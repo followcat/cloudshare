@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
 import string
-import random
 import os.path
 import functools
 import extractor.unique_id
@@ -45,6 +44,11 @@ co_template = (
     ("introduction",        str),
     ("business",            list),
     ("total_employees",     str),
+)
+
+peo_template = (
+    ("id",                  str),
+    ("cv",                  list),
 )
 
 
@@ -268,7 +272,7 @@ def catch_selected(stream, selected, name=None):
 catch = functools.partial(catch_selected, selected=all_selected)
 
 
-def catch_cvinfo(stream, filename, name=None):
+def catch_cvinfo(stream, filename, catch_info=True):
     """
         >>> import core.outputstorage
         >>> st = 'curriculum vitea'
@@ -276,13 +280,14 @@ def catch_cvinfo(stream, filename, name=None):
         >>> assert catch_cvinfo(stream=st, filename=name.base)['filename'] == name.base
     """
     info = generate_info_template(cv_template)
-    catchinfo = catch(stream)
-    info.update(catchinfo)
+    if catch_info is True:
+        catchinfo = catch(stream)
+        info.update(catchinfo)
     extractor.unique_id.unique_id(info)
     try:
         info['id'] = info['unique_id']
     except KeyError:
-        info['id'] = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
+        info['id'] = extractor.unique_id.cv_id(stream)
     info["filename"] = filename
     return info
 
@@ -303,6 +308,21 @@ def catch_coinfo(stream, name):
                 pass
         try:
             info['business'].append(stream['business'])
+        except KeyError:
+            pass
+    return info
+
+def catch_peopinfo(stream, name):
+    """
+        >>> intro = {'id': '00yd4ww2', 'unique_id': 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'}
+        >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['id'] == 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'
+        >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['cv'] == ['00yd4ww2']
+    """
+    info = generate_info_template(peo_template)
+    info['id'] = name
+    if isinstance(stream, dict):
+        try:
+            info['cv'].append(stream['id'])
         except KeyError:
             pass
     return info

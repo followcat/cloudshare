@@ -12,7 +12,7 @@ import { message, Popconfirm } from 'antd';
 import { getBookmark, deleteBookmark } from '../request/bookmark';
 import { resetPassword } from '../request/password';
 import { signOut } from '../request/sign';
-import { URL } from '../request/api';
+import { URL } from '../config/url';
 import { getMenu, getCurrentActive } from '../utils/sider-menu-list';
 import History from '../utils/history';
 import './user-info.less';

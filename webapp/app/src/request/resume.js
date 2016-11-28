@@ -1,5 +1,5 @@
 'use strict';
-import { API } from './api';
+import { API } from '../config/api';
 import { callbackFunction } from './callback';
 import StorageUtil from '../utils/storage';
 import 'whatwg-fetch';

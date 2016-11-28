@@ -1,10 +1,10 @@
 'use strict';
 import StorageUtil from '../utils/storage';
-import { getAPI } from './api';
+import { API } from '../config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
-const BOOKMARK_API = getAPI.BOOKMARK_API(StorageUtil.get('user'))
+const BOOKMARK_API = `${API.ACCOUNTS_API}/${StorageUtil.get('user')}/${API.BOOKMARK_API}`;
 
 /**
  * 获取书签列表

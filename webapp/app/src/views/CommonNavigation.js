@@ -5,7 +5,7 @@ import Profile from '../components/manage/Profile';
 import { Menu, Modal } from 'antd';
 import StorageUtil from '../utils/storage';
 import { signOut } from '../request/sign';
-import { URL } from '../request/api';
+import { URL } from '../config/url';
 const MenuItem = Menu.Item,
       confirm = Modal.confirm;
 

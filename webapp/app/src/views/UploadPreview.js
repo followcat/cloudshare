@@ -5,7 +5,7 @@ import Header from '../components/header';
 import CommonNavigation from './CommonNavigation';
 import Container from '../components/container';
 import ResumeContent from '../components/common/ResumeContent';
-import { URL } from '../request/api';
+import { URL } from '../config/url';
 import { getEnglishResume } from '../request/resume';
 import './upload-preview.less'
 

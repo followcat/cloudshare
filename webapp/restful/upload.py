@@ -49,18 +49,18 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
-                peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata,
-                                                            cvobj.metadata['unique_id'])
-                peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-                peo_result = self.svc_peo.add(peopobj, user.id)
-                if peo_result is True:
-                    cv_result = self.svc_mult_cv.add(cvobj, user.id,
-                                                     project_name, unique=True)
-                    if cv_result is True:
-                        names.append(cvobj.name.md)
-                        documents.append(cvobj.data)
-                        status = 'success'
-                        message = 'Upload success.'
+                if 'unique_id' in cvobj.metadata:
+                    peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata,
+                                                                cvobj.metadata['unique_id'])
+                    peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+                    peo_result = self.svc_peo.add(peopobj, user.id)
+                cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                 project_name, unique=True)
+                if cv_result is True:
+                    names.append(cvobj.name.md)
+                    documents.append(cvobj.data)
+                    status = 'success'
+                    message = 'Upload success.'
             results.append({ 'id': id,
                              'status': status,
                              'message': message,

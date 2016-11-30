@@ -26,8 +26,8 @@ cv_template = (
     ("marital_status",      str),
     ("age",                 str),
     ("birthdate",           str),
-    ("education_history",   dict),
-    ("education",           dict),
+    ("education_history",   list),
+    ("education",           str),
     ("school",              str),
     ("company",             str),
     ("position",            str),
@@ -122,17 +122,19 @@ def get_education(stream, name=None):
         assert name in fix_func
     except AssertionError:
         name = 'default'
-    result = dict(education='', school='', education_history=[])
+    result = dict()
     education_result = fix_func[name](stream)
     result.update(education_result)
     if 'education_history' in education_result:
+        highest_education = -1
         for edu in education_result['education_history']:
-            result['education'] = edu['education']
-            try:
-                result['school'] = edu['school']
-            except KeyError:
-                pass
-            break
+            if extractor.utils_parsing.education_rate(edu['education']) > highest_education:
+                highest_education = extractor.utils_parsing.education_rate(edu['education'])
+                result['education'] = edu['education']
+                try:
+                    result['school'] = edu['school']
+                except KeyError:
+                    pass
     return result
 
 

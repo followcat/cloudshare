@@ -116,7 +116,9 @@ class CurriculumVitae(services.base.storage.BaseStorage):
         return data
 
     def getinfo(self, id):
-        return self.getyaml(id)
+        name = core.outputstorage.ConvertName(id).yaml
+        yaml_str = self.interface.get(name)
+        return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
     def saveinfo(self, id, info, message, committer):
         name = core.outputstorage.ConvertName(id).yaml

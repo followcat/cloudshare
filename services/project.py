@@ -111,7 +111,7 @@ class Project(services.base.service.Service):
     def jd_add(self, company, name, description, committer, status=None):
         try:
             self.company_get(company)
-        except services.exception.NotExistsCompany:
+        except IOError:
             return False
         return self.jobdescription.add(company, name, description, committer, status)
 

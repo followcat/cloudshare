@@ -4,7 +4,6 @@ import yaml
 
 import utils._yaml
 import core.outputstorage
-import services.exception
 import services.base.storage
 
 
@@ -34,17 +33,7 @@ class Company(services.base.storage.BaseStorage):
         >>> svc_co.getyaml('CompanyB') # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
-        NotExistsCompany
+        IOError...
         >>> shutil.rmtree(DIR)
     """
     commitinfo = 'Company'
-
-    def getyaml(self, id):
-        name = core.outputstorage.ConvertName(id).yaml
-        try:
-            yaml_str = self.interface.get(name)
-            if yaml_str is None:
-                raise IOError
-        except IOError:
-            raise services.exception.NotExistsCompany
-        return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)

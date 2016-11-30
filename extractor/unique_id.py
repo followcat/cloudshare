@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import re
 import hashlib
 
 import extractor.utils_parsing
@@ -143,6 +144,8 @@ def history(cv_yaml, to_date=u'至今'):
         pass
     return order_history(history)
 
+TRAILING_PARENTHESIS = re.compile(extractor.utils_parsing.exclude_with_parenthesis('')+'$', re.M)
+
 def output_history(item):
     u"""
         >>> xp = {
@@ -150,16 +153,22 @@ def output_history(item):
         ...     'date_to':     u'至今',
         ...     'name':        u'有限公司'}
         >>> assert len([h for h in output_history(xp)]) == 1
+
+        >>> xp['name'] = u'服务有限公司'
+        >>> g = output_history(xp)
+        >>> xp['name'] = u'服务有限公司（Service co.）'
+        >>> assert list(g) == list(output_history(xp))
     """
     if is_education(item):
-        experience = u'|'.join([item['education'], item['school'], item['major']])
+        experience = u'|'.join([item['education'], item['school'], TRAILING_PARENTHESIS.sub('', item['major'])])
     elif is_experience(item):
-        experience = item['name']
+        experience = TRAILING_PARENTHESIS.sub('', item['name'])
     else:
         raise ValueError("history item must be education or experience")
     yield (item['date_from'], u'|'.join([item['date_from'], experience]))
     if not item['date_to'] == u'至今':
         yield (item['date_to'], u'|'.join([item['date_from'], item['date_to'], experience]))
+
 
 def hash_history(cv_yaml, to_date=u'至今', mininum_xp=2):
     u"""

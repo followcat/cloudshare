@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Modal, Button, Collapse, Table, Input } from 'antd';
+import { Modal, Button, Collapse, Table, Input, Spin } from 'antd';
 
 import Charts from '../common/Charts';
 
@@ -15,6 +15,8 @@ export default class DrawChart extends Component {
       jdId: '',
       jdDoc: '',
       type: 'id',
+      selectedRowKeys: [],
+      chartVisible: false,
     };
 
     this.handleClick = this.handleClick.bind(this);
@@ -23,6 +25,9 @@ export default class DrawChart extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleOk = this.handleOk.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
+    this.handleRowSelectionChange = this.handleRowSelectionChange.bind(this);
+    this.handlePaginationChange = this.handlePaginationChange.bind(this);
+    this.handleRowSelectionSelect = this.handleRowSelectionSelect.bind(this);
   }
 
   handleClick() {
@@ -59,7 +64,29 @@ export default class DrawChart extends Component {
   handleSubmit() {
     let value = this.state.type === 'id' ? this.state.jdId : this.state.jdDoc,
         object = { type: this.state.type, value: value };
+    this.setState({
+      chartVisible: true,
+    });
     this.props.onDrawChartSubmit(object);
+  }
+
+  handleRowSelectionChange(selectedRowKeys, selectedRows) {
+    this.setState({
+      selectedRowKeys: selectedRowKeys,
+    });
+  }
+
+  handlePaginationChange() {
+    this.setState({
+      selectedRowKeys: [],
+      jdId: '',
+    });
+  }
+
+  handleRowSelectionSelect(record, selected, selectedRows) {
+    this.setState({
+      jdId: record.id,
+    });
   }
 
   render() {
@@ -67,8 +94,8 @@ export default class DrawChart extends Component {
     const columns = [
       {
         title: 'Company Name',
-        dataIndex: 'company',
-        key: 'company',
+        dataIndex: 'company_name',
+        key: 'company_name',
         width: 120,
       }, {
         title: 'Position',
@@ -84,17 +111,22 @@ export default class DrawChart extends Component {
 
     const rowSelection = {
       type: 'radio',
-      onChange: (selectedRowKeys, selectedRows) => {
-        this.setState({
-          jdId: selectedRows[0].id,
-        });
-      },
+      selectedRowKeys: this.state.selectedRowKeys,
+      onChange: this.handleRowSelectionChange,
+      onSelect: this.handleRowSelectionSelect,
     };
 
     const pagination = {
       total: this.props.jdList.length,
       pageSize: 5,
       size: 'small',
+      onChange: this.handlePaginationChange
+    };
+
+    const chartWrapperStyle = {
+      width: '100%',
+      height: 460,
+      marginTop: 10,
     };
 
     return (
@@ -149,12 +181,16 @@ export default class DrawChart extends Component {
           >
             Submit
           </Button>
-          {Object.keys(this.props.radarOption).length > 0 ?
-            <Charts
-              option={this.props.radarOption}
-              style={{ width: '100%', height: 460, marginTop: 10 }}
-            />
-           : ''}
+          <Spin spinning={this.props.chartSpinning}>
+            <div style={Object.assign(chartWrapperStyle, { display: this.state.chartVisible ? 'block' : 'none' })}>
+              {Object.keys(this.props.radarOption).length > 0 ?
+                <Charts
+                  option={this.props.radarOption}
+                  style={chartWrapperStyle}
+                />
+               : ''}
+             </div>
+          </Spin>
         </Modal>
       </div>
     );

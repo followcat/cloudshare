@@ -6,6 +6,7 @@ import logging
 import pypandoc
 
 import utils._yaml
+import core.basedata
 import interface.predator
 import services.curriculumvitae
 import extractor.information_explorer
@@ -23,8 +24,9 @@ logger.setLevel(log_level)
 
 class CVStorageSync(object):
 
-    def __init__(self, svc_cv_sto, rawdb):
+    def __init__(self, svc_peo_sto, svc_cv_sto, rawdb):
         self.cv_storage = svc_cv_sto
+        self.peo_storage = svc_peo_sto
         self.rawdb = rawdb
         self.logger = logging.getLogger("CVStorageSyncLogger.UPDATE")
 
@@ -57,10 +59,12 @@ class CVStorageSync(object):
                     continue
                 usetime = time.time() - t1
                 self.logger.info((' ').join(["Used", logidname, str(usetime)]))
-                infostream = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
-                                       allow_unicode=True)
-                self.cv_storage.addcv(id, md.encode('utf-8'), infostream,
-                                      raw_html.encode('utf-8'))
+
+                dataobj = core.basedata.DataObject(data=md.encode('utf-8'),
+                                                   metadata=info)
+                dataobj['id'] = id
+                self.peo_storage.add(dataobj)
+                self.cv_storage.addcv(dataobj, raw_html.encode('utf-8'))
 
     def generate_md(self, raw_html):
         return pypandoc.convert(raw_html, 'markdown', format='docbook')

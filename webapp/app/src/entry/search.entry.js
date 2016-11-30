@@ -7,7 +7,7 @@ import 'babel-polyfill';
 import enUS from 'antd/lib/locale-provider/en_US';
 import { LocaleProvider } from 'antd';
 
-import Search from '../containers/Search';
+import Search from '../views/Search';
 
 ReacDOM.render(
   <LocaleProvider local={enUS}>

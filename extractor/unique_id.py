@@ -274,3 +274,6 @@ def unique_id(cv_yaml, to_date=u'至今'):
 
 def company_id(name):
     return hashlib.sha1(name.encode('utf8')).hexdigest()
+
+def cv_id(markdown):
+    return hashlib.sha1(markdown.encode('utf8')).hexdigest()

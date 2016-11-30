@@ -22,5 +22,5 @@ export default class ResumeContent extends Component {
 }
 
 ResumeContent.propTypes = {
-  html: PropTypes.string.isRequired,
+  html: PropTypes.string,
 };

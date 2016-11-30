@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  var timestamp = '2016-11-05 00:00:00';
+  var timestamp = '2016-11-18 00:00:00';
 
   function removeHistoryStorage() {
     var storage = localStorage.getItem('history') && JSON.parse(localStorage.getItem('history'));

@@ -5,9 +5,6 @@ import services.curriculumvitae
 class SimulationCV(services.base.simulation.Simulation,
                    services.curriculumvitae.CurriculumVitae):
 
-    ids_file = 'names.json'
-
-    YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
         ("committer",           list),
         ("comment",             list),
@@ -17,11 +14,6 @@ class SimulationCV(services.base.simulation.Simulation,
 
     def __init__(self, path, name, cvstorage):
         super(SimulationCV, self).__init__(path, name, cvstorage)
-
-    def getmd(self, name):
-        if not self.exists(name):
-            return None
-        return self.cvstorage.getmd(name)
 
     def getmd_en(self, id):
         yamlinfo = self.getyaml(id)

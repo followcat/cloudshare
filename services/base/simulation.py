@@ -71,6 +71,11 @@ class Simulation(services.base.storage.BaseStorage):
             yamlstream = '{}'
         return yaml.load(yamlstream, Loader=utils._yaml.Loader)
 
+    def getmd(self, name):
+        if not self.exists(name):
+            return None
+        return self.cvstorage.getmd(name)
+
     def getyaml(self, id):
         if not self.exists(id):
             return None
@@ -129,8 +134,6 @@ class Simulation(services.base.storage.BaseStorage):
             mdpath = os.path.join(path, name.md)
             mdstream = self.cvstorage.getmd(i)
             storage(mdpath, mdstream)
-            htmlpath = os.path.join(path, name.html)
-            htmlstream = self.cvstorage.gethtml(i)
             storage(htmlpath, htmlstream)
             yamlinfo = self.cvstorage.getyaml(i)
             utils.builtin.save_yaml(yamlinfo, path, name.yaml)

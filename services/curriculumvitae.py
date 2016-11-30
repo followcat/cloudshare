@@ -45,10 +45,6 @@ class CurriculumVitae(services.base.storage.BaseStorage):
         self.interface.add(name.md, cvobj.data, committer=committer)
         return True
 
-    def modify(self, filename, stream, message=None, committer=None):
-        self.interface.modify(filename, stream, message, committer)
-        return True
-
     def gethtml(self, name):
         htmlname = core.outputstorage.ConvertName(name).html
         try:

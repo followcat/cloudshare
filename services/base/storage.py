@@ -58,6 +58,10 @@ class BaseStorage(services.base.service.Service):
         """
         return not self.exists(id)
 
+    def modify(self, filename, stream, message=None, committer=None):
+        self.interface.modify(filename, stream, message, committer)
+        return True
+
     def add(self, bsobj, committer=None, unique=True, yamlfile=True):
         if unique is True and self.unique(bsobj.name) is False:
             self.info = "Exists File"

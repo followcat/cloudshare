@@ -35,4 +35,9 @@ export const API = {
 
   UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}
 
+  LSI_BY_JD_ID_API: `${HOST}/api/mining/lsibyjdid`,
+
+  LSI_BY_CV_ID_API: `${HOST}/api/mining/lsibycvid`,
+
+  LSI_BY_DOC_API: `${HOST}/api/mining/lsibydoc`,
 };

@@ -6,6 +6,10 @@ export const URL = {
     return `/fastmatching?jd_id=${id}`;
   },
 
+  getFastMatchingByCV: (id) => {
+    return `/fastmatching?cv_id=${id}`
+  },
+
   getListJDURL: () => {
     return `/listjd`;
   },

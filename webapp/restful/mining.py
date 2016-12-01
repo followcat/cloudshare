@@ -214,6 +214,29 @@ class LSIbyJDidAPI(LSIbaseAPI):
         return { 'code': 200, 'data': result }
 
 
+class LSIbyCVidAPI(LSIbaseAPI):
+
+    def __init__(self):
+        super(LSIbyCVidAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('uses', type = list, location = 'json')
+        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        id = args['id']
+        project = args['project']
+        doc = self.svc_mult_cv.getproject(project).cv_getmd(id)
+        uses = [project] + args['uses'] if args['uses'] else [project]
+        filterdict = args['filterdict'] if args['filterdict'] else {}
+        cur_page = args['page']
+        result = self._post(project, doc, uses, filterdict, cur_page)
+        return { 'code': 200, 'data': result }
+
+
 class LSIbydocAPI(LSIbaseAPI):
 
     def __init__(self):

@@ -19,8 +19,8 @@ SENSEDROP = u'((\S+)[\n'+SP+EDUFIELDSEP+u']*)?'
 RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+u'(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*(?P=sep)'+ASP+u'*'+SENSEDROP+u'$', re.M)
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
-SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
-NOSCSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+u'((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+)'+EDUCATION+ASP+u'*', re.M)
+SPSOLHDR = ASP+u'*(?P<col1>-{5,}) (?:-{5,}) (?:-{5,}) (?:-{5,})\n'
+SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?(?P<period>'+PERIOD+ur'[:：]?'+ASP+u'*)'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
 UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
 RVSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+EDUCATION+u'[\n'+SP+u']+'+SCHOOL+u'[\n'+SP+u']+(?P<major>[^'+SP+u']+)[\n'+SP+u']+', re.M)
 
@@ -78,13 +78,13 @@ def format_output(output, groupdict, summary=None):
         if summary:
             result['education'] = summary['education'].strip()
             
-    if summary and 'major' in summary:
-        result['major'] = summary['major']
-    else:
-        try:
-            result['major'] = fix_name(groupdict['major'].replace('\n', ' '))
-        except AttributeError:
-            pass
+    try:
+        result['major'] = fix_name(groupdict['major'].replace('\n', ' '))
+    except AttributeError:
+        if summary and 'major' in summary:
+            result['major'] = fix_name(summary['major'])
+        else:
+            result['major'] = ''
     output.append(result)
 
 schools = lambda output: output[1]
@@ -260,7 +260,15 @@ def education_xp(text, summary=None):
 
 def fix_output(processed):
     result = {}
+    training = []
     if processed:
+        for e in processed:
+            if e['education'] == u'初中及以下':
+                training.append(e)
+        if training:
+            result['training_history'] = sorted(training, key=lambda x:x['date_from'], reverse=True)
+            for e in training:
+                processed.remove(e)
         result['education_history'] = processed
     return result
 
@@ -281,6 +289,12 @@ def fix_liepin(d):
             if SUMMARYMAJOR.search(remainer) and SUMMARYSCHOOL.search(remainer):
                 summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
                 summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
+            for r in SPSOLMA.finditer(res.group('edu')):
+                maj +=1
+                format_output(processed, r.groupdict(), summary)
+            else:
+                if maj:
+                    return fix_output(processed)
             for r in HDCTLMA.finditer(res.group('edu')):
                 maj +=1
                 format_output(processed, r.groupdict(), summary)
@@ -324,13 +338,23 @@ def fix_zhilian(d):
 def fix_jingying(d):
     u"""
         >>> assert u'云南' in fix_jingying(u'教育经历\\n   2010/9 -- 2012/12   云南师范大学   工商管理    硕士')['education_history'][0]['school']
-        >>> assert u'经济' in fix_jingying(u'教育经历\\n   2007/4 -- 2009/3    国际经济与贸易   硕士')['education_history'][0]['major']
+        >>> assert 2 == len(fix_jingying(u'教育经历\\n2000/9 -- 2003/6   湖南省衡阳师范学院           教育学   大专\\n'
+        ...     u'1997/9 -- 2000/7   湖南省衡阳市衡南县第二中学   理科     高中')['education_history'])
+        >>> assert u'生物' in fix_jingying(u'教育经历\\n2009/9 -- 2013/6  北京联合大学生物化学工程学院   生物工程   本科\\n'
+        ...     u'本科课程涉及生物化学')['education_history'][0]['major']
+        >>> assert not u'科学' in fix_jingying(u'教育经历\\n2000/7 -- 2003/7   江苏大学   计算机科学   本科\\n学士学位')['education_history'][0]['major']   #FIXME
+        >>> assert not u'法学' in fix_jingying(u'教育经历\\n2010/3-- 2013/3   苏州大学   法学   硕士\\n在职法律硕士')['education_history'][0]['major']  #FIXME
+        >>> assert u'药学' in fix_jingying(u'教育经历\\n ----------------------------------------------------------- ------------ ------ ------\\n'
+        ...     u'2006/9-- 2009/7                                             北京中医药大学   药学   大专')['education_history'][0]['major']
+        >>> assert u'无' in fix_jingying(u'教育经历\\n\\n2001/12 -- 2006/12   陕西中学   边防检查   大专\\n'
+        ...     u'1998/9 -- 2001/7     商洛中学   无         高中')['education_history'][1]['major']
+        >>> assert u'江南' in fix_jingying(u'教育经历\\n----------------- ---------------------- ------------------ ------\\n'
+        ...     u'2004/9-- 2008/7   黑龙江省江南职责学院                      本科')['education_history'][0]['school']
     """
     maj = 0
     processed = []
     summary = {}
-    MA = re.compile(SPSOLMA.pattern[1:], re.M)
-    NSMA = re.compile(u'(?P<school>)'+NOSCSPSOLMA.pattern[1:], re.M)
+    MA = re.compile(u'^('+SPSOLHDR+u')?'+SPSOLMA.pattern[1:]+'$', re.M)
     for RE in [ED, AED]:
         res = RE.search(d)
         if res:
@@ -338,19 +362,19 @@ def fix_jingying(d):
             if SUMMARYMAJOR.search(remainer) and SUMMARYSCHOOL.search(remainer):
                 summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
                 summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
-            for r in NSMA.finditer(res.group('edu')):
-                maj +=1
-                format_output(processed, r.groupdict(), summary)
-            else:
-                if maj:
-                    return fix_output(processed)
+            col1 = 999
             for r in MA.finditer(res.group('edu')):
+                if r.group('col1'):
+                    col1 = len(r.group('col1'))
                 maj +=1
-                format_output(processed, r.groupdict(), summary)
+                out = r.groupdict().copy()
+                if len(r.group('period')) > col1+1:
+                    out['major'] = r.groupdict()['school']
+                    out['school'] = ''
+                format_output(processed, out)
             else:
                 if maj:
-                    return fix_output(processed)
-            break
+                    break
     return fix_output(processed)
 
 def fix_yingcai(d):
@@ -360,6 +384,8 @@ def fix_yingcai(d):
         >>> assert fix_yingcai(u'本科\\n教育经历\\n 郑州科技学院\\n 1900.01 - 2016.07\\n 计算机科学与技术')
         >>> assert u'本科' == fix_yingcai(u'男\\n 22岁\\n 未婚\\n 本科')['education_history'][0]['education']
         >>> assert not fix_yingcai(u'教育经历\\n第一中学\\n1980.09 - 1983.07\\n高中\\n在校经历：我在')['education_history'][0]['major']
+        >>> assert u'技术' in fix_yingcai(u'教育经历\\n郑州工业 应用技术学院\\n2006.09 - 2009.07\\n'
+        ...     u'大专\\n计算机科学与技术')['education_history'][0]['school']
     """
     maj = 0
     processed = []
@@ -383,10 +409,7 @@ def fix_yingcai(d):
             maj +=1
             format_output(processed, res)
         else:
-            try:
-                processed.append(edu.groupdict())
-            except AttributeError:
-                pass
+            summary['education'] = edu.group('education')
     return fix_output(processed)
 
 def fix(d):
@@ -426,6 +449,15 @@ def fix(d):
         >>> assert not fix(u'----\\n1995.9—1999.7   长春光学精密机械学院       检测技术及仪器仪表   本科\\n----')   #FIXME
     """
     maj = 0
+    if is_jycv(d):
+        return fix_jingying(d)
+    elif is_lpcv(d):
+        return fix_liepin(d)
+    elif is_zlcv(d):
+        return fix_zhilian(d)
+    elif is_yccv(d):
+        return fix_yingcai(d)
+
     processed = []
     summary = {}
     res = ED.search(d)

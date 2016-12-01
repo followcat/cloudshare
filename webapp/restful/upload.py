@@ -49,18 +49,18 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
-                peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata,
-                                                            cvobj.metadata['unique_id'])
-                peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-                peo_result = self.svc_peo.add(peopobj, user.id)
-                if peo_result is True:
-                    cv_result = self.svc_mult_cv.add(cvobj, user.id,
-                                                     project_name, unique=True)
-                    if cv_result is True:
-                        names.append(cvobj.name.md)
-                        documents.append(cvobj.data)
-                        status = 'success'
-                        message = 'Upload success.'
+                if 'unique_id' in cvobj.metadata:
+                    peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata,
+                                                                cvobj.metadata['unique_id'])
+                    peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+                    peo_result = self.svc_peo.add(peopobj, user.id)
+                cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                 project_name, unique=True)
+                if cv_result is True:
+                    names.append(cvobj.name.md)
+                    documents.append(cvobj.data)
+                    status = 'success'
+                    message = 'Upload success.'
             results.append({ 'id': id,
                              'status': status,
                              'message': message,
@@ -76,9 +76,13 @@ class UploadCVAPI(Resource):
         filename = network_file.filename
         filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
                                               flask.current_app.config['UPLOAD_TEMP'])
+        if filepro.result is False:
+            return { 'code': 401, 'data': { 'result': False,
+                                            'resultid': filepro.resultcode,
+                                            'name': '', 'filename': filename } }
         try:
             yamlinfo = utils.timeout.process.process_timeout_call(
-                                 extractor.information_explorer.catch_cvinfo, 30,
+                                 extractor.information_explorer.catch_cvinfo, 120,
                                  kwargs={'stream': filepro.markdown_stream.decode('utf8'),
                                          'filename': filepro.base.base})
         except utils.timeout.process.KilledExecTimeout as e:
@@ -87,18 +91,15 @@ class UploadCVAPI(Resource):
                                             'name': '', 'filename': filename } }
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
-        upload[user.id][filename] = None
-        name = ''
+        if not dataobj.metadata['name']:
+            dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
+        name = dataobj.metadata['name']
         unique_peo = False
-        if filepro.result is True:
-            if not dataobj.metadata['name']:
-                dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
-            name = dataobj.metadata['name']
-            upload[user.id][filename] = dataobj
-            if 'unique_id' not in dataobj.metadata:
-                unique_peo = True
-            else:
-                unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
+        if 'unique_id' not in dataobj.metadata:
+            unique_peo = True
+        else:
+            unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
+        upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
                                         'unique_peo': unique_peo,

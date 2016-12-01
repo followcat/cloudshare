@@ -25,7 +25,11 @@ export const API = {
 
   SESSION_API: `${HOST}/api/session`,
 
-  UPLOAD_ENGLISH_RESUME: `${HOST}/api/uploadengcv`,
+  UPLOAD_RESUME_API: `${HOST}/api/uploadcv`,
+
+  UPLOAD_RESUME_PREVIEW_API: `${HOST}/api/uploadcv/preview`,
+
+  UPLOAD_ENGLISH_RESUME_API: `${HOST}/api/uploadengcv`,
 
   BOOKMARK_API: `bookmark`,  // {host}/api/accounts/{id}/bookmark
 

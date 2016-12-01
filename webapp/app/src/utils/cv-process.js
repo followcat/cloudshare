@@ -257,7 +257,6 @@ const CVProcess = {
     processer.deleteSectionTag();
     processer.deleteLinkOnParagraph();
     processer.deleteLine();
-    processer = null;
   }
 }
 

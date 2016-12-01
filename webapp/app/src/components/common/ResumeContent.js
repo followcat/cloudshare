@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 
-import CVProcess from '../../utils/cv_process';
+import CVProcess from '../../utils/cv-process';
 
 import './cvcontent.less';
 

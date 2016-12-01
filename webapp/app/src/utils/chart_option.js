@@ -62,7 +62,7 @@ const getIndicatorAndSeries = (data, max) => {
  * @param  {array]} data [请求的数据结果集]
  * @return {object} option [返回雷达图配置对象]
  */
-const getRadarOption = (max, data, cutNumber = 20, anonymized = false) => {
+const getRadarOption = (max, data, anonymized = false, cutNumber = 20) => {
   const legend = getLegend(data[0].value),
         indicatorAndSeries = getIndicatorAndSeries(data, max),
         indicator = indicatorAndSeries.indicator,
@@ -124,7 +124,7 @@ const getRadarOption = (max, data, cutNumber = 20, anonymized = false) => {
       type: 'radar',
       data: legend.map((item, index) => {
         return {
-          name: anonymizedLegend[index] || item,
+          name: anonymizedLegend ? anonymizedLegend[index] : item,
           value: series[item],
         };
       }),

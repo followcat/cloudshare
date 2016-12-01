@@ -202,7 +202,7 @@ export default class Resume extends Component {
    * @param  {object} object 传入数据对象
    * @return {void} 
    */
-  handleDrawChartSubmit(object) {
+  handleDrawChartSubmit(object, anonymized) {
     if (!object.value) {
       message.error('Please select a job description!');
       return;
@@ -229,7 +229,7 @@ export default class Resume extends Component {
     .then(response => response.json())
     .then(json => {
       if (json.code === 200) {
-        const option = getRadarOption(json.data.max, json.data.result);
+        const option = getRadarOption(json.data.max, json.data.result, anonymized);
         this.setState({
           radarOption: option,
           chartSpinning: false,

@@ -76,6 +76,10 @@ class UploadCVAPI(Resource):
         filename = network_file.filename
         filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
                                               flask.current_app.config['UPLOAD_TEMP'])
+        if filepro.result is False:
+            return { 'code': 401, 'data': { 'result': False,
+                                            'resultid': filepro.resultcode,
+                                            'name': '', 'filename': filename } }
         try:
             yamlinfo = utils.timeout.process.process_timeout_call(
                                  extractor.information_explorer.catch_cvinfo, 120,
@@ -87,18 +91,15 @@ class UploadCVAPI(Resource):
                                             'name': '', 'filename': filename } }
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
-        upload[user.id][filename] = None
-        name = ''
+        if not dataobj.metadata['name']:
+            dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
+        name = dataobj.metadata['name']
         unique_peo = False
-        if filepro.result is True:
-            if not dataobj.metadata['name']:
-                dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
-            name = dataobj.metadata['name']
-            upload[user.id][filename] = dataobj
-            if 'unique_id' not in dataobj.metadata:
-                unique_peo = True
-            else:
-                unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
+        if 'unique_id' not in dataobj.metadata:
+            unique_peo = True
+        else:
+            unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
+        upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
                                         'unique_peo': unique_peo,

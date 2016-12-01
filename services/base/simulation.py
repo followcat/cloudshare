@@ -17,6 +17,9 @@ class Simulation(services.base.storage.BaseStorage):
     YAML_DIR = 'YAML'
     YAML_TEMPLATE = ()
 
+    fix_item = {}
+    list_item = {}
+
     def __init__(self, path, name, cvstorage):
         super(Simulation, self).__init__(path, name)
         self._ids = None
@@ -87,53 +90,63 @@ class Simulation(services.base.storage.BaseStorage):
             yaml.update(info)
         return yaml
 
+    def _modifyinfo(self, id, key, value, committer):
+        projectinfo = self.getinfo(id)
+        projectinfo[key] = value
+        self.saveinfo(id, projectinfo,
+                      'Modify %s key %s.' % (id, key), committer)
+        return {key: value}
+
+    def _addinfo(self, id, key, value, committer):
+        projectinfo = self.getinfo(id)
+        data = self._infoframe(value, committer)
+        projectinfo[key].insert(0, data)
+        self.saveinfo(id, projectinfo,
+                      'Add %s key %s.' % (id, key), committer)
+        return data
+
+    def _deleteinfo(self, id, key, value, date, committer):
+        projectinfo = self.getinfo(id)
+        data = self._infoframe(value, committer, date)
+        if data in projectinfo[key]:
+            projectinfo[key].remove(data)
+            self.saveinfo(id, projectinfo,
+                          'Delete %s key %s.' % (id, key), committer)
+            return data
+
     @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
-        data = None
+        assert key not in self.fix_item
+        assert self.exists(id)
         projectinfo = self.getinfo(id)
         baseinfo = self.getyaml(id)
-        if projectinfo is not None and (key in projectinfo or key in baseinfo):
-            data = { key: value }
-            if key == 'tag':
-                data = self.addtag(id, value, committer)
-            elif key == 'tracking':
-                data = self.addtracking(id, value, committer)
-            elif key == 'comment':
-                data = self.addcomment(id, value, committer)
-            else:
-                projectinfo[key] = value
-                self.saveinfo(id, projectinfo,
-                              'Update %s key %s.' % (id, key), committer)
-        return data
+        result = None
+        if key not in projectinfo and key not in baseinfo:
+            return result
+        if key in self.list_item:
+            result = self._addinfo(id, key, value, committer)
+        else:
+            result = self._modifyinfo(id, key, value, committer)
+        return result
 
-    def _infoframe(self, value, username):
+    def deleteinfo(self, id, key, value, committer, date):
+        assert key not in self.fix_item
+        assert key in self.list_item
+        assert self.exists(id)
+        projectinfo = self.getinfo(id)
+        baseinfo = self.getyaml(id)
+        result = None
+        if key not in projectinfo and key not in baseinfo:
+            return result
+        result = self._deleteinfo(id, key, value, date, committer)
+        return result
+
+    def _infoframe(self, value, username, date=None):
+        if date is None:
+            date = time.strftime('%Y-%m-%d %H:%M:%S')
         data = {'author': username,
                 'content': value,
-                'date': time.strftime('%Y-%m-%d %H:%M:%S')}
-        return data
-
-    def addtag(self, id, tag, committer):
-        assert self.exists(id)
-        info = self.getinfo(id)
-        data = self._infoframe(tag, committer)
-        info['tag'].insert(0, data)
-        self.saveinfo(id, info, 'Add %s tag.'%id, committer)
-        return data
-
-    def addcomment(self, id, comment, committer):
-        assert self.exists(id)
-        info = self.getinfo(id)
-        data = self._infoframe(comment, committer)
-        info['comment'].insert(0, data)
-        self.saveinfo(id, info, 'Add %s comment.'%id, committer)
-        return data
-
-    def addtracking(self, id, tracking, committer):
-        assert self.exists(id)
-        info = self.getinfo(id)
-        data = self._infoframe(tracking, committer)
-        info['tracking'].insert(0, data)
-        self.saveinfo(id, info, 'Add %s tracking.'%id, committer)
+                'date': date}
         return data
 
     def saveinfo(self, id, info, message, committer):

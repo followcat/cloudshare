@@ -7,7 +7,6 @@ import services.company
 import services.exception
 import services.base.service
 import services.simulationcv
-import services.curriculumvitae
 import services.jobdescription
 
 
@@ -23,11 +22,8 @@ class Project(services.base.service.Service):
         cvpath = os.path.join(path, self.CV_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
         idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
-        if os.path.exists(cvpath) and not os.path.exists(idsfile):
-            self.curriculumvitae = services.curriculumvitae.CurriculumVitae(cvpath)
-        else:
-            self.curriculumvitae = services.simulationcv.SimulationCV(cvpath, name,
-                                                                      cvrepo)
+        self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
+                                                        cvpath, name, cvrepo)
         self.company = corepo
         self.jobdescription = services.jobdescription.JobDescription(jdpath)
         self.config = dict()

@@ -20,6 +20,18 @@ class Simulation(services.base.storage.BaseStorage):
     fix_item = {}
     list_item = {}
 
+    @classmethod
+    def autoservice(cls, path, name, storage):
+        if cls.check(path):
+            return cls(path, name, storage)
+        else:
+            return cls.__bases__[1](path, name)
+
+    @classmethod
+    def check(cls, path):
+        idsfile = os.path.join(path, Simulation.ids_file)
+        return os.path.exists(path) and os.path.exists(idsfile)
+
     def __init__(self, path, name, cvstorage):
         super(Simulation, self).__init__(path, name)
         self._ids = None

@@ -46,7 +46,7 @@ class Processor():
         self.markdown_stream = str()
 
         self.base = core.outputstorage.ConvertName(name)
-        self.name = self.base.random
+        self.name = self.base
         self.stream = fileobj.read()
 
         self.output_path = core.outputstorage.OutputPath(output_base)
@@ -93,7 +93,7 @@ class Processor():
         location = os.path.join(des, name)
         while os.path.isfile(location) is True:
             self.base.reset_random()
-            self.name = self.base.random
+            self.name = self.base
             name = self.name
             location = os.path.join(des, name)
         with open(location, 'wb') as f:

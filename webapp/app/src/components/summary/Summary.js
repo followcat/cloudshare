@@ -22,7 +22,7 @@ class Summary extends Component {
                   {`${dataItem.name}: `}
                 </Col>
                 <Col span={20}>
-                  {dataItem.value.map((valueItem, index) => {
+                  {dataItem.value.reverse().map((valueItem, index) => {
                     return (
                       <p key={index}>{valueItem.join(' | ')}</p>
                     );

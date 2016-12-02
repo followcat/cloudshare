@@ -4,7 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import { Icon, Checkbox, Button, Tabs } from 'antd';
 
 import ResumeToolMenu from './ResumeToolMenu';
-import Summary from '../common/Summary';
+import Summary from '../summary';
 import ResumeContent from '../common/ResumeContent';
 
 import { getSourceURL } from '../../utils/source';
@@ -70,7 +70,7 @@ export default class ResumeWrapper extends Component {
             onDrawChartOpen={this.props.onDrawChartOpen}
             onDrawChartSubmit={this.props.onDrawChartSubmit}
           />
-          <Summary dataSource={this.props.dataSource} style={{ marginTop: 4 }} />
+          <Summary dataSource={this.props.summary} style={{ marginTop: 4 }} />
           <Tabs defaultActiveKey="1">
             <Tabs.TabPane
               tab="Chinese"
@@ -100,6 +100,7 @@ ResumeWrapper.propTypes = {
     origin: PropTypes.string,
     committer: PropTypes.string,
   }),
+  summary: PropTypes.array,
   upload: PropTypes.object,
   fileList: PropTypes.array,
   enComfirmLoading: PropTypes.bool,

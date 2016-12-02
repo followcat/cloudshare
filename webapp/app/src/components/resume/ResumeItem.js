@@ -22,6 +22,7 @@ class ResumeItem extends Component {
       <Spin spinning={props.paneLoading}>
         <ResumeWrapper 
           dataSource={props.dataSource}
+          summary={props.summary}
           html={props.html}
           enHtml={props.enHtml}
           collected={props.collected}

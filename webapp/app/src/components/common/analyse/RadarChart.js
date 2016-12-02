@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component } from 'react';
 
-import { Button, Modal } from 'antd';
+import { Button, Modal, Checkbox } from 'antd';
 
 import Charts from '../Charts';
 
@@ -18,10 +18,12 @@ export default class RadarChart extends Component {
       visible: false,
       data: [],
       option: {},
+      anonymized: false,
     };
 
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   handleClick() {
@@ -51,7 +53,7 @@ export default class RadarChart extends Component {
       if (json.code === 200) {
         _this.setState({
           data: json.data.result,
-          option: getRadarOption(json.data.max, json.data.result),
+          option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
         });
       }
     })
@@ -63,10 +65,17 @@ export default class RadarChart extends Component {
     });
   }
 
+  handleChange(e) {
+    this.setState({
+      anonymized: e.target.checked,
+    });
+  }
+
   render() {
     return (
       <div>
         <Button type="primary" onClick={this.handleClick}>Show Radar Chart</Button>
+        <Checkbox onChange={this.handleChange}>Anonymous</Checkbox>
         <Modal
           title="Charts View"
           visible={this.state.visible}

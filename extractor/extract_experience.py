@@ -69,13 +69,13 @@ TPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?'+ASP+u'
 TAPO = re.compile(u'^([所担]任)?职'+ASP+u'*[位务](类别)?[:：]?'+ASP+u'*\*?(?P<aposition>'+POSITION+u'?)((('+SALARY+u')?\*?'+ASP+u'*)|(\uff1b.*))$', re.M)
 BPO = re.compile(u'^(?P<aposition>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'*(?P<second>[^元/月'+SP+u']+)'+ASP+u'*)?($|(\|'+ASP+u'*('+SALARY+u')$))', re.M)
 
-SEPRTED = lambda l:u'(?:(?:__SEP__'+ASP+u'*)|(?:'+u')|(?:'.join(l)+u'))'
-PIPESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ASP+u'*?[\n\|]')
-NEWLISEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ASP+u'*?\n')
+SEPRTED = lambda l:u'(?:(?:'+ASP+u'*?__SEP__)|(?:'+u')|(?:'.join([ASP+u'*'+_ for _ in l])+u'))'
+PIPESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', u'[\n\|]')
+NEWLISEPRTED = lambda l:SEPRTED(l).replace('__SEP__', u'\n')
 SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ' ')
 
-NLIEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*?\n'+ASP+u'*'+SPACESEPRTED([u'(?:所在地区|工作地点)：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬[情状]况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
-PIPEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*?\n'+ASP+u'*'+PIPESEPRTED([u'(?:所在地区|工作地点)：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬[情状]况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
+NLIEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*?\n+'+SPACESEPRTED([u'(?:所在地区|工作地点)：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬[情状]况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
+PIPEPO = re.compile(u'^'+ASP+u'*(?P<aposition>'+POSITION+u'?)'+ASP+u'*'+APERIOD+ASP+u'*?\n+'+PIPESEPRTED([u'(?:所在地区|工作地点)：('+POASP+u'*\S+)?', u'所在部门：('+POASP+u'*\S+)?', u'汇报对象：('+POASP+u'*\S+)?', u'下属人数：('+POASP+u'*\d+)?', u'薪酬[情状]况：('+POASP+u'*'+SALARY+u')?'])+u'{1,9}'+ASP+u'*$', re.M)
 # Force use of ascii space to avoid matching new line and step over TCO in predator results
 LIEPPO = re.compile(u'^'+ASP+u'*'+APERIOD+ASP+ur'*(?P<aposition>'+POSITION+u'?)('+SALARY+u')?\n'+ASP+u'*((下属人数)|(所在地区)|(工作地点)|(汇报对象)|(所在部门))：.*$', re.M)
 
@@ -87,10 +87,10 @@ YICO = re.compile(u'^((?P<position>'+YIPOSITION+u')'+ASP+u'+)?'+PERIOD+ASP+u'*?\
 
 company_business = lambda RE:RE.pattern.replace('$','')+u'(\n+'+ASP+u'*\-{3}\-*\n('+POASP+u'*'+COMPANY_TYPE+POASP+u'*\|)?'+POASP+u'*(?P<business>[^\|\n\-： ]+?)('+POASP+u'*\|'+POASP+u'*'+AEMPLOYEES+u')?\n)?'
 
-company_business_noborder = lambda RE:RE.pattern.replace('$','')+u'\n+(:?\-{3}\-*\n)?'+POASP+u'*'+PIPESEPRTED([u'((?P<typelabel>(企业|公司)性质：)?'+POASP+u'*(?(typelabel)('+COMPANY_TYPE+u'|未填写)|'+COMPANY_TYPE+u'))', u'((?P<businesslabel>公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+DATE+u'))(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))', u'((?P<employlabel>(公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')', u'(?P<desclabel>公司描述：'+POASP+u'*.*?(?=[\n\|]))'])+u'{1,7}'+POASP+u'*$'
+company_business_noborder = lambda RE:RE.pattern.replace('$','')+u'\n+(:?\-{3}\-*\n)?'+PIPESEPRTED([u'((?P<typelabel>(企业|公司)性质：'+POASP+u'*)?(?(typelabel)('+COMPANY_TYPE+u'|未填写)|'+COMPANY_TYPE+u'))', u'((?P<businesslabel>公司行业：'+POASP+u'*)?(?P<business>(?=(?!'+DATE+u'))(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))', u'((?P<employlabel>(公司)?规模：'+POASP+u'*)?'+AEMPLOYEES+u')', u'(?P<desclabel>公司描述：'+POASP+u'*.*?(?=[\n\|]))'])+u'{1,7}'+POASP+u'*$'
 
 PIPEONLYSEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ASP+u'*\|')
-company_business_noborder_pipeonly = lambda RE:RE.pattern.replace('$','')+u'\n+(:?\-{3}\-*\n)?'+PIPEONLYSEPRTED([u'((?P<typelabel>(企业|公司)性质：)?'+POASP+u'*(?(typelabel)('+COMPANY_TYPE+u'|未填写)|'+COMPANY_TYPE+u'))', u'((公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+DATE+u'))(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))', u'(((公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')', u'(公司描述：'+POASP+u'*.*?(?=[\n\|]))'])+u'{1,7}'+POASP+u'*$'
+company_business_noborder_pipeonly = lambda RE:RE.pattern.replace('$','')+u'\n+(:?\-{3}\-*\n)?'+PIPEONLYSEPRTED([u'((?P<typelabel>(企业|公司)性质：'+POASP+u'*)?(?(typelabel)('+COMPANY_TYPE+u'|未填写)|'+COMPANY_TYPE+u'))', u'((公司行业：'+POASP+u'*)?(?P<business>(?=(?!'+DATE+u'))(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))', u'(((公司)?规模：'+POASP+u'*)?'+AEMPLOYEES+u')', u'(公司描述：'+POASP+u'*.*?(?=[\n\|]))'])+u'{1,7}'+POASP+u'*$'
 support_no_business = lambda RE:RE.pattern+company_business_noborder_pipeonly(re.compile('')).replace('{1,7}', '{,7}')[2:-1]
 
 RESPPO = re.compile(company_business_noborder_pipeonly(re.compile(u'^职责：(?P<position>'+POSITION+u')')), re.M)

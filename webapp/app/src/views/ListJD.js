@@ -16,7 +16,7 @@ import { message } from 'antd';
 import { getMenu, getCurrentActive } from '../utils/sider-menu-list';
 import { getJobDescriptions, createJobDescription, updateJobDescription } from '../request/jobdescription';
 import { getCompanys, createCompany } from '../request/company';
-import { URL } from '../request/api';
+import { URL } from '../config/url';
 import './list-jd.less';
 
 class ListJD extends Component {

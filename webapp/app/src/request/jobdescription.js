@@ -1,7 +1,7 @@
 'use strict';
 import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
-import { API, getAPI } from './api';
+import { API } from '../config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
@@ -46,7 +46,7 @@ const getBodyData = (params) => {
 };
 
 export const updateJobDescription = (params, callback) => {
-  return fetch(getAPI.UPDATE_JOBDESCRIPTION_API(params.id), {
+  return fetch(`${API.UPDATE_JOBDESCRIPTION_API}/${params.id}`, {
     method: 'PUT',
     credentials: 'include',
     headers: {

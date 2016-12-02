@@ -5,6 +5,7 @@ import { Row, Col, Checkbox, Button, Input, Form } from 'antd';
 
 import EnglishResumeAddition from './EnglishResumeAddition';
 import DrawChart from './DrawChart';
+import { URL } from '../../config/url';
 
 class ResumeToolMenu extends Component {
 
@@ -57,6 +58,12 @@ class ResumeToolMenu extends Component {
             onDrawChartOpen={this.props.onDrawChartOpen}
             onDrawChartSubmit={this.props.onDrawChartSubmit}
           />
+          <a
+            style={{ display: 'inline-block', marginLeft: 4 }}
+            href={URL.getFastMatchingByCV(this.props.dataSource.id)}
+          >
+            Fast Matching
+          </a>
         </div>
         <Form className="title-form pd-lr-8" style={style}>
           <Row>

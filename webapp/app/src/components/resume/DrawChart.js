@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Modal, Button, Collapse, Table, Input, Spin } from 'antd';
+import { Modal, Button, Collapse, Table, Input, Spin, Checkbox } from 'antd';
 
 import Charts from '../common/Charts';
 
@@ -17,12 +17,14 @@ export default class DrawChart extends Component {
       type: 'id',
       selectedRowKeys: [],
       chartVisible: false,
+      anonymized: false,
     };
 
     this.handleClick = this.handleClick.bind(this);
     this.handleCollapseChange = this.handleCollapseChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleAnonymousChange = this.handleAnonymousChange.bind(this);
     this.handleOk = this.handleOk.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleRowSelectionChange = this.handleRowSelectionChange.bind(this);
@@ -67,7 +69,13 @@ export default class DrawChart extends Component {
     this.setState({
       chartVisible: true,
     });
-    this.props.onDrawChartSubmit(object);
+    this.props.onDrawChartSubmit(object, this.state.anonymized);
+  }
+
+  handleAnonymousChange(e) {
+    this.setState({
+      anonymized: e.target.checked,
+    });
   }
 
   handleRowSelectionChange(selectedRowKeys, selectedRows) {
@@ -181,6 +189,12 @@ export default class DrawChart extends Component {
           >
             Submit
           </Button>
+          <Checkbox
+            style={{ marginLeft: 8 }}
+            onChange={this.handleAnonymousChange}
+          >
+            Anonymous
+          </Checkbox>
           <Spin spinning={this.props.chartSpinning}>
             <div style={Object.assign(chartWrapperStyle, { display: this.state.chartVisible ? 'block' : 'none' })}>
               {Object.keys(this.props.radarOption).length > 0 ?

@@ -52,9 +52,9 @@ class Simulation(services.base.storage.BaseStorage):
         id = core.outputstorage.ConvertName(name).base
         self.ids.add(id)
 
-    def add(self, cvobj, committer=None, unique=True, yamlfile=False):
+    def add(self, bsobj, committer=None, unique=True, yamlfile=True):
         result = False
-        id = cvobj.ID
+        id = bsobj.ID
         if (unique and not self.exists(id)) or not unique:
             self._add(id)
             filenames = []

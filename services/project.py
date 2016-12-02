@@ -91,6 +91,9 @@ class Project(services.base.service.Service):
     def cv_updateyaml(self, id, key, value, userid):
         return self.curriculumvitae.updateinfo(id, key, value, userid)
 
+    def cv_deleteyaml(self, id, key, value, userid, date):
+        return self.curriculumvitae.deleteinfo(id, key, value, userid, date)
+
     def cv_ids(self):
         return self.curriculumvitae.ids
 

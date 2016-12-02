@@ -3,16 +3,16 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
-import services.company
-import services.exception
 import services.base.service
 import services.simulationcv
+import services.simulationco
 import services.jobdescription
 
 
 class Project(services.base.service.Service):
 
     CV_PATH = 'CV'
+    CO_PATH = 'CO'
     JD_PATH = 'JD'
     config_file = 'config.yaml'
 
@@ -20,11 +20,13 @@ class Project(services.base.service.Service):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
         cvpath = os.path.join(path, self.CV_PATH)
+        copath = os.path.join(path, self.CO_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
         idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
                                                         cvpath, name, cvrepo)
-        self.company = corepo
+        self.company = services.simulationco.SimulationCO.autoservice(
+                                                        copath, name, corepo)
         self.jobdescription = services.jobdescription.JobDescription(jdpath)
         self.config = dict()
         try:
@@ -50,8 +52,8 @@ class Project(services.base.service.Service):
     def getclassify(self):
         return self.config['classify']
 
-    def cv_add(self, cvobj, committer=None, unique=True, yamlfile=True):
-        return self.curriculumvitae.add(cvobj, committer, unique, yamlfile)
+    def cv_add(self, cvobj, committer=None, unique=True):
+        return self.curriculumvitae.add(cvobj, committer, unique)
 
     def cv_yamls(self):
         return self.curriculumvitae.yamls()

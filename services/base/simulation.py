@@ -21,19 +21,20 @@ class Simulation(services.base.storage.BaseStorage):
     list_item = {}
 
     @classmethod
-    def autoservice(cls, path, name, storage):
+    def autoservice(cls, path, name, storage, iotype=None):
         if cls.check(path):
-            return cls(path, name, storage)
+            return cls(path, name, storage, iotype)
         else:
-            return cls.__bases__[1](path, name)
+            return cls.__bases__[1](path, name, iotype)
 
     @classmethod
     def check(cls, path):
         idsfile = os.path.join(path, Simulation.ids_file)
-        return os.path.exists(path) and os.path.exists(idsfile)
+        return not os.path.exists(path) or (
+            os.path.exists(path) and os.path.exists(idsfile))
 
-    def __init__(self, path, name, cvstorage):
-        super(Simulation, self).__init__(path, name)
+    def __init__(self, path, name, cvstorage, iotype=None):
+        super(Simulation, self).__init__(path, name, iotype)
         self._ids = None
         self.cvstorage = cvstorage
         self.yamlpath = self.YAML_DIR

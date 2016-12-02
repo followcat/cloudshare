@@ -14,7 +14,7 @@ class SimulationCV(services.base.simulation.Simulation,
 
     list_item = {"tag", "comment", "tracking"}
 
-    def __init__(self, path, name, cvstorage):
+    def __init__(self, path, name, cvstorage, iotype=None):
         """
             >>> from tests.settings import *
             >>> config = Config()
@@ -37,7 +37,7 @@ class SimulationCV(services.base.simulation.Simulation,
             True
             >>> config.destory()
         """
-        super(SimulationCV, self).__init__(path, name, cvstorage)
+        super(SimulationCV, self).__init__(path, name, cvstorage, iotype)
 
     def getmd_en(self, id):
         yamlinfo = self.getyaml(id)

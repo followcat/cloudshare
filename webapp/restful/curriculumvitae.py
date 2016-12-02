@@ -2,7 +2,7 @@ import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
-
+import utils.builtin  
 
 class CurrivulumvitaeAPI(Resource):
 
@@ -29,6 +29,7 @@ class CurrivulumvitaeAPI(Resource):
         else:
             yaml['collected'] = False
         en_html = ''
+        yaml['date'] = utils.builtin.strftime(yaml['date'])
         if 'enversion' in yaml:
             en_html = self.svc_mult_cv.getproject(project).cv_getmd_en(id)
         return { 'code': 200, 'data': { 'html': html, 'en_html': en_html, 'yaml_info': yaml } }

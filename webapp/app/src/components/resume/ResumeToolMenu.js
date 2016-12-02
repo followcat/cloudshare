@@ -42,7 +42,7 @@ class ResumeToolMenu extends Component {
       <div>
         <div className="tool-menu pd-lr-8">
           <Checkbox onChange={this.handleSwitchChange}>Switch to Modify Title</Checkbox>
-          <Button type="ghost" size="small">Download</Button>
+          <Button type="ghost" size="small" disabled={true}>Download</Button>
           <EnglishResumeAddition
             style={{ display: 'inline-block', marginLeft: 4 }}
             upload={this.props.upload}

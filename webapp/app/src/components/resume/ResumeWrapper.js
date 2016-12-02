@@ -22,6 +22,8 @@ export default class ResumeWrapper extends Component {
   }
 
   render() {
+    const date = this.props.dataSource.date && this.props.dataSource.date.split(' ')[0];
+
     return (
       <div className="cs-resume-wrapper">
         <div className="cs-resume-header">
@@ -42,7 +44,7 @@ export default class ResumeWrapper extends Component {
           </div>
           <div className="cs-resume-header-info">
             <label>Uploader: </label>
-            <span>{this.props.dataSource.committer}</span>
+            <span>{`${this.props.dataSource.committer}, ${date}`}</span>
           </div>
           <div className="cs-resume-header-info">
             {this.props.dataSource.committer === 'SCRAPPY' ?

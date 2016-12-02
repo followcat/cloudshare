@@ -20,7 +20,6 @@ class ResumeToolMenu extends Component {
 
     this.handleSwitchChange = this.handleSwitchChange.bind(this);
     this.hangdleSubmit = this.hangdleSubmit.bind(this);
-    this.handleDownloadClick = this.handleDownloadClick.bind(this);
   }
 
   handleSwitchChange(e) {

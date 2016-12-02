@@ -50,7 +50,7 @@ class CompanyListAPI(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         project = args['project']
-        result = self.svc_mult_cv.getproject(project).company_names()
+        result = self.svc_mult_cv.getproject(project).company_customers()
         data = []
         for coname in result:
             co = self.svc_mult_cv.getproject(project).company_get(coname)

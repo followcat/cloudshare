@@ -100,6 +100,9 @@ class Project(services.base.service.Service):
     def company_get(self, name):
         return self.company.getyaml(name)
 
+    def company_customers(self):
+        return self.company.customers
+
     def company_names(self):
         return self.company.ids
 

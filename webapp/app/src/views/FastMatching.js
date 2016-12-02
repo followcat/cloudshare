@@ -13,7 +13,7 @@ import SideBar from '../components/fastmatching/SideBar';
 import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
 import queryString from '../utils/query_string';
-
+import { API } from '../config/api';
 import './fastmatching.less';
 
 export default class FastMatching extends Component {
@@ -28,6 +28,7 @@ export default class FastMatching extends Component {
       total: 0,
       spinning: true,
       visible: false,
+      siderbarVisible: false,
       textarea: false,
       postData: {},
       postAPI: '',
@@ -208,20 +209,31 @@ export default class FastMatching extends Component {
 
   componentDidMount() {
     const params = queryString(window.location.href),
-          id = params.jd_id ? params.jd_id : '';
+          jd_id = params.jd_id ? params.jd_id : null,
+          cv_id = params.cv_id ? params.cv_id : null;
+    let postAPI;
 
     this.loadClassifyData();
-    if (id) {
-      let postAPI = '/api/mining/lsibyjdid';
+
+    if (jd_id) {
+      postAPI = API.LSI_BY_JD_ID_API;
       this.setState({
-        id: id,
+        siderbarVisible: true,
+        id: jd_id,
         postAPI: postAPI,
       });
-      this.loadResultData(id, postAPI);
+      this.loadResultData(jd_id, postAPI);
+    } else if (cv_id) {
+      postAPI = API.LSI_BY_CV_ID_API;
+      this.setState({
+        id: cv_id,
+        postAPI: postAPI,
+      });
+      this.loadResultData(cv_id, postAPI);
     } else {
       this.setState({
         textarea: true,
-        postAPI: '/api/mining/lsibydoc',
+        postAPI: API.LSI_BY_DOC_API,
       });
     }
   }
@@ -248,7 +260,7 @@ export default class FastMatching extends Component {
           onToggleSelection={this.handleToggleSelection}
         />
         <SideBar
-          visible={this.state.visible}
+          visible={this.state.siderbarVisible}
           postData={this.state.postData}
           selection={this.state.selection}
           dataSource={this.state.searchResultDataSource}

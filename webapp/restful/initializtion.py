@@ -35,10 +35,6 @@ def initialize(app):
 
     api.add_resource(CurrivulumvitaeAPI, '/api/resume',
                      endpoint = 'curriculumvitae')
-    api.add_resource(CurrivulumvitaeMDAPI, '/api/cvmd/<string:id>',
-                     endpoint = 'curriculumvitaemd')
-    api.add_resource(CurrivulumvitaeYAMLAPI, '/api/cvyaml/<string:id>',
-                     endpoint = 'curriculumvitaeyaml')
     api.add_resource(UpdateCurrivulumvitaeInformation, '/api/cv/updateinfo',
                      endpoint = 'updatecurrivulumvitaeinformation')
 
@@ -59,6 +55,7 @@ def initialize(app):
     api.add_resource(LSIbydocAPI, '/api/mining/lsibydoc', endpoint = 'lsibydoc')
 
     api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
+    api.add_resource(LSIbyCVidAPI, '/api/mining/lsibycvid', endpoint = 'lsibycvid')
 
     api.add_resource(SimilarAPI, '/api/mining/similar', endpoint = 'similar')
 

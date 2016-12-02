@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'antd';
-import { URL } from '../../request/api';
+import { URL } from '../../config/url';
 
 class HistoryItem extends Component {
   render() {

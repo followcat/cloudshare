@@ -85,12 +85,12 @@ NOBRPOS = POSITION.replace(u'：', u'（）：'+ENDLINESEP)
 YIPOSITION = NOBRPOS+u'(?P<lbr>[\(（])?(?(lbr)'+NOBRPOS+u'[\)）]('+NOBRPOS+u')?)'
 YICO = re.compile(u'^((?P<position>'+YIPOSITION+u')'+ASP+u'+)?'+PERIOD+ASP+u'*?\n'+ASP+u'*(?P<company>'+COMPANY+u')((('+ASP+u'+'+COMPANY_TYPE+u')|('+ASP+u'+'+EMPLOYEES+u')|('+ASP+u'+所属行业[:：]'+POASP+u'*?(?P<nl>\n+)?'+POASP+u'*(?P<business>.+))){1,3}|(('+ASP+u'+(?P<dpt>'+PODEPARTMENT+u'))?('+ASP+u'+(?P<positiontype>'+POSITION+u'))?'+ASP+u'+(('+SALARY+u')|(职位[:：](?P<aposition>'+POSITION+u'))))){1,2}'+ASP+u'*$', re.M)
 
-company_business = lambda RE:RE.pattern.replace('$','')+u'(\n+'+ASP+u'*\-{3}\-*\n('+POASP+u'*'+COMPANY_TYPE+POASP+u'*\|)?'+POASP+u'*(?P<business>[^\|\n\-： ]+?)('+POASP+u'*\|'+POASP+u'*'+AEMPLOYEES+u')?\n)?'
+company_business = lambda RE:RE.pattern+u'(\n+'+ASP+u'*\-{3}\-*\n('+POASP+u'*'+COMPANY_TYPE+POASP+u'*\|)?'+POASP+u'*(?P<business>[^\|\n\-： ]+?)('+POASP+u'*\|'+POASP+u'*'+AEMPLOYEES+u')?\n)?'
 
-company_business_noborder = lambda RE:RE.pattern.replace('$','')+u'\n+(:?\-{3}\-*\n)?'+POASP+u'*'+PIPESEPRTED([u'((?P<typelabel>(企业|公司)性质：)?'+POASP+u'*(?(typelabel)('+COMPANY_TYPE+u'|未填写)|'+COMPANY_TYPE+u'))', u'((?P<businesslabel>公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+DATE+u'))(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))', u'((?P<employlabel>(公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')', u'(?P<desclabel>公司描述：'+POASP+u'*.*?(?=[\n\|]))'])+u'{1,7}'+POASP+u'*$'
+company_business_noborder = lambda RE:RE.pattern+u'\n+(:?\-{3}\-*\n)?'+POASP+u'*'+PIPESEPRTED([u'((?P<typelabel>(企业|公司)性质：)?'+POASP+u'*(?(typelabel)('+COMPANY_TYPE+u'|未填写)|'+COMPANY_TYPE+u'))', u'((?P<businesslabel>公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+DATE+u'))(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))', u'((?P<employlabel>(公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')', u'(?P<desclabel>公司描述：'+POASP+u'*.*?(?=[\n\|]))'])+u'{1,7}'+POASP+u'*$'
 
 PIPEONLYSEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ASP+u'*\|')
-company_business_noborder_pipeonly = lambda RE:RE.pattern.replace('$','')+u'\n+(:?\-{3}\-*\n)?'+PIPEONLYSEPRTED([u'((?P<typelabel>(企业|公司)性质：)?'+POASP+u'*(?(typelabel)('+COMPANY_TYPE+u'|未填写)|'+COMPANY_TYPE+u'))', u'((公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+DATE+u'))(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))', u'(((公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')', u'(公司描述：'+POASP+u'*.*?(?=[\n\|]))'])+u'{1,7}'+POASP+u'*$'
+company_business_noborder_pipeonly = lambda RE:RE.pattern+u'\n+(:?\-{3}\-*\n)?'+PIPEONLYSEPRTED([u'((?P<typelabel>(企业|公司)性质：)?'+POASP+u'*(?(typelabel)('+COMPANY_TYPE+u'|未填写)|'+COMPANY_TYPE+u'))', u'((公司行业：)?'+POASP+u'*(?P<business>(?=(?!'+DATE+u'))(?=(?!'+AAEMPLOYEES+u'))[^\|\n\-：'+SP+u']+?(?!('+COMPANY_TYPE_KEYWORD+u')))(?=[\|\n'+SP+u']))', u'(((公司)?规模：)?'+POASP+u'*'+AEMPLOYEES+u')', u'(公司描述：'+POASP+u'*.*?(?=[\n\|]))'])+u'{1,7}'+POASP+u'*$'
 support_no_business = lambda RE:RE.pattern+company_business_noborder_pipeonly(re.compile('')).replace('{1,7}', '{,7}')[2:-1]
 
 RESPPO = re.compile(company_business_noborder_pipeonly(re.compile(u'^职责：(?P<position>'+POSITION+u')')), re.M)

@@ -124,6 +124,17 @@ STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P
 
 break_date = lambda x: tuple([int(i) for i in x.split('.')])
 
+def returns_with_time(command, name, arg):
+    try:
+        start = time.time()
+        command(arg)
+        return time.time() - start
+    except KeyboardInterrupt:
+        end = time.time()
+        raise Exception("Command with arg '%s' interrupted after: %i min %i sec" %
+                (name, divmod(end-start,60)[0], divmod(end-start,60)[1]))
+        return 0.
+
 def compute_period(date_from, date_to, today=u'至今'):
     u"""
         >>> assert (11, -1) == compute_period('2002.08', '2002.07')

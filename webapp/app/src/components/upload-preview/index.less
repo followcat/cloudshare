@@ -1,0 +1,57 @@
+@import '../default.less';
+@uploadContainerPrefixCls: cs-upload-container;
+@previewTopBarPrefixCls: cs-preview-top-bar;
+@topBarForm: cs-preview-top-bar-form;
+@previewPrefixCls: cs-upload-preview;
+@topBarHeight: 48px;
+
+.@{previewPrefixCls} {
+  display: none;
+}
+
+.@{previewPrefixCls}-active {
+  display: block;
+}
+
+.@{uploadContainerPrefixCls} {
+  position: relative;
+  width: 100%;
+  height: auto;
+
+  &-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+}
+
+.@{previewTopBarPrefixCls} {
+  position: relative;
+  height: @topBarHeight;
+  margin: 0 auto;
+  padding: 4px 0;
+
+  &-prev,
+  &-next {
+    position: absolute;
+    top: 50%;
+    margin-top: -11px;
+  }
+
+  &-prev {
+    left: 8px;
+  }
+
+  &-next {
+   right: 8px;
+  }
+
+  .@{topBarForm} {
+    width: 720px;
+    margin: 0 auto;
+    padding-top: 3px;
+  }
+
+}

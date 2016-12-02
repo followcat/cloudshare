@@ -35,10 +35,6 @@ def initialize(app):
 
     api.add_resource(CurrivulumvitaeAPI, '/api/resume',
                      endpoint = 'curriculumvitae')
-    api.add_resource(CurrivulumvitaeMDAPI, '/api/cvmd/<string:id>',
-                     endpoint = 'curriculumvitaemd')
-    api.add_resource(CurrivulumvitaeYAMLAPI, '/api/cvyaml/<string:id>',
-                     endpoint = 'curriculumvitaeyaml')
     api.add_resource(UpdateCurrivulumvitaeInformation, '/api/cv/updateinfo',
                      endpoint = 'updatecurrivulumvitaeinformation')
 

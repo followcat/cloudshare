@@ -20,6 +20,7 @@ class ResumeToolMenu extends Component {
 
     this.handleSwitchChange = this.handleSwitchChange.bind(this);
     this.hangdleSubmit = this.hangdleSubmit.bind(this);
+    this.handleDownloadClick = this.handleDownloadClick.bind(this);
   }
 
   handleSwitchChange(e) {
@@ -42,7 +43,7 @@ class ResumeToolMenu extends Component {
       <div>
         <div className="tool-menu pd-lr-8">
           <Checkbox onChange={this.handleSwitchChange}>Switch to Modify Title</Checkbox>
-          <Button type="ghost" size="small">Download</Button>
+          <Button type="ghost" size="small" disabled={true}>Download</Button>
           <EnglishResumeAddition
             style={{ display: 'inline-block', marginLeft: 4 }}
             upload={this.props.upload}

@@ -7,6 +7,7 @@ import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
 import History from '../utils/history';
 import { getRadarOption } from '../utils/chart_option';
+import generateSummary from '../utils/summary-generator';
 import 'whatwg-fetch';
 import './resume.less';
 const TabPane = Tabs.TabPane;
@@ -503,6 +504,7 @@ export default class Resume extends Component {
                     active={this.state.currentId === item}
                     text={`Item: ${item}`}
                     dataSource={this.state.dataSource}
+                    summary={generateSummary(this.state.dataSource)}
                     html={this.state.html}
                     enHtml={this.state.enHtml}
                     collected={this.state.collected}

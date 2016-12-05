@@ -28,7 +28,7 @@ def download(filename):
     import glob
     directory = os.path.join(flask.current_app.root_path,
                              '..', app.config['UPLOAD_TEMP'], 'source')
-    result = glob.glob(os.path.join(directory, filename+'.*'))
+    result = glob.glob(os.path.join(directory, filename+'*'))
     if result:
-        filename = os.path.split(result)[1]
+        filename = os.path.split(result[0])[1]
         return flask.send_from_directory(directory, filename, as_attachment=True)

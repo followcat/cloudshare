@@ -39,16 +39,11 @@ cv_template = (
 
 co_template = (
     ("name",                str),
-    ("product",             list),
-    ("position",            int),
+    ("product",             str),
     ("website",             str),
-    ("clientcontact",       list),
     ("conumber",            str),
-    ("caller",              list),
     ("address",             str),
     ("introduction",        str),
-    ("progress",            list),
-    ("updatednumber",       list),
     ("email",               str),
 )
 
@@ -307,6 +302,9 @@ def catch_coinfo(stream, name):
     info['name'] = name
     info['id'] = extractor.unique_id.company_id(name)
     if isinstance(stream, dict):
+        for key in info:
+            if stream[key]:
+                info[key] = stream[key]
         for key in ('introduction', 'total_employees'):
             try:
                 info[key] = stream[key]

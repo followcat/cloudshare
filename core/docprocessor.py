@@ -46,7 +46,7 @@ class Processor():
         self.markdown_stream = str()
 
         self.base = core.outputstorage.ConvertName(name)
-        self.name = self.base
+        self.name = self.base.random
         self.stream = fileobj.read()
 
         self.output_path = core.outputstorage.OutputPath(output_base)

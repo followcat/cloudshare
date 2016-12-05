@@ -71,6 +71,7 @@ export default class ResumeWrapper extends Component {
             onEnComfirmLoading={this.props.onEnComfirmLoading}
             onDrawChartOpen={this.props.onDrawChartOpen}
             onDrawChartSubmit={this.props.onDrawChartSubmit}
+            onDownloadClick={this.props.onDownloadClick}
           />
           <Summary dataSource={this.props.summary} style={{ marginTop: 4 }} />
           <Tabs defaultActiveKey="1">

@@ -89,6 +89,7 @@ class UploadCVAPI(Resource):
             return { 'code': 401, 'data': { 'result': False,
                                             'resultid': '',
                                             'name': '', 'filename': filename } }
+        filepro.renameconvert(yamlinfo['id'])
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
         if not dataobj.metadata['name']:

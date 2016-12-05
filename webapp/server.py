@@ -22,12 +22,13 @@ sess = flask.ext.session.Session()
 sess.init_app(app)
 webapp.restful.initializtion.initialize(app)
 
-@app.route("/download/<path:filename1>/<path:filename2>")
-def download(filename1, filename2):
+@app.route("/download/<path:filename>")
+def download(filename):
     import os
+    import glob
     directory = os.path.join(flask.current_app.root_path,
                              '..', app.config['UPLOAD_TEMP'], 'source')
-    if os.path.exists(os.path.join(directory, filename1)):
-        return flask.send_from_directory(directory, filename1, as_attachment=True)
-    else:
-        return flask.send_from_directory(directory, filename2, as_attachment=True)
+    result = glob.glob(os.path.join(directory, filename+'*'))
+    if result:
+        filename = os.path.split(result[0])[1]
+        return flask.send_from_directory(directory, filename, as_attachment=True)

@@ -8,6 +8,7 @@ import Generator from '../utils/generator';
 import History from '../utils/history';
 import { getRadarOption } from '../utils/chart_option';
 import generateSummary from '../utils/summary-generator';
+import { URL } from '../config/url';
 import 'whatwg-fetch';
 import './resume.less';
 const TabPane = Tabs.TabPane;
@@ -43,6 +44,7 @@ export default class Resume extends Component {
     this.handleSubmitFollowUp = this.handleSubmitFollowUp.bind(this);
     this.handleComment = this.handleComment.bind(this);
     this.handleUploadChange = this.handleUploadChange.bind(this);
+    this.handleDownloadClick = this.handleDownloadClick.bind(this);
     this.getResumeInfoData = this.getResumeInfoData.bind(this);
     this.getPeopleList = this.getPeopleList.bind(this);
     this.getSimilarData = this.getSimilarData.bind(this);
@@ -364,6 +366,15 @@ export default class Resume extends Component {
   }
 
   /**
+   * 简历下载链接
+   * @param  {string} id  简历ID
+   * @return {void}
+   */
+  handleDownloadClick(id) {
+    location.href = URL.getDownloadURL(id);
+  }
+
+  /**
    * 获取简历信息数据
    * @param  {string} id 简历ID值
    * @return {void}
@@ -524,6 +535,7 @@ export default class Resume extends Component {
                     onSubmitTag={this.handleSubmitTag}
                     onSubmitFollowUp={this.handleSubmitFollowUp}
                     onSubmitComment={this.handleComment}
+                    onDownloadClick={this.handleDownloadClick}
                   />
                 </TabPane>
               );

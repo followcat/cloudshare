@@ -37,6 +37,7 @@ class ResumeItem extends Component {
           onEnComfirmLoading={props.onEnComfirmLoading}
           onDrawChartOpen={props.onDrawChartOpen}
           onDrawChartSubmit={props.onDrawChartSubmit}
+          onDownloadClick={props.onDownloadClick}
         />
         <ResumeExtension
           dataSource={props.extendInfo}

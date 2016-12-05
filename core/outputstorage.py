@@ -82,7 +82,7 @@ class ConvertName(str):
     def reset_random(self):
         self._random = ''.join(random.choice(
                                string.ascii_lowercase + string.digits)
-                               for _ in range(8))
+                               for _ in range(32))
 
 
 class OutputPath(object):

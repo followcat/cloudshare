@@ -39,11 +39,17 @@ cv_template = (
 
 co_template = (
     ("name",                str),
-    ("committer",           str),
-    ("date",                int),
+    ("product",             list),
+    ("position",            int),
+    ("website",             str),
+    ("clientcontact",       list),
+    ("conumber",            str),
+    ("caller",              list),
+    ("address",             str),
     ("introduction",        str),
-    ("business",            list),
-    ("total_employees",     str),
+    ("progress",            list),
+    ("updatednumber",       list),
+    ("email",               str),
 )
 
 peo_template = (

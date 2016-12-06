@@ -37,3 +37,7 @@ class Company(services.base.storage.BaseStorage):
         >>> shutil.rmtree(DIR)
     """
     commitinfo = 'Company'
+
+    def datas(self):
+        for id in self.ids:
+            yield id, self.getyaml(id)

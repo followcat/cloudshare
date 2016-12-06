@@ -56,3 +56,32 @@ class CompanyListAPI(Resource):
             co = self.svc_mult_cv.getproject(project).company_get(coname)
             data.append(co)
         return { 'code': 200, 'data': data }
+
+
+class CompanysAllAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(CompanyListAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('begin', location = 'json')
+        self.reqparse.add_argument('lenght', location = 'json')
+
+    def get(self):
+        project = self.svc_mult_cv.getproject(projectname)
+        return list(project.company.datas())
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        projectname = args['project']
+        begin = args['begin']
+        lenght = args['lenght']
+        project = self.svc_mult_cv.getproject(projectname)
+        data = []
+        ids = sorted(list(project.company.ids))
+        for id in ids[begin:begin+lenght]:
+            data.append(project.company.getyaml(id))
+        return { 'code': 200, 'data': data }

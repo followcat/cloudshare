@@ -5,7 +5,6 @@ import os.path
 import utils._yaml
 import core.docprocessor
 import core.outputstorage
-import core.uniquesearcher
 import services.base.storage
 
 
@@ -13,71 +12,19 @@ class CurriculumVitae(services.base.storage.BaseStorage):
 
     commitinfo = 'CurriculumVitae'
 
-    @utils.issue.fix_issue('issues/update_name.rst')
-    def unique(self, baseobject):
-        """
-            >>> import glob
-            >>> import shutil
-            >>> import os.path
-            >>> import core.basedata
-            >>> import core.docprocessor
-            >>> import interface.gitinterface
-            >>> import services.curriculumvitae
-            >>> import extractor.information_explorer
-            >>> repo_name = 'services/test_repo'
-            >>> test_path = 'services/test_output'
-            >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_bssto = services.curriculumvitae.CurriculumVitae(interface.path)
-            >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> f2 = open('core/test/cv_2.doc', 'r')
-            >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
-            >>> yamlinfo1 = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
-            >>> fp2 = core.docprocessor.Processor(f2, 'cv_2.doc', test_path)
-            >>> yamlinfo2 = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp2.markdown_stream.decode('utf8'), filename=fp2.base.base)
-            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo1)
-            >>> cv2 = core.basedata.DataObject(data=fp2.markdown_stream, metadata=yamlinfo2)
-            >>> svc_bssto.add(cv1)
-            True
-            >>> svc_bssto.add(cv2)
-            True
-            >>> md_files = glob.glob(os.path.join(svc_bssto.path, '*.md'))
-            >>> len(md_files)
-            2
-            >>> yaml_files = glob.glob(os.path.join(svc_bssto.path, '*.yaml'))
-            >>> len(yaml_files)
-            2
-            >>> svc_bssto.add(cv1)
-            False
-            >>> svc_bssto.info
-            'Exists File'
-            >>> f1.close()
-            >>> f2.close()
-            >>> shutil.rmtree(repo_name)
-            >>> shutil.rmtree(test_path)
-        """
-        assert baseobject.metadata['id']
-        if self.unique_checker is None:
-            self.unique_checker = core.uniquesearcher.UniqueSearcher(self.path)
-        self.unique_checker.update()
-        return self.unique_checker.unique(baseobject.metadata)
-
     def add_md(self, cvobj, committer=None):
         """
             >>> import glob
             >>> import shutil
             >>> import os.path
             >>> import core.basedata
-            >>> import interface.gitinterface
             >>> import services.curriculumvitae
             >>> import extractor.information_explorer
             >>> root = "core/test"
             >>> name = "cv_1.doc"
             >>> test_path = "services/test_output"
-            >>> repo_name = 'services/test_repo'
-            >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(interface.path)
+            >>> DIR = 'services/test_repo'
+            >>> svc_cv = services.curriculumvitae.CurriculumVitae(DIR)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
             >>> fp1 = core.docprocessor.Processor(obj, name, test_path)
@@ -93,7 +40,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> len(yaml_files)
             0
             >>> obj.close()
-            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(DIR)
             >>> shutil.rmtree(test_path)
         """
         name = core.outputstorage.ConvertName(cvobj.metadata['id'])
@@ -114,23 +61,12 @@ class CurriculumVitae(services.base.storage.BaseStorage):
                 result = core.docprocessor.md_to_html(md)
         return result
 
+    def getmd_en(self, id):
+        yamlinfo = self.getyaml(id)
+        veren = yamlinfo['enversion']
+        return self.gethtml(veren)
 
-    def getyaml(self, id):
-        """
-        MultiCV expects an IOError exception if file not found.
-            >>> import interface.predator
-            >>> import services.curriculumvitae
-            >>> P = interface.predator.PredatorInterface('/tmp')
-            >>> PS = services.curriculumvitae.CurriculumVitae(P.path)
-            >>> PS.getyaml('CV.md') # doctest: +ELLIPSIS
-            Traceback (most recent call last):
-            ...
-            IOError...
-        """
-        name = core.outputstorage.ConvertName(id).yaml
-        yaml_str = self.interface.get(name)
-        return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
-
+    @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer):
         data = None
         projectinfo = self.getinfo(id)
@@ -188,10 +124,9 @@ class CurriculumVitae(services.base.storage.BaseStorage):
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(name, dumpinfo, message=message, committer=committer)
 
-    def addcv(self, id, data, yamldata, rawdata=None):
-        cn_id = core.outputstorage.ConvertName(id)
-        self.interface.add(cn_id.md, data)
-        self.interface.add(cn_id.yaml, yamldata)
+    def addcv(self, bsobj, rawdata=None):
+        self.add(bsobj)
+        cn_id = core.outputstorage.ConvertName(bsobj.id)
         if rawdata is not None:
             self.interface.add(cn_id.html, rawdata)
         return True

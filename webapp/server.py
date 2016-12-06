@@ -24,5 +24,11 @@ webapp.restful.initializtion.initialize(app)
 
 @app.route("/download/<path:filename>")
 def download(filename):
-    directory = os.path.join(flask.current_app.root_path, '..',app.config['UPLOAD_TEMP'], 'source')
-    return flask.send_from_directory(directory, filename, as_attachment=True)
+    import os
+    import glob
+    directory = os.path.join(flask.current_app.root_path,
+                             '..', app.config['UPLOAD_TEMP'], 'source')
+    result = glob.glob(os.path.join(directory, filename+'*'))
+    if result:
+        filename = os.path.split(result[0])[1]
+        return flask.send_from_directory(directory, filename, as_attachment=True)

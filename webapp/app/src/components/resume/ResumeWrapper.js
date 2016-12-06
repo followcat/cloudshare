@@ -4,7 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import { Icon, Checkbox, Button, Tabs } from 'antd';
 
 import ResumeToolMenu from './ResumeToolMenu';
-import Summary from '../common/Summary';
+import Summary from '../summary';
 import ResumeContent from '../common/ResumeContent';
 
 import { getSourceURL } from '../../utils/source';
@@ -22,6 +22,8 @@ export default class ResumeWrapper extends Component {
   }
 
   render() {
+    const date = this.props.dataSource.date && this.props.dataSource.date.split(' ')[0];
+
     return (
       <div className="cs-resume-wrapper">
         <div className="cs-resume-header">
@@ -42,12 +44,17 @@ export default class ResumeWrapper extends Component {
           </div>
           <div className="cs-resume-header-info">
             <label>Uploader: </label>
-            <span>{this.props.dataSource.committer}</span>
+            <span>{`${this.props.dataSource.committer}, ${date}`}</span>
           </div>
           <div className="cs-resume-header-info">
-            {this.props.dataSource.committer === 'SCRAPPY'
-              ? <a href={getSourceURL(this.props.dataSource.origin, this.props.dataSource.filename)}>Click to the source cv</a>
-              : null
+            {this.props.dataSource.committer === 'SCRAPPY' ?
+                <a
+                  href={getSourceURL(this.props.dataSource.origin, this.props.dataSource.filename)}
+                  target="_blank"
+                >
+                  Click to the source cv
+                </a> :
+                null
             }
           </div>
         </div>
@@ -59,12 +66,14 @@ export default class ResumeWrapper extends Component {
             jdList={this.props.jdList}
             radarOption={this.props.radarOption}
             enComfirmLoading={this.props.enComfirmLoading}
+            chartSpinning={this.props.chartSpinning}
             onModifyTitle={this.props.onModifyTitle}
             onEnComfirmLoading={this.props.onEnComfirmLoading}
             onDrawChartOpen={this.props.onDrawChartOpen}
             onDrawChartSubmit={this.props.onDrawChartSubmit}
+            onDownloadClick={this.props.onDownloadClick}
           />
-          <Summary dataSource={this.props.dataSource} style={{ marginTop: 4 }} />
+          <Summary dataSource={this.props.summary} style={{ marginTop: 4 }} />
           <Tabs defaultActiveKey="1">
             <Tabs.TabPane
               tab="Chinese"
@@ -94,11 +103,12 @@ ResumeWrapper.propTypes = {
     origin: PropTypes.string,
     committer: PropTypes.string,
   }),
+  summary: PropTypes.array,
   upload: PropTypes.object,
   fileList: PropTypes.array,
   enComfirmLoading: PropTypes.bool,
-  onModifyTitle: PropTypes.func.isRequired,
-  onEnComfirmLoading: PropTypes.func.isRequired,
-  html: PropTypes.string.isRequired,
+  onModifyTitle: PropTypes.func,
+  onEnComfirmLoading: PropTypes.func,
+  html: PropTypes.string,
   enHtml: PropTypes.string,
 };

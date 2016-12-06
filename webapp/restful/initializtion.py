@@ -1,6 +1,7 @@
 import flask
 import flask.ext.restful
 
+from webapp.restful.people import *
 from webapp.restful.mining import *
 from webapp.restful.search import *
 from webapp.restful.upload import *
@@ -34,10 +35,6 @@ def initialize(app):
 
     api.add_resource(CurrivulumvitaeAPI, '/api/resume',
                      endpoint = 'curriculumvitae')
-    api.add_resource(CurrivulumvitaeMDAPI, '/api/cvmd/<string:id>',
-                     endpoint = 'curriculumvitaemd')
-    api.add_resource(CurrivulumvitaeYAMLAPI, '/api/cvyaml/<string:id>',
-                     endpoint = 'curriculumvitaeyaml')
     api.add_resource(UpdateCurrivulumvitaeInformation, '/api/cv/updateinfo',
                      endpoint = 'updatecurrivulumvitaeinformation')
 
@@ -58,6 +55,7 @@ def initialize(app):
     api.add_resource(LSIbydocAPI, '/api/mining/lsibydoc', endpoint = 'lsibydoc')
 
     api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
+    api.add_resource(LSIbyCVidAPI, '/api/mining/lsibycvid', endpoint = 'lsibycvid')
 
     api.add_resource(SimilarAPI, '/api/mining/similar', endpoint = 'similar')
 
@@ -69,6 +67,10 @@ def initialize(app):
                                         endpoint = 'valuablebydoc')
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
+
+
+    api.add_resource(PeopleByIDAPI, '/api/projuectbyid/<string:id>', endpoint = 'projuectbyid')
+    api.add_resource(PeopleByUniqueIDAPI, '/api/projectbyuni', endpoint = 'projectbyuni')
 
     api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')
     api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')

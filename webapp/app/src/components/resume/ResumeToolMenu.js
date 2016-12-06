@@ -5,6 +5,7 @@ import { Row, Col, Checkbox, Button, Input, Form } from 'antd';
 
 import EnglishResumeAddition from './EnglishResumeAddition';
 import DrawChart from './DrawChart';
+import { URL } from '../../config/url';
 
 class ResumeToolMenu extends Component {
 
@@ -19,6 +20,7 @@ class ResumeToolMenu extends Component {
 
     this.handleSwitchChange = this.handleSwitchChange.bind(this);
     this.hangdleSubmit = this.hangdleSubmit.bind(this);
+    this.handleDownloadClick = this.handleDownloadClick.bind(this);
   }
 
   handleSwitchChange(e) {
@@ -33,6 +35,11 @@ class ResumeToolMenu extends Component {
     this.props.onModifyTitle(fieldValue);
   }
 
+  handleDownloadClick(e) {
+    e.preventDefault();
+    this.props.onDownloadClick(this.props.dataSource.id);
+  }
+
   render() {
     const { getFieldProps } = this.props.form,
           style = this.state.checked ? { display: 'block' } : { display: 'none' };
@@ -41,7 +48,7 @@ class ResumeToolMenu extends Component {
       <div>
         <div className="tool-menu pd-lr-8">
           <Checkbox onChange={this.handleSwitchChange}>Switch to Modify Title</Checkbox>
-          <Button type="ghost" size="small">Download</Button>
+          <Button type="ghost" size="small" onClick={this.handleDownloadClick}>Download</Button>
           <EnglishResumeAddition
             style={{ display: 'inline-block', marginLeft: 4 }}
             upload={this.props.upload}
@@ -53,9 +60,16 @@ class ResumeToolMenu extends Component {
             style={{ display: 'inline-block', marginLeft: 4 }}
             jdList={this.props.jdList}
             radarOption={this.props.radarOption}
+            chartSpinning={this.props.chartSpinning}
             onDrawChartOpen={this.props.onDrawChartOpen}
             onDrawChartSubmit={this.props.onDrawChartSubmit}
           />
+          <a
+            style={{ display: 'inline-block', marginLeft: 4 }}
+            href={URL.getFastMatchingByCV(this.props.dataSource.id)}
+          >
+            Fast Matching
+          </a>
         </div>
         <Form className="title-form pd-lr-8" style={style}>
           <Row>

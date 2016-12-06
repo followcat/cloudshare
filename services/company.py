@@ -15,9 +15,8 @@ class Company(services.base.storage.BaseStorage):
         >>> import core.basedata
         >>> import interface.gitinterface
         >>> import extractor.information_explorer
-        >>> repo_name = 'services/test_repo'
-        >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> svc_co = services.company.Company(interface.path)
+        >>> DIR = 'services/test_repo'
+        >>> svc_co = services.company.Company(DIR)
         >>> name, committer, introduction = 'CompanyA', 'tester', 'This is Co.A'
         >>> metadata = extractor.information_explorer.catch_coinfo({'introduction': introduction,}, name)
         >>> coobj = core.basedata.DataObject(metadata, data=introduction)
@@ -36,7 +35,7 @@ class Company(services.base.storage.BaseStorage):
         Traceback (most recent call last):
         ...
         NotExistsCompany
-        >>> shutil.rmtree(repo_name)
+        >>> shutil.rmtree(DIR)
     """
     commitinfo = 'Company'
 

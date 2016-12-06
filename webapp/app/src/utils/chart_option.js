@@ -1,4 +1,5 @@
 'use strict';
+import { anonymizeGenerator, anonymize } from './anonymize';
 
 /**
  * 对职位描述中的每个item进行换行处理
@@ -61,11 +62,12 @@ const getIndicatorAndSeries = (data, max) => {
  * @param  {array]} data [请求的数据结果集]
  * @return {object} option [返回雷达图配置对象]
  */
-const getRadarOption = (max, data, cutNumber = 20) => {
+const getRadarOption = (max, data, anonymized = false, cutNumber = 20) => {
   const legend = getLegend(data[0].value),
         indicatorAndSeries = getIndicatorAndSeries(data, max),
         indicator = indicatorAndSeries.indicator,
-        series = indicatorAndSeries.series;
+        series = indicatorAndSeries.series,
+        anonymizedLegend = anonymized ? anonymize(legend) : null;
 
   const option = {
     title: {
@@ -73,13 +75,28 @@ const getRadarOption = (max, data, cutNumber = 20) => {
     },
     tooltip: {
       trigger: 'item',
-      position: 'bottom',
+      position: 'inside',
+      formatter: function (param, ticket, callback) {
+        const value = param.value;
+        let content = '';
+        for ( let i = 0; i < indicator.length; i++) {
+          let name = indicator[i].name;
+          if (name.length > 50) {
+            name = `${name.substr(0, 50)}...`;
+          }
+          content += `${name}: ${Math.round(value[i])} <br />`;
+        }
+        return content;
+      },
+      textStyle: {
+        fontSize: 12,
+      },
     },
     legend: {
       orient: 'horizontal',
       x: 'right',
       y: 'bottom',
-      data: legend,
+      data: anonymizedLegend || legend,
     },
     toolbox: {
       show: true,
@@ -105,7 +122,12 @@ const getRadarOption = (max, data, cutNumber = 20) => {
     calculable: true,
     series: [{
       type: 'radar',
-      data: legend.map(item => { return { name: item, value: series[item] } }),
+      data: legend.map((item, index) => {
+        return {
+          name: anonymizedLegend ? anonymizedLegend[index] : item,
+          value: series[item],
+        };
+      }),
     }],
   };
 

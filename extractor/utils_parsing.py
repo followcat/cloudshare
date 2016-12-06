@@ -27,10 +27,10 @@ EDUFIELDSEP = u'，'+FIELDSEP
 exclude_with_parenthesis = lambda x: u'(?:'+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
-PREFIX = u'((\d+['+SENTENCESEP+u'\.]?'+ASP+u'{2})|◆|·|\?|(\uf0d8\xa0)|\uf0b7|\uf075|\u258c)'
+PREFIX = u'(?:(?:\d+(?:['+SENTENCESEP+u'\.]|'+ASP+u'{2}))|◆|·|\?|\uf0d8\xa0|\uf0b7|\uf075|\u258c)'
 
 COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|合资|国企|民营|外资\([非欧美]+\)|代表处|股份制'
-COMPANY_TYPE = u'(([^/\|\n\- ：]*?(('+COMPANY_TYPE_KEYWORD+u')[^\|\n\- ]*)+)|(其他))'
+COMPANY_TYPE = u'(?:(?:[^/\|\n\- ：]*?(('+COMPANY_TYPE_KEYWORD+u')[^\|\n\- ]*)+)|其他)'
 # Exclude date related characters to avoid eating duration
 COMPANYTAIL = u'(?:、[^' + SENTENCESEP + u'=\n\*\u2013]+?)?'+exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
@@ -39,19 +39,20 @@ COMPANY = ur'(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?(?:\\\\\*)+)?(?:(?:(?:\\\\\*
 SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|\u2013\u2015\u3002]+'
 
-JYCVSRC = re.compile(u'^'+ASP+u'*精英网用户$', re.M)
+JYCVSRC = re.compile(u'^(英文简历\n)?(?: {2}\-{3,}\n)(?: {4}\-{3,}\n)(?: {6}\-{3,}\n)(?: {8}\-{3,}\n)(?: {8}精英网用户\n)?')
 NLPCVSRC = re.compile(u'^'+ASP+u'*-{9}[-'+SP+u']+\n+(.+\n+)?简历编号：'+ASP+u'*\S+'+ASP+u'*最新登录：'+ASP+u'*\S+'+ASP+u'*-{9}[-'+SP+u']+\n')
 LPCVSRC = re.compile(u'^(:?(个人信息\n(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n(On job, open for new job|Dimission, seeking for new job) ,)) ， ', re.M)
 ZLCVSRC = re.compile(u'^(简历ID：RCC|Resume ID：REC)00\d{8}\n'+ASP+u'*[^\n\uf0b7]')
 YCCVSRC = re.compile(u'^更新时间：(\d{4}-\d{2}-\d{2}|今天|昨天)\n(简历编号：)?')
 
 is_jycv = lambda cv:JYCVSRC.search(cv)
-is_lpcv = lambda cv:LPCVSRC.search(cv) or NLPCVSRC.search(cv)
+is_lpcv = lambda cv:LPCVSRC.search(cv)
+is_nlpcv = lambda cv:NLPCVSRC.search(cv)
 is_zlcv = lambda cv:ZLCVSRC.search(cv)
 is_yccv = lambda cv:YCCVSRC.search(cv)
 
 education_list = {
-    0: (u'初中', ),
+    0: (u'初中', u'初中及以下'),
     1: (u'中技', u'中专', u'高中', u'高职'),
     2: (u'大专', ),
     #3: Show clearly step before graduate
@@ -86,7 +87,7 @@ GENDER = u'(?P<gender>男|女)'
 MARITALSTATUS = u'(?P<marital_status>(未婚)|(已婚))'
 AGEANDBIRTH = u'('+AGE+ u'|((?P<abbr>'+UNIBRALEFT+u')?(?P<birthdate>' +FULLDATE+ u'|'+DATE+u')生?(?(abbr)' +UNIBRARIGHT + u')))+'
 
-SALARY = u'((?P<salabel>月薪(（税前）)?[:：]?)?'+ASP+u'*((?P<salary>\d[\-到 \d\|]*(月/月)?(?(salabel)((元/月)|元|(/月))?|((元/月)|元|(/月)))(以[上下])?)'+ASP+u'*(\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?|保密)|((年薪(（税前）)?[:：]?)?'+ASP+u'*(?P<yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
+SALARY = u'((?P<salabel>月薪(（税前）)?[:：]?)?'+ASP+u'*((?P<salary>\d[\-到 \d\|]*(月/月)?(?(salabel)((元'+ASP+u'*/'+ASP+u'*月)|元|(/月))?|((元'+ASP+u'*/'+ASP+u'*月)|元|(/月)))(以[上下])?)'+ASP+u'*(\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?|保密)|((年薪(（税前）)?[:：]?)?'+ASP+u'*(?P<yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
 EMPLOYEES = u'((?:(?P<employees>(少于)?\d+([ '+SEP+u']+\d+)?'+ASP+u'*人(以[上下])?)|未填写))'
 BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + u'(['+FIELDSEP+u']('+COMPANY_TYPE+u'))?' + UNIBRARIGHT +u')'
 BEMPLOYEES = u'('+ BEMPLOYEES + u'('+BEMPLOYEES.replace('P<employees>', ':')+u')?)'
@@ -122,6 +123,17 @@ STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P
 
 
 break_date = lambda x: tuple([int(i) for i in x.split('.')])
+
+def returns_with_time(command, name, arg):
+    try:
+        start = time.time()
+        command(arg)
+        return time.time() - start
+    except KeyboardInterrupt:
+        end = time.time()
+        raise Exception("Command with arg '%s' interrupted after: %i min %i sec" %
+                (name, divmod(end-start,60)[0], divmod(end-start,60)[1]))
+        return 0.
 
 def compute_period(date_from, date_to, today=u'至今'):
     u"""

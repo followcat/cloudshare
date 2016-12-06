@@ -318,3 +318,14 @@ def update_jd_co_id(SVC_JD, SVC_CO):
             filename = SVC_JD.filename(jd_id)
             with open(os.path.join(SVC_JD.path, filename), 'w') as f:
                 f.write(dump_data)
+
+
+def init_people(SVC_CV, SVC_PEO):
+    import core.basedata
+    for y in SVC_CV.yamls():
+        info = SVC_CV.getyaml(y)
+        if 'unique_id' not in info:
+            continue
+        peopmeta = extractor.information_explorer.catch_peopinfo(info, info['unique_id'])
+        peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+        SVC_PEO.add(peopobj)

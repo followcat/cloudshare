@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Modal, Button, Collapse, Table, Input } from 'antd';
+import { Modal, Button, Collapse, Table, Input, Spin, Checkbox } from 'antd';
 
 import Charts from '../common/Charts';
 
@@ -16,12 +16,15 @@ export default class DrawChart extends Component {
       jdDoc: '',
       type: 'id',
       selectedRowKeys: [],
+      chartVisible: false,
+      anonymized: false,
     };
 
     this.handleClick = this.handleClick.bind(this);
     this.handleCollapseChange = this.handleCollapseChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleAnonymousChange = this.handleAnonymousChange.bind(this);
     this.handleOk = this.handleOk.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleRowSelectionChange = this.handleRowSelectionChange.bind(this);
@@ -63,7 +66,16 @@ export default class DrawChart extends Component {
   handleSubmit() {
     let value = this.state.type === 'id' ? this.state.jdId : this.state.jdDoc,
         object = { type: this.state.type, value: value };
-    this.props.onDrawChartSubmit(object);
+    this.setState({
+      chartVisible: true,
+    });
+    this.props.onDrawChartSubmit(object, this.state.anonymized);
+  }
+
+  handleAnonymousChange(e) {
+    this.setState({
+      anonymized: e.target.checked,
+    });
   }
 
   handleRowSelectionChange(selectedRowKeys, selectedRows) {
@@ -119,6 +131,12 @@ export default class DrawChart extends Component {
       onChange: this.handlePaginationChange
     };
 
+    const chartWrapperStyle = {
+      width: '100%',
+      height: 460,
+      marginTop: 10,
+    };
+
     return (
       <div style={this.props.style}>
         <Button
@@ -171,12 +189,22 @@ export default class DrawChart extends Component {
           >
             Submit
           </Button>
-          {Object.keys(this.props.radarOption).length > 0 ?
-            <Charts
-              option={this.props.radarOption}
-              style={{ width: '100%', height: 460, marginTop: 10 }}
-            />
-           : ''}
+          <Checkbox
+            style={{ marginLeft: 8 }}
+            onChange={this.handleAnonymousChange}
+          >
+            Anonymous
+          </Checkbox>
+          <Spin spinning={this.props.chartSpinning}>
+            <div style={Object.assign(chartWrapperStyle, { display: this.state.chartVisible ? 'block' : 'none' })}>
+              {Object.keys(this.props.radarOption).length > 0 ?
+                <Charts
+                  option={this.props.radarOption}
+                  style={chartWrapperStyle}
+                />
+               : ''}
+             </div>
+          </Spin>
         </Modal>
       </div>
     );

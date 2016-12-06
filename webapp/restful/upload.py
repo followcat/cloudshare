@@ -6,6 +6,8 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.chsname
+import utils.timeout.process
+import utils.timeout.exception
 import core.basedata
 import core.docprocessor
 import extractor.information_explorer
@@ -20,6 +22,7 @@ class UploadCVAPI(Resource):
 
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         self.svc_min = flask.current_app.config['SVC_MIN']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -46,8 +49,14 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
-                result = self.svc_mult_cv.add(cvobj, user.id, project_name, unique=True)
-                if result is True:
+                if 'unique_id' in cvobj.metadata:
+                    peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata,
+                                                                cvobj.metadata['unique_id'])
+                    peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+                    peo_result = self.svc_peo.add(peopobj, user.id)
+                cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                 project_name, unique=True)
+                if cv_result is True:
                     names.append(cvobj.name.md)
                     documents.append(cvobj.data)
                     status = 'success'
@@ -67,20 +76,34 @@ class UploadCVAPI(Resource):
         filename = network_file.filename
         filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
                                               flask.current_app.config['UPLOAD_TEMP'])
-        yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                              stream=filepro.markdown_stream.decode('utf8'),
-                                              filename=filepro.base.base)
+        if filepro.result is False:
+            return { 'code': 401, 'data': { 'result': False,
+                                            'resultid': filepro.resultcode,
+                                            'name': '', 'filename': filename } }
+        try:
+            yamlinfo = utils.timeout.process.process_timeout_call(
+                                 extractor.information_explorer.catch_cvinfo, 120,
+                                 kwargs={'stream': filepro.markdown_stream.decode('utf8'),
+                                         'filename': filepro.base.base})
+        except utils.timeout.process.KilledExecTimeout as e:
+            return { 'code': 401, 'data': { 'result': False,
+                                            'resultid': '',
+                                            'name': '', 'filename': filename } }
+        filepro.renameconvert(yamlinfo['id'])
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
-        upload[user.id][filename] = None
-        name = ''
-        if filepro.result is True:
-            if not dataobj.metadata['name']:
-                dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
-            name = dataobj.metadata['name']
-            upload[user.id][filename] = dataobj
+        if not dataobj.metadata['name']:
+            dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
+        name = dataobj.metadata['name']
+        unique_peo = False
+        if 'unique_id' not in dataobj.metadata:
+            unique_peo = True
+        else:
+            unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
+        upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
+                                        'unique_peo': unique_peo,
                                         'name': name, 'filename': filename } }
 
 
@@ -100,7 +123,7 @@ class UploadEnglishCVAPI(Resource):
         user = flask.ext.login.current_user
         dataobj = uploadeng[user.id]
         md = dataobj.preview_data()
-        return { 'result': { 'markdown': md } }
+        return { 'code': 200, 'data': { 'markdown': md } }
 
     def put(self):
         user = flask.ext.login.current_user
@@ -126,11 +149,11 @@ class UploadEnglishCVAPI(Resource):
                                               flask.current_app.config['UPLOAD_TEMP'])
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
-                                              filename=filepro.base.base)
+                                              filename=filepro.base.base, catch_info=False)
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
         uploadeng[user.id] = dataobj
-        return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/preview' } }
+        return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/uploadpreview' } }
 
 
 class UploadCVPreviewAPI(Resource):
@@ -138,6 +161,7 @@ class UploadCVPreviewAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         super(UploadCVPreviewAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('filename', location = 'json')
@@ -149,4 +173,14 @@ class UploadCVPreviewAPI(Resource):
         dataobj = upload[user.id][filename]
         md = dataobj.preview_data()
         yaml_info = dataobj.metadata
-        return { 'code': 200, 'data': { 'filename': filename, 'markdown': md, 'yaml_info': yaml_info } }
+        try:
+            people_info = self.svc_peo.getyaml(yaml_info['unique_id'])
+            cvs = people_info['cv']
+        except IOError:
+            cvs = []
+        except KeyError:
+            cvs = []
+        return { 'code': 200, 'data': { 'filename': filename,
+                                        'markdown': md,
+                                        'yaml_info': yaml_info,
+                                        'cv': cvs } }

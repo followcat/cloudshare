@@ -268,13 +268,13 @@ class Mining(object):
                 self.sim[modelname][simname].update([svc])
                 self.sim[modelname][simname].save()
 
-    def probability(self, basemodel, doc, uses=None):
+    def probability(self, basemodel, doc, uses=None, top=None):
         if uses is None:
             uses = self.sim[basemodel].keys()
         result = []
         for name in uses:
             sim = self.sim[basemodel][name]
-            result.extend(sim.probability(doc))
+            result.extend(sim.probability(doc, top=top))
         results_set = set(result)
         return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
 

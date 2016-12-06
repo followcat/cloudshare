@@ -15,10 +15,15 @@ class Feature extends Component {
 
   render() {
     const props = this.props;
+    let classes = props.prefixCls;
+    if (props.className) {
+      classes = `${props.prefixCls} ${props.className}`;
+    }
 
     return (
       <div
-        className={`${props.prefixCls}`}
+        className={classes}
+        style={props.style}
         onClick={props.onClick}
       >
         <div className={`${props.prefixCls}-text`}>
@@ -32,7 +37,7 @@ class Feature extends Component {
           width={props.width}
           okText={props.okText}
           cancelText={props.cancelText}
-          style={props.style}
+          style={props.modalStyle}
           wrapClassName={props.wrapClassName}
         >
           <div dangerouslySetInnerHTML={{__html: this.getMarkup()}}></div>
@@ -43,6 +48,7 @@ class Feature extends Component {
 }
 
 Feature.defaultProps = {
+  className: '',
   text: 'Feature',
   onClick() {},
   dataSource: '',
@@ -54,11 +60,13 @@ Feature.defaultProps = {
   okText: 'OK',
   cancelText: 'Cancel',
   style: {},
+  modalStyle: {},
   wrapClassName: '',
   prefixCls: 'cs-feature',
 };
 
 Feature.propTypes = {
+  className: PropTypes.string,
   text: PropTypes.string,
   onClick: PropTypes.func,
   dataSource: PropTypes.string,
@@ -70,6 +78,7 @@ Feature.propTypes = {
   okText: PropTypes.string,
   cancelText: PropTypes.string,
   style: PropTypes.object,
+  modalStyle: PropTypes.object,
   wrapClassName: PropTypes.string,
   prefixCls: PropTypes.string,
 };

@@ -65,7 +65,7 @@ class LSImodel(object):
 
     def setup(self, names, texts):
         self.names = names
-        self.texts = self.slicer(texts)
+        self.texts = self.slicer(texts, extract=True)
         self.set_dictionary()
         self.set_corpus()
         self.set_tfidf()
@@ -91,7 +91,7 @@ class LSImodel(object):
                                                              self.corpu_dict_save_name))
 
     def add(self, name, document):
-        text = self.slicer(document)
+        text = self.slicer(document, extract=True)
         self.names.append(name)
         self.texts.append(text)
         if self.dictionary is None:

@@ -53,7 +53,7 @@ class Simulation(services.base.storage.BaseStorage):
         id = core.outputstorage.ConvertName(name).base
         self.ids.add(id)
 
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True):
+    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         result = False
         id = bsobj.ID
         if (unique and not self.exists(id)) or not unique:
@@ -214,9 +214,12 @@ class Simulation(services.base.storage.BaseStorage):
                 f.write(stream.encode('utf-8'))
         for i in self.ids:
             name = core.outputstorage.ConvertName(i)
-            mdpath = os.path.join(path, name.md)
-            mdstream = self.cvstorage.getmd(i)
-            storage(mdpath, mdstream)
+            try:
+                mdpath = os.path.join(path, name.md)
+                mdstream = self.cvstorage.getmd(i)
+                storage(mdpath, mdstream)
+            except IOError:
+                pass
             storage(htmlpath, htmlstream)
             yamlinfo = self.cvstorage.getyaml(i)
             utils.builtin.save_yaml(yamlinfo, path, name.yaml)

@@ -19,6 +19,8 @@ class Project(services.base.service.Service):
     def __init__(self, path, corepo, cvrepo, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
+        self.corepo = corepo
+        self.cvrepo = cvrepo
         cvpath = os.path.join(path, self.CV_PATH)
         copath = os.path.join(path, self.CO_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
@@ -97,8 +99,9 @@ class Project(services.base.service.Service):
     def cv_ids(self):
         return self.curriculumvitae.ids
 
-    def company_add(self, cvobj, committer=None, unique=True, yamlfile=True):
-        return self.company.add(cvobj, committer, unique, yamlfile)
+    def company_add(self, cvobj, committer=None, unique=True, yamlfile=True, mdfile=False):
+        self.corepo.add(cvobj, committer, unique, yamlfile, mdfile)
+        return self.company.add(cvobj, committer, unique, yamlfile, mdfile)
 
     def company_get(self, name):
         return self.company.getyaml(name)

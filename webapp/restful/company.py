@@ -115,3 +115,47 @@ class CompanyCustomerAPI(Resource):
         project = self.svc_mult_cv.getproject(projectname)
         result = project.company.deletecustomer(id, user)
         return { 'code': 200, 'result': result }
+
+
+class CompanyInfoUpdateAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(CompanyInfoUpdateAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('key', type = str, location = 'json')
+        self.reqparse.add_argument('date', type = str, location = 'json')
+        self.reqparse.add_argument('value', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def put(self):
+        args = self.reqparse.parse_args()
+        user = flask.ext.login.current_user
+        id = args['id']
+        key = args['key']
+        value = args['value']
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        data = project.company.updateinfo(id, key, value, user)
+        if data is not None:
+            response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
+        else:
+            response = { 'code': 400, 'message': 'Delete information error.'}
+
+    def delete(self):
+        args = self.reqparse.parse_args()
+        user = flask.ext.login.current_user
+        id = args['id']
+        key = args['key']
+        date = args['date']
+        value = args['value']
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        data = project.company.deleteinfo(id, key, value, user, date)
+        if data is not None:
+            response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
+        else:
+            response = { 'code': 400, 'message': 'Delete information error.'}

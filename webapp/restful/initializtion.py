@@ -3,7 +3,6 @@ import flask.ext.restful
 
 from webapp.restful.people import *
 from webapp.restful.mining import *
-from webapp.restful.search import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
 from webapp.restful.company import *
@@ -45,8 +44,7 @@ def initialize(app):
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv', endpoint = 'uploadengcv')
     api.add_resource(UploadCVPreviewAPI, '/api/uploadcv/preview')
 
-    # api.add_resource(SearchbyTextAPI, '/api/search/<string:text>', endpoint = 'searchbytext')
-    api.add_resource(SearchbyTextAPI, '/api/searchbytext', endpoint = 'searchbytext')
+    api.add_resource(SearchCVbyTextAPI, '/api/searchbytext', endpoint = 'searchbytext')
 
     api.add_resource(RegionAPI, '/api/mining/region', endpoint = 'region')
     api.add_resource(CapacityAPI, '/api/mining/capacity', endpoint = 'capacity')

@@ -96,21 +96,18 @@ class CompanyCustomerAPI(Resource):
         super(CompanyCustomerAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('id', location = 'json')
 
-    def post(self):
+    def post(self, id):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        id = args['id']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         result = project.company.addcustomer(id, user)
         return { 'code': 200, 'result': result }
 
-    def delete(self):
+    def delete(self, id):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        id = args['id']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         result = project.company.deletecustomer(id, user)
@@ -125,16 +122,14 @@ class CompanyInfoUpdateAPI(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('key', type = str, location = 'json')
         self.reqparse.add_argument('date', type = str, location = 'json')
         self.reqparse.add_argument('value', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
-    def put(self):
+    def put(self, id):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        id = args['id']
         key = args['key']
         value = args['value']
         projectname = args['project']
@@ -145,10 +140,9 @@ class CompanyInfoUpdateAPI(Resource):
         else:
             response = { 'code': 400, 'message': 'Delete information error.'}
 
-    def delete(self):
+    def delete(self, id):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        id = args['id']
         key = args['key']
         date = args['date']
         value = args['value']

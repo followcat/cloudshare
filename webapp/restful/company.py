@@ -3,6 +3,7 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
+import utils.builtin
 import core.basedata
 import extractor.information_explorer
 
@@ -153,3 +154,50 @@ class CompanyInfoUpdateAPI(Resource):
             response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
         else:
             response = { 'code': 400, 'message': 'Delete information error.'}
+
+
+class SearchCObyTextAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(SearchCObyTextAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('search_text', location = 'json')
+        self.reqparse.add_argument('page', type = int, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        cur_page = args['page']
+        text = args['search_text']
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        results = project.company.search(text)
+        yaml_results = project.company.search_yaml(text)
+        results.update(yaml_results)
+        count = 20
+        datas, pages = self.paginate(project.company, list(results), cur_page, count)
+        return {
+            'code': 200,
+            'data': {
+                'keyword': text,
+                'datas': datas,
+                'pages': pages,
+                'totals': len(results),
+            }
+        }
+
+    def paginate(self, svc_co, results, cur_page, eve_count):
+        if not cur_page:
+            cur_page = 1
+        sum = len(results)
+        if sum%eve_count != 0:
+            pages = sum/eve_count + 1
+        else:
+            pages = sum/eve_count
+        datas = []
+        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
+            datas.append({ 'cv_id': id, 'yaml_info': svc_co.getyaml(id) })
+        return datas, pages

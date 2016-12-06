@@ -137,7 +137,7 @@ class SearchCVbyTextAPI(Resource):
             try:
                 yaml_info = self.svc_mult_cv.getyaml(id)
             except IOError:
-                names.remove(id)
+                ids.remove(id)
                 continue
             info = {
                 'author': yaml_info['committer'],

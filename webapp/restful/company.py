@@ -58,13 +58,13 @@ class CompanyListAPI(Resource):
         return { 'code': 200, 'data': data }
 
 
-class CompanysAllAPI(Resource):
+class CompanyAllAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        super(CompanysAllAPI, self).__init__()
+        super(CompanyAllAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('begin', location = 'json')

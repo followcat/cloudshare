@@ -26,6 +26,8 @@ def initialize(app):
     api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyAllAPI, '/api/companyall', endpoint = 'companyall')
     api.add_resource(CompanyListAPI, '/api/companylist', endpoint = 'companylist')
+    api.add_resource(CompanyCustomerAPI, '/api/companycustomer',
+                     endpoint = 'companycustomer')
 
     api.add_resource(JobDescriptionUploadAPI, '/api/uploadjd',
                      endpoint = 'jobdescriptionupload')

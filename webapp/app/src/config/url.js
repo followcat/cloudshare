@@ -34,4 +34,8 @@ export const URL = {
     return `/userinfo`;
   },
 
+  getDownloadURL: (id, fileName) => {
+    return `/download/${id}`;
+  },
+
 };

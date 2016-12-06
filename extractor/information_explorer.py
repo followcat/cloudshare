@@ -303,7 +303,7 @@ def catch_coinfo(stream, name):
     info['id'] = extractor.unique_id.company_id(name)
     if isinstance(stream, dict):
         for key in info:
-            if stream[key]:
+            if key in stream and stream[key]:
                 info[key] = stream[key]
         for key in ('introduction', 'total_employees'):
             try:

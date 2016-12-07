@@ -1,0 +1,78 @@
+@import '../default.less';
+@textColor: #d6e4f1;
+@iconBackGroundColor: #99bddb;
+
+.cs-layout-header {
+  width: 100%;
+  height: @headerHeight;
+  background-color: @backgroundColor;
+  
+  .cs-layout-wrapper {
+    position: relative;
+    padding: 0 64px;
+    
+    .cs-layout-logo {
+      width: 180px;
+      height: 32px;
+      margin: 16px 28px 16px 0;
+      float: left;
+    }
+
+    .cs-layout-header-nav {
+      line-height: @headerHeight;
+      background-color: @backgroundColor;
+      border-bottom: 0;
+
+      li {
+        border-bottom: 0;
+
+        a {
+          font-size: 14px;
+          font-weight: 700;
+          color: @textColor;
+
+          &:hover {
+            color: #fff;
+          }
+        }
+        
+      }
+    }
+
+    .cs-layout-profile {
+      position: absolute;
+      top: 0;
+      right: 64px;
+      width: 140px;
+      height: @headerHeight;
+      overflow: hidden;
+      color: @textColor;
+
+      .cs-layout-profile-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: @iconBackGroundColor;
+        margin-top: 16px;
+        margin-right: 8px;
+        padding-top: 4px;
+        font-size: 16px;
+        text-align: center;
+        float: left;
+      }
+
+      .cs-layout-profile-content {
+        line-height: @headerHeight;
+
+        .cs-dropdown-link {
+          color: @textColor;
+          font-size: 14px;
+
+          &:hover {
+            color: #fff;
+          }
+        }
+      }
+    }  /* cs-layout-profile */
+  }  /* cs-layout-wrapper */
+}  /* cs-layout-header */

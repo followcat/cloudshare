@@ -18,6 +18,6 @@ SVC_PRJ_MED = services.project.Project(os.path.join(PRJ_PATH, 'medical'),
                                        SVC_CO_REPO, SVC_CV_REPO, 'medical')
 SVC_PRJ_MED.setup(MED_needed)
 
-SVC_PRJ_AI = services.project.Project(os.path.join(PRJ_PATH, 'artificial intelligence'),
-                                       SVC_CO_REPO, SVC_CV_REPO, 'artificial intelligence')
+SVC_PRJ_AI = services.project.Project(os.path.join(PRJ_PATH, 'ArtificialIntelligence'),
+                                       SVC_CO_REPO, SVC_CV_REPO, 'ArtificialIntelligence')
 SVC_PRJ_AI.setup(AI_needed)

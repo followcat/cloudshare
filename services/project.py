@@ -3,32 +3,32 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
-import services.company
-import services.exception
 import services.base.service
 import services.simulationcv
-import services.curriculumvitae
+import services.simulationco
 import services.jobdescription
 
 
 class Project(services.base.service.Service):
 
     CV_PATH = 'CV'
+    CO_PATH = 'CO'
     JD_PATH = 'JD'
     config_file = 'config.yaml'
 
     def __init__(self, path, corepo, cvrepo, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
+        self.corepo = corepo
+        self.cvrepo = cvrepo
         cvpath = os.path.join(path, self.CV_PATH)
+        copath = os.path.join(path, self.CO_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
         idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
-        if os.path.exists(cvpath) and not os.path.exists(idsfile):
-            self.curriculumvitae = services.curriculumvitae.CurriculumVitae(cvpath)
-        else:
-            self.curriculumvitae = services.simulationcv.SimulationCV(cvpath, name,
-                                                                      cvrepo)
-        self.company = corepo
+        self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
+                                                        cvpath, name, cvrepo)
+        self.company = services.simulationco.SimulationCO.autoservice(
+                                                        copath, name, corepo)
         self.jobdescription = services.jobdescription.JobDescription(jdpath)
         self.config = dict()
         try:
@@ -54,8 +54,8 @@ class Project(services.base.service.Service):
     def getclassify(self):
         return self.config['classify']
 
-    def cv_add(self, cvobj, committer=None, unique=True, yamlfile=True):
-        return self.curriculumvitae.add(cvobj, committer, unique, yamlfile)
+    def cv_add(self, cvobj, committer=None, unique=True):
+        return self.curriculumvitae.add(cvobj, committer, unique)
 
     def cv_yamls(self):
         return self.curriculumvitae.yamls()
@@ -93,14 +93,21 @@ class Project(services.base.service.Service):
     def cv_updateyaml(self, id, key, value, userid):
         return self.curriculumvitae.updateinfo(id, key, value, userid)
 
+    def cv_deleteyaml(self, id, key, value, userid, date):
+        return self.curriculumvitae.deleteinfo(id, key, value, userid, date)
+
     def cv_ids(self):
         return self.curriculumvitae.ids
 
-    def company_add(self, cvobj, committer=None, unique=True, yamlfile=True):
-        return self.company.add(cvobj, committer, unique, yamlfile)
+    def company_add(self, cvobj, committer=None, unique=True, yamlfile=True, mdfile=False):
+        self.corepo.add(cvobj, committer, unique, yamlfile, mdfile)
+        return self.company.add(cvobj, committer, unique, yamlfile, mdfile)
 
     def company_get(self, name):
         return self.company.getyaml(name)
+
+    def company_customers(self):
+        return self.company.customers
 
     def company_names(self):
         return self.company.ids
@@ -111,7 +118,7 @@ class Project(services.base.service.Service):
     def jd_add(self, company, name, description, committer, status=None):
         try:
             self.company_get(company)
-        except services.exception.NotExistsCompany:
+        except IOError:
             return False
         return self.jobdescription.add(company, name, description, committer, status)
 

@@ -54,15 +54,14 @@ class CVStorageSync(object):
                     self.logger.info((' ').join(["KeyboardInterrupt", logidname,
                                                  "used", str(usetime)]))
                     continue
-                except:
-                    self.logger.info((' ').join(["Error generate", logidname]))
+                except Exception as e:
+                    self.logger.info((' ').join(["Error %s generate " % e, logidname]))
                     continue
                 usetime = time.time() - t1
                 self.logger.info((' ').join(["Used", logidname, str(usetime)]))
 
                 dataobj = core.basedata.DataObject(data=md.encode('utf-8'),
                                                    metadata=info)
-                dataobj['id'] = id
                 self.peo_storage.add(dataobj)
                 self.cv_storage.addcv(dataobj, raw_html.encode('utf-8'))
 
@@ -72,9 +71,9 @@ class CVStorageSync(object):
     def generate_yaml(self, md, raw_yaml, selected=None, name=None):
         obj = yaml.load(raw_yaml)
         if selected is None:
-            catchinfo = extractor.information_explorer.catch(md, name)
+            catchinfo = extractor.information_explorer.catch(md, name=name)
         else:
-            catchinfo = extractor.information_explorer.catch_selected(md, selected, name)
+            catchinfo = extractor.information_explorer.catch_selected(md, selected, name=name)
         for key in catchinfo:
             if catchinfo[key] or (selected is not None and key in selected):
                 obj[key] = catchinfo[key]

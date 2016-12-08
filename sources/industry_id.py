@@ -5,8 +5,8 @@ import yaml
 with open('sources/industry_needed_medical.yaml') as f:
     needed_medical = yaml.load(f.read())
 
-with open('sources/industry_needed_uav.yaml') as f:
-    needed_uav = yaml.load(f.read())
+with open('sources/industry_needed_ai.yaml') as f:
+    needed_ai = yaml.load(f.read())
 
 with open('sources/industry_sources.yaml') as f:
     sources = yaml.load(f.read())

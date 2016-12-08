@@ -50,15 +50,17 @@ let webpackConfig = {
           return /\.css$/.test(filePath) && !/\.module\.css$/.test(filePath);
         },
         loader: ExtractTextPlugin.extract(
-          'css?sourceMap&-restructuring!' +
-          'postcss'
+          'style-loader',
+          'css-loader?sourceMap&-restructuring!' +
+          'postcss-loader'
         ),
       },
       {
         test: /\.module\.css$/,
         loader: ExtractTextPlugin.extract(
-          'css?sourceMap&-restructuring&modules&localIdentName=[local]___[hash:base64:5]!' +
-          'postcss'
+          'style-loader',
+          'css-loader?sourceMap&-restructuring&modules&localIdentName=[local]___[hash:base64:5]!' +
+          'postcss-loader'
         ),
       },
       {
@@ -66,16 +68,18 @@ let webpackConfig = {
           return /\.less$/.test(filePath) && !/\.module\.less$/.test(filePath);
         },
         loader: ExtractTextPlugin.extract(
-          'css?sourceMap!' +
-          'postcss!' +
+          'style-loader',
+          'css-loader?sourceMap!' +
+          'postcss-loader!' +
           `less-loader?{"sourceMap":true,"modifyVars":${JSON.stringify(theme)}}`
         ),
       },
       {
         test: /\.module\.less$/,
         loader: ExtractTextPlugin.extract(
-          'css?sourceMap&modules&localIdentName=[local]___[hash:base64:5]!!' +
-          'postcss!' +
+          'style-loader',
+          'css-loader?sourceMap&modules&localIdentName=[local]___[hash:base64:5]!!' +
+          'postcss-loader!' +
           `less-loader?{"sourceMap":true,"modifyVars":${JSON.stringify(theme)}}`
         ),
       },
@@ -86,7 +90,7 @@ let webpackConfig = {
     ],
   },
 
-  postcss: [require('autoprefixer'), require('precss')],
+  postcss: [require('autoprefixer')],
 
 };
 

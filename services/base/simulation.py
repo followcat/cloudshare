@@ -21,7 +21,7 @@ class Simulation(services.base.storage.BaseStorage):
     list_item = {}
 
     @classmethod
-    def autoservice(cls, path, name, storage, iotype=None):
+    def autoservice(cls, path, name, storage, iotype='git'):
         if cls.check(path):
             return cls(path, name, storage, iotype)
         else:
@@ -33,11 +33,15 @@ class Simulation(services.base.storage.BaseStorage):
         return not os.path.exists(path) or (
             os.path.exists(path) and os.path.exists(idsfile))
 
-    def __init__(self, path, name, cvstorage, iotype=None):
+    def __init__(self, path, name, cvstorage, iotype='git'):
         super(Simulation, self).__init__(path, name, iotype)
         self._ids = None
         self.cvstorage = cvstorage
         self.yamlpath = self.YAML_DIR
+        idsfile = os.path.join(path, Simulation.ids_file)
+        if not os.path.exists(idsfile):
+            dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
+            self.interface.add(self.ids_file, dumpinfo, message="Init ids file.")
 
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base

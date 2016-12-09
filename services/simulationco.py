@@ -18,7 +18,7 @@ class SimulationCO(services.base.simulation.Simulation,
     list_item = {"position", "clientcontact", "caller", "progress", "updatednumber"}
     customers_file = 'customers.json'
 
-    def __init__(self, path, name, cvstorage, iotype=None):
+    def __init__(self, path, name, cvstorage, iotype='git'):
         super(SimulationCO, self).__init__(path, name, cvstorage, iotype)
         self._customers = None
 

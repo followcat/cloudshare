@@ -10,10 +10,11 @@ class Navigation extends Component {
       <Menu 
         mode="horizontal"
         className="cs-layout-header-nav"
+        defaultSelectedKeys={this.props.defaultSelectedKeys}
       >
-        {this.props.menus.map((v, i) => {
+        {this.props.menus.map(v => {
           return (
-            <MenuItem key={i}>
+            <MenuItem key={v.url}>
               <a href={v.url}>{v.text}</a>
             </MenuItem>
           );
@@ -24,14 +25,16 @@ class Navigation extends Component {
 }
 
 Navigation.defaultProps = {
-  menus: []
+  menus: [],
+  defaultSelectedKeys: [],
 };
 
 Navigation.propTypes = {
   menus: PropTypes.arrayOf(PropTypes.shape({
     url: PropTypes.string,
     text: PropTypes.string,
-  }))
+  })),
+  defaultSelectedKeys: PropTypes.array,
 };
 
 export default Navigation;

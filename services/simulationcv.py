@@ -14,7 +14,7 @@ class SimulationCV(services.base.simulation.Simulation,
 
     list_item = {"tag", "comment", "tracking"}
 
-    def __init__(self, path, name, cvstorage, iotype=None):
+    def __init__(self, path, name, cvstorage, iotype='git'):
         """
             >>> from tests.settings import *
             >>> config = Config()

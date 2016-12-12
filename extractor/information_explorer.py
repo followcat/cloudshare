@@ -316,17 +316,18 @@ def catch_coinfo(stream, name):
             pass
     return info
 
-def catch_peopinfo(stream, name):
+def catch_peopinfo(stream):
     """
         >>> intro = {'id': '00yd4ww2', 'unique_id': 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'}
-        >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['id'] == 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'
-        >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['cv'] == ['00yd4ww2']
+        >>> assert catch_peopinfo(stream=intro)['id'] == 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'
+        >>> assert catch_peopinfo(stream=intro)['cv'] == ['00yd4ww2']
     """
     info = generate_info_template(peo_template)
-    info['id'] = name
     if isinstance(stream, dict):
+        assert 'id' in stream
         try:
-            info['cv'].append(stream['id'])
+            info['id'] = stream['unique_id']
         except KeyError:
-            pass
+            info['id'] = stream['id']
+        info['cv'].append(stream['id'])
     return info

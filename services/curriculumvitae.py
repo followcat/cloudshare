@@ -10,6 +10,10 @@ class CurriculumVitae(services.base.storage.BaseStorage):
 
     commitinfo = 'CurriculumVitae'
 
+    def exists(self, id):
+        mdname = core.outputstorage.ConvertName(id).md
+        return os.path.exists(os.path.join(self.path, mdname))
+
     def add_md(self, cvobj, committer=None):
         """
             >>> import glob
@@ -62,7 +66,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
 
     def addcv(self, bsobj, rawdata=None):
         self.add(bsobj)
-        cn_id = core.outputstorage.ConvertName(bsobj.id)
+        cn_id = core.outputstorage.ConvertName(bsobj.name)
         if rawdata is not None:
             self.interface.add(cn_id.html, rawdata)
         return True

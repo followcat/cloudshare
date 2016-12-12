@@ -20,4 +20,4 @@ SVC_PRJ_MED.setup(MED_needed)
 
 SVC_PRJ_AI = services.project.Project(os.path.join(PRJ_PATH, 'ArtificialIntelligence'),
                                        SVC_CO_REPO, SVC_CV_REPO, 'ArtificialIntelligence')
-SVC_PRJ_AI.setup(AI_needed)
+SVC_PRJ_AI.setup(AI_needed, config={'autoupdate': False})

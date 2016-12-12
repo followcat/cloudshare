@@ -47,7 +47,10 @@ class Project(services.base.service.Service):
         if not os.path.exists(os.path.join(self.path, self.config_file)):
             self.update(classify, committer)
 
-    def update(self, classify, committer=None):
+    def update(self, classify, committer=None, config=None):
+        if config is None:
+            config = {}
+        self.config.update(config)
         self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
         self.save()
 

@@ -18,10 +18,19 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300, tfidf_local=None, slicer=None):
+    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300,
+                 tfidf_local=None, slicer=None, config=None):
+        if config is None:
+            config = {}
         self.path = savepath
         self.topics = topics
         self.no_above = no_above
+        self.config = {
+            'topics': topics,
+            'no_above': no_above,
+            'extra_samples': extra_samples,
+        }
+        self.config.update(config)
         if slicer:
             self.slicer = slicer
         else:

@@ -37,14 +37,42 @@ class CompanyAPI(Resource):
         result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)
         return { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
 
+class CompanyAllAPI(Resource):
 
-class CompanyListAPI(Resource):
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(CompanyAllAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('begin', location = 'json')
+        self.reqparse.add_argument('length', location = 'json')
+
+    def get(self):
+        project = self.svc_mult_cv.getproject(projectname)
+        return list(project.company.datas())
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        projectname = args['project']
+        begin = args['begin']
+        length = args['length']
+        project = self.svc_mult_cv.getproject(projectname)
+        data = []
+        ids = sorted(list(project.company.ids))
+        for id in ids[int(begin):int(begin+length)]:
+            data.append(project.company.getyaml(id))
+        return { 'code': 200, 'data': data }
+
+#owner
+class CustomerListAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        super(CompanyListAPI, self).__init__()
+        super(CustomerListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
 
@@ -58,63 +86,37 @@ class CompanyListAPI(Resource):
             data.append(co)
         return { 'code': 200, 'data': data }
 
-
-class CompanyAllAPI(Resource):
+#create, delete
+class CustomerAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        super(CompanyAllAPI, self).__init__()
+        super(CustomerAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('begin', location = 'json')
-        self.reqparse.add_argument('lenght', location = 'json')
-
-    def get(self):
-        project = self.svc_mult_cv.getproject(projectname)
-        return list(project.company.datas())
+        self.reqparse.add_argument('id', location = 'json')
 
     def post(self):
-        args = self.reqparse.parse_args()
-        projectname = args['project']
-        begin = args['begin']
-        lenght = args['lenght']
-        project = self.svc_mult_cv.getproject(projectname)
-        data = []
-        ids = sorted(list(project.company.ids))
-        for id in ids[begin:begin+lenght]:
-            data.append(project.company.getyaml(id))
-        return { 'code': 200, 'data': data }
-
-
-class CompanyCustomerAPI(Resource):
-
-    decorators = [flask.ext.login.login_required]
-
-    def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        super(CompanyCustomerAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', location = 'json')
-
-    def post(self, id):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        id = args['id']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        result = project.company.addcustomer(id, user)
-        return { 'code': 200, 'result': result }
+        result = project.company.addcustomer(id, user.id)
+        return { 'code': 200, 'data': result }
 
-    def delete(self, id):
+    def delete(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        id = args['id']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        result = project.company.deletecustomer(id, user)
-        return { 'code': 200, 'result': result }
+        result = project.company.deletecustomer(id, user.id)
+        return { 'code': 200, 'data': result }
 
-
+#update info
 class CompanyInfoUpdateAPI(Resource):
 
     decorators = [flask.ext.login.login_required]

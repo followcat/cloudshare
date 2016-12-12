@@ -95,6 +95,12 @@ class LSImodel(object):
         self.set_tfidf()
         self.set_lsimodel()
 
+    def getconfig(self, param):
+        result = False
+        if param in self.config:
+            result = self.config[param]
+        return result
+
     def save(self):
         if not os.path.exists(self.path):
             os.makedirs(self.path)

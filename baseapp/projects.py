@@ -16,8 +16,8 @@ AI_needed = sources.industry_id.needed_ai
 
 SVC_PRJ_MED = services.project.Project(os.path.join(PRJ_PATH, 'medical'),
                                        SVC_CO_REPO, SVC_CV_REPO, 'medical')
-SVC_PRJ_MED.setup(MED_needed, config={'autoupdate': True})
+SVC_PRJ_MED.setup(MED_needed, config={'autoupdate': True, 'autosetup': True})
 
 SVC_PRJ_AI = services.project.Project(os.path.join(PRJ_PATH, 'ArtificialIntelligence'),
                                        SVC_CO_REPO, SVC_CV_REPO, 'ArtificialIntelligence')
-SVC_PRJ_AI.setup(AI_needed, config={'autoupdate': False})
+SVC_PRJ_AI.setup(AI_needed, config={'autoupdate': False, 'autosetup': False})

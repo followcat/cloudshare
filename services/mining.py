@@ -190,7 +190,8 @@ class Mining(object):
     def setup(self):
         assert self.lsi_model
         for modelname in self.lsi_model:
-            if not self.lsi_model[modelname].names:
+            lsimodel = self.lsi_model[modelname]
+            if not lsimodel.names:
                 continue
             model = self.lsi_model[modelname]
             save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
@@ -218,14 +219,15 @@ class Mining(object):
             try:
                 lsi.load()
             except IOError:
-                if lsi.build([service]):
-                    lsi.save()
+                if lsi.getconfig('autosetup') is True:
+                    if lsi.build([service]):
+                        lsi.save()
             self.lsi_model[project.name] = lsi
 
     def update_model(self):
         for modelname in self.lsi_model:
             lsimodel = self.lsi_model[modelname]
-            if 'autoupdate' in lsimodel.config and lsimodel.config['autoupdate'] is True:
+            if lsimodel.getconfig('autoupdate') is True:
                 updated = self.lsi_model[modelname].update(
                     [self.services['default'][modelname]])
                 if updated:

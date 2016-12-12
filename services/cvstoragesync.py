@@ -62,8 +62,11 @@ class CVStorageSync(object):
 
                 dataobj = core.basedata.DataObject(data=md.encode('utf-8'),
                                                    metadata=info)
-                self.peo_storage.add(dataobj)
+                peoinfo = extractor.information_explorer.catch_peopinfo(info)
+                peoobj = core.basedata.DataObject(data=peoinfo,
+                                                   metadata=peoinfo)
                 self.cv_storage.addcv(dataobj, raw_html.encode('utf-8'))
+                self.peo_storage.add(peoobj)
 
     def generate_md(self, raw_html):
         return pypandoc.convert(raw_html, 'markdown', format='docbook')

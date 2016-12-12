@@ -185,7 +185,7 @@ class Mining(object):
             self.slicer = silencer
         else:
             self.slicer = slicer
-        self.make_lsi(self.services['default'])
+        self.make_lsi()
 
     def setup(self):
         assert self.lsi_model
@@ -208,24 +208,28 @@ class Mining(object):
                     index.save()
                 self.sim[modelname][svc_name] = index
 
-    def make_lsi(self, services):
+    def make_lsi(self):
         self.lsi_model = dict()
-        for name in services:
-            service = services[name]
-            lsi_path = os.path.join(self.path, name, 'model')
-            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer)
+        for project in self.projects.values():
+            service = project.curriculumvitae
+            lsi_path = os.path.join(self.path, project.name, 'model')
+            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer,
+                                                config=project.config)
             try:
                 lsi.load()
             except IOError:
                 if lsi.build([service]):
                     lsi.save()
-            self.lsi_model[name] = lsi
+            self.lsi_model[project.name] = lsi
 
     def update_model(self):
         for modelname in self.lsi_model:
-            updated = self.lsi_model[modelname].update([self.services['default'][modelname]])
-            if updated:
-                self.update_sims()
+            lsimodel = self.lsi_model[modelname]
+            if 'autoupdate' in lsimodel.config and lsimodel.config['autoupdate'] is True:
+                updated = self.lsi_model[modelname].update(
+                    [self.services['default'][modelname]])
+                if updated:
+                    self.update_sims()
 
     def update_sims(self):
         for modelname in self.sim:

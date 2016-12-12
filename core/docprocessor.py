@@ -46,7 +46,7 @@ class Processor():
         self.markdown_stream = str()
 
         self.base = core.outputstorage.ConvertName(name)
-        self.name = self.base
+        self.name = self.base.random
         self.stream = fileobj.read()
 
         self.output_path = core.outputstorage.OutputPath(output_base)
@@ -201,6 +201,55 @@ class Processor():
             logger.info('Skip')
             self.resultcode = 1
             return False
+
+    def renameconvert(self, new):
+        """
+            >>> import shutil
+            >>> import os.path
+            >>> import core.docprocessor
+            >>> basepath = 'core/test_output'
+            >>> f = open('core/test/cv_1.doc', 'r')
+            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
+            >>> cv1.result
+            True
+            >>> os.path.isfile(os.path.join(cv1.markdown_path,
+            ... cv1.name.md))
+            True
+            >>> cv1.renameconvert('newname.md')
+            >>> os.path.isfile(os.path.join(cv1.markdown_path, cv1.name.md))
+            False
+            >>> os.path.isfile(os.path.join(cv1.markdown_path, 'newname.md'))
+            True
+            >>> f.close()
+            >>> shutil.rmtree(basepath)
+        """
+        newname = core.outputstorage.ConvertName(new)
+
+        oldfile = os.path.join(self.docx_path, self.name.docx)
+        newfile = os.path.join(self.docx_path, newname.docx)
+        if os.path.isfile(oldfile):
+            os.rename(oldfile, newfile)
+
+        oldfile = os.path.join(self.html_path, self.name.html)
+        newfile = os.path.join(self.html_path, newname.html)
+        if os.path.isfile(oldfile):
+            os.rename(oldfile, newfile)
+
+        oldfile = os.path.join(self.docbook_path, self.name.xml)
+        newfile = os.path.join(self.docbook_path, newname.xml)
+        if os.path.isfile(oldfile):
+            os.rename(oldfile, newfile)
+
+        oldfile = os.path.join(self.markdown_path, self.name.md)
+        newfile = os.path.join(self.markdown_path, newname.md)
+        if os.path.isfile(oldfile):
+            os.rename(oldfile, newfile)
+
+        oldfile = os.path.join(self.source_path, self.name)
+        newfile = os.path.join(self.source_path, newname + self.name.suffix)
+        if os.path.isfile(oldfile):
+            os.rename(oldfile, newfile)
+
 
     def deleteconvert(self):
         """

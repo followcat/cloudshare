@@ -58,13 +58,18 @@ class BaseStorage(services.base.service.Service):
         """
         return not self.exists(id)
 
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True):
+    def modify(self, filename, stream, message=None, committer=None):
+        self.interface.modify(filename, stream, message, committer)
+        return True
+
+    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=True):
         if unique is True and self.unique(bsobj.name) is False:
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(bsobj.name)
-        message = "Add %s: %s data." % (self.commitinfo, name)
-        self.interface.add(name.md, bsobj.data, message=message, committer=committer)
+        if mdfile is True:
+            message = "Add %s: %s data." % (self.commitinfo, name)
+            self.interface.add(name.md, bsobj.data, message=message, committer=committer)
         if yamlfile is True:
             bsobj.metadata['committer'] = committer
             bsobj.metadata['date'] = time.time()

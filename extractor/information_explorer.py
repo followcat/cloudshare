@@ -265,9 +265,9 @@ def catch_selected(stream, selected, name=None):
     if 'expectation' in selected:
         info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                     # age
-    if 'classify' in selected:
+    if 'classify' in selected and 'classify' not in info_dict:
         experience = get_experience(stream, name)
-        info_dict["classify"] = get_classify(experience)
+        info_dict["classify"] = get_classify(experience['experience'])
     return info_dict
 
 catch = functools.partial(catch_selected, selected=all_selected)

@@ -46,8 +46,8 @@ class CompanyAllAPI(Resource):
         super(CompanyAllAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('begin', location = 'json')
-        self.reqparse.add_argument('length', location = 'json')
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
 
     def get(self):
         project = self.svc_mult_cv.getproject(projectname)
@@ -56,14 +56,14 @@ class CompanyAllAPI(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         projectname = args['project']
-        begin = args['begin']
-        length = args['length']
+        current_page = args['current_page']
+        page_size = args['page_size']
         project = self.svc_mult_cv.getproject(projectname)
         data = []
         ids = sorted(list(project.company.ids))
-        for id in ids[int(begin):int(begin+length)]:
+        for id in ids[(current_page-1)*page_size : current_page*page_size]:
             data.append(project.company.getyaml(id))
-        return { 'code': 200, 'data': data }
+        return { 'code': 200, 'data': data, 'total': len(ids) }
 
 #owner
 class CustomerListAPI(Resource):
@@ -168,38 +168,37 @@ class SearchCObyTextAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
-        cur_page = args['page']
+        cur_page = args['current_page']
+        page_size = args['page_size']
         text = args['search_text']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         results = project.company.search(text)
         yaml_results = project.company.search_yaml(text)
         results.update(yaml_results)
-        count = 20
-        datas, pages = self.paginate(project.company, list(results), cur_page, count)
+        datas, pages, total = self.paginate(project.company, list(results), cur_page, page_size)
         return {
             'code': 200,
-            'data': {
-                'keyword': text,
-                'datas': datas,
-                'pages': pages,
-                'totals': len(results),
-            }
+            'data': datas,
+            'keyword': text,
+            'pages': pages,
+            'total': total
         }
 
     def paginate(self, svc_co, results, cur_page, eve_count):
         if not cur_page:
             cur_page = 1
-        sum = len(results)
-        if sum%eve_count != 0:
-            pages = sum/eve_count + 1
+        total = len(results)
+        if total%eve_count != 0:
+            pages = total/eve_count + 1
         else:
-            pages = sum/eve_count
+            pages = total/eve_count
         datas = []
         for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            datas.append({ 'cv_id': id, 'yaml_info': svc_co.getyaml(id) })
-        return datas, pages
+            datas.append(svc_co.getyaml(id))
+        return datas, pages, total

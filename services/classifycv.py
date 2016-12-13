@@ -45,7 +45,7 @@ class ClassifyCV(object):
                     dataobj = core.basedata.DataObject(metadata, data)
                     self.add(dataobj, yamlfile=False)
 
-    def add(self, dataobj, committer=None, unique=True, yamlfile=True):
+    def add(self, dataobj, committer=None, unique=True, yamlfile=False):
         return self.curriculumvitae.add(dataobj, committer, unique, yamlfile)
 
     def exists(self, id):

@@ -72,7 +72,8 @@ class BaseStorage(services.base.service.Service):
             self.interface.add(name.md, bsobj.data, message=message, committer=committer)
         if yamlfile is True:
             bsobj.metadata['committer'] = committer
-            bsobj.metadata['date'] = time.time()
+            if 'date' not in bsobj or not bsobj.metadata['date']:
+                bsobj.metadata['date'] = time.time()
             message = "Add %s: %s metadata." % (self.commitinfo, name)
             self.interface.add(name.yaml, yaml.safe_dump(bsobj.metadata, allow_unicode=True),
                                message=message, committer=committer)

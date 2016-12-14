@@ -101,7 +101,7 @@ class LSIsimilarity(object):
             >>> names = [n for n in SVC_CV_REPO.names()]
             >>> texts = [SVC_CV_REPO.getmd(n) for n in names]
             >>> path = 'tests/lsisim/model'
-            >>> model = build_lsimodel(path, SVC_MIN.lsi_model['medical'].slicer, names, texts, no_above=1./8, extra_samples=300, tfidf_local=core.mining.lsimodel.tf_cal)
+            >>> model = build_lsimodel(path, SVC_MIN.lsi_model['medical'].slicer, names, texts, no_above=1./8, extra_samples=300)
             >>> sim_path = 'tests/lsisim/sim'
             >>> sim = build_sim(sim_path, model, [SVC_MIN.services['all']['medical']])
             >>> (PERFECT, GOOD, POOR, BAD)
@@ -111,16 +111,16 @@ class LSIsimilarity(object):
             >>> assert kgr_perfect('f12cd9fc1b3011e6a5286c3be51cefca', jd_service, sim)
             >>> assert kgr_perfect('d09227ca0b5d11e6b01c6c3be51cefca', jd_service, sim)
             >>> assert kgr_perfect('4a9f2d9c0b4f11e6877a6c3be51cefca', jd_service, sim)
-            >>> assert kgr_good('7cadbda40b5d11e699956c3be51cefca', jd_service, sim) #FIXME ranks {'1p95tjel': 6, '9zhvxraz': 22}
+            >>> assert kgr_perfect('7cadbda40b5d11e699956c3be51cefca', jd_service, sim)
             >>> assert kgr_perfect('d10df4940b4f11e69d676c3be51cefca', jd_service, sim)
-            >>> assert kgr_perfect('046ad1040b5511e6bd4d6c3be51cefca', jd_service, sim) # ranks {'z8si6kgb': 17}
-            >>> assert kgr_bad('542330f40d0011e69e136c3be51cefca', jd_service, sim) #FIXME ranks {'e9ef1ori': 21}
-            >>> assert kgr_bad('d652742841a211e68dc34ccc6a30cd76', jd_service, sim) #FIXME ranks {'vc4k6axu': 20}
-            >>> assert kgr_perfect('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('046ad1040b5511e6bd4d6c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('542330f40d0011e69e136c3be51cefca', jd_service, sim)
+            >>> assert kgr_perfect('d652742841a211e68dc34ccc6a30cd76', jd_service, sim)
+            >>> assert kgr_good('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
             >>> assert kgr_bad('9b48f97653e811e6af534ccc6a30cd76', jd_service, sim)
             >>> assert kgr_good('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim)
             >>> assert kgr_poor('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim)
-            >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=int(float(1)/3*100))
+            >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=int(float(2)/3*100))
             >>> assert kgr_poor('80ce049a320711e6ac1f4ccc6a30cd76', jd_service, sim)
             >>> assert kgr_bad('b73ac9621cd811e694e76c3be51cefca', jd_service, sim)
             >>> assert kgr_bad('48dc231c0b5d11e6b89e6c3be51cefca', jd_service, sim)
@@ -159,7 +159,7 @@ class LSIsimilarity(object):
             >>> assert kgr_percentage('78df9d86555f11e6abad4ccc6a30cd76', jd_service, sim, cvs=['5ziy6c80', '6y0a1a75', '80clrjqi', 'rlb3jau0', 'sbip7deq', 'uwbvmsod', '68oojytn'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=int(float(2)/7*100))
             >>> assert kgr_bad('80ce049a320711e6ac1f4ccc6a30cd76', jd_service, sim, cvs=['nvujsh0u'])
             >>> assert kgr_bad('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'])
-            >>> assert kgr_percentage('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=int(float(1)/3*100)) #FIXME ranks {'qssipwf9': 37, 'nji2v4s7': 25, 'qfgwkkhg': 7}
+            >>> assert kgr_percentage('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=int(float(2)/3*100)) #FIXME ranks {'qssipwf9': 37, 'nji2v4s7': 25, 'qfgwkkhg': 7}
             >>> assert kgr_bad('d33a669c313511e69edc4ccc6a30cd76', jd_service, sim, cvs=['csa46gdd', 'fahayhk8'])
 
         IBA new:
@@ -169,6 +169,8 @@ class LSIsimilarity(object):
             >>> assert kgr_bad('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, cvs=['cn1rg3mo', 'ienforp4', 'ju9vljdd'])
             >>> assert kgr_bad('e3bd422a2d6411e6b5296c3be51cefca', jd_service, sim, cvs=['qsfmtebc'])
             >>> assert kgr_bad('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim, cvs=['fv51hvdy', 'je7d0xeg', 'v0gcrsow', 'sjk41azl', 'f280mmdm', 'cla50bo5'])
+            >>> count_in[0]
+            38
         """
         if top is None:
             top = len(self.index)

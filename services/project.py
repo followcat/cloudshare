@@ -103,6 +103,10 @@ class Project(services.base.service.Service):
     def cv_ids(self):
         return self.curriculumvitae.ids
 
+    def cv_timerange(self, start_y, start_m, start_d, end_y, end_m, end_d):
+        return self.curriculumvitae.timerange(start_y, start_m, start_d,
+                                              end_y, end_m, end_d)
+
     def company_add(self, cvobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         self.corepo.add(cvobj, committer, unique, yamlfile, mdfile)
         return self.company.add(cvobj, committer, unique, yamlfile, mdfile)

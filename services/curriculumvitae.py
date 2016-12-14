@@ -1,5 +1,7 @@
 import yaml
+import time
 import os.path
+import datetime
 
 import core.docprocessor
 import core.outputstorage
@@ -63,6 +65,15 @@ class CurriculumVitae(services.base.storage.BaseStorage):
         yamlinfo = self.getyaml(id)
         veren = yamlinfo['enversion']
         return self.gethtml(veren)
+
+    def timerange(self, start_y, start_m, start_d, end_y, end_m, end_d):
+        start = time.mktime(datetime.datetime(start_y, start_m, start_d).timetuple())
+        end = time.mktime(datetime.datetime(end_y, end_m, end_d).timetuple())
+        for id in self.ids:
+            info = self.getyaml(id)
+            date = info['date']
+            if start < date and date < end:
+                yield id
 
     def addcv(self, bsobj, rawdata=None):
         self.add(bsobj)

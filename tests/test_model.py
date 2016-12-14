@@ -4,8 +4,10 @@ import functools
 
 import yaml
 
+from webapp.settings import *
 
-FIRST_PAGE = range(20)
+
+FIRST_PAGE = range(SVC_PRJ_MED.cv_numbers()/90)
 
 PERFECT = 100
 GOOD = 50

@@ -87,7 +87,7 @@ class TablePlus extends Component {
           columns={props.columns}
           rowSelection={props.rowSelection}
           pagination={props.pagination}
-          size={props.pagination}
+          size={props.size}
           loading={props.loading}
           bordered={props.bordered}
           expandedRowRender={props.expandedRowRender}

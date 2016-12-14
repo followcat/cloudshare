@@ -12,6 +12,8 @@ GOOD = 50
 POOR = 25
 BAD = 0
 
+count_in = [0]
+
 kgr_file = 'tests/known_good_jd_cv_mapping.yaml'
 with open(kgr_file) as f:
     datas = yaml.load(f)
@@ -39,16 +41,19 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
     if not hasattr(cvs, '__iter__'):
         cvs = {cvs}
     success_count = kgr(jd_id, cvs, jd_service, sim, index_service, filterdict)
+    global count_in
+    count_in[0] += success_count
     if percentage == PERFECT:
-        return success_count == len(cvs)
+        result = success_count == len(cvs)
     elif percentage == GOOD:
-        return len(cvs)*0.5 <= success_count and (success_count < len(cvs) or above_allow)
+        result = len(cvs)*0.5 <= success_count and (success_count < len(cvs) or above_allow)
     elif percentage == POOR:
-        return len(cvs)*0.25 <= success_count and (success_count < len(cvs)*0.5 or above_allow)
+        result = len(cvs)*0.25 <= success_count and (success_count < len(cvs)*0.5 or above_allow)
     elif percentage == BAD:
-        return success_count == 0 or above_allow
+        result = success_count == 0 or above_allow
     elif 0 < percentage < 100:
-        return len(cvs)*float(percentage)/100 <= success_count and (success_count < len(cvs) or above_allow)
+        result = len(cvs)*float(percentage)/100 <= success_count and (success_count < len(cvs) or above_allow)
+    return result
 
 kgr_perfect = functools.partial(kgr_percentage, percentage=PERFECT)
 kgr_good = functools.partial(kgr_percentage, percentage=GOOD)

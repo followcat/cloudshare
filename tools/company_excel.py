@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import xlrd
 import yaml
 
 import core.basedata
@@ -8,6 +7,7 @@ from extractor.information_explorer import *
 
 
 def outputdict(path):
+    import xlrd
     data = xlrd.open_workbook(path)
     table = data.sheets()[0]
     l = list()

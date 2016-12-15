@@ -38,4 +38,8 @@ export const URL = {
     return `/download/${id}`;
   },
 
+  getProjectManagement: () => {
+    return `/pm`;
+  },
+
 };

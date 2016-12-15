@@ -13,6 +13,12 @@ export const API = {
 
   COMPANY_API: `${HOST}/api/company`,
 
+  ALL_COMPANY_API: `${HOST}/api/companyall`,
+
+  ALL_COMPANY_BY_SEARCH_API: `${HOST}/api/searchcobytext`,
+
+  UPDATE_COMPANY_INFO_API: `${HOST}/api/companyinfoupdate`,
+
   CREATE_JOBDESCRIPTION_API: `${HOST}/api/uploadjd`,
 
   FEATURE_API: `${HOST}/api/feature`,

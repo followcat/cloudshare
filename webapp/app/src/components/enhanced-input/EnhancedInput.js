@@ -30,8 +30,19 @@ class EnhancedInput extends Component {
   }
 
   handleBtnClick() {
-    if (this.props.onClick) {
-      this.props.onClick(this.state.value);
+    const props = this.props;
+
+    if (props.onClick) {
+      if (props.dataIndex) {
+        let obj = {};
+        obj[props.dataIndex] = this.state.value;
+        props.onClick(obj);
+      } else {
+        props.onClick(this.state.value);
+      }
+      this.setState({
+        value: ''
+      });
     }
   }
 
@@ -85,6 +96,7 @@ EnhancedInput.propTypes = {
   type: PropTypes.oneOf(['search', 'plus']),
   style: PropTypes.object,
   placeholder: PropTypes.string,
+  dataIndex: PropTypes.string,
   btnSize: PropTypes.string,
   onClick: PropTypes.func,
 };

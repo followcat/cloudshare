@@ -35,3 +35,13 @@ class MultiClassify(object):
                     dataobj = core.basedata.DataObject(metadata, data)
                     self.classifies[c].add(dataobj)
         self.save()
+
+    def updateids(self):
+        for id in self.cvstorage.ids:
+            metadata = self.cvstorage.getyaml(id)
+            for c in metadata['classify']:
+                if not self.classifies[c].exists(id):
+                    self.classifies[c]._add(id)
+        for c in self.classifies:
+            self.classifies[c].saveids()
+        self.save()

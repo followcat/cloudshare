@@ -27,7 +27,7 @@ def initialize(app):
     api.add_resource(CustomerListAPI, '/api/customerlist', endpoint = 'customerlist')
     api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
     api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
-    api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate/<string:id>',
+    api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate',
                      endpoint = 'companyinfoupdate')
 
     api.add_resource(JobDescriptionUploadAPI, '/api/uploadjd',

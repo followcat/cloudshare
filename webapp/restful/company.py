@@ -6,7 +6,7 @@ from flask.ext.restful import Resource
 import utils.builtin
 import core.basedata
 import extractor.information_explorer
-
+import json
 
 class CompanyAPI(Resource):
 
@@ -35,7 +35,11 @@ class CompanyAPI(Resource):
         metadata = extractor.information_explorer.catch_coinfo(name=coname, stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)
-        return { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
+        if result:
+            response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
+        else:
+            response = { 'code': 400, 'data': result, 'message': 'Create new company failed.' }
+        return response
 
 class CompanyAllAPI(Resource):
 
@@ -125,37 +129,45 @@ class CompanyInfoUpdateAPI(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('key', type = str, location = 'json')
-        self.reqparse.add_argument('date', type = str, location = 'json')
-        self.reqparse.add_argument('value', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('id', location = 'json')
+        self.reqparse.add_argument('update_info', type= list, location = 'json')
+        self.reqparse.add_argument('date', location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('key', location = 'json')
+        self.reqparse.add_argument('value', location = 'json')
 
-    def put(self, id):
+    def put(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        key = args['key']
-        value = args['value']
+        id = args['id']
+        update_info = args['update_info']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        data = project.company.updateinfo(id, key, value, user)
-        if data is not None:
-            response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
+        data = dict()
+        for item in update_info:
+            result = project.company.updateinfo(id, item['key'], item['value'], user.id)
+            data.update(result)
+        if len(data) != 0:
+            response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
         else:
-            response = { 'code': 400, 'message': 'Delete information error.'}
+            response = { 'code': 400, 'message': 'Update information error.' }
+        return response
 
-    def delete(self, id):
+    def delete(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
+        id = args['id']
         key = args['key']
         date = args['date']
         value = args['value']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        data = project.company.deleteinfo(id, key, value, user, date)
+        data = project.company.deleteinfo(id, key, value, user.id, date)
         if data is not None:
             response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
         else:
             response = { 'code': 400, 'message': 'Delete information error.'}
+        return response
 
 
 class SearchCObyTextAPI(Resource):

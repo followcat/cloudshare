@@ -97,49 +97,54 @@ export default class SideBar extends Component {
       'showed': this.props.visible === true,
       'hidden': this.props.visible === false,
     });
-    return (
-      <div className={classSet} id="sidebar">
-        <div className="sidebar-button" onClick={this.handleSidebarBtnClick}>
-          {this.state.visible ? <Icon type="caret-right" /> : <Icon type="caret-left" />}
+
+    if (this.props.closable) {
+      return null;
+    } else {
+      return (
+        <div className={classSet} id="sidebar">
+          <div className="sidebar-button" onClick={this.handleSidebarBtnClick}>
+            {this.state.visible ? <Icon type="caret-right" /> : <Icon type="caret-left" />}
+          </div>
+          <Card className="sidebar-container">
+            <div className="analyse">
+              <div className="title">
+                <h3>Analyse</h3>
+              </div>
+              <Competency
+                domId={chartsViewId}
+                dataSource={this.props.dataSource}
+              />
+              <Experience 
+                domId={chartsViewId}
+                dataSource={this.props.dataSource}
+              />
+            </div>
+            <div className="radar">
+              <div className="title">
+                <h3>Draw Charts</h3>
+              </div>
+              <HistorySelection
+                selection={this.props.selection}
+                onToggleSelection={this.props.onToggleSelection}
+              />
+              <RadarChart 
+                selection={this.props.selection}
+                postData={this.props.postData}
+              />
+              <div className="selection-box">
+                <div className="selection-title">
+                  <h4>Selection</h4>
+                </div>
+                <div className="selection-container">
+                  {this.renderSelectionDOM()}
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
-        <Card className="sidebar-container">
-          <div className="analyse">
-            <div className="title">
-              <h3>Analyse</h3>
-            </div>
-            <Competency
-              domId={chartsViewId}
-              dataSource={this.props.dataSource}
-            />
-            <Experience 
-              domId={chartsViewId}
-              dataSource={this.props.dataSource}
-            />
-          </div>
-          <div className="radar">
-            <div className="title">
-              <h3>Draw Charts</h3>
-            </div>
-            <HistorySelection
-              selection={this.props.selection}
-              onToggleSelection={this.props.onToggleSelection}
-            />
-            <RadarChart 
-              selection={this.props.selection}
-              postData={this.props.postData}
-            />
-            <div className="selection-box">
-              <div className="selection-title">
-                <h4>Selection</h4>
-              </div>
-              <div className="selection-container">
-                {this.renderSelectionDOM()}
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
+      );
+    }
   }
 }
 

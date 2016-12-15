@@ -43,6 +43,9 @@ class Simulation(services.base.storage.BaseStorage):
             dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
             self.interface.add(self.ids_file, dumpinfo, message="Init ids file.")
 
+    def saveids(self):
+        self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))
+
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base
         return id in self.ids
@@ -56,6 +59,7 @@ class Simulation(services.base.storage.BaseStorage):
     def _add(self, name):
         id = core.outputstorage.ConvertName(name).base
         self.ids.add(id)
+        return True
 
     def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         result = False

@@ -324,7 +324,6 @@ def init_people(SVC_CV, SVC_PEO):
     import core.basedata
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
-        if 'unique_id' not in info:
-            peopmeta = extractor.information_explorer.catch_peopinfo(info)
-            peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-            SVC_PEO.add(peopobj)
+        peopmeta = extractor.information_explorer.catch_peopinfo(info)
+        peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+        SVC_PEO.add(peopobj)

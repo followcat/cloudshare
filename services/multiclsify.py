@@ -43,5 +43,5 @@ class MultiClassify(object):
                 if not self.classifies[c].exists(id):
                     self.classifies[c]._add(id)
         for c in self.classifies:
-            self.classifies[c].saveids()
+            self.classifies[c].curriculumvitae.saveids()
         self.save()

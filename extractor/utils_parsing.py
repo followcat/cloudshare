@@ -9,6 +9,7 @@ TODAY = u'(?:(?:至今)|(?:目前)|(?:现在)|今|(?:[Pp]resent)|(?:[Nn]ow))'
 CHNUMBERS = u'一二三四五六七八九十'
 SP = u'\s\xa0\ufffd\u2028\u3000'
 ASP = u'[' + SP + u']'
+POASP = ASP.replace('\s', ' \t')
 SEP = u'\-\uff0d\u2013\u2014\u2015\u4e00\\\\·,~～/'
 UNIBRALEFT = ur'[（\(\[【]'
 UNIBRARIGHT = ur'[）\)\]】]'
@@ -29,7 +30,7 @@ EDUFIELDSEP = u'，'+FIELDSEP
 exclude_with_parenthesis = lambda x: u'(?:'+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
-PREFIX = u'(?:(?:\d+(?:['+SENTENCESEP+u'\.]|'+ASP+u'{2}))|◆|·|\?|\uf0d8\xa0|\uf0b7|\uf075|\u258c)'
+PREFIX = u'(?:(?:\d+(?:['+SENTENCESEP+u'\.]|'+ASP+u'{2}))|◆|■|·|\?|\uf0d8\xa0|\uf0b7|\uf075|\u258c)'
 
 LIST_SEPARATOR = u')|(?:'
 COMPANY_BUSINESS_KEYWORD = u'((?:'
@@ -45,10 +46,10 @@ COMPANY_TYPE_KEYWORD = u'外商|企业|外企|合营|事业单位|上市|机关|
 COMPANY_TYPE = u'(?:(?:[^/\|\n\- ：]*?(('+COMPANY_TYPE_KEYWORD+u')[^\|\n\- ]*)+)|其他)'
 
 # Exclude date related characters to avoid eating duration
-COMPANYTAIL = u'(?:、[^' + SENTENCESEP + u'=\n\*\u2013]+?)?'+exclude_with_parenthesis(u'人年月')
+COMPANYTAIL = u'(?:、[^' + SENTENCESEP + u'=\n\*\u2013◆■]+?)?'+exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
 # \u2014, \u2015 and \u4e00 are found in company
-COMPANY = ur'(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?(?:\\\\\*)+)?(?:(?:(?:\\\\\*){3})|(?:[^' + SENTENCESEP + u'=\n\*\u2013]+?))(?:'+COMPANYTAIL+u')?'
+COMPANY = u'(?:\\\\\*|(?:[^' + SENTENCESEP + u'=\n\*\u2013◆■]+?(?:(?:\\\\)?\*(?=(?!'+POASP+u')))+)?(?:(?:(?:\\\\\*){3})|(?:[^' + SENTENCESEP + u'=\n\*\u2013◆■]+?))(?:'+COMPANYTAIL+u')?)'
 SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|\u2013\u2015\u3002]+'
 
@@ -101,8 +102,8 @@ AGEANDBIRTH = u'('+AGE+ u'|((?P<abbr>'+UNIBRALEFT+u')?(?P<birthdate>' +FULLDATE+
 
 SALARY = u'(?:(?P<salarylabel>月薪(?:（税前）)?[:：]?)?'+ASP+u'*(?:(?P<salary>\d[\-到 \d\|]*(?:月/月)?(?(salarylabel)(?:(?:元'+ASP+u'*/'+ASP+u'*月)|>元|(?:/月))?|(?:(?:元'+ASP+u'*/'+ASP+u'*月)|元|(?:/月)))(?:以[上下])?)'+ASP+u'*(?:\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?|保密)|(?:(?:年薪(?:（税前）)?[:：]?)?'+ASP+u'*(?P<salary_yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
 
-EMPLOYEES = u'((?:(?P<employees>(少于)?\d+([ '+SEP+u']+\d+)?'+ASP+u'*人(以[上下])?)|未填写))'
-BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + u'(['+FIELDSEP+u']('+COMPANY_TYPE+u'))?' + UNIBRARIGHT +u')'
+EMPLOYEES = u'((?:(?P<employees>(少于)?\d+([ '+SEP+u']+(?:(?<= )-0 )?\d+)?'+ASP+u'*人(以[上下])?)|未填写))'
+BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + u'(['+FIELDSEP+u']('+COMPANY_TYPE+u'))?' +ASP+u'*' + UNIBRARIGHT +u')'
 BEMPLOYEES = u'('+ BEMPLOYEES + u'('+BEMPLOYEES.replace('P<employees>', ':')+u')?)'
 BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + DURATION + u'(?(br)[\n'+SP+u']*' +UNIBRARIGHT + u'(?(dit)\*)))'
 
@@ -128,7 +129,9 @@ ten_thousands = lambda x: re.compile(u'(?<=\d)'+ASP+u'*W').sub(u'万', x)
 salary_unit = lambda x: re.compile(u'(?<=\d)/(?=[年月])').sub(u'元/', x)
 fix_salary = lambda x: salary_unit(ten_thousands(salary_range(re.compile(ASP+'+').sub('', x))))
 
-fix_employees = lambda x: re.compile(u'[ '+SEP+u']+').sub(u'-', x)
+fix_range = lambda x: x.replace(' -0 ', '')
+fix_people = lambda x: re.compile(ASP+u'+人').sub(u'人', x)
+fix_employees = lambda x: re.compile(u'[ '+SEP+u']+').sub(u'-', fix_people(fix_range(x)))
 
 
 WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)$'

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 const InputGroup = Input.Group;
 
-class SearchInput extends Component {
+class EnhancedInput extends Component {
   constructor() {
     super();
     this.state = {
@@ -14,7 +14,7 @@ class SearchInput extends Component {
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleFocusBlur = this.handleFocusBlur.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
+    this.handleBtnClick = this.handleBtnClick.bind(this);
   }
 
   handleInputChange(e) {
@@ -29,9 +29,9 @@ class SearchInput extends Component {
     });
   }
 
-  handleSearch() {
-    if (this.props.onSearch) {
-      this.props.onSearch(this.state.value);
+  handleBtnClick() {
+    if (this.props.onClick) {
+      this.props.onClick(this.state.value);
     }
   }
 
@@ -63,10 +63,10 @@ class SearchInput extends Component {
           />
           <div className="ant-input-group-wrap">
             <Button
-              icon="search"
+              icon={props.type}
               className={btnCls}
               size={props.btnSize}
-              onClick={this.handleSearch}
+              onClick={this.handleBtnClick}
             />
           </div>
         </InputGroup>
@@ -75,16 +75,18 @@ class SearchInput extends Component {
   }
 }
 
-SearchInput.defaultProps = {
-  placeholder: 'Please input search text',
-  onSearch() {}
+EnhancedInput.defaultProps = {
+  type: 'search',
+  placeholder: 'Please input text',
+  onClick() {}
 };
 
-SearchInput.propTypes = {
+EnhancedInput.propTypes = {
+  type: PropTypes.oneOf(['search', 'plus']),
   style: PropTypes.object,
   placeholder: PropTypes.string,
   btnSize: PropTypes.string,
-  onSearch: PropTypes.func,
+  onClick: PropTypes.func,
 };
 
-export default SearchInput;
+export default EnhancedInput;

@@ -133,6 +133,7 @@ export default class FastMatching extends Component {
       postData: postData,
       visible: true,
       spinning: true,
+      siderbarVisible: true,
     });
 
     fetch(this.state.postAPI, {
@@ -221,6 +222,7 @@ export default class FastMatching extends Component {
       this.setState({
         id: jd_id,
         postAPI: postAPI,
+        siderbarVisible: true,
       });
       this.loadResultData(jd_id, postAPI);
     } else if (cv_id) {

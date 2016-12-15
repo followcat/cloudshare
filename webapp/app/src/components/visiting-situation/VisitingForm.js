@@ -1,54 +1,57 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import { Form, Input, Button, DatePicker } from 'antd';
-const FormItem = Form.Item;
+import { Input, Button } from 'antd';
 
 class VisitingForm extends Component {
   constructor() {
     super();
+    this.state = {
+      value: '',
+    };
     this.handleClick = this.handleClick.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   handleClick(e) {
     e.preventDefault();
-    this.props.form.validateFields((errors, values) => {
-      if (errors) {
-        console.log(errors);
-      }
-      this.props.onSubmit(values);
+    const fieldValue = this.state.value;
+    if (fieldValue) {
+      this.props.onSubmit(fieldValue);
+      this.setState({
+        value: '',
+      });
+    }
+  }
+
+  handleChange(e) {
+    this.setState({
+      value: e.target.value,
     });
   }
 
   render() {
-    const props = this.props,
-          { getFieldProps } = props.form;
+    const props = this.props;
 
     return (
       <div className="cs-visiting-form">
         <div className="cs-visiting-form-icon">
-          <span className="cs-visiting-form-user">{props.currentUser && props.currentUser.split('')[0].toUpperCase()}</span>
+          <span className="cs-visiting-form-user">
+            {props.currentUser && props.currentUser.split('')[0].toUpperCase()}
+          </span>
         </div>
-        <Form
-          inline
-        >
-          <FormItem>
-            <Input
-              {...getFieldProps('visitingText', {rules: [{ required: true }]})}
-              placeholder={props.placeholder}
-            />
-          </FormItem>
-          <FormItem>
-            <DatePicker {...getFieldProps('visitingDate', {rules: [{ required: true }]})} />
-          </FormItem>
-          <FormItem>
-            <Button
-              type={props.btnType}
-              onClick={this.handleClick}
-            >
-              {props.btnText}
-            </Button>
-          </FormItem>
-        </Form>
+        <div className="cs-visiting-form-field">
+          <Input
+            value={this.state.value}
+            placeholder={props.placeholder}
+            onChange={this.handleChange}
+          />
+          <Button
+            type={props.btnType}
+            onClick={this.handleClick}
+          >
+            {props.btnText}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -68,4 +71,4 @@ VisitingForm.propTypess = {
   onSubmit: PropTypes.func,
 };
 
-export default VisitingForm = Form.create({})(VisitingForm);
+export default VisitingForm;

@@ -1,5 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { Menu } from 'antd';
 const SubMenu = Menu.SubMenu,
       MenuItem = Menu.Item;
@@ -12,13 +13,19 @@ class CardSiderMenu extends Component {
       <div className="cs-card-sider">
         <Menu
           selectedKeys={props.selectedKeys}
+          defaultOpenKeys={props.defaultOpenKeys}
           mode="inline"
+          onClick={props.onClick}
         >
-          {props.menus.map((menu, i) => {
+          {props.menus.map(menu => {
             return (
-              <SubMenu key={i} title={menu.subMenuTitle}>
-                {menu.menuItems.map(item => {
-                  return <MenuItem key={item}>{item}</MenuItem>
+              <SubMenu key={menu.subMenu.key} title={menu.subMenu.title}>
+                {menu.menuItem.map(item => {
+                  return (
+                    <MenuItem key={item.key}>
+                      <Link to={item.url}>{item.title}</Link>
+                    </MenuItem>
+                  )
                 })}
               </SubMenu>
             );
@@ -35,10 +42,7 @@ CardSiderMenu.defaultProps = {
 };
 
 CardSiderMenu.propTypes = {
-  menus: PropTypes.arrayOf(PropTypes.shape({
-    subMenuTitle: PropTypes.string,
-    MenuItem: PropTypes.array,
-  })),
+  menus: PropTypes.array,
   selectedKeys: PropTypes.array,
 };
 

@@ -81,7 +81,7 @@ class Simulation(services.base.storage.BaseStorage):
                 filenames.append(bytes(os.path.join(self.yamlpath, name)))
                 filedatas.append(dumpinfo)
             self.interface.add_files(filenames, filedatas,
-                                     message='Add new cv %s.'%id,
+                                     message='Add new data %s.'%id,
                                      committer=committer)
             self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))
             result = True

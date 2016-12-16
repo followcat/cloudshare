@@ -88,8 +88,6 @@ class Simulation(services.base.storage.BaseStorage):
         return result
 
     def getinfo(self, id):
-        if not self.exists(id):
-            return None
         name = core.outputstorage.ConvertName(id).yaml
         try:
             yamlstream = self.interface.get(os.path.join(self.yamlpath, name))
@@ -98,17 +96,12 @@ class Simulation(services.base.storage.BaseStorage):
         return yaml.load(yamlstream, Loader=utils._yaml.Loader)
 
     def getmd(self, name):
-        if not self.exists(name):
-            return None
         return self.cvstorage.getmd(name)
 
     def getyaml(self, id):
-        if not self.exists(id):
-            return None
         yaml = self.cvstorage.getyaml(id)
-        if yaml is not None:
-            info = self.getinfo(id)
-            yaml.update(info)
+        info = self.getinfo(id)
+        yaml.update(info)
         return yaml
 
     def _modifyinfo(self, id, key, value, committer):

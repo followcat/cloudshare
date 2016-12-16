@@ -75,7 +75,7 @@ class MultiCV(object):
         try:
             result = cvservice.cv_getyaml(id)
         except IOError:
-            result = None
+            result = self.repodb.getyaml(id)
         if result is None:
             for each in self.additionals.values():
                 try:

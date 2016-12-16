@@ -45,6 +45,4 @@ class SimulationCV(services.base.simulation.Simulation,
         return self.cvstorage.gethtml(veren)
 
     def gethtml(self, name):
-        if not self.exists(name):
-            return None
         return self.cvstorage.gethtml(name)

@@ -83,7 +83,6 @@ class Simulation(services.base.storage.BaseStorage):
             self.interface.add_files(filenames, filedatas,
                                      message='Add new data %s.'%id,
                                      committer=committer)
-            self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))
             result = True
         return result
 

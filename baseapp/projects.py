@@ -11,13 +11,13 @@ if not os.path.exists(PRJ_PATH):
     os.makedirs(PRJ_PATH)
 
 MED_needed = sources.industry_id.needed_medical
-UAV_needed = sources.industry_id.needed_uav
+AI_needed = sources.industry_id.needed_ai
 
 
 SVC_PRJ_MED = services.project.Project(os.path.join(PRJ_PATH, 'medical'),
                                        SVC_CO_REPO, SVC_CV_REPO, 'medical')
-SVC_PRJ_MED.setup(MED_needed)
+SVC_PRJ_MED.setup(MED_needed, config={'autoupdate': True, 'autosetup': True})
 
-SVC_PRJ_UAV = services.project.Project(os.path.join(PRJ_PATH, 'UAV'),
-                                       SVC_CO_REPO, SVC_CV_REPO, 'UAV')
-SVC_PRJ_UAV.setup(UAV_needed)
+SVC_PRJ_AI = services.project.Project(os.path.join(PRJ_PATH, 'ArtificialIntelligence'),
+                                       SVC_CO_REPO, SVC_CV_REPO, 'ArtificialIntelligence')
+SVC_PRJ_AI.setup(AI_needed, config={'autoupdate': False, 'autosetup': False})

@@ -6,8 +6,6 @@ import ujson
 
 from gensim import corpora, models
 
-import core.outputstorage
-
 
 class LSImodel(object):
 
@@ -18,10 +16,19 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300, tfidf_local=None, slicer=None):
+    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300,
+                 tfidf_local=None, slicer=None, config=None):
+        if config is None:
+            config = {}
         self.path = savepath
         self.topics = topics
         self.no_above = no_above
+        self.config = {
+            'topics': topics,
+            'no_above': no_above,
+            'extra_samples': extra_samples,
+        }
+        self.config.update(config)
         if slicer:
             self.slicer = slicer
         else:
@@ -62,6 +69,37 @@ class LSImodel(object):
             return True
         return False
 
+    def build_from_names(self, svccv_list, names):
+        texts = []
+        if len(names) < 6:
+            return False
+        for name in names:
+            for svc_cv in svccv_list:
+                if svc_cv.exists(name):
+                    doc = svc_cv.getmd(name)
+                    texts.append(doc)
+                    break
+            else:
+                raise Exception("Not exists name: " + name)
+        self.setup(names, texts)
+        return True
+
+    def build_from_words(self, svccv_list, words):
+        names = []
+        texts = []
+        for svc_cv in svccv_list:
+            for data in svc_cv.datas():
+                name, doc = data
+                for word in words:
+                    if word in doc:
+                        names.append(name)
+                        texts.append(doc)
+                        break
+        if len(names) > 5:
+            self.setup(names, texts)
+            return True
+        return False
+
     def setup(self, names, texts):
         self.names = names
         self.texts = self.slicer(texts)
@@ -69,6 +107,12 @@ class LSImodel(object):
         self.set_corpus()
         self.set_tfidf()
         self.set_lsimodel()
+
+    def getconfig(self, param):
+        result = False
+        if param in self.config:
+            result = self.config[param]
+        return result
 
     def save(self):
         if not os.path.exists(self.path):

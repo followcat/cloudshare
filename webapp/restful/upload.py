@@ -50,8 +50,7 @@ class UploadCVAPI(Resource):
                     if key is not u'id':
                         cvobj.metadata[key] = value
                 if 'unique_id' in cvobj.metadata:
-                    peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata,
-                                                                cvobj.metadata['unique_id'])
+                    peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
                     peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
                     peo_result = self.svc_peo.add(peopobj, user.id)
                 cv_result = self.svc_mult_cv.add(cvobj, user.id,

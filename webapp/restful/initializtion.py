@@ -3,7 +3,6 @@ import flask.ext.restful
 
 from webapp.restful.people import *
 from webapp.restful.mining import *
-from webapp.restful.search import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
 from webapp.restful.company import *
@@ -24,7 +23,13 @@ def initialize(app):
     api.add_resource(BookmarkAPI, '/api/accounts/<string:id>/bookmark')
 
     api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
+    api.add_resource(CompanyAllAPI, '/api/companyall', endpoint = 'companyall')
     api.add_resource(CompanyListAPI, '/api/companylist', endpoint = 'companylist')
+    api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
+    api.add_resource(CompanyCustomerAPI, '/api/companycustomer/<string:id>',
+                     endpoint = 'companycustomer')
+    api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate/<string:id>',
+                     endpoint = 'companyinfoupdate')
 
     api.add_resource(JobDescriptionUploadAPI, '/api/uploadjd',
                      endpoint = 'jobdescriptionupload')
@@ -42,8 +47,7 @@ def initialize(app):
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv', endpoint = 'uploadengcv')
     api.add_resource(UploadCVPreviewAPI, '/api/uploadcv/preview')
 
-    # api.add_resource(SearchbyTextAPI, '/api/search/<string:text>', endpoint = 'searchbytext')
-    api.add_resource(SearchbyTextAPI, '/api/searchbytext', endpoint = 'searchbytext')
+    api.add_resource(SearchCVbyTextAPI, '/api/searchbytext', endpoint = 'searchbytext')
 
     api.add_resource(RegionAPI, '/api/mining/region', endpoint = 'region')
     api.add_resource(CapacityAPI, '/api/mining/capacity', endpoint = 'capacity')

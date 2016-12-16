@@ -38,7 +38,9 @@ cv_template = (
 )
 
 co_template = (
+    ("id",                  str),
     ("name",                str),
+    ("district",            str),
     ("product",             str),
     ("website",             str),
     ("conumber",            str),

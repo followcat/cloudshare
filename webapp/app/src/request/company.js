@@ -109,3 +109,18 @@ export const updateCompanyInfo = (method, params, callback) => {
   .then(response => response.json())
   .then(json => callbackFunction(callback, json));
 };
+
+export const getCustomerList = (callback) => {
+  return fetch(API.CUSTOMER_LIST_API, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: Generator.getPostData()
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};

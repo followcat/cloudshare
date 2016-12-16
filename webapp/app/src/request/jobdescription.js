@@ -46,7 +46,7 @@ const getBodyData = (params) => {
 };
 
 export const updateJobDescription = (params, callback) => {
-  return fetch(`${API.UPDATE_JOBDESCRIPTION_API}/${params.id}`, {
+  return fetch(API.UPDATE_JOBDESCRIPTION_API, {
     method: 'PUT',
     credentials: 'include',
     headers: {

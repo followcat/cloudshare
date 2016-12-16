@@ -8,6 +8,7 @@ class SimulationCO(services.base.simulation.Simulation,
                    services.company.Company):
 
     YAML_TEMPLATE = (
+        ("relatedcompany",     list),
         ("position",           list),
         ("clientcontact",      list),
         ("caller",             list),

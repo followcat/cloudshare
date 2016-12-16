@@ -107,9 +107,10 @@ class Project(services.base.service.Service):
         return self.curriculumvitae.timerange(start_y, start_m, start_d,
                                               end_y, end_m, end_d)
 
-    def company_add(self, cvobj, committer=None, unique=True, yamlfile=True, mdfile=False):
-        self.corepo.add(cvobj, committer, unique, yamlfile, mdfile)
-        return self.company.add(cvobj, committer, unique, yamlfile, mdfile)
+    def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
+        self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
+        self.company.add(coobj, committer, unique, yamlfile, mdfile)
+        return self.company.addcustomer(coobj.name, committer)
 
     def company_get(self, name):
         return self.company.getyaml(name)

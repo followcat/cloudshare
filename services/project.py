@@ -95,7 +95,12 @@ class Project(services.base.service.Service):
         return self.curriculumvitae.history(author, entries, skip)
 
     def cv_updateyaml(self, id, key, value, userid):
-        return self.curriculumvitae.updateinfo(id, key, value, userid)
+        result = None
+        try:
+            result = self.curriculumvitae.updateinfo(id, key, value, userid)
+        except AssertionError:
+            pass
+        return result
 
     def cv_deleteyaml(self, id, key, value, userid, date):
         return self.curriculumvitae.deleteinfo(id, key, value, userid, date)

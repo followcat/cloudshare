@@ -2,12 +2,17 @@
 import os.path
 import functools
 
+import json
 import yaml
 
 from webapp.settings import *
 
 
-FIRST_PAGE = range(SVC_PRJ_MED.cv_numbers()/90)
+with open('tests/fix_names.json') as f:
+    names = json.load(f)
+FIRST_PAGE = range(len(names)/90)
+
+FIRST_PAGE = range(22)
 
 PERFECT = 100
 GOOD = 50
@@ -28,7 +33,7 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
         >>> jd_service = SVC_PRJ_MED.jobdescription
         >>> sim = SVC_MIN.sim['medical']['medical']
         >>> assert kgr_perfect('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim)
-        >>> assert kgr_good('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
+        >>> assert kgr_perfect('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
         >>> assert kgr_poor('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim, above_allow=True)
         >>> assert kgr_poor('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim)
         >>> assert kgr_bad('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim)

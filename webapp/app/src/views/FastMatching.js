@@ -28,6 +28,7 @@ export default class FastMatching extends Component {
       total: 0,
       spinning: true,
       visible: false,
+      siderbarClosable: false,
       siderbarVisible: false,
       textarea: false,
       postData: {},
@@ -132,6 +133,7 @@ export default class FastMatching extends Component {
       postData: postData,
       visible: true,
       spinning: true,
+      siderbarVisible: true,
     });
 
     fetch(this.state.postAPI, {
@@ -218,14 +220,15 @@ export default class FastMatching extends Component {
     if (jd_id) {
       postAPI = API.LSI_BY_JD_ID_API;
       this.setState({
-        siderbarVisible: true,
         id: jd_id,
         postAPI: postAPI,
+        siderbarVisible: true,
       });
       this.loadResultData(jd_id, postAPI);
     } else if (cv_id) {
       postAPI = API.LSI_BY_CV_ID_API;
       this.setState({
+        siderbarClosable: true,
         id: cv_id,
         postAPI: postAPI,
       });
@@ -260,6 +263,7 @@ export default class FastMatching extends Component {
           onToggleSelection={this.handleToggleSelection}
         />
         <SideBar
+          closable={this.state.siderbarClosable}
           visible={this.state.siderbarVisible}
           postData={this.state.postData}
           selection={this.state.selection}

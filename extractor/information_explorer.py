@@ -38,7 +38,9 @@ cv_template = (
 )
 
 co_template = (
+    ("id",                  str),
     ("name",                str),
+    ("district",            str),
     ("product",             str),
     ("website",             str),
     ("conumber",            str),
@@ -243,7 +245,9 @@ def get_age(stream):
     return result
 
 
-all_selected = ('name', 'originid', 'age', 'phone', 'email', 'education', 'experience', 'expectation', 'classify')
+all_selected = ('name', 'originid', 'age', 'phone', 'email',
+                'education', 'experience', 'expectation',
+                'classify', 'unique_id')
 
 def catch_selected(stream, selected, name=None):
     assert set(selected).issubset(set(all_selected))
@@ -265,9 +269,11 @@ def catch_selected(stream, selected, name=None):
     if 'expectation' in selected:
         info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                     # age
-    if 'classify' in selected:
+    if 'unique_id' in selected:
+        extractor.unique_id.unique_id(info_dict)
+    if 'classify' in selected and 'classify' not in info_dict:
         experience = get_experience(stream, name)
-        info_dict["classify"] = get_classify(experience)
+        info_dict["classify"] = get_classify(experience['experience'])
     return info_dict
 
 catch = functools.partial(catch_selected, selected=all_selected)

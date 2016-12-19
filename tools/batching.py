@@ -133,7 +133,6 @@ def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.path, yamlname)
     explorer_name = get_explorer_name(svc_cv, yamlname)
-
     extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname),
                                                                    explorer_name)
     obj.update(extracted_data)
@@ -160,10 +159,22 @@ def originid(svc_cv, yamlname):
         fp.write(yamlstream)
 
 def yamlaction(svc_cv, action, *args, **kwargs):
+    import time
+    import utils.timeout.process
+    i = 0
     for yamlname in svc_cv.yamls():
-        action(svc_cv, yamlname, *args, **kwargs)
-
-
+        i += 1
+        t1 = time.time()
+        try:
+            utils.timeout.process.process_timeout_call(action, 120,
+                                    args=tuple([svc_cv, yamlname]+list(args)),
+                                    kwargs=kwargs)
+        except utils.timeout.process.KilledExecTimeout as e:
+            print(yamlname, action, e)
+        usetime = time.time() - t1
+        print("CV %s use %s."%(yamlname, str(usetime)))
+        if i % 100 == 0:
+            print i
 
 def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
     def fix_same(l):
@@ -324,7 +335,6 @@ def init_people(SVC_CV, SVC_PEO):
     import core.basedata
     for y in SVC_CV.yamls():
         info = SVC_CV.getyaml(y)
-        if 'unique_id' not in info:
-            peopmeta = extractor.information_explorer.catch_peopinfo(info)
-            peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-            SVC_PEO.add(peopobj)
+        peopmeta = extractor.information_explorer.catch_peopinfo(info)
+        peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+        SVC_PEO.add(peopobj)

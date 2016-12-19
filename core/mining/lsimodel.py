@@ -6,8 +6,6 @@ import ujson
 
 from gensim import corpora, models
 
-import core.outputstorage
-
 
 class LSImodel(object):
 
@@ -70,6 +68,21 @@ class LSImodel(object):
             self.setup(names, texts)
             return True
         return False
+
+    def build_from_names(self, svccv_list, names):
+        texts = []
+        if len(names) < 6:
+            return False
+        for name in names:
+            for svc_cv in svccv_list:
+                if svc_cv.exists(name):
+                    doc = svc_cv.getmd(name)
+                    texts.append(doc)
+                    break
+            else:
+                raise Exception("Not exists name: " + name)
+        self.setup(names, texts)
+        return True
 
     def build_from_words(self, svccv_list, words):
         names = []

@@ -82,4 +82,6 @@ class CVStorageSync(object):
                 obj[key] = catchinfo[key]
             elif key not in obj:
                 obj[key] = catchinfo[key]
+            elif not obj[key] and type(obj[key]) != type(catchinfo[key]):
+                obj[key] = catchinfo[key]
         return obj

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+
+import core.basedata
 import core.mining.lsimodel
 import core.mining.lsisimilarity
 
@@ -130,7 +132,9 @@ def repl_web(m):
     else:
         return '\n'
 
-def silencer(document):
+def silencer(document, cutservice=None, id=None):
+    if (cutservice and id) and cutservice.exists(id):
+        return cutservice.getyaml(id)['words']
     if isinstance(document, list):
         texts = document
     else:
@@ -158,9 +162,14 @@ def silencer(document):
             out.append(word)
         selected_texts.append(out)
     if isinstance(document, list):
-        return selected_texts
+        result = selected_texts
     else:
-        return selected_texts[0]
+        result = selected_texts[0]
+    if cutservice and id:
+        cutobj = core.basedata.DataObject(metadata={'id': id, 'words': result},
+                                          data=None)
+        cutservice.add(cutobj)
+    return result
 
 
 class Mining(object):

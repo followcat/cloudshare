@@ -43,6 +43,9 @@ class Simulation(services.base.storage.BaseStorage):
             dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
             self.interface.add(self.ids_file, dumpinfo, message="Init ids file.")
 
+    def saveids(self):
+        self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))
+
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base
         return id in self.ids
@@ -56,6 +59,7 @@ class Simulation(services.base.storage.BaseStorage):
     def _add(self, name):
         id = core.outputstorage.ConvertName(name).base
         self.ids.add(id)
+        return True
 
     def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         result = False
@@ -77,15 +81,12 @@ class Simulation(services.base.storage.BaseStorage):
                 filenames.append(bytes(os.path.join(self.yamlpath, name)))
                 filedatas.append(dumpinfo)
             self.interface.add_files(filenames, filedatas,
-                                     message='Add new cv %s.'%id,
+                                     message='Add new data %s.'%id,
                                      committer=committer)
-            self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))
             result = True
         return result
 
     def getinfo(self, id):
-        if not self.exists(id):
-            return None
         name = core.outputstorage.ConvertName(id).yaml
         try:
             yamlstream = self.interface.get(os.path.join(self.yamlpath, name))
@@ -94,17 +95,12 @@ class Simulation(services.base.storage.BaseStorage):
         return yaml.load(yamlstream, Loader=utils._yaml.Loader)
 
     def getmd(self, name):
-        if not self.exists(name):
-            return None
         return self.cvstorage.getmd(name)
 
     def getyaml(self, id):
-        if not self.exists(id):
-            return None
         yaml = self.cvstorage.getyaml(id)
-        if yaml is not None:
-            info = self.getinfo(id)
-            yaml.update(info)
+        info = self.getinfo(id)
+        yaml.update(info)
         return yaml
 
     def _modifyinfo(self, id, key, value, committer):

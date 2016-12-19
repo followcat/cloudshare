@@ -52,8 +52,9 @@ class MultiCV(object):
 
     def gethtml(self, id, projectname=None):
         cvservice = self.getproject(projectname)
-        result = cvservice.cv_gethtml(id)
-        if result is None:
+        try:
+            result = cvservice.cv_gethtml(id)
+        except IOError:
             for each in self.additionals.values():
                 result = each.gethtml(id)
                 if result is not None:
@@ -62,8 +63,9 @@ class MultiCV(object):
 
     def getmd(self, id, projectname=None):
         cvservice = self.getproject(projectname)
-        result = cvservice.cv_getmd(id)
-        if result is None:
+        try:
+            result = cvservice.cv_getmd(id)
+        except IOError:
             for each in self.additionals.values():
                 result = each.getmd(id)
                 if result is not None:
@@ -76,6 +78,11 @@ class MultiCV(object):
             result = cvservice.cv_getyaml(id)
         except IOError:
             result = None
+        if result is None:
+            try:
+                result = self.repodb.getyaml(id)
+            except IOError:
+                result = None
         if result is None:
             for each in self.additionals.values():
                 try:

@@ -8,6 +8,7 @@ class SimulationCO(services.base.simulation.Simulation,
                    services.company.Company):
 
     YAML_TEMPLATE = (
+        ("relatedcompany",     list),
         ("position",           list),
         ("clientcontact",      list),
         ("caller",             list),
@@ -15,7 +16,9 @@ class SimulationCO(services.base.simulation.Simulation,
         ("updatednumber",      list),
     )
 
-    list_item = {"position", "clientcontact", "caller", "progress", "updatednumber"}
+    list_item = {"relatedcompany", "position", "clientcontact",
+                 "caller", "progress", "updatednumber"}
+    fix_item  = {"id", "name"}
     customers_file = 'customers.json'
 
     def __init__(self, path, name, cvstorage, iotype='git'):

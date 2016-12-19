@@ -98,12 +98,13 @@ class LSIsimilarity(object):
             >>> from tests.multi_models import *
             >>> import core.mining.lsimodel
             >>> jd_service = SVC_PRJ_MED.jobdescription
+            >>> names = list(test_cv_svc.ids)
             >>> texts = [SVC_CV_REPO.getmd(n) for n in names]
             >>> path = 'tests/lsisim/model'
             >>> model = build_lsimodel(path, SVC_MIN.lsi_model['medical'].slicer, names, texts, no_above=1./3, extra_samples=300)
             >>> sim_path = 'tests/lsisim/sim'
             >>> origin = count_in[0]
-            >>> sim = build_sim(sim_path, model, [SVC_MIN.services['all']['medical']])
+            >>> sim = build_sim(sim_path, model, [test_cv_svc])
             >>> (PERFECT, GOOD, POOR, BAD)
             (100, 50, 25, 0)
             >>> assert kgr_perfect('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim)

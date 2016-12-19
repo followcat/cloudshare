@@ -8,11 +8,10 @@ import yaml
 from webapp.settings import *
 
 
-with open('tests/fix_names.json') as f:
-    names = json.load(f)
-FIRST_PAGE = range(len(names)/90)
+test_cv_svc = services.simulationcv.SimulationCV('tests/cv_svc', 'lsisim_test', 
+                SVC_CV_REPO, iotype='base')
 
-FIRST_PAGE = range(22)
+FIRST_PAGE = range(len(test_cv_svc.ids)/90)
 
 PERFECT = 100
 GOOD = 50

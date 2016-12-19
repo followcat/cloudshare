@@ -160,8 +160,14 @@ def originid(svc_cv, yamlname):
         fp.write(yamlstream)
 
 def yamlaction(svc_cv, action, *args, **kwargs):
+    import utils.timeout.process
     for yamlname in svc_cv.yamls():
-        action(svc_cv, yamlname, *args, **kwargs)
+        try:
+            utils.timeout.process.process_timeout_call(action, 120,
+                                    args=tuple([svc_cv, yamlname]+list(args)),
+                                    kwargs=kwargs)
+        except utils.timeout.process.KilledExecTimeout as e:
+            print(yamlname, action, e)
 
 
 

@@ -281,11 +281,12 @@ class LSImodel(object):
     def probability(self, doc):
         u"""
             >>> from tests.test_index import *
+            >>> from tests.test_model import *
             >>> from tests.multi_models import *
             >>> from webapp.settings import *
             >>> import compiler.ast
             >>> model = SVC_MIN.lsi_model['medical']
-            >>> names = [n for n in SVC_CV_REPO.names()]
+            >>> names = [n for n in test_cv_svc.ids]
             >>> texts = [SVC_CV_REPO.getmd(n) for n in names]
             >>> path = 'tests/lsimodel/medical'
             >>> model = build_lsimodel(path, model.slicer, names, texts, no_above=1./8, extra_samples=300, tfidf_local=core.mining.lsimodel.tf_cal)

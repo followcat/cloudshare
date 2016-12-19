@@ -247,7 +247,7 @@ class Mining(object):
         for name in services:
             service = services[name]
             lsi_path = os.path.join(self.path, name, 'model')
-            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer)
+            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer, no_above=1./3)
             try:
                 lsi.load()
             except IOError:

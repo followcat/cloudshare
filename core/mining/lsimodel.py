@@ -18,7 +18,7 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300, power_iters=6, tfidf_local=None, slicer=None):
+    def __init__(self, savepath, no_above=1./1, topics=100, extra_samples=300, power_iters=6, tfidf_local=None, slicer=None):
         self.path = savepath
         self.topics = topics
         self.power_iters = power_iters

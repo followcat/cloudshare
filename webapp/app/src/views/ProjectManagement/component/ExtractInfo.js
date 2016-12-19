@@ -79,23 +79,29 @@ class ExtractInfo extends Component {
   }
 
   getNormalRender(prop) {
-    return prop.map(v => {
-      return <span key={v.content} className="cs-extra-item">{v.content}</span>
-    });
+    if (Array.isArray(prop)) {
+      return prop.map(v => {
+        return <span key={v.content} className="cs-extra-item">{v.content}</span>
+      });
+    }
+    return null;
   }
 
   getEditingRender(dataIndex, prop) {
-    return prop.map((v, i) => {
-      return (
-        <Tag
-          key={i}
-          closable={this.state.editing}
-          afterClose={() => this.handleAfterClose(dataIndex, v.content, v.date)}
-        >
-          {v.content}
-        </Tag>
-      );
-    });
+    if (Array.isArray(prop)) {
+      return prop.map((v, i) => {
+        return (
+          <Tag
+            key={i}
+            closable={this.state.editing}
+            afterClose={() => this.handleAfterClose(dataIndex, v.content, v.date)}
+          >
+            {v.content}
+          </Tag>
+        );
+      });
+    }
+    return null;
   }
 
   render() {
@@ -110,6 +116,9 @@ class ExtractInfo extends Component {
     }, {
       title: language.CONTACT_WAY,
       dataIndex: 'updatednumber',
+    }, {
+      title: language.RELATED_COMPANY,
+      dataIndex: 'relatedcompany',
     }];
 
     return (

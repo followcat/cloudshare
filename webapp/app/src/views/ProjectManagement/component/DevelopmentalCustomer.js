@@ -6,7 +6,7 @@ import SiderPanel from '../../../components/sider-panel';
 import EnhancedInput from '../../../components/enhanced-input';
 import VisitingSituation from '../../../components/visiting-situation';
 import DetailInformation from '../../../components/detail-information';
-import CreateCompany from './CreateCompany';
+import CreateNewCompany from './CreateNewCompany';
 import ExtractInfo from './ExtractInfo';
 
 import { Button, message } from 'antd';
@@ -14,7 +14,8 @@ import { Button, message } from 'antd';
 import {
   getAllCompany,
   getAllCompanyBySearch,
-  updateCompanyInfo
+  updateCompanyInfo,
+  createCompany
 } from '../../../request/company';
 import StorageUtil from '../../../utils/storage';
 import remove from 'lodash/remove';
@@ -49,6 +50,7 @@ export default class DevelopmentalCustomer extends Component {
       searchWord: '',
       loading: false,
       siderPanelVisible: false,
+      createCompanyConfirmLoading: false,
     };
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
@@ -59,6 +61,7 @@ export default class DevelopmentalCustomer extends Component {
     this.handleVisitingSubmit = this.handleVisitingSubmit.bind(this);
     this.handleExtractInfoCreate = this.handleExtractInfoCreate.bind(this);
     this.handleExtractInfoRemove = this.handleExtractInfoRemove.bind(this);
+    this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getDataSourceBySearch = this.getDataSourceBySearch.bind(this);
   }
@@ -221,6 +224,26 @@ export default class DevelopmentalCustomer extends Component {
     });
   }
 
+  handleCreateCompanySubmit(fieldValues) {
+    const { current, pageSize } = this.state;
+          
+    this.setState({
+      createCompanyConfirmLoading: true,
+    });
+
+    createCompany(fieldValues, (json) => {
+      if (json.code === 200) {
+        message.success(json.message);
+        this.getDataSource(current, pageSize);
+      } else {
+        message.error(json.message);
+      }
+      this.setState({
+        createCompanyConfirmLoading: false,
+      });
+    });
+  }
+
   getDataSource(current, pageSize) {
     this.setState({
       loading: true,
@@ -277,7 +300,12 @@ export default class DevelopmentalCustomer extends Component {
       )
     }, {
       col: { span: 3 },
-      render: <CreateCompany />
+      render: (
+        <CreateNewCompany
+          confirmLoading={this.state.createCompanyConfirmLoading}
+          onSubmit={this.handleCreateCompanySubmit}
+        />
+      )
     }];
 
     // 主体表格列数组
@@ -364,6 +392,10 @@ export default class DevelopmentalCustomer extends Component {
       title: language.COMPANY_NAME,
       dataIndex: 'name',
       key: 'name',
+    }, {
+      title: language.DISTRICT,
+      dataIndex: 'district',
+      key: 'district',
     }, {
       title: language.PRODUCT,
       dataIndex: 'product',

@@ -36,6 +36,8 @@ const websiteText = {
     ADDRESS: '地址',
     WEBSITE: '网站',
     COMPANY_INTRODUCTION: '公司概述',
+    DISTRICT: '区域',
+    RELATED_COMPANY: '相关公司',
     OPERATION: '操作',
     SUBMIT: '提交',
     EXTENDED_INFORMATION: '扩展信息',

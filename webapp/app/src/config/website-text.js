@@ -38,6 +38,7 @@ const websiteText = {
     COMPANY_INTRODUCTION: '公司概述',
     OPERATION: '操作',
     SUBMIT: '提交',
+    EXTENDED_INFORMATION: '扩展信息',
     BASIC_INFORMATION: '基本信息',
     INPUT_PLACEHOLDER: '请输入',
     EMAIL_VALIDATE_TIP: '请输入正确的邮箱地址',

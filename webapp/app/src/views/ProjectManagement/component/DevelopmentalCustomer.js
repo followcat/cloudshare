@@ -421,7 +421,8 @@ export default class DevelopmentalCustomer extends Component {
             onSubmit={this.handleVisitingSubmit}
           />
           <ExtractInfo 
-            title="扩展信息"
+            title={language.EXTENDED_INFORMATION}
+            editable={true}
             dataSource={this.state.detailData}
             onCreate={this.handleExtractInfoCreate}
             onRemove={this.handleExtractInfoRemove}

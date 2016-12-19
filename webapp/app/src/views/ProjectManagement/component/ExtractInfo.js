@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import EnhancedInput from '../../../components/enhanced-input';
 import {
   Row,
@@ -36,7 +36,7 @@ class ExtractInfo extends Component {
     this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleEnhancedInputClick = this.handleEnhancedInputClick.bind(this);
     this.handleAfterClose = this.handleAfterClose.bind(this);
-    this.getExtraElement = this.getExtraElement.bind(this);
+    this.getExtractElement = this.getExtractElement.bind(this);
     this.getNormalRender = this.getNormalRender.bind(this);
     this.getEditingRender = this.getEditingRender.bind(this);
   }
@@ -63,12 +63,19 @@ class ExtractInfo extends Component {
     this.props.onRemove(key, value, date);
   }
 
-  getExtraElement() {
-    if (this.state.editing) {
-      return <a href="javascript: void(0);" onClick={this.handleCancelClick}>{language.CANCEL}</a>
-    } else {
-      return <a href="javascript: void(0);" onClick={this.handleEditClick}>{language.EDIT}</a>
+  getExtractElement() {
+    const { editable } = this.props;
+    let extractElement = null;
+
+    if (editable) {
+      if (this.state.editing) {
+        extractElement = (<a href="javascript: void(0);" onClick={this.handleCancelClick}>{language.CANCEL}</a>);
+      } else {
+        extractElement = (<a href="javascript: void(0);" onClick={this.handleEditClick}>{language.EDIT}</a>);
+      }
     }
+
+    return extractElement;
   }
 
   getNormalRender(prop) {
@@ -108,8 +115,8 @@ class ExtractInfo extends Component {
     return (
       <Card
         title={this.props.title}
-        style={{ marginBottom: 8 }}
-        extra={this.getExtraElement()}
+        style={{ marginBottom: 16 }}
+        extra={this.getExtractElement()}
       >
         {rows.map((item, index) => {
           return (
@@ -141,5 +148,13 @@ class ExtractInfo extends Component {
     );
   }
 }
+
+ExtractInfo.default = {
+  editable: true,
+};
+
+ExtractInfo.propTypes = {
+  editable: PropTypes.bool,
+};
 
 export default ExtractInfo;

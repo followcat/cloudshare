@@ -40,9 +40,6 @@ class EnhancedInput extends Component {
       } else {
         props.onClick(this.state.value);
       }
-      this.setState({
-        value: ''
-      });
     }
   }
 

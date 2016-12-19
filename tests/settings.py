@@ -49,7 +49,7 @@ class Config(object):
 
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MULT_CV)
         self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].no_above = 1
-        self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].setup('first.md',
+        self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].setup(['first.md'],
             ['here is a text for testing.'])
         self.SVC_MIN.setup()
 

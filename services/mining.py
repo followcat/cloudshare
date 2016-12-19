@@ -7,7 +7,6 @@ import core.mining.lsimodel
 import core.mining.lsisimilarity
 
 from utils.builtin import jieba_cut, pos_extract, industrytopath
-from extractor.utils_parsing import *
 
 
 REJECT = re.compile('(('+')|('.join([
@@ -32,12 +31,6 @@ DOT_NET = re.compile(ur'((vs|VS|C#|c#|asp|ASP|Asp|ADO|ado)\.(Net|net|NET))')
 
 SYMBOL = re.compile(ur'[- /]+')
 SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
-
-RESP = ur'((工作)?职责[:：]?|负责)'+ASP+u'*.*'
-COMDES = ur'[\w(（）)]*?(公司|集团|所|局|单位|院|基地)([(（]\w*[）)])*?(是|成立|成立于|创始于|创立|始建于|创建于|坐落于|座落于|位于|地处|主要从事|主要经营|属于|专注于)'
-TABLE = ur'(公司性质|公司规模|汇报对象|下属人数|所在部门|公司描述|企业简介|企业概况|公司名称|勿推荐企业)'
-TIMEDU = ur'(\d{4}'+ASP+u'*[/\.]'+ASP+u'*\d{0,2}'+ASP+u'*'+ASP+u'*[-—–至]*'+ASP+u'*)(\d{4}'+ASP+u'*[/\.]'+ASP+u'*\d{0,2}'+ASP+u'*|至今)'+ASP+u'*'
-TSEP = ASP+ur'\|'+ASP
 
 
 FLAGS = ['x', # spaces
@@ -140,31 +133,7 @@ def repl_web(m):
     else:
         return '\n'
 
-def extract_lines(doc):
-    lines = []
-    for line in doc.split('\n'):
-        if len(line.strip())> 30:
-            if u'搜索同事' in line or u'http://' in line or u'https://' in line:
-                continue
-            if not re.search(ur'\w', line):
-                continue
-            for p in line.split('  '):
-                if re.search(RESP, p):
-                    lines.append(p)
-                    continue
-                if re.search(COMDES, p):
-                    continue
-                if re.search(TABLE, p):
-                    continue
-                if re.search(TSEP, p):
-                    continue
-                if re.search(TIMEDU, p):
-                    continue
-                if len(p.strip()) > 30:
-                    lines.append(p)
-    return u'\n'.join(lines)
-
-def silencer(document, extract=False, cutservice=None, id=None):
+def silencer(document, cutservice=None, id=None):
     if (cutservice and id) and cutservice.exists(id):
         return cutservice.getyaml(id)['words']
     if isinstance(document, list):
@@ -173,8 +142,6 @@ def silencer(document, extract=False, cutservice=None, id=None):
         texts = [document]
     selected_texts = []
     for text in texts:
-        if extract:
-            text = extract_lines(text)
         text = re_sub(LINE, ' ', text)
         text = re_sub(WEB, repl_web, text)
         text = re_sub(SYMBOL, ' ', text)

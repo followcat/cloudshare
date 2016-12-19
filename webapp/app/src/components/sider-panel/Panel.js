@@ -8,9 +8,18 @@ import getStyle from '../../utils/get-style';
 class Panel extends Component {
   constructor() {
     super();
+    this.setContentScroll = this.setContentScroll.bind(this);
+  }
+
+  componentDidMount() {
+    this.setContentScroll();
   }
 
   componentDidUpdate() {
+    this.setContentScroll();
+  }
+
+  setContentScroll() {
     const container = ReactDOM.findDOMNode(this.refs.container),
           header = ReactDOM.findDOMNode(this.refs.header),
           content = ReactDOM.findDOMNode(this.refs.content);
@@ -22,7 +31,6 @@ class Panel extends Component {
           containerPaddingBottom = parseInt(getStyle(container, 'paddingBottom'));
 
     let maxContentHeight = containerHeight - headerHeight - containerPaddingTop - containerPaddingBottom;
-
     if (contentHeight > maxContentHeight) {
       content.style.overflowY = 'scroll';
       content.style.maxHeight = `${maxContentHeight}px`;

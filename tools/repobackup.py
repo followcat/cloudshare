@@ -31,6 +31,6 @@ if __name__ == '__main__':
         utils.builtin.assure_path_exists(company_backup_path)
         source_repo.backup(data_backup_path, bare=True)
         account_repo.backup(account_backup_path, bare=True)
+        company_repo.backup(company_backup_path, bare=True)
         medical_repo.backup(medical_backup_path, bare=True)
         AI_repo.backup(AI_backup_path, bare=True)
-        company_repo.backup(company_backup_path, bare=True)

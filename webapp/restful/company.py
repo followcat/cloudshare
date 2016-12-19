@@ -15,9 +15,15 @@ class CompanyAPI(Resource):
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('coname', location = 'json')
-        self.reqparse.add_argument('introduction', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('name', location = 'json')
+        self.reqparse.add_argument('product', location = 'json')
+        self.reqparse.add_argument('introduction', location = 'json')
+        self.reqparse.add_argument('conumber', location = 'json')
+        self.reqparse.add_argument('address', location = 'json')
+        self.reqparse.add_argument('email', location = 'json')
+        self.reqparse.add_argument('website', location = 'json')
+        self.reqparse.add_argument('district', location = 'json')
         super(CompanyAPI, self).__init__()
 
     def get(self, name):
@@ -29,7 +35,7 @@ class CompanyAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         project = args['project']
-        coname = args['coname']
+        coname = args['name']
         if args['introduction'] is None:
             args['introduction'] = str()
         metadata = extractor.information_explorer.catch_coinfo(name=coname, stream=args)

@@ -32,9 +32,9 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
         >>> jd_service = SVC_PRJ_MED.jobdescription
         >>> sim = SVC_MIN.sim['medical']['medical']
         >>> assert kgr_perfect('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim)
-        >>> assert kgr_perfect('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
+        >>> assert kgr_good('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
         >>> assert kgr_poor('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim, above_allow=True)
-        >>> assert kgr_poor('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim)
+        >>> assert kgr_percentage('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim, percentage=int(float(1)/7*100))
         >>> assert kgr_bad('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim)
         >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=33)
         >>> jd_id, cvs = '2fe1c53a231b11e6b7096c3be51cefca', ['3hffapdz', '2x5wx4aa']

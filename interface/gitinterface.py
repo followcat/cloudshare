@@ -142,6 +142,9 @@ class GitInterface(interface.base.Interface):
         if files is None:
             files = []
         grep_list = []
+        greppath = os.path.join(self.repo.path, path)
+        if not os.path.exists(greppath):
+            return grep_list
         keywords = restrings.split()
         if keywords:
             command = ['git', 'grep', '-l', '--all-match']
@@ -152,7 +155,7 @@ class GitInterface(interface.base.Interface):
             p = subprocess.Popen(command,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,
-                                 cwd=os.path.join(self.repo.path, path))
+                                 cwd=greppath)
             returncode = p.communicate()[0]
             for each in returncode.split('\n'):
                 if each:

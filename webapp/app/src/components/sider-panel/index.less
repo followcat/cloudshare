@@ -1,0 +1,91 @@
+@borderRadiusWidth: 6px;
+
+.sider-panel-mask {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  opacity: 0.6;
+  background-color: #373737;
+  z-index: 999;
+}
+
+.sider-panel-wrapper {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  padding: 24px 16px;
+  background-color: #fff;
+  z-index: 999;
+  color: #666;
+  outline: none;
+
+  .close {
+    position: absolute;
+    font-size: 24px;
+    top: 24px;
+    right: 16px;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    color: #000;
+  }
+}
+
+.sider-panel-left {
+  left: 0;
+  border-top-right-radius: @borderRadiusWidth;
+  border-bottom-right-radius: @borderRadiusWidth;
+}
+
+.sider-panel-right {
+  right: 0;
+  border-top-left-radius: @borderRadiusWidth;
+  border-bottom-left-radius: @borderRadiusWidth;
+}
+
+.sider-panel-header {
+  padding-bottom: 24px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.mask-enter {
+  opacity: 0;
+}
+
+.mask-enter.mask-enter-active {
+  opacity: 0.6;
+  transition: opacity 300ms ease-out;
+}
+
+.mask-leave {
+  opacity: 0.6;
+}
+
+.mask-leave.mask-leave-active {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+}
+
+.panel-enter {
+  opacity: 0;
+}
+
+.panel-enter.panel-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-out;
+}
+
+.panel-leave {
+  opacity: 1;
+}
+
+.panel-leave.panel-leave-active {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+}

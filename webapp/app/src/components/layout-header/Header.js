@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import LayoutHeader from './LayoutHeader';
 import Navigation from './Navigation';
+import ProjectMessage from './ProjectMessage';
 import Profile from './Profile';
 import { Dropdown, Icon } from 'antd';
 
@@ -15,6 +16,7 @@ class Header extends Component {
           menus={props.navMenus}
           selectedKeys={props.selectedKeys}
         />
+        <ProjectMessage project={props.project} />
         <Profile>
           <Dropdown overlay={props.profileMenu}>
             <a className="cs-dropdown-link" href="#">

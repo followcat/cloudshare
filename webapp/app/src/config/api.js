@@ -21,6 +21,8 @@ export const API = {
 
   CUSTOMER_LIST_API: `${HOST}/api/customerlist`,
 
+  CUSTOMER_API: `${HOST}/api/customer`,
+
   CREATE_JOBDESCRIPTION_API: `${HOST}/api/uploadjd`,
 
   FEATURE_API: `${HOST}/api/feature`,

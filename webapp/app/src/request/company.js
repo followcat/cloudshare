@@ -124,3 +124,18 @@ export const getCustomerList = (callback) => {
   .then(response => response.json())
   .then(json => callbackFunction(callback, json));
 };
+
+export const updateCustomer = (method, params, callback) => {
+  return fetch(API.CUSTOMER_API, {
+    method: method,
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};

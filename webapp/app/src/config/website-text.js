@@ -6,6 +6,8 @@ const websiteText = {
   'zhCN': {
     SIGN_IN: '登入',
     SIGN_OUT: '登出',
+    SIGN_OUT_CONFIRM_MSG: '是否确定登出?',
+
     PROFILE: '个人中心',
     SEARCH: '搜索',
     MATCH: '匹配',
@@ -74,8 +76,8 @@ const websiteText = {
     JOB_DESCRIPTION_CONTENT_VALIDATE_MSG: '请输入职位描述内容',
     
     ADD_CUSTOMER: '添加客户',
-    ADDED_CUSTOMER: '已添加客户'
-    
+    ADDED_CUSTOMER: '已添加客户',
+
     ADD_CONFIRM_MSG: '确定要添加这个条目吗?',
     ADD_SUCCESS_MSG: '添加成功!',
     ADD_FAIL_MSG: '添加失败!',

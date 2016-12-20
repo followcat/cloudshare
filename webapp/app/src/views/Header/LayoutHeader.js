@@ -3,9 +3,10 @@ import React, { Component } from 'react';
 
 import Header from '../../components/layout-header';
 
-import { Menu } from 'antd';
+import { Modal, Menu } from 'antd';
 
 import { URL } from '../../config/url';
+import { signOut } from '../../request/sign';
 import StorageUtil from '../../utils/storage';
 import logo from '../../image/logo.png';
 
@@ -14,41 +15,65 @@ import websiteText from '../../config/website-text';
 const language = websiteText.zhCN;
 
 const MenuItem = Menu.Item,
-      MenuDivider = Menu.Divider;
+      MenuDivider = Menu.Divider,
+      confirm = Modal.confirm;
 
+
+const navMenus = [{
+  url: URL.getSearchURL(),
+  text: language.SEARCH
+}, {
+  url: URL.getFastMatchingByDoc(),
+  text: language.MATCH
+}, {
+  url: URL.getProjectManagement(),
+  text: language.PROJECT_MANAGEMENT
+}];
 
 export default class LayoutHeader extends Component {
   constructor() {
     super();
-    this.getDefaultSelectedKeys = this.getDefaultSelectedKeys.bind(this);
+    this.state = {
+      selectedKeys: []
+    };
+    this.handleSignOutClick = this.handleSignOutClick.bind(this);
   }
 
-  getDefaultSelectedKeys(navMenus) {
+  componentDidMount() {
     const href = location.href;
-    let defaultSelectedKeys = [];
+    let selectedKeys = [];
 
     navMenus.forEach(v => {
-      if (href.indexOf(v.url) > 0) {
-        defaultSelectedKeys.push(v.url);
+      if (href.indexOf(v.url) > -1) {
+        selectedKeys.push(v.url);
       }
     });
-    
-    return defaultSelectedKeys;
+
+    this.setState({
+      selectedKeys: selectedKeys
+    });
+  }
+
+  handleSignOutClick(e) {
+    e.preventDefault();
+    confirm({
+      title: language.SIGN_OUT,
+      content: language.SIGN_OUT_CONFIRM_MSG,
+      onOk() {
+        signOut((json) => {
+          if (json.code === 200) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            location.href = json.redirect_url;
+          }
+        });
+      },
+      onCancel() {}
+    });
   }
 
   render() {
     const { style, children } = this.props;
-
-    const navMenus = [{
-      url: URL.getSearchURL(),
-      text: language.SEARCH
-    }, {
-      url: URL.getFastMatching(),
-      text: language.MATCH
-    }, {
-      url: URL.getProjectManagement(),
-      text: language.PROJECT_MANAGEMENT
-    }];
 
     const profileMenu = (
       <Menu>
@@ -57,12 +82,15 @@ export default class LayoutHeader extends Component {
         </MenuItem>
         <MenuDivider />
         <MenuItem>
-          <a href="#">{language.SIGN_OUT}</a>
+          <a
+            href="#"
+            onClick={this.handleSignOutClick}
+          >
+            {language.SIGN_OUT}
+          </a>
         </MenuItem>
       </Menu>
     );
-
-    const defaultSelectedKeys = this.getDefaultSelectedKeys(navMenus);
 
     return (
       <div style={style}>
@@ -70,8 +98,9 @@ export default class LayoutHeader extends Component {
           logoImg={logo}
           navMenus={navMenus}
           profileMenu={profileMenu}
+          project={StorageUtil.get('_pj')}
           profileText={StorageUtil.get('user')}
-          defaultSelectedKeys={defaultSelectedKeys}
+          selectedKeys={this.state.selectedKeys}
         />
         <div className="cs-layout-wrapper">
           {children}

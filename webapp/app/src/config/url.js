@@ -10,6 +10,10 @@ export const URL = {
     return `/fastmatching?cv_id=${id}`
   },
 
+  getFastMatchingByDoc: () => {
+    return `/fastmatching`
+  },
+
   getListJDURL: () => {
     return `/listjd`;
   },

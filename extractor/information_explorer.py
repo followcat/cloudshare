@@ -38,12 +38,15 @@ cv_template = (
 )
 
 co_template = (
+    ("id",                  str),
     ("name",                str),
-    ("committer",           str),
-    ("date",                int),
+    ("district",            str),
+    ("product",             str),
+    ("website",             str),
+    ("conumber",            str),
+    ("address",             str),
     ("introduction",        str),
-    ("business",            list),
-    ("total_employees",     str),
+    ("email",               str),
 )
 
 peo_template = (
@@ -242,7 +245,9 @@ def get_age(stream):
     return result
 
 
-all_selected = ('name', 'originid', 'age', 'phone', 'email', 'education', 'experience', 'expectation', 'classify')
+all_selected = ('name', 'originid', 'age', 'phone', 'email',
+                'education', 'experience', 'expectation',
+                'classify', 'unique_id')
 
 def catch_selected(stream, selected, name=None):
     assert set(selected).issubset(set(all_selected))
@@ -264,9 +269,11 @@ def catch_selected(stream, selected, name=None):
     if 'expectation' in selected:
         info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
                                                     # age
-    if 'classify' in selected:
+    if 'unique_id' in selected:
+        extractor.unique_id.unique_id(info_dict)
+    if 'classify' in selected and 'classify' not in info_dict:
         experience = get_experience(stream, name)
-        info_dict["classify"] = get_classify(experience)
+        info_dict["classify"] = get_classify(experience['experience'])
     return info_dict
 
 catch = functools.partial(catch_selected, selected=all_selected)
@@ -301,6 +308,9 @@ def catch_coinfo(stream, name):
     info['name'] = name
     info['id'] = extractor.unique_id.company_id(name)
     if isinstance(stream, dict):
+        for key in info:
+            if key in stream and stream[key]:
+                info[key] = stream[key]
         for key in ('introduction', 'total_employees'):
             try:
                 info[key] = stream[key]
@@ -312,17 +322,18 @@ def catch_coinfo(stream, name):
             pass
     return info
 
-def catch_peopinfo(stream, name):
+def catch_peopinfo(stream):
     """
         >>> intro = {'id': '00yd4ww2', 'unique_id': 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'}
-        >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['id'] == 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'
-        >>> assert catch_peopinfo(stream=intro, name=intro['unique_id'])['cv'] == ['00yd4ww2']
+        >>> assert catch_peopinfo(stream=intro)['id'] == 'e16f06e87d38c195f0d61fb685ec559ca9cfd5b3'
+        >>> assert catch_peopinfo(stream=intro)['cv'] == ['00yd4ww2']
     """
     info = generate_info_template(peo_template)
-    info['id'] = name
     if isinstance(stream, dict):
+        assert 'id' in stream
         try:
-            info['cv'].append(stream['id'])
+            info['id'] = stream['unique_id']
         except KeyError:
-            pass
+            info['id'] = stream['id']
+        info['cv'].append(stream['id'])
     return info

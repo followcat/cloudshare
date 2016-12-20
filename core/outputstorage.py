@@ -36,6 +36,7 @@ class ConvertName(str):
         obj._xml = obj._add_suffix('xml')
         obj._html = obj._add_suffix('html')
         obj._yaml = obj._add_suffix('yaml')
+        obj._json = obj._add_suffix('json')
         obj._doc = obj._add_suffix('doc')
         obj._docx = obj._add_suffix('docx')
         obj._md = obj._add_suffix('md')
@@ -56,6 +57,10 @@ class ConvertName(str):
     @property
     def html(self):
         return self._html
+
+    @property
+    def json(self):
+        return self._json
 
     @property
     def yaml(self):

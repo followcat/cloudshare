@@ -7,7 +7,9 @@ import SiderPanel from '../../../components/sider-panel';
 import DetailInformation from '../../../components/detail-information';
 import ExtractInfo from './ExtractInfo';
 
-import { getCustomerList } from '../../../request/company';
+import { Popconfirm, message } from 'antd';
+
+import { getCustomerList, updateCustomer } from '../../../request/company';
 import websiteText from '../../../config/website-text';
 
 const language = websiteText.zhCN;
@@ -26,6 +28,7 @@ class OwnCustomer extends Component {
       siderPanelVisible: false,
       detailData: {},
     };
+    this.handleDeleteCustomerConfirm = this.handleDeleteCustomerConfirm.bind(this);
     this.handleViewDetailsClick = this.handleViewDetailsClick.bind(this);
     this.handleSiderPanelClose = this.handleSiderPanelClose.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
@@ -33,6 +36,19 @@ class OwnCustomer extends Component {
 
   componentDidMount() {
     this.getDataSource();
+  }
+
+  handleDeleteCustomerConfirm(id) {
+    updateCustomer('DELETE', {
+      id: id
+    }, (json) => {
+      if (json.code === 200) {
+        message.success(language.DELETE_SUCCESS_MSG);
+        this.getDataSource();
+      } else {
+        message.error(language.DELETE_FAIL_MSG);
+      }
+    });
   }
 
   handleViewDetailsClick(record) {
@@ -108,7 +124,24 @@ class OwnCustomer extends Component {
       render: (text, record) => {
         return (
           <ul>
-            <li><a href="javascript: void(0);" onClick={() => this.handleViewDetailsClick(record)}>{language.VIEW_DETAILS}</a></li>
+            <li>
+              <Popconfirm
+                title={language.DELETE_CONFIRM_MSG}
+                onConfirm={() => this.handleDeleteCustomerConfirm(record.id)}
+              >
+                <a href="javascript: void(0);">
+                  {language.DELETE}
+                </a>
+              </Popconfirm>
+            </li>
+            <li>
+              <a
+                href="javascript: void(0);"
+                onClick={() => this.handleViewDetailsClick(record)}
+              >
+                {language.VIEW_DETAILS}
+              </a>
+            </li>
           </ul>
         );
       }

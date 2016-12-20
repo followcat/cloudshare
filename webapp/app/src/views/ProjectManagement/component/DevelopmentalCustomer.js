@@ -9,13 +9,15 @@ import DetailInformation from '../../../components/detail-information';
 import CreateNewCompany from './CreateNewCompany';
 import ExtractInfo from './ExtractInfo';
 
-import { Button, message } from 'antd';
+import { Button, message, Popconfirm } from 'antd';
 
 import {
   getAllCompany,
   getAllCompanyBySearch,
   updateCompanyInfo,
-  createCompany
+  createCompany,
+  getCustomerList,
+  updateCustomer
 } from '../../../request/company';
 import StorageUtil from '../../../utils/storage';
 import remove from 'lodash/remove';
@@ -47,6 +49,7 @@ export default class DevelopmentalCustomer extends Component {
       total: 0,
       dataSource: [],
       detailData: {},
+      customerIDList: [],
       searchWord: '',
       loading: false,
       siderPanelVisible: false,
@@ -62,14 +65,17 @@ export default class DevelopmentalCustomer extends Component {
     this.handleExtractInfoCreate = this.handleExtractInfoCreate.bind(this);
     this.handleExtractInfoRemove = this.handleExtractInfoRemove.bind(this);
     this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
+    this.handleAddCustomerConfirm = this.handleAddCustomerConfirm.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getDataSourceBySearch = this.getDataSourceBySearch.bind(this);
+    this.getRenderCustomerOperation = this.getRenderCustomerOperation.bind(this);
   }
 
   componentDidMount() {
     const current = this.state.current,
           pageSize = this.state.pageSize;
     this.getDataSource(current, pageSize);
+    this.getCustomerDataSource();
   }
 
   handleShowSizeChange(current, pageSize) {
@@ -244,6 +250,24 @@ export default class DevelopmentalCustomer extends Component {
     });
   }
 
+  handleAddCustomerConfirm(id) {
+    let idList = this.state.customerIDList;
+
+    updateCustomer('POST', {
+      id: id
+    }, (json) => {
+      if (json.code === 200) {
+        message.success(language.ADD_SUCCESS_MSG);
+        idList.push(id);
+        this.setState({
+          customerIDList: idList
+        });
+      } else {
+        message.success(language.ADD_FAIL_MSG);
+      }
+    });
+  }
+
   getDataSource(current, pageSize) {
     this.setState({
       loading: true,
@@ -285,6 +309,36 @@ export default class DevelopmentalCustomer extends Component {
     });
   }
 
+  getCustomerDataSource() {
+    getCustomerList(json => {
+      if (json.code === 200) {
+        let idList = json.data.map(v => v.id);
+        this.setState({
+          customerIDList: idList
+        });
+      } else {
+        console.log('Get customer list error.')
+      }
+    })
+  }
+
+  getRenderCustomerOperation(id) {
+    const idList = this.state.customerIDList;
+
+    if (idList.indexOf(id) > -1) {
+      return <span>{language.ADDED_CUSTOMER}</span>
+    } else {
+      return (
+        <Popconfirm
+          title={language.ADD_CONFIRM_MSG}
+          onConfirm={() => this.handleAddCustomerConfirm(id)}
+        >
+          <a href="javascript: void(0);">{language.ADD_CUSTOMER}</a>
+        </Popconfirm>
+      )
+    }
+  }
+
   render() {
 
     // 表格头部工具栏元素数组
@@ -293,7 +347,6 @@ export default class DevelopmentalCustomer extends Component {
       render: (
         <EnhancedInput
           type="search"
-          placeholder="Please input search text"
           style={{ marginRight: 8 }}
           onClick={this.handleTablePlusSearch}
         />
@@ -352,6 +405,9 @@ export default class DevelopmentalCustomer extends Component {
       render: (text, record) => {
         return (
           <ul>
+            <li style={{ marginBottom: 8 }}>
+              {this.getRenderCustomerOperation(record.id)}
+            </li>
             <li><a href="javascript: void(0);" onClick={() => this.handleViewDetailsClick(record)}>{language.VIEW_DETAILS}</a></li>
           </ul>
         );

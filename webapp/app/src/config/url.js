@@ -15,7 +15,7 @@ export const URL = {
   },
 
   getListJDURL: () => {
-    return `/listjd`;
+    return `/pm`;
   },
 
   getPreview: () => {

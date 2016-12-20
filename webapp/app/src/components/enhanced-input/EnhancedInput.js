@@ -85,7 +85,7 @@ class EnhancedInput extends Component {
 
 EnhancedInput.defaultProps = {
   type: 'search',
-  placeholder: 'Please input text',
+  placeholder: '',
   onClick() {}
 };
 

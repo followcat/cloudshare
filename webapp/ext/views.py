@@ -86,6 +86,12 @@ def configure(app):
         view_func=webapp.views.views.UploadPreview.as_view('uploadpreview'),
     )
 
+    #RESTful Project Management page entrance
+    app.add_url_rule(
+        '/pm',
+        view_func=webapp.views.views.ProjectManagement.as_view('ProjectManagement'),
+    )
+
     app.add_url_rule(
         '/gotologin',
         view_func=webapp.views.views.LoginRedirect.as_view('gotologin'),

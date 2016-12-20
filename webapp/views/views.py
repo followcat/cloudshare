@@ -90,3 +90,10 @@ class UploadPreview(flask.views.MethodView):
     @flask.ext.login.login_required
     def get(self):
         return flask.render_template('uploadpreview.html')
+
+#Render Project Management page of RESTful
+class ProjectManagement(flask.views.MethodView):
+
+    @flask.ext.login.login_required
+    def get(self):
+        return flask.render_template('projectmanagement.html')

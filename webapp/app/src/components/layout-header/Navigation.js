@@ -10,7 +10,7 @@ class Navigation extends Component {
       <Menu 
         mode="horizontal"
         className="cs-layout-header-nav"
-        defaultSelectedKeys={this.props.defaultSelectedKeys}
+        selectedKeys={this.props.selectedKeys}
       >
         {this.props.menus.map(v => {
           return (

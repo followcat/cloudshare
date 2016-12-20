@@ -11,7 +11,10 @@ class Header extends Component {
 
     return (
       <LayoutHeader logoImg={props.logoImg}>
-        <Navigation menus={props.navMenus}/>
+        <Navigation
+          menus={props.navMenus}
+          selectedKeys={props.selectedKeys}
+        />
         <Profile>
           <Dropdown overlay={props.profileMenu}>
             <a className="cs-dropdown-link" href="#">

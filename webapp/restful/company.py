@@ -115,7 +115,11 @@ class CustomerAPI(Resource):
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         result = project.company.addcustomer(id, user.id)
-        return { 'code': 200, 'data': result }
+        if result:
+            response = { 'code': 200, 'message': 'Add customer success.' }
+        else:
+            response = { 'code': 400, 'message': 'Add customer fail.' }
+        return response
 
     def delete(self):
         user = flask.ext.login.current_user
@@ -124,7 +128,11 @@ class CustomerAPI(Resource):
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         result = project.company.deletecustomer(id, user.id)
-        return { 'code': 200, 'data': result }
+        if result:
+            response = { 'code': 200, 'message': 'Delete customer success.' }
+        else:
+            response = { 'code': 400, 'message': 'Delete customer fail.' }
+        return response
 
 #update info
 class CompanyInfoUpdateAPI(Resource):

@@ -1,5 +1,6 @@
 import os
 import glob
+import time
 import cPickle
 import collections
 
@@ -14,7 +15,8 @@ class ReverseIndexing(object):
                  'education',
                  'gender',
                  'marital_status',
-                 'business')
+                 'business',
+                 'date')
 
     def __init__(self, path, cvsvc):
         self.path = path
@@ -69,6 +71,8 @@ class ReverseIndexing(object):
                 self.indexkeys[3]: dict(),
                 self.indexkeys[4]: dict(),
                 self.indexkeys[5]: dict(),
+                self.indexkeys[6]: dict(),
+                self.indexkeys[7]: dict(),
         }
         if svc_name in self.index:
             cv_index = self.index[svc_name]
@@ -109,6 +113,7 @@ class ReverseIndexing(object):
                 self.indexkeys[4]: self._gender(yamlinfo),
                 self.indexkeys[5]: self._mar_status(yamlinfo),
                 self.indexkeys[6]: self._business(yamlinfo),
+                self.indexkeys[7]: self._date(yamlinfo),
             }
         result = dict()
         for each in selected:
@@ -225,4 +230,11 @@ class ReverseIndexing(object):
             for c in yamlinfo['experience']['company']:
                 if 'business' in c:
                     result[c['business']].add(yamlinfo['id'])
+        return result
+
+    def _date(self, yamlinfo):
+        result = dict()
+        if 'date' in yamlinfo and yamlinfo['date']:
+            ste_date = time.strftime('%Y%m%d', time.localtime(yamlinfo['date']))
+            result[ste_date] = set([yamlinfo['id']])
         return result

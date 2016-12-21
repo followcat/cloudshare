@@ -1,7 +1,8 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Modal, Button, Collapse, Table, Input, Spin, Checkbox } from 'antd';
+import TablePlus from '../table-plus';
+import { Modal, Button, Collapse, Input, Spin, Checkbox } from 'antd';
 
 import Charts from '../common/Charts';
 
@@ -163,7 +164,9 @@ export default class DrawChart extends Component {
               header={'Job description list'}
               key="id"
             >
-              <Table
+              <TablePlus
+                isToolbarShowed={true}
+                isSearched={true}
                 columns={columns}
                 dataSource={this.props.jdList}
                 rowSelection={rowSelection}

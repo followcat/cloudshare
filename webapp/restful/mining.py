@@ -151,7 +151,7 @@ class LSIbaseAPI(Resource):
         datas, pages, totals = self.process(project, uses, doc, cur_page, count, indexdict)
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
-    def filter(result, filterdict=None):
+    def filteresult(result, filterdict=None):
         def nemudate(dates):
             str_result = []
             datetimes_result = []
@@ -178,7 +178,7 @@ class LSIbaseAPI(Resource):
             cur_page = 1
         datas = []
         result = self.miner.probability(project, doc, uses=uses)
-        result = self.filter(result, filterdict)
+        result = self.filteresult(result, filterdict)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

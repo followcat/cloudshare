@@ -1,4 +1,5 @@
 import os.path
+import datetime
 
 import flask
 import flask.ext.login
@@ -150,14 +151,34 @@ class LSIbaseAPI(Resource):
         datas, pages, totals = self.process(project, uses, doc, cur_page, count, indexdict)
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
+    def filter(result, filterdict=None):
+        def nemudate(dates):
+            str_result = []
+            datetimes_result = []
+            datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
+            tstart = min(datetimes)
+            tend = max(datetimes)
+            while(tstart <= tend):
+                datetimes_result.append(tstart)
+                tstart += datetime.timedelta(days = 1)
+            for each in datetimes_result:
+                str_result.append(each.strftime('%Y%m%d'))
+            return str_result
+
+        if filterdict:
+            if 'date' in filterdict:
+                filterdict['date'] = nemudate(filterdict['date'])
+            filteset = self.index.get(filterdict, uses=uses)
+            result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
+        return result
+
+
     def process(self, project, uses, doc, cur_page, eve_count, filterdict=None):
         if not cur_page:
             cur_page = 1
         datas = []
         result = self.miner.probability(project, doc, uses=uses)
-        if filterdict:
-            filteset = self.index.get(filterdict, uses=uses)
-            result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
+        result = self.filter(resultm filterdict)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

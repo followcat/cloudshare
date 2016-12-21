@@ -178,7 +178,7 @@ class LSIbaseAPI(Resource):
             cur_page = 1
         datas = []
         result = self.miner.probability(project, doc, uses=uses)
-        result = self.filter(resultm filterdict)
+        result = self.filter(result, filterdict)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

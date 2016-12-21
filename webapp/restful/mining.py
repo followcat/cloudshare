@@ -143,15 +143,6 @@ class LSIbaseAPI(Resource):
         self.sim_names = self.miner.addition_names()
 
     def _post(self, project, doc, uses, filterdict, cur_page):
-        indexdict = {}
-        for key in filterdict:
-            if filterdict[key]:
-                indexdict[key] = self.index.get_indexkeys([key], filterdict[key], uses)
-        count = 20
-        datas, pages, totals = self.process(project, uses, doc, cur_page, count, indexdict)
-        return { 'datas': datas, 'pages': pages, 'totals': totals }
-
-    def filteresult(result, filterdict=None):
         def nemudate(dates):
             str_result = []
             datetimes_result = []
@@ -164,21 +155,27 @@ class LSIbaseAPI(Resource):
             for each in datetimes_result:
                 str_result.append(each.strftime('%Y%m%d'))
             return str_result
-
-        if filterdict:
-            if 'date' in filterdict:
+        indexdict = {}
+        if 'date' in filterdict:
+            try:
                 filterdict['date'] = nemudate(filterdict['date'])
-            filteset = self.index.get(filterdict, uses=uses)
-            result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
-        return result
-
+            except ValueError:
+                filterdict.pop('date')
+        for key in filterdict:
+            if filterdict[key]:
+                indexdict[key] = self.index.get_indexkeys([key], filterdict[key], uses)
+        count = 20
+        datas, pages, totals = self.process(project, uses, doc, cur_page, count, indexdict)
+        return { 'datas': datas, 'pages': pages, 'totals': totals }
 
     def process(self, project, uses, doc, cur_page, eve_count, filterdict=None):
         if not cur_page:
             cur_page = 1
         datas = []
         result = self.miner.probability(project, doc, uses=uses)
-        result = self.filteresult(result, filterdict)
+        filteset = self.index.get(filterdict, uses=uses)
+        if filteset:
+            result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

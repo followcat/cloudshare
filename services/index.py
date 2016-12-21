@@ -71,6 +71,8 @@ class ReverseIndexing(object):
                 self.indexkeys[3]: dict(),
                 self.indexkeys[4]: dict(),
                 self.indexkeys[5]: dict(),
+                self.indexkeys[6]: dict(),
+                self.indexkeys[7]: dict(),
         }
         if svc_name in self.index:
             cv_index = self.index[svc_name]
@@ -234,5 +236,5 @@ class ReverseIndexing(object):
         result = dict()
         if 'date' in yamlinfo and yamlinfo['date']:
             ste_date = time.strftime('%Y%m%d', time.localtime(yamlinfo['date']))
-            result[ste_date] = yamlinfo['id']
+            result[ste_date] = set([yamlinfo['id']])
         return result

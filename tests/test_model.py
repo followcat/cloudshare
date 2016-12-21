@@ -2,15 +2,23 @@
 import os.path
 import functools
 
+import json
 import yaml
 
+from webapp.settings import *
 
-FIRST_PAGE = range(20)
+
+test_cv_svc = services.simulationcv.SimulationCV('tests/cv_svc', 'lsisim_test', 
+                SVC_CV_REPO, iotype='base')
+
+FIRST_PAGE = range(len(test_cv_svc.ids)/90)
 
 PERFECT = 100
 GOOD = 50
 POOR = 25
 BAD = 0
+
+count_in = [0]
 
 kgr_file = 'tests/known_good_jd_cv_mapping.yaml'
 with open(kgr_file) as f:
@@ -26,7 +34,7 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
         >>> assert kgr_perfect('9bbc45a81e4511e6b7066c3be51cefca', jd_service, sim)
         >>> assert kgr_good('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
         >>> assert kgr_poor('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim, above_allow=True)
-        >>> assert kgr_poor('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim)
+        >>> assert kgr_percentage('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim, percentage=int(float(1)/7*100))
         >>> assert kgr_bad('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim)
         >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=33)
         >>> jd_id, cvs = '2fe1c53a231b11e6b7096c3be51cefca', ['3hffapdz', '2x5wx4aa']
@@ -39,16 +47,19 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
     if not hasattr(cvs, '__iter__'):
         cvs = {cvs}
     success_count = kgr(jd_id, cvs, jd_service, sim, index_service, filterdict)
+    global count_in
+    count_in[0] += success_count
     if percentage == PERFECT:
-        return success_count == len(cvs)
+        result = success_count == len(cvs)
     elif percentage == GOOD:
-        return len(cvs)*0.5 <= success_count and (success_count < len(cvs) or above_allow)
+        result = len(cvs)*0.5 <= success_count and (success_count < len(cvs) or above_allow)
     elif percentage == POOR:
-        return len(cvs)*0.25 <= success_count and (success_count < len(cvs)*0.5 or above_allow)
+        result = len(cvs)*0.25 <= success_count and (success_count < len(cvs)*0.5 or above_allow)
     elif percentage == BAD:
-        return success_count == 0 or above_allow
+        result = success_count == 0 or above_allow
     elif 0 < percentage < 100:
-        return len(cvs)*float(percentage)/100 <= success_count and (success_count < len(cvs) or above_allow)
+        result = len(cvs)*float(percentage)/100 <= success_count and (success_count < len(cvs) or above_allow)
+    return result
 
 kgr_perfect = functools.partial(kgr_percentage, percentage=PERFECT)
 kgr_good = functools.partial(kgr_percentage, percentage=GOOD)

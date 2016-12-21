@@ -142,6 +142,7 @@ class ReverseIndexing(object):
             #     'gender',
             #     'marital_status',
             #     'business'
+            #     'date'
         """
         if uses is None:
             uses = self.index.keys()

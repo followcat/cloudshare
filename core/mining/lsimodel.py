@@ -101,8 +101,10 @@ class LSImodel(object):
         return False
 
     def setup(self, names, texts):
+        assert len(names) == len(texts)
         self.names = names
-        self.texts = self.slicer(texts)
+        for name, doc in zip(names, texts):
+            self.texts.append(self.slicer(doc, id=name))
         self.set_dictionary()
         self.set_corpus()
         self.set_tfidf()
@@ -134,7 +136,7 @@ class LSImodel(object):
                                                              self.corpu_dict_save_name))
 
     def add(self, name, document):
-        text = self.slicer(document)
+        text = self.slicer(document, id=name)
         self.names.append(name)
         self.texts.append(text)
         if self.dictionary is None:

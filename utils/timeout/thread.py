@@ -135,7 +135,7 @@ def parse_return(queue):
     if res[0] == 'success':
         return res[1]
     if res[0] == 'exception':
-        raise res[1][0], res[1][1], res[1][2]
+        raise res[1][1]
 
 
 def thread_timeout_call(func, delay, kill=True, kill_wait=0.04, args=None, kwargs=None):

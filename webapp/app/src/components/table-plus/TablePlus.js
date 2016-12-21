@@ -75,6 +75,7 @@ class TablePlus extends Component {
           ? <TableToolbar
               isSearched={props.isSearched}
               searchCol={props.searchCol}
+              size={props.size}
               searchPlaceholder={props.searchPlaceholder}
               elements={props.elements}
               onSearch={this.handleSearch}

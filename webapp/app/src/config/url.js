@@ -10,8 +10,12 @@ export const URL = {
     return `/fastmatching?cv_id=${id}`
   },
 
+  getFastMatchingByDoc: () => {
+    return `/fastmatching`
+  },
+
   getListJDURL: () => {
-    return `/listjd`;
+    return `/pm`;
   },
 
   getPreview: () => {
@@ -36,6 +40,10 @@ export const URL = {
 
   getDownloadURL: (id, fileName) => {
     return `/download/${id}`;
+  },
+
+  getProjectManagement: () => {
+    return `/pm`;
   },
 
 };

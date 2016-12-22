@@ -347,7 +347,6 @@ class DevelopmentalCustomer extends Component {
       render: (
         <EnhancedInput
           type="search"
-          style={{ marginRight: 8 }}
           onClick={this.handleTablePlusSearch}
         />
       )

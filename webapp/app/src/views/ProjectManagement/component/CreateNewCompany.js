@@ -64,6 +64,7 @@ class CreateNewCompany extends Component {
         onButtonClick={this.handleButtonClick}
         onModalOk={this.handleModalOk}
         onModalCancel={this.handleModalCancel}
+        buttonStyle={{ marginLeft: 8 }}
         modalStyle={{ top: 20 }}
       >
         <Form horizontal>

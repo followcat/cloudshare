@@ -37,7 +37,7 @@ class LSIsimilarity(object):
             for data in svc_cv.datas():
                 name, doc = data
                 names.append(name)
-                words = self.lsi_model.slicer(doc)
+                words = self.lsi_model.slicer(doc, id=name)
                 corpus.append(self.lsi_model.dictionary.doc2bow(words))
         self.setup(names, corpus)
 
@@ -67,7 +67,7 @@ class LSIsimilarity(object):
 
     def add(self, name, document):
         assert(self.lsi_model.dictionary)
-        text = self.lsi_model.slicer(document)
+        text = self.lsi_model.slicer(document, id=name)
         self.names.append(name)
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
@@ -76,7 +76,7 @@ class LSIsimilarity(object):
         assert(self.lsi_model.dictionary)
         assert len(names) == len(documents)
         for name, document in zip(names, documents):
-            text = self.lsi_model.slicer(document)
+            text = self.lsi_model.slicer(document, id=name)
             self.names.append(name)
             corpu = self.lsi_model.dictionary.doc2bow(text)
             self.corpus.append(corpu)

@@ -11,28 +11,30 @@ class JobDescriptionAPI(Resource):
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('jd_id', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
         self.reqparse.add_argument('status', location = 'json')
         self.reqparse.add_argument('description', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         super(JobDescriptionAPI, self).__init__()
 
-    def get(self, id):
+    def get(self):
+        jd_id = args['jd_id']
         project = args['project']
-        result = self.svc_mult_cv.getproject(project).jd_get(id)
+        result = self.svc_mult_cv.getproject(project).jd_get(jd_id)
         co_id = result['company']
         co_name = self.svc_mult_cv.getproject(project).company_get(co_id)['name']
         result['company_name'] = co_name
         return { 'code': 200, 'data': result }
 
-    def put(self, id):
+    def put(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        jd_id = args['jd_id']
         project = args['project']
         status = args['status']
-        co_id = args['co_id']
         description = args['description']
-        result = self.svc_mult_cv.getproject(project).jd_modify(id, description, status, user.id)
+        result = self.svc_mult_cv.getproject(project).jd_modify(jd_id, description, status, user.id)
         if result: 
             response = { 'code': 200, 'data': result, 'message': 'Update job description successed.' }
         else:

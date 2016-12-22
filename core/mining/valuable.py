@@ -10,7 +10,7 @@ import core.outputstorage
 from extractor.utils_parsing import *
 
 
-EDUCATION_REQUIREMENT = re.compile(ur'(?P<education>.+)[及或]?以上学历')
+EDUCATION_REQUIREMENT = re.compile(ur'[\d .]*(?P<education>.{2})(?=[及或以上]{0,3}学历)')
 
 
 def rate(miner, svc_cv, doc, basemodel, top=10, selected=5, uses=None, name_list=None):

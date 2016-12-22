@@ -7,6 +7,8 @@ class SiderPanel extends Component {
   constructor() {
     super();
     this.renderPortal = this.renderPortal.bind(this);
+    this.beforeOpen = this.beforeOpen.bind(this);
+    this.afterClose = this.afterClose.bind(this);
   }
 
   componentDidMount() {
@@ -15,8 +17,17 @@ class SiderPanel extends Component {
     this.renderPortal();
   }
 
+  componentWillUpdate() {
+    this.beforeOpen();
+  }
+
   componentDidUpdate() {
     this.renderPortal();
+
+    if (!this.props.visible) {
+      this.afterClose();
+    }
+    
   }
 
   componentWillUnmount() {
@@ -26,6 +37,17 @@ class SiderPanel extends Component {
 
   renderPortal() {
     ReactDOM.unstable_renderSubtreeIntoContainer(this, <SiderPanelPortal {...this.props} />, this.node);
+  }
+
+  beforeOpen() {
+    const scrollWidth = window.innerWidth - document.body.clientWidth;
+
+    document.body.style.paddingRight = `${scrollWidth}px`;
+    document.body.style.overflow = 'hidden';
+  }
+
+  afterClose() {
+    document.body.removeAttribute('style');
   }
 
   render() {

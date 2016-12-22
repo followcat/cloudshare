@@ -1,4 +1,5 @@
 import os.path
+import datetime
 
 import flask
 import flask.ext.login
@@ -142,7 +143,24 @@ class LSIbaseAPI(Resource):
         self.sim_names = self.miner.addition_names()
 
     def _post(self, project, doc, uses, filterdict, cur_page):
+        def nemudate(dates):
+            str_result = []
+            datetimes_result = []
+            datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
+            tstart = min(datetimes)
+            tend = max(datetimes)
+            while(tstart <= tend):
+                datetimes_result.append(tstart)
+                tstart += datetime.timedelta(days = 1)
+            for each in datetimes_result:
+                str_result.append(each.strftime('%Y%m%d'))
+            return str_result
         indexdict = {}
+        if 'date' in filterdict:
+            try:
+                filterdict['date'] = nemudate(filterdict['date'])
+            except ValueError:
+                filterdict.pop('date')
         for key in filterdict:
             if filterdict[key]:
                 indexdict[key] = self.index.get_indexkeys([key], filterdict[key], uses)
@@ -155,8 +173,8 @@ class LSIbaseAPI(Resource):
             cur_page = 1
         datas = []
         result = self.miner.probability(project, doc, uses=uses)
-        if filterdict:
-            filteset = self.index.get(filterdict, uses=uses)
+        filteset = self.index.get(filterdict, uses=uses)
+        if filteset:
             result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
         totals = len(result)
         if totals%eve_count != 0:

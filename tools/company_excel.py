@@ -103,9 +103,33 @@ def init_siminfo(SVC_CO_SIM, d):
             eng = chs_to_eng(chs)
             format_eng = reformat(eng)
             id = extractor.unique_id.company_id(format_eng['name'])
+            info = SVC_CO_SIM.getyaml(id)
+            if key not in info:
+                continue
+            existvalues = [v['content'] for v in info[key]]
             caller = 'dev'
             if format_eng['caller']:
                 caller = format_eng['caller'][0]
             for value in format_eng[key]:
+                if value in existvalues:
+                    continue
                 SVC_CO_SIM.updateinfo(id, key, value, caller)
+
+def delete_ununique(SVC_CO_SIM):
+    for key in ('relatedcompany', 'position', 'clientcontact',
+                'caller', 'progress', 'updatednumber'):
+        for id in SVC_CO_SIM.ids:
+            info = SVC_CO_SIM.getyaml(id)
+            caller = info['caller']
+            info_set = set([(v['content'], v['author'], v['date']) for v in info[key]])
+            if len(info[key]) != len(info_set):
+                for v in info_set:
+                    item = {
+                        'content': v[0],
+                        'author': v[1],
+                        'date': v[2]
+                    }
+                    info[key].remove(item)
+                for v in info[key]:
+                    SVC_CO_SIM.deleteinfo(id, key, v['content'], v['author'], v['date'])
 

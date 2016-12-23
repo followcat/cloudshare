@@ -26,6 +26,9 @@ const navMenus = [{
   url: URL.getFastMatchingByDoc(),
   text: language.MATCH
 }, {
+  url: URL.getUploaderURL(),
+  text: language.RESUME_UPLOADER
+}, {
   url: URL.getProjectManagement(),
   text: language.PROJECT_MANAGEMENT
 }];

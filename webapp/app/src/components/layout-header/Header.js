@@ -19,7 +19,7 @@ class Header extends Component {
         <ProjectMessage project={props.project} />
         <Profile>
           <Dropdown overlay={props.profileMenu}>
-            <a className="cs-dropdown-link" href="#">
+            <a className="cs-dropdown-link" href="javascript: void(0);">
               {props.profileText} <Icon type="down" />
             </a>
           </Dropdown>

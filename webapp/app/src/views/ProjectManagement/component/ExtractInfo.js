@@ -1,19 +1,18 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+
 import EnhancedInput from '../../../components/enhanced-input';
+
 import {
   Row,
   Col,
   Card,
-  Form,
-  Input,
-  Button,
   Tag
 } from 'antd';
+
 import websiteText from '../../../config/website-text';
 
 const language = websiteText.zhCN;
-const FormItem = Form.Item;
 
 const isValueNotNull = (object) => {
   let notNull = true;
@@ -30,7 +29,7 @@ class ExtractInfo extends Component {
   constructor() {
     super();
     this.state = {
-      editing: false,
+      editing: false
     };
     this.handleEditClick = this.handleEditClick.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
@@ -43,13 +42,13 @@ class ExtractInfo extends Component {
 
   handleEditClick() {
     this.setState({
-      editing: true,
+      editing: true
     });
   }
 
   handleCancelClick() {
     this.setState({
-      editing: false,
+      editing: false
     });
   }
 
@@ -81,7 +80,7 @@ class ExtractInfo extends Component {
   getNormalRender(prop) {
     if (Array.isArray(prop)) {
       return prop.map(v => {
-        return <span key={v.content} className="cs-extra-item">{v.content}</span>
+        return <span key={v.content} className="cs-extra-item">{v.content}</span>;
       });
     }
     return null;
@@ -109,16 +108,16 @@ class ExtractInfo extends Component {
 
     const rows = [{
       title: language.OPEN_POSITION,
-      dataIndex: 'position',
+      dataIndex: 'position'
     }, {
       title: language.CONTACT,
-      dataIndex: 'clientcontact',
+      dataIndex: 'clientcontact'
     }, {
       title: language.CONTACT_WAY,
-      dataIndex: 'updatednumber',
+      dataIndex: 'updatednumber'
     }, {
       title: language.RELATED_COMPANY,
-      dataIndex: 'relatedcompany',
+      dataIndex: 'relatedcompany'
     }];
 
     return (
@@ -159,11 +158,15 @@ class ExtractInfo extends Component {
 }
 
 ExtractInfo.default = {
-  editable: true,
+  editable: true
 };
 
 ExtractInfo.propTypes = {
+  title: PropTypes.string,
   editable: PropTypes.bool,
+  dataSource: PropTypes.object,
+  onCreate: PropTypes.func,
+  onRemove: PropTypes.func,
 };
 
 export default ExtractInfo;

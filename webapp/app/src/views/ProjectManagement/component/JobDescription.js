@@ -6,16 +6,16 @@ import EditJobDescriptionForm from './EditJobDescriptionForm';
 import CreateNewJobDescription from './CreateNewJobDescription';
 import Status from './Status';
 
+import { message } from 'antd';
+
 import {
   getJobDescriptions,
   updateJobDescription,
   createJobDescription
 } from '../../../request/jobdescription';
 import { getCustomerList } from '../../../request/company';
-
-import { message } from 'antd';
-
 import { URL } from '../../../config/url';
+
 import websiteText from '../../../config/website-text';
 
 const language = websiteText.zhCN;
@@ -33,7 +33,7 @@ class JobDescription extends Component {
       editVisible: false,
       editConfirmLoading: false,
       jdVisible: false,
-      jdConfirmLoading: false,
+      jdConfirmLoading: false
     };
     this.handleEditClick = this.handleEditClick.bind(this);
     this.handleEditFormCancel = this.handleEditFormCancel.bind(this);
@@ -55,7 +55,7 @@ class JobDescription extends Component {
   handleEditClick(record) {
     this.setState({
       record: record,
-      editVisible: true,
+      editVisible: true
     });
   }
 
@@ -79,7 +79,7 @@ class JobDescription extends Component {
     const params = {
       jd_id: fieldValues.id,
       description: fieldValues.description,
-      status: fieldValues.status,
+      status: fieldValues.status
     };
 
     updateJobDescription(params, (json) => {
@@ -102,21 +102,20 @@ class JobDescription extends Component {
   // 新建职位按钮事件, 打开Modal
   handleNewJDBtnClick() {
     this.setState({
-      jdVisible: true,
+      jdVisible: true
     });
   }
 
   // 新建职位Modal关闭事件, 关闭Modal
   handleJDModalCancel() {
     this.setState({
-      jdVisible: false,
+      jdVisible: false
     });
   }
 
   handleJobDescriptionCreate(fieldValues) {
-    console.log(fieldValues);
     this.setState({
-      jdConfirmLoading: true,
+      jdConfirmLoading: true
     });
 
     createJobDescription(fieldValues, (json) => {
@@ -124,7 +123,7 @@ class JobDescription extends Component {
         this.getjobDescriptionDataSource();
         this.setState({
           jdVisible: false,
-          jdConfirmLoading: false,
+          jdConfirmLoading: false
         });
         message.success(json.message);
       } else {
@@ -148,7 +147,7 @@ class JobDescription extends Component {
 
     this.setState({
       statusValue: value,
-      filterDataSource: filterDataSource,
+      filterDataSource: filterDataSource
     });
   }
 
@@ -176,18 +175,16 @@ class JobDescription extends Component {
     getCustomerList((json) => {
       if (json.code === 200) {
         this.setState({
-          customerDataSource: json.data,
+          customerDataSource: json.data
         });
-      } else {
-        console.log('Get customer list error.')
       }
-    })
+    });
   }
 
   // 获取渲染扩展JD展开行
   getExpandedRowRender(record) {
     return record.description.split('\n').map((item, index) => {
-      return <p key={index}>{item}</p>
+      return <p key={index}>{item}</p>;
     });
   }
 
@@ -195,13 +192,13 @@ class JobDescription extends Component {
   getJobDescriptionElements() {
     const statusList = [{
       text: language.ALL,
-      value: '',
+      value: ''
     }, {
       text: language.OPENING,
-      value: 'Opening',
+      value: 'Opening'
     }, {
       text: language.CLOSED,
-      value: 'Closed',
+      value: 'Closed'
     }];
 
     const elements = [{
@@ -223,7 +220,7 @@ class JobDescription extends Component {
           onModalCancel={this.handleJDModalCancel}
           onCreate={this.handleJobDescriptionCreate}
         />
-      ),
+      )
     }, {
       col: {
         span: 8,
@@ -247,17 +244,17 @@ class JobDescription extends Component {
       title: language.COMPANY_NAME,
       dataIndex: 'company_name',
       key: 'company_name',
-      width: '30%',
+      width: '30%'
     }, {
       title: language.POSITION,
       dataIndex: 'name',
       key: 'name',
-      width: '40%',
+      width: '40%'
     }, {
       title: language.CREATOR,
       dataIndex: 'committer',
       key: 'creator',
-      width: '10%',
+      width: '10%'
     }, {
       title: language.CURRENT_STATUS,
       dataIndex: 'status',
@@ -266,7 +263,7 @@ class JobDescription extends Component {
       render: (text) => {
         return text === 'Opening' ? 
             <span style={{ color: 'green' }}>{language.OPENING}</span> :
-            <span style={{ color: 'red' }}>{language.CLOSED}</span>
+            <span style={{ color: 'red' }}>{language.CLOSED}</span>;
       }
     }, {
       title: language.OPERATION,

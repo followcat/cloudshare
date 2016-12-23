@@ -24,7 +24,7 @@ with open(mix_file) as f:
     datas.update(yaml.load(f))
 
 def build_lsimodel(path, slicer, names=None, texts=None, no_above=1.,
-                    topics=None, extra_samples=0, tfidf_local=None):
+                    topics=None, extra_samples=300, power_iters=6, tfidf_local=None):
     if topics is None:
         if len(names) < 10:
             topics = 5
@@ -37,7 +37,8 @@ def build_lsimodel(path, slicer, names=None, texts=None, no_above=1.,
     m = core.mining.lsimodel.LSImodel(path,
                                       no_above=no_above,
                                       topics=topics,
-                                      extra_samples=0,
+                                      power_iters=power_iters,
+                                      extra_samples=extra_samples,
                                       tfidf_local=tfidf_local,
                                       slicer=slicer)
     try:

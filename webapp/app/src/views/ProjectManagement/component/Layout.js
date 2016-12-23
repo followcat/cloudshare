@@ -1,20 +1,20 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import LayoutHeader from '../../Header/LayoutHeader';
-import { CardContainer, CardSiderMenu, CardContent } from '../../../components/card-container';
-
-import { Menu, Button } from 'antd';
+import {
+  CardContainer,
+  CardSiderMenu,
+  CardContent
+} from '../../../components/card-container';
 
 import { getCurrentActive } from '../../../utils/sider-menu-list';
+
 import websiteText from '../../../config/website-text';
 
 const language = websiteText.zhCN;
 
-const SubMenu = Menu.SubMenu,
-      MenuItem = Menu.Item;
-
-export default class Layout extends Component {
+class Layout extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -93,3 +93,9 @@ export default class Layout extends Component {
     );
   }
 }
+
+Layout.propTypes = {
+  children: PropTypes.element
+};
+
+export default Layout;

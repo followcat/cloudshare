@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Modal, Form, Input, Select } from 'antd';
 
@@ -116,5 +116,13 @@ class EditJobDescriptionForm extends Component {
     );
   }
 }
+
+EditJobDescriptionForm.propTypes = {
+  form: PropTypes.shape({
+    getFieldProps: PropTypes.func,
+    validateFields: PropTypes.func
+  }),
+  onSubmit: PropTypes.func
+};
 
 export default EditJobDescriptionForm = Form.create({})(EditJobDescriptionForm);

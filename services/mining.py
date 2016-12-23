@@ -32,6 +32,7 @@ DOT_NET = re.compile(ur'((vs|VS|C#|c#|asp|ASP|Asp|ADO|ado)\.(Net|net|NET))')
 SYMBOL = re.compile(ur'[- /]+')
 SHORT = re.compile('(([a-z]\d{0,2})|([a-z]{1,4})|[\d\.]{1,11})$')
 
+
 FLAGS = ['x', # spaces
          'm', # number and date
          #'a', # adverb
@@ -224,7 +225,7 @@ class Mining(object):
             service = project.curriculumvitae
             lsi_path = os.path.join(self.path, project.name, 'model')
             lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer,
-                                                config=project.config)
+                                                no_above=1./3, config=project.config)
             try:
                 lsi.load()
             except IOError:

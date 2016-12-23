@@ -50,12 +50,6 @@ def configure(app):
         view_func=webapp.views.views.UserInfo.as_view('userinfo'),
     )
 
-    #RESTful ListJD page entrance
-    app.add_url_rule(
-        '/listjd',
-        view_func=webapp.views.views.ListJD.as_view('listjd')
-    )
-
     #RESTful FastMatching page entrance
     app.add_url_rule(
         '/fastmatching',

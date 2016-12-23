@@ -16,16 +16,19 @@ class LSImodel(object):
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
 
-    def __init__(self, savepath, no_above=1./8, topics=100, extra_samples=300,
-                 tfidf_local=None, slicer=None, config=None):
+
+    def __init__(self, savepath, no_above=1./1, topics=100, extra_samples=300,
+                 power_iters=6, tfidf_local=None, slicer=None, config=None):
         if config is None:
             config = {}
         self.path = savepath
         self.topics = topics
+        self.power_iters = power_iters
         self.no_above = no_above
         self.config = {
             'topics': topics,
             'no_above': no_above,
+            'power_iters': power_iters,
             'extra_samples': extra_samples,
         }
         self.config.update(config)
@@ -147,7 +150,7 @@ class LSImodel(object):
         corpu_tfidf = tfidf[[corpu]]
         if self.lsi is None:
             self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
-                            num_topics=self.topics, power_iters=6, extra_samples=self.extra_samples)
+                            num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
         else:
             self.lsi.add_documents(corpu_tfidf)
 
@@ -275,16 +278,17 @@ class LSImodel(object):
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=6, extra_samples=self.extra_samples)
+                                   num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
 
     def probability(self, doc):
         u"""
             >>> from tests.test_index import *
+            >>> from tests.test_model import *
             >>> from tests.multi_models import *
             >>> from webapp.settings import *
             >>> import compiler.ast
             >>> model = SVC_MIN.lsi_model['medical']
-            >>> names = [n for n in SVC_CV_REPO.names()]
+            >>> names = [n for n in test_cv_svc.ids]
             >>> texts = [SVC_CV_REPO.getmd(n) for n in names]
             >>> path = 'tests/lsimodel/medical'
             >>> model = build_lsimodel(path, model.slicer, names, texts, no_above=1./8, extra_samples=300, tfidf_local=core.mining.lsimodel.tf_cal)
@@ -295,7 +299,7 @@ class LSImodel(object):
         Some words happen to appear in the most significant topics from time
         to time, that will be considered as defective.
             >>> assert not fatten_words.count(u'湖南') < 15 #FIXME
-            >>> assert not fatten_words.count(u'渠道') < 13 #FIXME
+            >>> assert not fatten_words.count(u'广州市') < 16 #FIXME
             >>> assert not fatten_words.count(u'通用电气') < 13 #FIXME
             >>> assert not fatten_words.count(u'常州') < 14 #FIXME
             >>> assert not fatten_words.count(u'加速器') < 13 #FIXME
@@ -310,7 +314,7 @@ class LSImodel(object):
             >>> fatten_words = compiler.ast.flatten(words)
             >>> assert u'飞机' in model.dictionary.values()
             >>> assert u'航天' in model.dictionary.values()
-            >>> assert not u'航空' in model.dictionary.values() #FIXME
+            >>> assert u'航空' in model.dictionary.values()
             >>> assert not u'飞机' in fatten_words #FIXME
             >>> assert not u'航天' in fatten_words #FIXME
             >>> assert not u'航空' in fatten_words #FIXME
@@ -320,7 +324,7 @@ class LSImodel(object):
             >>> assert not u'律师' in fatten_words #FIXME
             >>> assert u'法律' in model.dictionary.values()
             >>> assert not u'法律' in fatten_words #FIXME
-            >>> assert u'行销' in model.dictionary.values()
+            >>> assert not u'行销' in model.dictionary.values() #FIXME
             >>> assert not u'行销' in fatten_words #FIXME
             >>> assert u'产业化' in model.dictionary.values()
             >>> assert not u'产业化' in fatten_words #FIXME
@@ -369,7 +373,7 @@ class LSImodel(object):
             >>> assert not u'市场' in mapping_topic_words(jd['text'], model) #FIXME
             >>> assert not u'行销' in mapping_topic_words(jd['text'], model) #FIXME
             >>> assert not u'产业化' in mapping_topic_words(jd['text'], model) #FIXME
-            >>> assert not u'推广' in mapping_topic_words(jd['text'], model) #FIXME
+            >>> assert u'推广' in mapping_topic_words(jd['text'], model)
             >>> assert not u'英文' in mapping_topic_words(jd['text'], model) #FIXME
         """
         texts = self.slicer(doc)

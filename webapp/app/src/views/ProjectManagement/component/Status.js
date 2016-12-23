@@ -1,6 +1,8 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+
 import { Select } from 'antd';
+
 const Option = Select.Option;
 
 class Status extends Component {
@@ -44,8 +46,8 @@ Status.propTypes = {
   statusLabel: PropTypes.string,
   dataSource: PropTypes.arrayOf(PropTypes.shape({
     text: PropTypes.string,
-    value: PropTypes.string,
-  })),
+    value: PropTypes.string
+  }))
 };
 
 export default Status;

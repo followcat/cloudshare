@@ -1,7 +1,7 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import ButtonWithModal from '../../../components/button-with-modal';
-import { Form, Input, Button } from 'antd';
+import { Form, Input } from 'antd';
 import websiteText from '../../../config/website-text';
 
 const language = websiteText.zhCN;
@@ -147,5 +147,15 @@ class CreateNewCompany extends Component {
     );
   }
 }
+
+CreateNewCompany.propTypes = {
+  confirmLoading: PropTypes.bool,
+  onSubmit: PropTypes.func,
+  form: PropTypes.shape({
+    getFieldProps: PropTypes.func,
+    resetFields: PropTypes.func,
+    validateFields: PropTypes.func,
+  }),
+};
 
 export default CreateNewCompany = Form.create({})(CreateNewCompany);

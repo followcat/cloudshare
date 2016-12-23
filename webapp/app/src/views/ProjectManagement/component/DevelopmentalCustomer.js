@@ -9,7 +9,7 @@ import DetailInformation from '../../../components/detail-information';
 import CreateNewCompany from './CreateNewCompany';
 import ExtractInfo from './ExtractInfo';
 
-import { Button, message, Popconfirm } from 'antd';
+import { message, Popconfirm } from 'antd';
 
 import {
   getAllCompany,
@@ -21,6 +21,7 @@ import {
 } from '../../../request/company';
 import StorageUtil from '../../../utils/storage';
 import remove from 'lodash/remove';
+
 import websiteText from '../../../config/website-text';
 
 const language = websiteText.zhCN;
@@ -38,9 +39,9 @@ const fieldValuesToParams = (object) => {
   }
 
   return arr;
-}
+};
 
-export default class DevelopmentalCustomer extends Component {
+class DevelopmentalCustomer extends Component {
   constructor() {
     super();
     this.state = {
@@ -53,7 +54,7 @@ export default class DevelopmentalCustomer extends Component {
       searchWord: '',
       loading: false,
       siderPanelVisible: false,
-      createCompanyConfirmLoading: false,
+      createCompanyConfirmLoading: false
     };
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
@@ -74,6 +75,7 @@ export default class DevelopmentalCustomer extends Component {
   componentDidMount() {
     const current = this.state.current,
           pageSize = this.state.pageSize;
+
     this.getDataSource(current, pageSize);
     this.getCustomerDataSource();
   }
@@ -83,7 +85,7 @@ export default class DevelopmentalCustomer extends Component {
 
     this.setState({
       current: current,
-      pageSize: pageSize,
+      pageSize: pageSize
     });
 
     if (searchWord === '') {
@@ -96,8 +98,9 @@ export default class DevelopmentalCustomer extends Component {
   handlePaginationChange(current) {
     const pageSize = this.state.pageSize,
           searchWord = this.state.searchWord.trim();
+
     this.setState({
-      current: current,
+      current: current
     });
 
     if (searchWord === '') {
@@ -105,7 +108,6 @@ export default class DevelopmentalCustomer extends Component {
     } else {
       this.getDataSourceBySearch(searchWord, current, pageSize);
     }
-    
   }
 
   handleTablePlusSearch(value) {
@@ -116,7 +118,7 @@ export default class DevelopmentalCustomer extends Component {
       searchWord: value,
       loading: true,
       current: current,
-      pageSize: pageSize,
+      pageSize: pageSize
     });
 
     if (value) {
@@ -129,7 +131,7 @@ export default class DevelopmentalCustomer extends Component {
   handleViewDetailsClick(record) {
     this.setState({
       siderPanelVisible: true,
-      detailData: record,
+      detailData: record
     });
   }
 
@@ -154,12 +156,11 @@ export default class DevelopmentalCustomer extends Component {
 
   handleSiderPanelClose() {
     this.setState({
-      siderPanelVisible: false,
+      siderPanelVisible: false
     });
   }
 
   handleVisitingSubmit(fieldValue) {
-    console.log(fieldValue);
     let detailData = this.state.detailData,
         key = 'progress';
 
@@ -184,10 +185,12 @@ export default class DevelopmentalCustomer extends Component {
     let detailData = this.state.detailData,
         params = [];
     const key = Object.keys(fieldValue)[0];
+
     params.push({
       key: key,
       value: fieldValue[key]
     });
+
     updateCompanyInfo('PUT', {
       id: detailData.id,
       update_info: params
@@ -218,9 +221,10 @@ export default class DevelopmentalCustomer extends Component {
       if (json.code === 200) {
         let newData = remove(data, v => v.date !== json.data.date),
             newObj = {};
+          
         newObj[key] = newData;
         this.setState({
-          detailData: Object.assign({}, detailData, newObj),
+          detailData: Object.assign({}, detailData, newObj)
         });
         this.getDataSource(this.state.current, this.state.pageSize);
         message.success(json.message);
@@ -234,7 +238,7 @@ export default class DevelopmentalCustomer extends Component {
     const { current, pageSize } = this.state;
           
     this.setState({
-      createCompanyConfirmLoading: true,
+      createCompanyConfirmLoading: true
     });
 
     createCompany(fieldValues, (json) => {
@@ -245,7 +249,7 @@ export default class DevelopmentalCustomer extends Component {
         message.error(json.message);
       }
       this.setState({
-        createCompanyConfirmLoading: false,
+        createCompanyConfirmLoading: false
       });
     });
   }
@@ -270,28 +274,26 @@ export default class DevelopmentalCustomer extends Component {
 
   getDataSource(current, pageSize) {
     this.setState({
-      loading: true,
+      loading: true
     });
 
     getAllCompany({
       current_page: current,
-      page_size: pageSize,
+      page_size: pageSize
     }, (json) => {
       if (json.code === 200) {
         this.setState({
           dataSource: json.data,
           total: json.total,
-          loading: false,
+          loading: false
         });
       }
     });
   }
 
   getDataSourceBySearch(searchWord, current, pageSize) {
-    const dataSource = this.state.dataSource;
-
     this.setState({
-      loading: true,
+      loading: true
     });
 
     getAllCompanyBySearch({
@@ -303,8 +305,8 @@ export default class DevelopmentalCustomer extends Component {
         this.setState({
           dataSource: json.data,
           total: json.total,
-          loading: false,
-        })
+          loading: false
+        });
       }
     });
   }
@@ -316,17 +318,15 @@ export default class DevelopmentalCustomer extends Component {
         this.setState({
           customerIDList: idList
         });
-      } else {
-        console.log('Get customer list error.')
       }
-    })
+    });
   }
 
   getRenderCustomerOperation(id) {
     const idList = this.state.customerIDList;
 
     if (idList.indexOf(id) > -1) {
-      return <span>{language.ADDED_CUSTOMER}</span>
+      return <span>{language.ADDED_CUSTOMER}</span>;
     } else {
       return (
         <Popconfirm
@@ -335,7 +335,7 @@ export default class DevelopmentalCustomer extends Component {
         >
           <a href="javascript: void(0);">{language.ADD_CUSTOMER}</a>
         </Popconfirm>
-      )
+      );
     }
   }
 
@@ -366,7 +366,7 @@ export default class DevelopmentalCustomer extends Component {
       title: language.COMPANY_NAME,
       dataIndex: 'name',
       key: 'name',
-      width: '14%',
+      width: '14%'
     }, {
       title: language.PRODUCT,
       dataIndex: 'product',
@@ -376,18 +376,18 @@ export default class DevelopmentalCustomer extends Component {
       title: language.TELLPHONE,
       dataIndex: 'conumber',
       key: 'conumber',
-      width: '14%',
+      width: '14%'
     }, {
       title: language.EMAIL,
       dataIndex: 'email',
       key: 'email',
-      width: '12%',
+      width: '12%'
     }, {
       title: language.OPEN_POSITION,
       key: 'position',
       width: '16%',
       render: (text, record) => {
-        return <span>{extractValueToString('content', record.position)}</span>
+        return <span>{extractValueToString('content', record.position)}</span>;
       }
     }, {
       title: language.NEW_VISITING_SITUATION,
@@ -396,7 +396,7 @@ export default class DevelopmentalCustomer extends Component {
       render: (text, record) => {
         return record.progress.length > 0 ?
             <span>{record.progress[0].content}</span> :
-            null
+            null;
       }
     }, {
       title: language.OPERATION,
@@ -408,7 +408,14 @@ export default class DevelopmentalCustomer extends Component {
             <li style={{ marginBottom: 8 }}>
               {this.getRenderCustomerOperation(record.id)}
             </li>
-            <li><a href="javascript: void(0);" onClick={() => this.handleViewDetailsClick(record)}>{language.VIEW_DETAILS}</a></li>
+            <li>
+              <a
+                href="javascript: void(0);"
+                onClick={() => this.handleViewDetailsClick(record)}
+              >
+                {language.VIEW_DETAILS}
+              </a>
+            </li>
           </ul>
         );
       }
@@ -423,63 +430,63 @@ export default class DevelopmentalCustomer extends Component {
       showTotal: total => `共 ${total} 条`,
       onShowSizeChange: this.handleShowSizeChange,
       onChange: this.handlePaginationChange
-    }
+    };
 
     // 陌拜表列
     const visitingColumn = [{
       title: language.VISITING_SITUATION,
       dataIndex: 'content',
       key: 'situation',
-      width: '60%',
+      width: '60%'
     }, {
       title: language.DATE,
       dataIndex: 'date',
       key: 'date',
-      width: '30%',
+      width: '30%'
     }, {
       title: language.VISITOR,
       dataIndex: 'author',
       key: 'name',
-      width: '10%',
+      width: '10%'
     }];
 
     // 基本信息条目
     const rows = [{
       title: language.COMPANY_NAME,
       dataIndex: 'name',
-      key: 'name',
+      key: 'name'
     }, {
       title: language.DISTRICT,
       dataIndex: 'district',
-      key: 'district',
+      key: 'district'
     }, {
       title: language.PRODUCT,
       dataIndex: 'product',
-      key: 'product',
+      key: 'product'
     }, {
       title: language.TELLPHONE,
       dataIndex: 'conumber',
-      key: 'conumber',
+      key: 'conumber'
     }, {
       title: language.EMAIL,
       dataIndex: 'email',
-      key: 'email',
+      key: 'email'
     }, {
       title: language.ADDRESS,
       dataIndex: 'address',
-      key: 'address',
+      key: 'address'
     }, {
       title: language.WEBSITE,
       dataIndex: 'website',
       key: 'website',
       render: (record) => {
-        return <a href={record} target="_blank">{record}</a>
+        return <a href={record} target="_blank">{record}</a>;
       }
     }, {
       title: language.COMPANY_INTRODUCTION,
       dataIndex: 'introduction',
       key: 'introduction',
-      type: 'textarea',
+      type: 'textarea'
     }];
 
     return (
@@ -530,3 +537,5 @@ export default class DevelopmentalCustomer extends Component {
     );
   }
 }
+
+export default DevelopmentalCustomer;

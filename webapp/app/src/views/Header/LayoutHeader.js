@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import Header from '../../components/layout-header';
 
@@ -8,8 +8,8 @@ import { Modal, Menu } from 'antd';
 import { URL } from '../../config/url';
 import { signOut } from '../../request/sign';
 import StorageUtil from '../../utils/storage';
-import logo from '../../image/logo.png';
 
+import logo from '../../image/logo.png';
 import websiteText from '../../config/website-text';
 
 const language = websiteText.zhCN;
@@ -30,7 +30,7 @@ const navMenus = [{
   text: language.PROJECT_MANAGEMENT
 }];
 
-export default class LayoutHeader extends Component {
+class LayoutHeader extends Component {
   constructor() {
     super();
     this.state = {
@@ -109,3 +109,10 @@ export default class LayoutHeader extends Component {
     );
   }
 }
+
+LayoutHeader.propTypes = {
+  style: PropTypes.object,
+  children: PropTypes.arrayOf(PropTypes.element)
+};
+
+export default LayoutHeader;

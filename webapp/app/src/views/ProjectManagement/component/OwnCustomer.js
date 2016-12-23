@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 
 import TablePlus from '../../../components/table-plus';
-import EnhancedInput from '../../../components/enhanced-input';
 import SiderPanel from '../../../components/sider-panel';
 import DetailInformation from '../../../components/detail-information';
 import ExtractInfo from './ExtractInfo';
@@ -10,6 +9,7 @@ import ExtractInfo from './ExtractInfo';
 import { Popconfirm, message } from 'antd';
 
 import { getCustomerList, updateCustomer } from '../../../request/company';
+
 import websiteText from '../../../config/website-text';
 
 const language = websiteText.zhCN;
@@ -26,7 +26,7 @@ class OwnCustomer extends Component {
       dataSource: [],
       loading: false,
       siderPanelVisible: false,
-      detailData: {},
+      detailData: {}
     };
     this.handleDeleteCustomerConfirm = this.handleDeleteCustomerConfirm.bind(this);
     this.handleViewDetailsClick = this.handleViewDetailsClick.bind(this);
@@ -54,26 +54,26 @@ class OwnCustomer extends Component {
   handleViewDetailsClick(record) {
     this.setState({
       siderPanelVisible: true,
-      detailData: record,
+      detailData: record
     });
   }
 
   handleSiderPanelClose() {
     this.setState({
-      siderPanelVisible: false,
+      siderPanelVisible: false
     });
   }
 
   getDataSource() {
     this.setState({
-      loading: true,
+      loading: true
     });
 
     getCustomerList(json => {
       if (json.code === 200) {
         this.setState({
           dataSource: json.data,
-          loading: false,
+          loading: false
         });
       }
     });
@@ -85,7 +85,7 @@ class OwnCustomer extends Component {
       title: language.COMPANY_NAME,
       dataIndex: 'name',
       key: 'name',
-      width: '14%',
+      width: '14%'
     }, {
       title: language.PRODUCT,
       dataIndex: 'product',
@@ -95,18 +95,18 @@ class OwnCustomer extends Component {
       title: language.TELLPHONE,
       dataIndex: 'conumber',
       key: 'conumber',
-      width: '14%',
+      width: '14%'
     }, {
       title: language.EMAIL,
       dataIndex: 'email',
       key: 'email',
-      width: '12%',
+      width: '12%'
     }, {
       title: language.OPEN_POSITION,
       key: 'position',
       width: '16%',
       render: (text, record) => {
-        return <span>{extractValueToString('content', record.position)}</span>
+        return <span>{extractValueToString('content', record.position)}</span>;
       }
     }, {
       title: language.NEW_VISITING_SITUATION,
@@ -115,7 +115,7 @@ class OwnCustomer extends Component {
       render: (text, record) => {
         return record.progress.length > 0 ?
             <span>{record.progress[0].content}</span> :
-            null
+            null;
       }
     }, {
       title: language.OPERATION,
@@ -151,35 +151,35 @@ class OwnCustomer extends Component {
     const rows = [{
       title: language.COMPANY_NAME,
       dataIndex: 'name',
-      key: 'name',
+      key: 'name'
     }, {
       title: language.PRODUCT,
       dataIndex: 'product',
-      key: 'product',
+      key: 'product'
     }, {
       title: language.TELLPHONE,
       dataIndex: 'conumber',
-      key: 'conumber',
+      key: 'conumber'
     }, {
       title: language.EMAIL,
       dataIndex: 'email',
-      key: 'email',
+      key: 'email'
     }, {
       title: language.ADDRESS,
       dataIndex: 'address',
-      key: 'address',
+      key: 'address'
     }, {
       title: language.WEBSITE,
       dataIndex: 'website',
       key: 'website',
       render: (record) => {
-        return <a href={record} target="_blank">{record}</a>
+        return <a href={record} target="_blank">{record}</a>;
       }
     }, {
       title: language.COMPANY_INTRODUCTION,
       dataIndex: 'introduction',
       key: 'introduction',
-      type: 'textarea',
+      type: 'textarea'
     }];
 
     return (

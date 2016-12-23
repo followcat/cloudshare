@@ -368,15 +368,20 @@ class DevelopmentalCustomer extends Component {
       key: 'name',
       width: '14%'
     }, {
+      title: language.DISTRICT,
+      dataIndex: 'district',
+      key: 'district',
+      width: '10%'
+    }, {
       title: language.PRODUCT,
       dataIndex: 'product',
       key: 'product',
-      width: '20%'
+      width: '16%'
     }, {
       title: language.TELLPHONE,
       dataIndex: 'conumber',
       key: 'conumber',
-      width: '14%'
+      width: '12%'
     }, {
       title: language.EMAIL,
       dataIndex: 'email',
@@ -385,14 +390,14 @@ class DevelopmentalCustomer extends Component {
     }, {
       title: language.OPEN_POSITION,
       key: 'position',
-      width: '16%',
+      width: '14%',
       render: (text, record) => {
         return <span>{extractValueToString('content', record.position)}</span>;
       }
     }, {
       title: language.NEW_VISITING_SITUATION,
       key: 'progress',
-      width: '14%',
+      width: '12%',
       render: (text, record) => {
         return record.progress.length > 0 ?
             <span>{record.progress[0].content}</span> :

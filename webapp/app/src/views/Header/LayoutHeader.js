@@ -112,7 +112,7 @@ class LayoutHeader extends Component {
 
 LayoutHeader.propTypes = {
   style: PropTypes.object,
-  children: PropTypes.arrayOf(PropTypes.element)
+  children: PropTypes.element
 };
 
 export default LayoutHeader;

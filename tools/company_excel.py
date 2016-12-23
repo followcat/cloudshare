@@ -47,17 +47,17 @@ def chs_to_eng(d):
 
 def reformat(item):
     if not isinstance(item['position'], list):
-        item['position'] = [e for e in re.split(u'[、，,]', item['position']) if e]
+        item['position'] = [e for e in re.split(u'[、，,]', unicode(item['position'])) if e]
     if not isinstance(item['clientcontact'], list):
-        item['clientcontact'] = [e for e in re.split(u'', item['clientcontact']) if e]
+        item['clientcontact'] = [e for e in re.split(u'', unicode(item['clientcontact'])) if e]
     if not isinstance(item['caller'], list):
-        item['caller'] = [e for e in re.split(u'', item['caller']) if e]
+        item['caller'] = [e for e in re.split(u'', unicode(item['caller'])) if e]
     if not isinstance(item['progress'], list):
-        item['progress'] = [e for e in re.split(u'[;\n]', item['progress']) if e]
+        item['progress'] = [e for e in re.split(u'[;\n]', unicode(item['progress'])) if e]
     if isinstance(item['updatednumber'], float):
         item['updatednumber'] = [int(item['updatednumber'])]
     elif not isinstance(item['updatednumber'], list):
-        item['updatednumber'] = [e for e in re.split(u'[、；]', item['updatednumber']) if e]
+        item['updatednumber'] = [e for e in re.split(u'[、；]', unicode(item['updatednumber'])) if e]
     return item
 
 def process(d):

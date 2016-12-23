@@ -9,7 +9,7 @@ const dateValueFormat = (dateString) => {
   let date = new Date(dateString),
       localDateString = date.toLocaleDateString(),
       splitDate = localDateString.split('/');
-  splitDate.unshift(splitDate.splice(-1, 1));
+  splitDate.unshift(splitDate.splice(-1, 1)[0]);
   return splitDate.join('-');
 };
 
@@ -54,12 +54,6 @@ class ResumeFollowUp extends Component {
   render() {
     const { getFieldProps } = this.props.form;
 
-    const customLocale = {
-      timezoneOffset: 8 * 60,
-      firstDayOfWeek: 0,
-      minimalDaysInFirstWeek: 1,
-    };
-
     return (
       <Card
         title="Follow Up"
@@ -83,7 +77,6 @@ class ResumeFollowUp extends Component {
                 {...getFieldProps('date')}
                 style={{ width: '100%' }}
                 size="small"
-                locale={{ ...enUS, ...customLocale }}
                 format="yyyy-MM-dd"
               />
             </Form.Item>

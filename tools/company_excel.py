@@ -46,18 +46,26 @@ def chs_to_eng(d):
     return nd
 
 def reformat(item):
+    if not isinstance(item['relatedcompany'], list):
+        item['relatedcompany'] = [e for e in re.split(u'[、，,;；]',
+                                  unicode(item['relatedcompany'])) if e]
     if not isinstance(item['position'], list):
-        item['position'] = [e for e in re.split(u'[、，,]', unicode(item['position'])) if e]
+        item['position'] = [e for e in re.split(u'[、，,]',
+                            unicode(item['position'])) if e]
     if not isinstance(item['clientcontact'], list):
-        item['clientcontact'] = [e for e in re.split(u'', unicode(item['clientcontact'])) if e]
+        item['clientcontact'] = [e for e in re.split(u'',
+                                 unicode(item['clientcontact'])) if e]
     if not isinstance(item['caller'], list):
-        item['caller'] = [e for e in re.split(u'', unicode(item['caller'])) if e]
+        item['caller'] = [e for e in re.split(u'',
+                          unicode(item['caller'])) if e]
     if not isinstance(item['progress'], list):
-        item['progress'] = [e for e in re.split(u'[;\n]', unicode(item['progress'])) if e]
+        item['progress'] = [e for e in re.split(u'[;\n]',
+                            unicode(item['progress'])) if e]
     if isinstance(item['updatednumber'], float):
         item['updatednumber'] = [int(item['updatednumber'])]
     elif not isinstance(item['updatednumber'], list):
-        item['updatednumber'] = [e for e in re.split(u'[、；]', unicode(item['updatednumber'])) if e]
+        item['updatednumber'] = [e for e in re.split(u'[、；]',
+                                 unicode(item['updatednumber'])) if e]
     return item
 
 def process(d):
@@ -103,9 +111,33 @@ def init_siminfo(SVC_CO_SIM, d):
             eng = chs_to_eng(chs)
             format_eng = reformat(eng)
             id = extractor.unique_id.company_id(format_eng['name'])
+            info = SVC_CO_SIM.getyaml(id)
+            if key not in info:
+                continue
+            existvalues = [v['content'] for v in info[key]]
             caller = 'dev'
             if format_eng['caller']:
                 caller = format_eng['caller'][0]
             for value in format_eng[key]:
+                if value in existvalues:
+                    continue
                 SVC_CO_SIM.updateinfo(id, key, value, caller)
+
+def delete_ununique(SVC_CO_SIM):
+    for key in ('relatedcompany', 'position', 'clientcontact',
+                'caller', 'progress', 'updatednumber'):
+        for id in SVC_CO_SIM.ids:
+            info = SVC_CO_SIM.getyaml(id)
+            caller = info['caller']
+            info_set = set([(v['content'], v['author'], v['date']) for v in info[key]])
+            if len(info[key]) != len(info_set):
+                for v in info_set:
+                    item = {
+                        'content': v[0],
+                        'author': v[1],
+                        'date': v[2]
+                    }
+                    info[key].remove(item)
+                for v in info[key]:
+                    SVC_CO_SIM.deleteinfo(id, key, v['content'], v['author'], v['date'])
 

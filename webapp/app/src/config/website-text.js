@@ -11,6 +11,7 @@ const websiteText = {
     PROFILE: '个人中心',
     SEARCH: '搜索',
     MATCH: '匹配',
+    RESUME_UPLOADER: '简历上传',
     PROJECT_MANAGEMENT: '项目管理',
 
     JOB_DESCRIPTION_MANAGEMENT: '职位管理',

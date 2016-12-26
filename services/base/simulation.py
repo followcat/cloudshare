@@ -104,11 +104,15 @@ class Simulation(services.base.storage.BaseStorage):
         return yaml
 
     def _modifyinfo(self, id, key, value, committer):
+        result = {}
         projectinfo = self.getinfo(id)
-        projectinfo[key] = value
-        self.saveinfo(id, projectinfo,
-                      'Modify %s key %s.' % (id, key), committer)
-        return {key: value}
+        projectyaml = self.getyaml(id)
+        if not projectyaml[key] == value:
+            projectinfo[key] = value
+            self.saveinfo(id, projectinfo,
+                          'Modify %s key %s.' % (id, key), committer)
+            result = {key: value}
+        return result
 
     def _addinfo(self, id, key, value, committer):
         projectinfo = self.getinfo(id)

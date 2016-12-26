@@ -197,9 +197,11 @@ class Mining(object):
             self.slicer = slicer
         self.make_lsi()
 
-    def setup(self):
+    def setup(self, modelnames=None):
         assert self.lsi_model
-        for modelname in self.lsi_model:
+        if modelnames is None:
+            modelnames = self.lsi_model
+        for modelname in modelnames:
             lsimodel = self.lsi_model[modelname]
             if not lsimodel.names:
                 continue

@@ -129,15 +129,16 @@ def delete_ununique(SVC_CO_SIM):
         for id in SVC_CO_SIM.ids:
             info = SVC_CO_SIM.getyaml(id)
             caller = info['caller']
-            info_set = set([(v['content'], v['author'], v['date']) for v in info[key]])
+            info_set = set([(v['content'], v['author']) for v in info[key]])
             if len(info[key]) != len(info_set):
+                delete_l = list()
                 for v in info_set:
-                    item = {
-                        'content': v[0],
-                        'author': v[1],
-                        'date': v[2]
-                    }
-                    info[key].remove(item)
+                    for dictv in info[key]:
+                        if v[0] == dictv['content']:
+                            delete_l.append(dictv)
+                            break
+                for each in delete_l:
+                    info[key].remove(each)
                 for v in info[key]:
                     SVC_CO_SIM.deleteinfo(id, key, v['content'], v['author'], v['date'])
 

@@ -159,7 +159,10 @@ class CompanyInfoUpdateAPI(Resource):
         project = self.svc_mult_cv.getproject(projectname)
         data = dict()
         for item in update_info:
-            result = project.company.updateinfo(id, item['key'], item['value'], user.id)
+            try:
+                result = project.company.updateinfo(id, item['key'], item['value'], user.id)
+            except AssertionError:
+                continue
             data.update(result)
         if len(data) != 0:
             response = { 'code': 200, 'data': data, 'message': 'Update information success.' }

@@ -67,6 +67,7 @@ class DevelopmentalCustomer extends Component {
     this.handleExtractInfoRemove = this.handleExtractInfoRemove.bind(this);
     this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
     this.handleAddCustomerConfirm = this.handleAddCustomerConfirm.bind(this);
+    this.updateDataSource = this.updateDataSource.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getDataSourceBySearch = this.getDataSourceBySearch.bind(this);
     this.getRenderCustomerOperation = this.getRenderCustomerOperation.bind(this);
@@ -147,6 +148,7 @@ class DevelopmentalCustomer extends Component {
         this.setState({
           detailData: Object.assign({}, detailData, json.data)
         });
+        this.updateDataSource();
         message.success(json.message);
       } else {
         message.error(json.message);
@@ -173,7 +175,7 @@ class DevelopmentalCustomer extends Component {
         this.setState({
           detailData: detailData
         });
-        this.getDataSource(this.state.current, this.state.pageSize);
+        this.updateDataSource();
         message.success(json.message);
       } else {
         message.error(json.message);
@@ -200,7 +202,7 @@ class DevelopmentalCustomer extends Component {
         this.setState({
           detailData: detailData
         });
-        this.getDataSource(this.state.current, this.state.pageSize);
+        this.updateDataSource();
         message.success(json.message);
       } else {
         message.error(json.message);
@@ -226,7 +228,7 @@ class DevelopmentalCustomer extends Component {
         this.setState({
           detailData: Object.assign({}, detailData, newObj)
         });
-        this.getDataSource(this.state.current, this.state.pageSize);
+        this.updateDataSource();
         message.success(json.message);
       } else {
         message.error(json.message);
@@ -270,6 +272,18 @@ class DevelopmentalCustomer extends Component {
         message.success(language.ADD_FAIL_MSG);
       }
     });
+  }
+
+  updateDataSource() {
+    const searchWord = this.state.searchWord.trim(),
+          current = this.state.current,
+          pageSize = this.state.pageSize;
+    
+    if (searchWord === '') {
+      this.getDataSource(current, pageSize);
+    } else {
+      this.getDataSourceBySearch(searchWord, current, pageSize);
+    }
   }
 
   getDataSource(current, pageSize) {
@@ -458,39 +472,47 @@ class DevelopmentalCustomer extends Component {
     const rows = [{
       title: language.COMPANY_NAME,
       dataIndex: 'name',
-      key: 'name'
+      key: 'name',
+      editable: false
     }, {
       title: language.DISTRICT,
       dataIndex: 'district',
-      key: 'district'
+      key: 'district',
+      editable: true
     }, {
       title: language.PRODUCT,
       dataIndex: 'product',
-      key: 'product'
+      key: 'product',
+      editable: true
     }, {
       title: language.TELLPHONE,
       dataIndex: 'conumber',
-      key: 'conumber'
+      key: 'conumber',
+      editable: true
     }, {
       title: language.EMAIL,
       dataIndex: 'email',
-      key: 'email'
+      key: 'email',
+      editable: true
     }, {
       title: language.ADDRESS,
       dataIndex: 'address',
-      key: 'address'
+      key: 'address',
+      editable: true
     }, {
       title: language.WEBSITE,
       dataIndex: 'website',
       key: 'website',
       render: (record) => {
-        return <a href={record} target="_blank">{record}</a>;
-      }
+        return <a href={record} target="_blank">{record}</a>
+      },
+      editable: true
     }, {
       title: language.COMPANY_INTRODUCTION,
       dataIndex: 'introduction',
       key: 'introduction',
-      type: 'textarea'
+      type: 'textarea',
+      editable: true
     }];
 
     return (

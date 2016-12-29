@@ -231,3 +231,49 @@ class SearchCObyTextAPI(Resource):
         for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
             datas.append(svc_co.getyaml(id))
         return datas, pages, total
+
+
+class CompanyUploadExcelAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(CompanyUploadExcdlAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('files', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def post(self):
+        user = flask.ext.login.current_user
+        if user.id not in upload:
+            upload[user.id] = dict()
+        project_name = args['project']
+        network_file = flask.request.files['files']
+        project = self.svc_mult_cv.getproject(project_name)
+        datas = project.company_compare_excel(network_file.read(), committer=user)
+        return {
+            'code': 200,
+            'data': datas
+        }
+
+
+class CompanyConfirmExcelAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(CompanyConfirmExcelAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('data', location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def post(self):
+        datas = args['data']
+        project_name = args['project']
+        project = self.svc_mult_cv.getproject(project_name)
+        project.company_add_excel(datas)
+        return {
+            'code': 200
+        }

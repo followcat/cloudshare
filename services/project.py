@@ -118,6 +118,13 @@ class Project(services.base.service.Service):
         outputs.extend(self.company.compare_excel(stream, committer))
         return outputs
 
+    def company_add_excel(self, items):
+        for item in items:
+            if item[0] == 'add':
+                self.corepo.add(*item[1])
+            elif item[0] == 'followup':
+                self.company.updateinfo(*item[1])
+
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
         self.company.add(coobj, committer, unique, yamlfile, mdfile)

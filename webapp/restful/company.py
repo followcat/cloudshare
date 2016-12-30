@@ -238,20 +238,19 @@ class CompanyUploadExcelAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        super(CompanyUploadExcdlAPI, self).__init__()
+        super(CompanyUploadExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('files', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
+        args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        if user.id not in upload:
-            upload[user.id] = dict()
         project_name = args['project']
         network_file = flask.request.files['files']
         project = self.svc_mult_cv.getproject(project_name)
-        datas = project.company_compare_excel(network_file.read(), committer=user)
+        datas = project.company_compare_excel(network_file.read(), committer=user.id)
         return {
             'code': 200,
             'data': datas

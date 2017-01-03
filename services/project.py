@@ -58,6 +58,12 @@ class Project(services.base.service.Service):
     def getclassify(self):
         return self.config['classify']
 
+    def getindustry(self):
+        result = dict()
+        for each in self.config['classify']:
+            result.update({each: sources.industry_id.sources[each]})
+        return result
+
     def cv_add(self, cvobj, committer=None, unique=True):
         return self.curriculumvitae.add(cvobj, committer, unique)
 

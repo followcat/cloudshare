@@ -42,7 +42,7 @@ class UploadCVAPI(Resource):
         for item in updates:
             id = ''
             status = 'fail'
-            message = 'The contact information is existend.'
+            message = 'The contact information is empty.'
             cvobj = upload[user.id].pop(item['filename'])
             if cvobj is not None:
                 id = cvobj.metadata['id']

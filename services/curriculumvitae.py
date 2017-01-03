@@ -75,9 +75,17 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             if start < date and date < end:
                 yield id
 
+    def add(self, bsobj, committer=None, unique=True,
+            yamlfile=True, mdfile=True, contacts=True):
+        if contacts and not bsobj.metadata['email'] and not bsobj.metadata['phone']:
+            return False
+        return super(CurriculumVitae, self).add(bsobj, committer, unique,
+                                                yamlfile, mdfile)
+
     def addcv(self, bsobj, rawdata=None):
-        self.add(bsobj)
-        cn_id = core.outputstorage.ConvertName(bsobj.name)
-        if rawdata is not None:
-            self.interface.add(cn_id.html, rawdata)
-        return True
+        result = self.add(bsobj, contacts=False)
+        if result is True:
+            cn_id = core.outputstorage.ConvertName(bsobj.name)
+            if rawdata is not None:
+                self.interface.add(cn_id.html, rawdata)
+        return result

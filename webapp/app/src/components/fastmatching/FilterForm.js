@@ -3,7 +3,9 @@ import React, { Component, PropTypes } from 'react';
 
 import { Row, Col, Form, Select, Input, Checkbox, Button, DatePicker } from 'antd';
 
-const RangePicker = DatePicker.RangePicker;
+const RangePicker = DatePicker.RangePicker,
+      Option = Select.Option,
+      OptGroup = Select.OptGroup;
 
 class FilterForm extends Component {
 
@@ -24,6 +26,7 @@ class FilterForm extends Component {
     this.handleReset = this.handleReset.bind(this);
     this.handleRangePickerChange = this.handleRangePickerChange.bind(this);
     this.disabledDate = this.disabledDate.bind(this);
+    this.renderIndustry = this.renderIndustry.bind(this);
   }
 
   handleGenderChange(values) {
@@ -72,6 +75,21 @@ class FilterForm extends Component {
 
   disabledDate(current) {
     return current && current.getTime() > Date.now();
+  }
+
+  renderIndustry() {
+    const industry = this.props.industry;
+    let optGroup = [];
+
+    for (let key in industry) {
+      optGroup.push(
+        <OptGroup key={key} label={key}>
+          {industry[key].map(item => <Option key={item} value={item}>{item}</Option>)}
+        </OptGroup>
+      );
+    }
+
+    return optGroup;
   }
 
   render() {
@@ -129,7 +147,7 @@ class FilterForm extends Component {
                 multiple
               >
                 {this.props.classify.map((item, index) => {
-                  return <Select.Option key={index} value={item} >{item}</Select.Option>
+                  return <Option key={index} value={item} >{item}</Option>
                 })}
               </Select>
             </Form.Item>
@@ -206,9 +224,13 @@ class FilterForm extends Component {
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <Input
+              <Select
                 {...getFieldProps('business')}
-              />
+                showSearch={true}
+                multiple={true}
+              >
+                {this.renderIndustry()}
+              </Select>
             </Form.Item>
           </Col>
         </Row>

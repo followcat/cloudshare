@@ -173,7 +173,7 @@ class LSIbaseAPI(Resource):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(project, doc, uses=uses)
+        result = self.miner.probability(project, doc, uses=uses, top=500)
         filteset = self.index.get(filterdict, uses=uses)
         if filteset:
             result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)

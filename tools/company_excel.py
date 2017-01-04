@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 import yaml
 
 import core.basedata
@@ -11,8 +12,10 @@ def process(stream):
     excels = utils.companyexcel.convert(stream)
     for excel in excels:
         metadata = catch_coinfo(excel, excel['name'])
-        do = core.basedata.DataObject(metadata, excel)
-        dos.append(do)
+        bsobj = core.basedata.DataObject(metadata, excel)
+        if 'date' not in bsobj.metadata or not bsobj.metadata['date']:
+            bsobj.metadata['date'] = time.time()
+        dos.append(bsobj)
     return dos
 
 

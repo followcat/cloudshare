@@ -173,9 +173,9 @@ class LSIbaseAPI(Resource):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(project, doc, uses=uses)
+        result = self.miner.probability(project, doc, uses=uses, top=500)
         filteset = self.index.get(filterdict, uses=uses)
-        if filteset:
+        if filterdict:
             result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
         totals = len(result)
         if totals%eve_count != 0:
@@ -327,10 +327,11 @@ class ValuablebaseAPI(Resource):
                 if args['uses'] else [project]+project.getclassify()
         name_list = args['name_list']
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project, uses=uses)
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
+                                               doc, project, uses=uses)
         else:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project,
-                                               uses=uses, name_list=name_list)
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
+                                               doc, project, uses=uses, name_list=name_list)
         response = dict()
         datas = []
         for index in result:
@@ -341,7 +342,9 @@ class ValuablebaseAPI(Resource):
                 name = match_item[0]
                 yaml_data = self.svc_mult_cv.getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
-                values.append({ 'match': match_item[1], 'id': yaml_data['id'], 'name': yaml_data['name'] })
+                values.append({ 'match': match_item[1],
+                                'id': yaml_data['id'],
+                                'name': yaml_data['name'] })
             item['value'] = values
             datas.append(item)
         response['result'] = datas

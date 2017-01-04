@@ -227,6 +227,7 @@ class FilterForm extends Component {
               <Select
                 {...getFieldProps('business')}
                 showSearch={true}
+                multiple={true}
               >
                 {this.renderIndustry()}
               </Select>

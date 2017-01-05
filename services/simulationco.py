@@ -24,8 +24,8 @@ class SimulationCO(services.base.simulation.Simulation,
     fix_item  = {"id", "name"}
     customers_file = 'customers.json'
 
-    def __init__(self, path, name, cvstorage, iotype='git'):
-        super(SimulationCO, self).__init__(path, name, cvstorage, iotype)
+    def __init__(self, path, name, costorage, iotype='git'):
+        super(SimulationCO, self).__init__(path, name, costorage, iotype)
         self._customers = None
 
     def compare_excel(self, stream, committer):

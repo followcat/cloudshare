@@ -8,8 +8,11 @@ import Status from './Status';
 
 import { message } from 'antd';
 
+import findIndex from 'lodash/findIndex';
+
 import {
   getJobDescriptionList,
+  getJobDescription,
   updateJobDescription,
   createJobDescription
 } from '../../../request/jobdescription';
@@ -43,6 +46,7 @@ class JobDescription extends Component {
     this.handleJobDescriptionCreate = this.handleJobDescriptionCreate.bind(this);
     this.handleStatusChange = this.handleStatusChange.bind(this);
     this.getjobDescriptionDataSource = this.getjobDescriptionDataSource.bind(this);
+    this.getJobDescriptionByID = this.getJobDescriptionByID.bind(this);
     this.getExpandedRowRender = this.getExpandedRowRender.bind(this);
     this.getJobDescriptionElements = this.getJobDescriptionElements.bind(this);
   }
@@ -53,8 +57,8 @@ class JobDescription extends Component {
   }
 
   handleEditClick(record) {
+    this.getJobDescriptionByID(record.id);
     this.setState({
-      record: record,
       editVisible: true
     });
   }
@@ -165,6 +169,38 @@ class JobDescription extends Component {
           dataSource: json.data,
           filterDataSource: json.data.filter(item => item.status === statusValue),
           loading: false
+        });
+      }
+    });
+  }
+
+  // 根据id获取最新数据
+  getJobDescriptionByID(id) {
+    let dataSource = this.state.dataSource,
+        filterDataSource = this.state.filterDataSource;
+
+    getJobDescription({
+      'jd_id': id
+    }, json => {
+      if (json.code === 200) {
+        const dataIndex = findIndex(dataSource, item => item.id === id),
+              filterIndex = findIndex(filterDataSource, item => item.id === id);
+        if (dataIndex > -1) {
+          dataSource[dataIndex] = json.data;
+          this.setState({
+            dataSource: dataSource
+          });
+        }
+
+        if (filterIndex > -1) {
+          filterDataSource[filterIndex] = json.data;
+          this.setState({
+            filterDataSource: filterDataSource
+          });
+        }
+      
+        this.setState({
+          record: json.data
         });
       }
     });

@@ -168,6 +168,9 @@ class Project(services.base.service.Service):
     def jd_lists(self):
         return self.jobdescription.lists()
 
+    def peo_getyaml(self, id):
+        return self.people.getyaml(id)
+
     def backup(self, path, bare=True):
         project_path = os.path.join(path, 'project')
         cv_path = os.path.join(path, 'curriculumvitae')

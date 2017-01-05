@@ -40,6 +40,9 @@ class EnhancedInput extends Component {
       } else {
         props.onClick(this.state.value);
       }
+      this.setState({
+        value: ''
+      });
     }
   }
 
@@ -68,12 +71,13 @@ class EnhancedInput extends Component {
             onFocus={this.handleFocusBlur}
             onBlur={this.handleFocusBlur}
             onPressEnter={this.handleSearch}
+            size={props.size || 'default'}
           />
           <div className="ant-input-group-wrap">
             <Button
               icon={props.type}
               className={btnCls}
-              size={props.btnSize}
+              size={props.size || 'default'}
               onClick={this.handleBtnClick}
             />
           </div>

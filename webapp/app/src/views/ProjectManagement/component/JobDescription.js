@@ -9,7 +9,7 @@ import Status from './Status';
 import { message } from 'antd';
 
 import {
-  getJobDescriptions,
+  getJobDescriptionList,
   updateJobDescription,
   createJobDescription
 } from '../../../request/jobdescription';
@@ -159,7 +159,7 @@ class JobDescription extends Component {
       loading: true
     });
     
-    getJobDescriptions((json) => {
+    getJobDescriptionList((json) => {
       if (json.code === 200) {
         this.setState({
           dataSource: json.data,

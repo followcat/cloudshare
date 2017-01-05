@@ -40,9 +40,12 @@ class EnhancedInput extends Component {
       } else {
         props.onClick(this.state.value);
       }
-      this.setState({
-        value: ''
-      });
+
+      if (props.resettable) {
+        this.setState({
+          value: ''
+        });
+      }
     }
   }
 
@@ -90,7 +93,8 @@ class EnhancedInput extends Component {
 EnhancedInput.defaultProps = {
   type: 'search',
   placeholder: '',
-  onClick() {}
+  onClick() {},
+  resettable: false,
 };
 
 EnhancedInput.propTypes = {
@@ -100,6 +104,7 @@ EnhancedInput.propTypes = {
   dataIndex: PropTypes.string,
   btnSize: PropTypes.string,
   onClick: PropTypes.func,
+  resettable: PropTypes.bool
 };
 
 export default EnhancedInput;

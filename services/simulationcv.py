@@ -7,14 +7,11 @@ class SimulationCV(services.base.simulation.Simulation,
 
     YAML_TEMPLATE = (
         ("committer",           str),
-        ("comment",             list),
-        ("tag",                 list),
-        ("tracking",            list),
     )
 
-    list_item = {"tag", "comment", "tracking"}
+    list_item = {}
 
-    def __init__(self, path, name, cvstorage, iotype='git'):
+    def __init__(self, path, name, storage, iotype='git'):
         """
             >>> from tests.settings import *
             >>> config = Config()
@@ -37,12 +34,15 @@ class SimulationCV(services.base.simulation.Simulation,
             True
             >>> config.destory()
         """
-        super(SimulationCV, self).__init__(path, name, cvstorage, iotype)
+        super(SimulationCV, self).__init__(path, name, storage, iotype)
 
     def getmd_en(self, id):
         yamlinfo = self.getyaml(id)
         veren = yamlinfo['enversion']
-        return self.cvstorage.gethtml(veren)
+        return self.storage.gethtml(veren)
 
     def gethtml(self, name):
-        return self.cvstorage.gethtml(name)
+        return self.storage.gethtml(name)
+
+    def getuniqueid(self, id):
+        return self.storage.getuniqueid(id)

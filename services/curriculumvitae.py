@@ -51,6 +51,14 @@ class CurriculumVitae(services.base.storage.BaseStorage):
         self.interface.add(name.md, cvobj.data, committer=committer)
         return True
 
+    def getuniqueid(self, id):
+        info = self.getyaml(id)
+        try:
+            uniqueid = info['unique_id']
+        except KeyError:
+            uniqueid = info['id']
+        return uniqueid
+
     def gethtml(self, name):
         htmlname = core.outputstorage.ConvertName(name).html
         try:

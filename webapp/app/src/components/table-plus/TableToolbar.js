@@ -20,6 +20,7 @@ class TableToolbar extends Component {
         {(props.isSearched)
           ? <Col {...props.searchCol}>
               <Input
+                size={props.size}
                 placeholder={props.searchPlaceholder}
                 onChange={this.handleSearchChange}
               />

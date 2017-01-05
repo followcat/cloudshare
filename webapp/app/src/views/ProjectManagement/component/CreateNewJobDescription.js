@@ -1,7 +1,11 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import ButtonWithModal from '../button-with-modal';
+import ButtonWithModal from '../../../components/button-with-modal';
 import { Form, Input, Select } from 'antd';
+
+import websiteText from '../../../config/website-text';
+
+const language = websiteText.zhCN;
 const FormItem = Form.Item,
       SelectOption = Select.Option;
 
@@ -26,20 +30,16 @@ class CreateNewJobDescription extends Component {
     const props = this.props,
           { getFieldProps } = props.form;
 
-    const companyProps = getFieldProps('companyName', {
-      rules: [
-        { required: true, message: 'Please choose a company name.' },
-      ],
+    const companyNameProps = getFieldProps('co_id', {
+      rules: [{ required: true, message: language.COMPANY_NAME_VALIDATE_MSG }]
     });
-    const jdNameProps = getFieldProps('jobDescriptionName', {
-      rules: [
-        { required: true, message: 'Please input job description project name.' },
-      ],
+
+    const jobDescriptionNameProps = getFieldProps('jd_name', {
+      rules: [{ required: true, message: language.JOB_DESCRIPTION_NAME_VALIDATE_MSG }]
     });
-    const jdContentProps = getFieldProps('jobDescriptionContent', {
-      rules: [
-        { required: true, message: 'Please input job description content.' },
-      ],
+
+    const jobDescriptionContentProps = getFieldProps('jd_description', {
+      rules: [{ required: true, message: language.JOB_DESCRIPTION_CONTENT_VALIDATE_MSG }]
     });
 
     return (
@@ -49,10 +49,9 @@ class CreateNewJobDescription extends Component {
       >
         <Form horizontal>
           <FormItem
-            id="companyName"
-            label="Company Name"
+            label={language.COMPANY_NAME}
           >
-            <Select {...companyProps}>
+            <Select {...companyNameProps}>
               {props.companyList.map(item => {
                 return (
                   <SelectOption
@@ -66,17 +65,15 @@ class CreateNewJobDescription extends Component {
             </Select>
           </FormItem>
           <FormItem
-            id="jobDescriptionName"
-            label="Job Description Project Name"
+            label={language.JOB_DESCRIPTION_NAME}
           >
-            <Input {...jdNameProps}/>
+            <Input {...jobDescriptionNameProps}/>
           </FormItem>
           <FormItem
-            id="jobDescriptionContent"
-            label="Job Description Content"
+            label={language.JOB_DESCRIPTION_CONTENT}
           >
             <Input
-              {...jdContentProps}
+              {...jobDescriptionContentProps}
               type="textarea"
               rows="4"
             />

@@ -49,7 +49,7 @@ def parse_return(res):
     if res[0] == 'success':
         return res[1]
     if res[0] == 'exception':
-        raise res[1][0], res[1][1], res[1][2]
+        raise res[1][1]
 
 
 def process_timeout_call(func, delay, kill=True, args=None, kwargs=None):
@@ -61,7 +61,7 @@ def process_timeout_call(func, delay, kill=True, args=None, kwargs=None):
             queue.put(('success', result))
         except:
             e = sys.exc_info()
-            queue.put(('exception', e[0:1]))
+            queue.put(('exception', e[0:2]))
 
     if args is None:
         if kwargs is None:

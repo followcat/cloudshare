@@ -58,6 +58,12 @@ class Project(services.base.service.Service):
     def getclassify(self):
         return self.config['classify']
 
+    def getindustry(self):
+        result = dict()
+        for each in self.config['classify']:
+            result.update({each: sources.industry_id.sources[each]})
+        return result
+
     def cv_add(self, cvobj, committer=None, unique=True):
         return self.curriculumvitae.add(cvobj, committer, unique)
 
@@ -111,6 +117,19 @@ class Project(services.base.service.Service):
     def cv_timerange(self, start_y, start_m, start_d, end_y, end_m, end_d):
         return self.curriculumvitae.timerange(start_y, start_m, start_d,
                                               end_y, end_m, end_d)
+
+    def company_compare_excel(self, stream, committer):
+        outputs = list()
+        outputs.extend(self.corepo.compare_excel(stream, committer))
+        outputs.extend(self.company.compare_excel(stream, committer))
+        return outputs
+
+    def company_add_excel(self, items):
+        for item in items:
+            if item[0] == 'add':
+                self.corepo.add(*item[1])
+            elif item[0] == 'followup':
+                self.company.updateinfo(*item[1])
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         self.corepo.add(coobj, committer, unique, yamlfile, mdfile)

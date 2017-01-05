@@ -6,7 +6,7 @@ from flask.ext.restful import Resource
 import utils.builtin
 import core.basedata
 import extractor.information_explorer
-
+import json
 
 class CompanyAPI(Resource):
 
@@ -15,9 +15,15 @@ class CompanyAPI(Resource):
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('coname', location = 'json')
-        self.reqparse.add_argument('introduction', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('name', location = 'json')
+        self.reqparse.add_argument('product', location = 'json')
+        self.reqparse.add_argument('introduction', location = 'json')
+        self.reqparse.add_argument('conumber', location = 'json')
+        self.reqparse.add_argument('address', location = 'json')
+        self.reqparse.add_argument('email', location = 'json')
+        self.reqparse.add_argument('website', location = 'json')
+        self.reqparse.add_argument('district', location = 'json')
         super(CompanyAPI, self).__init__()
 
     def get(self, name):
@@ -29,22 +35,54 @@ class CompanyAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         project = args['project']
-        coname = args['coname']
+        coname = args['name']
         if args['introduction'] is None:
             args['introduction'] = str()
         metadata = extractor.information_explorer.catch_coinfo(name=coname, stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)
-        return { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
+        if result:
+            response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
+        else:
+            response = { 'code': 400, 'data': result, 'message': 'Create new company failed.' }
+        return response
 
+class CompanyAllAPI(Resource):
 
-class CompanyListAPI(Resource):
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(CompanyAllAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
+
+    def get(self):
+        project = self.svc_mult_cv.getproject(projectname)
+        return list(project.company.datas())
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        projectname = args['project']
+        current_page = args['current_page']
+        page_size = args['page_size']
+        project = self.svc_mult_cv.getproject(projectname)
+        data = []
+        ids = sorted(list(project.company.ids))
+        for id in ids[(current_page-1)*page_size : current_page*page_size]:
+            data.append(project.company.getyaml(id))
+        return { 'code': 200, 'data': data, 'total': len(ids) }
+
+#owner
+class CustomerListAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        super(CompanyListAPI, self).__init__()
+        super(CustomerListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
 
@@ -58,63 +96,45 @@ class CompanyListAPI(Resource):
             data.append(co)
         return { 'code': 200, 'data': data }
 
-
-class CompanyAllAPI(Resource):
+#create, delete
+class CustomerAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        super(CompanyAllAPI, self).__init__()
+        super(CustomerAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('begin', location = 'json')
-        self.reqparse.add_argument('lenght', location = 'json')
-
-    def get(self):
-        project = self.svc_mult_cv.getproject(projectname)
-        return list(project.company.datas())
+        self.reqparse.add_argument('id', location = 'json')
 
     def post(self):
-        args = self.reqparse.parse_args()
-        projectname = args['project']
-        begin = args['begin']
-        lenght = args['lenght']
-        project = self.svc_mult_cv.getproject(projectname)
-        data = []
-        ids = sorted(list(project.company.ids))
-        for id in ids[begin:begin+lenght]:
-            data.append(project.company.getyaml(id))
-        return { 'code': 200, 'data': data }
-
-
-class CompanyCustomerAPI(Resource):
-
-    decorators = [flask.ext.login.login_required]
-
-    def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        super(CompanyCustomerAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', location = 'json')
-
-    def post(self, id):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        id = args['id']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        result = project.company.addcustomer(id, user)
-        return { 'code': 200, 'result': result }
+        result = project.company.addcustomer(id, user.id)
+        if result:
+            response = { 'code': 200, 'message': 'Add customer success.' }
+        else:
+            response = { 'code': 400, 'message': 'Add customer fail.' }
+        return response
 
-    def delete(self, id):
+    def delete(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        id = args['id']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        result = project.company.deletecustomer(id, user)
-        return { 'code': 200, 'result': result }
+        result = project.company.deletecustomer(id, user.id)
+        if result:
+            response = { 'code': 200, 'message': 'Delete customer success.' }
+        else:
+            response = { 'code': 400, 'message': 'Delete customer fail.' }
+        return response
 
-
+#update info
 class CompanyInfoUpdateAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
@@ -123,37 +143,48 @@ class CompanyInfoUpdateAPI(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('key', type = str, location = 'json')
-        self.reqparse.add_argument('date', type = str, location = 'json')
-        self.reqparse.add_argument('value', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('id', location = 'json')
+        self.reqparse.add_argument('update_info', type= list, location = 'json')
+        self.reqparse.add_argument('date', location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('key', location = 'json')
+        self.reqparse.add_argument('value', location = 'json')
 
-    def put(self, id):
+    def put(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        key = args['key']
-        value = args['value']
+        id = args['id']
+        update_info = args['update_info']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        data = project.company.updateinfo(id, key, value, user)
-        if data is not None:
-            response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
+        data = dict()
+        for item in update_info:
+            try:
+                result = project.company.updateinfo(id, item['key'], item['value'], user.id)
+            except AssertionError:
+                continue
+            data.update(result)
+        if len(data) != 0:
+            response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
         else:
-            response = { 'code': 400, 'message': 'Delete information error.'}
+            response = { 'code': 400, 'message': 'Update information error.' }
+        return response
 
-    def delete(self, id):
+    def delete(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
+        id = args['id']
         key = args['key']
         date = args['date']
         value = args['value']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        data = project.company.deleteinfo(id, key, value, user, date)
+        data = project.company.deleteinfo(id, key, value, user.id, date)
         if data is not None:
             response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
         else:
             response = { 'code': 400, 'message': 'Delete information error.'}
+        return response
 
 
 class SearchCObyTextAPI(Resource):
@@ -166,38 +197,82 @@ class SearchCObyTextAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
-        cur_page = args['page']
+        cur_page = args['current_page']
+        page_size = args['page_size']
         text = args['search_text']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         results = project.company.search(text)
         yaml_results = project.company.search_yaml(text)
         results.update(yaml_results)
-        count = 20
-        datas, pages = self.paginate(project.company, list(results), cur_page, count)
+        datas, pages, total = self.paginate(project.company, list(results), cur_page, page_size)
         return {
             'code': 200,
-            'data': {
-                'keyword': text,
-                'datas': datas,
-                'pages': pages,
-                'totals': len(results),
-            }
+            'data': datas,
+            'keyword': text,
+            'pages': pages,
+            'total': total
         }
 
     def paginate(self, svc_co, results, cur_page, eve_count):
         if not cur_page:
             cur_page = 1
-        sum = len(results)
-        if sum%eve_count != 0:
-            pages = sum/eve_count + 1
+        total = len(results)
+        if total%eve_count != 0:
+            pages = total/eve_count + 1
         else:
-            pages = sum/eve_count
+            pages = total/eve_count
         datas = []
         for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            datas.append({ 'cv_id': id, 'yaml_info': svc_co.getyaml(id) })
-        return datas, pages
+            datas.append(svc_co.getyaml(id))
+        return datas, pages, total
+
+
+class CompanyUploadExcelAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(CompanyUploadExcelAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('files', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = flask.ext.login.current_user
+        project_name = args['project']
+        network_file = flask.request.files['files']
+        project = self.svc_mult_cv.getproject(project_name)
+        datas = project.company_compare_excel(network_file.read(), committer=user.id)
+        return {
+            'code': 200,
+            'data': datas
+        }
+
+
+class CompanyConfirmExcelAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(CompanyConfirmExcelAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('data', location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def post(self):
+        datas = args['data']
+        project_name = args['project']
+        project = self.svc_mult_cv.getproject(project_name)
+        project.company_add_excel(datas)
+        return {
+            'code': 200
+        }

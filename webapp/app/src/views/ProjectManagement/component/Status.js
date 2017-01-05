@@ -1,6 +1,8 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+
 import { Select } from 'antd';
+
 const Option = Select.Option;
 
 class Status extends Component {
@@ -8,7 +10,11 @@ class Status extends Component {
     const props = this.props;
 
     return (
-      <div style={props.style}>
+      <div
+        className="cs-status-selection"
+        style={props.style}
+      >
+        <label className="cs-status-selection-label">{props.statusLabel}</label>
         <Select
           defaultValue={props.defaultValue}
           style={{ width: props.width }}
@@ -32,14 +38,16 @@ class Status extends Component {
 
 Status.defaultProps = {
   dataSource: [],
+  statusLabel: ''
 };
 
 Status.propTypes = {
   style: PropTypes.object,
+  statusLabel: PropTypes.string,
   dataSource: PropTypes.arrayOf(PropTypes.shape({
     text: PropTypes.string,
-    value: PropTypes.string,
-  })),
+    value: PropTypes.string
+  }))
 };
 
 export default Status;

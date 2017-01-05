@@ -24,16 +24,19 @@ def initialize(app):
 
     api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyAllAPI, '/api/companyall', endpoint = 'companyall')
-    api.add_resource(CompanyListAPI, '/api/companylist', endpoint = 'companylist')
+    api.add_resource(CompanyUploadExcelAPI, '/api/couploadexcel',
+                     endpoint = 'couploadexcel')
+    api.add_resource(CompanyConfirmExcelAPI, '/api/coconfirmexcel',
+                     endpoint = 'coconfirmexcel')
+    api.add_resource(CustomerListAPI, '/api/customerlist', endpoint = 'customerlist')
     api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
-    api.add_resource(CompanyCustomerAPI, '/api/companycustomer/<string:id>',
-                     endpoint = 'companycustomer')
-    api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate/<string:id>',
+    api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
+    api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate',
                      endpoint = 'companyinfoupdate')
 
     api.add_resource(JobDescriptionUploadAPI, '/api/uploadjd',
                      endpoint = 'jobdescriptionupload')
-    api.add_resource(JobDescriptionAPI, '/api/jd/<string:id>',
+    api.add_resource(JobDescriptionAPI, '/api/jd',
                      endpoint = 'jobdescription')
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
                      endpoint = 'jobdescriptionlist')
@@ -81,3 +84,4 @@ def initialize(app):
     api.add_resource(DBNumberAPI, '/api/dbnumber/<string:name>', endpoint = 'dbnumber')
     api.add_resource(DBNumbersAPI, '/api/dbnumbers', endpoint = 'dbnumbers')
     api.add_resource(ClassifyAPI, '/api/classify', endpoint = 'classify')
+    api.add_resource(IndustryAPI, '/api/industry', endpoint = 'industry')

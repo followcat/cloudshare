@@ -1,7 +1,11 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Row, Col, Form, Select, Input, Checkbox, Button } from 'antd';
+import { Row, Col, Form, Select, Input, Checkbox, Button, DatePicker } from 'antd';
+
+const RangePicker = DatePicker.RangePicker,
+      Option = Select.Option,
+      OptGroup = Select.OptGroup;
 
 class FilterForm extends Component {
 
@@ -12,6 +16,7 @@ class FilterForm extends Component {
       gender: [],
       education: [],
       maritalStatus: [],
+      date: [],
     };
 
     this.handleGenderChange = this.handleGenderChange.bind(this);
@@ -19,6 +24,9 @@ class FilterForm extends Component {
     this.handleMaritalStatusChange = this.handleMaritalStatusChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleReset = this.handleReset.bind(this);
+    this.handleRangePickerChange = this.handleRangePickerChange.bind(this);
+    this.disabledDate = this.disabledDate.bind(this);
+    this.renderIndustry = this.renderIndustry.bind(this);
   }
 
   handleGenderChange(values) {
@@ -48,6 +56,7 @@ class FilterForm extends Component {
         gender: this.state.gender,
         education: this.state.education,
         marital_status: this.state.maritalStatus,
+        date: this.state.date,
       });
       this.props.onSearch(formValues);
     });
@@ -56,6 +65,31 @@ class FilterForm extends Component {
   handleReset(e) {
     e.preventDefault();
     this.props.form.resetFields();
+  }
+
+  handleRangePickerChange(value, dateString) {
+    this.setState({
+      date: dateString
+    });
+  }
+
+  disabledDate(current) {
+    return current && current.getTime() > Date.now();
+  }
+
+  renderIndustry() {
+    const industry = this.props.industry;
+    let optGroup = [];
+
+    for (let key in industry) {
+      optGroup.push(
+        <OptGroup key={key} label={key}>
+          {industry[key].map(item => <Option key={item} value={item}>{item}</Option>)}
+        </OptGroup>
+      );
+    }
+
+    return optGroup;
   }
 
   render() {
@@ -97,12 +131,12 @@ class FilterForm extends Component {
               </Form.Item>
             </Col>
           </Row> : ''}
-        <Row>
-          <Col>
+        <Row gutter={8}>
+          <Col span={12}>
             <Form.Item
               label="Classify"
-              labelCol={{ span: 3 }}
-              wrapperCol={{ span: 8 }}
+              labelCol={{ span: 6 }}
+              wrapperCol={{ span: 18 }}
             >
               <Select
                 {...getFieldProps('uses', {
@@ -113,9 +147,23 @@ class FilterForm extends Component {
                 multiple
               >
                 {this.props.classify.map((item, index) => {
-                  return <Select.Option key={index} value={item} >{item}</Select.Option>
+                  return <Option key={index} value={item} >{item}</Option>
                 })}
               </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Date"
+              labelCol={{ span: 8}}
+              wrapperCol={{ span: 16 }}
+            >
+              <RangePicker
+                {...getFieldProps('date')}
+                value={this.state.date}
+                disabledDate={this.disabledDate}
+                onChange={this.handleRangePickerChange}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -176,9 +224,13 @@ class FilterForm extends Component {
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <Input
+              <Select
                 {...getFieldProps('business')}
-              />
+                showSearch={true}
+                multiple={true}
+              >
+                {this.renderIndustry()}
+              </Select>
             </Form.Item>
           </Col>
         </Row>

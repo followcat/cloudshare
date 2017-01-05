@@ -14,6 +14,9 @@ import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
 import queryString from '../utils/query_string';
 import { API } from '../config/api';
+
+import { getIndustry } from '../request/classify';
+
 import './fastmatching.less';
 
 export default class FastMatching extends Component {
@@ -23,6 +26,7 @@ export default class FastMatching extends Component {
     this.state = {
       id: '',
       classify: [],
+      industry: {},
       searchResultDataSource: [],
       pages: 0,
       total: 0,
@@ -37,6 +41,7 @@ export default class FastMatching extends Component {
     };
 
     this.loadClassifyData = this.loadClassifyData.bind(this);
+    this.loadIndustry = this.loadIndustry.bind(this);
     this.loadResultData = this.loadResultData.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
@@ -64,6 +69,16 @@ export default class FastMatching extends Component {
         });
       }
     })
+  }
+
+  loadIndustry() {
+    getIndustry(json => {
+      if (json.code === 200) {
+        this.setState({
+          industry: json.data
+        });
+      }
+    });
   }
 
   /**
@@ -216,6 +231,7 @@ export default class FastMatching extends Component {
     let postAPI;
 
     this.loadClassifyData();
+    this.loadIndustry();
 
     if (jd_id) {
       postAPI = API.LSI_BY_JD_ID_API;
@@ -248,6 +264,7 @@ export default class FastMatching extends Component {
         <FilterBox
           textarea={this.state.textarea}
           classify={this.state.classify}
+          industry={this.state.industry}
           visible={this.state.visible}
           total={this.state.total}
           onSearch={this.handleSearch}

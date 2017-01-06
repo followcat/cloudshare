@@ -104,6 +104,7 @@ class DetailInformation extends Component {
         loading={false}
         title={title}
         extra={this.renderExtra()}
+        className={this.props.prefixCls}
       >
         {rows.map(v => {
           return (
@@ -121,6 +122,7 @@ class DetailInformation extends Component {
 }
 
 DetailInformation.defaultProps = {
+  prefixCls: 'cs-details-card',
   title: '',
   rows: [],
   dataSource: {},

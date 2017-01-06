@@ -134,14 +134,21 @@ def repl_web(m):
     else:
         return '\n'
 
-def silencer(document, cutservice=None, id=None):
-    if (cutservice and id) and cutservice.exists(id):
-        return cutservice.getyaml(id)['words']
+def simple_cut_word(document, cutservice=None, id=None):
     text = document
     text = re_sub(LINE, ' ', text)
     text = re_sub(WEB, repl_web, text)
     text = re_sub(SYMBOL, ' ', text)
+    if cutservice and id and cutservice.exists(id):
+        return cutservice.getyaml(id)['words']
     words = jieba_cut(text, pos=True)
+    if cutservice and id:
+        cutobj = core.basedata.DataObject(metadata={'id': id, 'words': words},
+                                      data=None)
+    return words
+
+def silencer(document, cutservice=None, id=None):
+    words = simple_cut_word(document, cutservice, id)
     words = pos_extract(words, FLAGS)
     result = []
     for word in words:
@@ -157,10 +164,6 @@ def silencer(document, cutservice=None, id=None):
             continue
         word = word.lower()
         result.append(word)
-    if cutservice and id:
-        cutobj = core.basedata.DataObject(metadata={'id': id, 'words': result},
-                                          data=None)
-        cutservice.add(cutobj)
     return result
 
 def cut_word(document):

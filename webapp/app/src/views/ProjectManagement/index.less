@@ -41,8 +41,59 @@ body {
 }
 
 .cs-item-row {
-  line-height: 24px;
   margin-bottom: 8px;
+  overflow: hidden;
+
+  &-label {
+    position: relative;
+    display: block;
+    width: 18%;
+    text-align: right;
+    float: left;
+    font-weight: 700;
+
+    &:after {
+      content: ':';
+    }
+  }
+
+  &-content {
+    position: relative;
+    display: block;
+    width: 77.999%;
+    margin-left: 4%;
+    float: left;
+
+    &-text {
+      display: inline-block;
+      width: 100%;
+    }
+
+    .ommit {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    
+    .edit-icon-hide {
+      display: none;
+    }
+
+    .edit-icon-show {
+      position: absolute;
+      display: inline-block;
+      bottom: 8px;
+      right: 0;
+
+      &:hover {
+        color: #337ab7;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
 
   .mg-bottom {
     margin-bottom: 8px;
@@ -62,6 +113,95 @@ body {
     .editing-showed {
       display: 'block' !important;
     }
+  }
+}
+
+.visiting-label {
+  width: 4.499% !important;
+}
+
+.visiting-content {
+  margin-left: 2.499% !important;
+  width: 91% !important;
+
+  ul {
+    list-style: initial;
+  }
+
+  .visiting-item {
+    display: list-item;
+
+    .visiting-author {
+      padding: 0 16px;
+    
+    }
+    .visiting-detail {
+      padding-right: 16px;
+    }
+  }
+  
+  .visiting-item-hide {
+    display: none;
+  }
+
+  .visiting-opearator {
+    width: 40%;
+
+    .visiting-form {
+      & > button {
+        display: inline-block;
+        margin-left: 8px;
+      }
+    }
+  }
+}
+
+.cs-input-group {
+  input {
+    display: inline-block;
+    width: 99.999%;
+  }
+
+  .cs-button-group {
+    display: inline-block;
+    margin-top: 8px;
+
+    button {
+      margin-left: 4px;
+    }
+  }
+}
+
+.cs-card-inner {
+  .cs-card-inner-top {
+    padding-bottom: 16px;
+
+    &-col {
+      display: inline-block;
+      width: 16.999%;
+      margin-left: 16px;
+    }
+
+    &-col:first-of-type {
+      margin-left: 0 !important;
+    }
+  }
+
+  .cs-card-inner-bottom {
+    padding: 16px 0;
+    overflow: hidden;
+
+    .ant-pagination {
+      float: right;
+    }
+  }
+}
+
+.cs-additional-input-group {
+  padding: 8px 0;
+
+  & > button {
+    margin-top: 8px;
   }
 }
 

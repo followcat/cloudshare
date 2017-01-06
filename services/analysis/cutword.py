@@ -2,6 +2,8 @@ import os
 import ujson
 import hashlib
 
+import jieba.posseg
+
 import core.outputstorage
 import services.base.storage
 
@@ -38,17 +40,29 @@ class Cutword(services.base.storage.BaseStorage):
         except IOError:
             return False
 
+    def encode(self, info):
+        encode_info = []
+        for data in info:
+            word, flag = data[0], data[1]
+            encode_info.append(jieba.posseg.pair(word, flag))
+        return encode_info
+
     def getyaml(self, id):
         name = core.outputstorage.ConvertName(id).yaml
         yaml_str = self.interface.get(name)
-        return ujson.loads(yaml_str)
+        raw = ujson.loads(yaml_str)
+        data = dict(raw)
+        for key, info in raw['words'].items():
+            data['words'][key] = self.encode(info)
+        return data
 
     def getwords(self, id, text):
         checksum = self.getchecksum(text)
         name = core.outputstorage.ConvertName(id).yaml
         yaml_str = self.interface.get(name)
-        info = ujson.loads(yaml_str)
-        return info['words'][checksum]
+        raw = ujson.loads(yaml_str)
+        info = self.encode(raw['words'][checksum])
+        return info
 
     def add(self, docobj, committer=None, unique=True, yamlfile=True):
         name = core.outputstorage.ConvertName(docobj.name)

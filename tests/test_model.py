@@ -58,7 +58,9 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
     elif percentage == BAD:
         result = success_count == 0 or above_allow
     elif 0 < percentage < 100:
-        result = len(cvs)*float(percentage)/100 <= success_count and (success_count < len(cvs) or above_allow)
+        matching_num = len(cvs)*float(percentage)/100
+        better = matching_num + 1
+        result = matching_num <= success_count and (success_count < better or above_allow)
     return result
 
 kgr_perfect = functools.partial(kgr_percentage, percentage=PERFECT)

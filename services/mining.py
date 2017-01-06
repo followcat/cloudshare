@@ -4,6 +4,7 @@ import re
 
 import core.basedata
 import core.mining.lsimodel
+import core.mining.word2vec
 import core.mining.lsisimilarity
 
 from utils.builtin import jieba_cut, pos_extract, industrytopath
@@ -172,6 +173,20 @@ def silencer(document, cutservice=None, id=None):
         cutservice.add(cutobj)
     return result
 
+def cut_word(document):
+    if isinstance(document, list):
+        texts = document
+    else:
+        texts = [document]
+    re_words = []
+    for text in texts:
+        words = jieba_cut(text, pos=True)
+        re_words.append(pos_extract(words, [u'ns', u'x', u'm']))
+    if isinstance(document, list):
+        result = re_words
+    else:
+        result = re_words[0]
+    return result
 
 class Mining(object):
 
@@ -196,6 +211,7 @@ class Mining(object):
         else:
             self.slicer = slicer
         self.make_lsi()
+        self.make_word2vec()
 
     def setup(self, modelnames=None):
         assert self.lsi_model
@@ -236,6 +252,22 @@ class Mining(object):
                         lsi.save()
             self.lsi_model[project.name] = lsi
 
+    def make_word2vec(self):
+        self.word2vec_model = dict()
+        for project in self.projects.values():
+            service = project.curriculumvitae
+            word2vec_path = os.path.join(self.path, project.name, 'word2vec')
+            word2vec = core.mining.word2vec.Doc2Vecmodel(word2vec_path,
+                                                         slicer=cut_word,
+                                                         config=project.config)
+            try:
+                word2vec.load()
+            except IOError:
+                if word2vec.getconfig('autosetup') is True:
+                    if word2vec.build([service]):
+                        word2vec.save()
+            self.word2vec_model[project.name] = word2vec
+
     def update_model(self):
         for modelname in self.lsi_model:
             lsimodel = self.lsi_model[modelname]
@@ -273,6 +305,11 @@ class Mining(object):
                 result = probability
                 break
         return result
+
+    def similar_words(self, basemodel, doc, num_words=5):
+        word2vec = self.word2vec_model[basemodel]
+        words = word2vec.most_similar(doc, num_words)
+        return words
 
     def lenght(self, basemodel, uses=None):
         if uses is None:

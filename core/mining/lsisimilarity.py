@@ -119,7 +119,7 @@ class LSIsimilarity(object):
             >>> assert kgr_perfect('d652742841a211e68dc34ccc6a30cd76', jd_service, sim)
             >>> assert kgr_perfect('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
             >>> assert kgr_good('9b48f97653e811e6af534ccc6a30cd76', jd_service, sim)
-            >>> assert kgr_good('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim)
+            >>> assert kgr_perfect('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim)
             >>> assert kgr_poor('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim)
             >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=int(float(2)/3*100))
             >>> assert kgr_poor('80ce049a320711e6ac1f4ccc6a30cd76', jd_service, sim)
@@ -156,7 +156,7 @@ class LSIsimilarity(object):
             >>> assert kgr_bad('ae31247274c811e6b6b54ccc6a30cd76', jd_service, sim, cvs=['2sh48rjp'])
             >>> assert kgr_bad('5b2f8548320611e6b4e84ccc6a30cd76', jd_service, sim, cvs=['cfimev64', 'ko5luqyi', '0x4zpslk'])
             >>> assert kgr_bad('5b2f8548320611e6b4e84ccc6a30cd76', jd_service, sim, cvs=['cfimev64', 'ko5luqyi', '0x4zpslk'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]})
-            >>> assert kgr_percentage('78df9d86555f11e6abad4ccc6a30cd76', jd_service, sim, cvs=['5ziy6c80', '6y0a1a75', '80clrjqi', 'rlb3jau0', 'sbip7deq', 'uwbvmsod', '68oojytn'], percentage=int(float(1)/7*100))
+            >>> assert kgr_percentage('78df9d86555f11e6abad4ccc6a30cd76', jd_service, sim, cvs=['5ziy6c80', '6y0a1a75', '80clrjqi', 'rlb3jau0', 'sbip7deq', 'uwbvmsod', '68oojytn'], percentage=int(float(2)/7*100))
             >>> assert kgr_percentage('78df9d86555f11e6abad4ccc6a30cd76', jd_service, sim, cvs=['5ziy6c80', '6y0a1a75', '80clrjqi', 'rlb3jau0', 'sbip7deq', 'uwbvmsod', '68oojytn'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=int(float(2)/7*100))
             >>> assert kgr_bad('80ce049a320711e6ac1f4ccc6a30cd76', jd_service, sim, cvs=['nvujsh0u'])
             >>> assert kgr_bad('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'])
@@ -165,13 +165,13 @@ class LSIsimilarity(object):
 
         IBA new:
             >>> assert kgr_bad('4f2d032e53e911e685e24ccc6a30cd76', jd_service, sim, cvs=['X4dy5bzu', 'x4dy5bzu', 'i1xm7sml'])
-            >>> assert kgr_bad('86119050313711e69b804ccc6a30cd76', jd_service, sim, cvs=['dpaxyqns', 'kf9sxzox', '5o4tiazc', 'n2ae2kyt', 'hieheubl', 'jc496tc2', 'hieheubl', 'rzcqg8m3'])
+            >>> assert kgr_percentage('86119050313711e69b804ccc6a30cd76', jd_service, sim, cvs=['dpaxyqns', 'kf9sxzox', '5o4tiazc', 'n2ae2kyt', 'jc496tc2', 'hieheubl', 'rzcqg8m3'], percentage=int(float(1)/7*100))
             >>> assert kgr_percentage('9b48f97653e811e6af534ccc6a30cd76', jd_service, sim, cvs=['6r03u6so', '8fq1dwq3', 'dg2n5hqa'], percentage=int(float(1)/3*100))
             >>> assert kgr_bad('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, cvs=['cn1rg3mo', 'ienforp4', 'ju9vljdd'])
             >>> assert kgr_bad('e3bd422a2d6411e6b5296c3be51cefca', jd_service, sim, cvs=['qsfmtebc'])
-            >>> assert kgr_bad('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim, cvs=['fv51hvdy', 'je7d0xeg', 'v0gcrsow', 'sjk41azl', 'f280mmdm', 'cla50bo5'])
+            >>> assert kgr_percentage('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim, cvs=['fv51hvdy', 'je7d0xeg', 'v0gcrsow', 'sjk41azl', 'f280mmdm', 'cla50bo5'], percentage=int(float(1)/6*100))
             >>> count_in[0] - origin
-            44
+            48
         """
         if top is None:
             top = len(self.index)

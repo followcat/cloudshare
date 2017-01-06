@@ -137,36 +137,26 @@ def repl_web(m):
 def silencer(document, cutservice=None, id=None):
     if (cutservice and id) and cutservice.exists(id):
         return cutservice.getyaml(id)['words']
-    if isinstance(document, list):
-        texts = document
-    else:
-        texts = [document]
-    selected_texts = []
-    for text in texts:
-        text = re_sub(LINE, ' ', text)
-        text = re_sub(WEB, repl_web, text)
-        text = re_sub(SYMBOL, ' ', text)
-        words = jieba_cut(text, pos=True)
-        words = pos_extract(words, FLAGS)
-        out = []
-        for word in words:
-            if REJECT.match(word):
-                continue
-            if word.istitle():
-                # Can make it match SHORT later for skip (eg 'Ltd' ...)
-                word = word.lower()
-            if SHORT.match(word):
-                continue
-                # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
-            if len(word) == 1:
-                continue
+    text = document
+    text = re_sub(LINE, ' ', text)
+    text = re_sub(WEB, repl_web, text)
+    text = re_sub(SYMBOL, ' ', text)
+    words = jieba_cut(text, pos=True)
+    words = pos_extract(words, FLAGS)
+    result = []
+    for word in words:
+        if REJECT.match(word):
+            continue
+        if word.istitle():
+            # Can make it match SHORT later for skip (eg 'Ltd' ...)
             word = word.lower()
-            out.append(word)
-        selected_texts.append(out)
-    if isinstance(document, list):
-        result = selected_texts
-    else:
-        result = selected_texts[0]
+        if SHORT.match(word):
+            continue
+            # Even out tools and brands (eg 'CLEARCASE' vs 'clearcase')
+        if len(word) == 1:
+            continue
+        word = word.lower()
+        result.append(word)
     if cutservice and id:
         cutobj = core.basedata.DataObject(metadata={'id': id, 'words': result},
                                           data=None)
@@ -174,19 +164,9 @@ def silencer(document, cutservice=None, id=None):
     return result
 
 def cut_word(document):
-    if isinstance(document, list):
-        texts = document
-    else:
-        texts = [document]
-    re_words = []
-    for text in texts:
-        words = jieba_cut(text, pos=True)
-        re_words.append(pos_extract(words, [u'ns', u'x', u'm']))
-    if isinstance(document, list):
-        result = re_words
-    else:
-        result = re_words[0]
-    return result
+    words = jieba_cut(document, pos=True)
+    words = pos_extract(words, [u'ns', u'x', u'm'])
+    return words
 
 class Mining(object):
 

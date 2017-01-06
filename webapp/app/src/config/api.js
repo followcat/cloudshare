@@ -41,6 +41,8 @@ export const API = {
 
   UPLOAD_ENGLISH_RESUME_API: `${HOST}/api/uploadengcv`,
 
+  UPLOAD_EXCEL_API: `${HOST}/api/couploadexcel`,
+
   BOOKMARK_API: `bookmark`,  // {host}/api/accounts/{id}/bookmark
 
   UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}

@@ -73,6 +73,7 @@ class EnhancedInput extends Component {
             onChange={this.handleInputChange}
             onFocus={this.handleFocusBlur}
             onBlur={this.handleFocusBlur}
+            onKeyPress={this.handleBtnClick}
             onPressEnter={this.handleSearch}
             size={props.size || 'default'}
           />

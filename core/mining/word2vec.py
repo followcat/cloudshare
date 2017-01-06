@@ -135,7 +135,10 @@ class Doc2Vecmodel(object):
         words = self.slicer(doc)
         for word in words:
             re_words.append(word)
-            re_words.extend([w[0] for w in self.word2vec.most_similar(word, topn=num_words)])
+            try:
+                re_words.extend([w[0] for w in self.word2vec.most_similar(word, topn=num_words)])
+            except KeyError:
+                continue
         return re_words
 
     @property

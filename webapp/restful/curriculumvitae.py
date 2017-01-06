@@ -47,7 +47,6 @@ class UpdateCurrivulumvitaeInformation(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('date', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('update_info', type = dict, location = 'json')
 
@@ -64,24 +63,6 @@ class UpdateCurrivulumvitaeInformation(Resource):
                 response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
             else:
                 response = { 'code': 400, 'message': 'Update information error.'}
-                break
-        return response
-
-    def delete(self):
-        args = self.reqparse.parse_args()
-        user = flask.ext.login.current_user
-        id = args['id']
-        date = args['date']
-        project = args['project']
-        update_info = args['update_info']
-
-        for key, value in update_info.iteritems():
-            data = self.svc_mult_cv.getproject(project).cv_deleteyaml(id, key, value,
-                                                                      user.id, date)
-            if data is not None:
-                response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
-            else:
-                response = { 'code': 400, 'message': 'Delete information error.'}
                 break
         return response
 

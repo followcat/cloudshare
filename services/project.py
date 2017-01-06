@@ -112,9 +112,6 @@ class Project(services.base.service.Service):
             pass
         return result
 
-    def cv_deleteyaml(self, id, key, value, userid, date):
-        return self.curriculumvitae.deleteinfo(id, key, value, userid, date)
-
     def cv_ids(self):
         return self.curriculumvitae.ids
 
@@ -170,6 +167,17 @@ class Project(services.base.service.Service):
 
     def peo_getyaml(self, id):
         return self.people.getyaml(id)
+
+    def peo_updateyaml(self, id, key, value, userid):
+        result = None
+        try:
+            result = self.people.updateinfo(id, key, value, userid)
+        except AssertionError:
+            pass
+        return result
+
+    def peo_deleteyaml(self, id, key, value, userid, date):
+        return self.people.deleteinfo(id, key, value, userid, date)
 
     def backup(self, path, bare=True):
         project_path = os.path.join(path, 'project')

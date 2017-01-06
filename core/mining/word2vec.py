@@ -15,7 +15,7 @@ class Doc2Vecmodel(object):
     texts_save_name = 'word2vec.texts'
 
 
-    def __init__(self, savepath, size=100, sample=0, window=6, iter=1, workers=1, slicer=None, config=None):
+    def __init__(self, savepath, size=100, sample=0, window=6, iter=1, workers=0, slicer=None, config=None):
         if config is None:
             config = {}
         self.path = savepath

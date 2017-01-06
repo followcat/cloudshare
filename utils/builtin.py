@@ -80,7 +80,7 @@ def jieba_cut(text, pos=False, HMM=True):
         及/c
         仪器/n
         >>> s = '有较强的自学能力'
-        >>> words = list(jieba_cut(s))
+        >>> words = jieba_cut(s)
         >>> for _w in words:     
         ...     print(_w.encode('utf-8'))
         有
@@ -88,7 +88,7 @@ def jieba_cut(text, pos=False, HMM=True):
         强
         的
         自学能力
-        >>> words = list(jieba_cut(s, pos=True))
+        >>> words = jieba_cut(s, pos=True)
         >>> for _w in words:
         ...     print(_w.encode('utf-8'))
         有/v
@@ -97,8 +97,8 @@ def jieba_cut(text, pos=False, HMM=True):
         自学能力/l
     """
     if pos:
-        return jieba.posseg.cut(text, HMM=HMM)
-    return jieba.cut(text, HMM=HMM)
+        return list(jieba.posseg.cut(text, HMM=HMM))
+    return list(jieba.cut(text, HMM=HMM))
 
 def pos_extract(words, flags):
     """

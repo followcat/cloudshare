@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import math
 import ujson
 
 import jieba.posseg
@@ -100,7 +99,7 @@ class Doc2Vecmodel(object):
 
     def setup(self, names, texts):
         self.names = names
-        self.sentences = self.slicer(texts)
+        self.texts = self.slicer(texts)
         self.set_word2vec_model()
 
     def getconfig(self, param):
@@ -124,7 +123,7 @@ class Doc2Vecmodel(object):
         self.word2vec = Word2Vec.load(os.path.join(self.path, self.model_save_name))
 
     def set_word2vec_model(self):
-        self.word2vec = Word2Vec(self.sentences,
+        self.word2vec = Word2Vec(self.texts,
                           size=self.size,
                           window=self.window,
                           min_count=0,

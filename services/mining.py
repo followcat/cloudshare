@@ -134,8 +134,8 @@ def repl_web(m):
         return '\n'
 
 def silencer(document, cutservice=None, id=None):
-    if (cutservice and id) and cutservice.exists(id):
-        return cutservice.getyaml(id)['words']
+    if (cutservice and id) and cutservice.existswords(id, document):
+        return cutservice.getwords(id, document)
     if isinstance(document, list):
         texts = document
     else:
@@ -168,7 +168,7 @@ def silencer(document, cutservice=None, id=None):
         result = selected_texts[0]
     if cutservice and id:
         cutobj = core.basedata.DataObject(metadata={'id': id, 'words': result},
-                                          data=None)
+                                          data=texts[0])
         cutservice.add(cutobj)
     return result
 

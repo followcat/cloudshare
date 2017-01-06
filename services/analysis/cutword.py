@@ -76,7 +76,7 @@ class Cutword(services.base.storage.BaseStorage):
             self.interface.add(name.yaml, ujson.dumps(info, ensure_ascii=False),
                                message=message, committer=committer)
         else:
-            info = getyaml(docobj.metadata['id'])
+            info = self.getyaml(docobj.metadata['id'])
             info['words'][checksum] = docobj.metadata['words']
             self.interface.modify(name.yaml, ujson.dumps(info, ensure_ascii=False),
                                message=message, committer=committer)

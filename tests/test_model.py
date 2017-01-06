@@ -80,8 +80,16 @@ def ranks(jd_id, jd_service, sim, cvs=None, index_service=None,
             filterdict=None):
     if cvs is None:
         cvs = datas[jd_id]
-    job_desc = jd_service.get(jd_id)['description']
-    score_board = sim.probability(job_desc)
+    jd = jd_service.get(jd_id)
+    doc = jd['description']
+    jd_title = jd['name']
+    num_words = 2000/len(doc)
+    if num_words < 5:
+        num_words = 5
+    if num_words > 20:
+        num_words = 20
+    doc += ' '.join(SVC_MIN.similar_words('medical', jd_title, num_words))
+    score_board = sim.probability(doc)
     if index_service is not None and filterdict is not None:
         filteset = index_service.get(filterdict)
         score_board = filter(lambda x: os.path.splitext(x[0])[0] in filteset,

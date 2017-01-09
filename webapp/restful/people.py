@@ -15,6 +15,7 @@ class PeopleAPI(Resource):
         self.reqparse.add_argument('date', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('unique_id', type = str, location = 'json')
+        self.reqparse.add_argument('update_info', type = dict, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()

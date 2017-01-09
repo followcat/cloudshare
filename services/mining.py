@@ -258,6 +258,11 @@ class Mining(object):
             self.word2vec_model[project.name] = word2vec
 
     def update_model(self):
+        for modelname in self.word2vec_model:
+            word2vec = self.word2vec_model[modelname]
+            if word2vec.getconfig('autoupdate'):
+                self.word2vec_model[modelname].update(
+                    [self.services['default'][modelname]])
         for modelname in self.lsi_model:
             lsimodel = self.lsi_model[modelname]
             if lsimodel.getconfig('autoupdate') is True:

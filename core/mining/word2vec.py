@@ -43,13 +43,17 @@ class Doc2Vecmodel(object):
 
     def update(self, svccv_list):
         added = False
+        add_texts = []
         for svc_cv in svccv_list:
             for name in svc_cv.names():
                 if name not in self.names:
                     doc = svc_cv.getmd(name)
-                    self.add(name, doc)
+                    self.names.append(name)
+                    self.texts.append(doc)
+                    add_texts.append(self.slicer(doc, id=name))
                     added = True
         if added:
+            self.word2vec.train(add_texts)
             self.save()
         return added
 

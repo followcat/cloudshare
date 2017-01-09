@@ -3,6 +3,7 @@ import time
 import os.path
 import datetime
 
+import core.exception
 import core.docprocessor
 import core.outputstorage
 import services.base.storage
@@ -78,7 +79,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
     def add(self, bsobj, committer=None, unique=True,
             yamlfile=True, mdfile=True, contacts=True):
         if contacts and not bsobj.metadata['email'] and not bsobj.metadata['phone']:
-            return False
+            raise core.exception.NotExistsContactException
         return super(CurriculumVitae, self).add(bsobj, committer, unique,
                                                 yamlfile, mdfile)
 

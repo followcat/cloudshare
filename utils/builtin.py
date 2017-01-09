@@ -61,7 +61,7 @@ def strftime(t, format='%Y-%m-%d %H:%M:%S'):
     return time.strftime(format, time.localtime(t))
 
 
-def jieba_cut(text, pos=False, HMM=True):
+def jieba_cut(text, pos=False, HMM=True, no_symbol=True):
     """
         >>> from utils.builtin import jieba_cut
         >>> s = "测试计量技术及仪器"
@@ -72,6 +72,13 @@ def jieba_cut(text, pos=False, HMM=True):
         技术
         及
         仪器
+        >>> for _w in jieba_cut(s, pos=True):
+        ...     print(_w.encode('utf-8'))
+        测试/vn
+        计量/n
+        技术/n
+        及/c
+        仪器/n
         >>> for _w in jieba_cut(s, pos=True):
         ...     print(_w.encode('utf-8'))
         测试/vn
@@ -97,7 +104,10 @@ def jieba_cut(text, pos=False, HMM=True):
         自学能力/l
     """
     if pos:
-        return list(jieba.posseg.cut(text, HMM=HMM))
+        if no_symbol:
+            return [w for w in jieba.posseg.cut(text, HMM=HMM) if w.flag not in [u'x']]
+        else:
+            return list(jieba.posseg.cut(text, HMM=HMM))
     return list(jieba.cut(text, HMM=HMM))
 
 def pos_extract(words, flags):
@@ -105,7 +115,7 @@ def pos_extract(words, flags):
         >>> from services.mining import FLAGS
         >>> from utils.builtin import jieba_cut, pos_extract
         >>> s = "◆负责产品环境、电磁兼容、可靠性、安规等测试；"
-        >>> words = list(jieba_cut(s, pos=True))
+        >>> words = list(jieba_cut(s, pos=True, no_symbol=False))
         >>> for _w in words:
         ...     print(_w.encode('utf-8'))
         ◆/x
@@ -131,7 +141,7 @@ def pos_extract(words, flags):
         可靠性
         测试
         >>> s = "研究表明电子器件的失效中70%是由焊点失效引起的"
-        >>> words = list(jieba_cut(s, pos=True))
+        >>> words = list(jieba_cut(s, pos=True, no_symbol=False))
         >>> for _w in words:
         ...     print(_w.encode('utf-8'))
         研究/vn

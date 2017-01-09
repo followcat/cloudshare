@@ -323,15 +323,16 @@ class ValuablebaseAPI(Resource):
 
     def _get(self, doc, project):
         args = self.reqparse.parse_args()
-        uses = [project] + args['uses']\
-                if args['uses'] else [project]+project.getclassify()
+        projectname = project.name
+        uses = [projectname] + args['uses']\
+                if args['uses'] else [projectname]+project.getclassify()
         name_list = args['name_list']
         if len(name_list) == 0:
             result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
-                                               doc, project, uses=uses)
+                                               doc, projectname, uses=uses)
         else:
             result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
-                                               doc, project, uses=uses, name_list=name_list)
+                                               doc, projectname, uses=uses, name_list=name_list)
         response = dict()
         datas = []
         for index in result:

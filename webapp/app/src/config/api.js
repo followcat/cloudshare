@@ -29,7 +29,9 @@ export const API = {
 
   FEATURE_API: `${HOST}/api/feature`,
 
-  JOBDESCRIPTION_API: `${HOST}/api/jdlist`,
+  JOBDESCRIPTION_LIST_API: `${HOST}/api/jdlist`,
+
+  JOBDESCRIPTION_API: `${HOST}/api/jd`,
 
   PROJECTS_API: `${HOST}/api/projectnames`,
 
@@ -45,7 +47,7 @@ export const API = {
 
   BOOKMARK_API: `bookmark`,  // {host}/api/accounts/{id}/bookmark
 
-  UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}
+  //UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}
 
   LSI_BY_JD_ID_API: `${HOST}/api/mining/lsibyjdid`,
 

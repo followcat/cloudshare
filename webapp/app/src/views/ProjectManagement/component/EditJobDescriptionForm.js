@@ -92,6 +92,7 @@ class EditJobDescriptionForm extends Component {
               })}
               type="textarea"
               rows="6"
+              disabled={props.record.committer !== localStorage.user}
             />
           </FormItem>
           <FormItem

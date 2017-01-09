@@ -168,8 +168,8 @@ def silencer(document, cutservice=None, id=None):
         result.append(word)
     return result
 
-def cut_word(document):
-    words = jieba_cut(document, pos=True)
+def cut_word(document, cutservice=None, id=None):
+    words = simple_cut_word(document, cutservice, id)
     words = pos_extract(words, [u'ns', u'x', u'm'])
     return words
 
@@ -177,7 +177,7 @@ class Mining(object):
 
     SIMS_PATH = 'all'
 
-    def __init__(self, path, cvsvc, slicer=None):
+    def __init__(self, path, cvsvc, slicer=None, cutword=None):
         self.sim = {}
         self.path = path
         self.lsi_model = dict()
@@ -195,6 +195,10 @@ class Mining(object):
             self.slicer = silencer
         else:
             self.slicer = slicer
+        if cutword is None:
+            self.cutword = cut_word
+        else:
+            self.cutword = cutword
         self.make_lsi()
         self.make_word2vec()
 
@@ -243,7 +247,7 @@ class Mining(object):
             service = project.curriculumvitae
             word2vec_path = os.path.join(self.path, project.name, 'word2vec')
             word2vec = core.mining.word2vec.Doc2Vecmodel(word2vec_path,
-                                                         slicer=cut_word,
+                                                         slicer=self.cutword,
                                                          config=project.config)
             try:
                 word2vec.load()

@@ -99,8 +99,8 @@ class Doc2Vecmodel(object):
 
     def setup(self, names, texts):
         self.names = names
-        for text in texts:
-            self.texts.append(self.slicer(text))
+        for id, text in zip(names, texts):
+            self.texts.append(self.slicer(text, id=id))
         self.set_word2vec_model()
 
     def getconfig(self, param):

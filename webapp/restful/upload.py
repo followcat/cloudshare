@@ -9,6 +9,7 @@ import utils.chsname
 import utils.timeout.process
 import utils.timeout.exception
 import core.basedata
+import core.exception
 import core.docprocessor
 import extractor.information_explorer
 
@@ -40,9 +41,6 @@ class UploadCVAPI(Resource):
         documents = []
         project_name = self.svc_mult_cv.getproject(project).name
         for item in updates:
-            id = ''
-            status = 'fail'
-            message = 'The contact information is existend.'
             cvobj = upload[user.id].pop(item['filename'])
             if cvobj is not None:
                 id = cvobj.metadata['id']
@@ -52,18 +50,25 @@ class UploadCVAPI(Resource):
                 if 'unique_id' in cvobj.metadata:
                     peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
                     peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+                try:
+                    cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                     project_name, unique=True)
                     peo_result = self.svc_peo.add(peopobj, user.id)
-                cv_result = self.svc_mult_cv.add(cvobj, user.id,
-                                                 project_name, unique=True)
-                if cv_result is True:
-                    names.append(cvobj.name.md)
-                    documents.append(cvobj.data)
-                    status = 'success'
-                    message = 'Upload success.'
-            results.append({ 'id': id,
-                             'status': status,
-                             'message': message,
-                             'filename': item['filename'] })
+                    if cv_result is True:
+                        names.append(cvobj.name.md)
+                        documents.append(cvobj.data)
+                        status = 'success'
+                        message = 'Upload success.'
+                    else:
+                        status = 'failed'
+                        message = 'Existed CV.'
+                except core.exception.NotExistsContactException:
+                    status = 'failed'
+                    message = 'The contact information is empty.'
+                results.append({ 'id': id,
+                                 'status': status,
+                                 'message': message,
+                                 'filename': item['filename'] })
         self.svc_min.sim[project_name][project_name].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 

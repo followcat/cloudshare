@@ -6,11 +6,12 @@ import enUS from 'antd/lib/date-picker/locale/en_US';
 
 
 const dateValueFormat = (dateString) => {
-  let date = new Date(dateString),
-      localDateString = date.toLocaleDateString(),
-      splitDate = localDateString.split('/');
-  splitDate.unshift(splitDate.splice(-1, 1)[0]);
-  return splitDate.join('-');
+  let date = new Date(dateString);
+  const year = date.getFullYear(),
+        month = date.getMonth() + 1,
+        day = date.getDate();
+  
+  return `${year}-${month}-${day}`;
 };
 
 class ResumeFollowUp extends Component {
@@ -54,6 +55,12 @@ class ResumeFollowUp extends Component {
   render() {
     const { getFieldProps } = this.props.form;
 
+    const customLocale = {
+      timezoneOffset: 8 * 60,
+      firstDayOfWeek: 0,
+      minimalDaysInFirstWeek: 1,
+    };
+
     return (
       <Card
         title="Follow Up"
@@ -78,6 +85,7 @@ class ResumeFollowUp extends Component {
                 style={{ width: '100%' }}
                 size="small"
                 format="yyyy-MM-dd"
+                locale={{ ...enUS, ...customLocale }}
               />
             </Form.Item>
             <Form.Item>

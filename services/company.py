@@ -3,8 +3,10 @@ import time
 import yaml
 
 import utils._yaml
+import utils.companyexcel
 import core.outputstorage
 import services.base.storage
+import extractor.information_explorer
 
 
 class Company(services.base.storage.BaseStorage):
@@ -41,3 +43,13 @@ class Company(services.base.storage.BaseStorage):
     def datas(self):
         for id in self.ids:
             yield id, self.getyaml(id)
+
+    def compare_excel(self, stream, committer):
+        output = list()
+        excels = utils.companyexcel.convert(stream)
+        for excel in excels:
+            metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
+            data = core.basedata.DataObject(metadata, excel)
+            if not self.exists(data.name):
+                output.append('add', (data, committer))
+        return output

@@ -54,7 +54,7 @@ class UploadCVAPI(Resource):
                     cv_result = self.svc_mult_cv.add(cvobj, user.id,
                                                      project_name, unique=True)
                     peo_result = self.svc_peo.add(peopobj, user.id)
-                    result = project.peo_add(cvobj, committer)
+                    result = project.peo_add(cvobj, committer=user.id)
                     if cv_result is True:
                         names.append(cvobj.name.md)
                         documents.append(cvobj.data)

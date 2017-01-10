@@ -290,10 +290,7 @@ def catch_cvinfo(stream, filename, catch_info=True):
     if catch_info is True:
         catchinfo = catch(stream)
         info.update(catchinfo)
-    try:
-        info['id'] = info['unique_id']
-    except KeyError:
-        info['id'] = extractor.unique_id.cv_id(stream)
+    info["id"] = extractor.unique_id.cv_id(stream)
     info["filename"] = filename
     return info
 

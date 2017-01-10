@@ -84,7 +84,6 @@ export default class Resume extends Component {
    * @return {void}
    */
   handleTabsChange(key) {
-    console.log(key);
     this.setState({
       resumeID: key,
     });

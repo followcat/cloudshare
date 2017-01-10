@@ -24,7 +24,7 @@ kgr_file = 'tests/known_good_jd_cv_mapping.yaml'
 with open(kgr_file) as f:
     datas = yaml.load(f)
 
-med_co_cv_file = 'tmp/co_cv_names_latest.json'
+med_co_cv_file = 'tests/co_cv_md_names.json'
 with open(med_co_cv_file) as f:
     med_co_cv_ids = json.load(f)
 

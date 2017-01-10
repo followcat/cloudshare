@@ -137,6 +137,8 @@ class Doc2Vecmodel(object):
 
     def most_similar(self, doc, num_words=5):
         re_words = []
+        if self.word2vec is None:
+            return re_words
         words = self.slicer(doc)
         for word in words:
             re_words.append(word)

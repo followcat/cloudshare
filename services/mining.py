@@ -301,7 +301,10 @@ class Mining(object):
         return result
 
     def similar_words(self, basemodel, doc, num_words=5):
-        word2vec = self.word2vec_model[basemodel]
+        try:
+            word2vec = self.word2vec_model[basemodel]
+        except KeyError:
+            return []
         words = word2vec.most_similar(doc, num_words)
         return words
 

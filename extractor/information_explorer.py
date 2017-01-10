@@ -267,8 +267,8 @@ def catch_selected(stream, selected, name=None):
     if 'experience' in selected:
         info_dict.update(get_experience(stream, name))    # experience, company, position
     if 'expectation' in selected:
-        info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
-                                                    # age
+        info_dict.update(get_expectation(stream))   # expectation, current, gender,
+                                                    # marital_status, age
     if 'unique_id' in selected:
         extractor.unique_id.unique_id(info_dict)
     if 'classify' in selected and 'classify' not in info_dict:
@@ -290,7 +290,6 @@ def catch_cvinfo(stream, filename, catch_info=True):
     if catch_info is True:
         catchinfo = catch(stream)
         info.update(catchinfo)
-    extractor.unique_id.unique_id(info)
     try:
         info['id'] = info['unique_id']
     except KeyError:

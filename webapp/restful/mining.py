@@ -227,6 +227,14 @@ class LSIbyJDidAPI(LSIbaseAPI):
         project = self.svc_mult_cv.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
+        title = jd_yaml['name']
+        num_words = 2000/len(doc)
+        if num_words < 5:
+            num_words = 5
+        if num_words > 20:
+            num_words = 20
+        related_words = self.miner.similar_words(projectname, title, num_words)
+        doc += ' '.join(related_words)
         uses = [projectname] + args['uses']\
                 if args['uses'] else [projectname]+project.getclassify()
         filterdict = args['filterdict'] if args['filterdict'] else {}

@@ -165,6 +165,9 @@ class Project(services.base.service.Service):
     def jd_lists(self):
         return self.jobdescription.lists()
 
+    def peo_add(self, peopobj, committer=None, unique=True):
+        return self.people.add(peopobj, committer, unique)
+
     def peo_getyaml(self, id):
         return self.people.getyaml(id)
 

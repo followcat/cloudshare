@@ -44,7 +44,7 @@ class JobDescription(services.base.service.Service):
         yaml_str = self.interface.get(name)
         return yaml.load(yaml_str)
 
-    def add(self, company, name, description, committer, status=None):
+    def add(self, company, name, description, committer, status=None, do_commit=True):
         if status is None:
             status = 'Opening'
 
@@ -61,10 +61,10 @@ class JobDescription(services.base.service.Service):
         filename = self.filename(hex_id)
         self.interface.add(filename,
                            yaml.safe_dump(data, allow_unicode=True),
-                           "Add job description file: " + filename)
+                           "Add job description file: " + filename, do_commit=do_commit)
         return True
 
-    def modify(self, hex_id, description, status, committer):
+    def modify(self, hex_id, description, status, committer, do_commit=True):
         data = self.get(hex_id)
         if data['description'] != description and data['committer'] != committer:
             return False
@@ -74,7 +74,7 @@ class JobDescription(services.base.service.Service):
         dump_data = yaml.safe_dump(data, allow_unicode=True)
         self.interface.modify(filename, dump_data,
                               message="Modify job description: " + filename,
-                              committer=committer)
+                              committer=committer, do_commit=do_commit)
         return True
 
     def filename(self, hex_id):

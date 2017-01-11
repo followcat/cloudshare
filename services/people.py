@@ -34,7 +34,7 @@ class People(services.base.storage.BaseStorage):
                     yield sto.getyaml(id)
                     break
 
-    def add(self, peopobj, committer=None, unique=True, yamlfile=True):
+    def add(self, peopobj, committer=None, unique=True, yamlfile=True, do_commit=True):
         name = core.outputstorage.ConvertName(peopobj.name)
         if unique is True and self.unique(peopobj.name) is not True:
             savedobj = self.getyaml(name)
@@ -43,6 +43,6 @@ class People(services.base.storage.BaseStorage):
             peopobj.metadata['cv'] = savedobj['cv'] + peopobj.metadata['cv']
         message = "Add %s: %s metadata." % (self.commitinfo, name)
         self.interface.add(name.yaml, yaml.safe_dump(peopobj.metadata, allow_unicode=True),
-                           message=message, committer=committer)
+                           message=message, committer=committer, do_commit=do_commit)
         self._nums += 1
         return True

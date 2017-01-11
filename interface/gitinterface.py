@@ -70,6 +70,7 @@ class GitInterface(interface.base.Interface):
             True
             >>> shutil.rmtree(repo_name)
         """
+        commit_id = ''
         if message is None:
             message = "Add file: " + filename + ".\n"
         committer = self.committer(committer)
@@ -97,6 +98,7 @@ class GitInterface(interface.base.Interface):
             >>> shutil.rmtree(repo_name)
         """
         assert len(filenames) == len(filedatas)
+        commit_id = ''
         if message is None:
             message = ""
             for each in filenames:
@@ -130,6 +132,7 @@ class GitInterface(interface.base.Interface):
             'Modify test'
             >>> shutil.rmtree(repo_name)
         """
+        commit_id = ''
         if not self.exists(filename):
             raise Exception('Not exists file:', filename)
         if message is None:

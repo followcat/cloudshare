@@ -79,6 +79,8 @@ const websiteText = {
     ADD_CUSTOMER: '添加客户',
     ADDED_CUSTOMER: '已添加客户',
 
+    SAVE_SUCCESS_MSG: '已保存!',
+    SAVE_FAIL_MSG: '保存失败!',
     ADD_CONFIRM_MSG: '确定要添加这个条目吗?',
     ADD_SUCCESS_MSG: '添加成功!',
     ADD_FAIL_MSG: '添加失败!',

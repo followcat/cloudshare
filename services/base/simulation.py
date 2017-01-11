@@ -171,8 +171,8 @@ class Simulation(services.base.storage.BaseStorage):
         name = core.outputstorage.ConvertName(id).yaml
         dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
-        self.interface.modify(name, dumpinfo, message=message,
-                              committer=committer, do_commit=do_commit)
+        self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
+                              message=message, committer=committer, do_commit=do_commit)
 
     def search(self, keyword):
         results = set()

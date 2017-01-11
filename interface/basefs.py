@@ -66,7 +66,7 @@ class BaseFSInterface(interface.base.Interface):
             result = result.decode('utf-8')
         return result
 
-    def modify(self, filepath, stream, message=None, committer=None):
+    def modify(self, filepath, stream, message=None, committer=None, do_commit=True):
         result = False
         filepath = os.path.join(self.path, filepath)
         if os.path.exists(filepath):
@@ -119,7 +119,7 @@ class BaseFSInterface(interface.base.Interface):
                     grep_list.append(each)
         return grep_list
 
-    def add(self, filepath, filedate, message=None, committer=None):
+    def add(self, filepath, filedate, message=None, committer=None, do_commit=True):
         path = os.path.join(self.path, filepath)
         with open(path, 'w') as f:
             f.write(filedate)

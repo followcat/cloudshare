@@ -76,8 +76,6 @@ class LayoutHeader extends Component {
   }
 
   render() {
-    const { style, children } = this.props;
-
     const profileMenu = (
       <Menu>
         <MenuItem>
@@ -96,19 +94,14 @@ class LayoutHeader extends Component {
     );
 
     return (
-      <div style={style}>
-        <Header
-          logoImg={logo}
-          navMenus={navMenus}
-          profileMenu={profileMenu}
-          project={StorageUtil.get('_pj')}
-          profileText={StorageUtil.get('user')}
-          selectedKeys={this.state.selectedKeys}
-        />
-        <div className="cs-layout-wrapper">
-          {children}
-        </div>
-      </div>
+      <Header
+        logoImg={logo}
+        navMenus={navMenus}
+        profileMenu={profileMenu}
+        project={StorageUtil.get('_pj')}
+        profileText={StorageUtil.get('user')}
+        selectedKeys={this.state.selectedKeys}
+      />
     );
   }
 }

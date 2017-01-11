@@ -110,7 +110,7 @@ class DetailInformation extends Component {
             <Row key={v.key} className="cs-item-row">
               <Col span={4}>{v.title}</Col>
               <Col span={18}>
-                {editing ? this.renderForm(v) : this.renderValue(v)}
+                {editing && v.editable ? this.renderForm(v) : this.renderValue(v)}
               </Col>
             </Row>
           );

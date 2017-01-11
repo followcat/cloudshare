@@ -16,4 +16,9 @@ class LayoutHeader extends Component {
   }
 }
 
+LayoutHeader.propTypes = {
+  logoImg: PropTypes.string,
+  children: PropTypes.element
+};
+
 export default LayoutHeader;

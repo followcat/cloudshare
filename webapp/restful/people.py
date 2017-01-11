@@ -76,6 +76,9 @@ class PeopleByCVAPI(Resource):
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         yamlinfo = project.cv_getyaml(cv_id)
-        unique_id = yamlinfo['unique_id']
+        try:
+            unique_id = yamlinfo['unique_id']
+        except KeyError:
+            unique_id = yamlinfo['id']
         peopleinfo = project.peo_getyaml(unique_id)
         return { 'code': 200, 'data': peopleinfo }

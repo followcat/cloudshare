@@ -12,7 +12,7 @@ def init_prjpeo(SVC_PRJ):
         info = SVC_PRJ.curriculumvitae.getyaml(id)
         md = SVC_PRJ.curriculumvitae.getmd(id)
         baseobj = core.basedata.DataObject({'id': uniqueid}, md)
-        SVC_PRJ.people.add(baseobj, info['committer'])
+        SVC_PRJ.people.add(baseobj, info['committer'], do_commit=False)
 
 
 def convert_infos(SVC_PRJ):

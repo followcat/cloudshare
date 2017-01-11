@@ -51,5 +51,5 @@ class Company(services.base.storage.BaseStorage):
             metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
             data = core.basedata.DataObject(metadata, excel)
             if not self.exists(data.name):
-                output.append('add', (data, committer))
+                output.append('companyadd', (metadata, excel, committer))
         return output

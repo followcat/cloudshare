@@ -12,6 +12,7 @@ ED = re.compile(ur'^'+ASP+u'*(?P<br>'+UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((
 AED = re.compile(ur'^'+ASP+u'*(?P<br>'+ UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*)', re.DOTALL+re.M)
 PFXED = re.compile(with_prefix(ED), re.DOTALL+re.M)
 PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
+EED = re.compile(ur'^'+PREFIX+'*'+ASP+u'*(?P<br>'+ UNIBRALEFT +u')?Education'+ UNIBRARIGHT +u'?\n(?P<edu>.*)', re.DOTALL+re.M)
 
 
 SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+SCHOOL+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P=sep)'+ASP+u'*'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
@@ -53,6 +54,8 @@ SINGLEYIED = re.compile(u'^教育经[历位]'+ASP+u'+'+SCHOOL+ASP+u'+'+PERIOD+AS
 SUMMARYEDU = re.compile(u'学'+ASP+u'*[历位][:：]'+ASP+u'*(?P<education>\S+)', re.M)
 SUMMARYMAJOR = re.compile(u'专'+ASP+u'*业[:：]'+ASP+u'*(?P<major>\S+)', re.M)
 SUMMARYSCHOOL = re.compile(u'((毕业院)|(学))'+ASP+u'*校[:：]'+ASP+u'*'+SCHOOL, re.M)
+
+EMA = re.compile('^'+PREFIX+'*'+ASP+'*(?P<school>\S[\S ]*)\n+'+PREFIX+'*'+ASP+'*'+EDUCATION+','+ASP+'*(?P<major>\S[\S ]+)\n+(?P<from>\d{4})'+DATESEP+'(?P<to>\d{4})', re.M)
 
 def format_output(output, groupdict, summary=None):
     result = {
@@ -543,6 +546,14 @@ def fix(d):
         maj = 0
         out = []
         for r in SENSEMA.finditer(d):
+            maj +=1
+            format_output(out, r.groupdict())
+        processed = out
+    elif EED.search(d):
+        maj = 0
+        out = []
+        res = EED.search(d).group('edu')
+        for r in EMA.finditer(res):
             maj +=1
             format_output(out, r.groupdict())
         processed = out

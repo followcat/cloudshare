@@ -147,6 +147,7 @@ class FilterForm extends Component {
               label="Classify"
               labelCol={{ span: 6 }}
               wrapperCol={{ span: 18 }}
+              className="classify-selection"
             >
               <Select
                 {...getFieldProps('uses', {

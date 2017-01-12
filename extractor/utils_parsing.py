@@ -89,9 +89,9 @@ education_list = {
     1: (u'中技', u'中专', u'高中', u'高职'),
     2: (u'大专', ),
     #3: Show clearly step before graduate
-    4: (u'本科', u'\S{0,5}(?P<shorted4>学士)', u'全日制本科', u'统招本科'),
+    4: (u'本科', u'\S{0,5}(?P<shorted4>学士)', u'全日制本科', u'统招本科', "Bachelor's degree"),
     5: (u'在职硕士', ),
-    6: (u'\S{0,5}(?P<shorted6>硕士)', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA'),
+    6: (u'\S{0,5}(?P<shorted6>硕士)', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA', "Master's degree"),
     7: (u'\S{0,5}(?P<shorted7>博士)', u'博士研究生'),
     8: (u'博士后', )
     }
@@ -196,6 +196,8 @@ def compute_period(date_from, date_to, today=u'至今'):
             return (0, 0)
         else:
             return (0, -1)
+    if '.' not in date_from:
+        date_from += '.09'
     time_from = time.mktime(break_date(date_from)+(1,0,0,0,0,0,0))
     if date_to == u'至今':
         if today == u'至今':
@@ -203,6 +205,8 @@ def compute_period(date_from, date_to, today=u'至今'):
         else:
             time_to = time.mktime(break_date(today)+(1,0,0,0,0,0,0))
     else:
+        if '.' not in date_to:
+            date_to += '.06'
         time_to = time.mktime(break_date(date_to)+(1,0,0,0,0,0,0))
     duration_tuple = time.gmtime(time_to - time_from)
     zerotime_tuple = time.gmtime(0)
@@ -254,6 +258,8 @@ def add_months(date, increment):
     """
     if date == u'至今':
         return date
+    if '.' not in date:
+        date += '.01'
     year, month = break_date(date)
     year_inc, month_inc = divmod(increment, 12)
     month += month_inc

@@ -14,12 +14,31 @@ SEP = u'\-\uff0d\u2013\u2014\u2015\u4e00\\\\·,~～/'
 UNIBRALEFT = ur'[（\(\[【]'
 UNIBRARIGHT = ur'[）\)\]】]'
 DATESEP = u'['+SEP+SP+u'至]+'
-_PDATE = ur'(?:(?:\d{4}'+ASP+u'?__DATE_SEP__'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))(?:'+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))|'+TODAY+')'
+_CHPDATE = ur'(?:\d{4}'+ASP+u'?__DATE_SEP__'+ASP+u'{0,2}(?:(?:(?:(?:[01]\d{1})|(?:[1-9]{1}))(?:'+ASP+u'?月)?)|(?:['+CHNUMBERS+u']{1,3}月)))'
+MONTH_MATCHING = {
+        'January': 1,
+        'February': 2,
+        'March': 3,
+        'April': 4,
+        'May': 5,
+        'June': 6,
+        'July': 7,
+        'August': 8,
+        'September': 9,
+        'October': 10,
+        'November': 11,
+        'December': 12,
+        }
+ENMONTH = r'(?:'+'|'.join(MONTH_MATCHING)+')'
+_ENPDATE = ur'(?:'+ENMONTH+ASP+'*\d{4})'
+_PDATE = ur'(?:'+_CHPDATE+'|'+_ENPDATE+'|'+TODAY+')'
 FDSEP = u'(?P<fromsep>['+SEP+u'\.．年])'
 DATE = _PDATE.replace('__DATE_SEP__', FDSEP.replace('P<fromsep>', ':'))
 SDSEP = u'(?P=fromsep)'
 PERIOD = u'(?P<from>' + _PDATE.replace('__DATE_SEP__', FDSEP) + ur')' + DATESEP + ASP+ u'*(?P<to>' + _PDATE.replace('__DATE_SEP__', SDSEP) + ')(?:'+UNIBRALEFT+u'含[^（\(\[【]+?期'+UNIBRARIGHT+u')?'
-DURATION = ur'(?P<duration>(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(?:['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
+CHDURATION = ur'(?:(?:\-?\d{1,2}'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(?:['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
+ENDURATION = ur'(?:(?:\d{1,2}'+ASP+u'?years?'+ASP+u'?)?(?:(?:\d{1,2})'+ASP+u'?months?))'
+DURATION = ur'(?P<duration>'+CHDURATION+'|'+ENDURATION+')'
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
 FULLDATE = u'(?:\d{4}[\.．年](?:(?:[01]\d{1})|(?:[1-9]{1}))[\.．月](?:(?:[0123]\d{1})|(?:[1-9]{1}))日)'
 FIELDSEP = ur'、：:；;\|\uff5c'
@@ -30,7 +49,7 @@ EDUFIELDSEP = u'，'+FIELDSEP
 exclude_with_parenthesis = lambda x: u'(?:'+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
-PREFIX = u'(?:(?:\d+(?:['+SENTENCESEP+u'\.]|'+ASP+u'{2}))|◆|■|·|\?|\uf0d8\xa0|\uf0b7|\uf075|\u258c)'
+PREFIX = u'(?:(?:\d+(?:['+SENTENCESEP+u'\.]|'+ASP+u'{2}))|#|◆|■|·|\?|\uf0d8\xa0|\uf0b7|\uf075|\u258c)'
 
 LIST_SEPARATOR = u')|(?:'
 COMPANY_BUSINESS_KEYWORD = u'((?:'
@@ -109,19 +128,34 @@ BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + 
 
 PLACES = u'(?:(\S+)['+SENTENCESEP+SEP+']?)+'
 
+
+MONTH_ID = re.compile('(?P<emonth>'+ENMONTH+')')
+
+def date_to_ch(x):
+    try:
+        month, year = x.split(' ')
+        return ' '.join((year, str(MONTH_MATCHING[MONTH_ID.search(month).group('emonth')])))
+    except ValueError:
+        return x
+    except AttributeError:
+        return x
+
 month_to_str = lambda x: str.zfill(str(x), 2)
 fix_today = lambda x: re.compile('^'+TODAY+'$').sub(u'至今', x)
-fix_sep = lambda x: re.compile(u'['+SP+SEP+u'\.．年]+').sub('.', x)
 fix_trail = lambda x: x.replace(u'月', '').strip()
+fix_sep = lambda x: re.compile(u'['+SP+SEP+u'\.．年]+').sub('.', x)
 zero_date = lambda x: month_to_str(x.group())
 fix_trailing = lambda x: re.compile(ur'\d+$').sub(zero_date, x)
-fix_date = lambda x: fix_trailing(fix_sep(fix_trail(fix_today(x))))
+fix_date = lambda x: fix_trailing(fix_sep(date_to_ch(fix_trail(fix_today(x)))))
 
+duration_to_ch = lambda x: re.compile('months?').sub(u'个月', re.compile('years?').sub(u'年',x))
+fix_duration = lambda x: re.compile(ASP+'+').sub('', duration_to_ch(x)).strip()
+
+fix_prefix = lambda x: re.compile(PREFIX+'+'+ASP+'*').sub('', x).strip('*')
 fix_star = lambda x: x.replace('\*', '*')
 remove_escape = lambda x: x.group(1)
 fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, fix_star(x))
-fix_name = lambda x: re.compile(ASP+'+').sub(' ', fix_escape(x)).strip()
-fix_duration = lambda x: re.compile(ASP+'+').sub('', x).strip()
+fix_name = lambda x: re.compile(ASP+'+').sub(' ', fix_escape(fix_prefix(x.strip())))
 
 range_repl = lambda x: x.group('low')+'-'+x.group('high')+u'元/月'
 salary_range = lambda x: re.compile(u'(?P<low>\d+)到(?P<high>\d+)').sub(range_repl, x)

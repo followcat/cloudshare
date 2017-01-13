@@ -271,8 +271,9 @@ class CompanyConfirmExcelAPI(Resource):
     def post(self):
         datas = args['data']
         project_name = args['project']
+        user = flask.ext.login.current_user
         project = self.svc_mult_cv.getproject(project_name)
-        results = project.company_add_excel(datas)
+        results = project.company_add_excel(datas, user.id)
         return {
             'code': 200,
             'data': results

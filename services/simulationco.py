@@ -40,7 +40,7 @@ class SimulationCO(services.base.simulation.Simulation,
                 for item in self.list_item:
                     if item in metadata:
                         metadata.pop(item)
-                output.append(('projectadd', metadata.ID, (metadata, excel, committer)))
+                output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
             if excel['caller']:
                 caller = excel['caller'][0]
             for key in self.list_item:

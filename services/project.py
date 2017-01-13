@@ -124,16 +124,27 @@ class Project(services.base.service.Service):
         outputs.extend(self.company.compare_excel(stream, committer))
         return outputs
 
-    def company_add_excel(self, items):
+    def company_add_excel(self, items, committer):
         results = dict()
+        repo_result = set()
+        project_result = set()
         for item in items:
+            yamlname = core.outputstorage.ConvertName(item[1]).yaml
             if item[0] == 'companyadd':
-                result = self.corepo.add(*item[2])
+                baseobj = core.basedata.DataObject(*item[2][:2])
+                repo_result.add(yamlname)
+                result = self.corepo.add(baseobj, committer=item[2][-1], do_commit=False)
             elif item[0] == 'projectadd':
-                result = self.company.add(*item[2])
+                baseobj = core.basedata.DataObject(*item[2][:2])
+                project_result.add(self.company.ids_file)
+                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+                result = self.company.add(baseobj, committer=item[2][-1], do_commit=False)
             elif item[0] == 'listadd':
-                result = self.company.updateinfo(*item[2])
+                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+                result = self.company.updateinfo(*item[2], do_commit=False)
             results[item[1]] = result
+        self.corepo.interface.do_commit(list(repo_result), committer=committer)
+        self.company.interface.do_commit(list(project_result), committer=committer)
         return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):

@@ -75,6 +75,9 @@ class Simulation(services.base.storage.BaseStorage):
                     os.makedirs(os.path.join(self.path, self.yamlpath))
                 info = self.generate_info_template()
                 info['committer'] = committer
+                info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                if 'date' not in info or not info['date']:
+                    info['date'] = time.time()
                 name = core.outputstorage.ConvertName(id).yaml
                 dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                      allow_unicode=True, default_flow_style=False)
@@ -108,6 +111,7 @@ class Simulation(services.base.storage.BaseStorage):
         projectinfo = self.getinfo(id)
         projectyaml = self.getyaml(id)
         if not projectyaml[key] == value:
+            projectinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             projectinfo[key] = value
             self.saveinfo(id, projectinfo,
                           'Modify %s key %s.' % (id, key), committer)
@@ -117,6 +121,7 @@ class Simulation(services.base.storage.BaseStorage):
     def _addinfo(self, id, key, value, committer):
         projectinfo = self.getinfo(id)
         data = self._infoframe(value, committer)
+        projectinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         projectinfo[key].insert(0, data)
         self.saveinfo(id, projectinfo,
                       'Add %s key %s.' % (id, key), committer)

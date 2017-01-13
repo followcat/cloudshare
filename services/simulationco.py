@@ -29,28 +29,27 @@ class SimulationCO(services.base.simulation.Simulation,
         self._customers = None
 
     def compare_excel(self, stream, committer):
-        datas = list()
         output = list()
         excels = utils.companyexcel.convert(stream)
         for excel in excels:
             metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
             data = core.basedata.DataObject(metadata, excel)
-            datas.append(data)
-        for key in self.list_item:
-            for excel in excels:
-                id = extractor.unique_id.company_id(excel['name'])
-                caller = committer
+            id = metadata['id']
+            caller = committer
+            if not self.exists(id):
+                output.append(('projectadd', (metadata, excel, committer)))
+            if excel['caller']:
+                caller = excel['caller'][0]
+            for key in self.list_item:
                 existvalues = list()
                 if self.exists(id):
                     info = self.getyaml(id)
-                    if excel['caller']:
-                        caller = excel['caller'][0]
                     existvalues = [v['content'] for v in info[key]]
                 for value in excel[key]:
                     if value in existvalues:
                         continue
                     existvalues.append(value)
-                    output.append(('followup', (id, key, value, caller)))
+                    output.append(('listadd', (id, key, value, caller)))
         return output
 
     def addcustomer(self, id, user):

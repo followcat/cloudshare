@@ -69,7 +69,8 @@ class BaseStorage(services.base.service.Service):
         name = core.outputstorage.ConvertName(bsobj.name)
         if mdfile is True:
             message = "Add %s: %s data." % (self.commitinfo, name)
-            self.interface.add(name.md, bsobj.data, message=message, committer=committer)
+            self.interface.add(name.md, bsobj.data, message=message,
+                               committer=committer, do_commit=do_commit)
         if yamlfile is True:
             if committer is not None:
                 bsobj.metadata['committer'] = committer

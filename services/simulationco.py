@@ -47,9 +47,9 @@ class SimulationCO(services.base.simulation.Simulation,
                 existvalues = list()
                 if self.exists(id):
                     info = self.getyaml(id)
-                    existvalues = [v['content'] for v in info[key]]
+                    existvalues = [v['content'].replace(' ', '') for v in info[key]]
                 for value in excel[key]:
-                    if value in existvalues:
+                    if value.replace(' ', '') in existvalues:
                         continue
                     existvalues.append(value)
                     output.append(('listadd', id, (id, key, value, caller)))

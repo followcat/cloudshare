@@ -119,6 +119,9 @@ class BaseFSInterface(interface.base.Interface):
                     grep_list.append(each)
         return grep_list
 
+    def do_commit(self, filenames, message=None, committer=None):
+        return ''
+
     def add(self, filepath, filedate, message=None, committer=None, do_commit=True):
         path = os.path.join(self.path, filepath)
         with open(path, 'w') as f:

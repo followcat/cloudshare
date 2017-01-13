@@ -58,6 +58,15 @@ class GitInterface(interface.base.Interface):
     def getraw(self, filename):
         raise IOError
 
+    def do_commit(self, filenames, message=None, committer=None):
+        if message is None:
+            message = "Batch commits."
+        committer = self.committer(committer)
+        for filename in self.filenames:
+            self.repo.stage(bytes(filename))
+        commit_id = self.repo.do_commit(message, committer=bytes(committer))
+        return commit_id
+
     def add(self, filename, filedata, message=None, committer=None, do_commit=True):
         """
             >>> import shutil

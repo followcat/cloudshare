@@ -254,10 +254,11 @@ class CompanyUploadExcelAPI(Resource):
         infos = dict()
         for item in compare_result:
             coid = item[1]
-            if project.corepo.exists(coid):
-                infos[coid] = project.company_get(coid)
-            else:
-                infos[coid] = item[2][0]
+            if coid not in infos:
+                if project.corepo.exists(coid):
+                    infos[coid] = project.company_get(coid)
+                else:
+                    infos[coid] = item[2][0]
         return {
             'code': 200,
             'data': compare_result,

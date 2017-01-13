@@ -40,7 +40,7 @@ class SimulationCO(services.base.simulation.Simulation,
                 for item in self.list_item:
                     if item in metadata:
                         metadata.pop(item)
-                output.append(('projectadd', (metadata, excel, committer)))
+                output.append(('projectadd', metadata.ID, (metadata, excel, committer)))
             if excel['caller']:
                 caller = excel['caller'][0]
             for key in self.list_item:
@@ -52,7 +52,7 @@ class SimulationCO(services.base.simulation.Simulation,
                     if value in existvalues:
                         continue
                     existvalues.append(value)
-                    output.append(('listadd', (id, key, value, caller)))
+                    output.append(('listadd', id, (id, key, value, caller)))
         return output
 
     def addcustomer(self, id, user):

@@ -272,7 +272,8 @@ class CompanyConfirmExcelAPI(Resource):
         datas = args['data']
         project_name = args['project']
         project = self.svc_mult_cv.getproject(project_name)
-        project.company_add_excel(datas)
+        results = project.company_add_excel(datas)
         return {
-            'code': 200
+            'code': 200,
+            'data': results
         }

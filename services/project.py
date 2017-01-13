@@ -125,11 +125,16 @@ class Project(services.base.service.Service):
         return outputs
 
     def company_add_excel(self, items):
+        results = dict()
         for item in items:
-            if item[0] == 'add':
-                self.corepo.add(*item[1])
-            elif item[0] == 'followup':
-                self.company.updateinfo(*item[1])
+            if item[0] == 'companyadd':
+                result = self.corepo.add(*item[2])
+            elif item[0] == 'projectadd':
+                result = self.company.add(*item[2])
+            elif item[0] == 'listadd':
+                result = self.company.updateinfo(*item[2])
+            results[item[1]] = result
+        return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         self.corepo.add(coobj, committer, unique, yamlfile, mdfile)

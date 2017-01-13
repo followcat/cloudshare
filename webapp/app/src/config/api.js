@@ -47,6 +47,8 @@ export const API = {
 
   UPLOAD_EXCEL_API: `${HOST}/api/couploadexcel`,
 
+  CONFIRM_UPLOAD_EXCEL_API: `${HOST}/api/coconfirmexcel`,
+
   BOOKMARK_API: `bookmark`,  // {host}/api/accounts/{id}/bookmark
 
   //UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}

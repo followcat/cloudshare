@@ -57,6 +57,7 @@ const websiteText = {
     SAVE: '保存',
     ADD: '添加',
     MATCH_ACTION: '进行匹配',
+    UPLOAD: '上传',
 
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',
@@ -87,6 +88,11 @@ const websiteText = {
     DELETE_CONFIRM_MSG: '确定要删除这个条目吗?',
     DELETE_SUCCESS_MSG: '删除成功!',
     DELETE_FAIL_MSG: '删除失败!',
+
+    NEW_CREATION: '新增',
+    CHANGE: '变更',
+    CONFIRM_UOLOAD: '确认上传',
+    UPLOAD_SUCCESS_MSG: '上传成功'
   },
 
   // 待扩展语言

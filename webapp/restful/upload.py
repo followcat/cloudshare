@@ -49,7 +49,7 @@ class UploadCVAPI(Resource):
                         cvobj.metadata[key] = value
                 if 'unique_id' in cvobj.metadata:
                     peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
-                    peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+                    peopobj = core.basedata.DataObject(metadata=peopmeta, data='')
                 try:
                     cv_result = self.svc_mult_cv.add(cvobj, user.id,
                                                      project_name, unique=True)
@@ -94,8 +94,8 @@ class UploadCVAPI(Resource):
                                             'resultid': '',
                                             'name': '', 'filename': filename } }
         filepro.renameconvert(yamlinfo['id'])
-        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
-                                           metadata=yamlinfo)
+        dataobj = core.basedata.DataObject(metadata=yamlinfo,
+                                           data=filepro.markdown_stream,)
         if not dataobj.metadata['name']:
             dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
         name = dataobj.metadata['name']
@@ -154,8 +154,8 @@ class UploadEnglishCVAPI(Resource):
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
                                               filename=filepro.base.base, catch_info=False)
-        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
-                                           metadata=yamlinfo)
+        dataobj = core.basedata.DataObject(metadata=yamlinfo,
+                                           data=filepro.markdown_stream)
         uploadeng[user.id] = dataobj
         return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/uploadpreview' } }
 

@@ -251,9 +251,17 @@ class CompanyUploadExcelAPI(Resource):
         network_file = flask.request.files['files']
         project = self.svc_mult_cv.getproject(project_name)
         compare_result = project.company_compare_excel(network_file.read(), committer=user.id)
+        infos = dict()
+        for item in compare_result:
+            coid = item[1]
+            if project.corepo.exists(coid):
+                infos[coid] = project.company_get(coid)
+            else:
+                infos[coid] = item[2][0]
         return {
             'code': 200,
-            'data': compare_result
+            'data': compare_result,
+            'info': infos
         }
 
 

@@ -37,6 +37,9 @@ class SimulationCO(services.base.simulation.Simulation,
             id = metadata['id']
             caller = committer
             if not self.exists(id):
+                for item in self.list_item:
+                    if item in metadata:
+                        metadata.pop(item)
                 output.append(('projectadd', (metadata, excel, committer)))
             if excel['caller']:
                 caller = excel['caller'][0]

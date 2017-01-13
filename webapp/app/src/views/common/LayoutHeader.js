@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 
 import Header from '../../components/layout-header';
 
@@ -105,10 +105,5 @@ class LayoutHeader extends Component {
     );
   }
 }
-
-LayoutHeader.propTypes = {
-  style: PropTypes.object,
-  children: PropTypes.element
-};
 
 export default LayoutHeader;

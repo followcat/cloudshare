@@ -175,11 +175,15 @@ body {
 .cs-card-inner {
   .cs-card-inner-top {
     padding-bottom: 16px;
-
-    &-col {
+    overflow: hidden;
+    
+    &-col, &-col-2 {
       display: inline-block;
-      width: 16.999%;
-      margin-left: 16px;
+      margin-left: 8px;
+    }
+
+    &-col-2 {
+      width: 16.666%
     }
 
     &-col:first-of-type {
@@ -223,4 +227,64 @@ body {
     display: inline-block;
     padding: 0 8px;
   }
+}
+
+.card-inner-top {
+  padding: 8px 0;
+
+  .legend {
+    display: inline-block;
+    vertical-align: top;
+
+    .legend-item {
+      display: inline-block;
+      margin-right: 16px;
+      height: 28px;
+
+      .block {
+        display: inline-block;
+        vertical-align: top;
+        width: 48px;
+        height: 28px;
+        margin-top: 0 !important;
+      }
+
+      .legend-item-label {
+        display: inline-block;
+        vertical-align: top;
+        line-height: 28px;
+        margin-left: 4px;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.company-item {
+  padding: 8px;
+
+  .info, .diff {
+    padding: 4px 8px;
+  }
+
+  .info > .info-index, .diff > .diff-index {
+    font-weight: bold;
+
+    &:after {
+      content: ': ';
+    }
+  }
+
+  & > .ant-card-body {
+    padding: 0;
+  }
+}
+
+.bg-green {
+  background-color: mediumseagreen;
+  margin-top: 8px;
+}
+
+.bg-yellow {
+  background-color: yellow;
 }

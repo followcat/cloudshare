@@ -49,13 +49,13 @@ class Layout extends Component {
       title: language.OPEN_JOB_DESCRIPTION,
       url: '/jobdescription'
     }, {
-      key: 'owncustomer',
+      key: 'customer',
       title: language.OWN_CUSTOMER_MANAGEMENT,
-      url: '/owncustomer'
+      url: '/customer'
     }, {
-      key: 'developcustomer',
+      key: 'company',
       title: language.DEVELOPMENT_CUSTOMER_MANAGEMENT,
-      url: '/developcustomer'
+      url: '/company/list'
     }];
 
     const cardContentTitle = this.getTitle(this.state.selectedKey, menus);

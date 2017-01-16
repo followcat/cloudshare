@@ -49,22 +49,25 @@ class UploadCVAPI(Resource):
                         cvobj.metadata[key] = value
                 if 'unique_id' in cvobj.metadata:
                     peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
-                    peopobj = core.basedata.DataObject(metadata=peopmeta, data='')
-                try:
-                    cv_result = self.svc_mult_cv.add(cvobj, user.id,
-                                                     project_name, unique=True)
-                    peo_result = self.svc_peo.add(peopobj, user.id)
-                    if cv_result is True:
-                        names.append(cvobj.name.md)
-                        documents.append(cvobj.data)
-                        status = 'success'
-                        message = 'Upload success.'
-                    else:
+                    peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+                    try:
+                        cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                         project_name, unique=True)
+                        peo_result = self.svc_peo.add(peopobj, user.id)
+                        if cv_result is True:
+                            names.append(cvobj.name.md)
+                            documents.append(cvobj.data)
+                            status = 'success'
+                            message = 'Upload success.'
+                        else:
+                            status = 'failed'
+                            message = 'Existed CV.'
+                    except core.exception.NotExistsContactException:
                         status = 'failed'
-                        message = 'Existed CV.'
-                except core.exception.NotExistsContactException:
+                        message = 'The contact information is empty.'
+                else:
                     status = 'failed'
-                    message = 'The contact information is empty.'
+                    message = 'Unable to extract personal information, please modify and try again'
                 results.append({ 'id': id,
                                  'status': status,
                                  'message': message,

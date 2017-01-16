@@ -227,8 +227,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         project = self.svc_mult_cv.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
-        uses = [projectname] + args['uses']\
-                if args['uses'] else [projectname]+project.getclassify()
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self._post(projectname, doc, uses, filterdict, cur_page)
@@ -252,8 +251,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         doc = project.cv_getmd(id)
-        uses = [projectname] + args['uses']\
-                if args['uses'] else [projectname]+project.getclassify()
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self._post(projectname, doc, uses, filterdict, cur_page)
@@ -275,8 +273,7 @@ class LSIbydocAPI(LSIbaseAPI):
         doc = args['doc']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        uses = [projectname] + args['uses']\
-                if args['uses'] else [projectname]+project.getclassify()
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self._post(projectname, doc, uses, filterdict, cur_page)
@@ -324,8 +321,7 @@ class ValuablebaseAPI(Resource):
     def _get(self, doc, project):
         args = self.reqparse.parse_args()
         projectname = project.name
-        uses = [projectname] + args['uses']\
-                if args['uses'] else [projectname]+project.getclassify()
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         name_list = args['name_list']
         if len(name_list) == 0:
             result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,

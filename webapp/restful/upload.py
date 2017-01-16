@@ -96,19 +96,15 @@ class UploadCVAPI(Resource):
                                             'resultid': '',
                                             'name': '', 'filename': filename } }
         filepro.renameconvert(yamlinfo['id'])
-        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
-                                           metadata=yamlinfo)
-        name = dataobj.metadata['name']
-        unique_peo = False
-        if 'unique_id' not in dataobj.metadata:
-            unique_peo = True
-        else:
-            unique_peo = self.svc_peo.unique(dataobj.metadata['unique_id'])
+        unique_peo = 'unique_id' not in yamlinfo or self.svc_peo.unique(yamlinfo['unique_id'])
+        dataobj = core.basedata.DataObject(metadata=yamlinfo,
+                                           data=filepro.markdown_stream)
         upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
                                         'unique_peo': unique_peo,
-                                        'name': name, 'filename': filename } }
+                                        'name': dataobj.metadata['name'],
+                                        'filename': filename } }
 
 
 class UploadEnglishCVAPI(Resource):

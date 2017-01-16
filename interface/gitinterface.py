@@ -59,11 +59,13 @@ class GitInterface(interface.base.Interface):
         raise IOError
 
     def do_commit(self, filenames, message=None, committer=None):
+        commit_id = ''
         if message is None:
             message = "Batch commits."
-        committer = self.committer(committer)
-        self.repo.stage(filenames)
-        commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
+        if filenames:
+            committer = self.committer(committer)
+            self.repo.stage(filenames)
+            commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
         return commit_id
 
     def add(self, filename, filedata, message=None, committer=None, do_commit=True):

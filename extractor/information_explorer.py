@@ -3,6 +3,8 @@ import re
 import string
 import os.path
 import functools
+
+import utils.chsname
 import extractor.unique_id
 import extractor.education
 import extractor.expectation
@@ -290,6 +292,8 @@ def catch_cvinfo(stream, filename, catch_info=True):
     if catch_info is True:
         catchinfo = catch(stream)
         info.update(catchinfo)
+        if not info['name']:
+            info['name'] = utils.chsname.name_from_filename(filename)
     info["id"] = extractor.unique_id.cv_id(stream)
     info["filename"] = filename
     return info

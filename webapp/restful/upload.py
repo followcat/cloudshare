@@ -5,7 +5,6 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
-import utils.chsname
 import utils.timeout.process
 import utils.timeout.exception
 import core.basedata
@@ -99,8 +98,6 @@ class UploadCVAPI(Resource):
         filepro.renameconvert(yamlinfo['id'])
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
-        if not dataobj.metadata['name']:
-            dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
         name = dataobj.metadata['name']
         unique_peo = False
         if 'unique_id' not in dataobj.metadata:

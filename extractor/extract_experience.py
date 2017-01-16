@@ -15,12 +15,13 @@ AXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(�
 TXP = re.compile(ur'-{9}[\-'+SP+u']*(?P<expe>'+PERIOD+ur'.*?)(?=-{9}[\-'+SP+u']*)', re.DOTALL)
 
 PXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?项目经历'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?(((教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|(培训)))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+EXP = re.compile(ur'^'+PREFIX+u'*'+ASP+u'*'+ UNIBRALEFT +u'?Experience'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+PREFIX+u'*'+ASP+u'*(?='+ UNIBRALEFT +u'?(?:Languages|Skills|Education)'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
 
 
 # Allow multiline once in company name when duration is present
 # As company has at least one char, need to handle break just as company tail
 # Catching all employees is too expensive on parenthesis repetition, some will be post processed
-ECO = re.compile(u'^(?P<position>(\S[\S ]+\n)*)\n+(?P<company>(\S[\S ]+\n)*)\n+' + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
+ECO = re.compile(u'^'+PREFIX+u'*'+ASP+u'*(?P<position>(\S[\S ]+\n)*)\n+'+PREFIX+u'*'+ASP+u'*(?P<company>(\S[\S ]+\n)*)\n+' + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
 CO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*\*?))(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)'+BEMPLOYEES+'?\*?'+ASP+u'*\*?'+BDURATION+'\*?'+ASP+u'*$', re.DOTALL+re.M)
 CCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*\*?))(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)'+BEMPLOYEES+'?\*?'+ASP+u'*\*?'+BDURATION+'\*?'+ASP+u'*$', re.DOTALL+re.M)
 TCO = re.compile(u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+PREFIX+u'*'+CONTEXT+u'?'+POASP+u'*'+PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*\*?))(?P<company>'+COMPANY+u')'+BEMPLOYEES+'?\*?'+ASP+u'*\*?'+BDURATION+'?\*?$', re.DOTALL+re.M)
@@ -128,7 +129,8 @@ DRPATTERN = u'(?<!(?:职责|工作)描述：\n{2})^'+PERIOD+ur'[:：]?(?!\n{2}�
 DRTACO = re.compile(DRPATTERN.replace('__COMPANY__', u'('+COMPANY+u'\n)?'+COMPANY.replace(u'、', '')+u'?'+ASP+u'*').replace('__SEP__', '\|').replace('__ITEM__', u'([^\|（\(\[【]+'+COMPANYTAIL+u')*([^\|（\(\[【]*)'), re.DOTALL+re.M)
 
 WYJCO_DPT = u'(\S+?[部处室册科]|QA|R&D|XP|\S*[\w\s]+)'
-WYJCO = re.compile(u'^'+PREFIX+u'*'+POASP+u'*'+PERIOD+POASP+u'{3,}(?P<position>'+POSITION+u')'+POASP+u'*(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+'+POASP+u'*\*?(?P<company>[^\|\n]+?)'+POASP+u'*'+BDURATION+'\*?(?=(?!\n+(?:.+?'+POASP+u'*(?=\|))?'+position_details(re.compile('')).replace('{3,17}', '{2,17}')+u'))$', re.M)
+# Company using (?P<company>[^\|\n]+?) is too slow to fail on long empty lines
+WYJCO = re.compile(u'^'+PREFIX+u'*'+POASP+u'*'+PERIOD+POASP+u'{3,}(?P<position>'+POSITION+u')'+POASP+u'*(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+'+POASP+u'*\*?(?P<company>[^\|'+SP+u']+(?: [^\|'+SP+u']+)*)'+POASP+u'*'+BDURATION+'\*?(?=(?!\n+(?:.+?'+POASP+u'*(?=\|))?'+position_details(re.compile('')).replace('{3,17}', '{2,17}')+u'))$', re.M)
 BTCO = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'+(?P<company>[^'+SP+u']+)'+ASP+u'+'+u'(?P<position>'+POSITION+u'?)'+ASP+u'+(?P<dpt>'+WYJCO_DPT+u')$', re.M)
 
 # Combine presence of duration and bracket around period for safer searching
@@ -1427,6 +1429,16 @@ def fix(d, as_dict=False):
                 reject = 2
             else:
                 processed = out
+        elif EXP.search(d):
+            pos = 0
+            out = {'company': [], 'position': []}
+            res = EXP.search(d)
+            if ECO.search(res.group('expe')):
+                for r in ECO.finditer(res.group('expe')):
+                    company_output(out, r.groupdict())
+                    pos +=1
+                    position_output(out, r.groupdict())
+            processed = out
         else:
             reject = 4
     return fix_output_legacy(processed, reject)

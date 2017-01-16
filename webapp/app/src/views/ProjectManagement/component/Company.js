@@ -20,7 +20,7 @@ const parseResponse = (data, info) => {
     let item = data[i],
         id = item[1];
 
-    if (item[0] === 'projectadd' || item[0] === 'repoadd') {
+    if (item[0] === 'projectadd' || item[0] === 'companyadd') {
       if (!idObject.hasOwnProperty(id)) {
         idObject[id] = result.length;
         result.push(Object.assign({}, info[id], {
@@ -96,7 +96,10 @@ class Company extends Component {
           loading: false,
           status: 'done'
         });
-        this.props.history.push('/company/list');
+        
+        setTimeout(() => {
+          this.props.history.push('/company/list');
+        }, 1000);
       }
     });
   }

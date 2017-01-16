@@ -2,7 +2,6 @@
 const WebpackDevServer = require('webpack-dev-server');
 const webpack = require('webpack');
 const webpackConf = require('./webpack/webpack.config');
-const config = require('./config');
 
 //遍历每个入口文件并加入热加载插件
 let entryObject = webpackConf.entry;
@@ -19,12 +18,14 @@ webpackConf.entry = entryObject;
 
 const compiler = webpack(webpackConf);
 
+const port = 3000;
+
 const server = new WebpackDevServer(compiler, {
   // webpack-dev-server options
 
   contentBase: './',
 
-  progress: true,
+  progress: false,
 
   inline: true,  // 启用inline模式自动刷新
 
@@ -35,11 +36,15 @@ const server = new WebpackDevServer(compiler, {
   compress: true,  //启用gzip压缩
 
   // It's a required option.
-  publicPath: config.serverConfig.dev.baseURL,
+  publicPath: `http://localhost:${port}/`,
 
-  headers: { "X-Custom-Header": "yes" },
+  headers: { 'X-Custom-Header': 'yes' },
 
-  stats: { colors: true },
+  stats: {
+    color: true,
+    chunks: false,
+    children: false
+  },
 
   proxy: {
     '/api/*': {
@@ -51,9 +56,9 @@ const server = new WebpackDevServer(compiler, {
 });
 
 
-server.listen(3000, 'localhost', function (err) {
+server.listen(port, 'localhost', function (err) {
   if (err) {
     console.log(err);
   }
-  console.log('Listening at localhost:3000.');
+  console.log(`Listening at localhost:${port}.`);
 });

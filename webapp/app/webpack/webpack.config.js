@@ -1,12 +1,11 @@
 'use strict';
-const path = require('path');
-const fs = require('fs');
-
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const merge = require('webpack-merge');
 
-const config = require('../config');
+const getEntryFile = require('./config/entry-file');
+const folderPath = require('./config/folder-path');
 const theme = require('../cloudshare-theme-default');
+
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const development = require('./dev.config');
 const production = require('./prod.config');
@@ -15,21 +14,8 @@ const TARGET = process.env.npm_lifecycle_event;
 
 process.env.BABEL_ENV = TARGET;
 
-const getEntry = function() {
-  let entryPath = path.resolve(config.PATHS.SRC_PATH, 'entry');
-  let dirs = fs.readdirSync(entryPath);
-  let matchs = [], files = {};
-  dirs.forEach(function(item) {
-    matchs = item.match(/(.+)\.entry\.js$/);
-    if (matchs) {
-      files[matchs[1]] = path.resolve(config.PATHS.SRC_PATH, 'entry', item);
-    }
-  });
-  return files;
-};
-
 let webpackConfig = {
-  entry: getEntry(),
+  entry: getEntryFile(),
 
   // output: {},
 
@@ -43,7 +29,7 @@ let webpackConfig = {
         test: /\.js|jsx$/,
         exclude: /node_modules/,
         loaders: ['react-hot', 'babel'],
-        include: config.PATHS.SRC_PATH,
+        include: folderPath.PATHS.SRC_PATH,
       },
       {
         test(filePath) {
@@ -96,7 +82,7 @@ let webpackConfig = {
 
 
 // module.exports = webpackConfig;
-if (TARGET === 'start' || !TARGET) {
+if (TARGET === 'dev' || !TARGET) {
   module.exports = merge(development, webpackConfig);
 }
 

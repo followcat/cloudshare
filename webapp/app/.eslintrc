@@ -3,6 +3,7 @@
   "plugins": ["react"],
   "extends": ["eslint:recommended", "plugin:react/recommended"],
   "env": {
+    "node": true,
     "browser": true,
     "mocha": true
   },
@@ -18,5 +19,10 @@
     "semi": ["error", "always"],
     "no-class-assign": "off",
     "no-extra-boolean-cast": "warn"
+  },
+  "globals": {
+    "require": true,
+    "module": true,
+    "__dirname": true
   }
 }

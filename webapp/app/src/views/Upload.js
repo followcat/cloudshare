@@ -317,6 +317,7 @@ export default class Upload extends Component {
                     <UploadPreview
                       key={index}
                       id={item.filename}  // id是标记文件唯一的标准,这里用filename作为辨识
+                      resumeID={item.yaml_info.id}
                       currentPreview={this.state.currentPreview}
                       total={this.state.total}
                       index={index}

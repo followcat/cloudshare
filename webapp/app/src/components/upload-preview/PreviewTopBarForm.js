@@ -39,11 +39,18 @@ class PreviewTopBarForm extends Component {
         inline
         className={`${props.prefixCls}`}
       >
+        <FormItem label="ID">
+          <Input
+            style={{ width: 120 }}
+            value={props.resumeID}
+            readOnly
+          />
+        </FormItem>
         <FormItem label="Name">
           <Input
             {...nameProps}
             placeholder="Please input name"
-            style={{ width: 120 }}
+            style={{ width: 100 }}
           />
         </FormItem>
         <FormItem label="Source">
@@ -53,7 +60,7 @@ class PreviewTopBarForm extends Component {
             placeholder="Select a source"
             optionFilterProp="children"
             notFoundContent="Not found"
-            style={{ width: 140 }}
+            style={{ width: 120 }}
           >
             {resumeSource.map(item => {
               return (
@@ -73,7 +80,7 @@ class PreviewTopBarForm extends Component {
             multiple
             placeholder="Select a classify"
             value={props.classifyValue}
-            style={{ width: 160 }}
+            style={{ width: 120 }}
           >
             {props.classifyList.map((item, index) => {
               return (

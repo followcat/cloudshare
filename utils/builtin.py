@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
+import socket
 import hashlib
 
 import yaml
@@ -59,6 +60,18 @@ except ImportError:
 
 def strftime(t, format='%Y-%m-%d %H:%M:%S'):
     return time.strftime(format, time.localtime(t))
+
+
+def is_port_open(ip, port):
+    result = False
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    try:
+        s.connect((ip,int(port)))
+        s.shutdown(2)
+        result = True
+    except:
+        result = False
+    return result
 
 
 def jieba_cut(text, pos=False, HMM=True):

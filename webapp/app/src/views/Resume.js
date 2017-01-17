@@ -7,7 +7,7 @@ import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
 import History from '../utils/history';
 import { getRadarOption } from '../utils/chart_option';
-import generateSummary from '../utils/summary-generator';
+import { generateSummary } from '../utils/summary-generator';
 import { URL } from '../config/url';
 import 'whatwg-fetch';
 import './resume.less';

@@ -143,21 +143,5 @@ class SearchCVbyTextAPI(Resource):
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
             }
-            yaml_info['experience'] = self.experience_process(yaml_info['experience'])
             datas.append({ 'cv_id': id, 'yaml_info': yaml_info, 'info': info})
         return datas, pages
-
-    def experience_process(self, experience):
-        ex_company = experience['company'] if len(experience) and 'company' in experience else []
-        ex_position = experience['position'] if len(experience) and 'position' in experience else []
-
-        if len(ex_position) > 0:
-            for position in ex_position:
-                for company in ex_company:
-                    if position['at_company'] == company['id']:
-                        position['company'] = company['name']
-                        if 'business' in company:
-                            position['business'] = company['business']
-            return ex_position
-        else:
-            return ex_company

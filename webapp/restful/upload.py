@@ -55,6 +55,7 @@ class UploadCVAPI(Resource):
                                                          project_name, unique=True)
                         peo_result = self.svc_peo.add(peopobj, user.id)
                         if cv_result is True:
+                            project.peo_add(peopobj, user.id)
                             names.append(cvobj.name.md)
                             documents.append(cvobj.data)
                             status = 'success'

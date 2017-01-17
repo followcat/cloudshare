@@ -14,7 +14,7 @@ import { uploadPreview, confirmUpload } from '../request/upload';
 import { API } from '../config/api';
 import { URL } from '../config/url';
 import StorageUtil from '../utils/storage';
-import generateSummary from '../utils/summary-generator';
+import { generateSummary } from '../utils/summary-generator';
 import remove from 'lodash/remove';
 import findIndex from 'lodash/findIndex';
 import './upload.less';

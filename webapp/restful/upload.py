@@ -40,6 +40,7 @@ class UploadCVAPI(Resource):
         documents = []
         project = self.svc_mult_cv.getproject(project_name)
         for item in updates:
+            status = 'failed'
             cvobj = upload[user.id].pop(item['filename'])
             if cvobj is not None:
                 id = cvobj.metadata['id']
@@ -59,13 +60,10 @@ class UploadCVAPI(Resource):
                             status = 'success'
                             message = 'Upload success.'
                         else:
-                            status = 'failed'
                             message = 'Existed CV.'
                     except core.exception.NotExistsContactException:
-                        status = 'failed'
                         message = 'The contact information is empty.'
                 else:
-                    status = 'failed'
                     message = 'Unable to extract personal information, please modify and try again'
                 results.append({ 'id': id,
                                  'status': status,

@@ -1,6 +1,7 @@
 class MultiCV(object):
 
     def __init__(self, projects, repodb, additionals=None):
+        self.default = projects[0]
         self.repodb = repodb
         self.projects = dict([tuple([p.name, p]) for p in projects])
         self.projectscv = dict([tuple([p.name, p.curriculumvitae]) for p in projects])
@@ -10,9 +11,13 @@ class MultiCV(object):
             self.additionals = additionals
         self.svcls = [p.curriculumvitae for p in projects] + self.additionals.values()
 
-    def getproject(self, name):
-        assert name in self.projects
-        return self.projects[name]
+    def getproject(self, name=None):
+        if name is not None:
+            assert name in self.projects
+            project = self.projects[name]
+        else:
+            project = self.default
+        return project
 
     def add_md(self, cvobj, committer=None):
         return self.repodb.add_md(cvobj, committer)

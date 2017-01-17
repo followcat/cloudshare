@@ -63,7 +63,7 @@ const parseExperience = (experience) => {
     let workTime = `${expArray[i].date_from} - ${expArray[i].date_to}`,
         business = expArray[i].business || null,
         positionName = expArray[i].name || null,
-        companyName = expArray[i].companyName || expexpArrayerience.name || null,
+        companyName = expArray[i].companyName || null,
         duration = expArray[i].duration;
 
     value.push([workTime, business, positionName, companyName, duration]);

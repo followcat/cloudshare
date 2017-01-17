@@ -92,7 +92,7 @@ class UploadCVAPI(Resource):
             yamlinfo = utils.timeout.process.process_timeout_call(
                                  extractor.information_explorer.catch_cvinfo, 120,
                                  kwargs={'stream': filepro.markdown_stream.decode('utf8'),
-                                         'filename': filepro.base.base})
+                                         'filename': filename})
         except utils.timeout.process.KilledExecTimeout as e:
             return { 'code': 401, 'data': { 'result': False,
                                             'resultid': '',

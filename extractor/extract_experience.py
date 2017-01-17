@@ -160,7 +160,9 @@ TAPO = re.compile(u'^([所担]任)?职'+ASP+u'*[位务](类别)?[:：]?'+ASP+u'*
 BPO = re.compile(u'^(?P<aposition>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'*(?P<second>[^元/月'+SP+u']+)'+ASP+u'*)?($|(\|'+ASP+u'*('+SALARY+u')$))', re.M)
 
 LIEPPO = re.compile(u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+POASP+u'*'+APERIOD+ASP+ur'*(?P<position>'+POSITION+u'?)'+SALARY+u'?'+POASP+u'*$', re.M)
-NLIEPO = re.compile(u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+POASP+u'*(?:工作岗位：'+ASP+u'*)?(?P<position>'+POSITION+u'?)'+POASP+u'*('+SALARY+POASP+u'*)?'+APERIOD, re.M)
+NLIEPOBASE = u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+POASP+u'*(?:工作岗位：'+ASP+u'*)?(?P<position>'+POSITION+u'?)'+POASP+u'*('+SALARY+POASP+u'*)?'
+NLIEPO = re.compile(NLIEPOBASE+APERIOD, re.M)
+NLIEPONOPER = re.compile(NLIEPOBASE+u'(?:'+APERIOD+u'|'+POASP+u'*$)', re.M)
 
 NOBRPOS = POSITION.replace(u'：', u'（）：'+ENDLINESEP)
 YIPOSITION = NOBRPOS+u'(?P<lbr>[\(（])?(?(lbr)'+NOBRPOS+u'[\)）]('+NOBRPOS+u')?)'
@@ -370,7 +372,7 @@ def find_xp(RE, text):
 
 def work_xp_new_liepin(text):
     u"""
-    Test for NLIEPO
+    Test for NLIEPO (period mandatory)
         >>> assert '1000' in employees(company_1(work_xp_new_liepin(u'2009/07-至今   强生上海医疗器材有限公司\\n'
         ...     u'    公司性质： 外商独资·外企办事处 | 公司规模： 1000-2000人 | 公司行业： 医疗设备/器械\\n   产品经理   2014/09 - 至今  \\n'
         ...     u'    所在地区：北京    所在部门：杨森诊断中国事业部   汇报对象：事业部经理\\n下属人数： 0   薪酬情况： 22000')))
@@ -383,6 +385,11 @@ def work_xp_new_liepin(text):
         ...     u'  公司行业： 制药/生物工程\\n   运营中心总监   2014.01-至今\\n   薪酬状况：  25000 元 / 月\\n 工作地点： 北京\\n 下属人数： 30')))
         >>> assert u'软件开发' in name(position_1(work_xp_new_liepin(u'2002.09-2005.04         东洋网蓝软件服务有限公司\\n'
         ...     u'工作岗位：软件开发工程师    2002.09-2005.04\\n下属人数：   0\\n工作职责：         负责MRP软件的开发和维护')))
+
+    Test for NLIEPONOPER (no period)
+        >>> assert u'工程师' in name(position_1(work_xp_new_liepin(u'2012/10-至今    泰康资产管理有限责任公司\\n'
+        ...     u'    公司性质： 私营·民营企业 | 公司规模： 500-999人 | 公司行业： 基金/证券/期货/投资\\n    运维工程师\\n'
+        ...     u'    所在地区：北京          所在部门：信息科技部          汇报对象：部门经理\\n下属人数： 10   薪酬情况： 保密')))
 
     Test for PIPEPO
         >>> assert u'专员' in position_1(work_xp_new_liepin(u'2013.02-至今       迈瑞生物医疗电子股份有限公司\\n\\n'
@@ -400,10 +407,10 @@ def work_xp_new_liepin(text):
             out = {'company': [], 'position': []}
             pattern = company_business_noborder(RE)
             if re.compile(SALARY).search(text):
-                popattern = position_details(NLIEPO)
+                popattern = position_details(NLIEPONOPER)
             else:
                 # Speed up non-matching
-                popattern = position_details(NLIEPO).replace(u'('+SALARY+POASP+u'*)?', '')
+                popattern = position_details(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
             MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
             res = MA.search(text)
             if res:
@@ -427,10 +434,10 @@ def work_xp_new_liepin(text):
                 out = {'company': [], 'position': []}
                 pattern = company_business_noborder(RE)
                 if re.compile(SALARY).search(text):
-                    popattern = position_details_spaceonly(NLIEPO)
+                    popattern = position_details_spaceonly(NLIEPONOPER)
                 else:
                     # Speed up non-matching
-                    popattern = position_details_spaceonly(NLIEPO).replace(u'('+SALARY+POASP+u'*)?', '')
+                    popattern = position_details_spaceonly(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
                 MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
                 res = MA.search(text)
                 if res:

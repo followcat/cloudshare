@@ -27,6 +27,7 @@ class UploadPreview extends Component {
           <PreviewTopBarForm
             form={props.form}
             id={props.id}
+            resumeID={props.resumeID}
             name={props.name}
             currentPreview={props.currentPreview}
             total={props.total}

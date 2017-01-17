@@ -21,9 +21,12 @@ RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PE
 MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
 SPSOLHDR = ASP+u'*(?P<col1>-{5,}) (?:-{5,}) (?:-{5,}) (?:-{5,})\n'
-SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?(?P<period>'+PERIOD+ur'[:：]?'+ASP+u'*)'+SCHOOL+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
+SEPLIST = ur'[:：]?'+ASP+u'*'
+CTL = (u'(?P<period>'+PERIOD+u')', SCHOOL)
+SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+ASP+u'*'+SEPLIST.join(CTL)+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
+RVSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+ASP+u'*'+SEPLIST.join(reversed(CTL))+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
 UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
-RVSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+EDUCATION+u'[\n'+SP+u']+'+SCHOOL+u'[\n'+SP+u']+(?P<major>[^'+SP+u']+)[\n'+SP+u']+', re.M)
+SPSOLMAEDFST = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+EDUCATION+u'[\n'+SP+u']+'+SCHOOL+u'[\n'+SP+u']+(?P<major>[^'+SP+u']+)[\n'+SP+u']+', re.M)
 
 PFXSENSEMA = re.compile(with_prefix(SENSEMA), re.M)
 PFXSPSOLMA = re.compile(with_prefix(SPSOLMA), re.M)
@@ -239,9 +242,9 @@ def education_xp(text, summary=None):
             else:
                 format_output(out, r.groupdict(), summary={'major': ''})
         out = sorted(out, key=lambda x: x['date_from'], reverse=True)
-    if not maj and RVSPSOLMA.search(text):
+    if not maj and SPSOLMAEDFST.search(text):
         out = []
-        for r in RVSPSOLMA.finditer(text):
+        for r in SPSOLMAEDFST.finditer(text):
             if r.group('major'):
                 maj +=1
                 format_output(out, r.groupdict())
@@ -277,6 +280,7 @@ def fix_output(processed):
 
 def fix_liepin(d):
     u"""
+        >>> assert fix_liepin(u'教育经历\\n----------\\n\\n----------\\n北京科技大学  2008/09–2012/07   计算机科学与技术   本科\\n----------')
         >>> assert u'网络' in fix_liepin(u'教育经历\\n   哈尔滨技师学院 （2007.09 - 2011.07）\\n'
         ...     u'专业：网络工程                         学历：大专   是否统招：否')['education_history'][0]['major']
         >>> assert u'齐齐' in fix_liepin(u'教育经历\\n   2002/9-2006/7 齐齐哈尔大学 工商管理 本科')['education_history'][0]['school']
@@ -293,6 +297,12 @@ def fix_liepin(d):
                 summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
                 summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
             for r in SPSOLMA.finditer(res.group('edu')):
+                maj +=1
+                format_output(processed, r.groupdict(), summary)
+            else:
+                if maj:
+                    return fix_output(processed)
+            for r in RVSPSOLMA.finditer(res.group('edu')):
                 maj +=1
                 format_output(processed, r.groupdict(), summary)
             else:
@@ -454,7 +464,7 @@ def fix(d):
     maj = 0
     if is_jycv(d):
         return fix_jingying(d)
-    elif is_lpcv(d):
+    elif is_lpcv(d) or is_nlpcv(d):
         return fix_liepin(d)
     elif is_zlcv(d):
         return fix_zhilian(d)

@@ -24,6 +24,7 @@ export default class FastMatching extends Component {
   constructor() {
     super();
     this.state = {
+      current: 1,  // 当前页
       id: '',
       classify: [],
       industry: {},
@@ -148,7 +149,8 @@ export default class FastMatching extends Component {
     }
 
     this.setState({
-      postData: postData,
+      current: 1,
+      postData: Object.assign({}, postData, { page: 1 }),
       visible: true,
       spinning: true,
       siderbarVisible: true,
@@ -182,6 +184,7 @@ export default class FastMatching extends Component {
    */
   handleSwitchPage(page) {
     this.setState({
+      current: page,
       spinning: true,
       searchResultDataSource: [],
     });
@@ -194,7 +197,7 @@ export default class FastMatching extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: Generator.getPostData(Object.assign(this.state.postData, { page: page })),
+      body: Generator.getPostData(Object.assign({}, this.state.postData, { page: page })),
     })
     .then(response => response.json())
     .then((json) => {
@@ -276,6 +279,7 @@ export default class FastMatching extends Component {
         <SearchResultBox
           type="match"
           visible={this.state.visible}
+          current={this.state.current}
           total={this.state.total}
           spinning={this.state.spinning}
           dataSource={this.state.searchResultDataSource}

@@ -62,7 +62,8 @@ class Config(object):
                                     filename=filepro.base.base)
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
-        self.SVC_MULT_CV.add(dataobj, projectname='project_test')
+        project = self.SVC_MULT_CV.getproject('project_test')
+        project.cv_add(dataobj)
 
     def rebuild(self):
         self.destory()

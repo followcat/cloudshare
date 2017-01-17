@@ -51,17 +51,20 @@ class UploadCVAPI(Resource):
                     peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
                     peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
                     try:
-                        cv_result = self.svc_mult_cv.add(cvobj, user.id,
-                                                         project_name, unique=True)
-                        peo_result = self.svc_peo.add(peopobj, user.id)
-                        if cv_result is True:
-                            project.peo_add(peopobj, user.id)
+                        repo_cv_result = self.svc_mult_cv.repodb.add(cvobj, user.id, unique=True)
+                        project_cv_result = project.cv_add(cvobj, user.id)
+                        if repo_cv_result:
+                            repo_peo_result = self.svc_peo.add(peopobj, user.id)
+                        if project_cv_result:
+                            project_peo_result = project.peo_add(peopobj, user.id)
+                            status = 'success'
+                            message = 'Add to CV database and project.'
                             names.append(cvobj.name.md)
                             documents.append(cvobj.data)
-                            status = 'success'
-                            message = 'Upload success.'
+                            if not repo_cv_result:
+                                message = 'Existed in other project.'
                         else:
-                            message = 'Existed CV.'
+                            message = 'Resume existed in database and project.'
                     except core.exception.NotExistsContactException:
                         message = 'The contact information is empty.'
                 else:

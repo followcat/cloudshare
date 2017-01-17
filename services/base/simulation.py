@@ -61,7 +61,8 @@ class Simulation(services.base.storage.BaseStorage):
         self.ids.add(id)
         return True
 
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False):
+    def add(self, bsobj, committer=None, unique=True,
+            yamlfile=True, mdfile=False, do_commit=True):
         result = False
         id = bsobj.ID
         if (unique and not self.exists(id)) or not unique:
@@ -75,6 +76,9 @@ class Simulation(services.base.storage.BaseStorage):
                     os.makedirs(os.path.join(self.path, self.yamlpath))
                 info = self.generate_info_template()
                 info['committer'] = committer
+                info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                if 'date' not in info or not info['date']:
+                    info['date'] = time.time()
                 name = core.outputstorage.ConvertName(id).yaml
                 dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                      allow_unicode=True, default_flow_style=False)
@@ -82,7 +86,7 @@ class Simulation(services.base.storage.BaseStorage):
                 filedatas.append(dumpinfo)
             self.interface.add_files(filenames, filedatas,
                                      message='Add new data %s.'%id,
-                                     committer=committer)
+                                     committer=committer, do_commit=do_commit)
             result = True
         return result
 
@@ -103,36 +107,38 @@ class Simulation(services.base.storage.BaseStorage):
         yaml.update(info)
         return yaml
 
-    def _modifyinfo(self, id, key, value, committer):
+    def _modifyinfo(self, id, key, value, committer, do_commit=True):
         result = {}
         projectinfo = self.getinfo(id)
         projectyaml = self.getyaml(id)
         if not projectyaml[key] == value:
+            projectinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             projectinfo[key] = value
             self.saveinfo(id, projectinfo,
-                          'Modify %s key %s.' % (id, key), committer)
+                          'Modify %s key %s.' % (id, key), committer, do_commit=do_commit)
             result = {key: value}
         return result
 
-    def _addinfo(self, id, key, value, committer):
+    def _addinfo(self, id, key, value, committer, do_commit=True):
         projectinfo = self.getinfo(id)
         data = self._infoframe(value, committer)
+        projectinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         projectinfo[key].insert(0, data)
         self.saveinfo(id, projectinfo,
-                      'Add %s key %s.' % (id, key), committer)
+                      'Add %s key %s.' % (id, key), committer, do_commit=do_commit)
         return data
 
-    def _deleteinfo(self, id, key, value, date, committer):
+    def _deleteinfo(self, id, key, value, date, committer, do_commit=True):
         projectinfo = self.getinfo(id)
         data = self._infoframe(value, committer, date)
         if data in projectinfo[key]:
             projectinfo[key].remove(data)
             self.saveinfo(id, projectinfo,
-                          'Delete %s key %s.' % (id, key), committer)
+                          'Delete %s key %s.' % (id, key), committer, do_commit=do_commit)
             return data
 
     @utils.issue.fix_issue('issues/update_name.rst')
-    def updateinfo(self, id, key, value, committer):
+    def updateinfo(self, id, key, value, committer, do_commit=True):
         assert key not in self.fix_item
         assert self.exists(id)
         projectinfo = self.getinfo(id)
@@ -141,12 +147,12 @@ class Simulation(services.base.storage.BaseStorage):
         if key not in projectinfo and key not in baseinfo:
             return result
         if key in self.list_item:
-            result = self._addinfo(id, key, value, committer)
+            result = self._addinfo(id, key, value, committer, do_commit=do_commit)
         else:
-            result = self._modifyinfo(id, key, value, committer)
+            result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
-    def deleteinfo(self, id, key, value, committer, date):
+    def deleteinfo(self, id, key, value, committer, date, do_commit=True):
         assert key not in self.fix_item
         assert key in self.list_item
         assert self.exists(id)
@@ -155,7 +161,7 @@ class Simulation(services.base.storage.BaseStorage):
         result = None
         if key not in projectinfo and key not in baseinfo:
             return result
-        result = self._deleteinfo(id, key, value, date, committer)
+        result = self._deleteinfo(id, key, value, date, committer, do_commit=do_commit)
         return result
 
     def _infoframe(self, value, username, date=None):
@@ -166,11 +172,12 @@ class Simulation(services.base.storage.BaseStorage):
                 'date': date}
         return data
 
-    def saveinfo(self, id, info, message, committer):
+    def saveinfo(self, id, info, message, committer, do_commit=True):
         name = core.outputstorage.ConvertName(id).yaml
         dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
-        self.interface.modify(name, dumpinfo, message=message, committer=committer)
+        self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
+                              message=message, committer=committer, do_commit=do_commit)
 
     def search(self, keyword):
         results = set()
@@ -188,13 +195,6 @@ class Simulation(services.base.storage.BaseStorage):
             id = core.outputstorage.ConvertName(filename).base
             results.add(id)
         return results
-
-    def saveinfo(self, id, info, message, committer):
-        name = core.outputstorage.ConvertName(id).yaml
-        dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
-                             allow_unicode=True, default_flow_style=False)
-        self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
-                              message=message, committer=committer)
 
     @property
     def ids(self):

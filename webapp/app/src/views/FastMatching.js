@@ -14,6 +14,9 @@ import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
 import queryString from '../utils/query_string';
 import { API } from '../config/api';
+
+import { getIndustry } from '../request/classify';
+
 import './fastmatching.less';
 
 export default class FastMatching extends Component {
@@ -23,6 +26,7 @@ export default class FastMatching extends Component {
     this.state = {
       id: '',
       classify: [],
+      industry: {},
       searchResultDataSource: [],
       pages: 0,
       total: 0,
@@ -37,6 +41,7 @@ export default class FastMatching extends Component {
     };
 
     this.loadClassifyData = this.loadClassifyData.bind(this);
+    this.loadIndustry = this.loadIndustry.bind(this);
     this.loadResultData = this.loadResultData.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
@@ -47,7 +52,7 @@ export default class FastMatching extends Component {
    * [初始加载classify列表]
    * @return {[type]} [description]
    */
-  loadClassifyData() {
+  loadClassifyData(id = null, postAPI = null) {
     fetch(`/api/classify`, {
       method: 'POST',
       headers: {
@@ -62,8 +67,21 @@ export default class FastMatching extends Component {
         this.setState({
           classify: json.data,
         });
+        if (id && postAPI) {
+          this.loadResultData(id, postAPI, json.data);
+        }
       }
     })
+  }
+
+  loadIndustry() {
+    getIndustry(json => {
+      if (json.code === 200) {
+        this.setState({
+          industry: json.data
+        });
+      }
+    });
   }
 
   /**
@@ -71,8 +89,8 @@ export default class FastMatching extends Component {
    * @param  {[string]} id [JD id]
    * @return {[type]}    [description]
    */
-  loadResultData(id, postAPI) {
-    let postData = { id: id };
+  loadResultData(id, postAPI, classify) {
+    let postData = { id: id, uses: classify };
     this.setState({
       visible: true,
       spinning: true,
@@ -215,7 +233,8 @@ export default class FastMatching extends Component {
           cv_id = params.cv_id ? params.cv_id : null;
     let postAPI;
 
-    this.loadClassifyData();
+    // this.loadClassifyData();
+    this.loadIndustry();
 
     if (jd_id) {
       postAPI = API.LSI_BY_JD_ID_API;
@@ -224,7 +243,7 @@ export default class FastMatching extends Component {
         postAPI: postAPI,
         siderbarVisible: true,
       });
-      this.loadResultData(jd_id, postAPI);
+      this.loadClassifyData(jd_id, postAPI);
     } else if (cv_id) {
       postAPI = API.LSI_BY_CV_ID_API;
       this.setState({
@@ -232,12 +251,13 @@ export default class FastMatching extends Component {
         id: cv_id,
         postAPI: postAPI,
       });
-      this.loadResultData(cv_id, postAPI);
+      this.loadClassifyData(cv_id, postAPI);
     } else {
       this.setState({
         textarea: true,
         postAPI: API.LSI_BY_DOC_API,
       });
+      this.loadClassifyData();
     }
   }
 
@@ -248,6 +268,7 @@ export default class FastMatching extends Component {
         <FilterBox
           textarea={this.state.textarea}
           classify={this.state.classify}
+          industry={this.state.industry}
           visible={this.state.visible}
           total={this.state.total}
           onSearch={this.handleSearch}

@@ -58,6 +58,12 @@ class Project(services.base.service.Service):
     def getclassify(self):
         return self.config['classify']
 
+    def getindustry(self):
+        result = dict()
+        for each in self.config['classify']:
+            result.update({each: sources.industry_id.sources[each]})
+        return result
+
     def cv_add(self, cvobj, committer=None, unique=True):
         return self.curriculumvitae.add(cvobj, committer, unique)
 
@@ -118,12 +124,28 @@ class Project(services.base.service.Service):
         outputs.extend(self.company.compare_excel(stream, committer))
         return outputs
 
-    def company_add_excel(self, items):
+    def company_add_excel(self, items, committer):
+        results = dict()
+        repo_result = set()
+        project_result = set()
         for item in items:
-            if item[0] == 'add':
-                self.corepo.add(*item[1])
-            elif item[0] == 'followup':
-                self.company.updateinfo(*item[1])
+            yamlname = core.outputstorage.ConvertName(item[1]).yaml
+            if item[0] == 'companyadd':
+                baseobj = core.basedata.DataObject(*item[2][:2])
+                repo_result.add(yamlname)
+                result = self.corepo.add(baseobj, committer=item[2][-1], do_commit=False)
+            elif item[0] == 'projectadd':
+                baseobj = core.basedata.DataObject(*item[2][:2])
+                project_result.add(self.company.ids_file)
+                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+                result = self.company.add(baseobj, committer=item[2][-1], do_commit=False)
+            elif item[0] == 'listadd':
+                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+                result = self.company.updateinfo(*item[2], do_commit=False)
+            results[item[1]] = result
+        self.corepo.interface.do_commit(list(repo_result), committer=committer)
+        self.company.interface.do_commit(list(project_result), committer=committer)
+        return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         self.corepo.add(coobj, committer, unique, yamlfile, mdfile)

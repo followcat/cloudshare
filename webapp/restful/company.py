@@ -238,23 +238,31 @@ class CompanyUploadExcelAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        super(CompanyUploadExcdlAPI, self).__init__()
+        super(CompanyUploadExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('files', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
+        args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        if user.id not in upload:
-            upload[user.id] = dict()
         project_name = args['project']
         network_file = flask.request.files['files']
         project = self.svc_mult_cv.getproject(project_name)
-        datas = project.company_compare_excel(network_file.read(), committer=user)
+        compare_result = project.company_compare_excel(network_file.read(), committer=user.id)
+        infos = dict()
+        for item in compare_result:
+            coid = item[1]
+            if coid not in infos:
+                if project.corepo.exists(coid):
+                    infos[coid] = project.company_get(coid)
+                else:
+                    infos[coid] = item[2][0]
         return {
             'code': 200,
-            'data': datas
+            'data': compare_result,
+            'info': infos
         }
 
 
@@ -266,14 +274,17 @@ class CompanyConfirmExcelAPI(Resource):
         super(CompanyConfirmExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.reqparse.add_argument('data', location = 'json')
+        self.reqparse.add_argument('data', type = list, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
+        args = self.reqparse.parse_args()
         datas = args['data']
         project_name = args['project']
+        user = flask.ext.login.current_user
         project = self.svc_mult_cv.getproject(project_name)
-        project.company_add_excel(datas)
+        results = project.company_add_excel(datas, user.id)
         return {
-            'code': 200
+            'code': 200,
+            'data': results
         }

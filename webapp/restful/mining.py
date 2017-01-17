@@ -38,12 +38,13 @@ class PositionAPI(BaseAPI):
 
     def post(self):
         args = self.reqparse.parse_args()
-        project = args['project']
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
         text = args['search_text']
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            searches = self.svc_mult_cv.getproject(project).cv_search(text)
+            searches = project.cv_search(text)
         result = []
         for name in searches:
             positions = []
@@ -172,9 +173,9 @@ class LSIbaseAPI(Resource):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(project, doc, uses=uses)
+        result = self.miner.probability(project, doc, uses=uses, top=500)
         filteset = self.index.get(filterdict, uses=uses)
-        if filteset:
+        if filterdict:
             result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
         totals = len(result)
         if totals%eve_count != 0:
@@ -222,13 +223,14 @@ class LSIbyJDidAPI(LSIbaseAPI):
     def post(self):
         args = self.reqparse.parse_args()
         id = args['id']
-        project = args['project']
-        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id)
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
-        uses = [project] + args['uses'] if args['uses'] else [project]
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(project, doc, uses, filterdict, cur_page)
+        result = self._post(projectname, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -246,12 +248,13 @@ class LSIbyCVidAPI(LSIbaseAPI):
     def post(self):
         args = self.reqparse.parse_args()
         id = args['id']
-        project = args['project']
-        doc = self.svc_mult_cv.getproject(project).cv_getmd(id)
-        uses = [project] + args['uses'] if args['uses'] else [project]
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        doc = project.cv_getmd(id)
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(project, doc, uses, filterdict, cur_page)
+        result = self._post(projectname, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -268,11 +271,12 @@ class LSIbydocAPI(LSIbaseAPI):
     def post(self):
         args = self.reqparse.parse_args()
         doc = args['doc']
-        project = args['project']
-        uses = [project] + args['uses'] if args['uses'] else [project]
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(project, doc, uses, filterdict, cur_page)
+        result = self._post(projectname, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -291,11 +295,12 @@ class SimilarAPI(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         id = args['id']
-        project = args['project']
+        projectname = args['project']
         doc = self.svc_mult_cv.getmd(id)
-        uses = [project] + self.svc_mult_cv.getyaml(id)['classify']
+        uses = [projectname] + self.svc_mult_cv.getyaml(id)['classify']
         datas = []
-        for name, score in self.miner.probability(project, doc, uses=uses, top=6)[1:6]:
+        for name, score in self.miner.probability(projectname, doc,
+                                                  uses=uses, top=6)[1:6]:
             yaml_info = self.svc_mult_cv.getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
         return { 'code': 200, 'data': datas }
@@ -315,13 +320,15 @@ class ValuablebaseAPI(Resource):
 
     def _get(self, doc, project):
         args = self.reqparse.parse_args()
-        uses = [project] + args['uses'] if args['uses'] else [project]
+        projectname = project.name
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         name_list = args['name_list']
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project, uses=uses)
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
+                                               doc, projectname, uses=uses)
         else:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv, doc, project,
-                                               uses=uses, name_list=name_list)
+            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
+                                               doc, projectname, uses=uses, name_list=name_list)
         response = dict()
         datas = []
         for index in result:
@@ -332,7 +339,9 @@ class ValuablebaseAPI(Resource):
                 name = match_item[0]
                 yaml_data = self.svc_mult_cv.getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
-                values.append({ 'match': match_item[1], 'id': yaml_data['id'], 'name': yaml_data['name'] })
+                values.append({ 'match': match_item[1],
+                                'id': yaml_data['id'],
+                                'name': yaml_data['name'] })
             item['value'] = values
             datas.append(item)
         response['result'] = datas
@@ -351,8 +360,9 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
     def post(self):
         args = self.reqparse.parse_args()
         id = args['id']
-        project = args['project']
-        jd_yaml = self.svc_mult_cv.getproject(project).jd_get(id)
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
         result = self._get(doc, project)
         return { 'code': 200, 'data': result }
@@ -367,8 +377,8 @@ class ValuablebydocAPI(ValuablebaseAPI):
     def post(self):
         args = self.reqparse.parse_args()
         doc = args['doc']
-        project = args['project']
-        result = self._get(doc, project)
+        projectname = args['project']
+        result = self._get(doc, projectname)
         return { 'result': result }
 
 
@@ -383,10 +393,11 @@ class ValuableAPI(ValuablebaseAPI):
 
     def post(self):
         args = self.reqparse.parse_args()
-        project = args['project']
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
         doc = ''
         if args['id']:
-            jd_yaml = self.svc_mult_cv.getproject(project).jd_get(args['id'])
+            jd_yaml = project.jd_get(args['id'])
             doc = jd_yaml['description']
         elif args['doc']:
             doc = args['doc']

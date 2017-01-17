@@ -72,6 +72,7 @@ export default class SearchResultBox extends Component {
           {this.renderResultDOM()}
         </Spin>
         <SearchResultPagination
+          current={this.props.current}
           total={this.props.total}
           onSwitchPage={this.props.onSwitchPage}
         />

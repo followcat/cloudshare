@@ -14,7 +14,7 @@ class AdditionalInfoItem extends Component {
     super();
     this.state = {
       visible: false,
-      editable: false,
+      editStatus: false,
       opening: false
     };
     this.handleMouseOver = this.handleMouseOver.bind(this);
@@ -42,13 +42,13 @@ class AdditionalInfoItem extends Component {
 
   handleClick() {
     this.setState({
-      editable: true
+      editStatus: true
     });
   }
 
   handleCancel() {
     this.setState({
-      editable: false
+      editStatus: false
     });
   }
 
@@ -121,12 +121,13 @@ class AdditionalInfoItem extends Component {
             </Tag>
           );
         })}
-        <div className="cs-additional-input-group">
+        <div className="cs-additional-input-group extra-opearator">
           <EnhancedInput
             type="plus"
             placeholder=""
             size="small"
             resettable={true}
+            style={{ display: 'inline-block', width: '80%' }}
             onClick={this.handleEnhancedInputClick}
           />
           <Button
@@ -153,9 +154,9 @@ class AdditionalInfoItem extends Component {
         onMouseOut={this.handleMouseOut}
         onDoubleClick={this.handleClick}
       >
-        <label className="cs-item-row-label">{itemInfo.title}</label>
-        <div className="cs-item-row-content">
-          {this.state.editable ?
+        <label className="cs-item-row-label extra-label">{itemInfo.title}</label>
+        <div className="cs-item-row-content extra-content">
+          {this.state.editStatus ?
               this.getEditingRender(dataSource, itemInfo.dataIndex) :
               this.getNormalRender(dataSource, itemInfo.dataIndex)
           }

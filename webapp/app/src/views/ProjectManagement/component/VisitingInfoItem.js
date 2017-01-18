@@ -11,7 +11,7 @@ class VisitingInfoItem extends Component {
     this.state = {
       visible: false,
       foldable: true,
-      editable: false
+      editStatus: false
     };
     this.handleMouseOver = this.handleMouseOver.bind(this);
     this.handleMouseOut = this.handleMouseOut.bind(this);
@@ -39,7 +39,7 @@ class VisitingInfoItem extends Component {
 
   handleEditClick() {
     this.setState({
-      editable: true
+      editStatus: true
     });
   }
 
@@ -63,7 +63,7 @@ class VisitingInfoItem extends Component {
 
   handleCancelClick() {
     this.setState({
-      editable: false
+      editStatus: false
     });
   }
 
@@ -83,9 +83,9 @@ class VisitingInfoItem extends Component {
 
   getFoldRender() {
     const { dataSource, itemInfo } = this.props,
-          { editable } = this.state;
+          { editStatus } = this.state;
 
-    if (dataSource[itemInfo.dataIndex].length > 1 && !editable) {
+    if (dataSource[itemInfo.dataIndex].length > 1 && !editStatus) {
       if (this.state.foldable) {
         return (
           <a href="javascript: void(0);" onClick={this.handleMoreClick}>更多</a>
@@ -101,9 +101,9 @@ class VisitingInfoItem extends Component {
   }
 
   getEditingRender() {
-    const { visible, editable } = this.state;
+    const { visible, editStatus } = this.state;
 
-    if (editable) {
+    if (editStatus) {
       return (
         <div className="visiting-form">
           <EnhancedInput
@@ -134,7 +134,7 @@ class VisitingInfoItem extends Component {
 
   render() {
     const { dataSource, itemInfo } = this.props,
-          { foldable, editable } = this.state,
+          { foldable, editStatus } = this.state,
           data = dataSource[itemInfo.dataIndex];
 
     return (
@@ -151,15 +151,15 @@ class VisitingInfoItem extends Component {
               {data.map((item, index) => {
                 return (
                   <li
-                    key={item.date}
-                    className={index > 0 && foldable && !editable ? 
+                    key={index}
+                    className={index > 0 && foldable && !editStatus ? 
                                   'visiting-item-hide' :
                                   'visiting-item'}
                   >
                     <span className="visiting-time">{item.date.split(' ')[0]}</span>
                     <span className="visiting-author">{item.author}</span>
                     <span className="visiting-detail">{item.content}</span>
-                    {editable && 
+                    {editStatus && 
                         <a
                           href="javascript: void(0);"
                           onClick={() => this.handleDeleteClick(item.content, item.date)}

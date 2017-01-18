@@ -31,7 +31,7 @@ class CompanyList extends Component {
     super();
     this.state = {
       current: 1,
-      pageSize: 20,
+      pageSize: 40,
       total: 0,
       searchWord: '',
       dataSource: [],
@@ -228,7 +228,7 @@ class CompanyList extends Component {
       total: total,
       showSizeChanger: true,
       showQuickJumper: true,
-      defaultPageSize: 20,
+      defaultPageSize: 40,
       showTotal: total => `共 ${total} 条`,
       onShowSizeChange: this.handleShowSizeChange,
       onChange: this.handlePaginationChange
@@ -262,6 +262,9 @@ class CompanyList extends Component {
             </ButtonWithModal>
           </div>
         </div>
+        <div className="cs-card-inner-pagination">
+          <Pagination {...pagination} />
+        </div>
         <Spin
           size="large"
           spinning={this.state.loading}
@@ -277,7 +280,7 @@ class CompanyList extends Component {
             );
           })}
         </Spin>
-        <div className="cs-card-inner-bottom">
+        <div className="cs-card-inner-pagination">
           <Pagination {...pagination} />
         </div>
       </div>

@@ -14,7 +14,7 @@ class BasicInfoItem extends Component {
       visible: false,
       fieldProp: '',
       fieldValue: '',
-      editable: false,
+      editStatus: false,
       opening: false
     };
     this.handleMouseOver = this.handleMouseOver.bind(this);
@@ -42,7 +42,7 @@ class BasicInfoItem extends Component {
     const { itemInfo, dataSource } = this.props;
 
     this.setState({
-      editable: true,
+      editStatus: true,
       fieldProp: itemInfo.dataIndex,
       fieldValue: dataSource[itemInfo.dataIndex]
     });
@@ -63,13 +63,13 @@ class BasicInfoItem extends Component {
     }
 
     this.setState({
-      editable: false
+      editStatus: false
     });
   }
 
   handleCancelClick() {
     this.setState({
-      editable: false
+      editStatus: false
     });
   }
 
@@ -82,8 +82,8 @@ class BasicInfoItem extends Component {
   }
 
   render() {
-    const { itemInfo, dataSource } = this.props;
-
+    const { itemInfo, labelCls, contentCls, dataSource } = this.props;
+    
     return (
       <div
         className="cs-item-row"
@@ -91,9 +91,9 @@ class BasicInfoItem extends Component {
         onMouseOut={this.handleMouseOut}
         onDoubleClick={this.handleClick}
       >
-        <label className="cs-item-row-label">{itemInfo.title}</label>
-        {!this.state.editable ?
-            <div className="cs-item-row-content">
+        <label className={`cs-item-row-label ${labelCls}`}>{itemInfo.title}</label>
+        {!this.state.editStatus ?
+            <div className={`cs-item-row-content ${contentCls}`}>
               <span
                 className={this.state.opening ? 'cs-item-row-content-text' : 'cs-item-row-content-text ommit'}
                 title={dataSource[itemInfo.dataIndex]}
@@ -142,12 +142,16 @@ class BasicInfoItem extends Component {
 }
 
 BasicInfoItem.defaultProps = {
+  labelCls: '',
+  contentCls: '',
   itemInfo: {},
   dataSource: {},
   onSave() {}
 };
 
 BasicInfoItem.propTypes = {
+  labelCls: PropTypes.string,
+  contentCls: PropTypes.string,
   itemInfo: PropTypes.object,
   dataSource: PropTypes.object,
   onSave: PropTypes.func

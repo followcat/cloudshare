@@ -5,7 +5,13 @@ import BasicInfoItem from './BasicInfoItem';
 import AdditionalInfoItem from './AdditionalInfoItem';
 import VisitingInfoItem from './VisitingInfoItem';
 
-import { Row, Col, Card, Icon } from 'antd';
+import {
+  Row,
+  Col,
+  Card,
+  Icon,
+  Popconfirm
+} from 'antd';
 
 import chunk from 'lodash/chunk';
 import websiteText from '../../../config/website-text';
@@ -19,6 +25,8 @@ class CompanyInfo extends Component {
       visible: false,
     };
     this.handleClick = this.handleClick.bind(this);
+    this.handleConfirm = this.handleConfirm.bind(this);
+    this.getRenderCustomerOperation = this.getRenderCustomerOperation.bind(this);
     this.getBasicInfoRender = this.getBasicInfoRender.bind(this);
     this.getAdditionalInfoRender = this.getAdditionalInfoRender.bind(this);
     this.getBasicInfoOnExtra = this.getBasicInfoOnExtra.bind(this);
@@ -29,6 +37,27 @@ class CompanyInfo extends Component {
     this.setState({
       visible: !this.state.visible
     });
+  }
+
+  handleConfirm(id) {
+    this.props.onAddCustomerConfirm(id);
+  }
+
+  getRenderCustomerOperation() {
+    const { dataSource, isCustomer } = this.props;
+
+    if (isCustomer) {
+      return <span style={{ color: 'green' }}>{language.ADDED_CUSTOMER}</span>;
+    } else {
+      return (
+        <Popconfirm
+          title={language.ADD_CONFIRM_MSG}
+          onConfirm={() => this.handleConfirm(dataSource.id)}
+        >
+          <a href="javascript: void(0);">{language.ADD_CUSTOMER}</a>
+        </Popconfirm>
+      );
+    }
   }
 
   getBasicInfoRender() {
@@ -175,8 +204,10 @@ class CompanyInfo extends Component {
     return (
       <Card
         style={{ marginBottom: 8 }}
-        bodyStyle={{ padding: 16 }}
       >
+        <div className="add-btn-container">
+          {this.getRenderCustomerOperation()}
+        </div>
         {this.getBasicInfoRender()}
         {this.getVisitingInfoRender()}
         <div className="extra">
@@ -197,17 +228,21 @@ class CompanyInfo extends Component {
 }
 
 CompanyInfo.defaultProps = {
+  isCustomer: false,
   basicInfoRows: [],
   dataSource: {},
   onSave() {},
-  onRemove() {}
+  onRemove() {},
+  onAddCustomerConfirm() {}
 };
 
 CompanyInfo.propTypes = {
+  isCustomer: PropTypes.bool,
   basicInfoRows: PropTypes.array,
   dataSource: PropTypes.object,
   onSave: PropTypes.func,
-  onRemove: PropTypes.func
+  onRemove: PropTypes.func,
+  onAddCustomerConfirm: PropTypes.func
 };
 
 export default CompanyInfo;

@@ -16,10 +16,12 @@ import {
 } from 'antd';
 
 import {
+  getCustomerList,
   getAllCompany,
   getAllCompanyBySearch,
   updateCompanyInfo,
-  createCompany
+  updateCustomer,
+  createCompany,
 } from '../../../request/company';
 
 import websiteText from '../../../config/website-text';
@@ -35,6 +37,7 @@ class CompanyList extends Component {
       total: 0,
       searchWord: '',
       dataSource: [],
+      customerIDList: [],
       loading: false,
       visible: false,
     };
@@ -46,9 +49,11 @@ class CompanyList extends Component {
     this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
     this.handleUploadBtnClick = this.handleUploadBtnClick.bind(this);
     this.handleUploadModalCancel = this.handleUploadModalCancel.bind(this);
+    this.handleAddCustomerConfirm = this.handleAddCustomerConfirm.bind(this);
     this.updateDataSource = this.updateDataSource.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getDataSourceBySearch = this.getDataSourceBySearch.bind(this);
+    this.getCustomerDataSource = this.getCustomerDataSource.bind(this);
   }
 
   componentDidMount() {
@@ -56,6 +61,7 @@ class CompanyList extends Component {
           pageSize = this.state.pageSize;
 
     this.getDataSource(current, pageSize);
+    this.getCustomerDataSource();
   }
 
   handleSave(field) {
@@ -168,6 +174,24 @@ class CompanyList extends Component {
     });
   }
 
+  handleAddCustomerConfirm(id) {
+    let idList = this.state.customerIDList;
+
+    updateCustomer('POST', {
+      id: id
+    }, (json) => {
+      if (json.code === 200) {
+        message.success(language.ADD_SUCCESS_MSG);
+        idList.push(id);
+        this.setState({
+          customerIDList: idList
+        });
+      } else {
+        message.error(language.ADD_FAIL_MSG);
+      }
+    });
+  }
+
   updateDataSource() {
     const searchWord = this.state.searchWord.trim(),
           current = this.state.current,
@@ -214,6 +238,17 @@ class CompanyList extends Component {
           dataSource: json.data,
           total: json.total,
           loading: false
+        });
+      }
+    });
+  }
+
+  getCustomerDataSource() {
+    getCustomerList(json => {
+      if (json.code === 200) {
+        let idList = json.data.map(v => v.id);
+        this.setState({
+          customerIDList: idList
         });
       }
     });
@@ -274,8 +309,10 @@ class CompanyList extends Component {
               <CompanyInfo
                 key={index}
                 dataSource={item}
+                isCustomer={this.state.customerIDList.indexOf(item.id) > -1}
                 onSave={this.handleSave}
                 onRemove={this.handleRemove}
+                onAddCustomerConfirm={this.handleAddCustomerConfirm}
               />
             );
           })}

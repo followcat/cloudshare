@@ -57,6 +57,7 @@ class UploadCVAPI(Resource):
                             repo_peo_result = self.svc_peo.add(peopobj, user.id)
                         if project_cv_result:
                             project_peo_result = project.peo_add(peopobj, user.id)
+                            project_cvmodel_result = project.cvmodel_add(cvobj, user.id)
                             status = 'success'
                             message = 'Add to CV database and project.'
                             names.append(cvobj.name.md)

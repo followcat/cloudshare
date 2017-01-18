@@ -186,7 +186,7 @@ class Project(services.base.service.Service):
     def peo_deleteyaml(self, id, key, value, userid, date):
         return self.people.deleteinfo(id, key, value, userid, date)
 
-    def model_add(self, cvobj, committer=None, unique=True):
+    def cvmodel_add(self, cvobj, committer=None, unique=True):
         return self.cvmodel.add(cvobj, committer, unique, yamlfile=False)
 
     def backup(self, path, bare=True):

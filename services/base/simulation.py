@@ -208,7 +208,7 @@ class Simulation(services.base.storage.BaseStorage):
     def dump(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
-        def storage(filepath, stream):
+        def writefile(filepath, stream):
             with open(filepath, 'w') as f:
                 f.write(stream.encode('utf-8'))
         for i in self.ids:
@@ -216,9 +216,9 @@ class Simulation(services.base.storage.BaseStorage):
             try:
                 mdpath = os.path.join(path, name.md)
                 mdstream = self.storage.getmd(i)
-                storage(mdpath, mdstream)
+                writefile(mdpath, mdstream)
             except IOError:
                 pass
-            storage(htmlpath, htmlstream)
+            writefile(htmlpath, htmlstream)
             yamlinfo = self.storage.getyaml(i)
             utils.builtin.save_yaml(yamlinfo, path, name.yaml)

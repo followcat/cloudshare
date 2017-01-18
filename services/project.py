@@ -16,6 +16,7 @@ class Project(services.base.service.Service):
     CO_PATH = 'CO'
     JD_PATH = 'JD'
     PEO_PATH = 'PEO'
+    CVMODEL_PATH = 'CVMODEL'
     config_file = 'config.yaml'
 
     def __init__(self, path, corepo, cvrepo, svcpeo, name, iotype='git'):
@@ -27,6 +28,7 @@ class Project(services.base.service.Service):
         copath = os.path.join(path, self.CO_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
+        cvmodelpath = os.path.join(path, self.CVMODEL_PATH)
         idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
                                                         cvpath, name, cvrepo)
@@ -34,6 +36,8 @@ class Project(services.base.service.Service):
                                                         copath, name, corepo)
         self.jobdescription = services.jobdescription.JobDescription(jdpath)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeo)
+        self.cvmodel = services.simulationco.SimulationCO.autoservice(
+                                                        cvmodelpath, name, cvrepo)
         self.config = dict()
         try:
             self.load()
@@ -182,19 +186,25 @@ class Project(services.base.service.Service):
     def peo_deleteyaml(self, id, key, value, userid, date):
         return self.people.deleteinfo(id, key, value, userid, date)
 
+    def model_add(self, cvobj, committer=None, unique=True):
+        return self.cvmodel.add(cvobj, committer, unique, yamlfile=False)
+
     def backup(self, path, bare=True):
         project_path = os.path.join(path, 'project')
         cv_path = os.path.join(path, 'curriculumvitae')
         jd_path = os.path.join(path, 'jobdescription')
         co_path = os.path.join(path, 'company')
         peo_path = os.path.join(path, 'people')
+        cvmodel_path = os.path.join(path, 'cvmodel')
         utils.builtin.assure_path_exists(project_path)
         utils.builtin.assure_path_exists(cv_path)
         utils.builtin.assure_path_exists(jd_path)
         utils.builtin.assure_path_exists(co_path)
         utils.builtin.assure_path_exists(peo_path)
+        utils.builtin.assure_path_exists(cvmodel_path)
         self.interface.backup(project_path, bare=bare)
         self.curriculumvitae.backup(cv_path, bare=bare)
         self.jobdescription.backup(jd_path, bare=bare)
         self.company.backup(co_path, bare=bare)
         self.people.backup(peo_path, bare=bare)
+        self.cvmodel.backup(cvmodel_path, bare=bare)

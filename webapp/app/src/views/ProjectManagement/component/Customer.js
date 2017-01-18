@@ -19,7 +19,7 @@ const extractValueToString = (key, array) => {
               .join(', ');
 };
 
-class OwnCustomer extends Component {
+class Customer extends Component {
   constructor() {
     super();
     this.state = {
@@ -226,4 +226,4 @@ class OwnCustomer extends Component {
   }
 }
 
-export default OwnCustomer;
+export default Customer;

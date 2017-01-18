@@ -9,7 +9,7 @@ body {
   padding-bottom: 64px;
 }
 
-.cs-layout-wrapper {
+.cs-layout-container {
   position: relative;
   padding: 0 50px;
 }
@@ -41,8 +41,59 @@ body {
 }
 
 .cs-item-row {
-  line-height: 24px;
   margin-bottom: 8px;
+  overflow: hidden;
+
+  &-label {
+    position: relative;
+    display: block;
+    width: 18%;
+    text-align: right;
+    float: left;
+    font-weight: 700;
+
+    &:after {
+      content: ':';
+    }
+  }
+
+  &-content {
+    position: relative;
+    display: block;
+    width: 77.999%;
+    margin-left: 4%;
+    float: left;
+
+    &-text {
+      display: inline-block;
+      width: 100%;
+    }
+
+    .ommit {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    
+    .edit-icon-hide {
+      display: none;
+    }
+
+    .edit-icon-show {
+      position: absolute;
+      display: inline-block;
+      bottom: 8px;
+      right: 0;
+
+      &:hover {
+        color: #337ab7;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
 
   .mg-bottom {
     margin-bottom: 8px;
@@ -65,6 +116,142 @@ body {
   }
 }
 
+.visiting-label, .extra-label {
+  width: 5.999% !important;
+}
+
+.visiting-content, .extra-content {
+  margin-left: 2.499% !important;
+  width: 91% !important;
+}
+
+.extra-content {
+  .extra-opearator {
+    width: 40%;
+  }
+}
+
+.extra {
+  position: relative;
+
+  & > &-btn {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    font-size: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    z-index: 99;
+
+    & > i {
+      vertical-align: top;
+    }
+  }
+
+  &-show {
+    display: block;
+  }
+
+  &-hidden {
+    display: none;
+  }
+}
+
+.visiting-content {
+  ul {
+    list-style: initial;
+  }
+
+  .visiting-item {
+    display: list-item;
+
+    .visiting-author {
+      padding: 0 16px;
+    
+    }
+    .visiting-detail {
+      padding-right: 16px;
+    }
+  }
+  
+  .visiting-item-hide {
+    display: none;
+  }
+
+  .visiting-opearator {
+    width: 40%;
+
+    .visiting-form {
+      & > button {
+        display: inline-block;
+        margin-left: 8px;
+      }
+    }
+  }
+}
+
+.cs-input-group {
+  input {
+    display: inline-block;
+    width: 99.999%;
+  }
+
+  .cs-button-group {
+    display: inline-block;
+    margin-top: 8px;
+
+    button {
+      margin-left: 4px;
+    }
+  }
+}
+
+.cs-card-inner {
+  .add-btn-container {
+    position: absolute;
+    top: 4px;
+    left: 24px;
+  }
+
+  .cs-card-inner-top {
+    overflow: hidden;
+    
+    &-col, &-col-2 {
+      display: inline-block;
+      margin-left: 8px;
+    }
+
+    &-col-2 {
+      width: 16.666%
+    }
+
+    &-col:first-of-type {
+      margin-left: 0 !important;
+    }
+  }
+
+  .ant-spin-container .ant-card:nth-child(even) {
+    background-color: #f5f5f5;
+  }
+
+  .cs-card-inner-pagination {
+    padding: 16px 0;
+    overflow: hidden;
+
+    .ant-pagination {
+      float: right;
+    }
+  }
+}
+
+.cs-additional-input-group {
+  padding: 8px 0;
+
+  & > button {
+    margin-left: 8px;
+  }
+}
+
 .cs-extra-row {
   line-height: 24px;
   margin-bottom: 8px;
@@ -83,4 +270,69 @@ body {
     display: inline-block;
     padding: 0 8px;
   }
+}
+
+.card-inner-top {
+  padding: 8px 0;
+
+  .legend {
+    display: inline-block;
+    vertical-align: top;
+
+    .legend-item {
+      display: inline-block;
+      margin-right: 16px;
+      height: 28px;
+
+      .block {
+        display: inline-block;
+        vertical-align: top;
+        width: 48px;
+        height: 28px;
+        margin-top: 0 !important;
+      }
+
+      .legend-item-label {
+        display: inline-block;
+        vertical-align: top;
+        line-height: 28px;
+        margin-left: 4px;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.company-item {
+  padding: 8px;
+  margin-bottom: 8px;
+
+  .info, .diff {
+    padding: 4px 8px;
+  }
+
+  .diff {
+    margin-bottom: 4px;
+  }
+
+  .info > .info-index, .diff > .diff-index {
+    font-weight: bold;
+
+    &:after {
+      content: ': ';
+    }
+  }
+
+  & > .ant-card-body {
+    padding: 0;
+  }
+}
+
+.bg-green {
+  background-color: mediumseagreen;
+  margin-top: 8px;
+}
+
+.bg-yellow {
+  background-color: yellow;
 }

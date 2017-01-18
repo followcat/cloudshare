@@ -1,38 +1,45 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import CompanyInfo from './CompanyInfo';
 import CreateNewCompany from './CreateNewCompany';
 import EnhancedInput from '../../../components/enhanced-input';
+import ButtonWithModal from '../../../components/button-with-modal';
 
 import {
   message,
   Pagination,
-  Spin
+  Spin,
+  Upload,
+  Button,
+  Icon
 } from 'antd';
 
 import {
+  getCustomerList,
   getAllCompany,
   getAllCompanyBySearch,
   updateCompanyInfo,
-  createCompany
+  updateCustomer,
+  createCompany,
 } from '../../../request/company';
 
 import websiteText from '../../../config/website-text';
 
 const language = websiteText.zhCN;
 
-class DevelopmentalCustomer extends Component {
-
+class CompanyList extends Component {
   constructor() {
     super();
     this.state = {
       current: 1,
-      pageSize: 20,
+      pageSize: 40,
       total: 0,
       searchWord: '',
       dataSource: [],
-      loading: false
+      customerIDList: [],
+      loading: false,
+      visible: false,
     };
     this.handleSave = this.handleSave.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
@@ -40,9 +47,13 @@ class DevelopmentalCustomer extends Component {
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
     this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
+    this.handleUploadBtnClick = this.handleUploadBtnClick.bind(this);
+    this.handleUploadModalCancel = this.handleUploadModalCancel.bind(this);
+    this.handleAddCustomerConfirm = this.handleAddCustomerConfirm.bind(this);
     this.updateDataSource = this.updateDataSource.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getDataSourceBySearch = this.getDataSourceBySearch.bind(this);
+    this.getCustomerDataSource = this.getCustomerDataSource.bind(this);
   }
 
   componentDidMount() {
@@ -50,6 +61,7 @@ class DevelopmentalCustomer extends Component {
           pageSize = this.state.pageSize;
 
     this.getDataSource(current, pageSize);
+    this.getCustomerDataSource();
   }
 
   handleSave(field) {
@@ -150,6 +162,36 @@ class DevelopmentalCustomer extends Component {
     });
   }
 
+  handleUploadBtnClick() {
+    this.setState({
+      visible: true
+    });
+  }
+
+  handleUploadModalCancel() {
+    this.setState({
+      visible: false
+    });
+  }
+
+  handleAddCustomerConfirm(id) {
+    let idList = this.state.customerIDList;
+
+    updateCustomer('POST', {
+      id: id
+    }, (json) => {
+      if (json.code === 200) {
+        message.success(language.ADD_SUCCESS_MSG);
+        idList.push(id);
+        this.setState({
+          customerIDList: idList
+        });
+      } else {
+        message.error(language.ADD_FAIL_MSG);
+      }
+    });
+  }
+
   updateDataSource() {
     const searchWord = this.state.searchWord.trim(),
           current = this.state.current,
@@ -201,14 +243,27 @@ class DevelopmentalCustomer extends Component {
     });
   }
 
+  getCustomerDataSource() {
+    getCustomerList(json => {
+      if (json.code === 200) {
+        let idList = json.data.map(v => v.id);
+        this.setState({
+          customerIDList: idList
+        });
+      }
+    });
+  }
+
   render() {
+    const { current, total, visible } = this.state;
+
     // 主体表格分页
     const pagination = {
-      current: this.state.current,
-      total: this.state.total,
+      current: current,
+      total: total,
       showSizeChanger: true,
       showQuickJumper: true,
-      defaultPageSize: 20,
+      defaultPageSize: 40,
       showTotal: total => `共 ${total} 条`,
       onShowSizeChange: this.handleShowSizeChange,
       onChange: this.handlePaginationChange
@@ -217,7 +272,7 @@ class DevelopmentalCustomer extends Component {
     return (
       <div className="cs-card-inner">
         <div className="cs-card-inner-top">
-          <div className="cs-card-inner-top-col">
+          <div className="cs-card-inner-top-col-2">
             <EnhancedInput 
               type="search"
               onClick={this.handleSeachClick}
@@ -226,6 +281,24 @@ class DevelopmentalCustomer extends Component {
           <div className="cs-card-inner-top-col">
             <CreateNewCompany onSubmit={this.handleCreateCompanySubmit} />
           </div>
+          <div className="cs-card-inner-top-col">
+            <ButtonWithModal
+              buttonText={language.UPLOAD}
+              modalTitle={language.UPLOAD}
+              visible={visible}
+              onButtonClick={this.handleUploadBtnClick}
+              onModalCancel={this.handleUploadModalCancel}
+            >
+              <Upload {...this.props.uploadProps}>
+                <Button type="ghost">
+                  <Icon type="upload" /> 点击上传
+                </Button>
+              </Upload>
+            </ButtonWithModal>
+          </div>
+        </div>
+        <div className="cs-card-inner-pagination">
+          <Pagination {...pagination} />
         </div>
         <Spin
           size="large"
@@ -236,13 +309,15 @@ class DevelopmentalCustomer extends Component {
               <CompanyInfo
                 key={index}
                 dataSource={item}
+                isCustomer={this.state.customerIDList.indexOf(item.id) > -1}
                 onSave={this.handleSave}
                 onRemove={this.handleRemove}
+                onAddCustomerConfirm={this.handleAddCustomerConfirm}
               />
             );
           })}
         </Spin>
-        <div className="cs-card-inner-bottom">
+        <div className="cs-card-inner-pagination">
           <Pagination {...pagination} />
         </div>
       </div>
@@ -250,4 +325,12 @@ class DevelopmentalCustomer extends Component {
   }
 }
 
-export default DevelopmentalCustomer;
+CompanyList.defaultProps = {
+  uploadProps: {}
+};
+
+CompanyList.propTypes = {
+  uploadProps: PropTypes.object
+};
+
+export default CompanyList;

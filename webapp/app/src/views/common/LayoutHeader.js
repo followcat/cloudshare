@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 
 import Header from '../../components/layout-header';
 
@@ -76,8 +76,6 @@ class LayoutHeader extends Component {
   }
 
   render() {
-    const { style, children } = this.props;
-
     const profileMenu = (
       <Menu>
         <MenuItem>
@@ -96,26 +94,16 @@ class LayoutHeader extends Component {
     );
 
     return (
-      <div style={style}>
-        <Header
-          logoImg={logo}
-          navMenus={navMenus}
-          profileMenu={profileMenu}
-          project={StorageUtil.get('_pj')}
-          profileText={StorageUtil.get('user')}
-          selectedKeys={this.state.selectedKeys}
-        />
-        <div className="cs-layout-wrapper">
-          {children}
-        </div>
-      </div>
+      <Header
+        logoImg={logo}
+        navMenus={navMenus}
+        profileMenu={profileMenu}
+        project={StorageUtil.get('_pj')}
+        profileText={StorageUtil.get('user')}
+        selectedKeys={this.state.selectedKeys}
+      />
     );
   }
 }
-
-LayoutHeader.propTypes = {
-  style: PropTypes.object,
-  children: PropTypes.element
-};
 
 export default LayoutHeader;

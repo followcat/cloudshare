@@ -6,6 +6,9 @@ class Interface(object):
     def __init__(self, path):
         self.path = path
 
+    def do_commit(self, filenames):
+        raise NotImplementedInterface
+
     def get(self, filename):
         raise NotImplementedInterface
 

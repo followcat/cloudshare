@@ -58,18 +58,19 @@ class BaseStorage(services.base.service.Service):
         """
         return not self.exists(id)
 
-    def modify(self, filename, stream, message=None, committer=None):
-        self.interface.modify(filename, stream, message, committer)
+    def modify(self, filename, stream, message=None, committer=None, do_commit=True):
+        self.interface.modify(filename, stream, message, committer, do_commit=do_commit)
         return True
 
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=True):
+    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=True, do_commit=True):
         if unique is True and self.unique(bsobj.name) is False:
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(bsobj.name)
         if mdfile is True:
             message = "Add %s: %s data." % (self.commitinfo, name)
-            self.interface.add(name.md, bsobj.data, message=message, committer=committer)
+            self.interface.add(name.md, bsobj.data, message=message,
+                               committer=committer, do_commit=do_commit)
         if yamlfile is True:
             if committer is not None:
                 bsobj.metadata['committer'] = committer
@@ -77,7 +78,7 @@ class BaseStorage(services.base.service.Service):
                 bsobj.metadata['date'] = time.time()
             message = "Add %s: %s metadata." % (self.commitinfo, name)
             self.interface.add(name.yaml, yaml.safe_dump(bsobj.metadata, allow_unicode=True),
-                               message=message, committer=committer)
+                               message=message, committer=committer, do_commit=do_commit)
         self._nums += 1
         return True
 

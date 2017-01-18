@@ -1,10 +1,11 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import LayoutHeader from '../../Header/LayoutHeader';
+import LayoutHeader from '../../common/LayoutHeader';
+import LayoutContainer from '../../common/LayoutContainer';
+import SubheadNav from '../../../components/subhead-nav';
 import {
   CardContainer,
-  CardSiderMenu,
   CardContent
 } from '../../../components/card-container';
 
@@ -20,11 +21,11 @@ class Layout extends Component {
     this.state = {
       selectedKey: getCurrentActive(props)
     };
-    this.handleCardSiderMenuClick = this.handleCardSiderMenuClick.bind(this);
+    this.handleSubheadNavClick = this.handleSubheadNavClick.bind(this);
     this.getTitle = this.getTitle.bind(this);
   }
 
-  handleCardSiderMenuClick(e) {
+  handleSubheadNavClick(e) {
     this.setState({
       selectedKey: e.key
     });
@@ -34,11 +35,8 @@ class Layout extends Component {
     let title = '';
 
     for (let i = menus.length - 1; i >= 0; i--) {
-      for (let j = menus[i].menuItem.length - 1; j >= 0; j--) {
-        if (menus[i].menuItem[j].key === key) {
-          title = menus[i].menuItem[j].title;
-          break;
-        }
+      if (menus[i].key === key) {
+        title = menus[i].title;
       }
     }
 
@@ -46,50 +44,39 @@ class Layout extends Component {
   }
 
   render() {
-    const cardSiderMenus = [{
-      subMenu: {
-        key: 'jdm',
-        title: language.JOB_DESCRIPTION_MANAGEMENT
-      },
-      menuItem: [{
-        key: 'jobdescription',
-        title: language.OPEN_JOB_DESCRIPTION,
-        url: '/jobdescription'
-      }]
+    const menus = [{
+      key: 'jobdescription',
+      title: language.OPEN_JOB_DESCRIPTION,
+      url: '/jobdescription'
     }, {
-      subMenu: {
-        key: 'cm',
-        title: language.CUSTOMER_MANAGEMENT
-      },
-      menuItem: [{
-        key: 'owncustomer',
-        title: language.OWN_CUSTOMER_MANAGEMENT,
-        url: '/owncustomer'
-      }, {
-        key: 'developcustomer',
-        title: language.DEVELOPMENT_CUSTOMER_MANAGEMENT,
-        url: '/developcustomer'
-      }]
+      key: 'customer',
+      title: language.OWN_CUSTOMER_MANAGEMENT,
+      url: '/customer'
+    }, {
+      key: 'company',
+      title: language.DEVELOPMENT_CUSTOMER_MANAGEMENT,
+      url: '/company/list'
     }];
 
-    const cardContentTitle = this.getTitle(this.state.selectedKey, cardSiderMenus);
-
-    const defaultOpenKeys = cardSiderMenus.map(v => v.subMenu.key);
+    const cardContentTitle = this.getTitle(this.state.selectedKey, menus);
 
     return (
-      <LayoutHeader>
-        <CardContainer>
-          <CardSiderMenu
-            menus={cardSiderMenus}
-            selectedKeys={[this.state.selectedKey]}
-            defaultOpenKeys={defaultOpenKeys}
-            onClick={this.handleCardSiderMenuClick}
-          />
-          <CardContent title={cardContentTitle}>
-            {this.props.children}
-          </CardContent>
-        </CardContainer>
-      </LayoutHeader>
+      <div>
+        <LayoutHeader />
+        <SubheadNav
+          menus={menus}
+          selectedKeys={[this.state.selectedKey]}
+          style={{ marginLeft: 338 }}
+          onClick={this.handleSubheadNavClick}
+        />
+        <LayoutContainer>
+          <CardContainer>
+            <CardContent title={cardContentTitle}>
+              {this.props.children}
+            </CardContent>
+          </CardContainer>
+        </LayoutContainer>
+      </div>
     );
   }
 }

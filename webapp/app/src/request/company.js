@@ -139,3 +139,19 @@ export const updateCustomer = (method, params, callback) => {
   .then(response => response.json())
   .then(json => callbackFunction(callback, json));
 };
+
+// 确认上传excel文件
+export const confirmExcelUpload = (params, callback) => {
+  return fetch(API.CONFIRM_UPLOAD_EXCEL_API, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};

@@ -59,7 +59,7 @@ class Config(object):
         filepro = core.docprocessor.Processor(f, filename, self.UPLOAD_TEMP)
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                     stream=filepro.markdown_stream.decode('utf8'),
-                                    filename=filepro.base.base)
+                                    filename=filename)
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
         project = self.SVC_MULT_CV.getproject('project_test')

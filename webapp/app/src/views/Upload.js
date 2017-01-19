@@ -1,22 +1,29 @@
 'use strict';
 import React, { Component } from 'react';
-import Viewport from '../components/viewport';
-import Header from '../components/header';
+
+import Viewport from 'components/viewport';
+import Header from 'components/header';
 import CommonNavigation from './CommonNavigation';
-import Container from '../components/container';
-import ShowCard from '../components/show-card';
-import DraggerUpload from '../components/dragger-upload';
-import UploadPreview from '../components/upload-preview';
-import ConfirmResult from '../components/confirm-result';
+import Container from 'components/container';
+import ShowCard from 'components/show-card';
+import DraggerUpload from 'components/dragger-upload';
+import UploadPreview from 'components/upload-preview';
+import ConfirmResult from 'components/confirm-result';
+
 import { message } from 'antd';
-import { getClassify } from '../request/classify';
-import { uploadPreview, confirmUpload } from '../request/upload';
-import { API } from '../config/api';
-import { URL } from '../config/url';
-import StorageUtil from '../utils/storage';
-import { generateSummary } from '../utils/summary-generator';
+
+import { getClassify } from 'request/classify';
+import { uploadPreview, confirmUpload } from 'request/upload';
+
+import { API } from 'API';
+import { URL } from 'URL';
+
+import StorageUtil from 'utils/storage';
+import { generateSummary } from 'utils/summary-generator';
+
 import remove from 'lodash/remove';
 import findIndex from 'lodash/findIndex';
+
 import './upload.less';
 
 /*

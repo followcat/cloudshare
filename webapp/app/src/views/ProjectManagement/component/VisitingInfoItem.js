@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import EnhancedInput from '../../../components/enhanced-input';
+import EnhancedInput from 'components/enhanced-input';
 
 import { Icon, Button } from 'antd';
 

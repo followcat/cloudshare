@@ -14,7 +14,7 @@ import {
 } from 'antd';
 
 import chunk from 'lodash/chunk';
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

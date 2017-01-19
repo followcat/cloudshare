@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 import CompanyInfo from './CompanyInfo';
 import CreateNewCompany from './CreateNewCompany';
-import EnhancedInput from '../../../components/enhanced-input';
+import EnhancedInput from 'components/enhanced-input';
 
 import {
   message,
@@ -16,9 +16,9 @@ import {
   getAllCompanyBySearch,
   updateCompanyInfo,
   createCompany
-} from '../../../request/company';
+} from 'request/company';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

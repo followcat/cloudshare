@@ -1,9 +1,9 @@
 'use strict';
 import React, { Component } from 'react';
 
-import Header from '../components/common/Header';
-import KeywordSearch from '../components/search/KeywordSearch';
-import DataBaseBox from '../components/common/DataBaseBox';
+import Header from 'components/common/Header';
+import KeywordSearch from 'components/search/KeywordSearch';
+import DataBaseBox from 'components/common/DataBaseBox';
 
 import './search.less';
 

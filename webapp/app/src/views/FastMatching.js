@@ -1,21 +1,20 @@
 'use strict';
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 
 import Immutable from 'immutable';
 import 'whatwg-fetch';
 
-import Header from '../components/common/Header';
-import FilterBox from '../components/fastmatching/FilterBox';
-import SearchResultBox from '../components/common/searchresult/SearchResultBox';
-import SideBar from '../components/fastmatching/SideBar';
+import Header from 'components/common/Header';
+import FilterBox from 'components/fastmatching/FilterBox';
+import SearchResultBox from 'components/common/searchresult/SearchResultBox';
+import SideBar from 'components/fastmatching/SideBar';
 
-import StorageUtil from '../utils/storage';
-import Generator from '../utils/generator';
-import queryString from '../utils/query_string';
-import { API } from '../config/api';
+import StorageUtil from 'utils/storage';
+import Generator from 'utils/generator';
+import queryString from 'utils/query_string';
+import { API } from 'API';
 
-import { getIndustry } from '../request/classify';
+import { getIndustry } from 'request/classify';
 
 import './fastmatching.less';
 

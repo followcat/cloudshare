@@ -1,13 +1,13 @@
 'use strict';
 import React, { Component } from 'react';
 
-import Header from '../components/common/Header';
-import ResultInfo from '../components/search/ResultInfo';
-import SearchResultBox from '../components/common/searchresult/SearchResultBox';
+import Header from 'components/common/Header';
+import ResultInfo from 'components/search/ResultInfo';
+import SearchResultBox from 'components/common/searchresult/SearchResultBox';
 
-import queryString from '../utils/query_string';
-import StorageUtil from '../utils/storage';
-import Generator from '../utils/generator';
+import queryString from 'utils/query_string';
+import StorageUtil from 'utils/storage';
+import Generator from 'utils/generator';
 
 import './searchresult.less';
 

@@ -1,16 +1,16 @@
 'use strcit';
 import React, { Component } from 'react';
 
-import TablePlus from '../../../components/table-plus';
-import SiderPanel from '../../../components/sider-panel';
-import DetailInformation from '../../../components/detail-information';
+import TablePlus from 'components/table-plus';
+import SiderPanel from 'components/sider-panel';
+import DetailInformation from 'components/detail-information';
 import ExtractInfo from './ExtractInfo';
 
 import { Popconfirm, message } from 'antd';
 
-import { getCustomerList, updateCustomer } from '../../../request/company';
+import { getCustomerList, updateCustomer } from 'request/company';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

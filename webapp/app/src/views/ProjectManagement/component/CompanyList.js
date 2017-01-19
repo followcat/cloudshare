@@ -3,8 +3,8 @@ import React, { Component, PropTypes } from 'react';
 
 import CompanyInfo from './CompanyInfo';
 import CreateNewCompany from './CreateNewCompany';
-import EnhancedInput from '../../../components/enhanced-input';
-import ButtonWithModal from '../../../components/button-with-modal';
+import EnhancedInput from 'components/enhanced-input';
+import ButtonWithModal from 'components/button-with-modal';
 
 import {
   message,
@@ -22,9 +22,9 @@ import {
   updateCompanyInfo,
   updateCustomer,
   createCompany,
-} from '../../../request/company';
+} from 'request/company';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

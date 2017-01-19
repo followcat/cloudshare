@@ -8,6 +8,7 @@ let entryObject = webpackConf.entry;
 for (let key in entryObject) {
   let arr = [];
   arr.push(entryObject[key]);
+  arr.push('react-hot-loader/patch');
   arr.push('webpack-dev-server/client?http://localhost:3000/');
   arr.push('webpack/hot/only-dev-server');
   entryObject[key] = arr;
@@ -25,8 +26,6 @@ const server = new WebpackDevServer(compiler, {
 
   contentBase: './',
 
-  progress: false,
-
   inline: true,  // 启用inline模式自动刷新
 
   hot: true,  // 启动热加载
@@ -38,7 +37,7 @@ const server = new WebpackDevServer(compiler, {
   // It's a required option.
   publicPath: `http://localhost:${port}/`,
 
-  headers: { 'X-Custom-Header': 'yes' },
+  headers: { 'X-Custom-Foo': 'bar' },
 
   stats: {
     color: true,

@@ -5,6 +5,8 @@ const path = require('path'),
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const env = process.env.npm_lifecycle_event;
+
 const getHTMLFile = function() {
   let entryPath = path.resolve(folderPath.PATHS.SRC_PATH, 'entry'),
       dirs = fs.readdirSync(entryPath),
@@ -18,8 +20,15 @@ const getHTMLFile = function() {
         title: 'Cloudshare - Willendare',
         template: path.join(folderPath.PATHS.SRC_PATH, '/template.html'),  // html模板文件
         inject: true,  // 允许修改的内容
-        chunks: [matchs[1]],
-        filename: path.join(folderPath.PATHS.BUILD_PATH, '/'+ matchs[1] +'.html'),  // 生成的html文件存放路径
+        chunks: [matchs[1], 'commons'],
+        chunksSortMode: 'dependency',
+        filename: function (filename) {
+          if (env === 'dev') {
+            return path.join(folderPath.PATHS.BUILD_PATH, '/'+ filename +'.html');
+          } else {
+            return path.join(folderPath.PATHS.ROOT_PATH, '/templates_dist/'+ filename +'.html');
+          }
+        }(matchs[1]),  // 生成的html文件存放路径
         minify: {    // 压缩HTML文件
           removeComments: true,    // 移除HTML中的注释
           collapseWhitespace: false,   // 删除空白符与换行符

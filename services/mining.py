@@ -240,7 +240,7 @@ class Mining(object):
             lsimodel = self.lsi_model[modelname]
             if lsimodel.getconfig('autoupdate') is True:
                 updated = self.lsi_model[modelname].update(
-                    [self.services['default'][modelname]])
+                    [self.projects[modelname].cvmodel])
                 if updated:
                     self.update_sims()
 

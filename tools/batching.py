@@ -129,6 +129,14 @@ def update_selected(svc_cv, yamlname, selected):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
+def update_uniqueid(svc_cv, yamlname):
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
+    extractor.unique_id.unique_id(obj)
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
+
 def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.path, yamlname)

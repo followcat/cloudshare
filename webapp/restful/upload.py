@@ -50,21 +50,24 @@ class UploadCVAPI(Resource):
                 if 'unique_id' in cvobj.metadata:
                     peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
                     peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-                try:
-                    cv_result = self.svc_mult_cv.add(cvobj, user.id,
-                                                     project_name, unique=True)
-                    peo_result = self.svc_peo.add(peopobj, user.id)
-                    if cv_result is True:
-                        names.append(cvobj.name.md)
-                        documents.append(cvobj.data)
-                        status = 'success'
-                        message = 'Upload success.'
-                    else:
+                    try:
+                        cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                         project_name, unique=True)
+                        peo_result = self.svc_peo.add(peopobj, user.id)
+                        if cv_result is True:
+                            names.append(cvobj.name.md)
+                            documents.append(cvobj.data)
+                            status = 'success'
+                            message = 'Upload success.'
+                        else:
+                            status = 'failed'
+                            message = 'Existed CV.'
+                    except core.exception.NotExistsContactException:
                         status = 'failed'
-                        message = 'Existed CV.'
-                except core.exception.NotExistsContactException:
+                        message = 'The contact information is empty.'
+                else:
                     status = 'failed'
-                    message = 'The contact information is empty.'
+                    message = 'Unable to extract personal information, please modify and try again'
                 results.append({ 'id': id,
                                  'status': status,
                                  'message': message,
@@ -134,7 +137,7 @@ class UploadEnglishCVAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        yaml_data = self.svc_mult_cv.getproject(project).cv_getyaml(id)
+        yaml_data = self.svc_mult_cv.repodb.getyaml(id)
         dataobj = uploadeng[user.id]
         result = self.svc_mult_cv.add_md(dataobj, user.id)
         yaml_data['enversion'] = dataobj.ID.md

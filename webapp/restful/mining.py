@@ -189,24 +189,8 @@ class LSIbaseAPI(Resource):
                 'time': utils.builtin.strftime(yaml_info['date']),
                 'match': score
             }
-            yaml_info['experience'] = self.experience_process(yaml_info['experience'])
             datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
         return datas, pages, totals
-
-    def experience_process(self, experience):
-        ex_company = experience['company'] if len(experience) and 'company' in experience else []
-        ex_position = experience['position'] if len(experience) and 'position' in experience else []
-
-        if len(ex_position) > 0:
-            for position in ex_position:
-                for company in ex_company:
-                    if position['at_company'] == company['id']:
-                        position['company'] = company['name']
-                        if 'business' in company:
-                            position['business'] = company['business']
-            return ex_position
-        else:
-            return ex_company
 
 
 class LSIbyJDidAPI(LSIbaseAPI):
@@ -227,8 +211,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         project = self.svc_mult_cv.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
-        uses = [projectname] + args['uses']\
-                if args['uses'] else [projectname]+project.getclassify()
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self._post(projectname, doc, uses, filterdict, cur_page)
@@ -252,8 +235,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         doc = project.cv_getmd(id)
-        uses = [projectname] + args['uses']\
-                if args['uses'] else [projectname]+project.getclassify()
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self._post(projectname, doc, uses, filterdict, cur_page)
@@ -275,8 +257,7 @@ class LSIbydocAPI(LSIbaseAPI):
         doc = args['doc']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        uses = [projectname] + args['uses']\
-                if args['uses'] else [projectname]+project.getclassify()
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self._post(projectname, doc, uses, filterdict, cur_page)
@@ -300,7 +281,12 @@ class SimilarAPI(Resource):
         id = args['id']
         projectname = args['project']
         doc = self.svc_mult_cv.getmd(id)
-        uses = [projectname] + self.svc_mult_cv.getyaml(id)['classify']
+        uses = [projectname]
+        project = self.svc_mult_cv.getproject(projectname)
+        project_classify = project.getclassify()
+        for classify in self.svc_mult_cv.getyaml(id)['classify']:
+            if classify in project_classify:
+                uses.append(classify)
         datas = []
         for name, score in self.miner.probability(projectname, doc,
                                                   uses=uses, top=6)[1:6]:
@@ -324,8 +310,7 @@ class ValuablebaseAPI(Resource):
     def _get(self, doc, project):
         args = self.reqparse.parse_args()
         projectname = project.name
-        uses = [projectname] + args['uses']\
-                if args['uses'] else [projectname]+project.getclassify()
+        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         name_list = args['name_list']
         if len(name_list) == 0:
             result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,

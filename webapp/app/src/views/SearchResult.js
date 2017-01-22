@@ -16,6 +16,7 @@ export default class SearchResult extends Component {
   constructor() {
     super();
     this.state = {
+      current: 1,
       keyword: '',
       pages: 0,
       total: 0,
@@ -60,6 +61,7 @@ export default class SearchResult extends Component {
   componentDidMount() {
     const url = window.location.href,
           params = queryString(url);
+
     this.setState({
       keyword: params.search_text,
     });
@@ -68,6 +70,7 @@ export default class SearchResult extends Component {
 
   handleSwitchPage(page) {
     this.setState({
+      current: page,
       spinning: true,
       data: [],
     });
@@ -98,6 +101,7 @@ export default class SearchResult extends Component {
 
   handleOnSearch(searchText) {
     this.setState({
+      current: 1,
       keyword: searchText,
       pages: 0,
       total: 0,
@@ -145,6 +149,7 @@ export default class SearchResult extends Component {
           />
           <SearchResultBox
             visible={true}
+            current={this.state.current}
             total={this.state.total}
             spinning={this.state.spinning}
             dataSource={this.state.data}

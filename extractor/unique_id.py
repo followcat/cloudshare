@@ -250,26 +250,19 @@ def unique_id(cv_yaml, to_date=u'至今'):
         >>> cv_yaml.update({'education_history': [ed]})
         >>> assert id == unique_id(cv_yaml, '2016.01')
     """
-    try:
-        unique_id_hash = set([tuple(v) for v in cv_yaml['unique_id_hash']])
-    except KeyError:
-        unique_id_hash = set()
-    except TypeError:
-        raise Exception(cv_yaml)
+    unique_id_hash = set()
     for date, history in hash_history(cv_yaml, to_date):
         unique_id_hash.add((date, history))
     if len(unique_id_hash):
         # Sort history hash value by hashdate
         cv_yaml['unique_id_hash'] = sorted(unique_id_hash, key=lambda x: x[0])
-
-    if 'unique_id' not in cv_yaml:
-        try:
-            cv_yaml['unique_id'] = cv_yaml['unique_id_hash'][-1][1]
-            cv_yaml['unique_id_hashdate'] = cv_yaml['unique_id_hash'][-1][0]
-        except KeyError:
-            pass
-        except IndexError:
-            pass
+    try:
+        cv_yaml['unique_id'] = cv_yaml['unique_id_hash'][-1][1]
+        cv_yaml['unique_id_hashdate'] = cv_yaml['unique_id_hash'][-1][0]
+    except KeyError:
+        pass
+    except IndexError:
+        pass
     return cv_yaml
 
 def company_id(name):

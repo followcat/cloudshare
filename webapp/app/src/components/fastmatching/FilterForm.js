@@ -65,6 +65,15 @@ class FilterForm extends Component {
   handleReset(e) {
     e.preventDefault();
     this.props.form.resetFields();
+    this.props.form.setFieldsValue({
+      uses: []
+    });
+    this.setState({
+      gender: [],
+      education: [],
+      maritalStatus: [],
+      date: []
+    });
   }
 
   handleRangePickerChange(value, dateString) {
@@ -111,11 +120,12 @@ class FilterForm extends Component {
       { label: 'Married', value: '已婚' },
     ];
 
-    const { getFieldProps } = this.props.form;
+    const { getFieldProps } = this.props.form,
+          { textarea, classify } = this.props;
 
     return (
       <Form horizontal>
-        {this.props.textarea ? 
+        {textarea ? 
           <Row>
             <Col>
               <Form.Item
@@ -137,38 +147,22 @@ class FilterForm extends Component {
               label="Classify"
               labelCol={{ span: 6 }}
               wrapperCol={{ span: 18 }}
+              className="classify-selection"
             >
               <Select
                 {...getFieldProps('uses', {
+                  initialValue: textarea ? [] : classify,
                   rules: [
                     { type: 'array' },
                   ],
                 })}
                 multiple
               >
-                {this.props.classify.map((item, index) => {
+                {classify.map((item, index) => {
                   return <Option key={index} value={item} >{item}</Option>
                 })}
               </Select>
             </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label="Date"
-              labelCol={{ span: 8}}
-              wrapperCol={{ span: 16 }}
-            >
-              <RangePicker
-                {...getFieldProps('date')}
-                value={this.state.date}
-                disabledDate={this.disabledDate}
-                onChange={this.handleRangePickerChange}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={8}>
-          <Col span={12}>
             <Form.Item
               label="Gender"
               labelCol={{ span: 6 }}
@@ -201,6 +195,18 @@ class FilterForm extends Component {
             </Form.Item>
           </Col>
           <Col span={12}>
+            <Form.Item
+              label="Date"
+              labelCol={{ span: 8}}
+              wrapperCol={{ span: 16 }}
+            >
+              <RangePicker
+                {...getFieldProps('date')}
+                value={this.state.date}
+                disabledDate={this.disabledDate}
+                onChange={this.handleRangePickerChange}
+              />
+            </Form.Item>
             <Form.Item
               label="Current Places"
               labelCol={{ span: 8 }}

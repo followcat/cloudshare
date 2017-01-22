@@ -158,8 +158,9 @@ class ReverseIndexing(object):
                         parts[key].update(index[key][value])
                 if key not in parts and filtedict[key]:
                     parts[key] = set()
-            result = set.intersection(*parts.values())
-            results.update(result)
+            if parts.values():
+                result = set.intersection(*parts.values())
+                results.update(result)
         return results
 
     def filte(self, filtedict, selected, uses=None):

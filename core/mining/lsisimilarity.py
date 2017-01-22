@@ -118,7 +118,7 @@ class LSIsimilarity(object):
             >>> assert kgr_perfect('542330f40d0011e69e136c3be51cefca', jd_service, sim)
             >>> assert kgr_perfect('d652742841a211e68dc34ccc6a30cd76', jd_service, sim)
             >>> assert kgr_perfect('098a91ca0b4f11e6abf46c3be51cefca', jd_service, sim)
-            >>> assert kgr_good('9b48f97653e811e6af534ccc6a30cd76', jd_service, sim)
+            >>> assert kgr_perfect('9b48f97653e811e6af534ccc6a30cd76', jd_service, sim)
             >>> assert kgr_good('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim)
             >>> assert kgr_poor('be97722a0cff11e6a3e16c3be51cefca', jd_service, sim)
             >>> assert kgr_percentage('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim, percentage=int(float(2)/3*100))
@@ -171,7 +171,7 @@ class LSIsimilarity(object):
             >>> assert kgr_bad('e3bd422a2d6411e6b5296c3be51cefca', jd_service, sim, cvs=['qsfmtebc'])
             >>> assert kgr_bad('e9f415f653e811e6945a4ccc6a30cd76', jd_service, sim, cvs=['fv51hvdy', 'je7d0xeg', 'v0gcrsow', 'sjk41azl', 'f280mmdm', 'cla50bo5'])
             >>> count_in[0] - origin
-            44
+            45
         """
         if top is None:
             top = len(self.index)

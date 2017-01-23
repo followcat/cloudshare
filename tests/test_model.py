@@ -6,6 +6,7 @@ import json
 import yaml
 
 from webapp.settings import *
+from tests.jd_additional_words import added_words
 
 
 test_cv_svc = services.simulationcv.SimulationCV('tests/cv_svc', 'lsisim_test', 
@@ -48,7 +49,7 @@ def kgr_percentage(jd_id, jd_service, sim, cvs=None, index_service=None, filterd
         >>> assert kgr_bad('06fdc0680b5d11e6ae596c3be51cefca', jd_service, sim)
         >>> assert kgr_perfect('e290dd36428a11e6b2934ccc6a30cd76', jd_service, sim)
         >>> jd_id, cvs = '2fe1c53a231b11e6b7096c3be51cefca', ['3hffapdz', '2x5wx4aa']
-        >>> assert kgr_bad(jd_id, jd_service, sim, cvs=cvs)
+        >>> assert kgr_good(jd_id, jd_service, sim, cvs=cvs)
         >>> assert kgr_bad('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'])
         >>> assert kgr_percentage('cce2a5be547311e6964f4ccc6a30cd76', jd_service, sim, cvs=['qfgwkkhg', 'nji2v4s7', 'qssipwf9'], index_service=SVC_INDEX, filterdict={'expectation_places': ['长沙'.decode('utf-8')]}, percentage=int(float(2)/3*100))
     """
@@ -89,6 +90,9 @@ def ranks(jd_id, jd_service, sim, cvs=None, index_service=None,
     if cvs is None:
         cvs = datas[jd_id]
     job_desc = jd_service.get(jd_id)['description']
+    if jd_id in added_words:
+        a_words = added_words[jd_id]
+        job_desc += a_words
     score_board = sim.probability(job_desc)
     if index_service is not None and filterdict is not None:
         filteset = index_service.get(filterdict)

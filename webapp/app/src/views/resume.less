@@ -7,41 +7,43 @@
   margin-bottom: 20px;
   margin-left: auto;
   margin-right: auto;
+  overflow: hidden;
 
-  & > .ant-tabs-card {
-    & > .ant-tabs-content {
-      background: #fff;
-      padding: 8px;
-      height: auto;
-      min-height: 450px;
-      margin-top: -16px;
-    }
+  & > .cs-layout-tabs {
+    width: 736px;
+    float: left;
 
-    & > .ant-tabs-bar {
-        .ant-tabs-tab {
-        border-color: transparent;
-        border-top-width: 2px;
-        margin-right: 8px;
-        background-color: #fff;
-
-        & > .ant-tabs-tab-inner {
-          padding-top: 6px;
-        }
+    & > .ant-tabs-card {
+      & > .ant-tabs-content {
+        background: #fff;
+        padding: 8px;
+        height: auto;
+        min-height: 450px;
+        margin-top: -16px;
       }
 
-      .ant-tabs-tab-active {
-        border-color: #fff;
-        border-top-style: solid;
-        border-top-color: @willendareColor;
+      & > .ant-tabs-bar {
+        .ant-tabs-tab {
+          border-color: transparent;
+          border-top-width: 2px;
+          margin-right: 8px;
+          background-color: #fff;
+
+          & > .ant-tabs-tab-inner {
+            padding-top: 6px;
+          }
+        }
+
+        .ant-tabs-tab-active {
+          border-color: #fff;
+          border-top-style: solid;
+          border-top-color: @willendareColor;
+        }
       }
     }
   }
 
   .cs-resume-wrapper {
-    float: left;
-    width: 720px;
-    background-color: #fff;
-
     .cs-resume-header {
       height: 48px;
       line-height: 48px;
@@ -120,9 +122,10 @@
 
 .resume-side {
   width: 340px;
-  height: 100px;
+  min-height: 100px;
   float: left;
   margin-left: 4px;
+  margin-top: 36px;
 
   .ant-card-bordered {
     border-color: #ccc;

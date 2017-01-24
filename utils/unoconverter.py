@@ -1,10 +1,12 @@
 import uno
 import os.path
+import subprocess
 
 from com.sun.star.beans import PropertyValue
 from com.sun.star.task import ErrorCodeIOException
 from com.sun.star.connection import NoConnectException
 
+import utils.builtin
 
 DEFAULT_OPENOFFICE_PORT = 8100
 
@@ -47,16 +49,32 @@ class DocumentConversionException(Exception):
 
 class DocumentConverter:
 
-    def __init__(self, port=DEFAULT_OPENOFFICE_PORT):
-        localContext = uno.getComponentContext()
-        resolver = localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", localContext)
-        try:
-            context = resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % port)
-        except NoConnectException:
-            raise DocumentConversionException, "failed to connect to OpenOffice.org on port %s" % port
-        self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)
+    def __init__(self, host='localhost', port=DEFAULT_OPENOFFICE_PORT, invisible=True):
+        self.host = host
+        self.port = port
+        self.invisible = invisible
+        self.startservice()
+        self.localContext = uno.getComponentContext()
+        self.resolver = self.localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver",
+                        self.localContext)
+
+    def startservice(self):
+        if not utils.builtin.is_port_open(self.host, self.port):
+            command = ['libreoffice',
+                       '--accept=socket,host=%s,port=%s;urp;'%(self.host, self.port)]
+            if self.invisible is True:
+                command.append('--invisible')
+            self.p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
 
     def convert(self, inputFile, outputFile):
+        try:
+            context = self.resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % self.port)
+        except NoConnectException:
+            self.startservice()
+            if not utils.builtin.is_port_open(self.host, self.port):
+                raise DocumentConversionException, "failed to connect to OpenOffice.org on port %s" % self.port
+            context = self.resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % self.port)
+        self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)
 
         inputUrl = self._toFileUrl(inputFile)
         outputUrl = self._toFileUrl(outputFile)

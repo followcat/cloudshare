@@ -25,20 +25,20 @@ export default class WorkExperience extends Component {
         if (index < 2) {  //前两个条目不需要折叠
           return (
             <div key={index}>
-              {item.date_from}-{item.date_to} | {item.business ? item.business + '|' : ''}{item.company ? item.company + '|' : ''} {item.name} | {item.duration}
+              {item.date_from}-{item.date_to} | {item.business ? item.business + '|' : ''}{item.companyName ? item.companyName + '|' : ''} {item.name} | {item.duration}
             </div>
           )
         } else {  //除了前两个条目, 其它条目折叠
           return (
             <div key={index} className={this.state.visible ? 'showed' : 'hidden'}>
-              {item.date_from}-{item.date_to} | {item.business ? item.business + '|' : ''}{item.company ? item.company + '|' : ''} {item.name} | {item.duration}
+              {item.date_from}-{item.date_to} | {item.business ? item.business + '|' : ''}{item.companyName ? item.companyName + '|' : ''} {item.name} | {item.duration}
             </div>
           )
         }
       } else {
         return (
           <div key={index}>
-            {item.date_from}-{item.date_to} | {item.business ? item.business + '|' : ''}{item.company ? item.company + '|' : ''} {item.name} | {item.duration}
+            {item.date_from}-{item.date_to} | {item.business ? item.business + '|' : ''}{item.companyName ? item.companyName + '|' : ''} {item.name} | {item.duration}
           </div>
         )
       }

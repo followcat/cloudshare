@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 import shutil
 
 import utils.chsname
@@ -166,22 +167,34 @@ def originid(svc_cv, yamlname):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
-def yamlaction(svc_cv, action, *args, **kwargs):
-    import time
+def timeout_yamlaction(svc_cv, action, *args, **kwargs):
     import utils.timeout.process
     i = 0
+    t1 = time.time()
     for yamlname in svc_cv.yamls():
         i += 1
-        t1 = time.time()
         try:
             utils.timeout.process.process_timeout_call(action, 120,
                                     args=tuple([svc_cv, yamlname]+list(args)),
                                     kwargs=kwargs)
         except utils.timeout.process.KilledExecTimeout as e:
             print(yamlname, action, e)
-        usetime = time.time() - t1
-        print("CV %s use %s."%(yamlname, str(usetime)))
         if i % 100 == 0:
+            usetime = time.time() - t1
+            t1 = time.time()
+            print("100 Action use %s."%(str(usetime)))
+            print i
+
+def yamlaction(svc_cv, action, *args, **kwargs):
+    i = 0
+    t1 = time.time()
+    for yamlname in svc_cv.yamls():
+        i += 1
+        action(svc_cv, yamlname, *args, **kwargs)
+        if i % 100 == 0:
+            usetime = time.time() - t1
+            t1 = time.time()
+            print("100 Action use %s."%(str(usetime)))
             print i
 
 def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):

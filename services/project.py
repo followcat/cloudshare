@@ -6,6 +6,7 @@ import sources.industry_id
 import services.base.service
 import services.simulationcv
 import services.simulationco
+import services.simulationpeo
 import services.jobdescription
 
 
@@ -14,9 +15,10 @@ class Project(services.base.service.Service):
     CV_PATH = 'CV'
     CO_PATH = 'CO'
     JD_PATH = 'JD'
+    PEO_PATH = 'PEO'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepo, cvrepo, name, iotype='git'):
+    def __init__(self, path, corepo, cvrepo, svcpeo, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype)
         self.path = path
         self.corepo = corepo
@@ -24,12 +26,13 @@ class Project(services.base.service.Service):
         cvpath = os.path.join(path, self.CV_PATH)
         copath = os.path.join(path, self.CO_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
-        idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
+        peopath = os.path.join(path, self.PEO_PATH)
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
                                                         cvpath, name, cvrepo)
         self.company = services.simulationco.SimulationCO.autoservice(
                                                         copath, name, corepo)
         self.jobdescription = services.jobdescription.JobDescription(jdpath)
+        self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeo)
         self.config = dict()
         try:
             self.load()
@@ -108,9 +111,6 @@ class Project(services.base.service.Service):
             pass
         return result
 
-    def cv_deleteyaml(self, id, key, value, userid, date):
-        return self.curriculumvitae.deleteinfo(id, key, value, userid, date)
-
     def cv_ids(self):
         return self.curriculumvitae.ids
 
@@ -180,16 +180,36 @@ class Project(services.base.service.Service):
     def jd_lists(self):
         return self.jobdescription.lists()
 
+    def peo_add(self, peopobj, committer=None, unique=True):
+        return self.people.add(peopobj, committer, unique)
+
+    def peo_getyaml(self, id):
+        return self.people.getyaml(id)
+
+    def peo_updateyaml(self, id, key, value, userid):
+        result = None
+        try:
+            result = self.people.updateinfo(id, key, value, userid)
+        except AssertionError:
+            pass
+        return result
+
+    def peo_deleteyaml(self, id, key, value, userid, date):
+        return self.people.deleteinfo(id, key, value, userid, date)
+
     def backup(self, path, bare=True):
         project_path = os.path.join(path, 'project')
         cv_path = os.path.join(path, 'curriculumvitae')
         jd_path = os.path.join(path, 'jobdescription')
         co_path = os.path.join(path, 'company')
+        peo_path = os.path.join(path, 'people')
         utils.builtin.assure_path_exists(project_path)
         utils.builtin.assure_path_exists(cv_path)
         utils.builtin.assure_path_exists(jd_path)
         utils.builtin.assure_path_exists(co_path)
+        utils.builtin.assure_path_exists(peo_path)
         self.interface.backup(project_path, bare=bare)
         self.curriculumvitae.backup(cv_path, bare=bare)
         self.jobdescription.backup(jd_path, bare=bare)
         self.company.backup(co_path, bare=bare)
+        self.people.backup(peo_path, bare=bare)

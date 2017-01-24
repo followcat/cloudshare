@@ -150,18 +150,17 @@ class ReverseIndexing(object):
         for use in uses:
             assert use in self.index
             parts = collections.defaultdict(set)
-            result = set()
             index = self.index[use]
             for key in filtedict:
                 assert key in index
                 for value in filtedict[key]:
                     if value in index[key]:
                         parts[key].update(index[key][value])
-            for key in parts:
-                if not result:
-                    result.update(parts[key])
-                result.intersection_update(parts[key])
-            results.update(result)
+                if key not in parts and filtedict[key]:
+                    parts[key] = set()
+            if parts.values():
+                result = set.intersection(*parts.values())
+                results.update(result)
         return results
 
     def filte(self, filtedict, selected, uses=None):

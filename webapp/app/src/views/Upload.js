@@ -14,7 +14,7 @@ import { uploadPreview, confirmUpload } from '../request/upload';
 import { API } from '../config/api';
 import { URL } from '../config/url';
 import StorageUtil from '../utils/storage';
-import generateSummary from '../utils/summary-generator';
+import { generateSummary } from '../utils/summary-generator';
 import remove from 'lodash/remove';
 import findIndex from 'lodash/findIndex';
 import './upload.less';
@@ -317,6 +317,7 @@ export default class Upload extends Component {
                     <UploadPreview
                       key={index}
                       id={item.filename}  // id是标记文件唯一的标准,这里用filename作为辨识
+                      resumeID={item.yaml_info.id}
                       currentPreview={this.state.currentPreview}
                       total={this.state.total}
                       index={index}

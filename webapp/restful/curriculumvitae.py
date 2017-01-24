@@ -15,7 +15,6 @@ class CurrivulumvitaeAPI(Resource):
 
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
-        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
@@ -48,7 +47,6 @@ class UpdateCurrivulumvitaeInformation(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('date', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('update_info', type = dict, location = 'json')
 
@@ -65,24 +63,6 @@ class UpdateCurrivulumvitaeInformation(Resource):
                 response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
             else:
                 response = { 'code': 400, 'message': 'Update information error.'}
-                break
-        return response
-
-    def delete(self):
-        args = self.reqparse.parse_args()
-        user = flask.ext.login.current_user
-        id = args['id']
-        date = args['date']
-        project = args['project']
-        update_info = args['update_info']
-
-        for key, value in update_info.iteritems():
-            data = self.svc_mult_cv.getproject(project).cv_deleteyaml(id, key, value,
-                                                                      user.id, date)
-            if data is not None:
-                response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
-            else:
-                response = { 'code': 400, 'message': 'Delete information error.'}
                 break
         return response
 
@@ -143,21 +123,5 @@ class SearchCVbyTextAPI(Resource):
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
             }
-            yaml_info['experience'] = self.experience_process(yaml_info['experience'])
             datas.append({ 'cv_id': id, 'yaml_info': yaml_info, 'info': info})
         return datas, pages
-
-    def experience_process(self, experience):
-        ex_company = experience['company'] if len(experience) and 'company' in experience else []
-        ex_position = experience['position'] if len(experience) and 'position' in experience else []
-
-        if len(ex_position) > 0:
-            for position in ex_position:
-                for company in ex_company:
-                    if position['at_company'] == company['id']:
-                        position['company'] = company['name']
-                        if 'business' in company:
-                            position['business'] = company['business']
-            return ex_position
-        else:
-            return ex_company

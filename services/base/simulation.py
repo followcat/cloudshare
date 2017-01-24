@@ -33,10 +33,10 @@ class Simulation(services.base.storage.BaseStorage):
         return not os.path.exists(path) or (
             os.path.exists(path) and os.path.exists(idsfile))
 
-    def __init__(self, path, name, cvstorage, iotype='git'):
+    def __init__(self, path, name, storage, iotype='git'):
         super(Simulation, self).__init__(path, name, iotype)
         self._ids = None
-        self.cvstorage = cvstorage
+        self.storage = storage
         self.yamlpath = self.YAML_DIR
         idsfile = os.path.join(path, Simulation.ids_file)
         if not os.path.exists(idsfile):
@@ -99,10 +99,10 @@ class Simulation(services.base.storage.BaseStorage):
         return yaml.load(yamlstream, Loader=utils._yaml.Loader)
 
     def getmd(self, name):
-        return self.cvstorage.getmd(name)
+        return self.storage.getmd(name)
 
     def getyaml(self, id):
-        yaml = self.cvstorage.getyaml(id)
+        yaml = self.storage.getyaml(id)
         info = self.getinfo(id)
         yaml.update(info)
         return yaml
@@ -181,7 +181,7 @@ class Simulation(services.base.storage.BaseStorage):
 
     def search(self, keyword):
         results = set()
-        allfile = self.cvstorage.search(keyword)
+        allfile = self.storage.search(keyword)
         for filename in allfile:
             id = core.outputstorage.ConvertName(filename).base
             if id in self.ids:
@@ -213,17 +213,17 @@ class Simulation(services.base.storage.BaseStorage):
     def dump(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
-        def storage(filepath, stream):
+        def writefile(filepath, stream):
             with open(filepath, 'w') as f:
                 f.write(stream.encode('utf-8'))
         for i in self.ids:
             name = core.outputstorage.ConvertName(i)
             try:
                 mdpath = os.path.join(path, name.md)
-                mdstream = self.cvstorage.getmd(i)
-                storage(mdpath, mdstream)
+                mdstream = self.storage.getmd(i)
+                writefile(mdpath, mdstream)
             except IOError:
                 pass
-            storage(htmlpath, htmlstream)
-            yamlinfo = self.cvstorage.getyaml(i)
+            writefile(htmlpath, htmlstream)
+            yamlinfo = self.storage.getyaml(i)
             utils.builtin.save_yaml(yamlinfo, path, name.yaml)

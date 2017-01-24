@@ -3,6 +3,7 @@ import shutil
 
 import core.basedata
 import services.mining
+import services.people
 import services.account
 import services.multicv
 import services.project
@@ -37,19 +38,20 @@ class Config(object):
         self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB_NAME,
                                                                     'cloudshare')
         self.SVC_CO_REPO = services.company.Company(self.REPO_DB_NAME, 'corepo')
-
-        self.SVC_PRJ_MED = services.project.Project(os.path.join(self.PRJ_PATH,
+        self.SVC_PEO_REPO = services.people.People(os.path.join(self.REPO_DB_NAME, 'PEO'),
+                                                   [self.SVC_CV_REPO], iotype='base')
+        self.SVC_PRJ_TEST = services.project.Project(os.path.join(self.PRJ_PATH,
                                                                  'project_test'),
                                                     self.SVC_CO_REPO, self.SVC_CV_REPO,
-                                                    'project_test')
-        self.SVC_PRJ_MED.setup([])
+                                                    self.SVC_PEO_REPO, 'project_test')
+        self.SVC_PRJ_TEST.setup([])
 
-        self.SVC_MULT_CV = services.multicv.MultiCV([self.SVC_PRJ_MED],
+        self.SVC_MULT_CV = services.multicv.MultiCV([self.SVC_PRJ_TEST],
                                                     self.SVC_CV_REPO)
 
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MULT_CV)
-        self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].no_above = 1
-        self.SVC_MIN.lsi_model[self.SVC_PRJ_MED.name].setup(['first.md'],
+        self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].no_above = 1
+        self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].setup(['first.md'],
             ['here is a text for testing.'])
         self.SVC_MIN.setup()
 
@@ -62,8 +64,12 @@ class Config(object):
                                     filename=filename)
         dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
                                            metadata=yamlinfo)
+        peopmeta = extractor.information_explorer.catch_peopinfo(yamlinfo)
+        peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
         project = self.SVC_MULT_CV.getproject('project_test')
         project.cv_add(dataobj)
+        self.SVC_PEO_REPO.add(peopobj)
+        self.SVC_PRJ_TEST.peo_add(peopobj)
 
     def rebuild(self):
         self.destory()

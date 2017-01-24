@@ -29,7 +29,7 @@ class Project(services.base.service.Service):
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
         cvmodelpath = os.path.join(path, self.CVMODEL_PATH)
-        idsfile = os.path.join(cvpath, services.simulationcv.SimulationCV.ids_file)
+
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
                                                         cvpath, name, cvrepo)
         self.company = services.simulationco.SimulationCO.autoservice(

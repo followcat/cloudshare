@@ -45,6 +45,16 @@ export const API = {
 
   UPLOAD_ENGLISH_RESUME_API: `${HOST}/api/uploadengcv`,
 
+  RESUME_INFO_API: `${HOST}/api/resume`,
+
+  SIMILAR_API: `${HOST}/api/mining/similar`,
+
+  RESUME_LIST_API: `${HOST}/api/peoplebycv`,
+
+  ADDITIONAL_INFO_API: `${HOST}/api/people`,
+
+  UPDATE_RESUME_INFO_API: `${HOST}/api/cv/updateinfo`,
+
   BOOKMARK_API: `bookmark`,  // {host}/api/accounts/{id}/bookmark
 
   //UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}

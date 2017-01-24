@@ -36,10 +36,10 @@ class UploadCVAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         updates = args['updates']
-        project = args['project']
+        project_name = args['project']
         names = []
         documents = []
-        project_name = self.svc_mult_cv.getproject(project).name
+        project = self.svc_mult_cv.getproject(project_name)
         for item in updates:
             cvobj = upload[user.id].pop(item['filename'])
             if cvobj is not None:
@@ -55,6 +55,7 @@ class UploadCVAPI(Resource):
                                                          project_name, unique=True)
                         peo_result = self.svc_peo.add(peopobj, user.id)
                         if cv_result is True:
+                            project.peo_add(peopobj, user.id)
                             names.append(cvobj.name.md)
                             documents.append(cvobj.data)
                             status = 'success'

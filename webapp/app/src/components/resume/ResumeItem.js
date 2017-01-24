@@ -1,7 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 import ResumeWrapper from './ResumeWrapper';
-import ResumeExtension from './ResumeExtension';
 import { Spin } from 'antd';
 
 class ResumeItem extends Component {
@@ -38,13 +37,6 @@ class ResumeItem extends Component {
           onDrawChartOpen={props.onDrawChartOpen}
           onDrawChartSubmit={props.onDrawChartSubmit}
           onDownloadClick={props.onDownloadClick}
-        />
-        <ResumeExtension
-          dataSource={props.extendInfo}
-          similar={props.similar}
-          onSubmitTag={props.onSubmitTag}
-          onSubmitFollowUp={props.onSubmitFollowUp}
-          onSubmitComment={props.onSubmitComment}
         />
       </Spin>
     );

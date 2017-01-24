@@ -72,8 +72,6 @@ class DocumentConverter:
         except NoConnectException:
             self.startservice()
             if not utils.builtin.is_port_open(self.host, self.port):
-                sout = self.p.stdout.readlines()
-                serr = self.p.stderr.readlines()
                 raise DocumentConversionException, "failed to connect to OpenOffice.org on port %s" % self.port
             context = self.resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % self.port)
         self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)

@@ -274,10 +274,11 @@ class CompanyConfirmExcelAPI(Resource):
         super(CompanyConfirmExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.reqparse.add_argument('data', location = 'json')
+        self.reqparse.add_argument('data', type = list, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
+        args = self.reqparse.parse_args()
         datas = args['data']
         project_name = args['project']
         user = flask.ext.login.current_user

@@ -1,13 +1,13 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Input, Button } from 'antd';
+import { Col, Input, Button } from 'antd';
 
 import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
-class BasicInfoItem extends Component {
+class CompanyItemCol extends Component {
   constructor() {
     super();
     this.state = {
@@ -18,24 +18,24 @@ class BasicInfoItem extends Component {
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleDoubleClick = this.handleDoubleClick.bind(this);
     this.handleSaveClick = this.handleSaveClick.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
-    this.handleOmmitClik = this.handleOmmitClik.bind(this);
   }
 
   handleClick() {
-    const { itemInfo, dataSource } = this.props;
+    this.setState({
+      opening: !this.state.opening
+    });
+  }
+  
+  handleDoubleClick() {
+    const { dataSource, dataIndex } = this.props;
 
     this.setState({
       editStatus: true,
-      fieldProp: itemInfo.dataIndex,
-      fieldValue: dataSource[itemInfo.dataIndex]
-    });
-  }
-
-  handleChange(e) {
-    this.setState({
-      fieldValue: e.target.value
+      fieldProp: dataIndex,
+      fieldValue: dataSource[dataIndex]
     });
   }
 
@@ -58,40 +58,30 @@ class BasicInfoItem extends Component {
     });
   }
 
-  handleOmmitClik() {
-    const opening = this.state.opening;
-
+  handleChange(e) {
     this.setState({
-      opening: !opening
+      fieldValue: e.target.value
     });
   }
 
   render() {
-    const { itemInfo, labelCls, contentCls, dataSource } = this.props;
-    
+    const { dataSource, dataIndex, span } = this.props,
+          { editStatus, opening } = this.state;
+
+    const itemCellCls = opening ? 'company-item-cell' : 'company-item-cell ommit';
+
     return (
-      <div
-        className="cs-item-row"
-        onDoubleClick={this.handleClick}
-      >
-        <label className={`cs-item-row-label ${labelCls}`}>{itemInfo.title}</label>
-        {!this.state.editStatus ?
-            <div className={`cs-item-row-content ${contentCls}`}>
-              <span
-                className={this.state.opening ? 'cs-item-row-content-text' : 'cs-item-row-content-text ommit'}
-                title={dataSource[itemInfo.dataIndex]}
-                onClick={this.handleOmmitClik}
-              >
-                {itemInfo.render ?
-                    itemInfo.render(dataSource[itemInfo.dataIndex]) :
-                    dataSource[itemInfo.dataIndex]
-                }
-              </span>
-            </div> :
+      <Col span={span}>
+        <div
+          className={itemCellCls}
+          onClick={this.handleClick}
+          onDoubleClick={this.handleDoubleClick}
+        >
+          {!editStatus ?
+            dataSource[dataIndex] || '无' :
             <div className="cs-item-row-content">
               <div className="cs-input-group">
                 <Input
-                  type={itemInfo.type || 'text'}
                   value={this.state.fieldValue}
                   size="small"
                   onChange={this.handleChange}
@@ -113,26 +103,18 @@ class BasicInfoItem extends Component {
                 </div>
               </div>
             </div>
-        }
-      </div>
+          }
+        </div>
+      </Col>
     );
   }
 }
 
-BasicInfoItem.defaultProps = {
-  labelCls: '',
-  contentCls: '',
-  itemInfo: {},
-  dataSource: {},
-  onSave() {}
-};
-
-BasicInfoItem.propTypes = {
-  labelCls: PropTypes.string,
-  contentCls: PropTypes.string,
-  itemInfo: PropTypes.object,
+CompanyItemCol.propTypes = {
   dataSource: PropTypes.object,
+  span: PropTypes.string,
+  dataIndex: PropTypes.string,
   onSave: PropTypes.func
 };
 
-export default BasicInfoItem;
+export default CompanyItemCol;

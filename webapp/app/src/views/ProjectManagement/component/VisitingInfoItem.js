@@ -3,62 +3,44 @@ import React, { Component, PropTypes } from 'react';
 
 import EnhancedInput from 'components/enhanced-input';
 
-import { Icon, Button } from 'antd';
+import { Button } from 'antd';
+
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
 
 class VisitingInfoItem extends Component {
   constructor() {
     super();
     this.state = {
-      visible: false,
-      foldable: true,
-      editStatus: false
+      editStatus: false,
+      opening: false,
     };
-    this.handleMouseOver = this.handleMouseOver.bind(this);
-    this.handleMouseOut = this.handleMouseOut.bind(this);
-    this.handleEditClick = this.handleEditClick.bind(this);
     this.handleAddClick = this.handleAddClick.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
-    this.handleMoreClick = this.handleMoreClick.bind(this);
-    this.handleFoldClick = this.handleFoldClick.bind(this);
-    this.getFoldRender = this.getFoldRender.bind(this);
+    this.handleOmmitClick = this.handleOmmitClick.bind(this);
+    this.handleDoubleClick = this.handleDoubleClick.bind(this);
     this.getEditingRender = this.getEditingRender.bind(this);
-  }
-
-  handleMouseOver() {
-    this.setState({
-      visible: true
-    });
-  }
-
-  handleMouseOut() {
-    this.setState({
-      visible: false
-    });
-  }
-
-  handleEditClick() {
-    this.setState({
-      editStatus: true
-    });
+    this.getRender = this.getRender.bind(this);
   }
 
   handleAddClick(value) {
-    const { dataSource, itemInfo } = this.props;
+    const { dataIndex, dataId } = this.props;
 
     if (value.trim() !== '') {
       this.props.onSave({
-        id: dataSource.id,
-        fieldProp: itemInfo.dataIndex,
+        id: dataId,
+        fieldProp: dataIndex,
         fieldValue: value
       });
     }
   }
 
   handleDeleteClick(content, date) {
-    const { dataSource, itemInfo } = this.props;
+    const { dataId, dataIndex } = this.props;
 
-    this.props.onRemove(dataSource.id, itemInfo.dataIndex, content, date);
+    this.props.onRemove(dataId, dataIndex, content, date);
   }
 
   handleCancelClick() {
@@ -67,41 +49,20 @@ class VisitingInfoItem extends Component {
     });
   }
 
-  handleMoreClick(e) {
-    e.preventDefault();
+  handleOmmitClick() {
     this.setState({
-      foldable: false
+      opening: !this.state.opening
     });
   }
 
-  handleFoldClick(e) {
-    e.preventDefault();
+  handleDoubleClick() {
     this.setState({
-      foldable: true
+      editStatus: true
     });
-  }
-
-  getFoldRender() {
-    const { dataSource, itemInfo } = this.props,
-          { editStatus } = this.state;
-
-    if (dataSource[itemInfo.dataIndex].length > 1 && !editStatus) {
-      if (this.state.foldable) {
-        return (
-          <a href="javascript: void(0);" onClick={this.handleMoreClick}>更多</a>
-        );
-      } else {
-        return (
-          <a href="javascript: void(0);" onClick={this.handleFoldClick}>收起</a>
-        );
-      }
-    }
-
-    return null;
   }
 
   getEditingRender() {
-    const { visible, editStatus } = this.state;
+    const { editStatus } = this.state;
 
     if (editStatus) {
       return (
@@ -117,66 +78,70 @@ class VisitingInfoItem extends Component {
             size="small"
             onClick={this.handleCancelClick}
           >
-           取消
+           {language.CANCEL}
           </Button>
+        </div>
+      );
+    }
+
+    return null;
+  }
+
+  getRender() {
+    const { visible, dataSource } = this.props,
+          { opening, editStatus } = this.state;
+
+    if (!visible) {
+      return (
+        <div
+          className={opening ? 'company-item-cell' : 'company-item-cell ommit'}
+          onClick={this.handleOmmitClick}
+          onDoubleClick={this.handleDoubleClick}
+        >
+          {dataSource.length > 0 ?
+            `${dataSource[0].author} | ${dataSource[0].date.split(' ')[0]} | ${dataSource[0].content}` :
+            `暂无数据`}
+          {editStatus && dataSource.length > 0 ?
+            <a
+              className="visiting-list-del"
+              href="javascript: void(0);"
+              onClick={() => this.handleDeleteClick(dataSource[0].content, dataSource[0].date)}>{language.DELETE}</a> :
+            null}
         </div>
       );
     } else {
       return (
-        <Icon
-          type="edit"
-          className={visible ? 'edit-icon-show' : 'edit-icon-hide'}
-          onClick={this.handleEditClick}
-        />
+        <div
+          onDoubleClick={this.handleDoubleClick}
+        >
+          {dataSource.length > 0 ? 
+            dataSource.map((item, index) => {
+              return (
+                <p key={index} className="visiting-list">
+                  {`${item.author} | ${item.date.split(' ')[0]} | ${item.content}`}
+                  {editStatus ?
+                    <a
+                      className="visiting-list-del"
+                      href="javascript: void(0);"
+                      onClick={() => this.handleDeleteClick(item.content, item.date)}>{language.DELETE}</a> :
+                    null}
+                </p>
+              );
+            }) :
+           '暂无数据'}
+        </div>
       );
     }
   }
 
   render() {
-    const { dataSource, itemInfo } = this.props,
-          { foldable, editStatus } = this.state,
-          data = dataSource[itemInfo.dataIndex];
-
     return (
       <div
         className="cs-item-row"
-        onMouseOver={this.handleMouseOver}
-        onMouseOut={this.handleMouseOut}
         onDoubleClick={this.handleEditClick}
       >
-        <label className="cs-item-row-label visiting-label">{itemInfo.title}</label>
-        <div className="cs-item-row-content visiting-content">
-          {data.length > 0 &&
-            <ul>
-              {data.map((item, index) => {
-                return (
-                  <li
-                    key={index}
-                    className={index > 0 && foldable && !editStatus ? 
-                                  'visiting-item-hide' :
-                                  'visiting-item'}
-                  >
-                    <span className="visiting-time">{item.date.split(' ')[0]}</span>
-                    <span className="visiting-author">{item.author}</span>
-                    <span className="visiting-detail">{item.content}</span>
-                    {editStatus && 
-                        <a
-                          href="javascript: void(0);"
-                          onClick={() => this.handleDeleteClick(item.content, item.date)}
-                        >
-                          删除
-                        </a>
-                    }
-                  </li>
-                );
-              })}
-            </ul>
-          }
-          <div className="visiting-opearator">
-            {this.getFoldRender()}
-            {this.getEditingRender()}
-          </div>
-        </div>
+        {this.getRender()}
+        {this.getEditingRender()}
       </div>
     );
   }
@@ -184,14 +149,16 @@ class VisitingInfoItem extends Component {
 
 VisitingInfoItem.defaultProps = {
   itemInfo: {},
-  dataSource: {},
+  dataSource: [],
   onSave() {},
   onRemove() {}
 };
 
 VisitingInfoItem.propTypes = {
-  itemInfo: PropTypes.object,
-  dataSource: PropTypes.object,
+  dataId: PropTypes.string,
+  dataIndex: PropTypes.string,
+  visible: PropTypes.bool,
+  dataSource: PropTypes.array,
   onSave: PropTypes.func,
   onRemove: PropTypes.func
 };

@@ -13,12 +13,9 @@ class AdditionalInfoItem extends Component {
   constructor() {
     super();
     this.state = {
-      visible: false,
       editStatus: false,
       opening: false
     };
-    this.handleMouseOver = this.handleMouseOver.bind(this);
-    this.handleMouseOut = this.handleMouseOut.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleEnhancedInputClick = this.handleEnhancedInputClick.bind(this);
@@ -26,18 +23,6 @@ class AdditionalInfoItem extends Component {
     this.handleOmmitClik = this.handleOmmitClik.bind(this);
     this.getNormalRender = this.getNormalRender.bind(this);
     this.getEditingRender = this.getEditingRender.bind(this);
-  }
-
-  handleMouseOver() {
-    this.setState({
-      visible: true
-    });
-  }
-
-  handleMouseOut() {
-    this.setState({
-      visible: false
-    });
   }
 
   handleClick() {
@@ -98,11 +83,6 @@ class AdditionalInfoItem extends Component {
         >
           {textContent}
         </span>
-        <Icon
-          type="edit"
-          className={this.state.visible ? 'edit-icon-show' : 'edit-icon-hide'}
-          onClick={this.handleClick}
-        />
       </div>
     );
   }
@@ -150,8 +130,6 @@ class AdditionalInfoItem extends Component {
     return (
       <div
         className="cs-item-row"
-        onMouseOver={this.handleMouseOver}
-        onMouseOut={this.handleMouseOut}
         onDoubleClick={this.handleClick}
       >
         <label className="cs-item-row-label extra-label">{itemInfo.title}</label>

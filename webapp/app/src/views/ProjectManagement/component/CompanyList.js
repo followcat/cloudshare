@@ -5,8 +5,10 @@ import CompanyInfo from './CompanyInfo';
 import CreateNewCompany from './CreateNewCompany';
 import EnhancedInput from 'components/enhanced-input';
 import ButtonWithModal from 'components/button-with-modal';
+import HeaderTitle from 'components/header-title';
 
 import {
+  Affix,
   message,
   Pagination,
   Spin,
@@ -269,6 +271,27 @@ class CompanyList extends Component {
       onChange: this.handlePaginationChange
     };
 
+    const headerTitle = [{
+      key: 'opearator',
+      span: 2
+    },{
+      key: 'name',
+      text: language.COMPANY_NAME,
+      span: 5,
+    }, {
+      key: 'district',
+      text: language.DISTRICT,
+      span: 2
+    }, {
+      key: 'conumber',
+      text: language.TELLPHONE,
+      span: 3
+    }, {
+      key: 'visiting',
+      text: language.VISITING_SITUATION,
+      span: 12
+    }];
+
     return (
       <div className="cs-card-inner">
         <div className="cs-card-inner-top">
@@ -304,6 +327,9 @@ class CompanyList extends Component {
           size="large"
           spinning={this.state.loading}
         >
+          <Affix>
+            <HeaderTitle dataSource={headerTitle}/>
+          </Affix>
           {this.state.dataSource.map((item, index) => {
             return (
               <CompanyInfo
@@ -316,6 +342,7 @@ class CompanyList extends Component {
               />
             );
           })}
+          
         </Spin>
         <div className="cs-card-inner-pagination">
           <Pagination {...pagination} />

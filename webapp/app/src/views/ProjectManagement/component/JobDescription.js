@@ -83,7 +83,8 @@ class JobDescription extends Component {
     const params = {
       jd_id: fieldValues.id,
       description: fieldValues.description,
-      status: fieldValues.status
+      status: fieldValues.status,
+      commentary: fieldValues.commentary
     };
 
     updateJobDescription(params, (json) => {
@@ -219,9 +220,24 @@ class JobDescription extends Component {
 
   // 获取渲染扩展JD展开行
   getExpandedRowRender(record) {
-    return record.description.split('\n').map((item, index) => {
-      return <p key={index}>{item}</p>;
-    });
+    return (
+      <div>
+        <div>
+          {record.description.split('\n').map((item, index) => { return <p key={index}>{item}</p>})}
+        </div>
+        <div className="commentary-box">
+          <label>备注:</label>
+          {record.commentary && record.commentary.split('\n').map((item, index) => {
+            return (
+              <p key={index}>{item}</p>
+            );
+          })}
+        </div>
+      </div>
+    );
+    // return record.description.split('\n').map((item, index) => {
+    //   return <p key={index}>{item}</p>;
+    // });
   }
 
   // 获取职位描述组件toolbar所要渲染组件

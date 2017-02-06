@@ -129,23 +129,25 @@ export default class FastMatching extends Component {
           postData = {};
 
     for (let key in value) {
-      if (key !== 'uses' && key !== 'doc') {
+      if (key !== 'uses' && key !== 'doc' && key !== 'appendcomment') {
         filterData[key] = value[key] instanceof Array ? value[key] : value[key] ? value[key].split(' ') : [];
+      } else if (key === 'appendcomment') {
+        postData = { appendcomment: value[key] };
       }
     }
 
     if (value.doc) {
-      postData = {
+      postData = Object.assign({}, postData, {
         doc: value.doc,
         uses: value.uses,
         filterdict: filterData,
-      };
+      });
     } else {
-      postData = {
+      postData = Object.assign({}, postData, {
         id: this.state.id,
         uses: value.uses,
         filterdict: filterData,
-      };
+      });
     }
 
     this.setState({

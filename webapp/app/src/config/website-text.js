@@ -61,6 +61,7 @@ const websiteText = {
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',
     JOB_DESCRIPTION_CONTENT: '职位描述内容',
+    COMMENTARY: '备注',
     CURRENT_STATUS: '当前状态',
     ALL: '所有',
     OPENING: '开放',

@@ -76,7 +76,7 @@ class JobDescription(services.base.service.Service):
         filename = self.filename(hex_id)
         self.interface.add(filename,
                            yaml.safe_dump(data, allow_unicode=True),
-                           "Add job description file: " + filename, do_commit=do_commit)
+                           "Add job description file: " + filename)
         return True
 
     def modify(self, hex_id, description, status, commentary, committer):
@@ -90,7 +90,7 @@ class JobDescription(services.base.service.Service):
         dump_data = yaml.safe_dump(data, allow_unicode=True)
         self.interface.modify(filename, dump_data,
                               message="Modify job description: " + filename,
-                              committer=committer, do_commit=do_commit)
+                              committer=committer)
         return True
 
     def filename(self, hex_id):

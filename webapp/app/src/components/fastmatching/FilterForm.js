@@ -122,7 +122,7 @@ class FilterForm extends Component {
     ];
 
     const { getFieldProps } = this.props.form,
-          { textarea, classify } = this.props;
+          { textarea, classify, appendCommentary } = this.props;
 
     return (
       <Form horizontal>
@@ -170,7 +170,14 @@ class FilterForm extends Component {
                   labelCol={{ span: 6 }}
                   wrapperCol={{ span: 18 }}
                 >
-                  <Checkbox {...getFieldProps('appendcomment')}>Open</Checkbox>
+                  <Checkbox
+                    {...getFieldProps('appendcomment', {
+                      initialValue: appendCommentary,
+                      valuePropName: 'checked'
+                    })}
+                  >
+                    Append
+                  </Checkbox>
                 </Form.Item> : 
                 null
               }

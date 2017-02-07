@@ -5,6 +5,7 @@ import TablePlus from '../../../components/table-plus';
 import EditJobDescriptionForm from './EditJobDescriptionForm';
 import CreateNewJobDescription from './CreateNewJobDescription';
 import Status from './Status';
+import Operation from './Operation';
 
 import { message } from 'antd';
 
@@ -322,10 +323,10 @@ class JobDescription extends Component {
       key: 'operation',
       width: '10%',
       render: (record) => (
-        <ul>
-          <li><a href={URL.getFastMatching(record.id)}>{language.MATCH_ACTION}</a></li>
-          <li><a href="javascript: void(0);" onClick={() => this.handleEditClick(record)}>{language.EDIT}</a></li>
-        </ul>
+        <Operation 
+          record={record}
+          onEdit={this.handleEditClick}
+        />
       )
     }];
 

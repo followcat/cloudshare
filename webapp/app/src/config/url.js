@@ -2,8 +2,8 @@
 
 export const URL = {
 
-  getFastMatching: (id) => {
-    return `/fastmatching?jd_id=${id}`;
+  getFastMatching: (id, append_commentary) => {
+    return `/fastmatching?jd_id=${id}&init_append_commentary=${append_commentary}`;
   },
 
   getFastMatchingByCV: (id) => {

@@ -36,6 +36,7 @@ export default class FastMatching extends Component {
       siderbarClosable: false,
       siderbarVisible: false,
       textarea: false,
+      appendCommentary: false,
       postData: {},
       postAPI: '',
       selection: Immutable.List(Immutable.Map()),
@@ -91,7 +92,7 @@ export default class FastMatching extends Component {
    * @return {[type]}    [description]
    */
   loadResultData(id, postAPI, classify) {
-    let postData = { id: id, uses: classify };
+    let postData = { id: id, uses: classify, appendcomment: this.state.appendCommentary };
     this.setState({
       visible: true,
       spinning: true,
@@ -132,6 +133,9 @@ export default class FastMatching extends Component {
       if (key !== 'uses' && key !== 'doc' && key !== 'appendcomment') {
         filterData[key] = value[key] instanceof Array ? value[key] : value[key] ? value[key].split(' ') : [];
       } else if (key === 'appendcomment') {
+        this.setState({
+          appendcomment: value[key]
+        });
         postData = { appendcomment: value[key] };
       }
     }
@@ -190,7 +194,7 @@ export default class FastMatching extends Component {
       spinning: true,
       searchResultDataSource: [],
     });
-
+    console.log(this.state.postData);
     fetch(this.state.postAPI, {
       method: 'POST',
       credentials: 'include',
@@ -234,8 +238,9 @@ export default class FastMatching extends Component {
 
   componentDidMount() {
     const params = queryString(window.location.href),
-          jd_id = params.jd_id ? params.jd_id : null,
-          cv_id = params.cv_id ? params.cv_id : null;
+          jd_id = params.jd_id || null,
+          cv_id = params.cv_id || null,
+          append_commentary = Boolean(params.init_append_commentary) || null;
     let postAPI;
 
     // this.loadClassifyData();
@@ -247,6 +252,7 @@ export default class FastMatching extends Component {
         id: jd_id,
         postAPI: postAPI,
         siderbarVisible: true,
+        appendCommentary: append_commentary
       });
       this.loadClassifyData(jd_id, postAPI);
     } else if (cv_id) {
@@ -275,6 +281,7 @@ export default class FastMatching extends Component {
           classify={this.state.classify}
           industry={this.state.industry}
           visible={this.state.visible}
+          appendCommentary={this.state.appendCommentary}
           total={this.state.total}
           onSearch={this.handleSearch}
         />

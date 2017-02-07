@@ -5,7 +5,8 @@ import { Row, Col, Form, Select, Input, Checkbox, Button, DatePicker } from 'ant
 
 const RangePicker = DatePicker.RangePicker,
       Option = Select.Option,
-      OptGroup = Select.OptGroup;
+      OptGroup = Select.OptGroup,
+      CheckboxGroup = Checkbox.Group;
 
 class FilterForm extends Component {
 
@@ -121,7 +122,7 @@ class FilterForm extends Component {
     ];
 
     const { getFieldProps } = this.props.form,
-          { textarea, classify } = this.props;
+          { textarea, classify, appendCommentary } = this.props;
 
     return (
       <Form horizontal>
@@ -163,24 +164,31 @@ class FilterForm extends Component {
                 })}
               </Select>
             </Form.Item>
+              {!textarea ? 
+                <Form.Item
+                  label="Commentary"
+                  labelCol={{ span: 6 }}
+                  wrapperCol={{ span: 18 }}
+                >
+                  <Checkbox
+                    {...getFieldProps('appendcomment', {
+                      initialValue: appendCommentary,
+                      valuePropName: 'checked'
+                    })}
+                  >
+                    Append
+                  </Checkbox>
+                </Form.Item> : 
+                null
+              }
             <Form.Item
               label="Gender"
               labelCol={{ span: 6 }}
               wrapperCol={{ span: 18 }}
             >
-              <Checkbox.Group
+              <CheckboxGroup
                 options={genderOptions}
                 onChange={this.handleGenderChange}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Education"
-              labelCol={{ span: 6 }}
-              wrapperCol={{ span: 18 }}
-            >
-              <Checkbox.Group
-                options={educationOptions}
-                onChange={this.handleEducationChange}
               />
             </Form.Item>
             <Form.Item
@@ -188,9 +196,19 @@ class FilterForm extends Component {
               labelCol={{ span: 6 }}
               wrapperCol={{ span: 18 }}
             >
-              <Checkbox.Group
+              <CheckboxGroup
                 options={maritalStatusOptions}
                 onChange={this.handleMaritalStatusChange}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Education"
+              labelCol={{ span: 6 }}
+              wrapperCol={{ span: 18 }}
+            >
+              <CheckboxGroup
+                options={educationOptions}
+                onChange={this.handleEducationChange}
               />
             </Form.Item>
           </Col>

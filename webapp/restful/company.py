@@ -159,7 +159,10 @@ class CompanyInfoUpdateAPI(Resource):
         project = self.svc_mult_cv.getproject(projectname)
         data = dict()
         for item in update_info:
-            result = project.company.updateinfo(id, item['key'], item['value'], user.id)
+            try:
+                result = project.company.updateinfo(id, item['key'], item['value'], user.id)
+            except AssertionError:
+                continue
             data.update(result)
         if len(data) != 0:
             response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
@@ -228,3 +231,60 @@ class SearchCObyTextAPI(Resource):
         for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
             datas.append(svc_co.getyaml(id))
         return datas, pages, total
+
+
+class CompanyUploadExcelAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(CompanyUploadExcelAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('files', type = str, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = flask.ext.login.current_user
+        project_name = args['project']
+        network_file = flask.request.files['files']
+        project = self.svc_mult_cv.getproject(project_name)
+        compare_result = project.company_compare_excel(network_file.read(), committer=user.id)
+        infos = dict()
+        for item in compare_result:
+            coid = item[1]
+            if coid not in infos:
+                if project.corepo.exists(coid):
+                    infos[coid] = project.company_get(coid)
+                else:
+                    infos[coid] = item[2][0]
+        return {
+            'code': 200,
+            'data': compare_result,
+            'info': infos
+        }
+
+
+class CompanyConfirmExcelAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(CompanyConfirmExcelAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('data', type = list, location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        datas = args['data']
+        project_name = args['project']
+        user = flask.ext.login.current_user
+        project = self.svc_mult_cv.getproject(project_name)
+        results = project.company_add_excel(datas, user.id)
+        return {
+            'code': 200,
+            'data': results
+        }

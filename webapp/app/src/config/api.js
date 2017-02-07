@@ -9,6 +9,8 @@ export const API = {
 
   CLASSIFY_API: `${HOST}/api/classify`,
 
+  INDUSTRY_API: `${HOST}/api/industry`,
+
   COMPANYLIST_API: `${HOST}/api/companylist`,
 
   COMPANY_API: `${HOST}/api/company`,
@@ -27,7 +29,9 @@ export const API = {
 
   FEATURE_API: `${HOST}/api/feature`,
 
-  JOBDESCRIPTION_API: `${HOST}/api/jdlist`,
+  JOBDESCRIPTION_LIST_API: `${HOST}/api/jdlist`,
+
+  JOBDESCRIPTION_API: `${HOST}/api/jd`,
 
   PROJECTS_API: `${HOST}/api/projectnames`,
 
@@ -41,9 +45,13 @@ export const API = {
 
   UPLOAD_ENGLISH_RESUME_API: `${HOST}/api/uploadengcv`,
 
+  UPLOAD_EXCEL_API: `${HOST}/api/couploadexcel`,
+
+  CONFIRM_UPLOAD_EXCEL_API: `${HOST}/api/coconfirmexcel`,
+
   BOOKMARK_API: `bookmark`,  // {host}/api/accounts/{id}/bookmark
 
-  UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}
+  //UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}
 
   LSI_BY_JD_ID_API: `${HOST}/api/mining/lsibyjdid`,
 

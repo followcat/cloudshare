@@ -18,7 +18,8 @@ class JobDescriptionAPI(Resource):
         self.reqparse.add_argument('project', location = 'json')
         super(JobDescriptionAPI, self).__init__()
 
-    def get(self):
+    def post(self):
+        args = self.reqparse.parse_args()
         jd_id = args['jd_id']
         project = args['project']
         result = self.svc_mult_cv.getproject(project).jd_get(jd_id)

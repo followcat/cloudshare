@@ -1,16 +1,18 @@
 'use strict';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 
-import Header from '../../components/layout-header';
+import Header from 'components/layout-header';
 
 import { Modal, Menu } from 'antd';
 
-import { URL } from '../../config/url';
-import { signOut } from '../../request/sign';
-import StorageUtil from '../../utils/storage';
+import { URL } from 'URL';
+
+import { signOut } from 'request/sign';
+import StorageUtil from 'utils/storage';
 
 import logo from '../../image/logo.png';
-import websiteText from '../../config/website-text';
+
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
@@ -76,8 +78,6 @@ class LayoutHeader extends Component {
   }
 
   render() {
-    const { style, children } = this.props;
-
     const profileMenu = (
       <Menu>
         <MenuItem>
@@ -96,26 +96,16 @@ class LayoutHeader extends Component {
     );
 
     return (
-      <div style={style}>
-        <Header
-          logoImg={logo}
-          navMenus={navMenus}
-          profileMenu={profileMenu}
-          project={StorageUtil.get('_pj')}
-          profileText={StorageUtil.get('user')}
-          selectedKeys={this.state.selectedKeys}
-        />
-        <div className="cs-layout-wrapper">
-          {children}
-        </div>
-      </div>
+      <Header
+        logoImg={logo}
+        navMenus={navMenus}
+        profileMenu={profileMenu}
+        project={StorageUtil.get('_pj')}
+        profileText={StorageUtil.get('user')}
+        selectedKeys={this.state.selectedKeys}
+      />
     );
   }
 }
-
-LayoutHeader.propTypes = {
-  style: PropTypes.object,
-  children: PropTypes.element
-};
 
 export default LayoutHeader;

@@ -1,7 +1,10 @@
 import ujson
 
+import utils.companyexcel
+import core.outputstorage
 import services.company
 import services.base.simulation
+import extractor.information_explorer
 
 
 class SimulationCO(services.base.simulation.Simulation,
@@ -25,7 +28,34 @@ class SimulationCO(services.base.simulation.Simulation,
         super(SimulationCO, self).__init__(path, name, cvstorage, iotype)
         self._customers = None
 
-    def addcustomer(self, id, user):
+    def compare_excel(self, stream, committer):
+        output = list()
+        excels = utils.companyexcel.convert(stream)
+        for excel in excels:
+            metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
+            data = core.basedata.DataObject(metadata, excel)
+            id = metadata['id']
+            caller = committer
+            if not self.exists(id):
+                for item in self.list_item:
+                    if item in metadata:
+                        metadata.pop(item)
+                output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
+            if excel['caller']:
+                caller = excel['caller'][0]
+            for key in self.list_item:
+                existvalues = list()
+                if self.exists(id):
+                    info = self.getyaml(id)
+                    existvalues = [v['content'].replace(' ', '') for v in info[key]]
+                for value in excel[key]:
+                    if value.replace(' ', '') in existvalues:
+                        continue
+                    existvalues.append(value)
+                    output.append(('listadd', id, (id, key, value, caller)))
+        return output
+
+    def addcustomer(self, id, user, do_commit=True):
         result = False
         if id in self.customers or not self.exists(id):
             return result
@@ -33,11 +63,11 @@ class SimulationCO(services.base.simulation.Simulation,
         self.interface.modify(self.customers_file,
                               ujson.dumps(sorted(self.customers), indent=4),
                               message="Add id: " + id + " to customers.\n",
-                              committer=user)
+                              committer=user, do_commit=do_commit)
         result = True
         return result
 
-    def deletecustomer(self, id, user):
+    def deletecustomer(self, id, user, do_commit=True):
         result = False
         if id not in self.customers or not self.exists(id):
             return result
@@ -45,7 +75,7 @@ class SimulationCO(services.base.simulation.Simulation,
         self.interface.modify(self.customers_file,
                               ujson.dumps(sorted(self.customers), indent=4),
                               message="Delete id: " + id + " in customers.\n",
-                              committer=user)
+                              committer=user, do_commit=do_commit)
         result = True
         return result
 

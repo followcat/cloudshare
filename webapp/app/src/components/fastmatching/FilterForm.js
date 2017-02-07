@@ -3,7 +3,9 @@ import React, { Component, PropTypes } from 'react';
 
 import { Row, Col, Form, Select, Input, Checkbox, Button, DatePicker } from 'antd';
 
-const RangePicker = DatePicker.RangePicker;
+const RangePicker = DatePicker.RangePicker,
+      Option = Select.Option,
+      OptGroup = Select.OptGroup;
 
 class FilterForm extends Component {
 
@@ -24,6 +26,7 @@ class FilterForm extends Component {
     this.handleReset = this.handleReset.bind(this);
     this.handleRangePickerChange = this.handleRangePickerChange.bind(this);
     this.disabledDate = this.disabledDate.bind(this);
+    this.renderIndustry = this.renderIndustry.bind(this);
   }
 
   handleGenderChange(values) {
@@ -62,6 +65,15 @@ class FilterForm extends Component {
   handleReset(e) {
     e.preventDefault();
     this.props.form.resetFields();
+    this.props.form.setFieldsValue({
+      uses: []
+    });
+    this.setState({
+      gender: [],
+      education: [],
+      maritalStatus: [],
+      date: []
+    });
   }
 
   handleRangePickerChange(value, dateString) {
@@ -72,6 +84,21 @@ class FilterForm extends Component {
 
   disabledDate(current) {
     return current && current.getTime() > Date.now();
+  }
+
+  renderIndustry() {
+    const industry = this.props.industry;
+    let optGroup = [];
+
+    for (let key in industry) {
+      optGroup.push(
+        <OptGroup key={key} label={key}>
+          {industry[key].map(item => <Option key={item} value={item}>{item}</Option>)}
+        </OptGroup>
+      );
+    }
+
+    return optGroup;
   }
 
   render() {
@@ -93,11 +120,12 @@ class FilterForm extends Component {
       { label: 'Married', value: '已婚' },
     ];
 
-    const { getFieldProps } = this.props.form;
+    const { getFieldProps } = this.props.form,
+          { textarea, classify } = this.props;
 
     return (
       <Form horizontal>
-        {this.props.textarea ? 
+        {textarea ? 
           <Row>
             <Col>
               <Form.Item
@@ -119,38 +147,22 @@ class FilterForm extends Component {
               label="Classify"
               labelCol={{ span: 6 }}
               wrapperCol={{ span: 18 }}
+              className="classify-selection"
             >
               <Select
                 {...getFieldProps('uses', {
+                  initialValue: textarea ? [] : classify,
                   rules: [
                     { type: 'array' },
                   ],
                 })}
                 multiple
               >
-                {this.props.classify.map((item, index) => {
-                  return <Select.Option key={index} value={item} >{item}</Select.Option>
+                {classify.map((item, index) => {
+                  return <Option key={index} value={item} >{item}</Option>
                 })}
               </Select>
             </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label="Date"
-              labelCol={{ span: 8}}
-              wrapperCol={{ span: 16 }}
-            >
-              <RangePicker
-                {...getFieldProps('date')}
-                value={this.state.date}
-                disabledDate={this.disabledDate}
-                onChange={this.handleRangePickerChange}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={8}>
-          <Col span={12}>
             <Form.Item
               label="Gender"
               labelCol={{ span: 6 }}
@@ -184,6 +196,18 @@ class FilterForm extends Component {
           </Col>
           <Col span={12}>
             <Form.Item
+              label="Date"
+              labelCol={{ span: 8}}
+              wrapperCol={{ span: 16 }}
+            >
+              <RangePicker
+                {...getFieldProps('date')}
+                value={this.state.date}
+                disabledDate={this.disabledDate}
+                onChange={this.handleRangePickerChange}
+              />
+            </Form.Item>
+            <Form.Item
               label="Current Places"
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
@@ -206,9 +230,13 @@ class FilterForm extends Component {
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <Input
+              <Select
                 {...getFieldProps('business')}
-              />
+                showSearch={true}
+                multiple={true}
+              >
+                {this.renderIndustry()}
+              </Select>
             </Form.Item>
           </Col>
         </Row>

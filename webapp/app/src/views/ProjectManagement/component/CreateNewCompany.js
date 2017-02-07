@@ -1,8 +1,11 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import ButtonWithModal from '../../../components/button-with-modal';
+
+import ButtonWithModal from 'components/button-with-modal';
+
 import { Form, Input } from 'antd';
-import websiteText from '../../../config/website-text';
+
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

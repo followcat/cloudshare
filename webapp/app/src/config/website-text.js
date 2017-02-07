@@ -57,6 +57,7 @@ const websiteText = {
     SAVE: '保存',
     ADD: '添加',
     MATCH_ACTION: '进行匹配',
+    UPLOAD: '上传',
 
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',
@@ -79,12 +80,22 @@ const websiteText = {
     ADD_CUSTOMER: '添加客户',
     ADDED_CUSTOMER: '已添加客户',
 
+    SAVE_SUCCESS_MSG: '已保存!',
+    SAVE_FAIL_MSG: '保存失败!',
     ADD_CONFIRM_MSG: '确定要添加这个条目吗?',
     ADD_SUCCESS_MSG: '添加成功!',
     ADD_FAIL_MSG: '添加失败!',
     DELETE_CONFIRM_MSG: '确定要删除这个条目吗?',
     DELETE_SUCCESS_MSG: '删除成功!',
     DELETE_FAIL_MSG: '删除失败!',
+
+    NEW_CREATION: '新增',
+    CHANGE: '变更',
+    CONFIRM_UOLOAD: '确认上传',
+    UPLOAD_SUCCESS_MSG: '上传成功',
+
+    FOLD_MSG: '收起所有信息',
+    UNFOLD_MSG: '展开所有信息'
   },
 
   // 待扩展语言

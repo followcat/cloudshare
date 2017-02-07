@@ -1,20 +1,20 @@
 'use strict';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import Header from '../components/header';
-import Navigation from '../components/navigation';
-import Viewport from '../components/viewport';
-import Container from '../components/container';
-import ShowCard from '../components/show-card';
-import SiderMenu from '../components/sider-menu';
-import Content from '../components/content';
-import CreateNewUser from '../components/manage/CreateNewUser';
-import Profile from '../components/manage/Profile';
+import Header from 'components/header';
+import Navigation from 'components/navigation';
+import Viewport from 'components/viewport';
+import Container from 'components/container';
+import ShowCard from 'components/show-card';
+import SiderMenu from 'components/sider-menu';
+import Content from 'components/content';
+import CreateNewUser from 'components/manage/CreateNewUser';
+import Profile from 'components/manage/Profile';
 import { message, Popconfirm, Menu, Modal } from 'antd';
-import { getAccounts, createAccount, deleteAccount } from '../request/account';
-import { resetPassword } from '../request/password';
-import { signOut } from '../request/sign';
-import { getMenu, getCurrentActive } from '../utils/sider-menu-list';
+import { getAccounts, createAccount, deleteAccount } from 'request/account';
+import { resetPassword } from 'request/password';
+import { signOut } from 'request/sign';
+import { getMenu, getCurrentActive } from 'utils/sider-menu-list';
 import './manage.less';
 
 const MenuItem = Menu.Item,

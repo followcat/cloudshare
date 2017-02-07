@@ -41,7 +41,8 @@ class ResumeComment extends Component {
   }
 
   render() {
-    const { getFieldProps } = this.props.form;
+    const { getFieldProps } = this.props.form,
+          { dataSource } = this.props;
 
     return (
       <Card
@@ -65,9 +66,9 @@ class ResumeComment extends Component {
             <Button type="ghost" size="small" className="submit-btn" onClick={this.handleSubmit}>Submit</Button>
           </Form.Item>
         </Form>
-        {this.props.dataSource.length > 0 ? 
+        {dataSource && dataSource.length > 0 ? 
           <div className="contend-box">
-            {this.props.dataSource.map((item, index) => {
+            {dataSource.map((item, index) => {
               return (
                 <div key={index} className="content-item">
                   <em>{item.author} / {item.date}</em>

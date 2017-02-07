@@ -2,7 +2,21 @@
 import React, { Component } from 'react';
 import Header from '../components/common/Header';
 import ResumeItem from '../components/resume/ResumeItem';
+import ResumeExtension from '../components/resume/ResumeExtension';
 import { Tabs, message } from 'antd';
+
+import {
+  getResumeInfo,
+  getSimilar,
+  getResumeList,
+  getAdditionalInfo,
+  updateResumeInfo,
+  updateAdditionalInfo
+} from '../request/resume';
+import {
+  getJobDescriptionList
+} from '../request/jobdescription';
+
 import StorageUtil from '../utils/storage';
 import Generator from '../utils/generator';
 import History from '../utils/history';
@@ -17,7 +31,8 @@ export default class Resume extends Component {
   constructor() {
     super();
     this.state = {
-      currentId: '',
+      resumeID: '',
+      uniqueID: '',
       resumeList: [],
       html: '',
       enHtml: '',
@@ -45,9 +60,9 @@ export default class Resume extends Component {
     this.handleComment = this.handleComment.bind(this);
     this.handleUploadChange = this.handleUploadChange.bind(this);
     this.handleDownloadClick = this.handleDownloadClick.bind(this);
-    this.getResumeInfoData = this.getResumeInfoData.bind(this);
-    this.getPeopleList = this.getPeopleList.bind(this);
-    this.getSimilarData = this.getSimilarData.bind(this);
+    this.getResumeDataSource = this.getResumeDataSource.bind(this);
+    this.getResumeIDList = this.getResumeIDList.bind(this);
+    this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
   }
 
   componentDidMount() {
@@ -55,12 +70,12 @@ export default class Resume extends Component {
           id = hrefArr[hrefArr.length-1];
 
     this.setState({
-      currentId: id,
+      resumeID: id,
     });
 
-    this.getPeopleList(id);
-    this.getResumeInfoData(id);
-    this.getSimilarData(id);
+    this.getResumeIDList(id);
+    this.getResumeDataSource(id);
+    this.getSimilarDataSource(id);
   }
 
   /**
@@ -70,11 +85,11 @@ export default class Resume extends Component {
    */
   handleTabsChange(key) {
     this.setState({
-      currentId: key,
+      resumeID: key,
     });
 
-    this.getResumeInfoData(key);
-    this.getSimilarData(key);
+    this.getResumeDataSource(key);
+    this.getSimilarDataSource(key);
   }
 
   /**
@@ -83,25 +98,17 @@ export default class Resume extends Component {
    * @return {void}
    */
   handleModifyTitle(fieldValue) {
-    fetch(`/api/cv/updateinfo`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Authorization': `Basic ${StorageUtil.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({ id: this.state.currentId, update_info: fieldValue })
-    })
-    .then(response => response.json())
-    .then(json => {
+    updateResumeInfo({
+      id: this.state.resumeID,
+      update_info: fieldValue
+    }, json => {
       if(json.code === 200)  {
         message.success(json.message);
-        this.getResumeInfoData(this.state.currentId);
+        this.getResumeDataSource(this.state.resumeID);
       } else {
         message.error(json.message);
       }
-    })
+    });
   }
 
   /**
@@ -122,7 +129,7 @@ export default class Resume extends Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        bookmark_id: this.state.currentId,
+        bookmark_id: this.state.resumeID,
       })
     })
     .then(response => response.json())
@@ -155,7 +162,7 @@ export default class Resume extends Component {
         'Content-Type': 'application/json',
       },
       body: Generator.getPostData({
-        id: this.state.currentId,
+        id: this.state.resumeID,
       })
     })
     .then(response => response.json())
@@ -181,23 +188,13 @@ export default class Resume extends Component {
    * @return {void}
    */
   handleDrawChartOpen() {
-    fetch(`/api/jdlist`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${StorageUtil.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData()
-    })
-    .then(response => response.json())
-    .then(json => {
+    getJobDescriptionList(json => {
       if (json.code === 200) {
         this.setState({
           jdList: json.data.filter(item => item.status === 'Opening'),
         });
       }
-    })
+    });
   }
 
   /**
@@ -216,7 +213,7 @@ export default class Resume extends Component {
     });
 
     const requestParam = object.type === 'id' ? { id: object.value } : { doc: object.value },
-          cvId = this.state.currentId;
+          cvId = this.state.resumeID;
 
     fetch(`/api/mining/valuable`, {
       method: 'POST',
@@ -247,21 +244,13 @@ export default class Resume extends Component {
    * @return {void}
    */
   handleSubmitTag(fieldValue) {
-    let tagList = this.state.tag;
-    fetch(`/api/cv/updateinfo`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Basic ${StorageUtil.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({
-        id: this.state.currentId,
-        update_info: fieldValue,
-      })
-    })
-    .then(response => response.json())
-    .then(json => {
+    let tagList = this.state.tag,
+        uniqueID = this.state.uniqueID;
+
+    updateAdditionalInfo({
+      unique_id: uniqueID,
+      update_info: fieldValue
+    }, json => {
       if (json.code === 200) {
         tagList.push(json.data);
         this.setState({
@@ -279,24 +268,15 @@ export default class Resume extends Component {
    * @return {object} fieldValue 跟进表单数据对象
    */
   handleSubmitFollowUp(fieldValue) {
-    let followUpList = this.state.tracking;
+    let followUpList = this.state.tracking,
+        uniqueID = this.state.uniqueID;
 
-    fetch(`/api/cv/updateinfo`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Basic ${StorageUtil.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({
-        id: this.state.currentId,
-        update_info: {
-          tracking: fieldValue,
-        },
-      })
-    })
-    .then(response => response.json())
-    .then(json => {
+    updateAdditionalInfo({
+      unique_id: uniqueID,
+      update_info: {
+        tracking: fieldValue
+      }
+    }, json => {
       if (json.code === 200) {
         followUpList.unshift(json.data);
         this.setState({
@@ -315,22 +295,13 @@ export default class Resume extends Component {
    * @return {void}
    */
   handleComment(fieldValue) {
-    let commentList = this.state.comment;
+    let commentList = this.state.comment,
+        uniqueID = this.state.uniqueID;
 
-    fetch(`/api/cv/updateinfo`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Basic ${StorageUtil.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({
-        id: this.state.currentId,
-        update_info: fieldValue,
-      })
-    })
-    .then(response => response.json())
-    .then(json => {
+    updateAdditionalInfo({
+      unique_id: uniqueID,
+      update_info: fieldValue
+    }, json => {
       if (json.code === 200) {
         commentList.unshift(json.data);
         this.setState({
@@ -379,51 +350,39 @@ export default class Resume extends Component {
    * @param  {string} id 简历ID值
    * @return {void}
    */
-  getResumeInfoData(id) {
+  getResumeDataSource(id) {
     this.setState({
       paneLoading: true,
       html: '',
       enHtml: '',
       dataSource: {},
       collected: false,
-      tag: [],
-      tracking: [],
-      comment: [],
       similar: [],
       radarOption: {},
     });
 
-    fetch(`/api/resume`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Authorization': `Basic ${StorageUtil.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({ id: id }),
-    })
-    .then(response => response.json())
-    .then(json => {
+    getResumeInfo({
+      id: id
+    }, json => {
       if (json.code === 200) {
-        const yamlInfo = json.data.yaml_info;
+        const { html, en_html, yaml_info } = json.data,
+              uniqueID = yaml_info.unique_id;
+
         this.setState({
-          html: json.data.html,
-          enHtml: json.data.en_html,
-          dataSource: yamlInfo,
-          collected: yamlInfo.collected,
-          tag: yamlInfo.tag,
-          tracking: yamlInfo.tracking,
-          comment: yamlInfo.comment,
+          html: html,
+          enHtml: en_html,
+          dataSource: yaml_info,
+          uniqueID: uniqueID,
+          collected: yaml_info.collected,
           paneLoading: false,
         });
 
         History.write({
           id: id,
-          name: yamlInfo.name
+          name: yaml_info.name
         });
       }
-    })
+    });
   }
 
   /**
@@ -431,27 +390,16 @@ export default class Resume extends Component {
    * @param  {string} id 待匹配的简历id
    * @return {void}
    */
-  getSimilarData(id) {
-    fetch(`/api/mining/similar`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Authorization': `Basic ${StorageUtil.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({
-        id: id
-      })
-    })
-    .then(response => response.json())
-    .then(json => {
+  getSimilarDataSource(id) {
+    getSimilar({
+      id: id
+    }, json => {
       if (json.code === 200) {
         this.setState({
           similar: json.data,
         });
       }
-    })
+    });
   }
 
   /**
@@ -459,30 +407,32 @@ export default class Resume extends Component {
    * @param  {string} id 候选人简历ID
    * @return {void}
    */
-  getPeopleList(id) {
-    fetch(`/api/projuectbyid/${id}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Authorization': `Basic ${StorageUtil.get('token')}`,
-      }
-    })
-    .then(response => response.json())
-    .then(json => {
+  getResumeIDList(id) {
+    getResumeList({
+      cv_id: id
+    }, json => {
       if (json.code === 200) {
+        const data = json.data;
+
         this.setState({
-          resumeList: json.data.cv,
+          resumeList: data.cv,
+          tag: data.tag,
+          comment: data.comment,
+          tracking: data.tracking
         });
       }
     });
   }
 
   render() {
+    const state = this.state;
+          
     const extendInfo = {
-      tag: this.state.tag,
-      tracking: this.state.tracking,
-      comment: this.state.comment,
+      tag: state.tag,
+      tracking: state.tracking,
+      comment: state.comment,
     };
+
     const uploadProps = {
       name: 'file',
       action: '/api/uploadengcv',
@@ -496,51 +446,55 @@ export default class Resume extends Component {
       <div>
         <Header fixed={false} />
         <div className="cs-layout-container">
-          <Tabs
-            type="card"
-            activeKey={this.state.currentId}
-            onChange={this.handleTabsChange}
-          >
-            {this.state.resumeList.map(item => {
-              return (
-                <TabPane 
-                  tab={`ID: ${item}`}
-                  key={item}
-                >
-                  <ResumeItem
+          <div className="cs-layout-tabs">
+            <Tabs
+              type="card"
+              activeKey={this.state.resumeID}
+              onChange={this.handleTabsChange}
+            >
+              {this.state.resumeList.map(item => {
+                return (
+                  <TabPane 
+                    tab={`ID: ${item}`}
                     key={item}
-                    id={item}
-                    paneLoading={this.state.paneLoading}
-                    currentId={this.state.currentId}
-                    active={this.state.currentId === item}
-                    text={`Item: ${item}`}
-                    dataSource={this.state.dataSource}
-                    summary={generateSummary(this.state.dataSource)}
-                    html={this.state.html}
-                    enHtml={this.state.enHtml}
-                    collected={this.state.collected}
-                    upload={uploadProps}
-                    fileList={this.state.fileList}
-                    jdList={this.state.jdList}
-                    radarOption={this.state.radarOption}
-                    chartSpinning={this.state.chartSpinning}
-                    enComfirmLoading={this.state.enComfirmLoading}
-                    extendInfo={extendInfo}
-                    similar={this.state.similar}
-                    onModifyTitle={this.handleModifyTitle}
-                    onCollection={this.handleCollection}
-                    onEnComfirmLoading={this.handleEnComfirmLoading}
-                    onDrawChartOpen={this.handleDrawChartOpen}
-                    onDrawChartSubmit={this.handleDrawChartSubmit}
-                    onSubmitTag={this.handleSubmitTag}
-                    onSubmitFollowUp={this.handleSubmitFollowUp}
-                    onSubmitComment={this.handleComment}
-                    onDownloadClick={this.handleDownloadClick}
-                  />
-                </TabPane>
-              );
-            })}
-          </Tabs>
+                  >
+                    <ResumeItem
+                      key={item}
+                      id={item}
+                      paneLoading={state.paneLoading}
+                      resumeID={state.resumeID}
+                      active={state.resumeID === item}
+                      text={`Item: ${item}`}
+                      dataSource={state.dataSource}
+                      summary={generateSummary(state.dataSource)}
+                      html={state.html}
+                      enHtml={state.enHtml}
+                      collected={state.collected}
+                      upload={uploadProps}
+                      fileList={state.fileList}
+                      jdList={state.jdList}
+                      radarOption={state.radarOption}
+                      chartSpinning={state.chartSpinning}
+                      enComfirmLoading={state.enComfirmLoading}
+                      onModifyTitle={this.handleModifyTitle}
+                      onCollection={this.handleCollection}
+                      onEnComfirmLoading={this.handleEnComfirmLoading}
+                      onDrawChartOpen={this.handleDrawChartOpen}
+                      onDrawChartSubmit={this.handleDrawChartSubmit}
+                      onDownloadClick={this.handleDownloadClick}
+                    />
+                  </TabPane>
+                );
+              })}
+            </Tabs>
+          </div>
+          <ResumeExtension
+            dataSource={extendInfo}
+            similar={state.similar}
+            onSubmitTag={this.handleSubmitTag}
+            onSubmitFollowUp={this.handleSubmitFollowUp}
+            onSubmitComment={this.handleComment}
+          />
         </div>
       </div>
     );

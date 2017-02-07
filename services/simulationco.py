@@ -24,8 +24,8 @@ class SimulationCO(services.base.simulation.Simulation,
     fix_item  = {"id", "name"}
     customers_file = 'customers.json'
 
-    def __init__(self, path, name, cvstorage, iotype='git'):
-        super(SimulationCO, self).__init__(path, name, cvstorage, iotype)
+    def __init__(self, path, name, costorage, iotype='git'):
+        super(SimulationCO, self).__init__(path, name, costorage, iotype)
         self._customers = None
 
     def compare_excel(self, stream, committer):
@@ -53,7 +53,7 @@ class SimulationCO(services.base.simulation.Simulation,
                     output.append(('followup', (id, key, value, caller)))
         return output
 
-    def addcustomer(self, id, user):
+    def addcustomer(self, id, user, do_commit=True):
         result = False
         if id in self.customers or not self.exists(id):
             return result
@@ -61,11 +61,11 @@ class SimulationCO(services.base.simulation.Simulation,
         self.interface.modify(self.customers_file,
                               ujson.dumps(sorted(self.customers), indent=4),
                               message="Add id: " + id + " to customers.\n",
-                              committer=user)
+                              committer=user, do_commit=do_commit)
         result = True
         return result
 
-    def deletecustomer(self, id, user):
+    def deletecustomer(self, id, user, do_commit=True):
         result = False
         if id not in self.customers or not self.exists(id):
             return result
@@ -73,7 +73,7 @@ class SimulationCO(services.base.simulation.Simulation,
         self.interface.modify(self.customers_file,
                               ujson.dumps(sorted(self.customers), indent=4),
                               message="Delete id: " + id + " in customers.\n",
-                              committer=user)
+                              committer=user, do_commit=do_commit)
         result = True
         return result
 

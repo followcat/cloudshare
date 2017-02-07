@@ -41,7 +41,7 @@ def predate(xp, to):
         output['date_to'] = u'至今'
     return output
 
-def acceptable_education(ed, to_date=u'至今', low_level=u'大专'):
+def acceptable_education(ed, to_date=u'至今', low_level=u'中专'):
     u"""
         >>> ed = {
         ...     'date_from':  '2014.01',

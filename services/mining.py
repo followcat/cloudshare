@@ -224,6 +224,7 @@ class Mining(object):
     def make_lsi(self):
         self.lsi_model = dict()
         for project in self.projects.values():
+            service = project.curriculumvitae
             lsi_path = os.path.join(self.path, project.name, 'model')
             lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer,
                                                 no_above=1./3, config=project.config)
@@ -231,7 +232,7 @@ class Mining(object):
                 lsi.load()
             except IOError:
                 if lsi.getconfig('autosetup') is True:
-                    if lsi.build([project.cvmodel]):
+                    if lsi.build([service]):
                         lsi.save()
             self.lsi_model[project.name] = lsi
 

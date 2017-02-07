@@ -7,30 +7,30 @@ from extractor.utils_parsing import *
 
 
 WORKEXPE =  u'((((((\d{1,2}((\-\d{1,2})|(\.\d))?)|(['+CHNUMBERS+u']{1,3})) *(年|(个月))(以[上下])?)|无)'+u'工作经验)|(应届(毕业)?生('+ASP+u'*经验)?))'
-GEN = re.compile(u'^'+ASP+u'*-{3}[\- ]*'+ASP+u'*((个人信息)|(基本资料)|(\S*个人简历))?\n+'+ASP+u'*(?P<general>姓'+ASP+u'*名[:：]?.+?性'+ASP+u'*别[:：]?.*?)(?=\n'+ASP+u'*-{3}[\- ]*)$', re.DOTALL+re.M)
-REVGEN = re.compile(u'^'+ASP+u'*(?P<general>姓'+ASP+u'*名[:：].+?性'+ASP+u'*别[:：].*?'+ASP+u'*-{3}[\- ]*\n+'+ASP+u'*((联系电话)|(电子邮件)|(年龄))[:：].*?)(?=\n+'+ASP+u'*-{3}[\- ]*)$', re.DOTALL+re.M)
+GEN = re.compile(u'^'+PREFIX+u'*-{3}[\- ]*'+ASP+u'*\**((个人信息)|(基本资料)|(\S*个人简历))?\**\n+'+ASP+u'*(?P<general>(?: ?\*{1,2})?姓'+ASP+u'*名[:：]?(?: ?\*{1,2})?.+?(?: ?\*{1,2})?性'+ASP+u'*别[:：]?(?: ?\*{1,2})?.*?)(?=\n'+ASP+u'*-{3}[\- ]*)$', re.DOTALL+re.M)
+REVGEN = re.compile(u'^'+PREFIX+u'*(?P<general>(?: ?\*{1,2})?姓'+ASP+u'*名[:：](?: ?\*{1,2})?.+?(?: ?\*{1,2})?性'+ASP+u'*别[:：](?: ?\*{1,2})?.*?'+ASP+u'*-{3}[\- ]*\n+'+ASP+u'*(?: ?\*{1,2})?((联系电话)|(电子邮件)|(年龄))[:：](?: ?\*{1,2})?.*?)(?=\n+'+ASP+u'*-{3}[\- ]*)$', re.DOTALL+re.M)
 
 GENFIELDS = (WORKEXPE, GENDER, AGEANDBIRTH, MARITALSTATUS, u'\d{3}cm', EDUCATION)
 PIPEGENSEP = ASP+u'*\|?'+ASP+u'*)|('
-PIPEGEN = re.compile(u'^'+ASP+u'*(?P<general>(('+PIPEGENSEP.join(GENFIELDS)+ASP+u'*\|?'+ASP+u'*)){2,6})', re.M)
+PIPEGEN = re.compile(u'^'+PREFIX+u'*(?P<general>(('+PIPEGENSEP.join(GENFIELDS)+ASP+u'*\|?'+ASP+u'*)){2,6})', re.M)
 
 SPGENSEP = ASP+u'{3}'+ASP+u'*'
-SPGENFIELDS = (GENDER, AGEANDBIRTH, WORKEXPE, EDUCATION, u'('+MARITALSTATUS+u')?')
-SPACEGEN = re.compile(u'^(?P<general>'+SPGENSEP.join(SPGENFIELDS)+u')', re.M)
+SPGENFIELDS = (u'(?:\S{2,3} )?'+GENDER, AGEANDBIRTH, WORKEXPE, EDUCATION, u'('+MARITALSTATUS+u')?')
+SPACEGEN = re.compile(u'^\**(?P<general>'+SPGENSEP.join(SPGENFIELDS)+u')\**', re.M)
 
 LBLPIPEGENSEP = ASP+u'*\|?'+ASP+u'*'
-LBLPIPEGEN = re.compile(u'^'+ASP+u'*'+PREFIX+u'*'+ASP+u'*(?P<general>姓名[:：]'+ASP+u'*.*?\|'+ASP+u'*'+LBLPIPEGENSEP.join(
+LBLPIPEGEN = re.compile(u'^'+PREFIX+u'*'+PREFIX+u'*'+ASP+u'*(?P<general>(?: ?\*{1,2})?姓名[:：](?: ?\*{1,2})?'+ASP+u'*.*?\|'+ASP+u'*'+LBLPIPEGENSEP.join(
     [GENDER, WORKEXPE, EDUCATION])+u')', re.M)
 
 NAMEHEADER = re.compile(u'^.+'+UNIBRALEFT+GENDER+u'['+SENTENCESEP+u']'+ASP+u'*(?P<age>\d{2})'+UNIBRARIGHT+ASP+u'*$', re.M)
-EXPECTATION = re.compile(u'期望((薪资)|([年月]薪))(（税前）)?[:：]'+ASP+u'*(?P<salary_expectation>'+SALARY+u')', re.M)
-SALARYCURRENT = re.compile(u'目前((薪资)|([年月]薪))(（税前）)?[:：]'+ASP+u'*(?P<salary_current>'+SALARY+u')', re.M)
+EXPECTATION = re.compile(u'(?: ?\*{1,2})?期望((薪资)|([年月]薪))(（税前）)?[:：](?: ?\*{1,2})?'+ASP+u'*(?P<salary_expectation>'+SALARY+u')', re.M)
+SALARYCURRENT = re.compile(u'(?: ?\*{1,2})?目前((薪资)|([年月]薪))(（税前）)?[:：](?: ?\*{1,2})?'+ASP+u'*(?P<salary_current>'+SALARY+u')', re.M)
 
-PLACETARGET = re.compile(u'((目标)|(期望))(工作)?地点[:：]'+ASP+u'*((不限)|(?P<places>'+PLACES+u'))', re.M)
-PLACECURRENT = re.compile(u'((目前)|(所在))(工作)?地点?[:：]'+ASP+u'*((不限)|(?P<places>'+PLACES+u'))', re.M)
+PLACETARGET = re.compile(u'(?: ?\*{1,2})?((目标)|(期望))(工作)?地点[:：](?: ?\*{1,2})?'+ASP+u'*((不限)|(?P<places>'+PLACES+u'))', re.M)
+PLACECURRENT = re.compile(u'(?: ?\*{1,2})?((目前)|(所在))(工作)?地点?[:：](?: ?\*{1,2})?'+ASP+u'*((不限)|(?P<places>'+PLACES+u'))', re.M)
 
-LABELGEND = re.compile(u'性'+ASP+u'*别[:：]?'+ASP+u'*'+GENDER, re.M)
-LABELMARITAL = re.compile(u'婚姻状况[:：]?'+ASP+u'*'+MARITALSTATUS, re.M)
+LABELGEND = re.compile(u'(?: ?\*{1,2})?性'+ASP+u'*别[:：]?(?: ?\*{1,2})?'+ASP+u'*'+GENDER, re.M)
+LABELMARITAL = re.compile(u'(?: ?\*{1,2})?婚姻状况[:：]?(?: ?\*{1,2})?'+ASP+u'*'+MARITALSTATUS, re.M)
 
 
 def format_salary(result, groupdict):
@@ -39,8 +39,8 @@ def format_salary(result, groupdict):
         result['salary_months'] = groupdict['salary_months']
     elif 'salary' in groupdict and groupdict['salary']:
         result['salary'] = fix_salary(groupdict['salary'])
-    elif 'yearly' in groupdict and groupdict['yearly']:
-        result['yearly'] = fix_salary(groupdict['yearly']+u'/年')
+    elif 'salary_yearly' in groupdict and groupdict['salary_yearly']:
+        result['yearly'] = fix_salary(groupdict['salary_yearly']+u'/年')
     return result
 
 places = lambda expectation:expectation['places']
@@ -125,12 +125,13 @@ def fix(d):
         >>> assert u'元' in salary(salary(expectation(fix(u'期望月薪： 8000/月'))))
         >>> assert u'年' in yearly(salary(current(fix(u'目前薪资： 年薪 30-40万 人民币'))))
         >>> assert u'万' in yearly(salary(current(fix(u'目前薪资： 15-30W人民币'))))
-        >>> assert u'元' in salary(salary(current(fix(u'目前薪资：月薪（税前）：25000 元 \* 15 个月'))))
+        >>> assert u'元' not in salary(salary(current(fix(u'目前薪资：月薪（税前）：25000 元 \* 15 个月'))))
         >>> assert not fix(u'期望地点：不限')
         >>> assert len(places(expectation(fix(u'3.  期望地点：湖南-长沙')))) == 1
         >>> assert len(places(expectation(fix(u'期望地点：   南昌,深圳,上海,广州')))) == 4
         >>> assert len(places(expectation(fix(u'目标地点： 东莞-南城区，东莞-莞城区，东莞-东城区，东莞-万江区')))) == 1
         >>> assert u'深圳' == places(current(fix(u'目前状态：   在职，看看新机会   所在地点：   深圳-南山区'))).pop()
+        >>> assert gender(fix(u'-   姓名： Starry   |  男  |  10 年工作经验   | 硕士')) == u'男'
         >>> assert gender(fix(u'''----\\n姓名：�  李  性别：�  男�\\n年龄：� 29 婚姻状况：�   已婚\\n----''')) == u'男'
         >>> assert gender(fix(u'''----\\n个人信息\\n姓名：     马        性别：       女\\n----''')) == u'女'
         >>> assert gender(fix(u'''----\\n基本资料\\n姓    名：    黄             性    别：    男\\n----''')) == u'男'
@@ -150,6 +151,7 @@ def fix(d):
         >>> assert marital_status(fix(u'10年以上工作经验 | 男 |  39岁（1976年4月4日） |  已婚 |  170cm |  无党派人士')) == u'已婚'
         >>> assert marital_status(fix(u'应届毕业生 | 男 |  22岁（1992年9月25日） |  未婚 |  170cm |  中共党员')) == u'未婚'
         >>> assert age(fix(u'应届生 经验 | 本科 | 男 | 未婚 | 24 岁 | 170cm | 团员 | 汉 |')) == 24
+        >>> assert gender(fix(u'**王东 男    43岁(1973年3月)    12年工作经验    硕士    已婚** \\\\')) == u'男'
         >>> assert gender(fix(u'男    33岁(1983年12月)    9年工作经验    本科   ')) == u'男'
         >>> assert marital_status(fix(u'女    26岁(1990年7月)    4年工作经验    本科    未婚')) == u'未婚'
         >>> assert age(fix(u'  男    38岁(1977年6月)    12年工作经验    硕士    已婚')) == 38

@@ -216,8 +216,8 @@ def hash_history(cv_yaml, to_date=u'至今', mininum_xp=2):
     for i, h in enumerate(history(cv_yaml, to_date)):
         for (hashdate, output) in output_history(h):
             if i+1 >= mininum_xp:
-                yield (hashdate, hashlib.sha1(previous+output.encode('utf8')).hexdigest())
-            previous += output.encode('utf8') + '\n'
+                yield (hashdate, hashlib.sha1(previous+output.replace('*', '').encode('utf8')).hexdigest())
+            previous += output.replace('*', '').encode('utf8') + '\n'
 
 def unique_id(cv_yaml, to_date=u'至今'):
     u"""

@@ -35,20 +35,20 @@ let webpackConfig = {
     rules: [{
       test: /\.js|jsx$/,
       exclude: /node_modules/,
-      loader: ['babel-loader'],
+      use: ['babel-loader'],
       include: folderPath.PATHS.SRC_PATH,
     }, {
       test: '/\.css$/',
       exclude: /node_modules/,
       loader: ExtractTextPlugin.extract({
-          fallbackLoader: 'style-loader',
-          loader: ['css-loader', 'postcss-loader']
+          fallback: 'style-loader',
+          use: ['css-loader', 'postcss-loader']
       })
     }, {
       test: /\.less$/i,
       loader: ExtractTextPlugin.extract({
-        fallbackLoader: 'style-loader',
-        loader: ['css-loader', 'postcss-loader' ,`less-loader?{"modifyVars":${JSON.stringify(theme)}}`]
+        fallback: 'style-loader',
+        use: ['css-loader', 'postcss-loader' ,`less-loader?{"modifyVars":${JSON.stringify(theme)}}`]
       })
     }, {
       test: /\.(png|jpg)$/,

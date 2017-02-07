@@ -36,7 +36,7 @@ class Project(services.base.service.Service):
                                                         copath, name, corepo)
         self.jobdescription = services.jobdescription.JobDescription(jdpath)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeo)
-        self.cvmodel = services.simulationcv.SimulationCV.autoservice(
+        self.cvmodel = services.simulationco.SimulationCO.autoservice(
                                                         cvmodelpath, name, cvrepo)
         self.config = dict()
         try:

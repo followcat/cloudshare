@@ -17,11 +17,12 @@ class Config(object):
 
     TESTING = True
     SECRET_KEY = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
-    UPLOAD_TEMP = 'tests/testcase_output'
-    REPO_DB_NAME = 'tests/testcase_data'
-    ACCOUNT_DB_NAME = 'tests/testcase_account'
-    LSI_PATH = 'tests/lsimodel'
-    PRJ_PATH = 'tests/projects'
+    TESTDATA_PATH = 'tests/testcase_data'
+    UPLOAD_TEMP = os.path.join(TESTDATA_PATH, 'output')
+    REPO_DB_NAME = os.path.join(TESTDATA_PATH, 'repo')
+    ACCOUNT_DB_NAME = os.path.join(TESTDATA_PATH, 'account')
+    LSI_PATH = os.path.join(TESTDATA_PATH, 'lsimodel')
+    PRJ_PATH = os.path.join(TESTDATA_PATH, 'projects')
 
     def __init__(self):
         self.build()
@@ -29,6 +30,8 @@ class Config(object):
         self.DESTORY = self.destory
 
     def build(self):
+        if not os.path.exists(self.TESTDATA_PATH):
+            os.mkdir(self.TESTDATA_PATH)
         if not os.path.exists(self.UPLOAD_TEMP):
             os.mkdir(self.UPLOAD_TEMP)
         if not os.path.exists(self.PRJ_PATH):
@@ -67,6 +70,7 @@ class Config(object):
         peopmeta = extractor.information_explorer.catch_peopinfo(yamlinfo)
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
         project = self.SVC_MULT_CV.getproject('project_test')
+        self.SVC_MULT_CV.repodb.add(dataobj, 'tester', unique=True)
         project.cv_add(dataobj)
         self.SVC_PEO_REPO.add(peopobj)
         self.SVC_PRJ_TEST.peo_add(peopobj)
@@ -76,13 +80,5 @@ class Config(object):
         self.build()
 
     def destory(self):
-        if os.path.exists(self.UPLOAD_TEMP):
-            shutil.rmtree(self.UPLOAD_TEMP)
-        if os.path.exists(self.REPO_DB_NAME):
-            shutil.rmtree(self.REPO_DB_NAME)
-        if os.path.exists(self.ACCOUNT_DB_NAME):
-            shutil.rmtree(self.ACCOUNT_DB_NAME)
-        if os.path.exists(self.LSI_PATH):
-            shutil.rmtree(self.LSI_PATH)
-        if os.path.exists(self.PRJ_PATH):
-            shutil.rmtree(self.PRJ_PATH)
+        if os.path.exists(self.TESTDATA_PATH):
+            shutil.rmtree(self.TESTDATA_PATH)

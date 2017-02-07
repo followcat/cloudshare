@@ -54,7 +54,7 @@ export default class FastMatching extends Component {
    * [初始加载classify列表]
    * @return {[type]} [description]
    */
-  loadClassifyData(id = null, postAPI = null) {
+  loadClassifyData(id = null, postAPI = null, appendCommentary = false) {
     fetch(`/api/classify`, {
       method: 'POST',
       headers: {
@@ -70,7 +70,7 @@ export default class FastMatching extends Component {
           classify: json.data,
         });
         if (id && postAPI) {
-          this.loadResultData(id, postAPI, json.data);
+          this.loadResultData(id, postAPI, json.data, appendCommentary);
         }
       }
     })
@@ -91,8 +91,8 @@ export default class FastMatching extends Component {
    * @param  {[string]} id [JD id]
    * @return {[type]}    [description]
    */
-  loadResultData(id, postAPI, classify) {
-    let postData = { id: id, uses: classify, appendcomment: this.state.appendCommentary };
+  loadResultData(id, postAPI, classify, appendCommentary) {
+    let postData = { id: id, uses: classify, appendcomment: appendCommentary };
     this.setState({
       visible: true,
       spinning: true,
@@ -240,7 +240,7 @@ export default class FastMatching extends Component {
     const params = queryString(window.location.href),
           jd_id = params.jd_id || null,
           cv_id = params.cv_id || null,
-          append_commentary = Boolean(params.init_append_commentary) || null;
+          append_commentary = params.init_append_commentary === 'true' ? true : false;
     let postAPI;
 
     // this.loadClassifyData();
@@ -254,7 +254,7 @@ export default class FastMatching extends Component {
         siderbarVisible: true,
         appendCommentary: append_commentary
       });
-      this.loadClassifyData(jd_id, postAPI);
+      this.loadClassifyData(jd_id, postAPI, append_commentary);
     } else if (cv_id) {
       postAPI = API.LSI_BY_CV_ID_API;
       this.setState({

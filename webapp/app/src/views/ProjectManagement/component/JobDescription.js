@@ -227,7 +227,7 @@ class JobDescription extends Component {
           {record.description.split('\n').map((item, index) => { return <p key={index}>{item}</p>})}
         </div>
         <div className="commentary-box">
-          <label>备注:</label>
+          <label>{`${language.COMMENTARY}：`}</label>
           {record.commentary && record.commentary.split('\n').map((item, index) => {
             return (
               <p key={index}>{item}</p>
@@ -236,9 +236,6 @@ class JobDescription extends Component {
         </div>
       </div>
     );
-    // return record.description.split('\n').map((item, index) => {
-    //   return <p key={index}>{item}</p>;
-    // });
   }
 
   // 获取职位描述组件toolbar所要渲染组件

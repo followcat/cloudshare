@@ -200,6 +200,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('appendcomment', type = bool, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -211,6 +212,9 @@ class LSIbyJDidAPI(LSIbaseAPI):
         project = self.svc_mult_cv.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
+        append_comment = args['appendcomment'] if args['appendcomment'] else False
+        if append_comment:
+            doc += jd_yaml['commentary']
         uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']

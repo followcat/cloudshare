@@ -22,7 +22,8 @@ class UploadCVAPI(Resource):
 
     def __init__(self):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
+        self.svc_peo = flask.current_app.config['SVC_PEO_REPO']
+        self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_min = flask.current_app.config['SVC_MIN']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -98,7 +99,7 @@ class UploadCVAPI(Resource):
                                             'resultid': '',
                                             'name': '', 'filename': filename } }
         filepro.renameconvert(yamlinfo['id'])
-        unique_peo = 'unique_id' not in yamlinfo or self.svc_peo.unique(yamlinfo['unique_id'])
+        unique_peo = 'unique_id' not in yamlinfo or self.svc_mult_peo.unique(yamlinfo['unique_id'])
         dataobj = core.basedata.DataObject(metadata=yamlinfo,
                                            data=filepro.markdown_stream)
         upload[user.id][filename] = dataobj
@@ -163,7 +164,7 @@ class UploadCVPreviewAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
+        self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         super(UploadCVPreviewAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('filename', location = 'json')
@@ -176,7 +177,7 @@ class UploadCVPreviewAPI(Resource):
         md = dataobj.preview_data()
         yaml_info = dataobj.metadata
         try:
-            people_info = self.svc_peo.getyaml(yaml_info['unique_id'])
+            people_info = self.svc_mult_peo.getyaml(yaml_info['unique_id'])
             cvs = people_info['cv']
         except IOError:
             cvs = []

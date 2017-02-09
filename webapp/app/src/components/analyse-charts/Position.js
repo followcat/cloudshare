@@ -1,14 +1,11 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
+import Charts from './Charts';
+
 import { Button, Modal } from 'antd';
 
-import Charts from '../Charts';
-
-import Storage from '../../../utils/storage';
-import Generator from '../../../utils/generator';
-
-import 'whatwg-fetch';
+import { getPositionData } from 'request/analyse';
 
 const compare = (value1, value2) => {
   let valueLen1 = value1.id_list.length,
@@ -31,17 +28,14 @@ const topNine = (data) => {
   }
 };
 
-export default class Position extends Component {
-  
-  constructor(props) {
-    super(props);
-
+class Position extends Component {
+  constructor() {
+    super();
     this.state = {
       data: [],
       visible: false,
       option: {},
     };
-
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
   }
@@ -49,12 +43,12 @@ export default class Position extends Component {
   getOption(data) {
     const option = {
       title: {
-        text: 'Position'
+        text: '职位分析'
       },
       tooltip: {
         trigger: 'axis',
-        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-          type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        axisPointer : {
+          type : 'shadow'
         },
       },
       toolbox: {
@@ -92,36 +86,26 @@ export default class Position extends Component {
   }
 
   handleClick() {
+    const { keyword } = this.props;
+
     this.setState({
       visible: true,
       data: [],
     });
 
-    const _this = this;
-    
-    fetch(`/api/mining/position`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Authorization': `Basic ${Storage.get('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: Generator.getPostData({
-        'search_text': this.props.keyword,
-      })
-    })
-    .then(response => response.json())
-    .then((json) => {
+    getPositionData({
+      search_text: keyword
+    }, json => {
       if (json.code === 200) {
         const data = json.data.sort(compare),
-              option = _this.getOption(data);
-        _this.setState({
+              option = this.getOption(data);
+        
+        this.setState({
           data: data,
           option: option,
         });
       }
-    })
+    });
   }
 
   handleCancel() {
@@ -131,22 +115,34 @@ export default class Position extends Component {
   }
 
   render() {
+    const { style } = this.props,
+          { visible, data, option } = this.state;
+
     return (
-      <div style={this.props.style}>
-        <Button type="primary" onClick={this.handleClick}>Show No. of Positions</Button>
+      <div style={style}>
+        <Button onClick={this.handleClick}>职位分析</Button>
         <Modal
-          title="Charts View"
-          visible={this.state.visible}
+          title="图表"
+          visible={visible}
           onCancel={this.handleCancel}
           footer={[
-            <Button type="ghost" size="large" onClick={this.handleCancel}>Cancel</Button>
+            <Button type="ghost" size="large" onClick={this.handleCancel}>取消</Button>
           ]}
           style={{ top: 20 }}
           width={980}
         >
-          {this.state.data.length > 0 ? <Charts option={this.state.option} style={{ width: 900, height: 460, margin: '0 auto' }} /> : ''}
+          {data.length > 0 ?
+            <Charts option={option} style={{ width: 900, height: 460, margin: '0 auto' }} /> :
+            ''}
         </Modal>
       </div>
     );
   }
 }
+
+Position.propTypes = {
+  style: PropTypes.object,
+  keyword: PropTypes.string
+};
+
+export default Position;

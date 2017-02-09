@@ -15,9 +15,10 @@ SVC_ACCOUNT = services.account.Account('account')
 
 SVC_CO_REPO = services.company.Company('repo/CO', 'corepo')
 SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare')
+SVC_PEO_REPO = services.people.People('repo/PEO', SVC_CV_REPO, iotype='base')
 
 SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')
-SVC_PEO_STO = services.people.People('storage/PEO', [SVC_CV_REPO, SVC_CV_STO], iotype='base')
+SVC_PEO_STO = services.people.People('storage/PEO', SVC_CV_STO, iotype='base')
 
 RAW_DIR = 'raw'
 RAW_DB = dict()

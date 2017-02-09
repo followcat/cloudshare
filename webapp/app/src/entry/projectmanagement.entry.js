@@ -15,7 +15,7 @@ import {
   Company,
   CompanyList,
   CompanyUploader
-} from '../views/ProjectManagement/index';
+} from 'views/ProjectManagement/index';
 
 import 'babel-polyfill';
 

@@ -23,6 +23,7 @@ let webpackConfig = {
     extensions: ['.js', '.jsx'],
     alias: {
       'components': path.resolve(folderPath.PATHS.SRC_PATH, 'components/'),
+      'views': path.resolve(folderPath.PATHS.SRC_PATH, 'views/'),
       'utils': path.resolve(folderPath.PATHS.SRC_PATH, 'utils/'),
       'request': path.resolve(folderPath.PATHS.SRC_PATH, 'request/'),
       'config': path.resolve(folderPath.PATHS.SRC_PATH, 'config/'),

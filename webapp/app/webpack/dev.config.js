@@ -9,6 +9,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
   output: {
     path: folderPath.PATHS.BUILD_PATH,
+    publicPath: '/assert/',
     filename: '[name].js',
   },
   

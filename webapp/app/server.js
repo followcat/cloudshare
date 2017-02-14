@@ -2,40 +2,54 @@
 const WebpackDevServer = require('webpack-dev-server');
 const webpack = require('webpack');
 const webpackConf = require('./webpack/webpack.config');
+const folderPath = require('./webpack/config/folder-path');
+
+const port = 3000;
 
 //遍历每个入口文件并加入热加载插件
-let entryObject = webpackConf.entry;
+let entryObject = webpackConf.entry,
+    historyApifallback = {};
+
 for (let key in entryObject) {
   let arr = [];
   arr.push('react-hot-loader/patch');
-  arr.push('webpack-dev-server/client?http://localhost:3000/');
+  arr.push(`webpack-dev-server/client?http://localhost:${port}/`);
   arr.push('webpack/hot/only-dev-server');
   arr.push(entryObject[key]);
   entryObject[key] = arr;
+
+  if (typeof historyApifallback.rewrites === 'undefined') {
+    historyApifallback.rewrites = [];
+  }
+
+  historyApifallback.rewrites.push({
+    from: new RegExp(`/${key}`),
+    to: `/assert/${key}.html`
+  });
 }
 
-webpackConf.entry = entryObject;
+// webpackConf.entry = Object.assign({}, entryObject, {
+//   devServerClient: 'webpack-dev-server/client?http://0.0.0.0:3000'
+// });
 // webpackConf.entry.unshift('webpack-dev-server/client?http://0.0.0.0:4888/', 'webpack/hot/only-dev-server');
 
 const compiler = webpack(webpackConf);
 
-const port = 3000;
-
 const server = new WebpackDevServer(compiler, {
   // webpack-dev-server options
 
-  contentBase: './',
+  contentBase: `${folderPath.PATHS.SRC_PATH}`,
 
   inline: true,  // 启用inline模式自动刷新
 
   hot: true,  // 启动热加载
 
-  historyApiFallback: true,
+  historyApiFallback: historyApifallback,
 
   compress: true,  //启用gzip压缩
 
   // It's a required option.
-  publicPath: `http://localhost:${port}/`,
+  publicPath: `http://localhost:${port}/assert/`,
 
   headers: { 'X-Custom-Foo': 'bar' },
 

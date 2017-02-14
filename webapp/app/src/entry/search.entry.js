@@ -5,7 +5,7 @@ import {
   Router, 
   Route,
   IndexRoute,
-  hashHistory
+  browserHistory
 } from 'react-router';
 
 import {
@@ -17,7 +17,7 @@ import {
 import 'babel-polyfill';
 
 ReacDOM.render(
-  <Router history={hashHistory}>
+  <Router history={browserHistory}>
     <Route path="/" component={Layout}>
       <IndexRoute name="search" component={Search} />
       <Route path="search" component={Search} />

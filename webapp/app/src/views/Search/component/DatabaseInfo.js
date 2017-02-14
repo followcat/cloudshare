@@ -1,6 +1,6 @@
 'use strict';
 'use strict';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 
 import { getDatabaseInfo } from 'request/search';
 
@@ -77,9 +77,5 @@ class DatabaseInfo extends Component {
     );
   }
 }
-
-DatabaseInfo.propTypes = {
-
-};
 
 export default DatabaseInfo;

@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component } from 'react';
 
-import { hashHistory } from 'react-router';
+import { browserHistory } from 'react-router';
 
 import KeywordSearch from 'components/keyword-search';
 import DatabaseInfo from './DatabaseInfo';
@@ -13,7 +13,7 @@ class Search extends Component {
   }
 
   handleSearch(value) {
-    hashHistory.push(`/result?search_text=${value}`);
+    browserHistory.push(`/result?search_text=${value}`);
   }
 
   render() {

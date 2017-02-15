@@ -84,8 +84,8 @@ class SearchCVbyTextAPI(Resource):
         project = args['project']
         text = args['search_text']
         cur_page = args['page']
-        results = self.svc_mult_cv.search(text, project)
-        yaml_results = self.svc_mult_cv.search_yaml(text, project)
+        results = self.svc_mult_cv.repodb.search(text)
+        yaml_results = self.svc_mult_cv.repodb.search_yaml(text)
         results.update(yaml_results)
         count = 20
         datas, pages = self.paginate(list(results), cur_page, count)

@@ -112,7 +112,6 @@ class Simulation(services.base.storage.BaseStorage):
         projectinfo = self.getinfo(id)
         projectyaml = self.getyaml(id)
         if not projectyaml[key] == value:
-            projectinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             projectinfo[key] = value
             self.saveinfo(id, projectinfo,
                           'Modify %s key %s.' % (id, key), committer, do_commit=do_commit)
@@ -122,7 +121,6 @@ class Simulation(services.base.storage.BaseStorage):
     def _addinfo(self, id, key, value, committer, do_commit=True):
         projectinfo = self.getinfo(id)
         data = self._infoframe(value, committer)
-        projectinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         projectinfo[key].insert(0, data)
         self.saveinfo(id, projectinfo,
                       'Add %s key %s.' % (id, key), committer, do_commit=do_commit)
@@ -174,6 +172,7 @@ class Simulation(services.base.storage.BaseStorage):
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
         name = core.outputstorage.ConvertName(id).yaml
+        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,

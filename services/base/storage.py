@@ -1,5 +1,4 @@
 import os
-import time
 import yaml
 
 import utils.issue
@@ -74,8 +73,6 @@ class BaseStorage(services.base.service.Service):
         if yamlfile is True:
             if committer is not None:
                 bsobj.metadata['committer'] = committer
-            if 'date' not in bsobj.metadata or not bsobj.metadata['date']:
-                bsobj.metadata['date'] = time.time()
             message = "Add %s: %s metadata." % (self.commitinfo, name)
             self.interface.add(name.yaml, yaml.safe_dump(bsobj.metadata, allow_unicode=True),
                                message=message, committer=committer, do_commit=do_commit)

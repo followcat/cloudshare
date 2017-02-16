@@ -15,6 +15,7 @@ class EnhancedInput extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleFocusBlur = this.handleFocusBlur.bind(this);
     this.handleBtnClick = this.handleBtnClick.bind(this);
+    this.handlekeyPress = this.handlekeyPress.bind(this);
   }
 
   handleInputChange(e) {
@@ -49,6 +50,12 @@ class EnhancedInput extends Component {
     }
   }
 
+  handlekeyPress(e) {
+    if (e.key === 'Enter') {
+      this.handleBtnClick();
+    }
+  }
+
   render() {
     const props = this.props;
 
@@ -73,7 +80,7 @@ class EnhancedInput extends Component {
             onChange={this.handleInputChange}
             onFocus={this.handleFocusBlur}
             onBlur={this.handleFocusBlur}
-            onKeyPress={this.handleBtnClick}
+            onKeyPress={this.handlekeyPress}
             onPressEnter={this.handleSearch}
             size={props.size || 'default'}
           />

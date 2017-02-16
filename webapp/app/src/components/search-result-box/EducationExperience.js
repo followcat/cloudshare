@@ -51,7 +51,7 @@ class EducationExperience extends Component {
       return (
         <div>
           {renderDOM}
-          <a href="javascript: void(0);" onClick={this.handleFold}>{visible ? foldText : unfoldText}</a>
+          <a href="javascript: void(0);" onClick={this.handleFold}>{visible ? unfoldText : foldText}</a>
         </div>
       );
     } else {

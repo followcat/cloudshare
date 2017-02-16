@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import { hashHistory } from 'react-router';
+import { browserHistory } from 'react-router';
 
 import KeywordSearch from 'components/keyword-search';
 import SearchResultBox from 'components/search-result-box';
@@ -29,7 +29,7 @@ class SearchResult extends Component {
   }
 
   handleSearch(value) {
-    hashHistory.push(`/result?search_text=${value}`);
+    browserHistory.push(`/result?search_text=${value}`);
 
     this.setState({
       searchText: value,

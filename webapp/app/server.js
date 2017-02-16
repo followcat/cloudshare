@@ -38,7 +38,7 @@ const compiler = webpack(webpackConf);
 const server = new WebpackDevServer(compiler, {
   // webpack-dev-server options
 
-  contentBase: `${folderPath.PATHS.SRC_PATH}`,
+  contentBase: './',
 
   inline: true,  // 启用inline模式自动刷新
 
@@ -49,7 +49,7 @@ const server = new WebpackDevServer(compiler, {
   compress: true,  //启用gzip压缩
 
   // It's a required option.
-  publicPath: `http://localhost:${port}/assert/`,
+  publicPath: `/assert/`,
 
   headers: { 'X-Custom-Foo': 'bar' },
 

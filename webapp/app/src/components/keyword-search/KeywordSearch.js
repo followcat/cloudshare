@@ -11,6 +11,7 @@ class KeywordSearch extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
   }
 
   componentWillMount() {
@@ -37,6 +38,12 @@ class KeywordSearch extends Component {
     }
   }
 
+  handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      this.handleClick();
+    }
+  }
+
   getHorizontalRender() {
     const { btnText } = this.props,
           { value } = this.state;
@@ -49,6 +56,7 @@ class KeywordSearch extends Component {
               value={value}
               size="large"
               onChange={this.handleChange}
+              onKeyPress={this.handleKeyPress}
             />
           </Col>
         </Row>
@@ -78,6 +86,7 @@ class KeywordSearch extends Component {
             value={value}
             size="large"
             onChange={this.handleChange}
+            onKeyPress={this.handleKeyPress}
           />
         </Col>
         <Col span={4} offset={1}>

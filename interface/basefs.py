@@ -128,6 +128,11 @@ class BaseFSInterface(interface.base.Interface):
             f.write(filedate)
         return True
 
+    def delete(self, filepath, message=None, committer=None, do_commit=True):
+        path = os.path.join(self.path, filepath)
+        os.remove(path)
+        return True
+
     def add_files(self, filenames, filedatas, message=None, committer=None):
         assert len(filenames) == len(filedatas)
         for filename, filedata in zip(filenames, filedatas):

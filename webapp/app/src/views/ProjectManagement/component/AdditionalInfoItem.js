@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 
 import EnhancedInput from 'components/enhanced-input';
 
-import { Icon, Tag, Button } from 'antd';
+import { Tag, Button } from 'antd';
 
 import websiteText from 'config/website-text';
 

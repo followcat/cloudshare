@@ -8,11 +8,8 @@ import {
   browserHistory
 } from 'react-router';
 
-import {
-  Layout,
-  Search,
-  SearchResult
-} from 'views/Search/index';
+import Layout from 'views/common/Layout';
+import { Search, SearchResult } from 'views/Search/index';
 
 import 'babel-polyfill';
 

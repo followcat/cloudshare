@@ -1,8 +1,8 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import LayoutHeader from '../../common/LayoutHeader';
-import LayoutContainer from '../../common/LayoutContainer';
+import LayoutHeader from './LayoutHeader';
+import LayoutContainer from './LayoutContainer';
 
 class Layout extends Component {
   render() {

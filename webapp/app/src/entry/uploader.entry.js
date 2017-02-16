@@ -9,11 +9,8 @@ import {
   browserHistory
 } from 'react-router';
 
-import {
-  Layout,
-  Uploader,
-  UploaderResult
-} from 'views/Uploader/index';
+import Layout from 'views/common/Layout';
+import { Uploader, UploaderResult } from 'views/Uploader/index';
 
 import 'babel-polyfill';
 

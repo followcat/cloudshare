@@ -4,7 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import BasicInfoItem from './BasicInfoItem';
 import AdditionalInfoItem from './AdditionalInfoItem';
 import VisitingInfoItem from './VisitingInfoItem';
-import CompanyItemCol from './CompanyItemCol';
+import Cell from './Cell';
 
 import {
   Row,
@@ -200,15 +200,15 @@ class CompanyInfo extends Component {
     const items = [{
       key: 'name',
       dataIndex: 'name',
-      span: '12'
+      span: 12
     }, {
-      key: 'district',
-      dataIndex: 'district',
-      span: '5'
+      key: 'clientcontact',
+      dataIndex: 'clientcontact',
+      span: 6
     }, {
       key: 'conumber',
       dataIndex: 'conumber',
-      span: '7'
+      span: 6
     }];
 
     return (
@@ -224,12 +224,13 @@ class CompanyInfo extends Component {
             <Row>
               {items.map(item => {
                 return (
-                  <CompanyItemCol
+                  <Cell
                     key={item.key}
                     span={item.span}
                     dataSource={dataSource}
                     dataIndex={item.dataIndex}
                     onSave={this.props.onSave}
+                    onRemove={this.props.onRemove}
                   />
                 );
               })}

@@ -297,14 +297,20 @@ body {
   }
 }
 
-.company-item-cell {
-  padding: 0 4px;
-  text-align: left;
-  cursor: pointer;
-}
-
 .ommit {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+// Cell component
+.cell-item {
+  display: block;
+  padding: 0 4px;
+  text-align: left;
+  cursor: pointer;
+
+  & > .ant-tag {
+    height: auto;
+  }
 }

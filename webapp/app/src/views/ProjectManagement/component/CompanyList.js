@@ -257,12 +257,13 @@ class CompanyList extends Component {
   }
 
   render() {
-    const { current, total, visible } = this.state;
+    const { current, total, pageSize, visible } = this.state;
 
     // 主体表格分页
     const pagination = {
       current: current,
       total: total,
+      pageSize: pageSize,
       showSizeChanger: true,
       showQuickJumper: true,
       defaultPageSize: 40,
@@ -279,8 +280,8 @@ class CompanyList extends Component {
       text: language.COMPANY_NAME,
       span: 5,
     }, {
-      key: 'district',
-      text: language.DISTRICT,
+      key: 'clientcontact',
+      text: language.CONTACT,
       span: 2
     }, {
       key: 'conumber',

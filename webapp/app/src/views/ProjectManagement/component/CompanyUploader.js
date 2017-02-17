@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 
 import { Card, Button } from 'antd';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

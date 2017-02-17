@@ -1,11 +1,16 @@
 'use strict';
 import React, { Component } from 'react';
-import Navigation from '../components/navigation';
-import Profile from '../components/manage/Profile';
+
+import Navigation from 'components/navigation';
+import Profile from 'components/manage/Profile';
+
 import { Menu, Modal } from 'antd';
-import StorageUtil from '../utils/storage';
-import { signOut } from '../request/sign';
-import { URL } from '../config/url';
+
+import { signOut } from 'request/sign';
+
+import StorageUtil from 'utils/storage';
+import { URL } from 'URL';
+
 const MenuItem = Menu.Item,
       confirm = Modal.confirm;
 

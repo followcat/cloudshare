@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component } from 'react';
 
-import TablePlus from '../../../components/table-plus';
+import TablePlus from 'components/table-plus';
 import EditJobDescriptionForm from './EditJobDescriptionForm';
 import CreateNewJobDescription from './CreateNewJobDescription';
 import Status from './Status';
@@ -15,11 +15,12 @@ import {
   getJobDescription,
   updateJobDescription,
   createJobDescription
-} from '../../../request/jobdescription';
-import { getCustomerList } from '../../../request/company';
-import { URL } from '../../../config/url';
+} from 'request/jobdescription';
+import { getCustomerList } from 'request/company';
 
-import websiteText from '../../../config/website-text';
+import { URL } from 'URL';
+
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

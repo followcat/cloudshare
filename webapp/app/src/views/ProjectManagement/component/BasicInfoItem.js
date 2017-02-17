@@ -1,9 +1,9 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Icon, Input, Button } from 'antd';
+import { Input, Button } from 'antd';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
@@ -11,31 +11,16 @@ class BasicInfoItem extends Component {
   constructor() {
     super();
     this.state = {
-      visible: false,
       fieldProp: '',
       fieldValue: '',
       editStatus: false,
       opening: false
     };
-    this.handleMouseOver = this.handleMouseOver.bind(this);
-    this.handleMouseOut = this.handleMouseOut.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSaveClick = this.handleSaveClick.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleOmmitClik = this.handleOmmitClik.bind(this);
-  }
-
-  handleMouseOver() {
-    this.setState({
-      visible: true
-    });
-  }
-
-  handleMouseOut() {
-    this.setState({
-      visible: false
-    });
   }
 
   handleClick() {
@@ -87,8 +72,6 @@ class BasicInfoItem extends Component {
     return (
       <div
         className="cs-item-row"
-        onMouseOver={this.handleMouseOver}
-        onMouseOut={this.handleMouseOut}
         onDoubleClick={this.handleClick}
       >
         <label className={`cs-item-row-label ${labelCls}`}>{itemInfo.title}</label>
@@ -104,11 +87,6 @@ class BasicInfoItem extends Component {
                     dataSource[itemInfo.dataIndex]
                 }
               </span>
-              <Icon
-                type="edit"
-                className={this.state.visible ? 'edit-icon-show' : 'edit-icon-hide'}
-                onClick={this.handleClick}
-              />
             </div> :
             <div className="cs-item-row-content">
               <div className="cs-input-group">

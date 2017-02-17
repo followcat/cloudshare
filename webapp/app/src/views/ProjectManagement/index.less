@@ -60,21 +60,12 @@ body {
   &-content {
     position: relative;
     display: block;
-    width: 77.999%;
-    margin-left: 4%;
-    float: left;
 
     &-text {
       display: inline-block;
       width: 100%;
     }
 
-    .ommit {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-    
     .edit-icon-hide {
       display: none;
     }
@@ -116,78 +107,34 @@ body {
   }
 }
 
-.visiting-label, .extra-label {
-  width: 5.999% !important;
-}
-
-.visiting-content, .extra-content {
-  margin-left: 2.499% !important;
-  width: 91% !important;
+.extra-label {
+  width: 12.999% !important;
 }
 
 .extra-content {
-  .extra-opearator {
-    width: 40%;
-  }
+  margin-left: 2.499% !important;
+  width: 84% !important;
 }
 
-.extra {
-  position: relative;
+.extra-box {
+  padding: 4px 0;
 
-  & > &-btn {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    font-size: 10px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    z-index: 99;
-
-    & > i {
-      vertical-align: top;
-    }
-  }
-
-  &-show {
-    display: block;
-  }
-
-  &-hidden {
-    display: none;
-  }
-}
-
-.visiting-content {
-  ul {
-    list-style: initial;
-  }
-
-  .visiting-item {
-    display: list-item;
-
-    .visiting-author {
-      padding: 0 16px;
-    
-    }
-    .visiting-detail {
-      padding-right: 16px;
-    }
+  .cs-item-row-content {
+    width: 77.999%;
+    margin-left: 4%;
+    float: left;
   }
   
-  .visiting-item-hide {
-    display: none;
-  }
+}
 
-  .visiting-opearator {
-    width: 40%;
+.visiting-list {
+  text-align: left;
+  cursor: pointer;
+  padding: 0 4px;
+}
 
-    .visiting-form {
-      & > button {
-        display: inline-block;
-        margin-left: 8px;
-      }
-    }
-  }
+.visiting-list-del {
+  margin-left: 8px;
 }
 
 .cs-input-group {
@@ -197,7 +144,6 @@ body {
   }
 
   .cs-button-group {
-    display: inline-block;
     margin-top: 8px;
 
     button {
@@ -304,9 +250,6 @@ body {
 }
 
 .company-item {
-  padding: 8px;
-  margin-bottom: 8px;
-
   .info, .diff {
     padding: 4px 8px;
   }
@@ -335,4 +278,33 @@ body {
 
 .bg-yellow {
   background-color: yellow;
+}
+
+.company-item {
+  padding: 8px 0;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+
+  &-row {
+    padding: 4px 0;
+
+  }
+}
+
+.company-item-operation {
+  & span, & a {
+    display: block;
+  }
+}
+
+.company-item-cell {
+  padding: 0 4px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ommit {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

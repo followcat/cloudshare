@@ -92,7 +92,10 @@ const websiteText = {
     NEW_CREATION: '新增',
     CHANGE: '变更',
     CONFIRM_UOLOAD: '确认上传',
-    UPLOAD_SUCCESS_MSG: '上传成功'
+    UPLOAD_SUCCESS_MSG: '上传成功',
+
+    FOLD_MSG: '收起所有信息',
+    UNFOLD_MSG: '展开所有信息'
   },
 
   // 待扩展语言

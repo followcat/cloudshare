@@ -1,9 +1,12 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+
 import { Form, Input, Select, Button } from 'antd';
-import { resumeSource } from '../../config/source';
+
+import { resumeSource } from 'config/source';
+
 const FormItem = Form.Item,
-      Option = Select.Option;
+      SelectOption = Select.Option;
 
 class PreviewTopBarForm extends Component {
   constructor() {
@@ -13,7 +16,9 @@ class PreviewTopBarForm extends Component {
 
   handleClick(e) {
     e.preventDefault();
+
     const fieldsValue = this.props.form.getFieldsValue();
+
     this.props.onConfirmClick({
       id: this.props.id,
       fieldsValue: fieldsValue
@@ -21,11 +26,22 @@ class PreviewTopBarForm extends Component {
   }
 
   render() {
-    const props = this.props,
-          { getFieldProps } = props.form;
+    const {
+      form,
+      name,
+      prefixCls,
+      resumeID,
+      classifyValue,
+      classifyList,
+      currentPreview,
+      total,
+      confirmLoading,
+      btnText
+    } = this.props,
+      { getFieldProps } = form;
 
     const nameProps = getFieldProps('name', {
-      initialValue: props.name ? props.name : ''
+      initialValue: name || ''
     });
 
     const sourceProps = getFieldProps('origin');
@@ -35,14 +51,11 @@ class PreviewTopBarForm extends Component {
     });
 
     return (
-      <Form
-        inline
-        className={`${props.prefixCls}`}
-      >
+      <Form inline className={`${prefixCls}-form`}>
         <FormItem label="ID">
           <Input
             style={{ width: 120 }}
-            value={props.resumeID}
+            value={resumeID}
             readOnly
           />
         </FormItem>
@@ -64,12 +77,7 @@ class PreviewTopBarForm extends Component {
           >
             {resumeSource.map(item => {
               return (
-                <Option
-                  key={item.id}
-                  value={item.name}
-                >
-                  {item.name}
-                </Option>
+                <SelectOption key={item.id} value={item.name}>{item.name}</SelectOption>
               );
             })}
           </Select>
@@ -79,32 +87,21 @@ class PreviewTopBarForm extends Component {
             {...classifyProps}
             multiple
             placeholder="Select a classify"
-            value={props.classifyValue}
+            value={classifyValue}
             style={{ width: 120 }}
           >
-            {props.classifyList.map((item, index) => {
+            {classifyList.map((item, index) => {
               return (
-                <Option
-                  key={index}
-                  value={item}
-                  disabled
-                >
-                  {item}
-                </Option>
+                <SelectOption key={index} value={item} disabled>{item}</SelectOption>
               );
             })}
           </Select>
         </FormItem>
-        {props.currentPreview === props.total - 1 ?
-            <FormItem>
-              <Button
-                loading={props.confirmLoading}
-                onClick={this.handleClick}
-              >
-                {props.btnText}
-              </Button>
-            </FormItem> :
-            null
+        {currentPreview === total - 1 ?
+          <FormItem>
+            <Button loading={confirmLoading} onClick={this.handleClick}>{btnText}</Button>
+          </FormItem> :
+          null
         }
       </Form>
     );
@@ -122,10 +119,16 @@ PreviewTopBarForm.defaultProps = {
 
 PreviewTopBarForm.propTypes = {
   prefixCls: PropTypes.string,
+  id: PropTypes.string,
   name: PropTypes.string,
   classifyValue: PropTypes.array,
   classifyList: PropTypes.array,
   btnText: PropTypes.string,
+  resumeID: PropTypes.string,
+  currentPreview: PropTypes.number,
+  total: PropTypes.number,
+  confirmLoading: PropTypes.bool,
+  form: PropTypes.object,
   onConfirmClick: PropTypes.func,
 };
 

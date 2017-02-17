@@ -4,17 +4,16 @@ import React, { Component, PropTypes } from 'react';
 import BasicInfoItem from './BasicInfoItem';
 import AdditionalInfoItem from './AdditionalInfoItem';
 import VisitingInfoItem from './VisitingInfoItem';
+import CompanyItemCol from './CompanyItemCol';
 
 import {
   Row,
   Col,
-  Card,
-  Icon,
   Popconfirm
 } from 'antd';
 
 import chunk from 'lodash/chunk';
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
@@ -110,9 +109,9 @@ class CompanyInfo extends Component {
       dataIndex: 'relatedcompany'
     }];
 
-    return chunk(additionalInfoRows, 4).map((item, index) => {
+    return chunk(additionalInfoRows, 4).map(item => {
       return (
-        <Row key={index}>
+        <Row className="extra-box">
           {item.map(v => {
             return (
               <Col span={24} key={v.dataIndex}>
@@ -159,7 +158,7 @@ class CompanyInfo extends Component {
     }];
 
     return (
-      <Row>
+      <Row className="extra-box">
         {rows.map(item => {
           return (
             <Col span={24} key={item.key}>
@@ -179,50 +178,70 @@ class CompanyInfo extends Component {
   }
 
   getVisitingInfoRender() {
-    const itemInfo = {
-      title: language.VISITING_SITUATION,
-      dataIndex: 'progress'
-    };
+    const { dataSource } = this.props,
+          { visible } = this.state;
 
     return (
-      <Row>
-        <Col span={24}>
-          <VisitingInfoItem
-            itemInfo={itemInfo}
-            dataSource={this.props.dataSource}
-            onSave={this.props.onSave}
-            onRemove={this.props.onRemove}
-          />
-        </Col>
-      </Row>
+      <VisitingInfoItem
+        visible={visible}
+        dataSource={dataSource.progress}
+        dataId={dataSource.id}
+        dataIndex="progress"
+        onSave={this.props.onSave}
+        onRemove={this.props.onRemove}
+      />
     );
   }
 
   render() {
-    const { visible } = this.state;
+    const { dataSource } = this.props,
+          { visible } = this.state;
+
+    const items = [{
+      key: 'name',
+      dataIndex: 'name',
+      span: '12'
+    }, {
+      key: 'district',
+      dataIndex: 'district',
+      span: '5'
+    }, {
+      key: 'conumber',
+      dataIndex: 'conumber',
+      span: '7'
+    }];
 
     return (
-      <Card
-        style={{ marginBottom: 8 }}
-      >
-        <div className="add-btn-container">
-          {this.getRenderCustomerOperation()}
-        </div>
-        {this.getBasicInfoRender()}
-        {this.getVisitingInfoRender()}
-        <div className="extra">
-          <div className="extra-btn" onClick={this.handleClick}>
-            {visible ? 
-                <Icon type="minus" /> :
-                <Icon type="plus" />
-            }
-          </div>
-          <div className={visible ? 'extra-container extra-show' : 'extra-container extra-hidden'}>
-            {this.getBasicInfoOnExtra()}
-            {this.getAdditionalInfoRender()}
-          </div>
-        </div>
-      </Card>
+      <div className="company-item">
+        <Row className="company-item-row">
+          <Col span="2" className="company-item-cell company-item-operation">
+            {this.getRenderCustomerOperation()}
+            <a href="javascript: void(0);" onClick={this.handleClick}>
+              {visible ? language.FOLD_MSG : language.UNFOLD_MSG}
+            </a>
+          </Col>
+          <Col span="10">
+            <Row>
+              {items.map(item => {
+                return (
+                  <CompanyItemCol
+                    key={item.key}
+                    span={item.span}
+                    dataSource={dataSource}
+                    dataIndex={item.dataIndex}
+                    onSave={this.props.onSave}
+                  />
+                );
+              })}
+            </Row>
+            {visible ? this.getBasicInfoOnExtra() : null}
+            {visible ? this.getAdditionalInfoRender() : null}
+          </Col>
+          <Col span="12">
+            {this.getVisitingInfoRender()}
+          </Col>
+        </Row>
+      </div>
     );
   }
 }

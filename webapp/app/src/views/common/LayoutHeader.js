@@ -1,16 +1,18 @@
 'use strict';
 import React, { Component } from 'react';
 
-import Header from '../../components/layout-header';
+import Header from 'components/layout-header';
 
 import { Modal, Menu } from 'antd';
 
-import { URL } from '../../config/url';
-import { signOut } from '../../request/sign';
-import StorageUtil from '../../utils/storage';
+import { URL } from 'URL';
+
+import { signOut } from 'request/sign';
+import StorageUtil from 'utils/storage';
 
 import logo from '../../image/logo.png';
-import websiteText from '../../config/website-text';
+
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

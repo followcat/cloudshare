@@ -40,7 +40,7 @@ class Uploader(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        return flask.render_template('upload.html')
+        return flask.render_template('uploader.html')
 
 #Render userinfo page of RESTful
 class UserInfo(flask.views.MethodView):

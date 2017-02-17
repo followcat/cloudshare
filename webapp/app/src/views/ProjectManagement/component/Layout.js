@@ -3,15 +3,15 @@ import React, { Component, PropTypes } from 'react';
 
 import LayoutHeader from '../../common/LayoutHeader';
 import LayoutContainer from '../../common/LayoutContainer';
-import SubheadNav from '../../../components/subhead-nav';
+import SubheadNav from 'components/subhead-nav';
 import {
   CardContainer,
   CardContent
-} from '../../../components/card-container';
+} from 'components/card-container';
 
-import { getCurrentActive } from '../../../utils/sider-menu-list';
+import { getCurrentActive } from 'utils/sider-menu-list';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

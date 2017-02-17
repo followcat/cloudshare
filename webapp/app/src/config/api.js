@@ -68,4 +68,14 @@ export const API = {
   LSI_BY_CV_ID_API: `${HOST}/api/mining/lsibycvid`,
 
   LSI_BY_DOC_API: `${HOST}/api/mining/lsibydoc`,
+
+  DATABASE_INFO_API: `${HOST}/api/dbnumbers`,
+
+  MINING_ABILITY_API: `${HOST}/api/mining/ability`,
+
+  MINING_EXPERIENCE_API: `${HOST}/api/mining/experience`,
+
+  MINING_POSITION_API: `${HOST}/api/mining/position`,
+
+  MINING_VALUABLE_API: `${HOST}/api/mining/valuable`
 };

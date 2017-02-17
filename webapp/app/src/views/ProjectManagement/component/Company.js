@@ -3,12 +3,12 @@ import React, { Component, PropTypes } from 'react';
 
 import { message } from 'antd';
 
-import { API } from '../../../config/api';
-import { confirmExcelUpload } from '../../../request/company';
+import { API } from 'API';
+import { confirmExcelUpload } from 'request/company';
 
-import StorageUtil from '../../../utils/storage';
+import StorageUtil from 'utils/storage';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

@@ -13,10 +13,10 @@ class TagsCurriculumVitae(services.simulationcv.SimulationCV):
         self.update()
 
     def update(self):
-        for id in self.cvstorage.ids:
+        for id in self.storage.ids:
             if not self.exists(id):
-                data = self.cvstorage.getyaml(id)
-                metadata = self.cvstorage.getyaml(id)
+                data = self.storage.getyaml(id)
+                metadata = self.storage.getyaml(id)
                 key = self.config['selected']['key']
                 values_set = self.config['selected']['value']
                 if key in yamlinfo:

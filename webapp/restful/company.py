@@ -70,7 +70,7 @@ class CompanyAllAPI(Resource):
         page_size = args['page_size']
         project = self.svc_mult_cv.getproject(projectname)
         data = []
-        ids = sorted(list(project.company.ids))
+        ids = project.company.sorted_ids('modifytime')
         for id in ids[(current_page-1)*page_size : current_page*page_size]:
             data.append(project.company.getyaml(id))
         return { 'code': 200, 'data': data, 'total': len(ids) }
@@ -210,7 +210,8 @@ class SearchCObyTextAPI(Resource):
         results = project.company.search(text)
         yaml_results = project.company.search_yaml(text)
         results.update(yaml_results)
-        datas, pages, total = self.paginate(project.company, list(results), cur_page, page_size)
+        sorted_results = project.company.sorted_ids('modifytime', ids=results)
+        datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
         return {
             'code': 200,
             'data': datas,

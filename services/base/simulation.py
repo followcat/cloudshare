@@ -195,6 +195,21 @@ class Simulation(services.base.storage.BaseStorage):
             results.add(id)
         return results
 
+    def sorted_ids(self, key, ids=None, reverse=True):
+        if ids is None:
+            ids = self.ids
+        sortinfo = list()
+        nokeyinfo = list()
+        for id in ids:
+            info = self.getinfo(id)
+            info['id'] = id
+            if key not in info:
+                nokeyinfo.append(info)
+            else:
+                sortinfo.append(info)
+        return map(lambda k: k['id'],
+                   sorted(sortinfo, key=lambda k: k[key], reverse=reverse)+nokeyinfo)
+
     @property
     def ids(self):
         if self._ids is None:

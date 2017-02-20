@@ -230,6 +230,7 @@ class Cell extends Component {
 }
 
 Cell.defaultProps = {
+  span: 24,
   onSave() {},
   onRemove() {}
 };

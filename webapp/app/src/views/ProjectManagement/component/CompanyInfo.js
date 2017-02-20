@@ -97,28 +97,28 @@ class CompanyInfo extends Component {
   getAdditionalInfoRender() {
     const additionalInfoRows = [{
       title: language.OPEN_POSITION,
-      dataIndex: 'position'
-    }, {
-      title: language.CONTACT,
-      dataIndex: 'clientcontact'
+      dataIndex: 'position',
+      key: 'position'
     }, {
       title: language.CONTACT_WAY,
-      dataIndex: 'updatednumber'
+      dataIndex: 'updatednumber',
+      key: 'updatednumber'
     }, {
       title: language.RELATED_COMPANY,
-      dataIndex: 'relatedcompany'
+      dataIndex: 'relatedcompany',
+      key: 'relatedcompany'
     }];
 
-    return chunk(additionalInfoRows, 4).map(item => {
+    return chunk(additionalInfoRows, 4).map((item, index) => {
       return (
-        <Row className="extra-box">
-          {item.map(v => {
+        <Row key={index} className="extra-box">
+          {item.map(item => {
             return (
-              <Col span={24} key={v.dataIndex}>
+              <Col span={24} key={item.key}>
                 <AdditionalInfoItem
-                  key={v.dataIndex}
-                  itemInfo={v}
+                  itemInfo={item}
                   dataSource={this.props.dataSource}
+                  dataIndex={item.dataIndex}
                   onSave={this.props.onSave}
                   onRemove={this.props.onRemove}
                 />
@@ -132,6 +132,10 @@ class CompanyInfo extends Component {
 
   getBasicInfoOnExtra() {
     const rows = [{
+      title: language.DISTRICT,
+      dataIndex: 'district',
+      key: 'district'
+    }, {
       title: language.PRODUCT,
       dataIndex: 'product',
       key: 'product'
@@ -164,10 +168,10 @@ class CompanyInfo extends Component {
             <Col span={24} key={item.key}>
               <BasicInfoItem
                 labelCls="extra-label"
-                contentCls="extra-content"
                 key={item.key}
                 itemInfo={item}
                 dataSource={this.props.dataSource}
+                dataIndex={item.dataIndex}
                 onSave={this.props.onSave}
               />
             </Col>

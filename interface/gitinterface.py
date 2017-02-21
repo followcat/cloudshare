@@ -187,7 +187,7 @@ class GitInterface(interface.base.Interface):
         greppath = os.path.join(self.repo.path, path)
         if not os.path.exists(greppath):
             return grep_list
-        keywords = restrings.split()
+        keywords = [restrings]
         if keywords:
             command = ['git', 'grep', '-l', '--all-match']
             for each in keywords:

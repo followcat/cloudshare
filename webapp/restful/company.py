@@ -84,13 +84,15 @@ class AddedCompanyListAPI(Resource):
         super(AddedCompanyListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('text', location = 'json')
     
     def post(self):
         args = self.reqparse.parse_args()
         projectname = args['project']
+        text = args['text']
         project = self.svc_mult_cv.getproject(projectname)
         customer_ids = project.company_customers()
-        company_ids = project.company.sorted_ids('modifyname')
+        company_ids = project.company.search('name: '+text)
         data = []
         for company_id in company_ids:
             if company_id in customer_ids:

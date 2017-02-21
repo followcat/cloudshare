@@ -1,12 +1,12 @@
-import flask
-import flask.ext.login
-from flask.ext.restful import reqparse
-from flask.ext.restful import Resource
+import json
 
-import utils.builtin
 import core.basedata
 import extractor.information_explorer
-import json
+import flask
+import flask.ext.login
+import utils.builtin
+from flask.ext.restful import Resource, reqparse
+
 
 class CompanyAPI(Resource):
 
@@ -75,6 +75,33 @@ class CompanyAllAPI(Resource):
             data.append(project.company.getyaml(id))
         return { 'code': 200, 'data': data, 'total': len(ids) }
 
+
+class AddedCompanyListAPI(Resource):
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        super(AddedCompanyListAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', location = 'json')
+    
+    def post(self):
+        args = self.reqparse.parse_args()
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        customer_ids = project.company_customers()
+        company_ids = project.company.sorted_ids('modifyname')
+        data = []
+        for company_id in company_ids:
+            if company_id in customer_ids:
+                continue
+            yaml = project.company.getyaml(company_id)
+            data.append({
+                'id': yaml['id'],
+                'company_name': yaml['name']
+            })
+        return { 'code': 200, 'data': data }
+
 #owner
 class CustomerListAPI(Resource):
 
@@ -95,7 +122,7 @@ class CustomerListAPI(Resource):
             co = self.svc_mult_cv.getproject(project).company_get(coname)
             data.append(co)
         return { 'code': 200, 'data': data }
-
+    
 #create, delete
 class CustomerAPI(Resource):
 

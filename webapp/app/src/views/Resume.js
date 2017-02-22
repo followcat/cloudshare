@@ -372,7 +372,6 @@ export default class Resume extends Component {
           html: html,
           enHtml: en_html,
           dataSource: yaml_info,
-          uniqueID: uniqueID,
           collected: yaml_info.collected,
           paneLoading: false,
         });
@@ -415,6 +414,7 @@ export default class Resume extends Component {
         const data = json.data;
 
         this.setState({
+          uniqueID: data.id,
           resumeList: data.cv,
           tag: data.tag,
           comment: data.comment,

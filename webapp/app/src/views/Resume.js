@@ -3,12 +3,25 @@ import React, { Component } from 'react';
 
 import Header from 'components/common/Header';
 import ResumeItem from 'components/resume/ResumeItem';
+import ResumeExtension from 'components/resume/ResumeExtension';
+
 import { Tabs, message } from 'antd';
+
+import {
+  updateResumeInfo,
+  updateAdditionalInfo,
+  getResumeInfo,
+  getResumeList,
+  getSimilar
+} from 'request/resume';
+import { getJobDescriptionList } from 'request/jobdescription';
+
 import StorageUtil from 'utils/storage';
 import Generator from 'utils/generator';
 import History from 'utils/history';
 import { getRadarOption } from 'utils/chart_option';
 import { generateSummary } from 'utils/summary-generator';
+
 import { URL } from 'URL';
 
 import 'whatwg-fetch';

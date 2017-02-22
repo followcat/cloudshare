@@ -274,15 +274,15 @@ class CompanyList extends Component {
 
     const headerTitle = [{
       key: 'opearator',
-      span: 2
+      span: 1
     },{
       key: 'name',
       text: language.COMPANY_NAME,
-      span: 5,
+      span: 6,
     }, {
       key: 'clientcontact',
       text: language.CONTACT,
-      span: 2
+      span: 3
     }, {
       key: 'conumber',
       text: language.TELLPHONE,
@@ -290,7 +290,7 @@ class CompanyList extends Component {
     }, {
       key: 'visiting',
       text: language.VISITING_SITUATION,
-      span: 12
+      span: 11
     }];
 
     return (

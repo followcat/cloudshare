@@ -9,7 +9,8 @@ import Cell from './Cell';
 import {
   Row,
   Col,
-  Popconfirm
+  Button,
+  Icon
 } from 'antd';
 
 import chunk from 'lodash/chunk';
@@ -215,16 +216,16 @@ class CompanyInfo extends Component {
       span: 6
     }];
 
+    const expandCls = visible ? 'cs-row-expand-icon cs-row-expanded' : 'cs-row-expand-icon cs-row-collapsed';
+
     return (
       <div className="company-item">
         <Row className="company-item-row">
-          <Col span="2" className="company-item-cell company-item-operation">
-            {this.getRenderCustomerOperation()}
-            <a href="javascript: void(0);" onClick={this.handleClick}>
-              {visible ? language.FOLD_MSG : language.UNFOLD_MSG}
-            </a>
+          <Col span="1" className="company-item-cell company-item-operation">
+            <span className={expandCls} onClick={this.handleClick}>
+            </span>
           </Col>
-          <Col span="10">
+          <Col span="12">
             <Row>
               {items.map(item => {
                 return (
@@ -242,7 +243,7 @@ class CompanyInfo extends Component {
             {visible ? this.getBasicInfoOnExtra() : null}
             {visible ? this.getAdditionalInfoRender() : null}
           </Col>
-          <Col span="12">
+          <Col span="11">
             {this.getVisitingInfoRender()}
           </Col>
         </Row>

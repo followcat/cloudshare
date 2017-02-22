@@ -15,6 +15,8 @@ export const API = {
 
   COMPANY_API: `${HOST}/api/company`,
 
+  ADDED_COMPANY_LIST_API: `${HOST}/api/addedcompanylist`,
+
   ALL_COMPANY_API: `${HOST}/api/companyall`,
 
   ALL_COMPANY_BY_SEARCH_API: `${HOST}/api/searchcobytext`,

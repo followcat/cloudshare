@@ -5,14 +5,30 @@ import TablePlus from 'components/table-plus';
 import SiderPanel from 'components/sider-panel';
 import DetailInformation from 'components/detail-information';
 import ExtractInfo from './ExtractInfo';
+import ButtonWithModal from 'components/button-with-modal';
 
-import { Popconfirm, message } from 'antd';
+import {
+  Popconfirm,
+  message,
+  Select,
+  Form
+} from 'antd';
 
-import { getCustomerList, updateCustomer } from 'request/company';
+import {
+  getCustomerList,
+  updateCustomer,
+  getAddedCompanyList
+} from 'request/company';
+
+import find from 'lodash/find';
 
 import websiteText from 'config/website-text';
 
+const Option = Select.Option;
+
 const language = websiteText.zhCN;
+
+let timer = null;
 
 const extractValueToString = (key, array) => {
   return array.map(v => v[key])
@@ -25,13 +41,23 @@ class Customer extends Component {
     this.state = {
       dataSource: [],
       loading: false,
+      visible: false,
       siderPanelVisible: false,
-      detailData: {}
+      detailData: {},
+      companyDataSource: [],
+      value: '',
+      id: ''
     };
     this.handleDeleteCustomerConfirm = this.handleDeleteCustomerConfirm.bind(this);
     this.handleViewDetailsClick = this.handleViewDetailsClick.bind(this);
     this.handleSiderPanelClose = this.handleSiderPanelClose.bind(this);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
+    this.handleCancelClick = this.handleCancelClick.bind(this);
+    this.handleOkClick = this.handleOkClick.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
+    this.getCompanyDataSource = this.getCompanyDataSource.bind(this);
+    this.getElements = this.getElements.bind(this);
   }
 
   componentDidMount() {
@@ -64,6 +90,53 @@ class Customer extends Component {
     });
   }
 
+  handleButtonClick() {
+    this.setState({
+      visible: true
+    });
+  }
+
+  handleOkClick() {
+    const { id } = this.state;
+
+    updateCustomer('POST', {
+      id: id
+    }, (json) => {
+      if (json.code === 200) {
+        this.setState({ visible: false });
+        message.success(language.ADD_SUCCESS_MSG);
+        this.getDataSource();
+      } else {
+        message.error(language.ADD_FAIL_MSG);
+      }
+    });
+  }
+
+  handleCancelClick() {
+    this.setState({
+      visible: false
+    });
+  }
+
+  handleChange(value) {
+    const { companyDataSource } = this.state;
+
+    this.setState({ value });
+
+    let object = find(companyDataSource, (item) => item.company_name === value)
+    if (object) {
+      this.setState({
+        id: object.id
+      });
+    } else {
+      this.setState({
+        id: ''
+      });
+    }
+
+    this.getCompanyDataSource(value);
+  }
+
   getDataSource() {
     this.setState({
       loading: true
@@ -77,6 +150,70 @@ class Customer extends Component {
         });
       }
     });
+  }
+
+  getCompanyDataSource(text) {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+
+    
+    timer = setTimeout(() => {
+      getAddedCompanyList({
+        text: text
+      }, json => {
+        if (json.code === 200) {
+          this.setState({
+            companyDataSource: json.data
+          });
+        }
+      });
+    }, 500);
+  }
+
+  getElements() {
+    const {
+      companyDataSource,
+      visible,
+    } = this.state;
+
+    const elements = [{
+      col: {
+        span: 4
+      },
+      render: (
+        <ButtonWithModal
+          buttonStyle={{ marginLeft: 8 }}
+          buttonType="primary"
+          buttonText="创建新的客户"
+          visible={visible}
+          modalTitle="创建新的客户"
+          modalOkText="提交"
+          modalCancelText="取消"
+          onButtonClick={this.handleButtonClick}
+          onModalOk={this.handleOkClick}
+          onModalCancel={this.handleCancelClick}
+        >
+          <Form>
+            <Form.Item label="选择公司名称">
+              <Select
+                combobox
+                value={this.state.value}
+                defaultActiveFirstOption={false}
+                showArrow={false}
+                filterOption={false}
+                onChange={this.handleChange}
+              >
+                {companyDataSource.map(item => <Option key={item.company_name}>{item.company_name}</Option>)}
+              </Select>
+            </Form.Item>
+          </Form>
+        </ButtonWithModal>
+      )
+    }];
+
+    return elements;
   }
 
   render() {
@@ -193,6 +330,7 @@ class Customer extends Component {
           rowKey={record => record.id}
           isToolbarShowed={true}
           isSearched={true}
+          elements={this.getElements()}
           columns={columns}
           expandedRowRender={record => <p>{record.introduction}</p>}
           dataSource={this.state.dataSource}

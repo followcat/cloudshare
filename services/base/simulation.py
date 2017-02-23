@@ -195,6 +195,18 @@ class Simulation(services.base.storage.BaseStorage):
             results.add(id)
         return results
 
+    def search_key(self, key, value, ids=None):
+        if ids is None:
+            ids = self.ids
+        formatted_value = value.__repr__().replace('u', '', 1).replace('\'', '')
+        result = list()
+        for id in ids:
+            info = self.getyaml(id)
+            searched = info[key]
+            if formatted_value in searched.__repr__():
+                result.append(info)
+        return result
+
     def sorted_ids(self, key, ids=None, reverse=True):
         if ids is None:
             ids = self.ids

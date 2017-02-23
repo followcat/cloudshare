@@ -204,7 +204,7 @@ class Simulation(services.base.storage.BaseStorage):
             info = self.getyaml(id)
             searched = info[key]
             if formatted_value in searched.__repr__():
-                result.append(info)
+                result.append(id)
         return result
 
     def sorted_ids(self, key, ids=None, reverse=True):

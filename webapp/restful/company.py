@@ -267,7 +267,13 @@ class SearchCObyKeyAPI(Resource):
 
     def __init__(self):
         super(SearchCObyKeyAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
         self.reqparse.add_argument('search_key', location = 'json')
+        self.reqparse.add_argument('search_text', location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -287,6 +293,19 @@ class SearchCObyKeyAPI(Resource):
             'pages': pages,
             'total': total
         }
+
+    def paginate(self, svc_co, results, cur_page, eve_count):
+        if not cur_page:
+            cur_page = 1
+        total = len(results)
+        if total%eve_count != 0:
+            pages = total/eve_count + 1
+        else:
+            pages = total/eve_count
+        datas = []
+        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
+            datas.append(svc_co.getyaml(id))
+        return datas, pages, total
 
 
 class CompanyUploadExcelAPI(Resource):

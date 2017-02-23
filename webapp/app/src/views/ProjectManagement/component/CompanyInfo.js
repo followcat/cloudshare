@@ -205,7 +205,8 @@ class CompanyInfo extends Component {
     const items = [{
       key: 'name',
       dataIndex: 'name',
-      span: 12
+      span: 12,
+      editable: false
     }, {
       key: 'clientcontact',
       dataIndex: 'clientcontact',
@@ -230,8 +231,8 @@ class CompanyInfo extends Component {
               {items.map(item => {
                 return (
                   <Cell
+                    {...item}
                     key={item.key}
-                    span={item.span}
                     dataSource={dataSource}
                     dataIndex={item.dataIndex}
                     onSave={this.props.onSave}

@@ -34,6 +34,10 @@ class VisitingInfoItem extends Component {
         fieldProp: dataIndex,
         fieldValue: value
       });
+
+      this.setState({
+        editStatus: false
+      });
     }
   }
 

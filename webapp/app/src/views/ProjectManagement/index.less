@@ -162,17 +162,35 @@ body {
   .cs-card-inner-top {
     overflow: hidden;
     
-    &-col, &-col-2 {
+    &-col, &-col-4 {
       display: inline-block;
       margin-left: 8px;
     }
 
-    &-col-2 {
-      width: 16.666%
+    &-col-4 {
+      width: 33.332%
     }
 
     &-col:first-of-type {
       margin-left: 0 !important;
+    }
+
+    .cs-label {
+      margin-right: 4px;
+    }
+
+    .cs-label::after {
+      content: ': ';
+    }
+    
+    .ant-select {
+      width: 100px;
+    }
+
+    .ant-input-wrapper {
+      display: inline-block;
+      width: 120px;
+      margin: 0 8px;
     }
   }
 

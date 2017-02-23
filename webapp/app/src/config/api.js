@@ -19,7 +19,9 @@ export const API = {
 
   ALL_COMPANY_API: `${HOST}/api/companyall`,
 
-  ALL_COMPANY_BY_SEARCH_API: `${HOST}/api/searchcobytext`,
+  COMPANY_BY_SEARCH_TEXT_API: `${HOST}/api/searchcobytext`,
+  
+  COMPANY_BY_SEARCH_KEY_API: `${HOST}/api/searchcobykey`,
 
   UPDATE_COMPANY_INFO_API: `${HOST}/api/companyinfoupdate`,
 

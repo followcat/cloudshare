@@ -363,7 +363,7 @@ class CompanyList extends Component {
               </Upload>
             </ButtonWithModal>
           </div>
-          <div className="cs-card-inner-top-col-4">
+          <div className="cs-card-inner-top-filter">
             <label className="cs-label">过滤条件</label>
             <Select value={filterKey} onSelect={this.handleFilterSelect}>
               {options.map(item => <Select.Option key={item.key}>{item.text}</Select.Option>)}

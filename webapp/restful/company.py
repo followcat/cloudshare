@@ -263,6 +263,32 @@ class SearchCObyTextAPI(Resource):
         return datas, pages, total
 
 
+class SearchCObyKeyAPI(Resource):
+
+    def __init__(self):
+        super(SearchCObyKeyAPI, self).__init__()
+        self.reqparse.add_argument('search_key', location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        cur_page = args['current_page']
+        page_size = args['page_size']
+        key = args['search_key']
+        text = args['search_text']
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        results = project.company.search_key(key, text)
+        sorted_results = project.company.sorted_ids('modifytime', ids=results)
+        datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
+        return {
+            'code': 200,
+            'data': datas,
+            'keyword': text,
+            'pages': pages,
+            'total': total
+        }
+
+
 class CompanyUploadExcelAPI(Resource):
 
     decorators = [flask.ext.login.login_required]

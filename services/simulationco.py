@@ -14,13 +14,15 @@ class SimulationCO(services.base.simulation.Simulation,
         ("relatedcompany",     list),
         ("position",           list),
         ("clientcontact",      list),
-        ("caller",             list),
         ("progress",           list),
         ("updatednumber",      list),
+        ("reminder",           list),
+        ("priority",           int),
+        ("responsible",        str),
     )
 
     list_item = {"relatedcompany", "position", "clientcontact",
-                 "caller", "progress", "updatednumber"}
+                 "progress", "updatednumber", "reminder"}
     fix_item  = {"id", "name"}
     customers_file = 'customers.json'
 

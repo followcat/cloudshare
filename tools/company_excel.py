@@ -5,6 +5,7 @@ import yaml
 import core.basedata
 import utils.companyexcel
 import extractor.unique_id
+import services.simulationco
 from extractor.information_explorer import *
 
 
@@ -45,8 +46,8 @@ def init_simid(SVC_CO_SIM, SVC_CO_REPO, ids):
 
 def init_siminfo(SVC_CO_SIM, stream):
     excels = process(d)
-    for key in ('relatedcompany', 'position', 'clientcontact',
-                'caller', 'progress', 'updatednumber'):
+    extractkeys = map(lambda k: k[0], services.simulationco.SimulationCO.YAML_TEMPLATE)
+    for key in extractkeys:
         for excel in excels:
             id = extractor.unique_id.company_id(excel['name'])
             info = SVC_CO_SIM.getyaml(id)
@@ -63,8 +64,8 @@ def init_siminfo(SVC_CO_SIM, stream):
 
 
 def delete_ununique(SVC_CO_SIM):
-    for key in ('relatedcompany', 'position', 'clientcontact',
-                'caller', 'progress', 'updatednumber'):
+    extractkeys = map(lambda k: k[0], services.simulationco.SimulationCO.YAML_TEMPLATE)
+    for key in extractkeys:
         for id in SVC_CO_SIM.ids:
             info = SVC_CO_SIM.getyaml(id)
             caller = info['caller']

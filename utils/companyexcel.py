@@ -24,8 +24,9 @@ def chs_to_eng(d):
     nd['email'] =           loose(d, [u'邮箱'])
     nd['clientcontact'] =   loose(d, [u'联系人'])                #
     nd['conumber'] =        loose(d, [u'座机'])
-    nd['caller'] =          loose(d, [u'跟进人', u'陌拜人'])      #
-    nd['progress'] =        loose(d, [u'跟进情况', u'陌拜情况'])   #;\n；
+    nd['responsible'] =     loose(d, [u'跟进人'])                #
+    nd['progress'] =        loose(d, [u'跟进情况'])              #;\n；
+    nd['priority'] =        loose(d, [u'优先级', u'优先项'])
     return nd
 
 
@@ -39,9 +40,8 @@ def reformat(item):
     if not isinstance(item['clientcontact'], list):
         item['clientcontact'] = [e for e in re.split(u'',
                                  unicode(item['clientcontact'])) if e]
-    if not isinstance(item['caller'], list):
-        item['caller'] = [e for e in re.split(u'',
-                          unicode(item['caller'])) if e]
+    if not isinstance(item['priority'], int):
+        item['priority'] = int(item['priority'])
     if not isinstance(item['progress'], list):
         item['progress'] = [e for e in re.split(u'[;\n]',
                             unicode(item['progress'])) if e]

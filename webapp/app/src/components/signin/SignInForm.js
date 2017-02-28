@@ -1,6 +1,12 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import { Form, Input, Button, Select } from 'antd';
+
+import {
+  Form,
+  Input,
+  Button,
+  Select
+} from 'antd';
 
 const FormItem = Form.Item,
       SelectOption = Select.Option;
@@ -11,76 +17,68 @@ class SignInForm extends Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick() {
+  handleClick(e) {
+    e.preventDefault();
+
     this.props.form.validateFields((errors, values) => {
-      if (!!errors) {
-        return;
-      } else {
+      if (!errors) {
         this.props.onSubmit(values);
       }
     });
   }
 
   render() {
-    const { getFieldProps } = this.props.form,
-          props = this.props;
-
-    const accountProps = getFieldProps('account', {
-      rules: [
-        { required: true, message: 'Account is required.' },
-      ],
-    });
-
-    const passwordProps = getFieldProps('password', {
-      rules: [
-        { required: true, message: 'Password is required.' },
-        { min: 6, max: 18, message: 'Invalid Password. (At least 6-12 characters)' },
-      ],
-    });
-
-    const projectProps = getFieldProps('project', {
-      rules: [
-        { required: true, message: 'Project is required.' }
-      ],
-    });
+    const { wrapperCol, btnText } = this.props,
+          { getFieldDecorator } = this.props.form;
 
     return (
       <Form horizontal>
         <FormItem
-          label="Account"
+          label="用户名"
           id="account"
         >
-          <Input {...accountProps} placeholder="Please input account." />
+          {getFieldDecorator('account', {
+            rules: [{ required: true, message: '用户名是必填项' }]
+          })(<Input placeholder="请输入用户名" />)}
         </FormItem>
         <FormItem
-          label="Password"
+          label="密码"
           id="password"
         >
-          <Input {...passwordProps} type="password" placeholder="Please input password." />
+          {getFieldDecorator('password', {
+            rules: [
+              { required: true, message: '密码是必填项' },
+              { min: 6, max: 18, message: '无效密码，密码长度为6-18位' }
+            ]
+          })(<Input type="password" placeholder="请输入密码" />)}
         </FormItem>
         <FormItem
-          label="Project"
+          label="项目"
           id="project"
         >
-          <Select {...projectProps}>
-            {this.props.projects.map((item, index) => {
-              return (
-                <SelectOption
-                  key={index}
-                  value={item}
-                >
-                  {item}
-                </SelectOption>
-              );
-            })}
-          </Select>
+          {getFieldDecorator('project', {
+            rules: [
+              { required: true, message: '项目是必填项' }
+            ],
+          })(<Select>
+              {this.props.projects.map((item, index) => {
+                return (
+                  <SelectOption
+                    key={index}
+                    value={item}
+                  >
+                    {item}
+                  </SelectOption>
+                );
+              })}
+            </Select>)}
         </FormItem>
-        <FormItem wrapperCol={props.wrapperCol}>
+        <FormItem wrapperCol={wrapperCol}>
           <Button
             type="primary"
             onClick={this.handleClick}
           >
-            {props.btnText}
+            {btnText}
           </Button>
         </FormItem>
       </Form>
@@ -90,16 +88,17 @@ class SignInForm extends Component {
 
 SignInForm.defaultProps = {
   projects: [],
-  btnText: 'Sign In',
+  btnText: '登入',
   wrapperCol: {},
-  onSUbmit() {},
+  onSubmit() {},
 };
 
-SignInForm.propsTypes = {
+SignInForm.propTypes = {
   projects: PropTypes.array,
   btnText: PropTypes.string,
   wrapperCol: PropTypes.object,
-  onSUbmit: PropTypes.func,
+  form: PropTypes.object,
+  onSubmit: PropTypes.func,
 };
 
 export default SignInForm = Form.create({})(SignInForm);

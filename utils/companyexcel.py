@@ -41,7 +41,10 @@ def reformat(item):
         item['clientcontact'] = [e for e in re.split(u'',
                                  unicode(item['clientcontact'])) if e]
     if not isinstance(item['priority'], int):
-        item['priority'] = int(item['priority'])
+        try:
+            item['priority'] = int(item['priority'])
+        except ValueError:
+            item['priority'] = 0
     if not isinstance(item['progress'], list):
         item['progress'] = [e for e in re.split(u'[;\n]',
                             unicode(item['progress'])) if e]

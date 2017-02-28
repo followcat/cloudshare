@@ -36,25 +36,29 @@ class SimulationCO(services.base.simulation.Simulation,
         for excel in excels:
             metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
             data = core.basedata.DataObject(metadata, excel)
-            id = metadata['id']
-            caller = committer
+            id = data.name
+            info = self.getyaml(id)
+            responsible = committer
             if not self.exists(id):
                 for item in self.list_item:
                     if item in metadata:
                         metadata.pop(item)
                 output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
-            if excel['caller']:
-                caller = excel['caller'][0]
+            if excel['responsible']:
+                responsible = excel['responsible']
             for key in self.list_item:
-                existvalues = list()
-                if self.exists(id):
-                    info = self.getyaml(id)
-                    existvalues = [v['content'].replace(' ', '') for v in info[key]]
-                for value in excel[key]:
-                    if value.replace(' ', '') in existvalues:
-                        continue
-                    existvalues.append(value)
-                    output.append(('listadd', id, (id, key, value, caller)))
+                if isinstance(info[key], list):
+                    existvalues = list()
+                    if self.exists(id):
+                        existvalues = [v['content'].replace(' ', '') for v in info[key]]
+                    for value in excel[key]:
+                        if value.replace(' ', '') in existvalues:
+                            continue
+                        existvalues.append(value)
+                        output.append(('listadd', id, (id, key, value, responsible)))
+                else:
+                    if info[key] != excel[key]:
+                         output.append(('listadd', id, (id, key, value, responsible)))
         return output
 
     def addcustomer(self, id, user, do_commit=True):

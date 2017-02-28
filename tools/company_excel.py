@@ -9,7 +9,8 @@ import services.simulationco
 from extractor.information_explorer import *
 
 
-def process(stream):
+def add(stream, SVC_CO_REPO):
+    dos = []
     excels = utils.companyexcel.convert(stream)
     for excel in excels:
         metadata = catch_coinfo(excel, excel['name'])
@@ -17,11 +18,6 @@ def process(stream):
         if 'date' not in bsobj.metadata or not bsobj.metadata['date']:
             bsobj.metadata['date'] = time.time()
         dos.append(bsobj)
-    return dos
-
-
-def add(d, SVC_CO_REPO):
-    dos = process(d)
     for each in dos:
         with open(os.path.join(SVC_CO_REPO.interface.path, each.name+'.yaml'), 'w') as fp:
             fp.write(yaml.safe_dump(each.metadata, allow_unicode=True))
@@ -41,26 +37,31 @@ def init_simid(SVC_CO_SIM, SVC_CO_REPO, ids):
         info = SVC_CO_REPO.getyaml(each)
         metadata = catch_coinfo(info, info['name'])
         do = core.basedata.DataObject(metadata, metadata)
-        SVC_CO_SIM.add(do)
+        SVC_CO_SIM.add(do, do_commit=False)
 
 
 def init_siminfo(SVC_CO_SIM, stream):
-    excels = process(d)
+    def update_list(id, info, excel, key):
+        existvalues = [v['content'] for v in info[key]]
+        for value in excel[key]:
+            if value in existvalues:
+                continue
+            SVC_CO_SIM.updateinfo(id, key, value, responsible, do_commit=False)
+    excels = utils.companyexcel.convert(stream)
     extractkeys = map(lambda k: k[0], services.simulationco.SimulationCO.YAML_TEMPLATE)
     for key in extractkeys:
         for excel in excels:
+            responsible = 'dev'
+            if excel['responsible']:
+                responsible = excel['responsible']
             id = extractor.unique_id.company_id(excel['name'])
             info = SVC_CO_SIM.getyaml(id)
-            if key not in info:
+            if key not in info or key not in excel:
                 continue
-            existvalues = [v['content'] for v in info[key]]
-            caller = 'dev'
-            if excel['caller']:
-                caller = excel['caller'][0]
-            for value in excel[key]:
-                if value in existvalues:
-                    continue
-                SVC_CO_SIM.updateinfo(id, key, value, caller)
+            if isinstance(info[key], list):
+                update_list(id, info, excel, key)
+            else:
+                SVC_CO_SIM.updateinfo(id, key, excel[key], responsible, do_commit=False)
 
 
 def delete_ununique(SVC_CO_SIM):

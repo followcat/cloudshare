@@ -29,9 +29,8 @@ def add_repo(excels, SVC_CO_REPO):
             bsobj.metadata['date'] = time.time()
         objs.append(bsobj)
     for each in objs:
-        if not SVC_CO_REPO.exists(each.name):
-            with open(os.path.join(SVC_CO_REPO.interface.path, each.name+'.yaml'), 'w') as fp:
-                fp.write(yaml.safe_dump(each.metadata, allow_unicode=True))
+        with open(os.path.join(SVC_CO_REPO.interface.path, each.name+'.yaml'), 'w') as fp:
+            fp.write(yaml.safe_dump(each.metadata, allow_unicode=True))
     return objs
 
 

@@ -1,9 +1,21 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'antd';
 
+import classNames from 'classnames';
+
 class HeaderTitle extends Component {
   render() {
-    const { prefixCls, dataSource } = this.props;
+    const {
+      prefixCls,
+      dataSource,
+      position
+    } = this.props;
+
+    const cls = classNames({
+      [`${prefixCls}-cell`]: true,
+      'text-center': position === 'center',
+      'text-left': position === 'left'
+    });
 
     return (
       <div className={prefixCls}>
@@ -12,7 +24,7 @@ class HeaderTitle extends Component {
             return (
               <Col
                 key={item.key}
-                className={`${prefixCls}-cell`}
+                className={cls}
                 span={item.span}
               >
                 {item.text}
@@ -27,13 +39,15 @@ class HeaderTitle extends Component {
 
 HeaderTitle.defaultProps = {
   prefixCls: 'cs-header-title',
-  dataSource: []
+  dataSource: [],
+  position: 'center'
 };
 
 HeaderTitle.propTypes = {
   span: PropTypes.number,
   prefixCls: PropTypes.string,
-  dataSource: PropTypes.array
+  dataSource: PropTypes.array,
+  position: PropTypes.string
 };
 
 export default HeaderTitle;

@@ -35,6 +35,12 @@ const options = [{
   key: 'name',
   text: language.COMPANY_NAME
 }, {
+  key: 'responsible',
+  text: language.RESPONSIBLE
+}, {
+  key: 'priority',
+  text: language.PRIORITY
+}, {
   key: 'clientcontact',
   text: language.CONTACT
 }, {
@@ -149,7 +155,7 @@ class CompanyList extends Component {
 
   handleCreateCompanySubmit(fieldValues) {
     const { current, pageSize } = this.state;
-          
+
     this.setState({
       createCompanyConfirmLoading: true
     });
@@ -342,11 +348,11 @@ class CompanyList extends Component {
       span: 2
     }, {
       key: 'priority',
-      text: '优先级',
+      text: language.PRIORITY,
       span: 2
     }, {
       key: 'reminder',
-      text: '待联系',
+      text: language.REMINDER,
       span: 3
     }, {
       key: 'visiting',

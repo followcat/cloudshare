@@ -327,7 +327,7 @@ class CompanyList extends Component {
     },{
       key: 'name',
       text: language.COMPANY_NAME,
-      span: 6,
+      span: 4,
     }, {
       key: 'clientcontact',
       text: language.CONTACT,
@@ -337,9 +337,21 @@ class CompanyList extends Component {
       text: language.TELLPHONE,
       span: 3
     }, {
+      key: 'responsible',
+      text: language.RESPONSIBLE,
+      span: 2
+    }, {
+      key: 'priority',
+      text: '优先级',
+      span: 2
+    }, {
+      key: 'reminder',
+      text: '待联系',
+      span: 3
+    }, {
       key: 'visiting',
       text: language.VISITING_SITUATION,
-      span: 11
+      span: 6
     }];
 
     return (
@@ -384,7 +396,7 @@ class CompanyList extends Component {
           spinning={this.state.loading}
         >
           <Affix>
-            <HeaderTitle dataSource={headerTitle}/>
+            <HeaderTitle position="left" dataSource={headerTitle} />
           </Affix>
           {this.state.dataSource.map((item, index) => {
             return (
@@ -398,7 +410,6 @@ class CompanyList extends Component {
               />
             );
           })}
-          
         </Spin>
         <div className="cs-card-inner-pagination">
           <Pagination {...pagination} />

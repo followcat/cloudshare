@@ -105,7 +105,7 @@ class Cell extends Component {
 
   getArrayDOMNormalRender() {
     const { dataSource, dataIndex } = this.props,
-          { openable } = this.state;
+          { openable, editStatus } = this.state;
     
     let text = '';
 
@@ -118,20 +118,20 @@ class Cell extends Component {
     });
 
     return (
-      <span
-        className={openable ? 'cell-item' : 'cell-item ommit'}
+      <div
+        className={openable && !editStatus ? '' : 'ommit'}
         title={text}
         onClick={this.handleOmmitClik}
       >
         {text || '无'}
-      </span>
+      </div>
     );
   }
 
   getArrayDOMEditingRender() {
     const { dataSource, dataIndex } = this.props;
     return (
-      <div className="cell-item">
+      <div>
         {dataSource[dataIndex].map((item, index) => {
            return (
             <Tag
@@ -169,27 +169,21 @@ class Cell extends Component {
           { editStatus } = this.state;
 
     if (editable) {
-      return (
-        <div>
-          {editStatus ?
-            this.getArrayDOMEditingRender() :
-            this.getArrayDOMNormalRender()
-          }
-        </div>
-      );
+      if (editStatus) {
+        return this.getArrayDOMEditingRender();
+      } else {
+        return this.getArrayDOMNormalRender();
+      }
     } else {
-      return (
-        <div>{this.getArrayDOMNormalRender()}</div>
-      );
+      return this.getArrayDOMNormalRender();
     }
-    
   }
 
   getStringDOMRender() {
     const { dataSource, dataIndex, editable } = this.props,
           { editStatus, openable, fieldValue } = this.state;
 
-    const cellCls = openable ? 'cell-item' : 'cell-item ommit';
+    const cellCls = openable && !editStatus ? '' : 'ommit';
 
     if (editable) {
       return (
@@ -228,14 +222,14 @@ class Cell extends Component {
         <div className={cellCls}>{dataSource[dataIndex] || '无'}</div>
       );
     }
-    
   }
 
   render() {
-    const { dataSource, dataIndex, span } = this.props;
+    const { dataSource, dataIndex, width } = this.props;
     return (
-      <Col
-        span={span}
+      <div
+        style={{ width: width }}
+        className="cell-item"
         onClick={this.handleClick}
         onDoubleClick={this.handleDoubleClick}
       >
@@ -243,21 +237,21 @@ class Cell extends Component {
           this.getArrayDOMRender() :
           this.getStringDOMRender()
         }
-      </Col>
+      </div>
     );
   }
 }
 
 Cell.defaultProps = {
   editable: true,
-  span: 24,
+  width: '87%',
   onSave() {},
   onRemove() {}
 };
 
 Cell.propTypes = {
   editable: PropTypes.bool,
-  span: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   dataIndex: PropTypes.string,
   dataSource: PropTypes.object,
   onSave: PropTypes.func,

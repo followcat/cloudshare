@@ -34,6 +34,7 @@ const websiteText = {
     OPEN_POSITION: '开放职位',
     NEW_VISITING_SITUATION: '最新陌拜情况',
     POSITION: '职位',
+    RESPONSIBLE: '跟进人',
 
     VISITING_SITUATION: '陌拜情况',
     VISITING_INFORMATION: '陌拜信息',

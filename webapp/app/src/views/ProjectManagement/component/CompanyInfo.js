@@ -4,13 +4,13 @@ import React, { Component, PropTypes } from 'react';
 import BasicInfoItem from './BasicInfoItem';
 import AdditionalInfoItem from './AdditionalInfoItem';
 import VisitingInfoItem from './VisitingInfoItem';
+import ReminderInfoItem from './ReminderInfoItem';
 import Cell from './Cell';
 
 import {
   Row,
   Col,
-  Button,
-  Icon
+  Popconfirm,
 } from 'antd';
 
 import chunk from 'lodash/chunk';
@@ -198,6 +198,22 @@ class CompanyInfo extends Component {
     );
   }
 
+  getReminderInfoRender() {
+    const { dataSource } = this.props,
+          { visible } = this.state;
+    
+    return (
+      <ReminderInfoItem
+        visible={visible}
+        dataSource={dataSource.reminder}
+        dataId={dataSource.id}
+        dataIndex="reminder"
+        onSave={this.props.onSave}
+        onRemove={this.props.onRemove}
+      />
+    );
+  }
+
   render() {
     const { dataSource } = this.props,
           { visible } = this.state;
@@ -205,16 +221,24 @@ class CompanyInfo extends Component {
     const items = [{
       key: 'name',
       dataIndex: 'name',
-      span: 12,
+      width: '28.61888888%',
       editable: false
     }, {
       key: 'clientcontact',
       dataIndex: 'clientcontact',
-      span: 6
+      width: '21.45999999%'
     }, {
       key: 'conumber',
       dataIndex: 'conumber',
-      span: 6
+      width: '21.45999999%'
+    }, {
+      key: 'responsible',
+      dataIndex: 'responsible',
+      width: '14.30999999%'
+    }, {
+      key: 'priority',
+      dataIndex: 'priority',
+      width: '14.15622222%'
     }];
 
     const expandCls = visible ? 'cs-row-expand-icon cs-row-expanded' : 'cs-row-expand-icon cs-row-collapsed';
@@ -226,7 +250,7 @@ class CompanyInfo extends Component {
             <span className={expandCls} onClick={this.handleClick}>
             </span>
           </Col>
-          <Col span="12">
+          <Col span="14">
             <Row>
               {items.map(item => {
                 return (
@@ -244,7 +268,10 @@ class CompanyInfo extends Component {
             {visible ? this.getBasicInfoOnExtra() : null}
             {visible ? this.getAdditionalInfoRender() : null}
           </Col>
-          <Col span="11">
+          <Col span="3" className="cell-item">
+            {this.getReminderInfoRender()}
+          </Col>
+          <Col span="6" className="cell-item">
             {this.getVisitingInfoRender()}
           </Col>
         </Row>

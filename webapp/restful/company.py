@@ -177,7 +177,7 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('date', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('key', location = 'json')
-        self.reqparse.add_argument('value', location = 'json')
+        self.reqparse.add_argument('value', type=dict, location = 'json')
 
     def put(self):
         args = self.reqparse.parse_args()

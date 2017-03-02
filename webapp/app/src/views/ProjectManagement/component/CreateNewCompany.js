@@ -81,15 +81,6 @@ class CreateNewCompany extends Component {
             />
           </FormItem>
           <FormItem
-            label={language.RESPONSIBLE}
-            {...formItemLayout}
-          >
-            <Input
-              {...getFieldProps('priority', { rules: [{ required: true }] })}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.RESPONSIBLE}`}
-            />
-          </FormItem>
-          <FormItem
             label={language.COMPANY_INTRODUCTION}
             {...formItemLayout}
           >

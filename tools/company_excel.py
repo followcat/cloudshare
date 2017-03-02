@@ -20,6 +20,11 @@ def initexcel(path, SVC_CO_REPO, SVC_PRJ):
     init_siminfo(excels, SVC_CO_SIM)
 
 
+def init_from_projectjd(SVC_PRJ, SVC_CO_REPO):
+    ids = [each['company'] for each in SVC_PRJ.jobdescription.lists()]
+    init_simid(SVC_PRJ.company, SVC_CO_REPO, ids)
+
+
 def add_repo(excels, SVC_CO_REPO):
     objs = []
     for excel in excels:

@@ -17,6 +17,7 @@ class CompanyAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('name', location = 'json')
+        self.reqparse.add_argument('priority', location = 'json')
         self.reqparse.add_argument('product', location = 'json')
         self.reqparse.add_argument('introduction', location = 'json')
         self.reqparse.add_argument('conumber', location = 'json')

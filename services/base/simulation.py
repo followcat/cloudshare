@@ -61,6 +61,14 @@ class Simulation(services.base.storage.BaseStorage):
         self.ids.add(id)
         return True
 
+    def _templateinfo(self, committer):
+        info = self.generate_info_template()
+        info['committer'] = committer
+        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if 'date' not in info or not info['date']:
+            info['date'] = time.time()
+        return info
+
     def add(self, bsobj, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
         result = False
@@ -74,11 +82,7 @@ class Simulation(services.base.storage.BaseStorage):
             if yamlfile is True:
                 if not os.path.exists(os.path.join(self.path, self.yamlpath)):
                     os.makedirs(os.path.join(self.path, self.yamlpath))
-                info = self.generate_info_template()
-                info['committer'] = committer
-                info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                if 'date' not in info or not info['date']:
-                    info['date'] = time.time()
+                info = self._templateinfo(committer)
                 name = core.outputstorage.ConvertName(id).yaml
                 dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                      allow_unicode=True, default_flow_style=False)

@@ -30,6 +30,11 @@ class SimulationCO(services.base.simulation.Simulation,
         super(SimulationCO, self).__init__(path, name, costorage, iotype)
         self._customers = None
 
+    def _templateinfo(self, committer):
+        info = super(SimulationCO, self)._templateinfo(committer)
+        info['responsible'] = committer
+        return info
+
     def compare_excel(self, stream, committer):
         output = list()
         excels = utils.companyexcel.convert(stream)

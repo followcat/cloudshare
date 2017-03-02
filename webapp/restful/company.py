@@ -17,14 +17,7 @@ class CompanyAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('name', location = 'json')
-        self.reqparse.add_argument('priority', location = 'json')
-        self.reqparse.add_argument('product', location = 'json')
         self.reqparse.add_argument('introduction', location = 'json')
-        self.reqparse.add_argument('conumber', location = 'json')
-        self.reqparse.add_argument('address', location = 'json')
-        self.reqparse.add_argument('email', location = 'json')
-        self.reqparse.add_argument('website', location = 'json')
-        self.reqparse.add_argument('district', location = 'json')
         super(CompanyAPI, self).__init__()
 
     def get(self, name):

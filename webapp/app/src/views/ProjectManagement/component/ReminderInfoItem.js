@@ -121,7 +121,7 @@ class ReminderInfoItem extends Component {
             <a
               className="visiting-list-del"
               href="javascript: void(0);"
-              onClick={() => this.handleDeleteClick(dataSource[0].author, dataSource[0].date)}>{language.DELETE}</a> :
+              onClick={() => this.handleDeleteClick(dataSource[0].content, dataSource[0].date)}>{language.DELETE}</a> :
             null}
         </div>
       );

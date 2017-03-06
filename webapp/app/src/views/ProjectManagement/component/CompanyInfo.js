@@ -234,7 +234,7 @@ class CompanyInfo extends Component {
     }, {
       key: 'responsible',
       dataIndex: 'responsible',
-      width: '14.30999999%'
+      width: '14.29999999%'
     }, {
       key: 'priority',
       dataIndex: 'priority',

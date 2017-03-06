@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import time
 import yaml
 
@@ -7,6 +8,19 @@ import utils.companyexcel
 import extractor.unique_id
 import services.simulationco
 from extractor.information_explorer import *
+
+
+def initexcel_fromdir(excelpath, projects, SVC_CO_REPO):
+    for parent, dirnames, filenames in os.walk(excelpath):
+        for dirname in dirnames:
+            try:
+                svc_prj = projects[dirname]
+            except KeyError:
+                continue
+            for eparent, edirnames, efilenames in os.walk(os.path.join(excelpath, dirname)):
+                for efilename in efilenames:
+                    initexcel(os.path.join(excelpath, dirname, efilename), SVC_CO_REPO, svc_prj)
+                    print efilename
 
 
 def initexcel(path, SVC_CO_REPO, SVC_PRJ):

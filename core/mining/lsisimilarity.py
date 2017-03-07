@@ -51,8 +51,9 @@ class LSIsimilarity(object):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
             ujson.dump(self.names, f)
-        with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-            ujson.dump(self.corpus, f)
+        if not self.corpus:
+            with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
+                ujson.dump(self.corpus, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
         self.clear()
 

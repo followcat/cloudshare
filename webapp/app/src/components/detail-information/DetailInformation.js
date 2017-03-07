@@ -104,13 +104,14 @@ class DetailInformation extends Component {
         loading={false}
         title={title}
         extra={this.renderExtra()}
+        className={this.props.prefixCls}
       >
         {rows.map(v => {
           return (
             <Row key={v.key} className="cs-item-row">
               <Col span={4}>{v.title}</Col>
               <Col span={18}>
-                {editing ? this.renderForm(v) : this.renderValue(v)}
+                {editing && v.editable ? this.renderForm(v) : this.renderValue(v)}
               </Col>
             </Row>
           );
@@ -121,6 +122,7 @@ class DetailInformation extends Component {
 }
 
 DetailInformation.defaultProps = {
+  prefixCls: 'cs-details-card',
   title: '',
   rows: [],
   dataSource: {},

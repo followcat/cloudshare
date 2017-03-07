@@ -61,6 +61,14 @@ class Simulation(services.base.storage.BaseStorage):
         self.ids.add(id)
         return True
 
+    def _templateinfo(self, committer):
+        info = self.generate_info_template()
+        info['committer'] = committer
+        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if 'date' not in info or not info['date']:
+            info['date'] = time.time()
+        return info
+
     def add(self, bsobj, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
         result = False
@@ -74,8 +82,7 @@ class Simulation(services.base.storage.BaseStorage):
             if yamlfile is True:
                 if not os.path.exists(os.path.join(self.path, self.yamlpath)):
                     os.makedirs(os.path.join(self.path, self.yamlpath))
-                info = self.generate_info_template()
-                info['committer'] = committer
+                info = self._templateinfo(committer)
                 name = core.outputstorage.ConvertName(id).yaml
                 dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                      allow_unicode=True, default_flow_style=False)
@@ -169,6 +176,7 @@ class Simulation(services.base.storage.BaseStorage):
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
         name = core.outputstorage.ConvertName(id).yaml
+        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
@@ -190,6 +198,33 @@ class Simulation(services.base.storage.BaseStorage):
             id = core.outputstorage.ConvertName(filename).base
             results.add(id)
         return results
+
+    def search_key(self, key, value, ids=None):
+        if ids is None:
+            ids = self.ids
+        formatted_value = value.__repr__().replace('u', '', 1).replace('\'', '')
+        result = list()
+        for id in ids:
+            info = self.getyaml(id)
+            searched = info[key]
+            if formatted_value in searched.__repr__():
+                result.append(id)
+        return result
+
+    def sorted_ids(self, key, ids=None, reverse=True):
+        if ids is None:
+            ids = self.ids
+        sortinfo = list()
+        nokeyinfo = list()
+        for id in ids:
+            info = self.getinfo(id)
+            info['id'] = id
+            if key not in info:
+                nokeyinfo.append(info)
+            else:
+                sortinfo.append(info)
+        return map(lambda k: k['id'],
+                   sorted(sortinfo, key=lambda k: k[key], reverse=reverse)+nokeyinfo)
 
     @property
     def ids(self):

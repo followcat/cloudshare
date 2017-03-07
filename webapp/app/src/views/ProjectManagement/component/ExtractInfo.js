@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import EnhancedInput from '../../../components/enhanced-input';
+import EnhancedInput from 'components/enhanced-input';
 
 import {
   Row,
@@ -10,7 +10,7 @@ import {
   Tag
 } from 'antd';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

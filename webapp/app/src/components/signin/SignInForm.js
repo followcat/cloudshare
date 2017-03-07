@@ -32,7 +32,7 @@ class SignInForm extends Component {
           { getFieldDecorator } = this.props.form;
 
     return (
-      <Form horizontal>
+      <Form layout="horizontal">
         <FormItem
           label="用户名"
           id="account"

@@ -18,6 +18,7 @@ class ReminderInfoItem extends Component {
       text: '',
       date: ''
     };
+    this.handleOmmitClick = this.handleOmmitClick.bind(this);
     this.handleDoubleClick = this.handleDoubleClick.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
@@ -26,6 +27,12 @@ class ReminderInfoItem extends Component {
     this.disabledDate = this.disabledDate.bind(this);
     this.getEditingRender = this.getEditingRender.bind(this);
     this.getRender = this.getRender.bind(this);
+  }
+
+  handleOmmitClick() {
+    this.setState({
+      opening: !this.state.opening
+    });
   }
 
   handleDoubleClick() {
@@ -113,9 +120,10 @@ class ReminderInfoItem extends Component {
       return (
         <div
           className={opening ? '' : 'ommit'}
+          onClick={this.handleOmmitClick}
         >
           {dataSource.length > 0 ?
-            `${dataSource[0].content.text} | ${dataSource[0].content.date}` :
+            `${dataSource[0].author} | ${dataSource[0].content.date} | ${dataSource[0].content.text}` :
             `暂无数据`}
           {editStatus && dataSource.length > 0 ?
             <a
@@ -132,7 +140,7 @@ class ReminderInfoItem extends Component {
             dataSource.map((item, index) => {
               return (
                 <p key={index} className="visiting-list">
-                  {item.content && `${item.content.text} | ${item.content.date}`}
+                  {item.content && `${item.author} | ${item.content.date} | ${item.content.text}`}
                   {editStatus ?
                     <a
                       className="visiting-list-del"

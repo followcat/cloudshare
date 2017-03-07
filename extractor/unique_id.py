@@ -41,18 +41,18 @@ def predate(xp, to):
         output['date_to'] = u'至今'
     return output
 
-def acceptable_education(ed, to_date=u'至今', low_level=u'大专'):
+def acceptable_education(ed, to_date=u'至今', low_level=u'中专'):
     u"""
         >>> ed = {
         ...     'date_from':  '2014.01',
         ...     'date_to':    '2014.04',
         ...     'school':     'XXX',
-        ...     'education':  u'中专',
+        ...     'education':  u'初中',
         ...     }
         >>> assert not acceptable_education(ed)
-        >>> assert acceptable_education(ed, low_level=u'中专')
+        >>> assert acceptable_education(ed, low_level=u'初中')
 
-        >>> ed['education'] = u'大专'
+        >>> ed['education'] = u'中专'
         >>> assert acceptable_education(ed)
         >>> assert not acceptable_education(ed, to_date='2013.01')
     """
@@ -100,7 +100,7 @@ def history(cv_yaml, to_date=u'至今'):
         >>> SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare')
         >>> yaml = SVC_CV_REPO.getyaml('0mlcw5kf.yaml')
         >>> assert yaml['education_history'][-1]['education'] == u'中专'
-        >>> assert not is_education(history(yaml)[0])
+        >>> assert is_education(history(yaml)[0])
 
         >>> cv = lambda xp: {'education_history': [], 'experience': {'company': [xp.copy()]}}
         >>> ed = {

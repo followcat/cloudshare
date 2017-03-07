@@ -68,13 +68,34 @@ export const getAllCompany = (params, callback) => {
 };
 
 /*
+ * 获取待开发客户列表
+ * @param  {string}   params   请求参数: 公司名称关键词
+ * @param  {function} callback 回调函数
+ * @return {function} fetch    异步请求方法
+ */
+export const getAddedCompanyList = (params, callback) => {
+  return fetch(API.ADDED_COMPANY_LIST_API, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+/*
  * 获取公司列表搜索结果
  * @param  {object}   params   请求参数: 页码, 每页条数, 搜索关键字
  * @param  {function} callback 回调函数
  * @return {function} fetch    异步请求方法
  */
 export const getAllCompanyBySearch = (params, callback) => {
-  return fetch(API.ALL_COMPANY_BY_SEARCH_API, {
+  return fetch(API.COMPANY_BY_SEARCH_KEY_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -128,6 +149,22 @@ export const getCustomerList = (callback) => {
 export const updateCustomer = (method, params, callback) => {
   return fetch(API.CUSTOMER_API, {
     method: method,
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+// 确认上传excel文件
+export const confirmExcelUpload = (params, callback) => {
+  return fetch(API.CONFIRM_UPLOAD_EXCEL_API, {
+    method: 'POST',
     credentials: 'include',
     headers: {
       'Authorization': `Basic ${StorageUtil.get('token')}`,

@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 
 import { Modal, Form, Input, Select } from 'antd';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 const FormItem = Form.Item,
@@ -93,6 +93,18 @@ class EditJobDescriptionForm extends Component {
               type="textarea"
               rows="6"
               disabled={props.record.committer !== localStorage.user}
+            />
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label={language.COMMENTARY}
+          >
+            <Input
+              {...getFieldProps('commentary', {
+                initialValue: props.record.commentary,
+              })}
+              type="textarea"
+              rows="2"
             />
           </FormItem>
           <FormItem

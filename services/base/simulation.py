@@ -7,6 +7,7 @@ import ujson
 import utils._yaml
 import utils.builtin
 import core.outputstorage
+import services.memsorted
 import services.base.storage
 
 
@@ -38,6 +39,7 @@ class Simulation(services.base.storage.BaseStorage):
         self._ids = None
         self.storage = storage
         self.yamlpath = self.YAML_DIR
+        self.memsorted = services.memsorted.MemerySorted(self)
         idsfile = os.path.join(path, Simulation.ids_file)
         if not os.path.exists(idsfile):
             dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
@@ -61,6 +63,14 @@ class Simulation(services.base.storage.BaseStorage):
         self.ids.add(id)
         return True
 
+    def _templateinfo(self, committer):
+        info = self.generate_info_template()
+        info['committer'] = committer
+        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if 'date' not in info or not info['date']:
+            info['date'] = time.time()
+        return info
+
     def add(self, bsobj, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
         result = False
@@ -74,8 +84,7 @@ class Simulation(services.base.storage.BaseStorage):
             if yamlfile is True:
                 if not os.path.exists(os.path.join(self.path, self.yamlpath)):
                     os.makedirs(os.path.join(self.path, self.yamlpath))
-                info = self.generate_info_template()
-                info['committer'] = committer
+                info = self._templateinfo(committer)
                 name = core.outputstorage.ConvertName(id).yaml
                 dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                      allow_unicode=True, default_flow_style=False)
@@ -84,6 +93,7 @@ class Simulation(services.base.storage.BaseStorage):
             self.interface.add_files(filenames, filedatas,
                                      message='Add new data %s.'%id,
                                      committer=committer, do_commit=do_commit)
+            self.memsorted.update('modifytime', id)
             result = True
         return result
 
@@ -169,10 +179,12 @@ class Simulation(services.base.storage.BaseStorage):
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
         name = core.outputstorage.ConvertName(id).yaml
+        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
                               message=message, committer=committer, do_commit=do_commit)
+        self.memsorted.update('modifytime', id)
 
     def search(self, keyword):
         results = set()
@@ -190,6 +202,21 @@ class Simulation(services.base.storage.BaseStorage):
             id = core.outputstorage.ConvertName(filename).base
             results.add(id)
         return results
+
+    def search_key(self, key, value, ids=None):
+        if ids is None:
+            ids = self.ids
+        formatted_value = value.__repr__().replace('u', '', 1).replace('\'', '')
+        result = list()
+        for id in ids:
+            info = self.getyaml(id)
+            searched = info[key]
+            if formatted_value in searched.__repr__():
+                result.append(id)
+        return result
+
+    def sorted_ids(self, key, ids=None, reverse=True):
+        return self.memsorted.sorted_ids(key, ids=ids, reverse=reverse)
 
     @property
     def ids(self):

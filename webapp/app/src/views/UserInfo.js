@@ -1,20 +1,26 @@
 'use strict';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import Viewport from '../components/viewport';
-import Header from '../components/header';
+
+import Viewport from 'components/viewport';
+import Header from 'components/header';
 import CommonNavigation from './CommonNavigation';
-import ShowCard from '../components/show-card';
-import Container from '../components/container';
-import SiderMenu from '../components/sider-menu';
-import Content from '../components/content';
+import ShowCard from 'components/show-card';
+import Container from 'components/container';
+import SiderMenu from 'components/sider-menu';
+import Content from 'components/content';
+
 import { message, Popconfirm } from 'antd';
-import { getBookmark, deleteBookmark } from '../request/bookmark';
-import { resetPassword } from '../request/password';
-import { signOut } from '../request/sign';
-import { URL } from '../config/url';
-import { getMenu, getCurrentActive } from '../utils/sider-menu-list';
-import History from '../utils/history';
+
+import { getBookmark, deleteBookmark } from 'request/bookmark';
+import { resetPassword } from 'request/password';
+import { signOut } from 'request/sign';
+
+import { URL } from 'URL';
+
+import { getMenu, getCurrentActive } from 'utils/sider-menu-list';
+import History from 'utils/history';
+
 import './user-info.less';
 
 export default class UserInfo extends Component {

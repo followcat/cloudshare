@@ -1,10 +1,11 @@
 'use strict';
 import React, { Component } from 'react';
 
-import TablePlus from '../../../components/table-plus';
+import TablePlus from 'components/table-plus';
 import EditJobDescriptionForm from './EditJobDescriptionForm';
 import CreateNewJobDescription from './CreateNewJobDescription';
 import Status from './Status';
+import Operation from './Operation';
 
 import { message } from 'antd';
 
@@ -15,11 +16,10 @@ import {
   getJobDescription,
   updateJobDescription,
   createJobDescription
-} from '../../../request/jobdescription';
-import { getCustomerList } from '../../../request/company';
-import { URL } from '../../../config/url';
+} from 'request/jobdescription';
+import { getCustomerList } from 'request/company';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
@@ -83,7 +83,8 @@ class JobDescription extends Component {
     const params = {
       jd_id: fieldValues.id,
       description: fieldValues.description,
-      status: fieldValues.status
+      status: fieldValues.status,
+      commentary: fieldValues.commentary
     };
 
     updateJobDescription(params, (json) => {
@@ -219,9 +220,21 @@ class JobDescription extends Component {
 
   // 获取渲染扩展JD展开行
   getExpandedRowRender(record) {
-    return record.description.split('\n').map((item, index) => {
-      return <p key={index}>{item}</p>;
-    });
+    return (
+      <div>
+        <div>
+          {record.description.split('\n').map((item, index) => { return <p key={index}>{item}</p>})}
+        </div>
+        <div className="commentary-box">
+          <label>{`${language.COMMENTARY}：`}</label>
+          {record.commentary && record.commentary.split('\n').map((item, index) => {
+            return (
+              <p key={index}>{item}</p>
+            );
+          })}
+        </div>
+      </div>
+    );
   }
 
   // 获取职位描述组件toolbar所要渲染组件
@@ -306,10 +319,10 @@ class JobDescription extends Component {
       key: 'operation',
       width: '10%',
       render: (record) => (
-        <ul>
-          <li><a href={URL.getFastMatching(record.id)}>{language.MATCH_ACTION}</a></li>
-          <li><a href="javascript: void(0);" onClick={() => this.handleEditClick(record)}>{language.EDIT}</a></li>
-        </ul>
+        <Operation 
+          record={record}
+          onEdit={this.handleEditClick}
+        />
       )
     }];
 

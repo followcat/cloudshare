@@ -124,12 +124,28 @@ class Project(services.base.service.Service):
         outputs.extend(self.company.compare_excel(stream, committer))
         return outputs
 
-    def company_add_excel(self, items):
+    def company_add_excel(self, items, committer):
+        results = dict()
+        repo_result = set()
+        project_result = set()
         for item in items:
-            if item[0] == 'add':
-                self.corepo.add(*item[1])
-            elif item[0] == 'followup':
-                self.company.updateinfo(*item[1])
+            yamlname = core.outputstorage.ConvertName(item[1]).yaml
+            if item[0] == 'companyadd':
+                baseobj = core.basedata.DataObject(*item[2][:2])
+                repo_result.add(yamlname)
+                result = self.corepo.add(baseobj, committer=item[2][-1], do_commit=False)
+            elif item[0] == 'projectadd':
+                baseobj = core.basedata.DataObject(*item[2][:2])
+                project_result.add(self.company.ids_file)
+                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+                result = self.company.add(baseobj, committer=item[2][-1], do_commit=False)
+            elif item[0] == 'listadd':
+                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+                result = self.company.updateinfo(*item[2], do_commit=False)
+            results[item[1]] = result
+        self.corepo.interface.do_commit(list(repo_result), committer=committer)
+        self.company.interface.do_commit(list(project_result), committer=committer)
+        return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
@@ -148,15 +164,18 @@ class Project(services.base.service.Service):
     def jd_get(self, hex_id):
         return self.jobdescription.get(hex_id)
 
-    def jd_add(self, company, name, description, committer, status=None):
+    def jd_add(self, company, name, description, commentary, committer,
+                status=None):
         try:
             self.company_get(company)
         except IOError:
             return False
-        return self.jobdescription.add(company, name, description, committer, status)
+        return self.jobdescription.add(company, name, description, committer,
+                                        status, commentary)
 
-    def jd_modify(self, hex_id, description, status, committer):
-        return self.jobdescription.modify(hex_id, description, status, committer)
+    def jd_modify(self, hex_id, description, status, commentary, committer):
+        return self.jobdescription.modify(hex_id, description, status,
+                                            commentary, committer)
 
     def jd_search(self, keyword):
         return self.jobdescription.search(keyword)

@@ -24,12 +24,14 @@ def initialize(app):
 
     api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyAllAPI, '/api/companyall', endpoint = 'companyall')
+    api.add_resource(AddedCompanyListAPI, '/api/addedcompanylist', endpoint = 'adddedcompanylist')
     api.add_resource(CompanyUploadExcelAPI, '/api/couploadexcel',
                      endpoint = 'couploadexcel')
     api.add_resource(CompanyConfirmExcelAPI, '/api/coconfirmexcel',
                      endpoint = 'coconfirmexcel')
     api.add_resource(CustomerListAPI, '/api/customerlist', endpoint = 'customerlist')
     api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
+    api.add_resource(SearchCObyKeyAPI, '/api/searchcobykey', endpoint = 'searchcobykey')
     api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
     api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate',
                      endpoint = 'companyinfoupdate')

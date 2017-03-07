@@ -1,15 +1,15 @@
 'use strict';
 import React, { Component } from 'react';
 import { message } from 'antd';
-import Home from '../components/index/Home';
-import HomeMain from '../components/index/HomeMain';
-import SignIn from '../components/signin';
-import Header from '../components/header';
-import Feature from '../components/feature';
-import StorageUtil from '../utils/storage';
-import { signIn } from '../request/sign';
-import { getFeature } from '../request/feature';
-import { getProject } from '../request/project';
+import Home from 'components/index/Home';
+import HomeMain from 'components/index/HomeMain';
+import SignIn from 'components/signin';
+import Header from 'components/header';
+import Feature from 'components/feature';
+import StorageUtil from 'utils/storage';
+import { signIn } from 'request/sign';
+import { getFeature } from 'request/feature';
+import { getProject } from 'request/project';
 
 export default class Index extends Component {
   constructor() {

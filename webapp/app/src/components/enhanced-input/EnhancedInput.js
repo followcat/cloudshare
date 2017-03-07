@@ -15,6 +15,7 @@ class EnhancedInput extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleFocusBlur = this.handleFocusBlur.bind(this);
     this.handleBtnClick = this.handleBtnClick.bind(this);
+    this.handlekeyPress = this.handlekeyPress.bind(this);
   }
 
   handleInputChange(e) {
@@ -40,6 +41,18 @@ class EnhancedInput extends Component {
       } else {
         props.onClick(this.state.value);
       }
+
+      if (props.resettable) {
+        this.setState({
+          value: ''
+        });
+      }
+    }
+  }
+
+  handlekeyPress(e) {
+    if (e.key === 'Enter') {
+      this.handleBtnClick();
     }
   }
 
@@ -67,13 +80,15 @@ class EnhancedInput extends Component {
             onChange={this.handleInputChange}
             onFocus={this.handleFocusBlur}
             onBlur={this.handleFocusBlur}
+            onKeyPress={this.handlekeyPress}
             onPressEnter={this.handleSearch}
+            size={props.size || 'default'}
           />
           <div className="ant-input-group-wrap">
             <Button
               icon={props.type}
               className={btnCls}
-              size={props.btnSize}
+              size={props.size || 'default'}
               onClick={this.handleBtnClick}
             />
           </div>
@@ -86,7 +101,8 @@ class EnhancedInput extends Component {
 EnhancedInput.defaultProps = {
   type: 'search',
   placeholder: '',
-  onClick() {}
+  onClick() {},
+  resettable: false,
 };
 
 EnhancedInput.propTypes = {
@@ -96,6 +112,7 @@ EnhancedInput.propTypes = {
   dataIndex: PropTypes.string,
   btnSize: PropTypes.string,
   onClick: PropTypes.func,
+  resettable: PropTypes.bool
 };
 
 export default EnhancedInput;

@@ -1,12 +1,13 @@
 'use strict';
-const path = require('path');
-const fs = require('fs');
-
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const webpack = require('webpack');
 const merge = require('webpack-merge');
+const path = require('path');
 
-const config = require('../config');
+const getEntryFile = require('./config/entry-file');
+const folderPath = require('./config/folder-path');
 const theme = require('../cloudshare-theme-default');
+
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const development = require('./dev.config');
 const production = require('./prod.config');
@@ -15,88 +16,62 @@ const TARGET = process.env.npm_lifecycle_event;
 
 process.env.BABEL_ENV = TARGET;
 
-const getEntry = function() {
-  let entryPath = path.resolve(config.PATHS.SRC_PATH, 'entry');
-  let dirs = fs.readdirSync(entryPath);
-  let matchs = [], files = {};
-  dirs.forEach(function(item) {
-    matchs = item.match(/(.+)\.entry\.js$/);
-    if (matchs) {
-      files[matchs[1]] = path.resolve(config.PATHS.SRC_PATH, 'entry', item);
-    }
-  });
-  return files;
-};
-
 let webpackConfig = {
-  entry: getEntry(),
-
-  // output: {},
+  entry: getEntryFile(),
 
   resolve: {
-    extensions: ['', '.js', '.jsx'],
+    extensions: ['.js', '.jsx'],
+    alias: {
+      'components': path.resolve(folderPath.PATHS.SRC_PATH, 'components/'),
+      'views': path.resolve(folderPath.PATHS.SRC_PATH, 'views/'),
+      'utils': path.resolve(folderPath.PATHS.SRC_PATH, 'utils/'),
+      'request': path.resolve(folderPath.PATHS.SRC_PATH, 'request/'),
+      'config': path.resolve(folderPath.PATHS.SRC_PATH, 'config/'),
+      'API': path.resolve(folderPath.PATHS.SRC_PATH, 'config/api.js'),
+      'URL': path.resolve(folderPath.PATHS.SRC_PATH, 'config/url.js')
+    }
   },
 
   module: {
-    loaders: [
-      {
-        test: /\.js|jsx$/,
-        exclude: /node_modules/,
-        loaders: ['react-hot', 'babel'],
-        include: config.PATHS.SRC_PATH,
-      },
-      {
-        test(filePath) {
-          return /\.css$/.test(filePath) && !/\.module\.css$/.test(filePath);
-        },
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          'css-loader?sourceMap&-restructuring!' +
-          'postcss-loader'
-        ),
-      },
-      {
-        test: /\.module\.css$/,
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          'css-loader?sourceMap&-restructuring&modules&localIdentName=[local]___[hash:base64:5]!' +
-          'postcss-loader'
-        ),
-      },
-      {
-        test(filePath) {
-          return /\.less$/.test(filePath) && !/\.module\.less$/.test(filePath);
-        },
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          'css-loader?sourceMap!' +
-          'postcss-loader!' +
-          `less-loader?{"sourceMap":true,"modifyVars":${JSON.stringify(theme)}}`
-        ),
-      },
-      {
-        test: /\.module\.less$/,
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          'css-loader?sourceMap&modules&localIdentName=[local]___[hash:base64:5]!!' +
-          'postcss-loader!' +
-          `less-loader?{"sourceMap":true,"modifyVars":${JSON.stringify(theme)}}`
-        ),
-      },
-      {
-        test: /\.(png|jpg)$/,
-        loader: 'url?limit=40000',
-      },
-    ],
+    rules: [{
+      test: /\.js|jsx$/,
+      exclude: /node_modules/,
+      use: ['babel-loader'],
+      include: folderPath.PATHS.SRC_PATH,
+    }, {
+      test: '/\.css$/',
+      exclude: /node_modules/,
+      loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'postcss-loader']
+      })
+    }, {
+      test: /\.less$/i,
+      loader: ExtractTextPlugin.extract({
+        fallback: 'style-loader',
+        use: ['css-loader', 'postcss-loader' ,`less-loader?{"modifyVars":${JSON.stringify(theme)}}`]
+      })
+    }, {
+      test: /\.(png|jpg)$/,
+      exclude: /node_modules/,
+      use: 'url-loader?limit=40000',
+    }]
   },
-
-  postcss: [require('autoprefixer')],
-
+  
+  plugins: [
+    // new webpack.DllReferencePlugin({
+    //   context: __dirname,
+    //   manifest: require('../lib/vendor-manifest.json')
+    // }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'commons'
+    })
+  ]
 };
 
 
 // module.exports = webpackConfig;
-if (TARGET === 'start' || !TARGET) {
+if (TARGET === 'dev' || !TARGET) {
   module.exports = merge(development, webpackConfig);
 }
 

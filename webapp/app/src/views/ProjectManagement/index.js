@@ -3,12 +3,16 @@ import './index.less';
 
 import Layout from './component/Layout';
 import JobDescription from './component/JobDescription';
-import OwnCustomer from './component/OwnCustomer';
-import DevelopmentalCustomer from './component/DevelopmentalCustomer';
+import Customer from './component/Customer';
+import Company from './component/Company';
+import CompanyList from './component/CompanyList';
+import CompanyUploader from './component/CompanyUploader';
 
 export {
   Layout,
   JobDescription,
-  OwnCustomer,
-  DevelopmentalCustomer
+  Customer,
+  Company,
+  CompanyList,
+  CompanyUploader
 };

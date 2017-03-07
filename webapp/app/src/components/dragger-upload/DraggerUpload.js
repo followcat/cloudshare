@@ -19,6 +19,7 @@ class DraggerUpload extends Component {
           onChange={props.onChange}
           onRemove={props.onRemove}
           disabled={props.disabled}
+          beforeUpload={props.beforeUpload}
         >
           <p className="ant-upload-drag-icon">
             <Icon type="inbox" />
@@ -47,6 +48,7 @@ DraggerUpload.propTypes = {
   headers: PropTypes.object,
   multiple: PropTypes.bool,
   accept: PropTypes.string,
+  beforeUpload: PropTypes.func,
   onChange: PropTypes.func,
   onRemove: PropTypes.func,
   disabled: PropTypes.bool,

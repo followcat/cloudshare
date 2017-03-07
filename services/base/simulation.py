@@ -93,6 +93,7 @@ class Simulation(services.base.storage.BaseStorage):
             self.interface.add_files(filenames, filedatas,
                                      message='Add new data %s.'%id,
                                      committer=committer, do_commit=do_commit)
+            self.memsorted.update('modifytime', id)
             result = True
         return result
 
@@ -183,6 +184,7 @@ class Simulation(services.base.storage.BaseStorage):
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
                               message=message, committer=committer, do_commit=do_commit)
+        self.memsorted.update('modifytime', id)
 
     def search(self, keyword):
         results = set()

@@ -7,6 +7,7 @@ import ujson
 import utils._yaml
 import utils.builtin
 import core.outputstorage
+import services.memsorted
 import services.base.storage
 
 
@@ -38,6 +39,7 @@ class Simulation(services.base.storage.BaseStorage):
         self._ids = None
         self.storage = storage
         self.yamlpath = self.YAML_DIR
+        self.memsorted = services.memsorted.MemerySorted(self)
         idsfile = os.path.join(path, Simulation.ids_file)
         if not os.path.exists(idsfile):
             dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
@@ -91,6 +93,7 @@ class Simulation(services.base.storage.BaseStorage):
             self.interface.add_files(filenames, filedatas,
                                      message='Add new data %s.'%id,
                                      committer=committer, do_commit=do_commit)
+            self.memsorted.update('modifytime', id)
             result = True
         return result
 
@@ -181,6 +184,7 @@ class Simulation(services.base.storage.BaseStorage):
                              allow_unicode=True, default_flow_style=False)
         self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
                               message=message, committer=committer, do_commit=do_commit)
+        self.memsorted.update('modifytime', id)
 
     def search(self, keyword):
         results = set()
@@ -212,19 +216,7 @@ class Simulation(services.base.storage.BaseStorage):
         return result
 
     def sorted_ids(self, key, ids=None, reverse=True):
-        if ids is None:
-            ids = self.ids
-        sortinfo = list()
-        nokeyinfo = list()
-        for id in ids:
-            info = self.getinfo(id)
-            info['id'] = id
-            if key not in info:
-                nokeyinfo.append(info)
-            else:
-                sortinfo.append(info)
-        return map(lambda k: k['id'],
-                   sorted(sortinfo, key=lambda k: k[key], reverse=reverse)+nokeyinfo)
+        return self.memsorted.sorted_ids(key, ids=ids, reverse=reverse)
 
     @property
     def ids(self):

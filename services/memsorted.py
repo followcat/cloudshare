@@ -20,6 +20,8 @@ class MemerySorted(object):
                    sorted(self.memdict[key].items(), key=lambda k: k[1], reverse=reverse))
 
     def update(self, key, id):
+        if key not in self.memdict:
+            self.memdict[key] = {}
         info = self.service.getinfo(id)
         if key not in info:
             self.memdict[key][id] = 0

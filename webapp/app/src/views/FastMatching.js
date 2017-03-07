@@ -35,6 +35,7 @@ export default class FastMatching extends Component {
       siderbarClosable: false,
       siderbarVisible: false,
       textarea: false,
+      appendCommentary: false,
       postData: {},
       postAPI: '',
       selection: Immutable.List(Immutable.Map()),
@@ -52,7 +53,7 @@ export default class FastMatching extends Component {
    * [初始加载classify列表]
    * @return {[type]} [description]
    */
-  loadClassifyData(id = null, postAPI = null) {
+  loadClassifyData(id = null, postAPI = null, appendCommentary = false) {
     fetch(`/api/classify`, {
       method: 'POST',
       headers: {
@@ -68,7 +69,7 @@ export default class FastMatching extends Component {
           classify: json.data,
         });
         if (id && postAPI) {
-          this.loadResultData(id, postAPI, json.data);
+          this.loadResultData(id, postAPI, json.data, appendCommentary);
         }
       }
     })
@@ -89,8 +90,8 @@ export default class FastMatching extends Component {
    * @param  {[string]} id [JD id]
    * @return {[type]}    [description]
    */
-  loadResultData(id, postAPI, classify) {
-    let postData = { id: id, uses: classify };
+  loadResultData(id, postAPI, classify, appendCommentary) {
+    let postData = { id: id, uses: classify, appendcomment: appendCommentary };
     this.setState({
       visible: true,
       spinning: true,
@@ -128,23 +129,28 @@ export default class FastMatching extends Component {
           postData = {};
 
     for (let key in value) {
-      if (key !== 'uses' && key !== 'doc') {
+      if (key !== 'uses' && key !== 'doc' && key !== 'appendcomment') {
         filterData[key] = value[key] instanceof Array ? value[key] : value[key] ? value[key].split(' ') : [];
+      } else if (key === 'appendcomment') {
+        this.setState({
+          appendcomment: value[key]
+        });
+        postData = { appendcomment: value[key] };
       }
     }
 
     if (value.doc) {
-      postData = {
+      postData = Object.assign({}, postData, {
         doc: value.doc,
         uses: value.uses,
         filterdict: filterData,
-      };
+      });
     } else {
-      postData = {
+      postData = Object.assign({}, postData, {
         id: this.state.id,
         uses: value.uses,
         filterdict: filterData,
-      };
+      });
     }
 
     this.setState({
@@ -187,7 +193,7 @@ export default class FastMatching extends Component {
       spinning: true,
       searchResultDataSource: [],
     });
-
+    console.log(this.state.postData);
     fetch(this.state.postAPI, {
       method: 'POST',
       credentials: 'include',
@@ -231,8 +237,9 @@ export default class FastMatching extends Component {
 
   componentDidMount() {
     const params = queryString(window.location.href),
-          jd_id = params.jd_id ? params.jd_id : null,
-          cv_id = params.cv_id ? params.cv_id : null;
+          jd_id = params.jd_id || null,
+          cv_id = params.cv_id || null,
+          append_commentary = params.init_append_commentary === 'true' ? true : false;
     let postAPI;
 
     // this.loadClassifyData();
@@ -244,8 +251,9 @@ export default class FastMatching extends Component {
         id: jd_id,
         postAPI: postAPI,
         siderbarVisible: true,
+        appendCommentary: append_commentary
       });
-      this.loadClassifyData(jd_id, postAPI);
+      this.loadClassifyData(jd_id, postAPI, append_commentary);
     } else if (cv_id) {
       postAPI = API.LSI_BY_CV_ID_API;
       this.setState({
@@ -272,6 +280,7 @@ export default class FastMatching extends Component {
           classify={this.state.classify}
           industry={this.state.industry}
           visible={this.state.visible}
+          appendCommentary={this.state.appendCommentary}
           total={this.state.total}
           onSearch={this.handleSearch}
         />

@@ -164,15 +164,18 @@ class Project(services.base.service.Service):
     def jd_get(self, hex_id):
         return self.jobdescription.get(hex_id)
 
-    def jd_add(self, company, name, description, committer, status=None):
+    def jd_add(self, company, name, description, commentary, committer,
+                status=None):
         try:
             self.company_get(company)
         except IOError:
             return False
-        return self.jobdescription.add(company, name, description, committer, status)
+        return self.jobdescription.add(company, name, description, committer,
+                                        status, commentary)
 
-    def jd_modify(self, hex_id, description, status, committer):
-        return self.jobdescription.modify(hex_id, description, status, committer)
+    def jd_modify(self, hex_id, description, status, commentary, committer):
+        return self.jobdescription.modify(hex_id, description, status,
+                                            commentary, committer)
 
     def jd_search(self, keyword):
         return self.jobdescription.search(keyword)

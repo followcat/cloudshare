@@ -143,7 +143,7 @@ class FilterForm extends Component {
     };
 
     return (
-      <Form horizontal>
+      <Form layout="horizontal">
         {textarea ?
           <Row>
             <Col>
@@ -273,7 +273,7 @@ class FilterForm extends Component {
 
 FilterForm.propTypes = {
   textarea: PropTypes.bool,
-  industry: PropTypes.array,
+  industry: PropTypes.objectOf(PropTypes.array),
   classify: PropTypes.array,
   form: PropTypes.object,
   onSearch: PropTypes.func

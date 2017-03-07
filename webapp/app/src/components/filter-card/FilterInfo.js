@@ -11,7 +11,7 @@ class FilterInfo extends Component {
     const style = this.props.visible ? { display: 'block' } : { display: 'none' };
     return (
       <div style={style}>
-        <p>总共有<em>{this.props.total}</em>相关结果。</p>
+        <p>总共有 <em>{this.props.total}</em> 条相关结果。</p>
       </div>
     );
   }

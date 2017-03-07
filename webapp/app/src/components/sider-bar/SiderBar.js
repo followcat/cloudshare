@@ -1,19 +1,17 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Icon, Card, Form, Button, Modal } from 'antd';
+import { Icon, Card } from 'antd';
 
-import Competency from '../common/analyse/Competency';
-import Experience from '../common/analyse/Experience';
-import HistorySelection from '../common/analyse/HistorySelection';
-import RadarChart from '../common/analyse/RadarChart';
-import Tag from '../common/Tag';
+import Competency from 'components/analyse-charts/Competency';
+import Experience from 'components/analyse-charts/Experience';
+import HistorySelection from 'components/analyse-charts/HistorySelection';
+import RadarChart from 'components/analyse-charts/RadarChart';
+import Tag from 'components/tag';
+
+import getStyle from 'utils/get-style';
 
 import classNames from 'classnames';
-
-function getStyle(obj) {
-  return obj.currentStyle ? obj.currentStyle : window.getComputedStyle(obj, null);
-}
 
 let timer = null;
 
@@ -21,7 +19,7 @@ function moved(element, t, target) {
   clearInterval(timer);
 
   timer = setInterval(() => {
-    let right = parseInt(getStyle(element).right),
+    let right = parseInt(getStyle(element, 'right')),
         speed = (target - right)/5;
 
     speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
@@ -34,34 +32,27 @@ function moved(element, t, target) {
   }, t);
 }
 
-export default class SideBar extends Component {
-
-  constructor(props) {
-    super(props);
+class SiderBar extends Component {
+  constructor() {
+    super();
     this.state = {
-      visible: false,
+      panelVisible: false
     };
-    this.handleSidebarBtnClick = this.handleSidebarBtnClick.bind(this);
+    this.handleSiderbarBtnClick = this.handleSiderbarBtnClick.bind(this);
     this.handleTagClose = this.handleTagClose.bind(this);
     this.renderSelectionDOM = this.renderSelectionDOM.bind(this);
   }
 
-  handleSidebarBtnClick() {
-    const visible = this.state.visible;
-
+  handleSiderbarBtnClick() {
+    const { panelVisible } = this.state;
     let t = 50,
-        target = visible ? -200 : 0,
-        element = document.getElementById('sidebar');
+        target = panelVisible ? -200 : 0,
+        element = this.refs.siderbar;
+    
+    this.setState({
+      panelVisible: !panelVisible
+    });
 
-    if (visible) {
-      this.setState({
-        visible: false,
-      });
-    } else {
-      this.setState({
-        visible: true,
-      });
-    }
     moved(element, t, target);
   }
 
@@ -70,10 +61,6 @@ export default class SideBar extends Component {
       id: id,
       name: name,
     });
-  }
-
-  shouldUpdateComponent(nextProps, nextState) {
-    return nextProps.visible === nextState.visible;
   }
 
   renderSelectionDOM() {
@@ -90,51 +77,59 @@ export default class SideBar extends Component {
   }
 
   render() {
-    const chartsViewId = 'chartsView';
+    const {
+            visible,
+            closable,
+            dataSource,
+            postData,
+            selection
+          } = this.props,
+          { panelVisible } = this.state,
+          chartsViewId = 'chartsView';
 
     const classSet = classNames({
-      'sidebar': true,
-      'showed': this.props.visible === true,
-      'hidden': this.props.visible === false,
+      'siderbar': true,
+      'showed': visible,
+      'hidden': !visible,
     });
 
-    if (this.props.closable) {
+    if (closable) {
       return null;
     } else {
       return (
-        <div className={classSet} id="sidebar">
-          <div className="sidebar-button" onClick={this.handleSidebarBtnClick}>
-            {this.state.visible ? <Icon type="caret-right" /> : <Icon type="caret-left" />}
+        <div className={classSet} ref="siderbar">
+          <div className="siderbar-button" onClick={this.handleSiderbarBtnClick}>
+            {panelVisible ? <Icon type="caret-right" /> : <Icon type="caret-left" />}
           </div>
-          <Card className="sidebar-container">
+          <Card className="siderbar-container">
             <div className="analyse">
               <div className="title">
-                <h3>Analyse</h3>
+                <h3>分析</h3>
               </div>
               <Competency
                 domId={chartsViewId}
-                dataSource={this.props.dataSource}
+                dataSource={dataSource}
               />
-              <Experience 
+              <Experience
                 domId={chartsViewId}
-                dataSource={this.props.dataSource}
+                dataSource={dataSource}
               />
             </div>
             <div className="radar">
               <div className="title">
-                <h3>Draw Charts</h3>
+                <h3>雷达图</h3>
               </div>
               <HistorySelection
-                selection={this.props.selection}
+                selection={selection}
                 onToggleSelection={this.props.onToggleSelection}
               />
               <RadarChart 
-                selection={this.props.selection}
-                postData={this.props.postData}
+                selection={selection}
+                postData={postData}
               />
               <div className="selection-box">
                 <div className="selection-title">
-                  <h4>Selection</h4>
+                  <h4>选中候选人列表</h4>
                 </div>
                 <div className="selection-container">
                   {this.renderSelectionDOM()}
@@ -148,10 +143,13 @@ export default class SideBar extends Component {
   }
 }
 
-SideBar.propTypes = {
+SiderBar.propTypes = {
   visible: PropTypes.bool,
+  closable: PropTypes.bool,
   dataSource: PropTypes.array,
   selection: PropTypes.array,
   postData: PropTypes.object,
   onToggleSelection: PropTypes.func,
-}
+};
+
+export default SiderBar;

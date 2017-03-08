@@ -17,7 +17,9 @@ class MemerySorted(object):
                 else:
                    self.memdict[key][id] = info[key]
         return map(lambda k: k[0],
-                   sorted(self.memdict[key].items(), key=lambda k: k[1], reverse=reverse))
+                   filter(lambda k: k[0] in ids,
+                          sorted(self.memdict[key].items(), key=lambda k: k[1],
+                                 reverse=reverse)))
 
     def update(self, key, id):
         if key not in self.memdict:

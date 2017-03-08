@@ -25,6 +25,7 @@ if __name__ == '__main__':
         data_backup_path = os.path.join(folder, 'data', backup_name)
         account_backup_path = os.path.join(folder, 'account', backup_name)
         medical_backup_path = os.path.join(folder, 'medical', backup_name)
+        company_backup_path = os.path.join(folder, 'company', backup_name)
         AI_backup_path = os.path.join(folder, 'AI', backup_name)
         BT_backup_path = os.path.join(folder, 'BT', backup_name)
         IA_backup_path = os.path.join(folder, 'IA', backup_name)

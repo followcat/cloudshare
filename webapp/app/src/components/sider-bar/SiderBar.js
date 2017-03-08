@@ -68,8 +68,8 @@ class SiderBar extends Component {
       return (
         <Tag
           key={index}
-          text={item.get('name') ? item.get('name') : item.get('id')}
-          onClick={() => this.handleTagClose(item.get('id'), item.get('name'))}
+          text={item.name || item.id}
+          onClick={() => this.handleTagClose(item.id, item.name)}
         />
       );
     });

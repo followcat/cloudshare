@@ -24,17 +24,17 @@ class HistorySelection extends Component {
     const historyStorage = History.read();
     let selectData = [];
 
-    historyStorage.forEach((item, index) => {
+    historyStorage.forEach(item => {
       selection.forEach((value) => {
-        if (item.id === value.get('id')) {
-          selectData.push(index);
+        if (item.id === value.id) {
+          selectData.push(value.id);
         }
       });
     });
     this.setState({
       visible: true,
       data: historyStorage,
-      selectedRowKeys: selectData,
+      selectedRowKeys: selectData
     });
   }
 
@@ -46,21 +46,25 @@ class HistorySelection extends Component {
 
   handleSelectChange(selectedRowKeys) {
     this.setState({
-      selectedRowKeys: selectedRowKeys,
+      selectedRowKeys: selectedRowKeys
     });
   }
 
   render() {
-    const { selectedRowKeys, visible, data } = this.state;
+    const {
+      selectedRowKeys,
+      visible,
+      data
+    } = this.state;
 
     const columns = [
       {
         title: '简历ID',
         dataIndex: 'id',
-        width: '30%',
+        width: '40%',
         key: 'id',
       }, {
-        title: '名字',
+        title: '候选人名字',
         dataIndex: 'name',
         width: '50%',
         key: 'name',
@@ -91,9 +95,10 @@ class HistorySelection extends Component {
             [<Button type="ghost" onClick={this.handleCancel}>取消</Button>]
           }
         >
-          <Table 
+          <Table
             columns={columns}
             dataSource={data}
+            rowKey="id"
             rowSelection={rowSelection}
             size="small"
           />

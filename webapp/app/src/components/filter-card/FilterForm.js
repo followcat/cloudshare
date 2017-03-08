@@ -149,7 +149,8 @@ class FilterForm extends Component {
             <Col>
               <FormItem
                 label="职位描述"
-                {...formItemLayout}
+                labelCol={{ span: 3 }}
+                 wrapperCol={{ span: 19 }}
               >
                 {getFieldDecorator('doc')(
                   <Input type="textarea" rows={1} />)}
@@ -279,4 +280,4 @@ FilterForm.propTypes = {
   onSearch: PropTypes.func
 };
 
-export default FilterForm = Form.create({})(FilterForm) ;
+export default FilterForm = Form.create({})(FilterForm);

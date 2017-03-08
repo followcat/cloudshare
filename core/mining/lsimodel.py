@@ -124,10 +124,10 @@ class LSImodel(object):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
             ujson.dump(self.names, f)
-        if not self.corpus:
+        if self.corpus:
             with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
                 ujson.dump(self.corpus, f)
-        if not self.texts:
+        if self.texts:
             with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
                 ujson.dump(self.texts, f)
         self.lsi.save(os.path.join(self.path, self.model_save_name))

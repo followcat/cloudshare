@@ -88,7 +88,7 @@ class SearchCVbyTextAPI(Resource):
         yaml_results = self.svc_mult_cv.search_yaml(text, project)
         results.update(yaml_results)
         count = 20
-        datas, pages = self.paginate(list(results), cur_page, count)
+        datas, pages = self.paginate(list(results), cur_page, count, project)
         return {
             'code': 200,
             'data': {
@@ -99,7 +99,7 @@ class SearchCVbyTextAPI(Resource):
             }
         }
 
-    def paginate(self, results, cur_page, eve_count):
+    def paginate(self, results, cur_page, eve_count, project):
         if not cur_page:
             cur_page = 1
         sum = len(results)
@@ -115,7 +115,7 @@ class SearchCVbyTextAPI(Resource):
             else:
                 continue
             try:
-                yaml_info = self.svc_mult_cv.getyaml(id)
+                yaml_info = self.svc_mult_cv.getyaml(id, projectname=project)
             except IOError:
                 ids.remove(id)
                 continue

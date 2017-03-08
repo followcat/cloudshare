@@ -1,16 +1,9 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import { Icon } from 'antd';
 
-import './Tag.less';
-
-export default class Tag extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-
+class Tag extends Component {
   render() {
     return (
       <div className="cs-tag">
@@ -20,3 +13,10 @@ export default class Tag extends Component {
     );
   }
 }
+
+Tag.propTypes = {
+  text: PropTypes.string,
+  onClick: PropTypes.func
+};
+
+export default Tag;

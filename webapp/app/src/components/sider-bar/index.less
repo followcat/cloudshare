@@ -1,26 +1,15 @@
-@import '../components/global.less';
+@import '../default.less';
+@siderbarPrefixCls: siderbar;
 
-html, body {
-  height: auto;
-}
-
-.cs-layout-top {
-  position: relative;
-}
-
-.pd-lr-30 {
-  padding-left: 30px;
-  padding-right: 30px;
-}
-
-.sidebar {
+.@{siderbarPrefixCls} {
   position: fixed;
   width: 200px;
   height: 100%;
   top: 0;
   right: -200px;
+  z-index: 999;
 
-  .sidebar-button {
+  &-button {
     width: 40px;
     height: 40px;
     background-color: #337ab7;
@@ -35,12 +24,12 @@ html, body {
     cursor: pointer;
   }
 
-  .sidebar-button i {
+  &-button i {
     color: #fff;
     font-size: 24px;
   }
 
-  .sidebar-container {
+  &-container {
     height: inherit;
 
     .analyse {
@@ -72,9 +61,10 @@ html, body {
   }
 }
 
-.classify-selection {
-  .ant-select-selection__rendered {
-    max-height: 32px;
-    overflow-y: scroll;
-  }
+.showed {
+  display: block;
+}
+
+.hidden {
+  display: none;
 }

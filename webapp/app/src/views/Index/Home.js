@@ -1,17 +1,21 @@
 'use strict';
 import React, { Component } from 'react';
-import { message } from 'antd';
-import Home from 'components/index/Home';
-import HomeMain from 'components/index/HomeMain';
+import { browserHistory } from 'react-router';
+
 import SignIn from 'components/signin';
 import Header from 'components/header';
 import Feature from 'components/feature';
-import StorageUtil from 'utils/storage';
-import { signIn } from 'request/sign';
+
+import { message } from 'antd';
+
 import { getFeature } from 'request/feature';
 import { getProject } from 'request/project';
 
-export default class Index extends Component {
+import StorageUtil from 'utils/storage';
+import { signIn } from 'request/sign';
+
+
+class Home extends Component {
   constructor() {
     super();
 
@@ -56,9 +60,9 @@ export default class Index extends Component {
           token: json.token,
           user: json.user
         });
-        location.href = json.redirect_url;
+        browserHistory.push(json.redirect_url);
       } else {
-        message.error(json.message);
+        message.error('用户名或密码错误！');
       }
     });
   }
@@ -85,26 +89,34 @@ export default class Index extends Component {
 
   render() {
     return (
-      <Home>
+      <div className="viewport">
         <Header logoMode="center">
           <Feature
             style={{ position: 'absolute', right: 0, top: 0 }}
+            text="更新日志"
+            title="更新日志"
             visible={this.state.visible}
             dataSource={this.state.dataSource}
             onClick={this.handleFeatureClick}
-            onOk={this.handleFeatureClose}
             onCancel={this.handleFeatureClose}
+            footer={null}
             wrapClassName="vertical-center-modal"
           />
         </Header>
-        <HomeMain>
-          <SignIn 
-            projects={this.state.projects}
-            wrapperCol={{ span: 14, offset: 9 }}
-            onSubmit={this.handleSignInSubmit}
-          />
-        </HomeMain>
-      </Home>
+        <div className="cs-container">
+          <div className="cs-container-center">
+            <SignIn
+              title="登入"
+              btnText="登入"
+              projects={this.state.projects}
+              wrapperCol={{ span: 14, offset: 9 }}
+              onSubmit={this.handleSignInSubmit}
+            />
+          </div>
+        </div>
+      </div>
     );
   }
 }
+
+export default Home;

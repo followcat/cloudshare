@@ -17,7 +17,7 @@
   "author": "kabessC",
   "license": "MIT",
   "dependencies": {
-    "antd": "^1.9.1",
+    "antd": "^2.7.3",
     "babel-plugin-transform-object-assign": "^6.8.0",
     "babel-polyfill": "^6.16.0",
     "classnames": "^2.2.5",
@@ -57,7 +57,7 @@
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.3.0",
+    "webpack-dev-server": "^2.4.1",
     "webpack-merge": "^2.4.0",
     "whatwg-fetch": "^1.0.0"
   }

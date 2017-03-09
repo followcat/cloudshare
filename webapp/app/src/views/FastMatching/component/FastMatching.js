@@ -42,39 +42,37 @@ class FastMatching extends Component {
   }
 
   componentDidMount() {
-    const params = queryString(window.location.href),
-          jd_id = params.jd_id ? params.jd_id : null,
-          cv_id = params.cv_id ? params.cv_id : null;
-    const { classify } = this.state;
+    const { classify } = this.state,
+          { location } = this.props;
     let postAPI;
 
     this.getIndustryDataSource();
     this.getClassifyDataSource();
     
-    if (jd_id) {
+    if (location.query.jd_id) {
       postAPI = API.LSI_BY_JD_ID_API;
 
       this.setState({
-        id: jd_id,
+        id: location.query.jd_id,
         postAPI: postAPI,
         siderbarVisible: true
       });
 
       this.getResultDataSource(postAPI, {
-        id: jd_id,
+        id: location.query.jd_id,
         uses: classify
       });
-    } else if (cv_id) {
+    } else if (location.query.cv_id) {
       postAPI = API.LSI_BY_CV_ID_API;
 
       this.setState({
-        id: cv_id,
+        id: location.query.cv_id,
         postAPI: postAPI,
         siderbarClosable: true
       });
 
       this.getResultDataSource(postAPI, {
-        id: cv_id,
+        id: location.query.cv_id,
         uses: classify
       });
     } else {

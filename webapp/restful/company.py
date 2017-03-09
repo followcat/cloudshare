@@ -17,13 +17,7 @@ class CompanyAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('name', location = 'json')
-        self.reqparse.add_argument('product', location = 'json')
         self.reqparse.add_argument('introduction', location = 'json')
-        self.reqparse.add_argument('conumber', location = 'json')
-        self.reqparse.add_argument('address', location = 'json')
-        self.reqparse.add_argument('email', location = 'json')
-        self.reqparse.add_argument('website', location = 'json')
-        self.reqparse.add_argument('district', location = 'json')
         super(CompanyAPI, self).__init__()
 
     def get(self, name):
@@ -177,7 +171,7 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('date', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('key', location = 'json')
-        self.reqparse.add_argument('value', location = 'json')
+        self.reqparse.add_argument('value', type=dict, location = 'json')
 
     def put(self):
         args = self.reqparse.parse_args()
@@ -239,6 +233,51 @@ class SearchCObyTextAPI(Resource):
         results = project.company.search(text)
         yaml_results = project.company.search_yaml(text)
         results.update(yaml_results)
+        sorted_results = project.company.sorted_ids('modifytime', ids=results)
+        datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
+        return {
+            'code': 200,
+            'data': datas,
+            'keyword': text,
+            'pages': pages,
+            'total': total
+        }
+
+    def paginate(self, svc_co, results, cur_page, eve_count):
+        if not cur_page:
+            cur_page = 1
+        total = len(results)
+        if total%eve_count != 0:
+            pages = total/eve_count + 1
+        else:
+            pages = total/eve_count
+        datas = []
+        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
+            datas.append(svc_co.getyaml(id))
+        return datas, pages, total
+
+
+class SearchCObyKeyAPI(Resource):
+
+    def __init__(self):
+        super(SearchCObyKeyAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
+        self.reqparse.add_argument('search_key', location = 'json')
+        self.reqparse.add_argument('search_text', location = 'json')
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        cur_page = args['current_page']
+        page_size = args['page_size']
+        key = args['search_key']
+        text = args['search_text']
+        projectname = args['project']
+        project = self.svc_mult_cv.getproject(projectname)
+        results = project.company.search_key(key, text)
         sorted_results = project.company.sorted_ids('modifytime', ids=results)
         datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
         return {

@@ -20,7 +20,7 @@ class Cell extends Component {
     this.state = {
       fieldProp: '',
       fieldValue: null,
-      editable: false,
+      editStatus: false,
       openable: false
     };
     this.handleClick = this.handleClick.bind(this);
@@ -46,7 +46,7 @@ class Cell extends Component {
     const { dataSource, dataIndex } = this.props;
 
     this.setState({
-      editable: true,
+      editStatus: true,
       fieldProp: dataIndex,
       fieldValue: dataSource[dataIndex] instanceof Array ? dataSource[dataIndex].content : dataSource[dataIndex]
     });
@@ -54,7 +54,7 @@ class Cell extends Component {
 
   handleCancelClick() {
     this.setState({
-      editable: false
+      editStatus: false
     });
   }
 
@@ -73,7 +73,7 @@ class Cell extends Component {
     }
 
     this.setState({
-      editable: false
+      editStatus: false
     });
   }
 
@@ -86,6 +86,10 @@ class Cell extends Component {
         fieldProp: dataIndex,
         fieldValue: fieldValue
       });
+
+      this.setState({
+        editStatus: false
+      });
     }
   }
 
@@ -95,13 +99,13 @@ class Cell extends Component {
     this.props.onRemove(dataSource.id, dataIndex, content, date);
 
     this.setState({
-      editable: false
+      editStatus: false
     });
   }
 
   getArrayDOMNormalRender() {
     const { dataSource, dataIndex } = this.props,
-          { openable } = this.state;
+          { openable, editStatus } = this.state;
     
     let text = '';
 
@@ -114,20 +118,20 @@ class Cell extends Component {
     });
 
     return (
-      <span
-        className={openable ? 'cell-item' : 'cell-item ommit'}
+      <div
+        className={openable && !editStatus ? '' : 'ommit'}
         title={text}
         onClick={this.handleOmmitClik}
       >
         {text || '无'}
-      </span>
+      </div>
     );
   }
 
   getArrayDOMEditingRender() {
     const { dataSource, dataIndex } = this.props;
     return (
-      <div className="cell-item">
+      <div>
         {dataSource[dataIndex].map((item, index) => {
            return (
             <Tag
@@ -161,62 +165,71 @@ class Cell extends Component {
   }
 
   getArrayDOMRender() {
-    const { editable } = this.state;
+    const { editable } = this.props,
+          { editStatus } = this.state;
 
-    return (
-      <div>
-        {editable ?
-          this.getArrayDOMEditingRender() :
-          this.getArrayDOMNormalRender()
-        }
-      </div>
-    );
+    if (editable) {
+      if (editStatus) {
+        return this.getArrayDOMEditingRender();
+      } else {
+        return this.getArrayDOMNormalRender();
+      }
+    } else {
+      return this.getArrayDOMNormalRender();
+    }
   }
 
   getStringDOMRender() {
-    const { dataSource, dataIndex } = this.props,
-          { editable, openable, fieldValue } = this.state;
+    const { dataSource, dataIndex, editable } = this.props,
+          { editStatus, openable, fieldValue } = this.state;
 
-    const cellCls = openable ? 'cell-item' : 'cell-item ommit';
+    const cellCls = openable && !editStatus ? '' : 'ommit';
 
-    return (
-      <div className={cellCls}>
-        {!editable ?
-          dataSource[dataIndex] || '无' :
-          <div className="cs-item-row-content">
-            <div className="cs-input-group">
-              <Input
-                value={fieldValue}
-                size="small"
-                onChange={this.handleChange}
-              />
-              <div className="cs-button-group">
-                <Button
-                  type="primary"
+    if (editable) {
+      return (
+        <div className={cellCls}>
+          {!editStatus ?
+            dataSource[dataIndex] || '无' :
+            <div className="cs-item-row-content">
+              <div className="cs-input-group">
+                <Input
+                  value={fieldValue}
                   size="small"
-                  onClick={this.handleSaveClick}
-                >
-                  {language.SAVE}
-                </Button>
-                <Button
-                  size="small"
-                  onClick={this.handleCancelClick}
-                >
-                  {language.CANCEL}
-                </Button>
+                  onChange={this.handleChange}
+                />
+                <div className="cs-button-group">
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={this.handleSaveClick}
+                  >
+                    {language.SAVE}
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={this.handleCancelClick}
+                  >
+                    {language.CANCEL}
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        }
-      </div>
-    );
+          }
+        </div>
+      );
+    } else {
+      return (
+        <div className={cellCls}>{dataSource[dataIndex] || '无'}</div>
+      );
+    }
   }
 
   render() {
-    const { dataSource, dataIndex, span } = this.props;
+    const { dataSource, dataIndex, width } = this.props;
     return (
-      <Col
-        span={span}
+      <div
+        style={{ width: width }}
+        className="cell-item"
         onClick={this.handleClick}
         onDoubleClick={this.handleDoubleClick}
       >
@@ -224,19 +237,21 @@ class Cell extends Component {
           this.getArrayDOMRender() :
           this.getStringDOMRender()
         }
-      </Col>
+      </div>
     );
   }
 }
 
 Cell.defaultProps = {
-  span: 24,
+  editable: true,
+  width: '87%',
   onSave() {},
   onRemove() {}
 };
 
 Cell.propTypes = {
-  span: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  editable: PropTypes.bool,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   dataIndex: PropTypes.string,
   dataSource: PropTypes.object,
   onSave: PropTypes.func,

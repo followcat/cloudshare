@@ -31,8 +31,12 @@ const language = websiteText.zhCN;
 let timer = null;
 
 const extractValueToString = (key, array) => {
-  return array.map(v => v[key])
+  if (array instanceof Array) {
+    return array.map(v => v[key])
               .join(', ');
+  }
+
+  return '';
 };
 
 class Customer extends Component {
@@ -123,7 +127,7 @@ class Customer extends Component {
 
     this.setState({ value });
 
-    let object = find(companyDataSource, (item) => item.company_name === value)
+    let object = find(companyDataSource, (item) => item.company_name === value);
     if (object) {
       this.setState({
         id: object.id
@@ -255,7 +259,7 @@ class Customer extends Component {
       key: 'progress',
       width: '12%',
       render: (text, record) => {
-        return record.progress.length > 0 ?
+        return record.progress && record.progress.length > 0 ?
             <span>{record.progress[0].content}</span> :
             null;
       }

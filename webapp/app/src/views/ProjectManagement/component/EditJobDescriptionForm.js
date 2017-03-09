@@ -97,6 +97,18 @@ class EditJobDescriptionForm extends Component {
           </FormItem>
           <FormItem
             {...formItemLayout}
+            label={language.COMMENTARY}
+          >
+            <Input
+              {...getFieldProps('commentary', {
+                initialValue: props.record.commentary,
+              })}
+              type="textarea"
+              rows="2"
+            />
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
             label={language.CURRENT_STATUS}
           >
             <Select {...getFieldProps('status', { initialValue: props.record.status })}>

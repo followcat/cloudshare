@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react';
 
 import CompanyInfo from './CompanyInfo';
 import CreateNewCompany from './CreateNewCompany';
-import EnhancedInput from 'components/enhanced-input';
 import ButtonWithModal from 'components/button-with-modal';
 import HeaderTitle from 'components/header-title';
 
@@ -14,7 +13,9 @@ import {
   Spin,
   Upload,
   Button,
-  Icon
+  Icon,
+  Select,
+  Input
 } from 'antd';
 
 import {
@@ -30,6 +31,26 @@ import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
+const options = [{
+  key: 'name',
+  text: language.COMPANY_NAME
+}, {
+  key: 'responsible',
+  text: language.RESPONSIBLE
+}, {
+  key: 'priority',
+  text: language.PRIORITY
+}, {
+  key: 'clientcontact',
+  text: language.CONTACT
+}, {
+  key: 'progress',
+  text: language.VISITING_SITUATION
+}, {
+  key: 'district',
+  text: language.DISTRICT
+}];
+
 class CompanyList extends Component {
   constructor() {
     super();
@@ -37,21 +58,24 @@ class CompanyList extends Component {
       current: 1,
       pageSize: 40,
       total: 0,
-      searchWord: '',
       dataSource: [],
       customerIDList: [],
       loading: false,
       visible: false,
+      filterKey: options[0].key,
+      filterValue: ''
     };
     this.handleSave = this.handleSave.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
-    this.handleSeachClick = this.handleSeachClick.bind(this);
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
     this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
     this.handleUploadBtnClick = this.handleUploadBtnClick.bind(this);
     this.handleUploadModalCancel = this.handleUploadModalCancel.bind(this);
     this.handleAddCustomerConfirm = this.handleAddCustomerConfirm.bind(this);
+    this.handleFilterSelect = this.handleFilterSelect.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.handleFilterClick = this.handleFilterClick.bind(this);
     this.updateDataSource = this.updateDataSource.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getDataSourceBySearch = this.getDataSourceBySearch.bind(this);
@@ -96,57 +120,42 @@ class CompanyList extends Component {
     });
   }
 
-  handleSeachClick(value) {
-    const pageSize = this.state.pageSize,
-          current = 1;
-
-    this.setState({
-      searchWord: value,
-      loading: true,
-      current: current,
-      pageSize: pageSize
-    });
-
-    if (value) {
-      this.getDataSourceBySearch(value, current, pageSize);
-    } else {
-      this.getDataSource(current, pageSize);
-    }
-  }
-
   handleShowSizeChange(current, pageSize) {
-    const searchWord = this.state.searchWord.trim();
+    const { filterKey, filterValue } = this.state;
 
     this.setState({
       current: current,
       pageSize: pageSize
     });
 
-    if (searchWord === '') {
+    if (this._isFilterValueNull()) {
       this.getDataSource(current, pageSize);
     } else {
-      this.getDataSourceBySearch(searchWord, current, pageSize);
+      this.getDataSourceBySearch(filterKey, filterValue, current, pageSize);
     }
   }
 
   handlePaginationChange(current) {
-    const pageSize = this.state.pageSize,
-          searchWord = this.state.searchWord.trim();
+    const {
+      pageSize,
+      filterKey,
+      filterValue
+    } = this.state;
 
     this.setState({
       current: current
     });
 
-    if (searchWord === '') {
+    if (this._isFilterValueNull()) {
       this.getDataSource(current, pageSize);
     } else {
-      this.getDataSourceBySearch(searchWord, current, pageSize);
+      this.getDataSourceBySearch(filterKey, filterValue, current, pageSize);
     }
   }
 
   handleCreateCompanySubmit(fieldValues) {
     const { current, pageSize } = this.state;
-          
+
     this.setState({
       createCompanyConfirmLoading: true
     });
@@ -194,15 +203,53 @@ class CompanyList extends Component {
     });
   }
 
-  updateDataSource() {
-    const searchWord = this.state.searchWord.trim(),
-          current = this.state.current,
-          pageSize = this.state.pageSize;
+  handleFilterSelect(value) {
+    this.setState({
+      filterKey: value
+    });
+  }
+
+  handleFilterChange(e) {
+    this.setState({
+      filterValue: e.target.value
+    });
+  }
+
+  handleFilterClick() {
+    const {
+      filterKey,
+      filterValue,
+      pageSize
+    } = this.state,
+      current = 1;
     
-    if (searchWord === '') {
+    this.setState({ current });
+
+    if (this._isFilterValueNull()) {
       this.getDataSource(current, pageSize);
     } else {
-      this.getDataSourceBySearch(searchWord, current, pageSize);
+      this.getDataSourceBySearch(filterKey, filterValue, current, pageSize);
+    }
+  }
+
+  _isFilterValueNull() {
+    const { filterValue } = this.state;
+
+    return filterValue.trim() === '';
+  }
+
+  updateDataSource() {
+    const {
+      filterKey,
+      filterValue,
+      current,
+      pageSize
+    } = this.state;
+    
+    if (this._isFilterValueNull()) {
+      this.getDataSource(current, pageSize);
+    } else {
+      this.getDataSourceBySearch(filterKey, filterValue, current, pageSize);
     }
   }
 
@@ -225,7 +272,7 @@ class CompanyList extends Component {
     });
   }
 
-  getDataSourceBySearch(searchWord, current, pageSize) {
+  getDataSourceBySearch(key, value, current, pageSize) {
     this.setState({
       loading: true
     });
@@ -233,7 +280,8 @@ class CompanyList extends Component {
     getAllCompanyBySearch({
       current_page: current,
       page_size: pageSize,
-      search_text: searchWord
+      search_key: key,
+      search_text: value
     }, json => {
       if (json.code === 200) {
         this.setState({
@@ -257,7 +305,14 @@ class CompanyList extends Component {
   }
 
   render() {
-    const { current, total, pageSize, visible } = this.state;
+    const {
+      current,
+      total,
+      pageSize,
+      visible,
+      filterKey,
+      filterValue
+    } = this.state;
 
     // 主体表格分页
     const pagination = {
@@ -278,7 +333,7 @@ class CompanyList extends Component {
     },{
       key: 'name',
       text: language.COMPANY_NAME,
-      span: 6,
+      span: 4,
     }, {
       key: 'clientcontact',
       text: language.CONTACT,
@@ -288,20 +343,26 @@ class CompanyList extends Component {
       text: language.TELLPHONE,
       span: 3
     }, {
+      key: 'responsible',
+      text: language.RESPONSIBLE,
+      span: 2
+    }, {
+      key: 'priority',
+      text: language.PRIORITY,
+      span: 2
+    }, {
+      key: 'reminder',
+      text: language.REMINDER,
+      span: 3
+    }, {
       key: 'visiting',
       text: language.VISITING_SITUATION,
-      span: 11
+      span: 6
     }];
 
     return (
       <div className="cs-card-inner">
         <div className="cs-card-inner-top">
-          <div className="cs-card-inner-top-col-2">
-            <EnhancedInput 
-              type="search"
-              onClick={this.handleSeachClick}
-            />
-          </div>
           <div className="cs-card-inner-top-col">
             <CreateNewCompany onSubmit={this.handleCreateCompanySubmit} />
           </div>
@@ -320,6 +381,18 @@ class CompanyList extends Component {
               </Upload>
             </ButtonWithModal>
           </div>
+          <div className="cs-card-inner-top-filter">
+            <label className="cs-label">过滤条件</label>
+            <Select value={filterKey} onSelect={this.handleFilterSelect}>
+              {options.map(item => <Select.Option key={item.key}>{item.text}</Select.Option>)}
+            </Select>
+            <Input
+              placeholder="请输入关键字"
+              value={filterValue}
+              onChange={this.handleFilterChange}
+            />
+            <Button onClick={this.handleFilterClick}>{language.SUBMIT}</Button>
+          </div>
         </div>
         <div className="cs-card-inner-pagination">
           <Pagination {...pagination} />
@@ -329,7 +402,7 @@ class CompanyList extends Component {
           spinning={this.state.loading}
         >
           <Affix>
-            <HeaderTitle dataSource={headerTitle}/>
+            <HeaderTitle position="left" dataSource={headerTitle} />
           </Affix>
           {this.state.dataSource.map((item, index) => {
             return (
@@ -343,7 +416,6 @@ class CompanyList extends Component {
               />
             );
           })}
-          
         </Spin>
         <div className="cs-card-inner-pagination">
           <Pagination {...pagination} />

@@ -14,13 +14,15 @@ class SimulationCO(services.base.simulation.Simulation,
         ("relatedcompany",     list),
         ("position",           list),
         ("clientcontact",      list),
-        ("caller",             list),
         ("progress",           list),
         ("updatednumber",      list),
+        ("reminder",           list),
+        ("priority",           int),
+        ("responsible",        str),
     )
 
     list_item = {"relatedcompany", "position", "clientcontact",
-                 "caller", "progress", "updatednumber"}
+                 "progress", "updatednumber", "reminder"}
     fix_item  = {"id", "name"}
     customers_file = 'customers.json'
 
@@ -28,31 +30,40 @@ class SimulationCO(services.base.simulation.Simulation,
         super(SimulationCO, self).__init__(path, name, costorage, iotype)
         self._customers = None
 
+    def _templateinfo(self, committer):
+        info = super(SimulationCO, self)._templateinfo(committer)
+        info['responsible'] = committer
+        return info
+
     def compare_excel(self, stream, committer):
         output = list()
         excels = utils.companyexcel.convert(stream)
         for excel in excels:
             metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
             data = core.basedata.DataObject(metadata, excel)
-            id = metadata['id']
-            caller = committer
+            id = data.name
+            info = self.getyaml(id)
+            responsible = committer
             if not self.exists(id):
                 for item in self.list_item:
                     if item in metadata:
                         metadata.pop(item)
                 output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
-            if excel['caller']:
-                caller = excel['caller'][0]
+            if excel['responsible']:
+                responsible = excel['responsible']
             for key in self.list_item:
-                existvalues = list()
-                if self.exists(id):
-                    info = self.getyaml(id)
-                    existvalues = [v['content'].replace(' ', '') for v in info[key]]
-                for value in excel[key]:
-                    if value.replace(' ', '') in existvalues:
-                        continue
-                    existvalues.append(value)
-                    output.append(('listadd', id, (id, key, value, caller)))
+                if isinstance(info[key], list):
+                    existvalues = list()
+                    if self.exists(id):
+                        existvalues = [v['content'].replace(' ', '') for v in info[key]]
+                    for value in excel[key]:
+                        if value.replace(' ', '') in existvalues:
+                            continue
+                        existvalues.append(value)
+                        output.append(('listadd', id, (id, key, value, responsible)))
+                else:
+                    if info[key] != excel[key]:
+                         output.append(('listadd', id, (id, key, value, responsible)))
         return output
 
     def addcustomer(self, id, user, do_commit=True):

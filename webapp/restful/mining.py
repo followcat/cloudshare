@@ -49,7 +49,7 @@ class PositionAPI(BaseAPI):
         for name in searches:
             positions = []
             try:
-                yaml_data = self.svc_mult_cv.getyaml(name)
+                yaml_data = self.svc_mult_cv.getyaml(name, projectname=projectname)
             except IOError:
                 continue
             if 'position' in yaml_data['experience']:
@@ -183,7 +183,7 @@ class LSIbaseAPI(Resource):
         else:
             pages = totals/eve_count
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = self.svc_mult_cv.getyaml(name)
+            yaml_info = self.svc_mult_cv.getyaml(name, projectname=project)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
@@ -200,6 +200,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('appendcomment', type = bool, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -211,6 +212,9 @@ class LSIbyJDidAPI(LSIbaseAPI):
         project = self.svc_mult_cv.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
+        append_comment = args['appendcomment'] if args['appendcomment'] else False
+        if append_comment:
+            doc += jd_yaml['commentary']
         uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
@@ -284,13 +288,13 @@ class SimilarAPI(Resource):
         uses = [projectname]
         project = self.svc_mult_cv.getproject(projectname)
         project_classify = project.getclassify()
-        for classify in self.svc_mult_cv.getyaml(id)['classify']:
+        for classify in self.svc_mult_cv.getyaml(id, projectname=projectname)['classify']:
             if classify in project_classify:
                 uses.append(classify)
         datas = []
         for name, score in self.miner.probability(projectname, doc,
                                                   uses=uses, top=6)[1:6]:
-            yaml_info = self.svc_mult_cv.getyaml(name)
+            yaml_info = self.svc_mult_cv.getyaml(name, projectname=projectname)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
         return { 'code': 200, 'data': datas }
 
@@ -326,7 +330,7 @@ class ValuablebaseAPI(Resource):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = self.svc_mult_cv.getyaml(name+'.yaml')
+                yaml_data = self.svc_mult_cv.getyaml(name+'.yaml', projectname=projectname)
                 yaml_data['match'] = match_item[1]
                 values.append({ 'match': match_item[1],
                                 'id': yaml_data['id'],

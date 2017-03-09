@@ -34,6 +34,9 @@ const websiteText = {
     OPEN_POSITION: '开放职位',
     NEW_VISITING_SITUATION: '最新陌拜情况',
     POSITION: '职位',
+    RESPONSIBLE: '跟进人',
+    PRIORITY: '优先级',
+    REMINDER: '待联系',
 
     VISITING_SITUATION: '陌拜情况',
     VISITING_INFORMATION: '陌拜信息',
@@ -62,6 +65,8 @@ const websiteText = {
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',
     JOB_DESCRIPTION_CONTENT: '职位描述内容',
+    COMMENTARY: '备注',
+    APPEND_COMMENTARY: '使用备注',
     CURRENT_STATUS: '当前状态',
     ALL: '所有',
     OPENING: '开放',

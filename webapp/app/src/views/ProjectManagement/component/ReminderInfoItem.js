@@ -1,56 +1,32 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import EnhancedInput from 'components/enhanced-input';
-
-import { Button } from 'antd';
+import { DatePicker, Input, Button } from 'antd';
 
 import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
-class VisitingInfoItem extends Component {
+const t = 1000*60*60*24;
+
+class ReminderInfoItem extends Component {
   constructor() {
     super();
     this.state = {
-      editStatus: false,
       opening: false,
+      editStatus: false,
+      text: '',
+      date: ''
     };
-    this.handleAddClick = this.handleAddClick.bind(this);
-    this.handleDeleteClick = this.handleDeleteClick.bind(this);
-    this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleOmmitClick = this.handleOmmitClick.bind(this);
     this.handleDoubleClick = this.handleDoubleClick.bind(this);
+    this.handleSave = this.handleSave.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.disabledDate = this.disabledDate.bind(this);
     this.getEditingRender = this.getEditingRender.bind(this);
     this.getRender = this.getRender.bind(this);
-  }
-
-  handleAddClick(value) {
-    const { dataIndex, dataId } = this.props;
-
-    if (value.trim() !== '') {
-      this.props.onSave({
-        id: dataId,
-        fieldProp: dataIndex,
-        fieldValue: value
-      });
-
-      this.setState({
-        editStatus: false
-      });
-    }
-  }
-
-  handleDeleteClick(content, date) {
-    const { dataId, dataIndex } = this.props;
-
-    this.props.onRemove(dataId, dataIndex, content, date);
-  }
-
-  handleCancelClick() {
-    this.setState({
-      editStatus: false
-    });
   }
 
   handleOmmitClick() {
@@ -65,25 +41,70 @@ class VisitingInfoItem extends Component {
     });
   }
 
+  handleSave() {
+    const { dataIndex, dataId } = this.props,
+          { text, date } = this.state;
+
+    if (text && date) {
+      this.props.onSave({
+        id: dataId,
+        fieldProp: dataIndex,
+        fieldValue: { text: text, date: date }
+      });
+
+      this.setState({
+        editStatus: false
+      });
+    }
+  }
+
+  handleDeleteClick(content, date) {
+    const { dataId, dataIndex } = this.props;
+
+    this.props.onRemove(dataId, dataIndex, content, date);
+  }
+
+  handleCancel() {
+    this.setState({
+      editStatus: false
+    });
+  }
+
+  handleInputChange(e) {
+    this.setState({
+      text: e.target.value
+    });
+  }
+
+  handleDateChange(value, dateString) {
+    this.setState({
+      date: dateString
+    });
+  }
+
+  disabledDate(current) {
+    return current && current.getTime() < Date.now() - t;
+  }
+
   getEditingRender() {
     const { editStatus } = this.state;
 
     if (editStatus) {
       return (
-        <div className="visiting-form">
-          <EnhancedInput
-            type="plus"
+        <div className="cs-reminder-edit-box">
+          <Input
             size="small"
-            style={{ display: 'inline-block', width: '80%' }}
-            resettable={true}
-            onClick={this.handleAddClick}
+            onChange={this.handleInputChange}
           />
-          <Button
+          <DatePicker
             size="small"
-            onClick={this.handleCancelClick}
-          >
-           {language.CANCEL}
-          </Button>
+            disabledDate={this.disabledDate}
+            onChange={this.handleDateChange}
+          />
+          <div className="cs-btn-group">
+            <Button type="primary" size="small" onClick={this.handleSave}>{language.SAVE}</Button>
+            <Button size="small" onClick={this.handleCancel}>{language.CANCEL}</Button>
+          </div>
         </div>
       );
     }
@@ -98,12 +119,11 @@ class VisitingInfoItem extends Component {
     if (!visible) {
       return (
         <div
-          className={opening ? 'company-item-cell' : 'company-item-cell ommit'}
+          className={opening ? '' : 'ommit'}
           onClick={this.handleOmmitClick}
-          onDoubleClick={this.handleDoubleClick}
         >
           {dataSource.length > 0 ?
-            `${dataSource[0].author} | ${dataSource[0].date.split(' ')[0]} | ${dataSource[0].content}` :
+            `${dataSource[0].author} | ${dataSource[0].content.date} | ${dataSource[0].content.text}` :
             `暂无数据`}
           {editStatus && dataSource.length > 0 ?
             <a
@@ -115,14 +135,12 @@ class VisitingInfoItem extends Component {
       );
     } else {
       return (
-        <div
-          onDoubleClick={this.handleDoubleClick}
-        >
-          {dataSource.length > 0 ? 
+        <div>
+          {dataSource.length > 0 ?
             dataSource.map((item, index) => {
               return (
                 <p key={index} className="visiting-list">
-                  {`${item.author} | ${item.date.split(' ')[0]} | ${item.content}`}
+                  {item.content && `${item.author} | ${item.content.date} | ${item.content.text}`}
                   {editStatus ?
                     <a
                       className="visiting-list-del"
@@ -142,7 +160,7 @@ class VisitingInfoItem extends Component {
     return (
       <div
         className="cs-item-row"
-        onDoubleClick={this.handleEditClick}
+        onDoubleClick={this.handleDoubleClick}
       >
         {this.getRender()}
         {this.getEditingRender()}
@@ -151,20 +169,13 @@ class VisitingInfoItem extends Component {
   }
 }
 
-VisitingInfoItem.defaultProps = {
-  itemInfo: {},
-  dataSource: [],
-  onSave() {},
-  onRemove() {}
-};
-
-VisitingInfoItem.propTypes = {
-  dataId: PropTypes.string,
-  dataIndex: PropTypes.string,
+ReminderInfoItem.propTypes = {
   visible: PropTypes.bool,
   dataSource: PropTypes.array,
+  dataIndex: PropTypes.string,
+  dataId: PropTypes.string,
   onSave: PropTypes.func,
   onRemove: PropTypes.func
 };
 
-export default VisitingInfoItem;
+export default ReminderInfoItem;

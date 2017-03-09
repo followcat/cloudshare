@@ -95,7 +95,7 @@ export const getAddedCompanyList = (params, callback) => {
  * @return {function} fetch    异步请求方法
  */
 export const getAllCompanyBySearch = (params, callback) => {
-  return fetch(API.ALL_COMPANY_BY_SEARCH_API, {
+  return fetch(API.COMPANY_BY_SEARCH_KEY_API, {
     method: 'POST',
     credentials: 'include',
     headers: {

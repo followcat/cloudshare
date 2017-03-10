@@ -9,7 +9,7 @@ import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 const FormItem = Form.Item,
-      SelectOption = Select.Option;
+      Option = Select.Option;
 
 class CreateNewJobDescription extends Component {
   constructor() {
@@ -30,55 +30,36 @@ class CreateNewJobDescription extends Component {
 
   render() {
     const props = this.props,
-          { getFieldProps } = props.form;
-
-    const companyNameProps = getFieldProps('co_id', {
-      rules: [{ required: true, message: language.COMPANY_NAME_VALIDATE_MSG }]
-    });
-
-    const jobDescriptionNameProps = getFieldProps('jd_name', {
-      rules: [{ required: true, message: language.JOB_DESCRIPTION_NAME_VALIDATE_MSG }]
-    });
-
-    const jobDescriptionContentProps = getFieldProps('jd_description', {
-      rules: [{ required: true, message: language.JOB_DESCRIPTION_CONTENT_VALIDATE_MSG }]
-    });
+          { getFieldDecorator } = props.form;
 
     return (
       <ButtonWithModal
         {...props}
         onModalOk={this.handleModalOk}
       >
-        <Form horizontal>
-          <FormItem
-            label={language.COMPANY_NAME}
-          >
-            <Select {...companyNameProps}>
-              {props.companyList.map(item => {
-                return (
-                  <SelectOption
-                    key={item.id}
-                    value={item.id}
-                  >
-                    {item.name}
-                  </SelectOption>
-                );
-              })}
-            </Select>
+        <Form layout="horizontal">
+          <FormItem label={language.COMPANY_NAME}>
+            {getFieldDecorator('co_id', {
+              rules: [{ required: true, message: language.COMPANY_NAME_VALIDATE_MSG }]
+            })(
+              <Select>
+                {props.companyList.map(item => {
+                  return (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            )}
           </FormItem>
-          <FormItem
-            label={language.JOB_DESCRIPTION_NAME}
-          >
-            <Input {...jobDescriptionNameProps}/>
+          <FormItem label={language.JOB_DESCRIPTION_NAME}>
+            {getFieldDecorator('jd_name')(<Input />)}
           </FormItem>
-          <FormItem
-            label={language.JOB_DESCRIPTION_CONTENT}
-          >
-            <Input
-              {...jobDescriptionContentProps}
-              type="textarea"
-              rows="4"
-            />
+          <FormItem label={language.JOB_DESCRIPTION_CONTENT}>
+            {getFieldDecorator('jd_description')(
+              <Input type="textarea" rows="4" />
+            )}
           </FormItem>
         </Form>
       </ButtonWithModal>
@@ -92,6 +73,7 @@ CreateNewJobDescription.defaultProps = {
 };
 
 CreateNewJobDescription.propTypes = {
+  form: PropTypes.object,
   companyList: PropTypes.array,
   onCreate: PropTypes.func,
 };

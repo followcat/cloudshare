@@ -1,8 +1,9 @@
 'use strict';
 const webpack = require('webpack');
-
+const path = require('path');
 const folderPath = require('./config/folder-path');
 const getHTMLFile = require('./config/html-file');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -11,6 +12,7 @@ module.exports = {
     path: folderPath.PATHS.BUILD_PATH,
     publicPath: '/assert/',
     filename: '[name].js',
+    chunkFilename: '[name].[chunkhash:5].chunk.js'
   },
   
   devtool: 'cheap-module-eval-source-map',
@@ -25,5 +27,12 @@ module.exports = {
     new ExtractTextPlugin('[name].css'),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-  ].concat(getHTMLFile()),
+    new HtmlWebpackPlugin({
+      hash: false,
+      title: 'Cloudshare - Willendare',
+      template: path.join(folderPath.PATHS.SRC_PATH, '/template.html'),
+      inject: true
+    })
+  ]
+  // ].concat(getHTMLFile()),
 };

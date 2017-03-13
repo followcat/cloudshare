@@ -28,6 +28,11 @@ def configure(app):
 
     #RESTful Index page entrance
     app.add_url_rule(
+        '/',
+        view_func=webapp.views.views.Index.as_view('rootindex'),
+    )
+
+    app.add_url_rule(
         '/index',
         view_func=webapp.views.views.Index.as_view('index'),
     )

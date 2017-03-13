@@ -48,7 +48,7 @@ class CreateNewCompany extends Component {
   }
 
   render() {
-    const { getFieldProps } = this.props.form;
+    const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -70,80 +70,79 @@ class CreateNewCompany extends Component {
         buttonStyle={{ marginLeft: 8 }}
         modalStyle={{ top: 20 }}
       >
-        <Form horizontal>
+        <Form layout="horizontal">
           <FormItem
             label={language.COMPANY_NAME}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('name', { rules: [{ required: true }] })}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_NAME}`}
-            />
+            {getFieldDecorator('name', {
+              rules: [{ required: true }]
+            })(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_NAME}`} />
+            )}
           </FormItem>
           <FormItem
             label={language.COMPANY_INTRODUCTION}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('introduction')}
-              type="textarea"
-              rows="2"
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_INTRODUCTION}`}
-            />
+            {getFieldDecorator('introduction')(
+              <Input
+                type="textarea"
+                rows="2"
+                placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_INTRODUCTION}`}
+              />
+            )}
           </FormItem>
           <FormItem
             label={language.DISTRICT}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('district')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.DISTRICT}`}
-            />
+            {getFieldDecorator('district')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.DISTRICT}`} />
+            )}
+            
           </FormItem>
           <FormItem
             label={language.PRODUCT}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('product')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.PRODUCT}`}
-            />
+            {getFieldDecorator('product')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.PRODUCT}`} />
+            )}
           </FormItem>
           <FormItem
             label={language.TELLPHONE}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('conumber')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.TELLPHONE}`}
-            />
+            {getFieldDecorator('conumber')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.TELLPHONE}`} />
+            )}
           </FormItem>
           <FormItem
             label={language.ADDRESS}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('address')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.ADDRESS}`}
-            />
+            {getFieldDecorator('address')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.ADDRESS}`} />
+            )}
           </FormItem>
           <FormItem
             label={language.EMAIL}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('email', { rules: [{ type: 'email', message: language.EMAIL_VALIDATE_TIP }] })}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.EMAIL}`}
-            />
+            {getFieldDecorator('email', {
+              rules: [{ type: 'email', message: language.EMAIL_VALIDATE_TIP }]
+            })(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.EMAIL}`} />
+            )}
           </FormItem>
           <FormItem
             label={language.WEBSITE}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('website')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.WEBSITE}`}
-            />
+            {getFieldDecorator('website')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.WEBSITE}`} />
+            )}
           </FormItem>
         </Form>
       </ButtonWithModal>
@@ -155,7 +154,7 @@ CreateNewCompany.propTypes = {
   confirmLoading: PropTypes.bool,
   onSubmit: PropTypes.func,
   form: PropTypes.shape({
-    getFieldProps: PropTypes.func,
+    getFieldDecorator: PropTypes.func,
     resetFields: PropTypes.func,
     validateFields: PropTypes.func,
   }),

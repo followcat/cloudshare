@@ -4,7 +4,6 @@ import { browserHistory } from 'react-router';
 
 import ShowCard from 'components/show-card';
 import DraggerUpload from 'components/dragger-upload';
-import UploadPreview from 'components/upload-preview';
 import Preview from './Preview';
 
 import { message } from 'antd';
@@ -15,7 +14,6 @@ import { uploadPreview, confirmUpload } from 'request/upload';
 import { API } from 'API';
 
 import StorageUtil from 'utils/storage';
-import { generateSummary } from 'utils/summary-generator';
 
 import remove from 'lodash/remove';
 import findIndex from 'lodash/findIndex';

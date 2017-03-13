@@ -60,7 +60,8 @@ class Home extends Component {
           token: json.token,
           user: json.user
         });
-        browserHistory.push(json.redirect_url);
+        // browserHistory.push(json.redirect_url);
+        window.location.href = json.redirect_url;
       } else {
         message.error('用户名或密码错误！');
       }

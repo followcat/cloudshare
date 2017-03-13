@@ -17,6 +17,7 @@ ShowCard.defaultProps = {
 
 ShowCard.propTypes = {
   prefixCls: PropTypes.string,
+  children: PropTypes.element
 };
 
 export default ShowCard;

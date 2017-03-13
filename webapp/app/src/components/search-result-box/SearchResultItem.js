@@ -11,14 +11,12 @@ import {
   Checkbox
 } from 'antd';
 
+import findIndex from 'lodash/findIndex';
 import { generateWorkExperience } from 'utils/summary-generator';
 
 class SearchResultItem extends Component {
   constructor() {
     super();
-    this.state = {
-      checked: false,
-    };
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.getNameTextRender = this.getNameTextRender.bind(this);
   }
@@ -26,7 +24,7 @@ class SearchResultItem extends Component {
   handleCheckboxChange(e) {
     this.props.onToggleSelection({
       id: e.target['data-id'],
-      name: e.target['data-name'],
+      name: e.target['data-name']
     });
   }
 
@@ -69,14 +67,17 @@ class SearchResultItem extends Component {
       <Card className="cs-ls-i">
         <div className="basic-info">
           <Row>
-            {type === 'default' ? '' : <Col span={1}>
-              <Checkbox
-                data-id={yaml_info.id}
-                data-name={yaml_info.name}
-                onChange={this.handleCheckboxChange}
-                checked={selection.findIndex(v => v.get('id') === yaml_info.id ) > -1 ? true : false}
-              />
-            </Col>}
+            {type === 'default' ?
+              null : 
+              <Col span={1}>
+                <Checkbox
+                  data-id={yaml_info.id}
+                  data-name={yaml_info.name}
+                  onChange={this.handleCheckboxChange}
+                  checked={findIndex(selection, (o) => o.id === yaml_info.id) > - 1 ? true : false}
+                />
+              </Col>
+            }
             <Col span={type === 'default' ? 4 : 3} className="omit">
               <a
                 href={`/resume/${cv_id}`}
@@ -152,14 +153,14 @@ SearchResultItem.propTypes = {
   educationExperienceText: PropTypes.string,
   foldText: PropTypes.string,
   unfoldText: PropTypes.string,
-  gradient: PropTypes.object,
+  gradient: PropTypes.array,
   info: PropTypes.object,
   type: PropTypes.string,
   selection: PropTypes.array,
   yaml_info: PropTypes.shape({
     name: PropTypes.string,
     education_history: PropTypes.array,
-    experience: PropTypes.array,
+    experience: PropTypes.object,
     current: PropTypes.object,
     gender: PropTypes.string,
     age: PropTypes.number,

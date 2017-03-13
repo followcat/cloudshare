@@ -82,14 +82,14 @@ export default class WorkExperience extends Component {
 
 WorkExperience.defaultProps = {
   workExperienceText: 'Work Experience',
-  experience: [],
+  experience: {},
   foldText: 'Fold',
   unfoldText: 'Unfold'
 };
 
 WorkExperience.propTypes = {
   workExperienceText: PropTypes.string,
-  experience: PropTypes.array,
+  experience: PropTypes.object,
   foldText: PropTypes.string,
   unfoldText: PropTypes.string
 };

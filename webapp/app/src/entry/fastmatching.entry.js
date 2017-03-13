@@ -1,17 +1,22 @@
 'use strict';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {
+  Router,
+  Route,
+  browserHistory
+} from 'react-router';
+
+import Layout from 'views/common/Layout';
+import { FastMatching } from 'views/FastMatching/index';
 
 import 'babel-polyfill';
 
-import enUS from 'antd/lib/locale-provider/en_US';
-import { LocaleProvider } from 'antd';
-
-import FastMatching from '../views/FastMatching';
-
 ReactDOM.render(
-  <LocaleProvider locale={enUS}>
-    <FastMatching />
-  </LocaleProvider>,
+  <Router history={browserHistory}>
+    <Route path="/" component={Layout} >
+    <Route path="fastmatching" component={FastMatching} />
+    </Route>
+  </Router>,
   document.getElementById('app')
 );

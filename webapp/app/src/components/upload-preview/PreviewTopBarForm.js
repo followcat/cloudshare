@@ -6,7 +6,7 @@ import { Form, Input, Select, Button } from 'antd';
 import { resumeSource } from 'config/source';
 
 const FormItem = Form.Item,
-      SelectOption = Select.Option;
+      Option = Select.Option;
 
 class PreviewTopBarForm extends Component {
   constructor() {
@@ -38,68 +38,79 @@ class PreviewTopBarForm extends Component {
       confirmLoading,
       btnText
     } = this.props,
-      { getFieldProps } = form;
-
-    const nameProps = getFieldProps('name', {
-      initialValue: name || ''
-    });
-
-    const sourceProps = getFieldProps('origin');
-
-    const classifyProps = getFieldProps('classify', {
-      rules: [{ type: 'array' }]
-    });
+      { getFieldDecorator } = form;
 
     return (
-      <Form inline className={`${prefixCls}-form`}>
-        <FormItem label="ID">
-          <Input
-            style={{ width: 120 }}
-            value={resumeID}
-            readOnly
-          />
+      <Form layout="inline" className={`${prefixCls}-form`}>
+        <FormItem label="简历ID">
+          {getFieldDecorator('resumeID', {
+            initialValue: resumeID || ''
+          })(
+            <Input
+              style={{ width: 120 }}
+              readOnly
+              size="small"
+            />
+          )}
+          
         </FormItem>
-        <FormItem label="Name">
-          <Input
-            {...nameProps}
-            placeholder="Please input name"
-            style={{ width: 100 }}
-          />
+        <FormItem label="候选人名字">
+          {getFieldDecorator('name', {
+            initialValue: name || ''
+          })(
+            <Input
+              placeholder="请输入候选人名字"
+              style={{ width: 100 }}
+              size="small"
+            />
+          )}
         </FormItem>
-        <FormItem label="Source">
-          <Select
-            {...sourceProps}
-            showSearch
-            placeholder="Select a source"
-            optionFilterProp="children"
-            notFoundContent="Not found"
-            style={{ width: 120 }}
-          >
-            {resumeSource.map(item => {
-              return (
-                <SelectOption key={item.id} value={item.name}>{item.name}</SelectOption>
-              );
-            })}
-          </Select>
+        <FormItem label="简历来源">
+          {getFieldDecorator('origin')(
+            <Select
+              showSearch
+              placeholder="选择简历来源"
+              optionFilterProp="children"
+              notFoundContent="Not found"
+              style={{ width: 120 }}
+              size="small"
+            >
+              {resumeSource.map(item => {
+                return (
+                  <Option key={item.id} value={item.name}>{item.name}</Option>
+                );
+              })}
+            </Select>
+          )}
         </FormItem>
-        <FormItem label="Classify">
-          <Select
-            {...classifyProps}
-            multiple
-            placeholder="Select a classify"
-            value={classifyValue}
-            style={{ width: 120 }}
-          >
-            {classifyList.map((item, index) => {
-              return (
-                <SelectOption key={index} value={item} disabled>{item}</SelectOption>
-              );
-            })}
-          </Select>
+        <FormItem label="行业">
+          {getFieldDecorator('classify', {
+            initialValue: classifyValue,
+            rules: [{ type: 'array' }]
+          })(
+            <Select
+              multiple
+              style={{ width: 120 }}
+              size="small"
+            >
+              {classifyList.map((item, index) => {
+                return (
+                  <Option key={index} value={item} disabled>{item}</Option>
+                );
+              })}
+            </Select>
+          )}
         </FormItem>
         {currentPreview === total - 1 ?
           <FormItem>
-            <Button loading={confirmLoading} onClick={this.handleClick}>{btnText}</Button>
+            <Button
+              type="primary"
+              loading={confirmLoading}
+              onClick={this.handleClick}
+              size="small"
+            >
+              {btnText}
+            </Button>
           </FormItem> :
           null
         }

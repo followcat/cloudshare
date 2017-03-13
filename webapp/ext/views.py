@@ -1,3 +1,4 @@
+import flask
 import flask.ext.login
 import utils.builtin
 
@@ -27,8 +28,12 @@ def configure(app):
     init_login(app)
 
     #RESTful Index page entrance
+    @app.route('/')
+    def rootindex():
+        return flask.redirect(flask.url_for('index'))
+
     app.add_url_rule(
-        '/',
+        '/index',
         view_func=webapp.views.views.Index.as_view('index'),
     )
 

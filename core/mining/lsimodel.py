@@ -66,7 +66,7 @@ class LSImodel(object):
             for data in svc_cv.datas():
                 name, doc = data
                 names.append(name)
-                texts.append(doc)
+                texts.append(self.slicer(doc, id=name))
         if len(names) > 5:
             self.setup(names, texts)
             return True
@@ -80,7 +80,7 @@ class LSImodel(object):
             for svc_cv in svccv_list:
                 if svc_cv.exists(name):
                     doc = svc_cv.getmd(name)
-                    texts.append(doc)
+                    texts.append(self.slicer(doc, id=name))
                     break
             else:
                 raise Exception("Not exists name: " + name)
@@ -96,7 +96,7 @@ class LSImodel(object):
                 for word in words:
                     if word in doc:
                         names.append(name)
-                        texts.append(doc)
+                        texts.append(self.slicer(doc, id=name))
                         break
         if len(names) > 5:
             self.setup(names, texts)
@@ -106,8 +106,7 @@ class LSImodel(object):
     def setup(self, names, texts):
         assert len(names) == len(texts)
         self.names = names
-        for name, doc in zip(names, texts):
-            self.texts.append(self.slicer(doc, id=name))
+        self.texts = texts
         self.set_dictionary()
         self.set_corpus()
         self.set_tfidf()

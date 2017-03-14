@@ -72,11 +72,11 @@ class Company extends Component {
     if (file.status === 'done' && file.response) {
       if (file.response.code === 200) {
         const dataSource = parseResponse(file.response.data, file.response.info);
+        message.success(`上传${file.name}文件成功!`);
         this.setState({
           previewList: file.response.data,
           dataSource: dataSource
         });
-        this.props.history.push('/company/uploader');
       }
     }
   }

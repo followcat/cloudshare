@@ -10,45 +10,11 @@ from utils.builtin import jieba_cut, pos_extract
 import modelanalysis.judge
 
 
-def add_one_source(source, unit, des, models, skyline=1.5):
-    result = False
-    index = None
-    for i in range(len(models)):
-        sumgood = modelanalysis.judge.linalg(unit, models[i])
-        if sumgood > skyline:
-            index = i
-            model = models[i]
-    else:
-        try:
-            model = origin_model(source, unit)
-        except ValueError:
-            return result, unit, index
-    model.slicer = services.mining.silencer
-    for requirement in des:
-        for unit in des[requirement]:
-            sumgood = modelanalysis.judge.linalg(unit, model)
-            if sumgood > skyline:
-                names = model.names
-                texts = model.texts
-                model = core.mining.lsimodel.LSImodel('/tmp/lsimodel')
-                model.slicer = services.mining.silencer
-                names.append(requirement)
-                texts.append(model.slicer(unit))
-                try:
-                    model.setup(names, texts)
-                except ValueError:
-                    continue
-                result = True
-                break
-        if result:
-            break
-    if result:
-        if index is None:
-            models.append(model)
-            index = models.index(model)
-        else:
-            models[index] = model
-    return result, requirement, index
+def unit_gen(sources):
+    for source in sources:
+        for unit in sources[source]:
+            yield source, unit
+
 
 def source_list(sources):
     d = dict()
@@ -95,7 +61,7 @@ def gen_models(sources):
                 if inputunit is None:
                     break
                 used_units.append(inputunit)
-                indexs = train(source, inputunit, sources, models)
+                indexs = train_by_source(source, inputunit, sources, models)
                 if not indexs:
                     continue
                 for index in indexs:
@@ -113,14 +79,42 @@ def origin_model(source, unit):
     model.setup([source], [model.slicer(unit)])
     return model
 
-def train(source, unit, sources, models):
+def train_by_source(source, requirement, sources, models, skyline=1.5):
     des = source_list(sources)
     indexs = []
     while(des):
-        result, requirement, index = add_one_source(source, unit, des, models)
-        if result:
-            des.pop(requirement)
-            indexs.append(index)
+        index = None
+        for i in range(len(models)):
+            sumgood = modelanalysis.judge.linalg(requirement, models[i])
+            if sumgood > skyline:
+                index = i
+                model = models[i]
+        else:
+            try:
+                model = origin_model(source, requirement)
+            except ValueError:
+                continue
+        for source, unit in unit_gen(des):
+            sumgood = modelanalysis.judge.linalg(unit, model)
+            if sumgood > skyline:
+                names = model.names
+                texts = model.texts
+                model = core.mining.lsimodel.LSImodel('/tmp/lsimodel')
+                model.slicer = services.mining.silencer
+                names.append(requirement)
+                texts.append(model.slicer(unit))
+                try:
+                    model.setup(names, texts)
+                except ValueError:
+                    continue
+                if index is None:
+                    models.append(model)
+                    index = models.index(model)
+                else:
+                    models[index] = model
+                des.pop(source)
+                indexs.append(index)
+                break
         else:
             break
     return indexs

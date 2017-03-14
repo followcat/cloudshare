@@ -29,7 +29,7 @@ class SearchResult extends Component {
   }
 
   handleSearch(value) {
-    browserHistory.push(`/result?search_text=${value}`);
+    browserHistory.push(`/search/result?search_text=${value}`);
 
     this.setState({
       searchText: value,

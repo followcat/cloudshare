@@ -13,7 +13,11 @@ class Search extends Component {
   }
 
   handleSearch(value) {
-    browserHistory.push(`/result?search_text=${value}`);
+    browserHistory.push(`/search/result?search_text=${value}`);
+    // browserHistory.push({
+    //   pathname: 'search/result',
+    //   query: { search_text: value }
+    // });
   }
 
   render() {

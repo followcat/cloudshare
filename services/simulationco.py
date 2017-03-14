@@ -52,15 +52,17 @@ class SimulationCO(services.base.simulation.Simulation,
             if excel['responsible']:
                 responsible = excel['responsible']
             for key in self.list_item:
-                if isinstance(info[key], list):
+                if dict(self.YAML_TEMPLATE)[key] == list:
                     existvalues = list()
                     if self.exists(id):
                         existvalues = [v['content'].replace(' ', '') for v in info[key]]
-                    for value in excel[key]:
-                        if value.replace(' ', '') in existvalues:
-                            continue
-                        existvalues.append(value)
-                        output.append(('listadd', id, (id, key, value, responsible)))
+                    if key in excel:
+                        for value in excel[key]:
+                            if (isinstance(value, str) and
+                                value.replace(' ', '') in existvalues):
+                                continue
+                            existvalues.append(value)
+                            output.append(('listadd', id, (id, key, value, responsible)))
                 else:
                     if info[key] != excel[key]:
                          output.append(('listadd', id, (id, key, value, responsible)))

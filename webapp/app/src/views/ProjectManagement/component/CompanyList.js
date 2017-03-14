@@ -72,6 +72,7 @@ class CompanyList extends Component {
     this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
     this.handleUploadBtnClick = this.handleUploadBtnClick.bind(this);
     this.handleUploadModalCancel = this.handleUploadModalCancel.bind(this);
+    this.handleUploadModalOk = this.handleUploadModalOk.bind(this);
     this.handleAddCustomerConfirm = this.handleAddCustomerConfirm.bind(this);
     this.handleFilterSelect = this.handleFilterSelect.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
@@ -183,6 +184,10 @@ class CompanyList extends Component {
     this.setState({
       visible: false
     });
+  }
+
+  handleUploadModalOk() {
+    this.props.history.push('/company/uploader');
   }
 
   handleAddCustomerConfirm(id) {
@@ -373,6 +378,7 @@ class CompanyList extends Component {
               visible={visible}
               onButtonClick={this.handleUploadBtnClick}
               onModalCancel={this.handleUploadModalCancel}
+              onModalOk={this.handleUploadModalOk}
             >
               <Upload {...this.props.uploadProps}>
                 <Button type="ghost">

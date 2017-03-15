@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import glob
 import collections
 
 import services.mining
@@ -26,7 +27,17 @@ class Automodels(object):
         if flags is not None:
             self.FLAGS = flags
         self.path = path
+        self.models = []
         self.sources = sources
+
+    def load(self):
+        models_dump = glob.glob(os.path.join(self.path, '*'))
+        models_num = len(models_dump)
+        self.models = [None]*models_num
+        for f in models_dump:
+            index = int(os.path.split(f)[-1])
+            self.models[index] = core.mining.lsimodel.LSImodel(f)
+            self.models[index].load()
 
     def unit_gen(self, sources):
         for id in sources:
@@ -54,7 +65,6 @@ class Automodels(object):
     def gen_models(self, autosave=False, path=None):
         if path is None:
             path = self.path
-        models = []
         sources = self.source_reloaded()
         for id in sources:
             for unit in sources[id]:
@@ -64,18 +74,17 @@ class Automodels(object):
                     if inputunit is None:
                         break
                     used_units.append(inputunit)
-                    indexs = self.train_by_model(id, inputunit, sources, models)
+                    indexs = self.train_by_model(id, inputunit, sources)
                     if not indexs:
                         continue
                     for index in indexs:
                         if autosave is True:
-                            models[index].save(os.path.join(path, str(index)))
-                        finished = set(models[index].dictionary.values()).intersection(
+                            self.models[index].save(os.path.join(path, str(index)))
+                        finished = set(self.models[index].dictionary.values()).intersection(
                                        sources[id][unit]['todo'])
                         for finish in finished:
                             sources[id][unit]['todo'].remove(finish)
                             sources[id][unit]['used'].add(finish)
-        return models
 
     def origin_model(self, id, unit):
         model = core.mining.lsimodel.LSImodel(self.path)
@@ -87,7 +96,7 @@ class Automodels(object):
             model.texts.append(model.slicer(unit))
         return model
 
-    def train_by_model(self, id, requirement, sources, models, skyline=1.5):
+    def train_by_model(self, id, requirement, sources, skyline=1.5):
         indexs = []
         index = None
         model = self.origin_model(id, requirement)
@@ -106,6 +115,6 @@ class Automodels(object):
             else:
                 break
         if model.names:
-            models.append(model)
-            indexs.append(models.index(model))
+            self.models.append(model)
+            indexs.append(self.models.index(model))
         return indexs

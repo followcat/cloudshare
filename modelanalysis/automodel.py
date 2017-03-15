@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 import re
 import collections
 
@@ -14,17 +14,18 @@ class Automodels(object):
 
     FLAGS = ['s', 'x']
 
-    def __init__(self, sources, flags=None):
+    def __init__(self, sources, path, flags=None):
         """
             >>> from modelanalysis.automodel import *
             >>> from baseapp.projects import *
             >>> sources = dict(map(lambda x: (x['id'], x['description']),
-            ...                 SVC_PRJ_MED.jobdescription.lists()))
-            >>> am = Automodels(sources)
-            >>> models = am.gen_models()
+            ...                SVC_PRJ_MED.jobdescription.lists()))
+            >>> am = Automodels(sources, '/tmp/automodel')
+            >>> models = am.gen_models(autosave=True)
         """
         if flags is not None:
             self.FLAGS = flags
+        self.path = path
         self.sources = sources
 
     def unit_gen(self, sources):
@@ -50,7 +51,9 @@ class Automodels(object):
                         if todo in inputunit:
                             return inputunit
 
-    def gen_models(self):
+    def gen_models(self, autosave=False, path=None):
+        if path is None:
+            path = self.path
         models = []
         sources = self.source_reloaded()
         for id in sources:
@@ -65,6 +68,8 @@ class Automodels(object):
                     if not indexs:
                         continue
                     for index in indexs:
+                        if autosave is True:
+                            models[index].save(os.path.join(path, str(index)))
                         finished = set(models[index].dictionary.values()).intersection(
                                        sources[id][unit]['todo'])
                         for finish in finished:
@@ -73,7 +78,7 @@ class Automodels(object):
         return models
 
     def origin_model(self, id, unit):
-        model = core.mining.lsimodel.LSImodel('')
+        model = core.mining.lsimodel.LSImodel(self.path)
         model.slicer = services.mining.silencer
         try:
             model.setup([id], [model.slicer(unit)])

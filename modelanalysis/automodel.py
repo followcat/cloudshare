@@ -11,32 +11,32 @@ import modelanalysis.judge
 
 
 def unit_gen(sources):
-    for source in sources:
-        for unit in sources[source]:
-            yield source, unit
+    for id in sources:
+        for unit in sources[id]:
+            yield id, unit
 
 
 def source_list(sources):
     d = dict()
-    for source in sources:
-        d[source] = sources[source].keys()
+    for id in sources:
+        d[id] = sources[id].keys()
     return d
 
 
 def source_reloaded(sources):
     d = collections.defaultdict(dict) 
-    for source in sources:
-        d[source] = collections.defaultdict(dict)
-        for unit in re.split(u'[\n,.。，;]', sources[source]):
-            d[source][unit] = {'used': set(),
+    for id in sources:
+        d[id] = collections.defaultdict(dict)
+        for unit in re.split(u'[\n,.。，;]', sources[id]):
+            d[id][unit] = {'used': set(),
                                'todo': set(pos_extract(jieba_cut(unit, pos=True),
                                                        ['s', 'x']))}
     return d
 
 
 def origin_unit(sources, used_units, todos):
-    for source in sources:
-        for inputunit in sources[source]:
+    for id in sources:
+        for inputunit in sources[id]:
             if inputunit not in used_units:
                 for todo in todos:
                     if todo in inputunit:
@@ -53,33 +53,39 @@ def gen_models(sources):
         >>> models = gen_models(loaded_sources)
     """
     models = []
-    for source in sources:
-        for unit in sources[source]:
+    for id in sources:
+        for unit in sources[id]:
             used_units = list()
-            while(sources[source][unit]['todo']):
-                inputunit = origin_unit(sources, used_units, sources[source][unit]['todo'])
+            while(sources[id][unit]['todo']):
+                inputunit = origin_unit(sources, used_units, sources[id][unit]['todo'])
                 if inputunit is None:
                     break
                 used_units.append(inputunit)
-                indexs = train_by_source(source, inputunit, sources, models)
+                indexs = train_by_source(id, inputunit, sources, models)
                 if not indexs:
                     continue
                 for index in indexs:
                     finished = set(models[index].dictionary.values()).intersection(
-                                   sources[source][unit]['todo'])
+                                   sources[id][unit]['todo'])
                     for finish in finished:
-                        sources[source][unit]['todo'].remove(finish)
-                        sources[source][unit]['used'].add(finish)
+                        sources[id][unit]['todo'].remove(finish)
+                        sources[id][unit]['used'].add(finish)
         break
     return models
 
-def origin_model(source, unit):
+
+def origin_model(id, unit):
     model = core.mining.lsimodel.LSImodel('')
     model.slicer = services.mining.silencer
-    model.setup([source], [model.slicer(unit)])
+    try:
+        model.setup([id], [model.slicer(unit)])
+    except ValueError:
+        model.names.append(id)
+        model.texts.append(model.slicer(unit))
     return model
 
-def train_by_source(source, requirement, sources, models, skyline=1.5):
+
+def train_by_source(id, requirement, sources, models, skyline=1.5):
     des = source_list(sources)
     indexs = []
     while(des):
@@ -91,20 +97,16 @@ def train_by_source(source, requirement, sources, models, skyline=1.5):
                 model = models[i]
         else:
             try:
-                model = origin_model(source, requirement)
+                model = origin_model(id, requirement)
             except ValueError:
                 continue
-        for source, unit in unit_gen(des):
+        for id, unit in unit_gen(des):
             sumgood = modelanalysis.judge.linalg(unit, model)
             if sumgood > skyline:
-                names = model.names
-                texts = model.texts
                 model = core.mining.lsimodel.LSImodel('/tmp/lsimodel')
                 model.slicer = services.mining.silencer
-                names.append(requirement)
-                texts.append(model.slicer(unit))
                 try:
-                    model.setup(names, texts)
+                    model.setup(model.names+[requirement], model.texts+[model.slicer(unit)])
                 except ValueError:
                     continue
                 if index is None:
@@ -112,7 +114,7 @@ def train_by_source(source, requirement, sources, models, skyline=1.5):
                     index = models.index(model)
                 else:
                     models[index] = model
-                des.pop(source)
+                des.pop(id)
                 indexs.append(index)
                 break
         else:

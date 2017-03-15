@@ -61,7 +61,7 @@ def gen_models(sources):
                 if inputunit is None:
                     break
                 used_units.append(inputunit)
-                indexs = train_by_model(id, inputunit, sources, models)
+                indexs = train_by_model(id, inputunit, sources, models) # train_by_source
                 if not indexs:
                     continue
                 for index in indexs:
@@ -119,4 +119,28 @@ def train_by_source(id, requirement, sources, models, skyline=1.5):
                 break
         else:
             break
+    return indexs
+
+
+def train_by_model(id, requirement, sources, models, skyline=1.5):
+    indexs = []
+    index = None
+    model = origin_model(id, requirement)
+    resources = source_list(sources)
+    while(resources):
+        for reid, resource in unit_gen(resources):
+            sumgood = modelanalysis.judge.linalg(resource, model)
+            if sumgood > skyline:
+                model = core.mining.lsimodel.LSImodel('/tmp/lsimodel')
+                model.slicer = services.mining.silencer
+                try:
+                    model.setup(model.names+[reid], model.texts+[model.slicer(resource)])
+                except ValueError:
+                    continue
+                resources.pop(reid)
+                break
+        else:
+            break
+    if index is not None:
+        indexs = [index]
     return indexs

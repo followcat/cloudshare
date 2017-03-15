@@ -10,7 +10,7 @@ module.exports = {
   indexRoute: {
     getComponent(nextState, callback) {
       require.ensure([], (require) => {
-        callback(null, require('views/FastMatching/component/FastMatching').default);
+        callback(null, require('views/fast-matching').default);
       }, 'fast-matching');
     }
   }

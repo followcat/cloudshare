@@ -61,7 +61,7 @@ def gen_models(sources):
                 if inputunit is None:
                     break
                 used_units.append(inputunit)
-                indexs = train_by_source(id, inputunit, sources, models)
+                indexs = train_by_model(id, inputunit, sources, models)
                 if not indexs:
                     continue
                 for index in indexs:
@@ -106,7 +106,7 @@ def train_by_source(id, requirement, sources, models, skyline=1.5):
                 model = core.mining.lsimodel.LSImodel('/tmp/lsimodel')
                 model.slicer = services.mining.silencer
                 try:
-                    model.setup(model.names+[requirement], model.texts+[model.slicer(unit)])
+                    model.setup(model.names+[id], model.texts+[model.slicer(unit)])
                 except ValueError:
                     continue
                 if index is None:

@@ -32,12 +32,6 @@ class Automodels(object):
             for unit in sources[id]:
                 yield id, unit
 
-    def source_list(self):
-        d = dict()
-        for id in self.sources:
-            d[id] = self.sources[id].keys()
-        return d
-
     def source_reloaded(self):
         d = collections.defaultdict(dict) 
         for id in self.sources:
@@ -67,7 +61,7 @@ class Automodels(object):
                     if inputunit is None:
                         break
                     used_units.append(inputunit)
-                    indexs = self.train_by_model(id, inputunit, sources, models) # train_by_source
+                    indexs = self.train_by_model(id, inputunit, sources, models)
                     if not indexs:
                         continue
                     for index in indexs:
@@ -87,44 +81,6 @@ class Automodels(object):
             model.names.append(id)
             model.texts.append(model.slicer(unit))
         return model
-
-
-    def train_by_source(self, id, requirement, sources, models, skyline=1.5):
-        des = self.source_reloaded()
-        indexs = []
-        while(des):
-            index = None
-            for i in range(len(models)):
-                sumgood = modelanalysis.judge.linalg(requirement, models[i])
-                if sumgood > skyline:
-                    index = i
-                    model = models[i]
-            else:
-                try:
-                    model = origin_model(id, requirement)
-                except ValueError:
-                    continue
-            for id, unit in unit_gen(des):
-                sumgood = modelanalysis.judge.linalg(unit, model)
-                if sumgood > skyline:
-                    model = core.mining.lsimodel.LSImodel('/tmp/lsimodel')
-                    model.slicer = services.mining.silencer
-                    try:
-                        model.setup(model.names+[id], model.texts+[model.slicer(unit)])
-                    except ValueError:
-                        continue
-                    if index is None:
-                        models.append(model)
-                        index = models.index(model)
-                    else:
-                        models[index] = model
-                    des.pop(id)
-                    indexs.append(index)
-                    break
-            else:
-                break
-        return indexs
-
 
     def train_by_model(self, id, requirement, sources, models, skyline=1.5):
         indexs = []

@@ -5,16 +5,16 @@ module.exports = {
   getComponent(nextState, callback) {
     require.ensure([], (require) => {
       callback(null, require('views/common/Layout').default);
-    }, 'common-layout');
+    }, 'layout');
   },
   indexRoute: {
     getComponent(nextState, callback) {
       require.ensure([], (require) => {
-        callback(null, require('views/Uploader/component/Uploader').default);
-      }, 'uploader');
+        callback(null, require('views/uploader/upload').default);
+      }, 'upload');
     }
   },
   childRoutes: [
-    require('./result')
+    require('./upload')
   ]
 };

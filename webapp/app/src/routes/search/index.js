@@ -1,6 +1,4 @@
 'use strict';
-// import Layout from 'views/common/Layout';
-// import { Search } from 'views/Search';
 
 module.exports = {
   path: 'search',
@@ -12,7 +10,7 @@ module.exports = {
   indexRoute: {
     getComponent(nextState, callback) {
       require.ensure([], (require) => {
-        callback(null, require('views/Search/component/Search').default);
+        callback(null, require('views/search/search').default);
       }, 'search');
     }
   },

@@ -1,17 +1,16 @@
 'use strict';
-// import { Layout, JobDescription } from 'views/ProjectManagement';
 
 module.exports = {
   path: 'pm',
   getComponent(nextState, callback) {
     require.ensure([], (require) => {
-      callback(null, require('views/ProjectManagement/component/Layout').default);
+      callback(null, require('views/pm/Layout').default);
     }, 'layout');
   },
   indexRoute: {
     getComponent(nextState, callback) {
       require.ensure([], (require) => {
-        callback(null, require('views/ProjectManagement/component/JobDescription').default);
+        callback(null, require('views/pm/job-description').default);
       }, 'job-description');
     }
   },

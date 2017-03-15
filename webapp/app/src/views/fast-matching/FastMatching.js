@@ -14,7 +14,6 @@ import { getFastMatching } from 'request/fastmatching';
 import { API } from 'API';
 
 import findIndex from 'lodash/findIndex';
-import queryString from 'utils/query_string';
 
 class FastMatching extends Component {
   constructor() {

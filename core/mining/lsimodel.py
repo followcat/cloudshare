@@ -118,30 +118,34 @@ class LSImodel(object):
             result = self.config[param]
         return result
 
-    def save(self):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        with open(os.path.join(self.path, self.names_save_name), 'w') as f:
+    def save(self, path=None):
+        if path is None:
+            path = self.path
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(os.path.join(path, self.names_save_name), 'w') as f:
             ujson.dump(self.names, f)
         if self.corpus:
-            with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
+            with open(os.path.join(path, self.corpus_save_name), 'w') as f:
                 ujson.dump(self.corpus, f)
         if self.texts:
-            with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
+            with open(os.path.join(path, self.texts_save_name), 'w') as f:
                 ujson.dump(self.texts, f)
-        self.lsi.save(os.path.join(self.path, self.model_save_name))
-        self.dictionary.save(os.path.join(self.path, self.corpu_dict_save_name))
+        self.lsi.save(os.path.join(path, self.model_save_name))
+        self.dictionary.save(os.path.join(path, self.corpu_dict_save_name))
         self.clear()
 
     def clear(self):
         self.corpus = None
         self.texts = None
 
-    def load(self):
-        with open(os.path.join(self.path, self.names_save_name), 'r') as f:
+    def load(self, path=None):
+        if path is None:
+            path = self.path
+        with open(os.path.join(path, self.names_save_name), 'r') as f:
             self.names = ujson.load(f)
-        self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
-        self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
+        self.lsi = models.LsiModel.load(os.path.join(path, self.model_save_name))
+        self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(path,
                                                              self.corpu_dict_save_name))
 
     def add(self, name, document):

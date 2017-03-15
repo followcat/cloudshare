@@ -1,8 +1,8 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import LayoutHeader from '../../common/LayoutHeader';
-import LayoutContainer from '../../common/LayoutContainer';
+import LayoutHeader from '../common/LayoutHeader';
+import LayoutContainer from '../common/LayoutContainer';
 import SubheadNav from 'components/subhead-nav';
 import {
   CardContainer,
@@ -47,15 +47,15 @@ class Layout extends Component {
     const menus = [{
       key: 'jobdescription',
       title: language.OPEN_JOB_DESCRIPTION,
-      url: '/jobdescription'
+      url: '/pm/jobdescription'
     }, {
       key: 'customer',
       title: language.OWN_CUSTOMER_MANAGEMENT,
-      url: '/customer'
+      url: '/pm/customer'
     }, {
-      key: 'company',
+      key: 'list',
       title: language.DEVELOPMENT_CUSTOMER_MANAGEMENT,
-      url: '/company/list'
+      url: '/pm/company/list'
     }];
 
     const cardContentTitle = this.getTitle(this.state.selectedKey, menus);

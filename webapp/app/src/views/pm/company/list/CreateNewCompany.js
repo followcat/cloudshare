@@ -9,8 +9,6 @@ import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
-const FormItem = Form.Item;
-
 class CreateNewCompany extends Component {
   constructor() {
     super();
@@ -48,7 +46,7 @@ class CreateNewCompany extends Component {
   }
 
   render() {
-    const { getFieldProps } = this.props.form;
+    const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -70,81 +68,80 @@ class CreateNewCompany extends Component {
         buttonStyle={{ marginLeft: 8 }}
         modalStyle={{ top: 20 }}
       >
-        <Form horizontal>
-          <FormItem
+        <Form layout="horizontal">
+          <Form.Item
             label={language.COMPANY_NAME}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('name', { rules: [{ required: true }] })}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_NAME}`}
-            />
-          </FormItem>
-          <FormItem
+            {getFieldDecorator('name', {
+              rules: [{ required: true }]
+            })(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_NAME}`} />
+            )}
+          </Form.Item>
+          <Form.Item
             label={language.COMPANY_INTRODUCTION}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('introduction')}
-              type="textarea"
-              rows="2"
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_INTRODUCTION}`}
-            />
-          </FormItem>
-          <FormItem
+            {getFieldDecorator('introduction')(
+              <Input
+                type="textarea"
+                rows="2"
+                placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_INTRODUCTION}`}
+              />
+            )}
+          </Form.Item>
+          <Form.Item
             label={language.DISTRICT}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('district')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.DISTRICT}`}
-            />
-          </FormItem>
-          <FormItem
+            {getFieldDecorator('district')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.DISTRICT}`} />
+            )}
+            
+          </Form.Item>
+          <Form.Item
             label={language.PRODUCT}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('product')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.PRODUCT}`}
-            />
-          </FormItem>
-          <FormItem
+            {getFieldDecorator('product')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.PRODUCT}`} />
+            )}
+          </Form.Item>
+          <Form.Item
             label={language.TELLPHONE}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('conumber')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.TELLPHONE}`}
-            />
-          </FormItem>
-          <FormItem
+            {getFieldDecorator('conumber')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.TELLPHONE}`} />
+            )}
+          </Form.Item>
+          <Form.Item
             label={language.ADDRESS}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('address')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.ADDRESS}`}
-            />
-          </FormItem>
-          <FormItem
+            {getFieldDecorator('address')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.ADDRESS}`} />
+            )}
+          </Form.Item>
+          <Form.Item
             label={language.EMAIL}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('email', { rules: [{ type: 'email', message: language.EMAIL_VALIDATE_TIP }] })}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.EMAIL}`}
-            />
-          </FormItem>
-          <FormItem
+            {getFieldDecorator('email', {
+              rules: [{ type: 'email', message: language.EMAIL_VALIDATE_TIP }]
+            })(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.EMAIL}`} />
+            )}
+          </Form.Item>
+          <Form.Item
             label={language.WEBSITE}
             {...formItemLayout}
           >
-            <Input
-              {...getFieldProps('website')}
-              placeholder={`${language.INPUT_PLACEHOLDER}${language.WEBSITE}`}
-            />
-          </FormItem>
+            {getFieldDecorator('website')(
+              <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.WEBSITE}`} />
+            )}
+          </Form.Item>
         </Form>
       </ButtonWithModal>
     );
@@ -155,7 +152,7 @@ CreateNewCompany.propTypes = {
   confirmLoading: PropTypes.bool,
   onSubmit: PropTypes.func,
   form: PropTypes.shape({
-    getFieldProps: PropTypes.func,
+    getFieldDecorator: PropTypes.func,
     resetFields: PropTypes.func,
     validateFields: PropTypes.func,
   }),

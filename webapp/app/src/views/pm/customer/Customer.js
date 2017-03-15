@@ -4,8 +4,8 @@ import React, { Component } from 'react';
 import TablePlus from 'components/table-plus';
 import SiderPanel from 'components/sider-panel';
 import DetailInformation from 'components/detail-information';
-import ExtractInfo from './ExtractInfo';
 import ButtonWithModal from 'components/button-with-modal';
+import ExtractInfo from './ExtractInfo';
 
 import {
   Popconfirm,
@@ -23,8 +23,6 @@ import {
 import find from 'lodash/find';
 
 import websiteText from 'config/website-text';
-
-const Option = Select.Option;
 
 const language = websiteText.zhCN;
 
@@ -209,7 +207,9 @@ class Customer extends Component {
                 filterOption={false}
                 onChange={this.handleChange}
               >
-                {companyDataSource.map(item => <Option key={item.company_name}>{item.company_name}</Option>)}
+                {companyDataSource.map(item => {
+                  return <Select.Option key={item.company_name}>{item.company_name}</Select.Option>;
+                })}
               </Select>
             </Form.Item>
           </Form>

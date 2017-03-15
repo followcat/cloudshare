@@ -42,7 +42,8 @@ class Operation extends Component {
 }
 
 Operation.propTypes = {
-
-}
+  record: PropTypes.object,
+  onEdit: PropTypes.func
+};
 
 export default Operation;

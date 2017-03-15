@@ -22,7 +22,7 @@ class Automodels(object):
             >>> sources = dict(map(lambda x: (x['id'], x['description']),
             ...                SVC_PRJ_MED.jobdescription.lists()))
             >>> am = Automodels(sources, '/tmp/automodel')
-            >>> models = am.gen_models(autosave=True)
+            >>> models = am.gen_models(autosave=False)
         """
         if flags is not None:
             self.FLAGS = flags

@@ -87,6 +87,12 @@ class UploaderResult extends Component {
   }
 }
 
+UploaderResult.default = {
+  fileList: [],
+  failedList: [],
+  confirmResult: []
+};
+
 UploaderResult.propTypes = {
   fileList: PropTypes.array,
   failedList: PropTypes.array,

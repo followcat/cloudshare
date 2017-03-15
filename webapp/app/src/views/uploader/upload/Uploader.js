@@ -195,7 +195,9 @@ class Uploader extends Component {
           confirmLoading: false,
         });
 
-        browserHistory.push('/uploader/result');
+        browserHistory.push({
+          pathname: '/uploader/upload/result'
+        });
       }
     });
   }
@@ -219,18 +221,22 @@ class Uploader extends Component {
       confirmLoading
     } = this.state;
 
-    return (
-      <Preview
-        completedList={completedList}
-        classifyList={classifyList}
-        currentPreview={currentPreview}
-        total={total}
-        confirmLoading={confirmLoading}
-        onPrevClick={this.handlePrevClick}
-        onNextClick={this.handleNextClick}
-        onConfirmClick={this.handleConfirmClick}
-      />
-    );
+    if (completedList.length > 0) {
+      return (
+        <Preview
+          completedList={completedList}
+          classifyList={classifyList}
+          currentPreview={currentPreview}
+          total={total}
+          confirmLoading={confirmLoading}
+          onPrevClick={this.handlePrevClick}
+          onNextClick={this.handleNextClick}
+          onConfirmClick={this.handleConfirmClick}
+        />
+      );
+    }
+
+    return null;
   }
 
   render() {
@@ -273,7 +279,7 @@ class Uploader extends Component {
 }
 
 Uploader.propTypes = {
-  children: PropTypes.element
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.array])
 };
 
 export default Uploader;

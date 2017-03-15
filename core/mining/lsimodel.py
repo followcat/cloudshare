@@ -166,6 +166,7 @@ class LSImodel(object):
                                         no_above=self.no_above)
 
     def set_corpus(self):
+        self.corpus = list()
         for text in self.texts:
             self.corpus.append(self.dictionary.doc2bow(text))
 

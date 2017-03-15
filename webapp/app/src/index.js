@@ -10,8 +10,8 @@ const rootRoute = {
   indexRoute: {
     getComponent(nextState, callback) {
       require.ensure([], (require) => {
-        callback(null, require('views/Index/Home').default);
-      }, 'home');
+        callback(null, require('views/index').default);
+      }, 'index');
     }
   },
   getComponent(nextState, callback) {
@@ -29,5 +29,5 @@ const rootRoute = {
 
 ReactDOM.render(
   <Router history={browserHistory} routes={rootRoute} />,
-  document.getElementById('app')
+  document.getElementById('root')
 );

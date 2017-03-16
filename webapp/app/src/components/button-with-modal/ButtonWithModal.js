@@ -19,15 +19,22 @@ class ButtonWithModal extends Component {
         </Button>
         <Modal
           visible={props.visible}
-          confirmLoading={props.confirmLoading}
           title={props.modalTitle}
           width={props.modalWidth}
-          okText={props.modalOkText}
-          cancelText={props.modalCancelText}
           style={props.modalStyle}
           wrapClassName={props.modalWrapClassName}
-          onOk={props.onModalOk}
-          onCancel={props.onModalCancel}
+          footer={[
+            <Button size="large" onClick={props.onModalCancel}>{props.modalCancelText}</Button>,
+            <Button
+              type="primary"
+              size="large"
+              loading={props.confirmLoading}
+              onClick={props.onModalOk}
+              disabled={props.disabled}
+            >
+              {props.modalOkText}
+            </Button>
+          ]}
         >
           {props.children}
         </Modal>
@@ -43,11 +50,12 @@ ButtonWithModal.defaultProps = {
   onButtonClick() {},
   visible: false,
   confirmLoading: false,
+  disabled: false,
   modalOkText: 'Ok',
   modalCancelText: 'Cancel',
   onModalOk() {},
-  onModalCancel() {},
-};  
+  onModalCancel() {}
+};
 
 ButtonWithModal.propTypes = {
   buttonStyle: PropTypes.object,
@@ -58,6 +66,7 @@ ButtonWithModal.propTypes = {
   onButtonClick: PropTypes.func,
   visible: PropTypes.bool,
   confirmLoading: PropTypes.bool,
+  disabled: PropTypes.bool,
   modalTitle: PropTypes.string,
   modalWidth: PropTypes.number,
   modalOkText: PropTypes.string,

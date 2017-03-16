@@ -187,6 +187,9 @@ class CompanyList extends Component {
   }
 
   handleUploadModalOk() {
+    this.setState({
+      visible: false
+    });
     this.props.history.push('/company/uploader');
   }
 
@@ -319,6 +322,8 @@ class CompanyList extends Component {
       filterValue
     } = this.state;
 
+    const { uploading, disabled } = this.props;
+
     // 主体表格分页
     const pagination = {
       current: current,
@@ -376,6 +381,7 @@ class CompanyList extends Component {
               buttonText={language.UPLOAD}
               modalTitle={language.UPLOAD}
               visible={visible}
+              disabled={disabled}
               onButtonClick={this.handleUploadBtnClick}
               onModalCancel={this.handleUploadModalCancel}
               onModalOk={this.handleUploadModalOk}
@@ -385,6 +391,7 @@ class CompanyList extends Component {
                   <Icon type="upload" /> 点击上传
                 </Button>
               </Upload>
+              {uploading ? <Icon type="loading" className="uploading" /> : null}
             </ButtonWithModal>
           </div>
           <div className="cs-card-inner-top-filter">

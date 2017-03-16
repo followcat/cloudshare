@@ -60,6 +60,8 @@ class Company extends Component {
       previewList: [],
       dataSource: [],
       loading: false,
+      uploading: false,
+      disabled: true,
       status: 'ready'
     };
     this.handleChange = this.handleChange.bind(this);
@@ -68,6 +70,18 @@ class Company extends Component {
 
   handleChange(info) {
     const file = info.file;
+    
+    if (file.status === 'uploading') {
+      this.setState({
+        uploading: true
+      });
+    }
+
+    if (file.status === 'error' || file.status === 'removed') {
+      this.setState({
+        uploading: false
+      });
+    }
 
     if (file.status === 'done' && file.response) {
       if (file.response.code === 200) {
@@ -75,7 +89,9 @@ class Company extends Component {
         message.success(`上传${file.name}文件成功!`);
         this.setState({
           previewList: file.response.data,
-          dataSource: dataSource
+          dataSource: dataSource,
+          uploading: false,
+          disabled: false
         });
       }
     }
@@ -124,6 +140,8 @@ class Company extends Component {
           React.cloneElement(this.props.children, {
             uploadProps: uploadProps,
             loading: this.state.loading,
+            uploading: this.state.uploading,
+            disabled: this.state.disabled,
             status: this.state.status,
             dataSource: this.state.dataSource,
             onConfirmUpload: this.handleConfirmUpload

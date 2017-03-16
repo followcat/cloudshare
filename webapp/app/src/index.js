@@ -23,7 +23,8 @@ const rootRoute = {
     require('./routes/search'),
     require('./routes/uploader'),
     require('./routes/pm'),
-    require('./routes/fast-matching')
+    require('./routes/fast-matching'),
+    require('./routes/user-info')
   ]
 };
 

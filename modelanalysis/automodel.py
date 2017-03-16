@@ -114,8 +114,13 @@ class Automodels(object):
         return result
 
     def judge_model(self, resource, model, skyline=1.5):
-        sumgood = modelanalysis.judge.linalg(resource, model)
-        return sumgood > skyline
+        result = False
+        try:
+            sumgood = modelanalysis.judge.linalg(resource, model)
+            result = sumgood > skyline
+        except TypeError:
+            pass
+        return result
 
     def train_by_model(self, id, requirement, sources):
         indexs = []

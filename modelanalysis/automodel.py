@@ -112,7 +112,7 @@ class Automodels(object):
         resources.pop(id)
         while(resources):
             for reid, resource in self.unit_gen(resources):
-                if self.judge_model(id, model):
+                if self.judge_model(requirement, model):
                     try:
                         model.setup(model.names+[reid], model.texts+[model.slicer(resource)])
                     except ValueError:

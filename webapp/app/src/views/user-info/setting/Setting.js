@@ -1,14 +1,15 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import Content from '../content';
-import ChangePassword from '../change-password';
+
+import Content from 'components/content';
+import ChangePassword from 'components/change-password';
 
 class Setting extends Component {
   render() {
     const props = this.props;
 
     return (
-      <Content prefixCls={props.settingPrefixCls}>
+      <Content prefixCls={props.prefixCls}>
         <ChangePassword onSubmit={props.onSubmit}/>
       </Content>
     );
@@ -16,11 +17,11 @@ class Setting extends Component {
 }
 
 Setting.defaultProps = {
+  prefixCls: 'cs-setting',
   onSubmit() {},
 };
 
 Setting.propTypes = {
-  settingPrefixCls: PropTypes.string,
   onSubmit: PropTypes.func,
 };
 

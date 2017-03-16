@@ -2,13 +2,11 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
-import Viewport from 'components/viewport';
-import Header from 'components/header';
-import CommonNavigation from './CommonNavigation';
 import ShowCard from 'components/show-card';
 import Container from 'components/container';
 import SiderMenu from 'components/sider-menu';
 import Content from 'components/content';
+import Layout from 'views/common/Layout';
 
 import { message, Popconfirm } from 'antd';
 
@@ -21,7 +19,9 @@ import { URL } from 'URL';
 import { getMenu, getCurrentActive } from 'utils/sider-menu-list';
 import History from 'utils/history';
 
-import './user-info.less';
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
 
 export default class UserInfo extends Component {
   constructor(props) {
@@ -117,40 +117,38 @@ export default class UserInfo extends Component {
 
   getColumns() {
     const columns = [{
-      title: 'Name',
+      title: '候选人姓名',
       dataIndex: 'name',
       width: 150,
       key: 'name',
       render: (text, record) => (
-        <a href={URL.getResumeURL(record.id)}>
-          {text || record.id}
-        </a>
+        <a href={URL.getResumeURL(record.id)} target="_blank">{text || record.id}</a>
       )
     }, {
-      title: 'Gender',
+      title: '性别',
       dataIndex: 'gender',
       width: 120,
       key: 'gender',
     }, {
-      title: 'Age',
+      title: '年龄',
       dataIndex: 'age',
       width: 120,
       key: 'age',
     }, {
-      title: 'Position',
+      title: '职位',
       dataIndex: 'position',
       key: 'position',
       width: 240,
     }, {
-      title: 'Operation',
+      title: '操作',
       key: 'operation',
       render: (text, record) => (
         <Popconfirm
-          title="Are you sure to delete this bookmark?"
+          title="确定进行删除操作?"
           placement="left"
           onConfirm={() => this.handleDeleteConfirm(record.id)}
         >
-          <a href="#">Delete</a>
+          <a href="javascript: void(0);">删除</a>
         </Popconfirm>
       ),
     }];
@@ -159,19 +157,27 @@ export default class UserInfo extends Component {
   }
 
   render() {
+    const menus = [{
+      key: 'history',
+      text: language.BROWSING_HISTORY,
+      url: '/userInfo/history'
+    }, {
+      key: 'bookmark',
+      text: language.BOOKMARK,
+      url: '/userInfo/bookmark'
+    }, {
+      key: 'setting',
+      text: language.SETTING,
+      url: '/userInfo/setting'
+    }];
+
     return (
-      <Viewport>
-        <Header 
-          fixed={true}
-          logoLink={URL.getSearchURL()}
-        >
-          <CommonNavigation />
-        </Header>
+      <Layout>
         <Container>
           <ShowCard ref="showCard">
             <SiderMenu
               selectedKeys={[this.state.current]}
-              menus={getMenu(this.props.route.childRoutes)}
+              menus={menus}
             />
             <Content>
               {this.props.children && React.cloneElement(this.props.children, {
@@ -189,7 +195,7 @@ export default class UserInfo extends Component {
             </Content>
           </ShowCard>
         </Container>
-      </Viewport>
+      </Layout>
     );
   }
 }

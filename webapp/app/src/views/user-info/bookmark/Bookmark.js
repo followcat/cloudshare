@@ -1,6 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import TablePlus from '../table-plus';
+
+import TablePlus from 'components/table-plus';
 
 class Bookmark extends Component {
   render() {

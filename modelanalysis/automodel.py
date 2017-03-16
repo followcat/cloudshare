@@ -54,14 +54,6 @@ class Automodels(object):
                                                            self.FLAGS))}
         return d
 
-    def origin_unit(self, sources, used_units, todos):
-        for id in sources:
-            for inputunit in sources[id]:
-                if inputunit not in used_units:
-                    for todo in todos:
-                        if todo in inputunit:
-                            return inputunit
-
     def gen_models(self, autosave=False, path=None):
         if path is None:
             path = self.path
@@ -70,7 +62,8 @@ class Automodels(object):
             for unit in sources[id]:
                 used_units = list()
                 while(sources[id][unit]['todo']):
-                    inputunit = self.origin_unit(sources, used_units, sources[id][unit]['todo'])
+                    inputunit = self.pick_origin_unit(sources, used_units,
+                                                      sources[id][unit]['todo'])
                     if inputunit is None:
                         break
                     used_units.append(inputunit)
@@ -96,16 +89,30 @@ class Automodels(object):
             model.texts.append(model.slicer(unit))
         return model
 
-    def train_by_model(self, id, requirement, sources, skyline=1.5):
+    def pick_origin_unit(self, sources, used_units, todos):
+        for id in sources:
+            for inputunit in sources[id]:
+                if inputunit not in used_units:
+                    for todo in todos:
+                        if todo in inputunit:
+                            return inputunit
+
+    def pick_model(self, id, requirement):
+        return self.origin_model(id, requirement)
+
+    def judge_model(self, resource, model, skyline=1.5):
+        sumgood = modelanalysis.judge.linalg(resource, model)
+        return sumgood > skyline
+
+    def train_by_model(self, id, requirement, sources):
         indexs = []
         index = None
-        model = self.origin_model(id, requirement)
+        model = self.pick_model(id, requirement)
         resources = self.source_reloaded()
         resources.pop(id)
         while(resources):
             for reid, resource in self.unit_gen(resources):
-                sumgood = modelanalysis.judge.linalg(resource, model)
-                if sumgood > skyline:
+                if self.judge_model(id, model):
                     try:
                         model.setup(model.names+[reid], model.texts+[model.slicer(resource)])
                     except ValueError:

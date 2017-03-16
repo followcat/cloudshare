@@ -20,7 +20,7 @@ class Automodels(object):
             >>> from modelanalysis.automodel import *
             >>> from baseapp.projects import *
             >>> sources = dict(map(lambda x: (x['id'], x['description']),
-            ...                SVC_PRJ_MED.jobdescription.lists()))
+            ...                SVC_PRJ_MED.jobdescription.lists()[:10]))
             >>> am = Automodels(sources, '/tmp/automodel')
             >>> models = am.gen_models(autosave=False)
         """
@@ -50,8 +50,8 @@ class Automodels(object):
             d[id] = collections.defaultdict(dict)
             for unit in re.split(u'[\n,.。，;]', self.sources[id]):
                 d[id][unit] = {'used': set(),
-                                   'todo': set(pos_extract(jieba_cut(unit, pos=True),
-                                                           self.FLAGS))}
+                               'todo': set(pos_extract(jieba_cut(unit, pos=True),
+                                           self.FLAGS))}
         return d
 
     def gen_models(self, autosave=False, path=None):
@@ -97,8 +97,21 @@ class Automodels(object):
                         if todo in inputunit:
                             return inputunit
 
-    def pick_model(self, id, requirement):
-        return self.origin_model(id, requirement)
+    def pick_model(self, id, requirement, percentage=1, effectline=1.5):
+        candidates = dict()
+        for model in self.models:
+            reqset = set(model.slicer(requirement))
+            coverpercent = float(len(reqset.intersection(
+                           model.dictionary.values())))/len(reqset) if len(reqset)!=0 else 0
+            if coverpercent >= percentage:
+                effective = modelanalysis.judge.linalg(requirement, model)
+                if effective > effectline:
+                    candidates[model] = effective
+        try:
+            result = sorted(candidates.items(), key=lambda d:d[1], reverse=True)[0][0]
+        except IndexError:
+            result = self.origin_model(id, requirement)
+        return result
 
     def judge_model(self, resource, model, skyline=1.5):
         sumgood = modelanalysis.judge.linalg(resource, model)
@@ -106,8 +119,7 @@ class Automodels(object):
 
     def train_by_model(self, id, requirement, sources):
         indexs = []
-        index = None
-        model = self.pick_model(id, requirement)
+        model = self.pick_model(requirement, requirement)
         resources = self.source_reloaded()
         resources.pop(id)
         while(resources):
@@ -121,7 +133,7 @@ class Automodels(object):
                     break
             else:
                 break
-        if model.names:
+        if model not in self.models:
             self.models.append(model)
-            indexs.append(self.models.index(model))
+        indexs.append(self.models.index(model))
         return indexs

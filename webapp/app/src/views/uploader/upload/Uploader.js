@@ -86,7 +86,7 @@ class Uploader extends Component {
 
         if (file.response.code === 200) {  // 上传成功后,请求预览数据
           // 请求preview API方法
-          uploadPreview({
+          uploadPreview(API.UPLOAD_RESUME_PREVIEW_API, {
             filename: file.response.data.filename
           }, json => {
             if (json.code === 200) {
@@ -181,7 +181,7 @@ class Uploader extends Component {
       confirmLoading: true,
     });
 
-    confirmUpload({
+    confirmUpload(API.UPLOAD_RESUME_API, {
       updates: confirmList
     }, (json) => {
       if (json.code === 200) {

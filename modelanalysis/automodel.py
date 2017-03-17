@@ -11,6 +11,20 @@ from utils.builtin import jieba_cut, pos_extract
 import modelanalysis.judge
 
 
+def gen_models(sources, path, flags=None):
+    """
+        >>> from modelanalysis.automodel import *
+        >>> from baseapp.projects import *
+        >>> sources = dict(map(lambda x: (x['id'], x['description']),
+        ...                SVC_PRJ_MED.jobdescription.lists()[:10]))
+        >>> gen_models(sources, '/tmp/genmodel')
+    """
+    g = Automodels(sources, path, flags)
+    results = list()
+    for k in g.model_generate():
+        results.append(k)
+    return results
+
 class Automodels(object):
 
     FLAGS = ['s', 'x']
@@ -22,7 +36,7 @@ class Automodels(object):
             >>> sources = dict(map(lambda x: (x['id'], x['description']),
             ...                SVC_PRJ_MED.jobdescription.lists()[:10]))
             >>> am = Automodels(sources, '/tmp/automodel')
-            >>> models = am.gen_models(autosave=False)
+            >>> gen = am.model_generate(autosave=False)
         """
         if flags is not None:
             self.FLAGS = flags
@@ -54,30 +68,16 @@ class Automodels(object):
                                            self.FLAGS))}
         return d
 
-    def gen_models(self, autosave=False, path=None):
+    def model_generate(self, autosave=False, path=None):
         if path is None:
             path = self.path
         sources = self.source_reloaded()
         for id in sources:
-            for unit in sources[id]:
-                used_units = list()
-                while(sources[id][unit]['todo']):
-                    inputunit = self.pick_origin_unit(sources, used_units,
-                                                      sources[id][unit]['todo'])
-                    if inputunit is None:
-                        break
-                    used_units.append(inputunit)
-                    indexs = self.train_by_model(id, inputunit, sources)
-                    if not indexs:
-                        continue
-                    for index in indexs:
-                        if autosave is True:
-                            self.models[index].save(os.path.join(path, str(index)))
-                        finished = set(self.models[index].dictionary.values()).intersection(
-                                       sources[id][unit]['todo'])
-                        for finish in finished:
-                            sources[id][unit]['todo'].remove(finish)
-                            sources[id][unit]['used'].add(finish)
+            for requirement in sources[id]:
+                indexs = self.train_by_model(id, requirement)
+                if not indexs:
+                    continue
+                yield self.models[indexs[0]]
 
     def origin_model(self, id, unit):
         model = core.mining.lsimodel.LSImodel(self.path)
@@ -89,30 +89,6 @@ class Automodels(object):
             model.texts.append(model.slicer(unit))
         return model
 
-    def pick_origin_unit(self, sources, used_units, todos):
-        for id in sources:
-            for inputunit in sources[id]:
-                if inputunit not in used_units:
-                    for todo in todos:
-                        if todo in inputunit:
-                            return inputunit
-
-    def pick_model(self, id, requirement, percentage=1, effectline=1.5):
-        candidates = dict()
-        for model in self.models:
-            reqset = set(model.slicer(requirement))
-            coverpercent = float(len(reqset.intersection(
-                           model.dictionary.values())))/len(reqset) if len(reqset)!=0 else 0
-            if coverpercent >= percentage:
-                effective = modelanalysis.judge.linalg(requirement, model)
-                if effective > effectline:
-                    candidates[model] = effective
-        try:
-            result = sorted(candidates.items(), key=lambda d:d[1], reverse=True)[0][0]
-        except IndexError:
-            result = self.origin_model(id, requirement)
-        return result
-
     def judge_model(self, resource, model, skyline=1.5):
         result = False
         try:
@@ -122,9 +98,9 @@ class Automodels(object):
             pass
         return result
 
-    def train_by_model(self, id, requirement, sources):
+    def train_by_model(self, id, requirement):
         indexs = []
-        model = self.pick_model(requirement, requirement)
+        model = self.origin_model(id, requirement)
         resources = self.source_reloaded()
         resources.pop(id)
         while(resources):

@@ -83,7 +83,7 @@ class ReminderInfoItem extends Component {
   }
 
   disabledDate(current) {
-    return current && current.getTime() < Date.now() - t;
+    return current && current.value < Date.now() - t;
   }
 
   getEditingRender() {

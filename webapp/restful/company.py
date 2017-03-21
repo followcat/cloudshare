@@ -171,7 +171,7 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('date', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
 
-    def put(self):
+    def post(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
         id = args['id']

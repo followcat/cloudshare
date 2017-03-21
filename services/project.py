@@ -126,8 +126,10 @@ class Project(services.base.service.Service):
                 projectinfo[item] = info[item]
             else:
                 baseinfo[item] = info[item]
-        prj_res = self.company.saveinfo(id, projectinfo, "Update information.", committer)
-        bas_res = self.company.storage.saveinfo(id, baseinfo, "Update information.", committer)
+        prj_res = self.company.saveinfo(id, projectinfo,
+                                        "Update %s information."%id, committer)
+        bas_res = self.company.storage.saveinfo(id, baseinfo,
+                                        "Update %s information."%id, committer)
         return prj_res or bas_res
 
     def company_compare_excel(self, stream, committer):

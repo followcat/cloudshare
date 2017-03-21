@@ -108,6 +108,7 @@ class BaseStorage(services.base.service.Service):
         baseinfo = self.getinfo(id)
         if baseinfo != info and set(baseinfo.keys()).issubset(set(info.keys())):
             name = core.outputstorage.ConvertName(id).yaml
+            info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
             self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,

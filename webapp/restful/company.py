@@ -170,8 +170,6 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('update_info', type= list, location = 'json')
         self.reqparse.add_argument('date', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('key', location = 'json')
-        self.reqparse.add_argument('value', type=dict, location = 'json')
 
     def put(self):
         args = self.reqparse.parse_args()
@@ -180,15 +178,17 @@ class CompanyInfoUpdateAPI(Resource):
         update_info = args['update_info']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        data = dict()
+        baseinfo = dict()
+        projectinfo = dict()
         for item in update_info:
-            try:
-                result = project.company.updateinfo(id, item['key'], item['value'], user.id)
-            except AssertionError:
-                continue
-            data.update(result)
-        if len(data) != 0:
-            response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
+            if item in dict(project.company.YAML_TEMPLATE):
+                projectinfo[item] = update_info[item]
+            else:
+                baseinfo[item] = update_info[item]
+        prj_res = project.company.saveinfo(id, projectinfo, "Update information.", committer)
+        bas_res = project.company.storage.saveinfo(id, baseinfo, "Update information.", committer)
+        if prj_res or bas_res:
+            response = { 'code': 200, 'message': 'Update information success.' }
         else:
             response = { 'code': 400, 'message': 'Update information error.' }
         return response

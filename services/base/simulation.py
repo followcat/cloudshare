@@ -125,9 +125,10 @@ class Simulation(services.base.storage.BaseStorage):
             else:
                 result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         else:
-            self.saveinfo(id, projectinfo, 'Update modifytime.',
+            result = self.saveinfo(id, projectinfo, 'Update modifytime.',
                           committer, do_commit=do_commit)
-            result = self.storage.updateinfo(id, key, value, committer, do_commit=do_commit)
+            if result:
+                self.storage.updateinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
     def deleteinfo(self, id, key, value, committer, date, do_commit=True):
@@ -142,9 +143,13 @@ class Simulation(services.base.storage.BaseStorage):
         return result
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
-        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
-        self.memsorted.update('modifytime', id)
+        result = False
+        projectinfo = self.getinfo(id)
+        if projectinfo != info and baseinfo.keys() == info.keys():
+            info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            result = super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
+            self.memsorted.update('modifytime', id)
+        return result
 
     def search(self, keyword):
         results = set()

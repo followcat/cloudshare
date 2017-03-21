@@ -104,11 +104,15 @@ class BaseStorage(services.base.service.Service):
         return result
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
-        name = core.outputstorage.ConvertName(id).yaml
-        dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
-                             allow_unicode=True, default_flow_style=False)
-        self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
-                              message=message, committer=committer, do_commit=do_commit)
+        result = False
+        baseinfo = self.getinfo(id)
+        if baseinfo != info and baseinfo.keys() == info.keys():
+            name = core.outputstorage.ConvertName(id).yaml
+            dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
+                                 allow_unicode=True, default_flow_style=False)
+            self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
+                                  message=message, committer=committer, do_commit=do_commit)
+        return result
 
     def modify(self, filename, stream, message=None, committer=None, do_commit=True):
         self.interface.modify(filename, stream, message, committer, do_commit=do_commit)

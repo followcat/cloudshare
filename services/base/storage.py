@@ -94,6 +94,15 @@ class BaseStorage(services.base.service.Service):
                           'Delete %s key %s.' % (id, key), committer, do_commit=do_commit)
             return data
 
+    @utils.issue.fix_issue('issues/update_name.rst')
+    def updateinfo(self, id, key, value, committer, do_commit=True):
+        assert self.exists(id)
+        baseinfo = self.getyaml(id)
+        result = None
+        if key in baseinfo:
+            result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
+        return result
+
     def saveinfo(self, id, info, message, committer, do_commit=True):
         name = core.outputstorage.ConvertName(id).yaml
         dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,

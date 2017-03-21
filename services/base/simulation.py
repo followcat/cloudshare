@@ -114,22 +114,20 @@ class Simulation(services.base.storage.BaseStorage):
         yaml.update(info)
         return yaml
 
-    @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer, do_commit=True):
         assert key not in self.fix_item
         assert self.exists(id)
         projectinfo = self.getinfo(id)
-        baseinfo = self.getyaml(id)
         result = None
         if key in projectinfo:
             if key in self.list_item:
                 result = self._addinfo(id, key, value, committer, do_commit=do_commit)
             else:
                 result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
-        elif key in baseinfo:
+        else:
             self.saveinfo(id, projectinfo, 'Update modifytime.',
                           committer, do_commit=do_commit)
-            result = self.storage._modifyinfo(id, key, value, committer, do_commit=do_commit)
+            result = self.storage.updateinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
     def deleteinfo(self, id, key, value, committer, date, do_commit=True):

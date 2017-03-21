@@ -207,10 +207,10 @@ class Simulation(services.base.storage.BaseStorage):
             name = core.outputstorage.ConvertName(i)
             try:
                 mdpath = os.path.join(path, name.md)
-                mdstream = self.storage.getmd(i)
+                mdstream = self.getmd(i)
                 writefile(mdpath, mdstream)
             except IOError:
                 pass
             writefile(htmlpath, htmlstream)
-            yamlinfo = self.storage.getyaml(i)
+            yamlinfo = self.getyaml(i)
             utils.builtin.save_yaml(yamlinfo, path, name.yaml)

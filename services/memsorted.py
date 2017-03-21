@@ -11,7 +11,7 @@ class MemerySorted(object):
             self.memdict[key] = {}
         for id in ids:
             if id not in self.memdict[key]:
-                info = self.service.getinfo(id)
+                info = self.service.getyaml(id)
                 if key not in info:
                     self.memdict[key][id] = 0
                 else:
@@ -24,7 +24,7 @@ class MemerySorted(object):
     def update(self, key, id):
         if key not in self.memdict:
             self.memdict[key] = {}
-        info = self.service.getinfo(id)
+        info = self.service.getyaml(id)
         if key not in info:
             self.memdict[key][id] = 0
         else:

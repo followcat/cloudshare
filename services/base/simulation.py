@@ -109,10 +109,13 @@ class Simulation(services.base.storage.BaseStorage):
         return self.storage.getmd(name)
 
     def getyaml(self, id):
-        yaml = self.storage.getyaml(id)
-        info = self.getinfo(id)
-        yaml.update(info)
-        return yaml
+        baseinfo = self.storage.getyaml(id)
+        prjinfo = self.getinfo(id)
+        basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
+        prjtime = prjinfo['modifytime'] if 'modifytime' in prjinfo else 0
+        prjinfo.update(baseinfo)
+        prjinfo['modifytime'] = max(basetime, prjtime)
+        return prjinfo
 
     def updateinfo(self, id, key, value, committer, do_commit=True):
         assert key not in self.fix_item
@@ -143,12 +146,8 @@ class Simulation(services.base.storage.BaseStorage):
         return result
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
-        result = False
-        projectinfo = self.getinfo(id)
-        if projectinfo != info and baseinfo.keys() == info.keys():
-            info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            result = super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
-            self.memsorted.update('modifytime', id)
+        result = super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
+        self.memsorted.update('modifytime', id)
         return result
 
     def search(self, keyword):

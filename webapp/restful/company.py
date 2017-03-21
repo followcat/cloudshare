@@ -178,16 +178,8 @@ class CompanyInfoUpdateAPI(Resource):
         update_info = args['update_info']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        baseinfo = dict()
-        projectinfo = dict()
-        for item in update_info:
-            if item in dict(project.company.YAML_TEMPLATE):
-                projectinfo[item] = update_info[item]
-            else:
-                baseinfo[item] = update_info[item]
-        prj_res = project.company.saveinfo(id, projectinfo, "Update information.", committer)
-        bas_res = project.company.storage.saveinfo(id, baseinfo, "Update information.", committer)
-        if prj_res or bas_res:
+        result = project.company_update_info(id, update_info, user.id)
+        if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
             response = { 'code': 400, 'message': 'Update information error.' }

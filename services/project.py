@@ -118,6 +118,18 @@ class Project(services.base.service.Service):
         return self.curriculumvitae.timerange(start_y, start_m, start_d,
                                               end_y, end_m, end_d)
 
+    def company_update_info(self, id, info, committer):
+        baseinfo = dict()
+        projectinfo = dict()
+        for item in info:
+            if item in dict(self.company.YAML_TEMPLATE):
+                projectinfo[item] = info[item]
+            else:
+                baseinfo[item] = info[item]
+        prj_res = self.company.saveinfo(id, projectinfo, "Update information.", committer)
+        bas_res = self.company.storage.saveinfo(id, baseinfo, "Update information.", committer)
+        return prj_res or bas_res
+
     def company_compare_excel(self, stream, committer):
         outputs = list()
         outputs.extend(self.corepo.compare_excel(stream, committer))

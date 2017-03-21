@@ -193,22 +193,6 @@ class CompanyInfoUpdateAPI(Resource):
             response = { 'code': 400, 'message': 'Update information error.' }
         return response
 
-    def delete(self):
-        args = self.reqparse.parse_args()
-        user = flask.ext.login.current_user
-        id = args['id']
-        key = args['key']
-        date = args['date']
-        value = args['value']
-        projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
-        data = project.company.deleteinfo(id, key, value, user.id, date)
-        if data is not None:
-            response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
-        else:
-            response = { 'code': 400, 'message': 'Delete information error.'}
-        return response
-
 
 class SearchCObyTextAPI(Resource):
 

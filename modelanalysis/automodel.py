@@ -11,19 +11,19 @@ from utils.builtin import jieba_cut, pos_extract
 import modelanalysis.judge
 
 
-def gen_models(sources, path, maxmodels=None, flags=None):
+def gen_models(sources, path, maxmodels=None, flags=None, autosave=False):
     """
         >>> from modelanalysis.automodel import *
         >>> from baseapp.projects import *
         >>> sources = dict(map(lambda x: (x['id'], x['description']),
         ...                SVC_PRJ_MED.jobdescription.lists()[:10]))
-        >>> gen_models(sources, '/tmp/genmodel')
+        >>> am = gen_models(sources, '/tmp/genmodel')
     """
     g = Automodels(sources, path, maxmodels, flags)
     results = list()
-    for k in g.model_generate():
+    for k in g.model_generate(autosave):
         results.append(k)
-    return results
+    return g
 
 class Automodels(object):
 

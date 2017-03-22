@@ -34,9 +34,10 @@ class Automodels(object):
             >>> from modelanalysis.automodel import *
             >>> from baseapp.projects import *
             >>> sources = dict(map(lambda x: (x['id'], x['description']),
-            ...                SVC_PRJ_MED.jobdescription.lists()[:10]))
+            ...                SVC_PRJ_MED.jobdescription.lists()))
             >>> am = Automodels(sources, '/tmp/automodel')
             >>> gen = am.model_generate(autosave=False)
+            >>> model = gen.next()
         """
         if flags is not None:
             self.FLAGS = flags
@@ -79,6 +80,17 @@ class Automodels(object):
                     continue
                 yield model
 
+    def pick_model(self, id, requirement, effectline=1.5):
+        candidates = dict()
+        for model in self.models:
+            candidates[model] = modelanalysis.judge.linalg(requirement, model)
+        results = sorted(candidates.items(), key=lambda d:d[1], reverse=True)
+        if results and results[0][1] > effectline:
+            model = results[0][0]
+        else:
+            model = self.origin_model(id, requirement)
+        return model
+
     def origin_model(self, id, unit):
         model = core.mining.lsimodel.LSImodel(self.path)
         model.slicer = services.mining.silencer
@@ -115,7 +127,7 @@ class Automodels(object):
                 break
 
     def train_model(self, id, requirement):
-        model = self.origin_model(id, requirement)
+        model = self.pick_model(id, requirement)
         result = self.upgrade_model(model, id, requirement)
         if result:
             resources = self.source_reloaded()

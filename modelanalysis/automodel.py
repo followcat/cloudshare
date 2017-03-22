@@ -17,7 +17,7 @@ def gen_models(sources, path, maxmodels=None, flags=None, autosave=False):
         >>> from baseapp.projects import *
         >>> sources = dict(map(lambda x: (x['id'], x['description']),
         ...                SVC_PRJ_MED.jobdescription.lists()[:10]))
-        >>> am = gen_models(sources, '/tmp/genmodel')
+        >>> am = gen_models(sources, '/tmp/genmodel', maxmodels=10)
     """
     g = Automodels(sources, path, maxmodels, flags)
     results = list()
@@ -84,7 +84,7 @@ class Automodels(object):
     def pick_model(self, id, requirement, effectline=1.5):
         candidates = dict()
         for model in self.models:
-            candidates[model] = modelanalysis.judge.linalg(requirement, model)
+            candidates[model] = modelanalysis.judge.probably(requirement, model)
         results = sorted(candidates.items(), key=lambda d:d[1], reverse=True)
         if results and results[0][1] > effectline:
             model = results[0][0]

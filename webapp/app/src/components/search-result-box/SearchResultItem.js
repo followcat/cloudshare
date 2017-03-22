@@ -82,6 +82,7 @@ class SearchResultItem extends Component {
               <a
                 href={`/resume/${cv_id}`}
                 style={linkColor}
+                target="_blank"
               >
                 {this.getNameTextRender()}
               </a>

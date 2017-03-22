@@ -1,0 +1,43 @@
+@searchResultPrefixCls: cs-search-result;
+
+body {
+  background-color: #f5f5f5;
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  min-width: 1024px;
+  min-height: 100%;
+}
+
+/* SearchResult component style */
+.@{searchResultPrefixCls} {
+  &-top {
+    width: 680px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  &-container {
+    .top-container {
+      border: 1px solid #eee;
+      border-radius: 4px;
+      background-color: #fff;
+      padding: 24px;
+      margin: 0 auto;
+      margin-bottom: 24px;
+      overflow: hidden;
+
+      .left-wrap {
+        width: 49%;
+        float: left;
+      }
+
+      .right-wrap {
+        width: 50%;
+        float: left;
+      }
+    }
+  }
+}

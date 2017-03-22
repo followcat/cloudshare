@@ -97,7 +97,7 @@ class ChangePassword extends Component {
     this.getPasswordStrenth(value, 'reNewPassword');
 
     if (value && value !== getFieldValue('newPassword')) {
-      callback('Twice password input value are inconsistent.');
+      callback('两次输入的密码不一致');
     } else {
       callback();
     }
@@ -140,103 +140,93 @@ class ChangePassword extends Component {
     };
 
     const props = this.props,
-          { getFieldProps } = props.form;
+          { getFieldDecorator } = props.form;
 
-    //旧密码表单验证
-    const oldPasswordProps = getFieldProps('oldPassword', {
-      rules: [
-        { required: true, message: 'Password is required.' },
-        { min: 6, max: 18, message: 'Invalid Password. (At least 6-12 characters)' },
-      ]
-    });
-
-    //新密码表单验证
-    const newPasswordProps = getFieldProps('newPassword', {
-      rules: [
-        { required: true, message: 'Password is required.'},
-        { min: 6, max: 12, message: 'Invalid Password. (At least 6-12 characters)' },
-        { validator: this.checkPassword }
-      ]
-    });
-    const reNewPasswordProps = getFieldProps('reNewPassword', {
-      rules: [
-        { required: true, message: 'Password is required.'},
-        { min: 6, max: 12, message: 'Invalid Password. (At least 6-12 characters)' },
-        { validator: this.checkRePassword }
-      ]
-    });
+    const rules = [
+      { required: true, message: '必填项' },
+      { min: 6, max: 18, message: '无效密码, 必须有6-12个字符组成' },
+    ];
 
     return (
-      <Form horizontal>
-        {/*old password*/}
+      <Form layout="horizontal">
         <Row>
           <Col span={16}>
             <FormItem
               {...formInputLayout}
-              label="Old password"
+              label="旧密码"
             >
-              <Input
-                {...oldPasswordProps}
-                type="password"
-                id="oldPassword"
-                autoComplete="off"
-                onContextMenu={noop}
-                onPaste={noop}
-                onCopy={noop}
-                onCut={noop}
-              />
+              {getFieldDecorator('oldPassword', {
+                rules: rules
+              })(
+                <Input
+                  type="password"
+                  id="oldPassword"
+                  autoComplete="off"
+                  onContextMenu={noop}
+                  onPaste={noop}
+                  onCopy={noop}
+                  onCut={noop}
+                />
+              )}
             </FormItem>
           </Col>
         </Row>
-        {/*old password end*/}
-        {/*new password*/}
         <Row>
           <Col span={16}>
             <FormItem
               {...formInputLayout}
-              label="New password"
+              label="新密码"
             >
-              <Input
-                {...newPasswordProps}
-                type="password"
-                id="newPassword"
-                autoComplete="off"
-                onContextMenu={noop}
-                onPaste={noop}
-                onCopy={noop}
-                onCut={noop}
-              />
+              {getFieldDecorator('newPassword', {
+                rules: [
+                  ...rules,
+                  { validator: this.checkPassword }
+                ]
+              })(
+                <Input
+                  type="password"
+                  id="newPassword"
+                  autoComplete="off"
+                  onContextMenu={noop}
+                  onPaste={noop}
+                  onCopy={noop}
+                  onCut={noop}
+                />
+              )}
             </FormItem>
           </Col>
           <Col span={8}>
             {this.state.newPasswordBarShow ? this.renderPasswordStrengthBar('newPassword') : null}
           </Col>
         </Row>
-        {/*new password end*/}
-        {/*new password confirmation*/}
         <Row>
           <Col span={16}>
             <FormItem
               {...formInputLayout}
-              label="Password confirmation"
+              label="确认新密码"
             >
-              <Input
-                {...reNewPasswordProps}
-                type="password"
-                id="reNewPassword"
-                autoComplete="off"
-                onContextMenu={noop}
-                onPaste={noop}
-                onCopy={noop}
-                onCut={noop}
-              />
+              {getFieldDecorator('reNewPassword', {
+                rules: [
+                  ...rules,
+                  { validator: this.checkRePassword }
+                ]
+              })(
+                <Input
+                  type="password"
+                  id="reNewPassword"
+                  autoComplete="off"
+                  onContextMenu={noop}
+                  onPaste={noop}
+                  onCopy={noop}
+                  onCut={noop}
+                />
+              )}
             </FormItem>
           </Col>
           <Col span={8}>
             {this.state.reNewPasswordBarShow ? this.renderPasswordStrengthBar('reNewPassword') : null}
           </Col>
         </Row>
-        {/*new password confirmation end*/}
         <Row>
           <Col
             span="16"
@@ -263,12 +253,13 @@ class ChangePassword extends Component {
 }
 
 ChangePassword.defaultProps = {
-  resetText: 'Reset',
-  submitText: 'Submit',
+  resetText: '重置',
+  submitText: '提交',
   onSubmit() {},
 };
 
 ChangePassword.propTypes = {
+  form: PropTypes.object,
   resetText: PropTypes.string,
   submitText: PropTypes.string,
   onSubmit: PropTypes.func,

@@ -1,0 +1,23 @@
+@import '../../../components/global.less';
+@import '../../../components/default.less';
+@indexMainPrefixCls: cs-container;
+
+body {
+  background-color: @white;
+}
+
+.cs-layout-container {
+  width: @baseWidth;
+  margin: 0 auto;
+}
+
+@{indexMainPrefixCls} {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  &-center {
+    width: @width;
+    margin: 0 auto;
+  }
+}

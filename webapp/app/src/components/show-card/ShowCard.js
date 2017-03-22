@@ -17,7 +17,7 @@ ShowCard.defaultProps = {
 
 ShowCard.propTypes = {
   prefixCls: PropTypes.string,
-  children: PropTypes.element
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)])
 };
 
 export default ShowCard;

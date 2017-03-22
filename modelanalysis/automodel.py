@@ -11,7 +11,7 @@ from utils.builtin import jieba_cut, pos_extract
 import modelanalysis.judge
 
 
-def gen_models(sources, path, flags=None):
+def gen_models(sources, path, maxmodels=None, flags=None):
     """
         >>> from modelanalysis.automodel import *
         >>> from baseapp.projects import *
@@ -19,7 +19,7 @@ def gen_models(sources, path, flags=None):
         ...                SVC_PRJ_MED.jobdescription.lists()[:10]))
         >>> gen_models(sources, '/tmp/genmodel')
     """
-    g = Automodels(sources, path, flags)
+    g = Automodels(sources, path, maxmodels, flags)
     results = list()
     for k in g.model_generate():
         results.append(k)
@@ -29,7 +29,7 @@ class Automodels(object):
 
     FLAGS = ['s', 'x']
 
-    def __init__(self, sources, path, flags=None):
+    def __init__(self, sources, path, maxmodels=None, flags=None):
         """
             >>> from modelanalysis.automodel import *
             >>> from baseapp.projects import *
@@ -44,6 +44,7 @@ class Automodels(object):
         self.path = path
         self.models = []
         self.sources = sources
+        self.maxmodels = maxmodels
 
     def load(self):
         models_dump = glob.glob(os.path.join(self.path, '*'))
@@ -88,7 +89,13 @@ class Automodels(object):
         if results and results[0][1] > effectline:
             model = results[0][0]
         else:
-            model = self.origin_model(id, requirement)
+            if self.maxmodels is None or len(self.models) < self.maxmodels:
+                model = self.origin_model(id, requirement)
+            else:
+                try:
+                    model = results[0][0]
+                except IndexError:
+                    model = None
         return model
 
     def origin_model(self, id, unit):

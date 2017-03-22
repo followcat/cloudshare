@@ -98,11 +98,12 @@ class Automodels(object):
 
     def judge_model(self, resource, model, skyline=1.5):
         result = False
-        try:
-            sumgood = modelanalysis.judge.linalg(resource, model)
-            result = sumgood > skyline
-        except TypeError:
-            pass
+        if model.slicer(resource) not in model.texts:
+            try:
+                sumgood = modelanalysis.judge.linalg(resource, model)
+                result = sumgood > skyline
+            except TypeError:
+                pass
         return result
 
     def upgrade_model(self, model, id, requirement):

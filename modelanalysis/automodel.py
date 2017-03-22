@@ -74,19 +74,14 @@ class Automodels(object):
         sources = self.source_reloaded()
         for id in sources:
             for requirement in sources[id]:
-                indexs = self.train_by_model(id, requirement)
-                if not indexs:
+                model = self.train_model(id, requirement)
+                if model is None:
                     continue
-                yield self.models[indexs[0]]
+                yield model
 
     def origin_model(self, id, unit):
         model = core.mining.lsimodel.LSImodel(self.path)
         model.slicer = services.mining.silencer
-        try:
-            model.setup([id], [model.slicer(unit)])
-        except ValueError:
-            model.names.append(id)
-            model.texts.append(model.slicer(unit))
         return model
 
     def judge_model(self, resource, model, skyline=1.5):
@@ -98,14 +93,18 @@ class Automodels(object):
             pass
         return result
 
-    def train_by_model(self, id, requirement):
-        indexs = []
-        model = self.origin_model(id, requirement)
-        resources = self.source_reloaded()
-        resources.pop(id)
+    def upgrade_model(self, model, id, requirement):
+        result = True
+        try:
+            model.setup(model.names+[id], model.texts+[model.slicer(requirement)])
+        except ValueError:
+            result = False
+        return result
+
+    def update_model(self, resources, model):
         while(resources):
             for reid, resource in self.unit_gen(resources):
-                if self.judge_model(requirement, model):
+                if self.judge_model(resource, model):
                     try:
                         model.setup(model.names+[reid], model.texts+[model.slicer(resource)])
                     except ValueError:
@@ -114,7 +113,16 @@ class Automodels(object):
                     break
             else:
                 break
-        if model not in self.models:
-            self.models.append(model)
-        indexs.append(self.models.index(model))
-        return indexs
+
+    def train_model(self, id, requirement):
+        model = self.origin_model(id, requirement)
+        result = self.upgrade_model(model, id, requirement)
+        if result:
+            resources = self.source_reloaded()
+            resources.pop(id)
+            self.update_model(resources, model)
+            if model not in self.models:
+                self.models.append(model)
+        else:
+            model = None
+        return model

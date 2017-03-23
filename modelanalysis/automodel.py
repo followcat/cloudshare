@@ -11,17 +11,17 @@ from utils.builtin import jieba_cut, pos_extract
 import modelanalysis.judge
 
 
-def gen_models(sources, path, maxmodels=None, flags=None, autosave=False):
+def gen_models(sources, path, maxmodels=None, flags=None, autosave=False, regression=False):
     """
         >>> from modelanalysis.automodel import *
         >>> from baseapp.projects import *
         >>> sources = dict(map(lambda x: (x['id'], x['description']),
-        ...                SVC_PRJ_MED.jobdescription.lists()[:10]))
+        ...                SVC_PRJ_MED.jobdescription.lists()))
         >>> am = gen_models(sources, '/tmp/genmodel', maxmodels=10)
     """
     g = Automodels(sources, path, maxmodels, flags)
     results = list()
-    for k in g.model_generate(autosave):
+    for k in g.model_generate(autosave, regression):
         results.append(k)
     return g
 
@@ -70,13 +70,13 @@ class Automodels(object):
                                            self.FLAGS))}
         return d
 
-    def model_generate(self, autosave=False, path=None):
+    def model_generate(self, autosave=False, path=None, regression=False):
         if path is None:
             path = self.path
         sources = self.source_reloaded()
         for id in sources:
             for requirement in sources[id]:
-                model = self.train_model(id, requirement)
+                model = self.train_model(id, requirement, regression)
                 if model is None:
                     continue
                 yield model
@@ -103,16 +103,6 @@ class Automodels(object):
         model.slicer = services.mining.silencer
         return model
 
-    def judge_model(self, resource, model, skyline=1.5):
-        result = False
-        if model.slicer(resource) not in model.texts:
-            try:
-                sumgood = modelanalysis.judge.linalg(resource, model)
-                result = sumgood > skyline
-            except TypeError:
-                pass
-        return result
-
     def upgrade_model(self, model, id, requirement):
         result = True
         try:
@@ -122,9 +112,18 @@ class Automodels(object):
         return result
 
     def update_model(self, resources, model):
+        def judge_model(self, resource, model, skyline=2):
+            result = False
+            if model.slicer(resource) not in model.texts:
+                try:
+                    sumgood = modelanalysis.judge.linalg(resource, model)
+                    result = sumgood > skyline
+                except TypeError:
+                    pass
+            return result
         while(resources):
             for reid, resource in self.unit_gen(resources):
-                if self.judge_model(resource, model):
+                if judge_model(resource, model):
                     try:
                         model.setup(model.names+[reid], model.texts+[model.slicer(resource)])
                     except ValueError:
@@ -134,13 +133,14 @@ class Automodels(object):
             else:
                 break
 
-    def train_model(self, id, requirement):
+    def train_model(self, id, requirement, regression=False):
         model = self.pick_model(id, requirement)
         result = self.upgrade_model(model, id, requirement)
         if result:
-            resources = self.source_reloaded()
-            resources.pop(id)
-            self.update_model(resources, model)
+            if regression:
+                resources = self.source_reloaded()
+                resources.pop(id)
+                self.update_model(resources, model)
             if model not in self.models:
                 self.models.append(model)
         else:

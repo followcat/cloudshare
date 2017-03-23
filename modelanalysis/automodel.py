@@ -11,7 +11,7 @@ from utils.builtin import jieba_cut, pos_extract
 import modelanalysis.judge
 
 
-def gen_models(sources, path, maxmodels=None, flags=None, autosave=False, regression=False):
+def gen_models(sources, path, maxmodels=None, flags=None, regression=False, autosave=False):
     """
         >>> from modelanalysis.automodel import *
         >>> from baseapp.projects import *
@@ -21,7 +21,7 @@ def gen_models(sources, path, maxmodels=None, flags=None, autosave=False, regres
     """
     g = Automodels(sources, path, maxmodels, flags)
     results = list()
-    for k in g.model_generate(autosave, regression):
+    for k in g.model_generate(autosave, regression=regression):
         results.append(k)
     return g
 
@@ -90,7 +90,7 @@ class Automodels(object):
             model = results[0][0]
         else:
             if self.maxmodels is None or len(self.models) < self.maxmodels:
-                model = self.origin_model(id, requirement)
+                model = self.new_model(id, requirement)
             else:
                 try:
                     model = results[0][0]
@@ -98,7 +98,7 @@ class Automodels(object):
                     model = None
         return model
 
-    def origin_model(self, id, unit):
+    def new_model(self, id, unit):
         model = core.mining.lsimodel.LSImodel(self.path)
         model.slicer = services.mining.silencer
         return model
@@ -111,7 +111,7 @@ class Automodels(object):
             result = False
         return result
 
-    def update_model(self, resources, model):
+    def regression_model(self, resources, model):
         def judge_model(self, resource, model, skyline=2):
             result = False
             if model.slicer(resource) not in model.texts:
@@ -140,7 +140,7 @@ class Automodels(object):
             if regression:
                 resources = self.source_reloaded()
                 resources.pop(id)
-                self.update_model(resources, model)
+                self.regression_model(resources, model)
             if model not in self.models:
                 self.models.append(model)
         else:

@@ -1,4 +1,5 @@
 import os
+import time
 import yaml
 
 import utils.issue
@@ -13,6 +14,7 @@ class BaseStorage(services.base.service.Service):
 
     def __init__(self, path, name=None, iotype=None):
         self.path = path
+        self.yamlpath = ''
         super(BaseStorage, self).__init__(self.path, name, iotype)
         self.unique_checker = None
         self.info = ""
@@ -57,6 +59,63 @@ class BaseStorage(services.base.service.Service):
         """
         return not self.exists(id)
 
+    def _listframe(self, value, username, date=None):
+        if date is None:
+            date = time.strftime('%Y-%m-%d %H:%M:%S')
+        data = {'author': username,
+                'content': value,
+                'date': date}
+        return data
+
+    def _modifyinfo(self, id, key, value, committer, do_commit=True):
+        result = {}
+        projectinfo = self.getinfo(id)
+        if not projectinfo[key] == value:
+            projectinfo[key] = value
+            self.saveinfo(id, projectinfo,
+                          'Modify %s key %s.' % (id, key), committer, do_commit=do_commit)
+            result = {key: value}
+        return result
+
+    def _addinfo(self, id, key, value, committer, do_commit=True):
+        projectinfo = self.getinfo(id)
+        data = self._listframe(value, committer)
+        projectinfo[key].insert(0, data)
+        self.saveinfo(id, projectinfo,
+                      'Add %s key %s.' % (id, key), committer, do_commit=do_commit)
+        return data
+
+    def _deleteinfo(self, id, key, value, date, committer, do_commit=True):
+        projectinfo = self.getinfo(id)
+        data = self._listframe(value, committer, date)
+        if data in projectinfo[key]:
+            projectinfo[key].remove(data)
+            self.saveinfo(id, projectinfo,
+                          'Delete %s key %s.' % (id, key), committer, do_commit=do_commit)
+            return data
+
+    @utils.issue.fix_issue('issues/update_name.rst')
+    def updateinfo(self, id, key, value, committer, do_commit=True):
+        assert self.exists(id)
+        baseinfo = self.getyaml(id)
+        result = None
+        if key in baseinfo:
+            result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
+        return result
+
+    def saveinfo(self, id, info, message, committer, do_commit=True):
+        result = False
+        baseinfo = self.getinfo(id)
+        if baseinfo != info and set(baseinfo.keys()).issubset(set(info.keys())):
+            name = core.outputstorage.ConvertName(id).yaml
+            info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
+                                 allow_unicode=True, default_flow_style=False)
+            self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
+                                  message=message, committer=committer, do_commit=do_commit)
+            result = True
+        return result
+
     def modify(self, filename, stream, message=None, committer=None, do_commit=True):
         self.interface.modify(filename, stream, message, committer, do_commit=do_commit)
         return True
@@ -78,6 +137,9 @@ class BaseStorage(services.base.service.Service):
                                message=message, committer=committer, do_commit=do_commit)
         self._nums += 1
         return True
+
+    def getinfo(self, id):
+        return self.getyaml(id)
 
     def getyaml(self, id):
         """

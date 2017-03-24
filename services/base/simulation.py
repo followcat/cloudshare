@@ -109,52 +109,24 @@ class Simulation(services.base.storage.BaseStorage):
         return self.storage.getmd(name)
 
     def getyaml(self, id):
-        yaml = self.storage.getyaml(id)
-        info = self.getinfo(id)
-        yaml.update(info)
-        return yaml
+        baseinfo = self.storage.getyaml(id)
+        prjinfo = self.getinfo(id)
+        basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
+        prjtime = prjinfo['modifytime'] if 'modifytime' in prjinfo else 0
+        prjinfo.update(baseinfo)
+        prjinfo['modifytime'] = max(basetime, prjtime)
+        return prjinfo
 
-    def _modifyinfo(self, id, key, value, committer, do_commit=True):
-        result = {}
-        projectinfo = self.getinfo(id)
-        projectyaml = self.getyaml(id)
-        if not projectyaml[key] == value:
-            projectinfo[key] = value
-            self.saveinfo(id, projectinfo,
-                          'Modify %s key %s.' % (id, key), committer, do_commit=do_commit)
-            result = {key: value}
-        return result
-
-    def _addinfo(self, id, key, value, committer, do_commit=True):
-        projectinfo = self.getinfo(id)
-        data = self._infoframe(value, committer)
-        projectinfo[key].insert(0, data)
-        self.saveinfo(id, projectinfo,
-                      'Add %s key %s.' % (id, key), committer, do_commit=do_commit)
-        return data
-
-    def _deleteinfo(self, id, key, value, date, committer, do_commit=True):
-        projectinfo = self.getinfo(id)
-        data = self._infoframe(value, committer, date)
-        if data in projectinfo[key]:
-            projectinfo[key].remove(data)
-            self.saveinfo(id, projectinfo,
-                          'Delete %s key %s.' % (id, key), committer, do_commit=do_commit)
-            return data
-
-    @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer, do_commit=True):
         assert key not in self.fix_item
         assert self.exists(id)
         projectinfo = self.getinfo(id)
-        baseinfo = self.getyaml(id)
         result = None
-        if key not in projectinfo and key not in baseinfo:
-            return result
-        if key in self.list_item:
-            result = self._addinfo(id, key, value, committer, do_commit=do_commit)
-        else:
-            result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
+        if key in projectinfo:
+            if key in self.list_item:
+                result = self._addinfo(id, key, value, committer, do_commit=do_commit)
+            else:
+                result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
     def deleteinfo(self, id, key, value, committer, date, do_commit=True):
@@ -162,29 +134,16 @@ class Simulation(services.base.storage.BaseStorage):
         assert key in self.list_item
         assert self.exists(id)
         projectinfo = self.getinfo(id)
-        baseinfo = self.getyaml(id)
         result = None
-        if key not in projectinfo and key not in baseinfo:
+        if key not in projectinfo:
             return result
         result = self._deleteinfo(id, key, value, date, committer, do_commit=do_commit)
         return result
 
-    def _infoframe(self, value, username, date=None):
-        if date is None:
-            date = time.strftime('%Y-%m-%d %H:%M:%S')
-        data = {'author': username,
-                'content': value,
-                'date': date}
-        return data
-
     def saveinfo(self, id, info, message, committer, do_commit=True):
-        name = core.outputstorage.ConvertName(id).yaml
-        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
-                             allow_unicode=True, default_flow_style=False)
-        self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
-                              message=message, committer=committer, do_commit=do_commit)
+        result = super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
         self.memsorted.update('modifytime', id)
+        return result
 
     def search(self, keyword):
         results = set()
@@ -242,10 +201,10 @@ class Simulation(services.base.storage.BaseStorage):
             name = core.outputstorage.ConvertName(i)
             try:
                 mdpath = os.path.join(path, name.md)
-                mdstream = self.storage.getmd(i)
+                mdstream = self.getmd(i)
                 writefile(mdpath, mdstream)
             except IOError:
                 pass
             writefile(htmlpath, htmlstream)
-            yamlinfo = self.storage.getyaml(i)
+            yamlinfo = self.getyaml(i)
             utils.builtin.save_yaml(yamlinfo, path, name.yaml)

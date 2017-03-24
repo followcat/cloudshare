@@ -170,43 +170,19 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('update_info', type= list, location = 'json')
         self.reqparse.add_argument('date', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('key', location = 'json')
-        self.reqparse.add_argument('value', type=dict, location = 'json')
 
-    def put(self):
+    def post(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
         id = args['id']
         update_info = args['update_info']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        data = dict()
-        for item in update_info:
-            try:
-                result = project.company.updateinfo(id, item['key'], item['value'], user.id)
-            except AssertionError:
-                continue
-            data.update(result)
-        if len(data) != 0:
-            response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
+        result = project.company_update_info(id, update_info, user.id)
+        if result:
+            response = { 'code': 200, 'message': 'Update information success.' }
         else:
             response = { 'code': 400, 'message': 'Update information error.' }
-        return response
-
-    def delete(self):
-        args = self.reqparse.parse_args()
-        user = flask.ext.login.current_user
-        id = args['id']
-        key = args['key']
-        date = args['date']
-        value = args['value']
-        projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
-        data = project.company.deleteinfo(id, key, value, user.id, date)
-        if data is not None:
-            response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
-        else:
-            response = { 'code': 400, 'message': 'Delete information error.'}
         return response
 
 
@@ -316,7 +292,7 @@ class CompanyUploadExcelAPI(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        project_name = args['project']
+        project_name = flask.request.form['project']
         network_file = flask.request.files['files']
         project = self.svc_mult_cv.getproject(project_name)
         compare_result = project.company_compare_excel(network_file.read(), committer=user.id)

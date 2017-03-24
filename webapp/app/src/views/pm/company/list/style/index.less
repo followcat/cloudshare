@@ -1,4 +1,5 @@
 @import '../../../../../components/global.less';
+@import '../../../../../components/default.less';
 
 .cs-layout-container {
   position: relative;
@@ -19,7 +20,7 @@
     font-weight: 700;
 
     &:after {
-      content: ':';
+      content: ': ';
     }
   }
 
@@ -285,4 +286,17 @@
       margin-left: 4px;
     }
   }
+}
+
+.commentary-box {
+  & > label {
+    display: block;
+    padding: 4px 0;
+    font-weight: bold;
+  }
+}
+
+.uploading {
+  font-size: 20px;
+  color: @backgroundColor;
 }

@@ -72,6 +72,7 @@ class CompanyList extends Component {
     this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
     this.handleUploadBtnClick = this.handleUploadBtnClick.bind(this);
     this.handleUploadModalCancel = this.handleUploadModalCancel.bind(this);
+    this.handleUploadModalOk = this.handleUploadModalOk.bind(this);
     this.handleAddCustomerConfirm = this.handleAddCustomerConfirm.bind(this);
     this.handleFilterSelect = this.handleFilterSelect.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
@@ -183,6 +184,13 @@ class CompanyList extends Component {
     this.setState({
       visible: false
     });
+  }
+
+  handleUploadModalOk() {
+    this.setState({
+      visible: false
+    });
+    this.props.history.push('/company/uploader');
   }
 
   handleAddCustomerConfirm(id) {
@@ -314,6 +322,8 @@ class CompanyList extends Component {
       filterValue
     } = this.state;
 
+    const { uploading, disabled } = this.props;
+
     // 主体表格分页
     const pagination = {
       current: current,
@@ -371,14 +381,17 @@ class CompanyList extends Component {
               buttonText={language.UPLOAD}
               modalTitle={language.UPLOAD}
               visible={visible}
+              disabled={disabled}
               onButtonClick={this.handleUploadBtnClick}
               onModalCancel={this.handleUploadModalCancel}
+              onModalOk={this.handleUploadModalOk}
             >
               <Upload {...this.props.uploadProps}>
                 <Button type="ghost">
                   <Icon type="upload" /> 点击上传
                 </Button>
               </Upload>
+              {uploading ? <Icon type="loading" className="uploading" /> : null}
             </ButtonWithModal>
           </div>
           <div className="cs-card-inner-top-filter">

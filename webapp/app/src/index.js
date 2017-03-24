@@ -25,7 +25,8 @@ const rootRoute = {
     require('./routes/pm'),
     require('./routes/fast-matching'),
     require('./routes/user-info'),
-    require('./routes/resume')
+    require('./routes/resume'),
+    require('./routes/upload-preview')
   ]
 };
 

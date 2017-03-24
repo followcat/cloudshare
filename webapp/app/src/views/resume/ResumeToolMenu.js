@@ -49,7 +49,12 @@ class ResumeToolMenu extends Component {
   }
 
   render() {
-    const { dataSource, resumeId } = this.props;
+    const {
+      dataSource,
+      resumeId,
+      uploadProps,
+      fileList
+    } = this.props;
 
     const { getFieldDecorator } = this.props.form,
           style = this.state.checked ? { display: 'block' } : { display: 'none' };
@@ -59,7 +64,12 @@ class ResumeToolMenu extends Component {
         <div className="tool-menu pd-lr-8">
           <Checkbox onChange={this.handleSwitchChange}>修改简历标题</Checkbox>
           <Button type="ghost" size="small" onClick={this.handleDownloadClick}>下载</Button>
-          <EnglishResumeAddition resumeId={resumeId} />
+          <EnglishResumeAddition
+            resumeId={resumeId}
+            uploadProps={uploadProps}
+            fileList={fileList}
+            onUploadModalOk={this.props.onUploadModalOk}
+          />
           <DrawChart resumeId={resumeId} />
           <a
             style={{ display: 'inline-block', marginLeft: 4 }}
@@ -111,5 +121,8 @@ ResumeToolMenu.propTypes = {
   form: PropTypes.object,
   dataSource: PropTypes.object,
   resumeId: PropTypes.string,
-  onSubmitModification: PropTypes.func
+  uploadProps: PropTypes.object,
+  fileList: PropTypes.array,
+  onSubmitModification: PropTypes.func,
+  onUploadModalOk: PropTypes.func
 };

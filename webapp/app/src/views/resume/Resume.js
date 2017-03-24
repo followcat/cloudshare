@@ -26,9 +26,14 @@ import {
   getSimilar
 } from 'request/resume';
 import { addBookmark, deleteBookmark } from 'request/bookmark';
+import { confirmUpload } from 'request/upload';
+
+import { API } from 'API';
+import { URL } from 'URL';
 
 import { generateSummary } from 'utils/summary-generator';
 import History from 'utils/history';
+import StorageUtil from 'utils/storage';
 
 class Resume extends Component {
   constructor() {
@@ -37,11 +42,13 @@ class Resume extends Component {
       uniqueId: '',
       resumeId: '',
       resumeList: [],
+      fileList: [],
       dataSource: {},
       html: '',
       enHTML: '',
       collected: false,
       panelLoading: false,
+      confirmLoading: false,
       tag: [],
       tracking: [],
       comment: [],
@@ -53,6 +60,8 @@ class Resume extends Component {
     this.handleSubmitTag = this.handleSubmitTag.bind(this);
     this.handleSubmitFollowUp = this.handleSubmitFollowUp.bind(this);
     this.handleComment = this.handleComment.bind(this);
+    this.handleUploadChange = this.handleUploadChange.bind(this);
+    this.handleUploadModalOk = this.handleUploadModalOk.bind(this);
     this.getResumeDataSource = this.getResumeDataSource.bind(this);
     this.getResumeIDList = this.getResumeIDList.bind(this);
     this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
@@ -214,6 +223,56 @@ class Resume extends Component {
     });
   }
 
+  handleUploadChange(info) {
+    let fileList = info.fileList;
+    fileList = fileList.map((file) => {
+      if (file.response) {
+        file.url = URL.getPreview();
+      }
+      return file;
+    });
+    if (info.file.status === 'done') {
+      message.success(`上传${info.file.name}成功.`);
+    } else if (info.file.status === 'error') {
+      message.error(`上传${info.file.name}失败.`);
+    }
+
+    this.setState({ fileList });
+  }
+
+  /**
+   * 确认上传文件按钮事件
+   * 
+   * 
+   * @memberOf Resume
+   */
+  handleUploadModalOk() {
+    const { resumeId } = this.state;
+
+    this.setState({
+      confirmLoading: true
+    });
+
+    confirmUpload(API.UPLOAD_ENGLISH_RESUME_API, {
+      id: resumeId
+    }, json => {
+      if (json.code === 200 && json.data.en_html) {
+        this.setState({
+          confirmLoading: false,
+          fileList: [],
+          enHTML: json.data.en_html,
+        });
+        message.error('上传英文简历成功!');
+      } else {
+        this.setState({
+          confirmLoading: false,
+          fileList: [],
+        });
+        message.error('上传英文简历失败!');
+      }
+    });
+  }
+
   /**
    * 获取简历信息数据
    * 
@@ -298,6 +357,7 @@ class Resume extends Component {
       dataSource,
       collected,
       resumeList,
+      fileList,
       panelLoading,
       html,
       enHTML,
@@ -306,6 +366,15 @@ class Resume extends Component {
       comment,
       similar
     } = this.state;
+
+    const uploadProps = {
+      name: 'file',
+      action: API.UPLOAD_ENGLISH_RESUME_API,
+      headers: {
+        Authorization: `Basic ${StorageUtil.get('token')}`,
+      },
+      onChange: this.handleUploadChange,
+    };
 
     return (
       <Layout>
@@ -329,7 +398,10 @@ class Resume extends Component {
                         <ResumeToolMenu
                           resumeId={resumeId}
                           dataSource={dataSource}
+                          uploadProps={uploadProps}
+                          fileList={fileList}
                           onSubmitModification={this.handleSubmitModification}
+                          onUploadModalOk={this.handleUploadModalOk}
                         />
                         <Summary dataSource={generateSummary(dataSource)} />
                         <Tabs defaultActiveKey="chinese">

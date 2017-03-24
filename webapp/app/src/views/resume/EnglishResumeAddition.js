@@ -5,27 +5,17 @@ import {
   Button,
   Modal,
   Upload,
-  Icon,
-  message
+  Icon
 } from 'antd';
-
-import { confirmUpload } from 'request/upload';
-
-import { API } from 'API';
-
-import StorageUtil from 'utils/storage';
 
 class EnglishResumeAddition extends Component {
   constructor() {
     super();
     this.state = {
-      visible: false,
-      fileList: []
+      visible: false
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
-    this.handleModalOk = this.handleModalOk.bind(this);
-    this.handleUploadChange = this.handleUploadChange.bind(this);
   }
 
   handleClick() {
@@ -40,62 +30,9 @@ class EnglishResumeAddition extends Component {
     });
   }
 
-  handleModalOk() {
-    const { resumeId } = this.props;
-
-    this.setState({
-      loading: true
-    });
-
-    confirmUpload(API.UPLOAD_ENGLISH_RESUME_API, {
-      id: resumeId
-    })
-    .then(response => response.json())
-    .then(json => {
-      if (json.code === 200 && json.data.en_html) {
-        this.setState({
-          loading: false,
-          fileList: [],
-          enHtml: json.data.en_html,
-        });
-      } else {
-        this.setState({
-          loading: false,
-          fileList: [],
-        });
-        message.error('上传英文简历失败.');
-      }
-    });
-  }
-
-  handleUploadChange(info) {
-    let fileList = info.fileList;
-    fileList = fileList.map((file) => {
-      if (file.response) {
-        file.url = file.response.data.url;
-      }
-      return file;
-    });
-    if (info.file.status === 'done') {
-      message.success(`上传${info.file.name}成功.`);
-    } else if (info.file.status === 'error') {
-      message.error(`上传${info.file.name}失败.`);
-    }
-
-    this.setState({ fileList });
-  }
-
   render() {
-    const { visible, loading, fileList } = this.state;
-
-    const uploadProps = {
-      name: 'file',
-      action: API.UPLOAD_ENGLISH_RESUME_API,
-      headers: {
-        Authorization: `Basic ${StorageUtil.get('token')}`,
-      },
-      onChange: this.handleUploadChange,
-    };
+    const { visible } = this.state,
+          { uploadProps, fileList, confirmLoading } = this.props;
 
     return (
       <div style={{ display: 'inline-block', marginLeft: 4 }}>
@@ -109,9 +46,9 @@ class EnglishResumeAddition extends Component {
         <Modal
           title="上传英文简历"
           visible={visible}
-          confirmLoading={loading}
+          confirmLoading={confirmLoading}
           okText="确认"
-          onOk={this.handleModalOk}
+          onOk={this.props.onUploadModalOk}
           onCancel={this.handleCancel}
         >
           <Upload
@@ -129,15 +66,10 @@ class EnglishResumeAddition extends Component {
 }
 
 EnglishResumeAddition.propTypes = {
-  style: PropTypes.object,
-  enComfirmLoading: PropTypes.bool,
-  upload: PropTypes.object,
+  confirmLoading: PropTypes.bool,
+  uploadProps: PropTypes.object,
   fileList: PropTypes.array,
-  onEnComfirmLoading: PropTypes.func
-};
-
-EnglishResumeAddition.propTypes = {
-  resumeId: PropTypes.string
+  onUploadModalOk: PropTypes.func
 };
 
 export default EnglishResumeAddition;

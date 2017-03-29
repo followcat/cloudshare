@@ -178,17 +178,18 @@ class CompanyInfoUpdateAPI(Resource):
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         origin_info = project.company_get(id)
-        for key in update_info:
-            value = update_info[key]
-            text = value['text']
-            vtype = value['type']
+        for each in update_info:
+            key = each['key']
+            vtype = each['type']
+            value = each['value']
+            content = value['content']
             if vtype == 'PUT':
-                origin_info[key] = value
+                origin_info[key] = content
             elif vtype == 'CREATE':
-                data = project.company._listframe(value, user)
+                data = project.company._listframe(content, user.id)
                 origin_info[key].insert(0, data)
             elif vtype == 'DELETE':
-                data = project.company._listframe(text, committer, value['date'])
+                data = project.company._listframe(content, value['author'], value['date'])
                 origin_info[key].remove(data)
         result = project.company_update_info(id, origin_info, user.id)
         if result:

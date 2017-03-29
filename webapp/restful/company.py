@@ -185,10 +185,10 @@ class CompanyInfoUpdateAPI(Resource):
             if vtype == 'PUT':
                 origin_info[key] = value
             elif vtype == 'CREATE':
-                data = self._listframe(value, user)
+                data = project.company._listframe(value, user)
                 origin_info[key].insert(0, data)
             elif vtype == 'DELETE':
-                data = self._listframe(text, committer, value['date'])
+                data = project.company._listframe(text, committer, value['date'])
                 origin_info[key].remove(data)
         result = project.company_update_info(id, origin_info, user.id)
         if result:

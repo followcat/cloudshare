@@ -106,10 +106,11 @@ class BaseStorage(services.base.service.Service):
     def saveinfo(self, id, info, message, committer, do_commit=True):
         result = False
         baseinfo = self.getinfo(id)
-        if baseinfo != info and set(baseinfo.keys()).issubset(set(info.keys())):
+        saveinfo = dict(filter(lambda k: k[0] in baseinfo, info.items()))
+        if baseinfo != saveinfo:
             name = core.outputstorage.ConvertName(id).yaml
-            info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
+            saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
             self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
                                   message=message, committer=committer, do_commit=do_commit)

@@ -1,56 +1,58 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import EnhancedInput from 'components/enhanced-input';
+import { Input } from 'antd';
 
-import { Button } from 'antd';
+import cloneDeep from 'lodash/cloneDeep';
+import remove from 'lodash/remove';
 
 import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
 class VisitingInfoItem extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      editStatus: false,
+      datas: cloneDeep(props.dataSource),
       opening: false,
+      fieldValue: ''
     };
-    this.handleAddClick = this.handleAddClick.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
-    this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleOmmitClick = this.handleOmmitClick.bind(this);
-    this.handleDoubleClick = this.handleDoubleClick.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.getEditingRender = this.getEditingRender.bind(this);
     this.getRender = this.getRender.bind(this);
   }
 
-  handleAddClick(value) {
-    const { dataIndex, dataId } = this.props;
-
-    if (value.trim() !== '') {
-      this.props.onSave({
-        id: dataId,
-        fieldProp: dataIndex,
-        fieldValue: value
-      });
-
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.editStatus === false) {
       this.setState({
-        editStatus: false
+        datas: cloneDeep(nextProps.dataSource),
+        fieldValue: ''
       });
     }
   }
 
-  handleDeleteClick(content, date) {
-    const { dataId, dataIndex } = this.props;
+  handleChange(e) {
+    const { dataIndex } = this.props;
 
-    this.props.onRemove(dataId, dataIndex, content, date);
+    this.setState({
+      fieldValue: e.target.value
+    });
+
+    this.props.onUpdateFieldValues(dataIndex, { content: e.target.value });
   }
 
-  handleCancelClick() {
-    this.setState({
-      editStatus: false
+  handleDeleteClick(item) {
+    const { dataIndex } = this.props,
+          { datas } = this.state;
+
+    remove(datas, (v) => {
+      return v.author === item.author && v.content === item.content && v.date === item.date;
     });
+
+    this.props.onUpdateDeleteList(dataIndex, item);
   }
 
   handleOmmitClick() {
@@ -59,31 +61,14 @@ class VisitingInfoItem extends Component {
     });
   }
 
-  handleDoubleClick() {
-    this.setState({
-      editStatus: true
-    });
-  }
-
   getEditingRender() {
-    const { editStatus } = this.state;
-
+    const { fieldValue } = this.state,
+          { editStatus } = this.props;
+    
     if (editStatus) {
       return (
         <div className="visiting-form">
-          <EnhancedInput
-            type="plus"
-            size="small"
-            style={{ display: 'inline-block', width: '80%' }}
-            resettable={true}
-            onClick={this.handleAddClick}
-          />
-          <Button
-            size="small"
-            onClick={this.handleCancelClick}
-          >
-           {language.CANCEL}
-          </Button>
+          <Input value={fieldValue} size="small" onChange={this.handleChange} />
         </div>
       );
     }
@@ -92,8 +77,8 @@ class VisitingInfoItem extends Component {
   }
 
   getRender() {
-    const { visible, dataSource } = this.props,
-          { opening, editStatus } = this.state;
+    const { visible, editStatus } = this.props,
+          { datas, opening } = this.state;
 
     if (!visible) {
       return (
@@ -102,14 +87,14 @@ class VisitingInfoItem extends Component {
           onClick={this.handleOmmitClick}
           onDoubleClick={this.handleDoubleClick}
         >
-          {dataSource.length > 0 ?
-            `${dataSource[0].author} | ${dataSource[0].date.split(' ')[0]} | ${dataSource[0].content}` :
+          {datas.length > 0 ?
+            `${datas[0].author} | ${datas[0].date.split(' ')[0]} | ${datas[0].content}` :
             `暂无数据`}
-          {editStatus && dataSource.length > 0 ?
+          {editStatus && datas.length > 0 ?
             <a
               className="visiting-list-del"
               href="javascript: void(0);"
-              onClick={() => this.handleDeleteClick(dataSource[0].content, dataSource[0].date)}>{language.DELETE}</a> :
+              onClick={() => this.handleDeleteClick(datas[0])}>{language.DELETE}</a> :
             null}
         </div>
       );
@@ -118,8 +103,8 @@ class VisitingInfoItem extends Component {
         <div
           onDoubleClick={this.handleDoubleClick}
         >
-          {dataSource.length > 0 ? 
-            dataSource.map((item, index) => {
+          {datas.length > 0 ? 
+            datas.map((item, index) => {
               return (
                 <p key={index} className="visiting-list">
                   {`${item.author} | ${item.date.split(' ')[0]} | ${item.content}`}
@@ -127,7 +112,7 @@ class VisitingInfoItem extends Component {
                     <a
                       className="visiting-list-del"
                       href="javascript: void(0);"
-                      onClick={() => this.handleDeleteClick(item.content, item.date)}>{language.DELETE}</a> :
+                      onClick={() => this.handleDeleteClick(item)}>{language.DELETE}</a> :
                     null}
                 </p>
               );
@@ -152,19 +137,16 @@ class VisitingInfoItem extends Component {
 }
 
 VisitingInfoItem.defaultProps = {
-  itemInfo: {},
-  dataSource: [],
-  onSave() {},
-  onRemove() {}
+  dataSource: []
 };
 
 VisitingInfoItem.propTypes = {
-  dataId: PropTypes.string,
   dataIndex: PropTypes.string,
   visible: PropTypes.bool,
+  editStatus: PropTypes.bool,
   dataSource: PropTypes.array,
-  onSave: PropTypes.func,
-  onRemove: PropTypes.func
+  onUpdateFieldValues: PropTypes.func,
+  onUpdateDeleteList: PropTypes.func
 };
 
 export default VisitingInfoItem;

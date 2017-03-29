@@ -10,8 +10,12 @@ import Cell from './Cell';
 import {
   Row,
   Col,
-  Popconfirm,
+  Icon,
+  Button,
+  message
 } from 'antd';
+
+import { updateCompanyInfo } from 'request/company';
 
 import chunk from 'lodash/chunk';
 import websiteText from 'config/website-text';
@@ -23,11 +27,16 @@ class CompanyInfo extends Component {
     super();
     this.state = {
       visible: false,
+      editStatus: false,
+      formValues: {},
+      deleteList: []
     };
     this.handleClick = this.handleClick.bind(this);
-    this.handleConfirm = this.handleConfirm.bind(this);
-    this.getRenderCustomerOperation = this.getRenderCustomerOperation.bind(this);
-    this.getBasicInfoRender = this.getBasicInfoRender.bind(this);
+    this.handleEditIconClick = this.handleEditIconClick.bind(this);
+    this.handleUpdateFieldValues = this.handleUpdateFieldValues.bind(this);
+    this.handleUpdateDeleteList = this.handleUpdateDeleteList.bind(this);
+    this.handleSaveClick = this.handleSaveClick.bind(this);
+    this.handleCancelClick = this.handleCancelClick.bind(this);
     this.getAdditionalInfoRender = this.getAdditionalInfoRender.bind(this);
     this.getBasicInfoOnExtra = this.getBasicInfoOnExtra.bind(this);
     this.getVisitingInfoRender = this.getVisitingInfoRender.bind(this);
@@ -39,59 +48,84 @@ class CompanyInfo extends Component {
     });
   }
 
-  handleConfirm(id) {
-    this.props.onAddCustomerConfirm(id);
+  handleEditIconClick() {
+    this.setState({
+      visible: true,
+      editStatus: true
+    });
   }
 
-  getRenderCustomerOperation() {
-    const { dataSource, isCustomer } = this.props;
+  handleUpdateFieldValues(fieldProp, fieldValue) {
+    const { formValues } = this.state;
 
-    if (isCustomer) {
-      return <span style={{ color: 'green' }}>{language.ADDED_CUSTOMER}</span>;
-    } else {
-      return (
-        <Popconfirm
-          title={language.ADD_CONFIRM_MSG}
-          onConfirm={() => this.handleConfirm(dataSource.id)}
-        >
-          <a href="javascript: void(0);">{language.ADD_CUSTOMER}</a>
-        </Popconfirm>
-      );
+    formValues[fieldProp] = fieldValue;
+    this.setState({ formValues });
+  }
+
+  handleUpdateDeleteList(dataIndex, value) {
+    const { deleteList } = this.state;
+
+    deleteList.push({
+      dataIndex: dataIndex,
+      value: value
+    });
+    this.setState({ deleteList });
+  }
+
+  handleSaveClick() {
+    const { dataSource } = this.props,
+          { formValues, deleteList } = this.state;
+    const listItemKeys = ['position', 'updatednumber', 'relatedcompany', 'clientcontact', 'reminder', 'progress'];
+
+    let args = [];
+
+    for (let key in formValues) {
+      let obj = {};
+      if (listItemKeys.indexOf(key) > -1) {
+        obj = {
+          key: key,
+          type: 'CREATE',
+          value: formValues[key]
+        };
+      } else {
+        obj = {
+          key: key,
+          type: 'PUT',
+          value: formValues[key]
+        };
+      }
+      args.push(obj);
     }
+
+    for (let i = 0; i < deleteList.length; i++) {
+      args.push({
+        key: deleteList[i].dataIndex,
+        type: 'DELETE',
+        value: deleteList[i].value
+      });
+    }
+
+    updateCompanyInfo({
+      id: dataSource.id,
+      update_info: args
+    }, (json) => {
+      if (json.code === 200) {
+        message.success('更新成功!');
+        this.setState({
+          formValues: [],
+          deleteList: [],
+          editStatus: false
+        });
+        this.props.updateDataSource();
+      } else {
+        message.error('更新失败!');
+      }
+    });
   }
 
-  getBasicInfoRender() {
-    const basicInfoRows = [{
-      title: language.COMPANY_NAME,
-      dataIndex: 'name',
-      key: 'name'
-    }, {
-      title: language.DISTRICT,
-      dataIndex: 'district',
-      key: 'district'
-    }, {
-      title: language.TELLPHONE,
-      dataIndex: 'conumber',
-      key: 'conumber'
-    }];
-
-    return chunk(basicInfoRows, 4).map((item, index) => {
-      return (
-        <Row key={index}>
-          {item.map(v => {
-            return (
-              <Col span={8} key={v.key}>
-                <BasicInfoItem
-                  key={v.key}
-                  itemInfo={v}
-                  dataSource={this.props.dataSource}
-                  onSave={this.props.onSave}
-                />
-              </Col>
-            );
-          })}
-        </Row>
-      );
+  handleCancelClick() {
+    this.setState({
+      editStatus: false
     });
   }
 
@@ -110,6 +144,8 @@ class CompanyInfo extends Component {
       key: 'relatedcompany'
     }];
 
+    const { editStatus } = this.state;
+
     return chunk(additionalInfoRows, 4).map((item, index) => {
       return (
         <Row key={index} className="extra-box">
@@ -120,8 +156,9 @@ class CompanyInfo extends Component {
                   itemInfo={item}
                   dataSource={this.props.dataSource}
                   dataIndex={item.dataIndex}
-                  onSave={this.props.onSave}
-                  onRemove={this.props.onRemove}
+                  editStatus={editStatus}
+                  onUpdateFieldValues={this.handleUpdateFieldValues}
+                  onUpdateDeleteList={this.handleUpdateDeleteList}
                 />
               </Col>
             );
@@ -162,6 +199,8 @@ class CompanyInfo extends Component {
       type: 'textarea'
     }];
 
+    const { editStatus } = this.state;
+
     return (
       <Row className="extra-box">
         {rows.map(item => {
@@ -173,7 +212,9 @@ class CompanyInfo extends Component {
                 itemInfo={item}
                 dataSource={this.props.dataSource}
                 dataIndex={item.dataIndex}
-                onSave={this.props.onSave}
+                editStatus={editStatus}
+                onUpdateFieldValues={this.handleUpdateFieldValues}
+                onUpdateDeleteList={this.handleUpdateDeleteList}
               />
             </Col>
           );
@@ -184,39 +225,39 @@ class CompanyInfo extends Component {
 
   getVisitingInfoRender() {
     const { dataSource } = this.props,
-          { visible } = this.state;
+          { visible, editStatus } = this.state;
 
     return (
       <VisitingInfoItem
         visible={visible}
         dataSource={dataSource.progress}
-        dataId={dataSource.id}
         dataIndex="progress"
-        onSave={this.props.onSave}
-        onRemove={this.props.onRemove}
+        editStatus={editStatus}
+        onUpdateFieldValues={this.handleUpdateFieldValues}
+        onUpdateDeleteList={this.handleUpdateDeleteList}
       />
     );
   }
 
   getReminderInfoRender() {
     const { dataSource } = this.props,
-          { visible } = this.state;
+          { visible, editStatus } = this.state;
     
     return (
       <ReminderInfoItem
         visible={visible}
         dataSource={dataSource.reminder}
-        dataId={dataSource.id}
         dataIndex="reminder"
-        onSave={this.props.onSave}
-        onRemove={this.props.onRemove}
+        editStatus={editStatus}
+        onUpdateFieldValues={this.handleUpdateFieldValues}
+        onUpdateDeleteList={this.handleUpdateDeleteList}
       />
     );
   }
 
   render() {
     const { dataSource } = this.props,
-          { visible } = this.state;
+          { visible, editStatus } = this.state;
 
     const items = [{
       key: 'name',
@@ -247,10 +288,10 @@ class CompanyInfo extends Component {
       <div className="company-item">
         <Row className="company-item-row">
           <Col span="1" className="company-item-cell company-item-operation">
-            <span className={expandCls} onClick={this.handleClick}>
-            </span>
+            <span className={expandCls} onClick={this.handleClick}></span>
+            <span className="cs-row-expand-icon" onClick={this.handleEditIconClick}><Icon type="edit" /></span>
           </Col>
-          <Col span="14">
+          <Col span="14">                                                                                                                                                                             
             <Row>
               {items.map(item => {
                 return (
@@ -259,14 +300,21 @@ class CompanyInfo extends Component {
                     key={item.key}
                     dataSource={dataSource}
                     dataIndex={item.dataIndex}
-                    onSave={this.props.onSave}
-                    onRemove={this.props.onRemove}
+                    editStatus={editStatus}
+                    onUpdateFieldValues={this.handleUpdateFieldValues}
+                    onUpdateDeleteList={this.handleUpdateDeleteList}
                   />
                 );
               })}
             </Row>
             {visible ? this.getBasicInfoOnExtra() : null}
             {visible ? this.getAdditionalInfoRender() : null}
+            {editStatus ?
+              <div className="btn-group">
+                <Button type="primary" size="small" onClick={this.handleSaveClick}>{language.SAVE}</Button>
+                <Button size="small" onClick={this.handleCancelClick}>{language.CANCEL}</Button>
+              </div> :
+              null}
           </Col>
           <Col span="3" className="cell-item">
             {this.getReminderInfoRender()}
@@ -283,19 +331,14 @@ class CompanyInfo extends Component {
 CompanyInfo.defaultProps = {
   isCustomer: false,
   basicInfoRows: [],
-  dataSource: {},
-  onSave() {},
-  onRemove() {},
-  onAddCustomerConfirm() {}
+  dataSource: {}
 };
 
 CompanyInfo.propTypes = {
   isCustomer: PropTypes.bool,
   basicInfoRows: PropTypes.array,
   dataSource: PropTypes.object,
-  onSave: PropTypes.func,
-  onRemove: PropTypes.func,
-  onAddCustomerConfirm: PropTypes.func
+  updateDataSource: PropTypes.func,
 };
 
 export default CompanyInfo;

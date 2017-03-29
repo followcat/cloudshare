@@ -5,7 +5,12 @@ import Cell from './Cell';
 
 class AdditionalInfoItem extends Component {
   render() {
-    const { itemInfo, dataSource, dataIndex } = this.props;
+    const {
+      itemInfo,
+      dataSource,
+      dataIndex,
+      editStatus
+    } = this.props;
 
     return (
       <div className="cs-item-row">
@@ -14,8 +19,9 @@ class AdditionalInfoItem extends Component {
           span={20}
           dataSource={dataSource}
           dataIndex={dataIndex}
-          onSave={this.props.onSave}
-          onRemove={this.props.onRemove}
+          editStatus={editStatus}
+          onUpdateFieldValues={this.props.onUpdateFieldValues}
+          onUpdateDeleteList={this.props.onUpdateDeleteList}
         />
       </div>
     );
@@ -23,18 +29,16 @@ class AdditionalInfoItem extends Component {
 }
 
 AdditionalInfoItem.defaultProps = {
-  dataSource: {},
-  itemInfo: {},
-  onSave() {},
-  onRemove() {}
+  dataSource: {}
 };
 
 AdditionalInfoItem.propTypes = {
+  editStatus: PropTypes.bool,
   dataSource: PropTypes.object,
   dataIndex: PropTypes.string,
   itemInfo: PropTypes.object,
-  onSave: PropTypes.func,
-  onRemove: PropTypes.func
+  onUpdateFieldValues: PropTypes.func,
+  onUpdateDeleteList: PropTypes.func
 };
 
 export default AdditionalInfoItem;

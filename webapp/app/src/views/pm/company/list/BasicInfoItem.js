@@ -5,16 +5,25 @@ import Cell from './Cell';
 
 class BasicInfoItem extends Component {
   render() {
-    const { itemInfo, labelCls, dataSource, dataIndex } = this.props;
+    const {
+      itemInfo,
+      labelCls,
+      dataSource,
+      dataIndex,
+      editStatus
+    } = this.props;
     
     return (
       <div className="cs-item-row">
         <label className={`cs-item-row-label ${labelCls}`}>{itemInfo.title}</label>
         <Cell
           span={20}
+          itemInfo={itemInfo}
           dataSource={dataSource}
           dataIndex={dataIndex}
-          onSave={this.props.onSave}
+          editStatus={editStatus}
+          onUpdateFieldValues={this.props.onUpdateFieldValues}
+          onUpdateDeleteList={this.props.onUpdateDeleteList}
         />
       </div>
     );
@@ -23,19 +32,18 @@ class BasicInfoItem extends Component {
 
 BasicInfoItem.defaultProps = {
   labelCls: '',
-  contentCls: '',
   itemInfo: {},
   dataSource: {},
-  onSave() {}
 };
 
 BasicInfoItem.propTypes = {
+  editStatus: PropTypes.bool,
   labelCls: PropTypes.string,
-  contentCls: PropTypes.string,
   itemInfo: PropTypes.object,
   dataSource: PropTypes.object,
   dataIndex: PropTypes.string,
-  onSave: PropTypes.func
+  onUpdateFieldValues: PropTypes.func,
+  onUpdateDeleteList: PropTypes.func
 };
 
 export default BasicInfoItem;

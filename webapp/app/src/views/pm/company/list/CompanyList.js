@@ -22,8 +22,6 @@ import {
   getCustomerList,
   getAllCompany,
   getAllCompanyBySearch,
-  updateCompanyInfo,
-  updateCustomer,
   createCompany,
 } from 'request/company';
 
@@ -65,15 +63,12 @@ class CompanyList extends Component {
       filterKey: options[0].key,
       filterValue: ''
     };
-    this.handleSave = this.handleSave.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
     this.handleCreateCompanySubmit = this.handleCreateCompanySubmit.bind(this);
     this.handleUploadBtnClick = this.handleUploadBtnClick.bind(this);
     this.handleUploadModalCancel = this.handleUploadModalCancel.bind(this);
     this.handleUploadModalOk = this.handleUploadModalOk.bind(this);
-    this.handleAddCustomerConfirm = this.handleAddCustomerConfirm.bind(this);
     this.handleFilterSelect = this.handleFilterSelect.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
     this.handleFilterClick = this.handleFilterClick.bind(this);
@@ -89,36 +84,6 @@ class CompanyList extends Component {
 
     this.getDataSource(current, pageSize);
     this.getCustomerDataSource();
-  }
-
-  handleSave(field) {
-    updateCompanyInfo('PUT', {
-      id: field.id,
-      update_info: [{ key: field.fieldProp, value: field.fieldValue }]
-    }, json => {
-      if (json.code === 200) {
-        message.success(language.SAVE_SUCCESS_MSG);
-        this.updateDataSource();
-      } else {
-        message.error(language.SAVE_FAIL_MSG);
-      }
-    });
-  }
-
-  handleRemove(id, key, value, date) {
-    updateCompanyInfo('DELETE', {
-      id: id,
-      key: key,
-      value: value,
-      date: date
-    }, json => {
-      if (json.code === 200) {
-        message.success(language.DELETE_SUCCESS_MSG);
-        this.updateDataSource();
-      } else {
-        message.error(language.DELETE_FAIL_MSG);
-      }
-    });
   }
 
   handleShowSizeChange(current, pageSize) {
@@ -191,24 +156,6 @@ class CompanyList extends Component {
       visible: false
     });
     this.props.history.push('/company/uploader');
-  }
-
-  handleAddCustomerConfirm(id) {
-    let idList = this.state.customerIDList;
-
-    updateCustomer('POST', {
-      id: id
-    }, (json) => {
-      if (json.code === 200) {
-        message.success(language.ADD_SUCCESS_MSG);
-        idList.push(id);
-        this.setState({
-          customerIDList: idList
-        });
-      } else {
-        message.error(language.ADD_FAIL_MSG);
-      }
-    });
   }
 
   handleFilterSelect(value) {
@@ -417,15 +364,13 @@ class CompanyList extends Component {
           <Affix>
             <HeaderTitle position="left" dataSource={headerTitle} />
           </Affix>
-          {this.state.dataSource.map((item, index) => {
+          {this.state.dataSource.map(item => {
             return (
               <CompanyInfo
-                key={index}
+                key={item.id}
                 dataSource={item}
                 isCustomer={this.state.customerIDList.indexOf(item.id) > -1}
-                onSave={this.handleSave}
-                onRemove={this.handleRemove}
-                onAddCustomerConfirm={this.handleAddCustomerConfirm}
+                updateDataSource={this.updateDataSource}
               />
             );
           })}
@@ -443,7 +388,9 @@ CompanyList.defaultProps = {
 };
 
 CompanyList.propTypes = {
-  uploadProps: PropTypes.object
+  uploadProps: PropTypes.object,
+  uploading: PropTypes.bool,
+  disabled: PropTypes.bool
 };
 
 export default CompanyList;

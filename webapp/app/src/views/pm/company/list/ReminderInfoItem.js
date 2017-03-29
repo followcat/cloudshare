@@ -3,6 +3,9 @@ import React, { Component, PropTypes } from 'react';
 
 import { DatePicker, Input, Button } from 'antd';
 
+import cloneDeep from 'lodash/cloneDeep';
+import remove from 'lodash/remove';
+
 import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
@@ -10,23 +13,35 @@ const language = websiteText.zhCN;
 const t = 1000*60*60*24;
 
 class ReminderInfoItem extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       opening: false,
       editStatus: false,
-      text: '',
-      date: ''
+      datas: cloneDeep(props.dataSource),
+      fieldValue: {
+        content: '',
+        date:''
+      }
     };
     this.handleOmmitClick = this.handleOmmitClick.bind(this);
-    this.handleDoubleClick = this.handleDoubleClick.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.disabledDate = this.disabledDate.bind(this);
     this.getEditingRender = this.getEditingRender.bind(this);
     this.getRender = this.getRender.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.editStatus === false) {
+      this.setState({
+        datas: cloneDeep(nextProps.dataSource),
+        fieldValue: {
+          content: '',
+          date: ''
+        }
+      });
+    }
   }
 
   handleOmmitClick() {
@@ -35,51 +50,35 @@ class ReminderInfoItem extends Component {
     });
   }
 
-  handleDoubleClick() {
-    this.setState({
-      editStatus: true
+  handleDeleteClick(item) {
+    const { dataIndex } = this.props,
+          { datas } = this.state;
+
+    remove(datas, (v) => {
+      return v.author === item.author && v.content === item.content && v.date === item.date;
     });
+
+    this.props.onUpdateDeleteList(dataIndex, item);
   }
 
-  handleSave() {
-    const { dataIndex, dataId } = this.props,
-          { text, date } = this.state;
+  handleInputChange(e) { 
+    const { fieldValue } = this.state,
+          { dataIndex } = this.props;
 
-    if (text && date) {
-      this.props.onSave({
-        id: dataId,
-        fieldProp: dataIndex,
-        fieldValue: { text: text, date: date }
-      });
+    fieldValue.text = e.target.value;
+    this.setState({ fieldValue });
 
-      this.setState({
-        editStatus: false
-      });
-    }
-  }
-
-  handleDeleteClick(content, date) {
-    const { dataId, dataIndex } = this.props;
-
-    this.props.onRemove(dataId, dataIndex, content, date);
-  }
-
-  handleCancel() {
-    this.setState({
-      editStatus: false
-    });
-  }
-
-  handleInputChange(e) {
-    this.setState({
-      text: e.target.value
-    });
+    this.props.onUpdateFieldValues(dataIndex, { content: fieldValue });
   }
 
   handleDateChange(value, dateString) {
-    this.setState({
-      date: dateString
-    });
+    const { fieldValue } = this.state,
+          { dataIndex } = this.props;
+
+    fieldValue.date = dateString;
+    this.setState({ fieldValue });
+
+    this.props.onUpdateFieldValues(dataIndex, { content: fieldValue });
   }
 
   disabledDate(current) {
@@ -87,7 +86,7 @@ class ReminderInfoItem extends Component {
   }
 
   getEditingRender() {
-    const { editStatus } = this.state;
+    const { editStatus } = this.props;
 
     if (editStatus) {
       return (
@@ -101,10 +100,6 @@ class ReminderInfoItem extends Component {
             disabledDate={this.disabledDate}
             onChange={this.handleDateChange}
           />
-          <div className="cs-btn-group">
-            <Button type="primary" size="small" onClick={this.handleSave}>{language.SAVE}</Button>
-            <Button size="small" onClick={this.handleCancel}>{language.CANCEL}</Button>
-          </div>
         </div>
       );
     }
@@ -113,8 +108,8 @@ class ReminderInfoItem extends Component {
   }
 
   getRender() {
-    const { visible, dataSource } = this.props,
-          { opening, editStatus } = this.state;
+    const { visible, editStatus } = this.props,
+          { datas, opening } = this.state;
 
     if (!visible) {
       return (
@@ -122,22 +117,22 @@ class ReminderInfoItem extends Component {
           className={opening ? '' : 'ommit'}
           onClick={this.handleOmmitClick}
         >
-          {dataSource.length > 0 ?
-            `${dataSource[0].author} | ${dataSource[0].content.date} | ${dataSource[0].content.text}` :
+          {datas.length > 0 ?
+            `${datas[0].author} | ${datas[0].content.date} | ${datas[0].content.text}` :
             `暂无数据`}
-          {editStatus && dataSource.length > 0 ?
+          {editStatus && datas.length > 0 ?
             <a
               className="visiting-list-del"
               href="javascript: void(0);"
-              onClick={() => this.handleDeleteClick(dataSource[0].content, dataSource[0].date)}>{language.DELETE}</a> :
+              onClick={() => this.handleDeleteClick(datas[0])}>{language.DELETE}</a> :
             null}
         </div>
       );
     } else {
       return (
         <div>
-          {dataSource.length > 0 ?
-            dataSource.map((item, index) => {
+          {datas.length > 0 ?
+            datas.map((item, index) => {
               return (
                 <p key={index} className="visiting-list">
                   {item.content && `${item.author} | ${item.content.date} | ${item.content.text}`}
@@ -145,7 +140,7 @@ class ReminderInfoItem extends Component {
                     <a
                       className="visiting-list-del"
                       href="javascript: void(0);"
-                      onClick={() => this.handleDeleteClick(item.content, item.date)}>{language.DELETE}</a> :
+                      onClick={() => this.handleDeleteClick(item)}>{language.DELETE}</a> :
                     null}
                 </p>
               );
@@ -171,11 +166,11 @@ class ReminderInfoItem extends Component {
 
 ReminderInfoItem.propTypes = {
   visible: PropTypes.bool,
+  editStatus: PropTypes.bool,
   dataSource: PropTypes.array,
   dataIndex: PropTypes.string,
-  dataId: PropTypes.string,
-  onSave: PropTypes.func,
-  onRemove: PropTypes.func
+  onUpdateFieldValues: PropTypes.func,
+  onUpdateDeleteList: PropTypes.func
 };
 
 export default ReminderInfoItem;

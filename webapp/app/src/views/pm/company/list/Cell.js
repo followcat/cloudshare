@@ -1,39 +1,39 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import EnhancedInput from 'components/enhanced-input';
-
 import {
-  Col,
   Input,
-  Button,
   Tag
 } from 'antd';
 
-import websiteText from 'config/website-text';
-
-const language = websiteText.zhCN;
-
 class Cell extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    
+    const { dataSource, dataIndex } = props;
+
     this.state = {
-      fieldProp: '',
-      fieldValue: null,
+      fieldValue: dataSource[dataIndex] instanceof Array ? '' : dataSource[dataIndex],
       editStatus: false,
       openable: false
     };
     this.handleClick = this.handleClick.bind(this);
-    this.handleDoubleClick = this.handleDoubleClick.bind(this);
-    this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleSaveClick = this.handleSaveClick.bind(this);
-    this.handleEnhancedInputClick = this.handleEnhancedInputClick.bind(this);
     this.handleAfterClose = this.handleAfterClose.bind(this);
     this.getArrayDOMNormalRender = this.getArrayDOMNormalRender.bind(this);
     this.getArrayDOMEditingRender = this.getArrayDOMEditingRender.bind(this);
     this.getArrayDOMRender = this.getArrayDOMRender.bind(this);
     this.getStringDOMRender = this.getStringDOMRender.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { editStatus, dataSource, dataIndex } = nextProps;
+
+    if (editStatus === false) {
+      this.setState({
+        fieldValue: dataSource[dataIndex] instanceof Array ? '' : dataSource[dataIndex]
+      });
+    }
   }
 
   handleClick() {
@@ -42,65 +42,20 @@ class Cell extends Component {
     });
   }
 
-  handleDoubleClick() {
-    const { dataSource, dataIndex } = this.props;
-
-    this.setState({
-      editStatus: true,
-      fieldProp: dataIndex,
-      fieldValue: dataSource[dataIndex] instanceof Array ? dataSource[dataIndex].content : dataSource[dataIndex]
-    });
-  }
-
-  handleCancelClick() {
-    this.setState({
-      editStatus: false
-    });
-  }
-
   handleChange(e) {
+    const { dataIndex } = this.props;
+
     this.setState({
       fieldValue: e.target.value
     });
+
+    this.props.onUpdateFieldValues(dataIndex, { content: e.target.value });
   }
 
-  handleSaveClick() {
-    const { dataSource } = this.props,
-          { fieldProp, fieldValue } = this.state;
+  handleAfterClose(item) {
+    const { dataIndex } = this.props;
 
-    if (fieldValue.trim() !== '') {
-      this.props.onSave({ id: dataSource.id, fieldProp: fieldProp, fieldValue: fieldValue });
-    }
-
-    this.setState({
-      editStatus: false
-    });
-  }
-
-  handleEnhancedInputClick(fieldValue) {
-    const { dataSource, dataIndex } = this.props;
-
-    if (fieldValue.trim() !== '') {
-      this.props.onSave({
-        id: dataSource.id,
-        fieldProp: dataIndex,
-        fieldValue: fieldValue
-      });
-
-      this.setState({
-        editStatus: false
-      });
-    }
-  }
-
-  handleAfterClose(content, date) {
-    const { dataSource, dataIndex } = this.props;
-
-    this.props.onRemove(dataSource.id, dataIndex, content, date);
-
-    this.setState({
-      editStatus: false
-    });
+    this.props.onUpdateDeleteList(dataIndex, item);
   }
 
   getArrayDOMNormalRender() {
@@ -129,7 +84,9 @@ class Cell extends Component {
   }
 
   getArrayDOMEditingRender() {
-    const { dataSource, dataIndex } = this.props;
+    const { dataSource, dataIndex } = this.props,
+          { fieldValue } = this.state;
+
     return (
       <div>
         {dataSource[dataIndex].map((item, index) => {
@@ -137,36 +94,22 @@ class Cell extends Component {
             <Tag
               key={index}
               closable={true}
-              onClose={() => this.handleAfterClose(item.content, item.date)}
+              onClose={() => this.handleAfterClose(item)}
             >
               {item.content}
             </Tag>
           );
         })}
         <div className="cs-additional-input-group extra-opearator">
-          <EnhancedInput
-            type="plus"
-            placeholder=""
-            size="small"
-            resettable={true}
-            style={{ display: 'inline-block', width: '80%' }}
-            onClick={this.handleEnhancedInputClick}
-          />
-          <Button
-            size="small"
-            type="ghost"
-            onClick={this.handleCancelClick}
-          >
-            {language.CANCEL}
-          </Button>
+          <Input value={fieldValue} size="small" onChange={this.handleChange} />
         </div>
       </div>
     );
   }
 
   getArrayDOMRender() {
-    const { editable } = this.props,
-          { editStatus } = this.state;
+    const { editable, editStatus } = this.props;
+          // { editStatus } = this.state;
 
     if (editable) {
       if (editStatus) {
@@ -179,13 +122,32 @@ class Cell extends Component {
     }
   }
 
+  /**
+   * 当dataSource数据类型为string的渲染函数
+   * 
+   * @returns 
+   * 
+   * @memberOf Cell
+   */
   getStringDOMRender() {
-    const { dataSource, dataIndex, editable } = this.props,
-          { editStatus, openable, fieldValue } = this.state;
+    const {
+            itemInfo,
+            dataSource,
+            dataIndex,
+            editable,
+            editStatus 
+          } = this.props,
+          { openable, fieldValue } = this.state;
 
     const cellCls = openable && !editStatus ? '' : 'ommit';
 
-    if (editable) {
+    let type = 'text';
+
+    if (itemInfo && itemInfo.type) {
+      type = itemInfo.type;
+    }
+
+    if (editable) {   // 允许编辑
       return (
         <div className={cellCls}>
           {!editStatus ?
@@ -195,29 +157,15 @@ class Cell extends Component {
                 <Input
                   value={fieldValue}
                   size="small"
+                  type={type}
                   onChange={this.handleChange}
                 />
-                <div className="cs-button-group">
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={this.handleSaveClick}
-                  >
-                    {language.SAVE}
-                  </Button>
-                  <Button
-                    size="small"
-                    onClick={this.handleCancelClick}
-                  >
-                    {language.CANCEL}
-                  </Button>
-                </div>
               </div>
             </div>
           }
         </div>
       );
-    } else {
+    } else {    // 不允许编辑
       return (
         <div className={cellCls}>{dataSource[dataIndex] || '无'}</div>
       );
@@ -231,7 +179,6 @@ class Cell extends Component {
         style={{ width: width }}
         className="cell-item"
         onClick={this.handleClick}
-        onDoubleClick={this.handleDoubleClick}
       >
         {dataSource[dataIndex] instanceof Array ?
           this.getArrayDOMRender() :
@@ -244,18 +191,18 @@ class Cell extends Component {
 
 Cell.defaultProps = {
   editable: true,
-  width: '87%',
-  onSave() {},
-  onRemove() {}
+  width: '87%'
 };
 
 Cell.propTypes = {
   editable: PropTypes.bool,
+  editStatus: PropTypes.bool,
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  itemInfo: PropTypes.object,
   dataIndex: PropTypes.string,
   dataSource: PropTypes.object,
-  onSave: PropTypes.func,
-  onRemove: PropTypes.func
+  onUpdateFieldValues: PropTypes.func,
+  onUpdateDeleteList: PropTypes.func
 };
 
 export default Cell;

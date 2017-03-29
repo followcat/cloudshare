@@ -58,8 +58,8 @@ const server = new WebpackDevServer(compiler, {
 
   stats: {
     colors: true,
-    // chunks: false,
-    // children: false
+    chunks: false,
+    children: false
   },
 
   proxy: {

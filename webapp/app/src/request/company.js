@@ -46,7 +46,7 @@ export const createCompany = (params, callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-/* 
+/**
  * 获取所有公司列表
  * @param  {object}   params   请求参数: 页码, 每页条数
  * @param  {function} callback 回调函数
@@ -67,7 +67,7 @@ export const getAllCompany = (params, callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-/*
+/**
  * 获取待开发客户列表
  * @param  {string}   params   请求参数: 公司名称关键词
  * @param  {function} callback 回调函数
@@ -88,7 +88,7 @@ export const getAddedCompanyList = (params, callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-/*
+/**
  * 获取公司列表搜索结果
  * @param  {object}   params   请求参数: 页码, 每页条数, 搜索关键字
  * @param  {function} callback 回调函数
@@ -109,16 +109,15 @@ export const getAllCompanyBySearch = (params, callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-/*
+/**
  * 更新公司信息
- * @param  {string}   method   请求方法: PUT(更新), DELETE(删除)
- * @param  {object}   params   请求参数
+ * @param  {object}   params   需要更新的字段参数
  * @param  {function} callback 回调函数
  * @return {function} fetch    异步请求方法
  */
-export const updateCompanyInfo = (method, params, callback) => {
+export const updateCompanyInfo = (params, callback) => {
   return fetch(API.UPDATE_COMPANY_INFO_API, {
-    method: method,
+    method: 'POST',
     credentials: 'include',
     headers: {
       'Authorization': `Basic ${StorageUtil.get('token')}`,
@@ -131,6 +130,10 @@ export const updateCompanyInfo = (method, params, callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
+/**
+ * 获取客户公司列表
+ * @param {function} callback  回调函数
+ */
 export const getCustomerList = (callback) => {
   return fetch(API.CUSTOMER_LIST_API, {
     method: 'POST',
@@ -146,6 +149,12 @@ export const getCustomerList = (callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
+/**
+ * 更新客户信息
+ * @param {string} method 异步请求方法
+ * @param {object} params 请求参数
+ * @param {function} callback 回调函数
+ */
 export const updateCustomer = (method, params, callback) => {
   return fetch(API.CUSTOMER_API, {
     method: method,
@@ -161,7 +170,11 @@ export const updateCustomer = (method, params, callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-// 确认上传excel文件
+/**
+ * 确认公司excel文件上传
+ * @param {object} params 请求参数
+ * @param {function} callback 回调函数
+ */
 export const confirmExcelUpload = (params, callback) => {
   return fetch(API.CONFIRM_UPLOAD_EXCEL_API, {
     method: 'POST',

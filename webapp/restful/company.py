@@ -168,7 +168,6 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', location = 'json')
         self.reqparse.add_argument('update_info', type= list, location = 'json')
-        self.reqparse.add_argument('date', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
@@ -178,7 +177,20 @@ class CompanyInfoUpdateAPI(Resource):
         update_info = args['update_info']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        result = project.company_update_info(id, update_info, user.id)
+        origin_info = project.company_get(id)
+        for key in update_info:
+            value = update_info[key]
+            text = value['text']
+            vtype = value['type']
+            if vtype == 'PUT':
+                origin_info[key] = value
+            elif vtype == 'CREATE':
+                data = self._listframe(value, user)
+                origin_info[key].insert(0, data)
+            elif vtype == 'DELETE':
+                data = self._listframe(text, committer, value['date'])
+                origin_info[key].remove(data)
+        result = project.company_update_info(id, origin_info, user.id)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:

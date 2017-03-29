@@ -7,7 +7,7 @@ import ujson
 import utils._yaml
 import utils.builtin
 import core.outputstorage
-import services.memsorted
+import services.memdatas
 import services.base.storage
 
 
@@ -39,7 +39,7 @@ class Simulation(services.base.storage.BaseStorage):
         self._ids = None
         self.storage = storage
         self.yamlpath = self.YAML_DIR
-        self.memsorted = services.memsorted.MemerySorted(self)
+        self.memdatas = services.memdatas.MemeryDatas(self)
         idsfile = os.path.join(path, Simulation.ids_file)
         if not os.path.exists(idsfile):
             dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
@@ -93,7 +93,7 @@ class Simulation(services.base.storage.BaseStorage):
             self.interface.add_files(filenames, filedatas,
                                      message='Add new data %s.'%id,
                                      committer=committer, do_commit=do_commit)
-            self.memsorted.update('modifytime', id)
+            self.memdatas.update('modifytime', id)
             result = True
         return result
 
@@ -142,7 +142,7 @@ class Simulation(services.base.storage.BaseStorage):
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
         result = super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
-        self.memsorted.update('modifytime', id)
+        self.memdatas.update('modifytime', id)
         return result
 
     def search(self, keyword):
@@ -175,7 +175,7 @@ class Simulation(services.base.storage.BaseStorage):
         return result
 
     def sorted_ids(self, key, ids=None, reverse=True):
-        return self.memsorted.sorted_ids(key, ids=ids, reverse=reverse)
+        return self.memdatas.sorted_ids(key, ids=ids, reverse=reverse)
 
     @property
     def ids(self):

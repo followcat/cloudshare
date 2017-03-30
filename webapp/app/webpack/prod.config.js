@@ -5,12 +5,13 @@ const webpack = require('webpack');
 const getHTMLFile = require('./config/html-file');
 const folderPath = require('./config/folder-path');
 
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   output: {
     path: path.join(folderPath.PATHS.STATIC_PATH, '/dist'),
-    publicPath: '/static/dist',
+    publicPath: '/static/dist/',
     filename: '[name].[hash].js',
   },
 
@@ -40,8 +41,19 @@ module.exports = {
           warnings: false
         },
         comments: false
+    }),
+    new HtmlWebpackPlugin({
+      hash: false,
+      title: 'Cloudshare - Willendare',
+      template: path.join(folderPath.PATHS.SRC_PATH, '/template.html'),
+      inject: true,
+      filename: path.join(folderPath.PATHS.ROOT_PATH, '/templates_dist/index.html'),
+      minify: {    // 压缩HTML文件
+        removeComments: true,    // 移除HTML中的注释
+        collapseWhitespace: false,   // 删除空白符与换行符
+      }
     })
-  ].concat(getHTMLFile()),
+  ],  
 
   stats: {
     color: true,

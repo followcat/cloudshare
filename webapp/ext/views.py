@@ -28,68 +28,73 @@ def configure(app):
     init_login(app)
 
     #RESTful Index page entrance
-    @app.route('/')
-    def rootindex():
-        return flask.redirect(flask.url_for('index'))
+    # @app.route('/')
+    # def rootindex():
+    #     return flask.redirect(flask.url_for('index'))
 
-    app.add_url_rule(
-        '/index',
-        view_func=webapp.views.views.Index.as_view('index'),
-    )
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def catch_all(path):
+        return flask.render_template('index.html')
 
-    #RESTful Uploader page entrance
-    app.add_url_rule(
-        '/uploader',
-        view_func=webapp.views.views.Uploader.as_view('uploader'),
-    )
+    # app.add_url_rule(
+    #     '/',
+    #     view_func=webapp.views.views.Index.as_view('index'),
+    # )
 
-    #RESTful Manage page entrance
-    app.add_url_rule(
-        '/manage',
-        view_func=webapp.views.views.Manage.as_view('manage'),
-    )
+    # #RESTful Uploader page entrance
+    # app.add_url_rule(
+    #     '/uploader',
+    #     view_func=webapp.views.views.Uploader.as_view('uploader'),
+    # )
 
-    #RESTful UserInfo page entrance
-    app.add_url_rule(
-        '/userinfo',
-        view_func=webapp.views.views.UserInfo.as_view('userinfo'),
-    )
+    # #RESTful Manage page entrance
+    # app.add_url_rule(
+    #     '/manage',
+    #     view_func=webapp.views.views.Manage.as_view('manage'),
+    # )
 
-    #RESTful FastMatching page entrance
-    app.add_url_rule(
-        '/fastmatching',
-        view_func=webapp.views.views.FastMatching.as_view('fastmatching')
-    )
+    # #RESTful UserInfo page entrance
+    # app.add_url_rule(
+    #     '/userinfo',
+    #     view_func=webapp.views.views.UserInfo.as_view('userinfo'),
+    # )
 
-    #RESTful Search page entrance
-    app.add_url_rule(
-        '/search',
-        view_func=webapp.views.views.Search.as_view('search')
-    )
+    # #RESTful FastMatching page entrance
+    # app.add_url_rule(
+    #     '/fastmatching',
+    #     view_func=webapp.views.views.FastMatching.as_view('fastmatching')
+    # )
 
-    #RESTful SearchResult page entrance
-    app.add_url_rule(
-        '/search/result',
-        view_func=webapp.views.views.SearchResult.as_view('searchresult')
-    )
+    # #RESTful Search page entrance
+    # app.add_url_rule(
+    #     '/search',
+    #     view_func=webapp.views.views.Search.as_view('search')
+    # )
 
-    #RESTful Resume page entrance
-    app.add_url_rule(
-        '/resume/<path:id>',
-        view_func=webapp.views.views.Resume.as_view('resume')
-    )
+    # #RESTful SearchResult page entrance
+    # app.add_url_rule(
+    #     '/search/result',
+    #     view_func=webapp.views.views.SearchResult.as_view('searchresult')
+    # )
 
-    #RESTful Upload Preview page entrance
-    app.add_url_rule(
-        '/uploadpreview',
-        view_func=webapp.views.views.UploadPreview.as_view('uploadpreview'),
-    )
+    # #RESTful Resume page entrance
+    # app.add_url_rule(
+    #     '/resume/<path:id>',
+    #     view_func=webapp.views.views.Resume.as_view('resume')
+    # )
 
-    #RESTful Project Management page entrance
-    app.add_url_rule(
-        '/pm',
-        view_func=webapp.views.views.ProjectManagement.as_view('ProjectManagement'),
-    )
+    # #RESTful Upload Preview page entrance
+    # app.add_url_rule(
+    #     '/uploadpreview',
+    #     view_func=webapp.views.views.UploadPreview.as_view('uploadpreview'),
+    # )
+
+    # #RESTful Project Management page entrance
+    # app.add_url_rule(
+    #     '/pm',
+    #     view_func=webapp.views.views.ProjectManagement.as_view('ProjectManagement'),
+    # )
 
     app.add_url_rule(
         '/gotologin',

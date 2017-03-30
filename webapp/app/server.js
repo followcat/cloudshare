@@ -7,8 +7,8 @@ const folderPath = require('./webpack/config/folder-path');
 const port = 3000;
 
 //遍历每个入口文件并加入热加载插件
-// let entryObject = webpackConf.entry,
-//     historyApifallback = {};
+// let entry = webpackConf.entry;
+webpackConf.entry.unshift('react-hot-loader/patch', `webpack-dev-server/client?http://localhost:${port}/`, 'webpack/hot/only-dev-server');
 
 // for (let key in entryObject) {
 //   let arr = [];

@@ -375,61 +375,63 @@ class Resume extends Component {
       },
       onChange: this.handleUploadChange,
     };
-
+    console.log(resumeList);
     return (
       <Layout>
-        <div className="cs-layout-tabs">
-          <Tabs
-            type="card"
-            activeKey={resumeId}
-            onChange={this.handleTabsChange}
-          >
-            {resumeList.map(item => {
-              return (
-                <Tabs.TabPane tab={`ID: ${item}`} key={item}>
-                  <Spin spinning={panelLoading}>
-                    <div className="cs-resume-wrapper">
-                      <ResumeHeader 
-                        collected={collected}
-                        dataSource={dataSource}
-                        onCollection={this.handleCollection}
-                      />
-                      <div className="cv-resume-content">
-                        <ResumeToolMenu
-                          resumeId={resumeId}
+        <div className="cs-layout-resume">
+          <div className="cs-layout-tabs">
+            <Tabs
+              type="card"
+              activeKey={resumeId}
+              onChange={this.handleTabsChange}
+            >
+              {resumeList.map(item => {
+                return (
+                  <Tabs.TabPane tab={`ID: ${item}`} key={item}>
+                    <Spin spinning={panelLoading}>
+                      <div className="cs-resume-wrapper">
+                        <ResumeHeader 
+                          collected={collected}
                           dataSource={dataSource}
-                          uploadProps={uploadProps}
-                          fileList={fileList}
-                          onSubmitModification={this.handleSubmitModification}
-                          onUploadModalOk={this.handleUploadModalOk}
+                          onCollection={this.handleCollection}
                         />
-                        <Summary dataSource={generateSummary(dataSource)} />
-                        <Tabs defaultActiveKey="chinese">
-                          <Tabs.TabPane tab="中文" key="chinese">
-                            <ResumeContent html={html} />
-                          </Tabs.TabPane>
-                          <Tabs.TabPane
-                            tab="English"
-                            key="english"
-                            disabled={!enHTML}
-                          >
-                            <ResumeContent html={enHTML} />
-                          </Tabs.TabPane>
-                        </Tabs>
-                        <ResumeContent html={html} />
+                        <div className="cv-resume-content">
+                          <ResumeToolMenu
+                            resumeId={resumeId}
+                            dataSource={dataSource}
+                            uploadProps={uploadProps}
+                            fileList={fileList}
+                            onSubmitModification={this.handleSubmitModification}
+                            onUploadModalOk={this.handleUploadModalOk}
+                          />
+                          <Summary dataSource={generateSummary(dataSource)} />
+                          <Tabs defaultActiveKey="chinese">
+                            <Tabs.TabPane tab="中文" key="chinese">
+                              <ResumeContent html={html} />
+                            </Tabs.TabPane>
+                            <Tabs.TabPane
+                              tab="English"
+                              key="english"
+                              disabled={!enHTML}
+                            >
+                              <ResumeContent html={enHTML} />
+                            </Tabs.TabPane>
+                          </Tabs>
+                          <ResumeContent html={html} />
+                        </div>
                       </div>
-                    </div>
-                  </Spin>
-                </Tabs.TabPane>
-              );
-            })}
-          </Tabs>
-        </div>
-        <div className="resume-side">
-          <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
-          <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
-          <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />
-          <ResumeSimilar dataSource={similar} />
+                    </Spin>
+                  </Tabs.TabPane>
+                );
+              })}
+            </Tabs>
+          </div>
+          <div className="resume-side">
+            <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
+            <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
+            <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />
+            <ResumeSimilar dataSource={similar} />
+          </div>
         </div>
       </Layout>
     );

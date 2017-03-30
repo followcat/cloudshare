@@ -3,12 +3,15 @@ import React, { Component, PropTypes } from 'react';
 
 class Container extends Component {
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      children
+    } = this.props;
 
     return(
-      <div className={`${props.prefixCls}`}>
-        <div className={`${props.prefixCls}-wrapper`}>
-            {props.children}
+      <div className={prefixCls}>
+        <div className={`${prefixCls}-wrapper`}>
+            {children}
         </div>
       </div>
     );
@@ -16,11 +19,12 @@ class Container extends Component {
 }
 
 Container.defaultProps = {
-  prefixCls: 'cs-container',
+  prefixCls: 'cs-container'
 };
 
 Container.propTypes = {
   prefixCls: PropTypes.string,
+  children: PropTypes.element
 };
 
 export default Container;

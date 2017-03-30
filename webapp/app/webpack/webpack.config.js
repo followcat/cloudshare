@@ -18,12 +18,7 @@ process.env.BABEL_ENV = TARGET;
 
 let webpackConfig = {
   // entry: getEntryFile(),
-  entry: [
-    'react-hot-loader/patch',
-    'webpack-dev-server/client?http://localhost:3000/',
-    'webpack/hot/only-dev-server',
-    './src/index.js'
-  ],
+  entry: ['./src/index.js'],
 
   resolve: {
     extensions: ['.js', '.jsx'],

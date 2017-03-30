@@ -1,8 +1,10 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import LayoutHeader from '../common/LayoutHeader';
-import LayoutContainer from '../common/LayoutContainer';
+import {
+  LayoutHeader,
+  LayoutContainer
+} from 'views/layout';
 import SubheadNav from 'components/subhead-nav';
 import {
   CardContainer,
@@ -69,7 +71,7 @@ class Layout extends Component {
           style={{ marginLeft: 338 }}
           onClick={this.handleSubheadNavClick}
         />
-        <LayoutContainer>
+        <LayoutContainer style={{ paddingLeft: 50, paddingRight: 50 }}>
           <CardContainer>
             <CardContent title={cardContentTitle}>
               {this.props.children}

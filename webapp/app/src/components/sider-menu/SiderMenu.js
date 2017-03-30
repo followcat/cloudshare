@@ -7,16 +7,21 @@ const MenuItem = Menu.Item;
 
 class SideMenu extends Component {
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      mode,
+      selectedKeys,
+      menus
+    } = this.props;
 
     return (
-      <div className={props.prefixCls}>
+      <div className={prefixCls}>
         <Menu
-          mode={props.mode}
-          selectedKeys={props.selectedKeys}
-          onClick={props.onClick}
+          mode={mode}
+          selectedKeys={selectedKeys}
+          onClick={this.props.onClick}
         >
-          {props.menus.map((item, index) => {
+          {menus.map((item) => {
             return (
               <MenuItem key={item.key}>
                 <Link to={item.url}>{item.text}</Link>

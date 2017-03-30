@@ -329,7 +329,7 @@ class JobDescription extends Component {
     const state = this.state;
 
     return (
-      <div>
+      <div className="cs-job-description">
         <TablePlus
           isToolbarShowed={true}
           isSearched={true}

@@ -1,7 +1,9 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import { Card } from 'antd';
+
 import SignInForm from './SignInForm';
+
+import { Card } from 'antd';
 
 class SignIn extends Component {
   render() {
@@ -25,14 +27,15 @@ class SignIn extends Component {
 }
 
 SignIn.defaultProps = {
+  prefixCls: 'cs-signin',
   title: 'Sign in',
   bordered: true,
   className: '',
-  style: {},
-  prefixCls: 'cs-signin'
+  style: {}
 };
 
 SignIn.propTypes = {
+  prefixCls: PropTypes.string,
   title: PropTypes.string,
   bordered: PropTypes.bool,
   className: PropTypes.string,

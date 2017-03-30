@@ -80,7 +80,7 @@ class UploaderResult extends Component {
 
   render() {
     return (
-      <div>
+      <div className="cs-uploader-result">
         {this.getConfirmResultRender()}
       </div>
     );

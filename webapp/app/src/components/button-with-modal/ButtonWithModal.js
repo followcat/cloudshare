@@ -7,7 +7,7 @@ class ButtonWithModal extends Component {
     const props = this.props;
 
     return (
-      <div className="cs-button-with-modal">
+      <div className={props.prefixCls}>
         <Button
           style={props.buttonStyle}
           type={props.buttonType}
@@ -44,6 +44,7 @@ class ButtonWithModal extends Component {
 }
 
 ButtonWithModal.defaultProps = {
+  prefixCls: 'cs-button-with-modal',
   buttonType: 'ghost',
   buttonLoading: false,
   buttonText: '',
@@ -58,6 +59,7 @@ ButtonWithModal.defaultProps = {
 };
 
 ButtonWithModal.propTypes = {
+  prefixCls: PropTypes.string,
   buttonStyle: PropTypes.object,
   buttonType: PropTypes.string,
   buttonSize: PropTypes.string,

@@ -22,11 +22,13 @@ class Search extends Component {
   render() {
     return (
       <div className="cs-layout-search">
-        <KeywordSearch
-          btnText="搜索"
-          horizontal
-          onSearch={this.handleSearch}
-        />
+        <div className="cs-search">
+          <KeywordSearch
+            btnText="搜索"
+            horizontal
+            onSearch={this.handleSearch}
+          />
+        </div>
         <DatabaseInfo />
       </div>
     );

@@ -329,7 +329,7 @@ class Customer extends Component {
     }];
 
     return (
-      <div>
+      <div className="cs-customer">
         <TablePlus
           rowKey={record => record.id}
           isToolbarShowed={true}

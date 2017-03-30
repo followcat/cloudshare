@@ -1,4 +1,6 @@
-.cs-search-result {
+@csSearchResultPrefixCls: cs-search-result;
+
+.@{csSearchResultPrefixCls} {
   max-width: 1080px;
   margin: 0 auto;
   
@@ -7,7 +9,7 @@
     top: 0;
   }
 
-  .cs-search-result-header {
+  &-header {
     background-color: #337ab7;
     padding-top: 12px;
     padding-bottom: 12px;
@@ -61,7 +63,7 @@
     }
   }
 
-  .cs-search-result-bottom {
+  &-bottom {
     padding: 40px 0;
   }
 }

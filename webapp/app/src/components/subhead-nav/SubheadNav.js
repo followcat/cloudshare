@@ -8,18 +8,23 @@ const MenuItem = Menu.Item;
 
 class SubheadNav extends Component {
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      selectedKeys,
+      style,
+      menus
+    } = this.props;
 
     return (
-      <div className={`${props.prefixCls}`}>
-        <div className={`${props.prefixCls}-wrap`}>
+      <div className={prefixCls}>
+        <div className={`${prefixCls}-wrap`}>
           <Menu
-            selectedKeys={props.selectedKeys}
+            selectedKeys={selectedKeys}
             mode="horizontal"
-            onClick={props.onClick}
-            style={props.style}
+            onClick={this.props.onClick}
+            style={style}
           >
-            {props.menus.map(item => {
+            {menus.map(item => {
               return (
                 <MenuItem key={item.key}>
                   <Link to={item.url}>{item.title}</Link>

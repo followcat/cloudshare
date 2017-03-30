@@ -75,6 +75,7 @@ class SearchResultBox extends Component {
   
   render() {
     const {
+      prefixCls,
       visible,
       spinning,
       current,
@@ -82,7 +83,7 @@ class SearchResultBox extends Component {
     } = this.props;
 
     const classSet = classNames({
-      'cs-search-result': true,
+      [`${prefixCls}`]: true,
       'showed': visible === true,
       'hidden': visible === false,
     });
@@ -103,7 +104,12 @@ class SearchResultBox extends Component {
   }
 }
 
+SearchResultBox.defaultProps = {
+  prefixCls: 'cs-search-result'
+};
+
 SearchResultBox.propTypes = {
+  prefixCls: PropTypes.string,
   type: PropTypes.string,
   visible: PropTypes.bool,
   spinning: PropTypes.bool,

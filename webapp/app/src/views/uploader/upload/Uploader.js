@@ -261,19 +261,21 @@ class Uploader extends Component {
     };
 
     return (
-      <ShowCard>
-        <DraggerUpload
-          {...uploadProps}
-          fileList={fileList}
-        />
-        {this.getPreviewRender()}
-        {this.props.children && React.cloneElement(this.props.children, {
-          completedList: completedList,
-          failedList: failedList,
-          fileList: fileList,
-          confirmResult: confirmResult
-        })}
-      </ShowCard>
+      <div className="cs-uploader">
+        <ShowCard>
+          <DraggerUpload
+            {...uploadProps}
+            fileList={fileList}
+          />
+          {this.getPreviewRender()}
+          {this.props.children && React.cloneElement(this.props.children, {
+            completedList: completedList,
+            failedList: failedList,
+            fileList: fileList,
+            confirmResult: confirmResult
+          })}
+        </ShowCard>
+      </div>
     );
   }
 }

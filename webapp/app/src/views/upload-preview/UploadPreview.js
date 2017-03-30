@@ -20,7 +20,6 @@ class UploadPreview extends Component {
   }
 
   getDataSource() {
-    console.log(getEnglishResume);
     getEnglishResume(json => {
       if (json.code === 200) {
         this.setState({

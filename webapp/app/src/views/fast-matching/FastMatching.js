@@ -239,7 +239,7 @@ class FastMatching extends Component {
     } = this.state;
 
     return (
-      <div>
+      <div className="cs-fast-matching">
         <FilterCard
           textarea={textarea}
           classify={classify}

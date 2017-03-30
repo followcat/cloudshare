@@ -135,7 +135,7 @@ class Company extends Component {
     };
 
     return (
-      <div>
+      <div className="cs-company">
         {this.props.children &&
           React.cloneElement(this.props.children, {
             uploadProps: uploadProps,

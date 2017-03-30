@@ -37,7 +37,7 @@ class CompanyUploader extends Component {
     const { dataSource } = this.props;
 
     return (
-      <div>
+      <div className="cs-company-uploader">
         <div className="card-inner-top">
           <div className="legend">
             <div className="legend-item">

@@ -28,10 +28,15 @@ class Feature extends Component {
       footer
     } = this.props;
 
-    let classes = prefixCls;
+    let classes = prefixCls,
+        wrapCls = 'cs-feature-wrap';
 
     if (className) {
       classes = `${prefixCls} ${className}`;
+    }
+
+    if (wrapClassName) {
+      wrapCls += ` ${wrapClassName}`;
     }
 
     return (
@@ -48,7 +53,7 @@ class Feature extends Component {
           visible={visible}
           style={modalStyle}
           width={width}
-          wrapClassName={wrapClassName}
+          wrapClassName={wrapCls}
           cancelText={cancelText}
           footer={footer}
           onCancel={this.props.onCancel}
@@ -62,6 +67,7 @@ class Feature extends Component {
 
 Feature.defaultProps = {
   prefixCls: 'cs-feature',
+  wrapClassName: '',
   className: '',
   text: '更新日志',
   dataSource: '',
@@ -72,7 +78,6 @@ Feature.defaultProps = {
   cancelText: '取消',
   style: {},
   modalStyle: {},
-  wrapClassName: '',
   onClick() {},
   onOk() {},
   onCancel() {}

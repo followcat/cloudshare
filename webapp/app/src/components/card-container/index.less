@@ -1,4 +1,8 @@
-.cs-card-container {
+@csCardContainerPrefixCls: cs-card-container;
+@csCardSiderPrefixCls: cs-card-sider;
+@csCardContentPrefixCls: cs-card-content;
+
+.@{csCardContainerPrefixCls} {
   position: relative;
   padding: 24px 0;
   background-color: #fff;
@@ -7,22 +11,22 @@
   min-height: 440px;
 }
 
-.cs-card-sider {
+.@{csCardSiderPrefixCls} {
   width: 188px;
   float: left;
 }
 
-.cs-card-content {
+.@{csCardContentPrefixCls} {
   border-left: 1px solid #e9e9e9;
   padding: 0 24px;
   overflow: auto;
   position: relative;
   left: -1px;
 
-  .cs-card-content-header {
+  &-header {
     margin-bottom: 16px;
 
-    .cs-card-content-title {
+    &-title {
       font-size: 24px;
       font-weight: 700;
     }

@@ -11,63 +11,64 @@
   border-radius: 4px;
   background-color: #fff;
   box-shadow: 0 0 14px;
-}
 
-.@{resumePrefixCls} {
-    h1, h2, h3 {
-    font-weight: bold;
-    display: table;
-    width: 100%;
-    margin: 0;
-    padding: 8px 0;
-    text-indent: 12px;
-    border: 1px solid @borderColor;
+  .@{resumePrefixCls} {
+      h1, h2, h3 {
+      font-weight: bold;
+      display: table;
+      width: 100%;
+      margin: 0;
+      padding: 8px 0;
+      text-indent: 12px;
+      border: 1px solid @borderColor;
+    }
+
+    p {
+      position: relative;
+      display: table;
+      width: 100%;
+      padding: 6px 0;
+      border: 1px solid @borderColor;
+    }
+
+    img {
+      width: 90px;
+      height: 110px;
+    }
+
+    table {
+      border-collapse:collapse;
+      width: 100%;
+    }
+
+    table thead {
+      border: 1px solid @borderColor;
+    }
+
+    table thead tr th {
+      font-weight: bold;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      text-align: center;
+    }
+
+    table tr:nth-child(odd) {
+      background-color: #ebebeb;
+    }
+
+    table tbody {
+      border: 1px solid @borderColor;
+    }
+
+    table tbody tr td {
+      line-height: 22px;
+      position: relative; 
+      padding-top: 2px;
+      padding-bottom: 2px;
+      padding-left: 12px;
+      text-align: left;
+      border: 1px solid @borderColor;
+    }
   }
 
-  p {
-    position: relative;
-    display: table;
-    width: 100%;
-    padding: 6px 0;
-    border: 1px solid @borderColor;
-  }
-
-  img {
-    width: 90px;
-    height: 110px;
-  }
-
-  table {
-    border-collapse:collapse;
-    width: 100%;
-  }
-
-  table thead {
-    border: 1px solid @borderColor;
-  }
-
-  table thead tr th {
-    font-weight: bold;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    text-align: center;
-  }
-
-  table tr:nth-child(odd) {
-    background-color: #ebebeb;
-  }
-
-  table tbody {
-    border: 1px solid @borderColor;
-  }
-
-  table tbody tr td {
-    line-height: 22px;
-    position: relative; 
-    padding-top: 2px;
-    padding-bottom: 2px;
-    padding-left: 12px;
-    text-align: left;
-    border: 1px solid @borderColor;
-  }
 }

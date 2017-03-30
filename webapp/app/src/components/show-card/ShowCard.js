@@ -3,9 +3,11 @@ import React, { Component, PropTypes } from 'react';
 
 class ShowCard extends Component {
   render() {
+    const { prefixCls, children } = this.props;
+
     return (
-      <div className={`${this.props.prefixCls}`}>
-        {this.props.children}
+      <div className={prefixCls}>
+        {children}
       </div>
     );
   }

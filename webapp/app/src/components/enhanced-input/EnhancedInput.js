@@ -57,38 +57,42 @@ class EnhancedInput extends Component {
   }
 
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      style,
+      placeholder,
+      type,
+      size
+    } = this.props,
+    { value, focus } = this.state;
 
     const btnCls = classNames({
       'ant-search-btn': true,
-      'ant-search-btn-noempty': !!this.state.value.trim(),
+      'ant-search-btn-noempty': !!value.trim(),
     });
     const searchCls = classNames({
       'ant-search-input': true,
-      'ant-search-input-focus': this.state.focus,
+      'ant-search-input-focus': focus,
     });
 
     return (
-      <div 
-        className="ant-search-input-wrapper"
-        style={props.style}
-      >
+      <div  className={prefixCls} style={style}>
         <InputGroup className={searchCls}>
           <Input
-            placeholder={props.placeholder}
+            placeholder={placeholder}
             value={this.state.value}
             onChange={this.handleInputChange}
             onFocus={this.handleFocusBlur}
             onBlur={this.handleFocusBlur}
             onKeyPress={this.handlekeyPress}
             onPressEnter={this.handleSearch}
-            size={props.size || 'default'}
+            size={size || 'default'}
           />
           <div className="ant-input-group-wrap">
             <Button
-              icon={props.type}
+              icon={type}
               className={btnCls}
-              size={props.size || 'default'}
+              size={size || 'default'}
               onClick={this.handleBtnClick}
             />
           </div>
@@ -99,6 +103,7 @@ class EnhancedInput extends Component {
 }
 
 EnhancedInput.defaultProps = {
+  prefixCls: 'ant-search-input-wrapper',
   type: 'search',
   placeholder: '',
   onClick() {},
@@ -106,11 +111,12 @@ EnhancedInput.defaultProps = {
 };
 
 EnhancedInput.propTypes = {
+  prefixCls: PropTypes.string,
   type: PropTypes.oneOf(['search', 'plus']),
+  size: PropTypes.string,
   style: PropTypes.object,
   placeholder: PropTypes.string,
   dataIndex: PropTypes.string,
-  btnSize: PropTypes.string,
   onClick: PropTypes.func,
   resettable: PropTypes.bool
 };

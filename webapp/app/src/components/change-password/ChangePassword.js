@@ -139,8 +139,8 @@ class ChangePassword extends Component {
       wrapperCol: { span: 16 },
     };
 
-    const props = this.props,
-          { getFieldDecorator } = props.form;
+    const { prefixCls, form, resetText, submitText } = this.props,
+          { getFieldDecorator } = form;
 
     const rules = [
       { required: true, message: '必填项' },
@@ -148,117 +148,121 @@ class ChangePassword extends Component {
     ];
 
     return (
-      <Form layout="horizontal">
-        <Row>
-          <Col span={16}>
-            <FormItem
-              {...formInputLayout}
-              label="旧密码"
+      <div className={prefixCls}>
+        <Form layout="horizontal">
+          <Row>
+            <Col span={16}>
+              <FormItem
+                {...formInputLayout}
+                label="旧密码"
+              >
+                {getFieldDecorator('oldPassword', {
+                  rules: rules
+                })(
+                  <Input
+                    type="password"
+                    id="oldPassword"
+                    autoComplete="off"
+                    onContextMenu={noop}
+                    onPaste={noop}
+                    onCopy={noop}
+                    onCut={noop}
+                  />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={16}>
+              <FormItem
+                {...formInputLayout}
+                label="新密码"
+              >
+                {getFieldDecorator('newPassword', {
+                  rules: [
+                    ...rules,
+                    { validator: this.checkPassword }
+                  ]
+                })(
+                  <Input
+                    type="password"
+                    id="newPassword"
+                    autoComplete="off"
+                    onContextMenu={noop}
+                    onPaste={noop}
+                    onCopy={noop}
+                    onCut={noop}
+                  />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={8}>
+              {this.state.newPasswordBarShow ? this.renderPasswordStrengthBar('newPassword') : null}
+            </Col>
+          </Row>
+          <Row>
+            <Col span={16}>
+              <FormItem
+                {...formInputLayout}
+                label="确认新密码"
+              >
+                {getFieldDecorator('reNewPassword', {
+                  rules: [
+                    ...rules,
+                    { validator: this.checkRePassword }
+                  ]
+                })(
+                  <Input
+                    type="password"
+                    id="reNewPassword"
+                    autoComplete="off"
+                    onContextMenu={noop}
+                    onPaste={noop}
+                    onCopy={noop}
+                    onCut={noop}
+                  />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={8}>
+              {this.state.reNewPasswordBarShow ? this.renderPasswordStrengthBar('reNewPassword') : null}
+            </Col>
+          </Row>
+          <Row>
+            <Col
+              span="16"
+              offset="8"
             >
-              {getFieldDecorator('oldPassword', {
-                rules: rules
-              })(
-                <Input
-                  type="password"
-                  id="oldPassword"
-                  autoComplete="off"
-                  onContextMenu={noop}
-                  onPaste={noop}
-                  onCopy={noop}
-                  onCut={noop}
-                />
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={16}>
-            <FormItem
-              {...formInputLayout}
-              label="新密码"
-            >
-              {getFieldDecorator('newPassword', {
-                rules: [
-                  ...rules,
-                  { validator: this.checkPassword }
-                ]
-              })(
-                <Input
-                  type="password"
-                  id="newPassword"
-                  autoComplete="off"
-                  onContextMenu={noop}
-                  onPaste={noop}
-                  onCopy={noop}
-                  onCut={noop}
-                />
-              )}
-            </FormItem>
-          </Col>
-          <Col span={8}>
-            {this.state.newPasswordBarShow ? this.renderPasswordStrengthBar('newPassword') : null}
-          </Col>
-        </Row>
-        <Row>
-          <Col span={16}>
-            <FormItem
-              {...formInputLayout}
-              label="确认新密码"
-            >
-              {getFieldDecorator('reNewPassword', {
-                rules: [
-                  ...rules,
-                  { validator: this.checkRePassword }
-                ]
-              })(
-                <Input
-                  type="password"
-                  id="reNewPassword"
-                  autoComplete="off"
-                  onContextMenu={noop}
-                  onPaste={noop}
-                  onCopy={noop}
-                  onCut={noop}
-                />
-              )}
-            </FormItem>
-          </Col>
-          <Col span={8}>
-            {this.state.reNewPasswordBarShow ? this.renderPasswordStrengthBar('reNewPassword') : null}
-          </Col>
-        </Row>
-        <Row>
-          <Col
-            span="16"
-            offset="8"
-          >
-            <Button
-              type="ghost"
-              onClick={this.handleReset}
-            >
-              {props.resetText}
-            </Button>
-            &nbsp;&nbsp;&nbsp;
-            <Button
-              type="primary"
-              onClick={this.handleSubmit}
-            >
-              {props.submitText}
-            </Button>
-          </Col>
-        </Row>
-      </Form>
+              <Button
+                type="ghost"
+                onClick={this.handleReset}
+              >
+                {resetText}
+              </Button>
+              &nbsp;&nbsp;&nbsp;
+              <Button
+                type="primary"
+                onClick={this.handleSubmit}
+              >
+                {submitText}
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      </div>
     );
   }
 }
 
 ChangePassword.defaultProps = {
+  prefixCls: 'cs-change-pwd',
   resetText: '重置',
   submitText: '提交',
   onSubmit() {},
 };
 
 ChangePassword.propTypes = {
+  prefixCls: PropTypes.string,
   form: PropTypes.object,
   resetText: PropTypes.string,
   submitText: PropTypes.string,

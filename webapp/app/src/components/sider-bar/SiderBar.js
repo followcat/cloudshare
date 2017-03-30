@@ -78,17 +78,18 @@ class SiderBar extends Component {
 
   render() {
     const {
-            visible,
-            closable,
-            dataSource,
-            postData,
-            selection
-          } = this.props,
-          { panelVisible } = this.state,
-          chartsViewId = 'chartsView';
+      prefixCls,
+      visible,
+      closable,
+      dataSource,
+      postData,
+      selection
+    } = this.props,
+    { panelVisible } = this.state,
+    chartsViewId = 'chartsView';
 
     const classSet = classNames({
-      'siderbar': true,
+      [`${prefixCls}`]: true,
       'showed': visible,
       'hidden': !visible,
     });
@@ -143,7 +144,12 @@ class SiderBar extends Component {
   }
 }
 
+SiderBar.defaultProps = {
+  prefixCls: 'cs-siderbar'
+};
+
 SiderBar.propTypes = {
+  prefixCls: PropTypes.string,
   visible: PropTypes.bool,
   closable: PropTypes.bool,
   dataSource: PropTypes.array,

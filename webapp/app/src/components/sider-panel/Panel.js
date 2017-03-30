@@ -1,9 +1,11 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
+
 import { Icon } from 'antd';
+
 import classNames from 'classnames';
-import getStyle from '../../utils/get-style';
+import getStyle from 'utils/get-style';
 
 class Panel extends Component {
   constructor() {
@@ -82,6 +84,7 @@ class Panel extends Component {
 }
 
 Panel.defaultProps = {
+  prefixCls: 'sider-panel-wrapper',
   title: '',
   position: 'right',
   visible: false,

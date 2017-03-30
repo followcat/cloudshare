@@ -36,8 +36,10 @@ class MultiClassify(object):
                     self.classifies[c].add(dataobj)
         self.save()
 
-    def updateids(self):
-        for id in self.storage.ids:
+    def updateids(self, ids=None):
+        if ids is None:
+            ids = self.storage.ids
+        for id in ids:
             metadata = self.storage.getyaml(id)
             for c in metadata['classify']:
                 if not self.classifies[c].exists(id):
@@ -45,3 +47,10 @@ class MultiClassify(object):
         for c in self.classifies:
             self.classifies[c].curriculumvitae.saveids()
         self.save()
+
+    def updatenewids(self):
+        exists_ids = set()
+        for c in self.classifies:
+            exists_ids.update(self.classifies[c].curriculumvitae.ids)
+        return set(self.storage.ids).difference(exists_ids)
+        self.updateids(ids=self.storage.ids.difference(exists_ids))

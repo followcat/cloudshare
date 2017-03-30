@@ -6,7 +6,7 @@ import ShowCard from 'components/show-card';
 import Container from 'components/container';
 import SiderMenu from 'components/sider-menu';
 import Content from 'components/content';
-import Layout from 'views/common/Layout';
+import { Layout } from 'views/layout';
 
 import { message, Popconfirm } from 'antd';
 
@@ -16,7 +16,7 @@ import { signOut } from 'request/sign';
 
 import { URL } from 'URL';
 
-import { getMenu, getCurrentActive } from 'utils/sider-menu-list';
+import { getCurrentActive } from 'utils/sider-menu-list';
 import History from 'utils/history';
 
 import websiteText from 'config/website-text';

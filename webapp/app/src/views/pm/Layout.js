@@ -1,8 +1,10 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import LayoutHeader from 'views/common/LayoutHeader';
-import LayoutContainer from 'views/common/LayoutContainer';
+import {
+  LayoutHeader,
+  LayoutContainer
+} from 'views/layout';
 import SubheadNav from 'components/subhead-nav';
 import {
   CardContainer,

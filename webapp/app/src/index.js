@@ -3,6 +3,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, browserHistory } from 'react-router';
 
+import 'components/global.less';
+
 import 'babel-polyfill';
 
 const rootRoute = {

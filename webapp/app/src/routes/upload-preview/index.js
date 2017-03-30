@@ -4,7 +4,7 @@ module.exports = {
   path: 'preview',
   getComponent(nextState, callback) {
     require.ensure([], (require) => {
-      callback(null, require('views/common/Layout').default);
+      callback(null, require('views/layout/Layout').default);
     });
   },
   indexRoute: {

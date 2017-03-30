@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
-import Layout from 'views/common/Layout';
+import { Layout } from 'views/layout';
 import ResumeContent from 'components/resume-content';
 import Summary from 'components/summary';
 import ResumeHeader from './ResumeHeader';

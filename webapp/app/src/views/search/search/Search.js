@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
 import KeywordSearch from 'components/keyword-search';
-import Layout from 'views/common/Layout';
 import DatabaseInfo from './DatabaseInfo';
 
 class Search extends Component {

@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
 import KeywordSearch from 'components/keyword-search';
+import Layout from 'views/common/Layout';
 import DatabaseInfo from './DatabaseInfo';
 
 class Search extends Component {
@@ -22,11 +23,13 @@ class Search extends Component {
   render() {
     return (
       <div className="cs-layout-search">
-        <KeywordSearch
-          btnText="搜索"
-          horizontal
-          onSearch={this.handleSearch}
-        />
+        <div className="cs-search">
+          <KeywordSearch
+            btnText="搜索"
+            horizontal
+            onSearch={this.handleSearch}
+          />
+        </div>
         <DatabaseInfo />
       </div>
     );

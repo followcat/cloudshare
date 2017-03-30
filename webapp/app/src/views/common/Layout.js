@@ -7,7 +7,7 @@ import LayoutContainer from './LayoutContainer';
 class Layout extends Component {
   render() {
     return (
-      <div>
+      <div className="cs-layout">
         <LayoutHeader />
         <LayoutContainer>
           {this.props.children}
@@ -19,7 +19,7 @@ class Layout extends Component {
 }
 
 Layout.propTypes = {
-  children: PropTypes.element
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)])
 };
 
 export default Layout;

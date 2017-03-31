@@ -22,11 +22,10 @@ class LSIsimilarity(object):
     def update(self, svccv_list, newmodel=False):
         added = False
         for svc_cv in svccv_list:
-            for name in svc_cv.names():
-                if name not in self.names:
-                    doc = svc_cv.getmd(name)
-                    self.add(name, doc)
-                    added = True
+            for name in set(svc_cv.names()).difference(set(self.names)):
+                doc = svc_cv.getmd(name)
+                self.add(name, doc)
+                added = True
         if added or newmodel:
             self.set_index()
         return added

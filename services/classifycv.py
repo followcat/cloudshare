@@ -73,6 +73,10 @@ class ClassifyCV(object):
         return self.curriculumvitae.gethtml(id)
 
     @property
+    def ids(self):
+        return self.curriculumvitae.ids
+
+    @property
     def NUMS(self):
         return self.curriculumvitae.NUMS
 

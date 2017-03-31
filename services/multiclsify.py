@@ -52,5 +52,4 @@ class MultiClassify(object):
         exists_ids = set()
         for c in self.classifies:
             exists_ids.update(self.classifies[c].curriculumvitae.ids)
-        return set(self.storage.ids).difference(exists_ids)
         self.updateids(ids=self.storage.ids.difference(exists_ids))

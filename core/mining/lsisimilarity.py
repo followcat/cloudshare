@@ -19,7 +19,7 @@ class LSIsimilarity(object):
         self.lsi_model = lsi_model
         self.index = None
 
-    def update(self, svccv_list):
+    def update(self, svccv_list, newmodel=False):
         added = False
         for svc_cv in svccv_list:
             for name in svc_cv.names():
@@ -27,7 +27,8 @@ class LSIsimilarity(object):
                     doc = svc_cv.getmd(name)
                     self.add(name, doc)
                     added = True
-        self.set_index()
+        if added or newmodel:
+            self.set_index()
         return added
 
     def build(self, svccv_list):

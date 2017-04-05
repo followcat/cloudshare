@@ -29,7 +29,8 @@ let webpackConfig = {
       'request': path.resolve(folderPath.PATHS.SRC_PATH, 'request/'),
       'config': path.resolve(folderPath.PATHS.SRC_PATH, 'config/'),
       'API': path.resolve(folderPath.PATHS.SRC_PATH, 'config/api.js'),
-      'URL': path.resolve(folderPath.PATHS.SRC_PATH, 'config/url.js')
+      'URL': path.resolve(folderPath.PATHS.SRC_PATH, 'config/url.js'),
+      'image': path.resolve(folderPath.PATHS.SRC_PATH, 'image/')
     }
   },
 

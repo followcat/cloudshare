@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import LogoImg from '../../image/logo.png';
+import LogoImg from 'image/logo.png';
 
 class Header extends Component {
   constructor() {

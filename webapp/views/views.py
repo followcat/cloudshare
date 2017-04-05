@@ -24,9 +24,7 @@ class LoginRedirect(flask.views.MethodView):
 class Index(flask.views.MethodView):
 
     def get(self):
-        with codecs.open('webapp/features.md', 'r', encoding='utf-8') as fp:
-            data = fp.read()
-        return flask.render_template('index.html', features=data)
+        return flask.render_template('index.html')
 
 #Render mange page of RESTful
 class Manage(flask.views.MethodView):

@@ -15,7 +15,7 @@ class SearchResultBox extends Component {
   constructor() {
     super();
     this.state = {
-      gradient: [],
+      gradient: []
     };
     this.getResultDOMRender = this.getResultDOMRender.bind(this);
   }

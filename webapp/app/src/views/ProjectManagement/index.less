@@ -1,3 +1,5 @@
+@import '../../components/default.less';
+
 body {
   background-color: #f4f4f4;  
 }
@@ -170,6 +172,11 @@ body {
 
     &-filter {
       width: 360px;
+
+      & > input {
+        width: 120px;
+        margin: 0 8px;
+      }
     }
 
     &-col:first-of-type {
@@ -186,12 +193,6 @@ body {
     
     .ant-select {
       width: 100px;
-    }
-
-    .ant-input-wrapper {
-      display: inline-block;
-      width: 120px;
-      margin: 0 8px;
     }
   }
 
@@ -378,4 +379,9 @@ body {
     padding: 4px 0;
     font-weight: bold;
   }
+}
+
+.uploading {
+  font-size: 20px;
+  color: @backgroundColor;
 }

@@ -13,7 +13,7 @@ class SignIn extends Component {
 
     return (
       <Card
-        title={props.titile}
+        title={props.title}
         bordered={props.bordered}
         className={classes}
         style={props.style}
@@ -25,7 +25,7 @@ class SignIn extends Component {
 }
 
 SignIn.defaultProps = {
-  titile: 'Sign in',
+  title: 'Sign in',
   bordered: true,
   className: '',
   style: {},
@@ -33,7 +33,7 @@ SignIn.defaultProps = {
 };
 
 SignIn.propTypes = {
-  titile: PropTypes.string,
+  title: PropTypes.string,
   bordered: PropTypes.bool,
   className: PropTypes.string,
   style: PropTypes.object,

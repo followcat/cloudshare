@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-export default class FilterInfo extends Component {
+class FilterInfo extends Component {
 
   constructor(props) {
     super(props);
@@ -11,7 +11,7 @@ export default class FilterInfo extends Component {
     const style = this.props.visible ? { display: 'block' } : { display: 'none' };
     return (
       <div style={style}>
-        <p>About {this.props.total} results.</p>
+        <p>总共有 <em>{this.props.total}</em> 条相关结果。</p>
       </div>
     );
   }
@@ -21,3 +21,5 @@ FilterInfo.propTypes = {
   visible: PropTypes.bool,
   total: PropTypes.number,
 };
+
+export default FilterInfo;

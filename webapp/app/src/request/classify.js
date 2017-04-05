@@ -5,11 +5,14 @@ import Generator from '../utils/generator';
 import StorageUtil from '../utils/storage';
 
 export const getClassify = (callback) => {
-  return fetch(API.ADDITIONALS_API, {
-    method: 'GET',
+  return fetch(API.CLASSIFY_API, {
+    method: 'POST',
     headers: {
-      'Authorization': `Basic ${StorageUtil.get('token')}`
-    }
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: Generator.getPostData()
   })
   .then(response => response.json())
   .then(json => callbackFunction(callback, json));

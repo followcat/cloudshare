@@ -42,27 +42,26 @@ class SimulationCO(services.base.simulation.Simulation,
             metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
             data = core.basedata.DataObject(metadata, excel)
             id = data.name
-            info = self.getyaml(id)
-            responsible = committer
+            responsible = excel['responsible'] if excel['responsible'] else committer
             if not self.exists(id):
                 for item in self.list_item:
                     if item in metadata:
                         metadata.pop(item)
                 output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
-            if excel['responsible']:
-                responsible = excel['responsible']
+            else:
+                info = self.getyaml(id)
             for key in self.list_item:
-                if isinstance(info[key], list):
-                    existvalues = list()
-                    if self.exists(id):
-                        existvalues = [v['content'].replace(' ', '') for v in info[key]]
-                    for value in excel[key]:
-                        if value.replace(' ', '') in existvalues:
-                            continue
-                        existvalues.append(value)
-                        output.append(('listadd', id, (id, key, value, responsible)))
+                if dict(self.YAML_TEMPLATE)[key] == list:
+                    existvalues = [v['content'] for v in info[key]]\
+                                    if self.exists(id) else list()
+                    if key in excel:
+                        for value in excel[key]:
+                            if value in existvalues:
+                                continue
+                            existvalues.append(value)
+                            output.append(('listadd', id, (id, key, value, responsible)))
                 else:
-                    if info[key] != excel[key]:
+                    if not self.exists(id) or info[key] != excel[key]:
                          output.append(('listadd', id, (id, key, value, responsible)))
         return output
 

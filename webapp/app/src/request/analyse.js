@@ -1,7 +1,8 @@
 'use strict';
-import { API } from '../config/api';
+import { API } from 'API';
 import { callbackFunction } from './callback';
-import { Generator } from 'utils/generator';
+import Generator from 'utils/generator';
+import StorageUtil from 'utils/storage';
 
 import 'whatwg-fetch';
 
@@ -10,7 +11,7 @@ export const getAbilityData = (params, callback) => {
     method: 'POST',
     credentials: 'include',
     headers: {
-      'Authorization': `Basic ${localStorage.token}`,
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
@@ -27,7 +28,7 @@ export const getExperienceData = (params, callback) => {
     method: 'POST',
     credentials: 'include',
     headers: {
-      'Authorization': `Basic ${localStorage.token}`,
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
@@ -44,7 +45,7 @@ export const getPositionData = (params, callback) => {
     method: 'POST',
     credentials: 'include',
     headers: {
-      'Authorization': `Basic ${localStorage.token}`,
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
@@ -61,7 +62,7 @@ export const getValuableData = (params, callback) => {
     method: 'POST',
     credential: 'include',
     headers: {
-      'Authorization': `Basic ${Storage.get('token')}`,
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },

@@ -316,7 +316,7 @@ class CompanyUploadExcelAPI(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        project_name = args['project']
+        project_name = flask.request.form['project']
         network_file = flask.request.files['files']
         project = self.svc_mult_cv.getproject(project_name)
         compare_result = project.company_compare_excel(network_file.read(), committer=user.id)

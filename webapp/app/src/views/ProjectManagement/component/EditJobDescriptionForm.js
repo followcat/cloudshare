@@ -10,9 +10,21 @@ const FormItem = Form.Item,
       Option = Select.Option;
 
 class EditJobDescriptionForm extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.state = {
+      status: props.record.status
+    };
     this.handleModalOK = this.handleModalOK.bind(this);
+    this.handleStatusChange = this.handleStatusChange.bind(this);
+  }
+  
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.visible) {
+      this.setState({
+        status: nextProps.record.status
+      });
+    }
   }
 
   handleModalOK() {
@@ -20,21 +32,34 @@ class EditJobDescriptionForm extends Component {
       if (!!errors) {
         return;
       } else {
-        this.props.onSubmit(values);
+        this.props.onSubmit(Object.assign({}, values, { status: this.state.status }));
       }
     });
   }
 
+  handleStatusChange(value) {
+    this.setState({
+      status: value
+    });
+  }
+
   render() {
-    const props = this.props,
-          { getFieldProps } = props.form;
+    const {
+      form,
+      visible,
+      confirmLoading,
+      record,
+      customerDataSource
+    } = this.props,
+    { getFieldDecorator } = form,
+    { status } = this.state;
     
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 16 },
     };
 
-    const status = [{
+    const statusOptions = [{
       value: 'Opening',
       text: language.OPENING
     }, {
@@ -46,82 +71,67 @@ class EditJobDescriptionForm extends Component {
       <Modal
         title={language.EDIT_JOB_DESCRIPTION}
         okText={language.SUBMIT}
-        visible={props.visible}
-        confirmLoading={props.confirmLoading}
+        visible={visible}
+        confirmLoading={confirmLoading}
         onOk={this.handleModalOK}
-        onCancel={props.onCancel}
+        onCancel={this.props.onCancel}
       >
-        <Form horizontal>
+        <Form layout="horizontal">
           <FormItem
             {...formItemLayout}
             label={language.JOB_DESCRIPTION_ID}
           >
-            <Input 
-              {...getFieldProps('id', { initialValue: props.record.id })}
-              readOnly
-            />
+            {getFieldDecorator('id', {
+              initialValue: record.id
+            })(<Input readOnly />)}
           </FormItem>
           <FormItem
             {...formItemLayout}
             label={language.COMPANY_NAME}
           >
-            <Select
-              {...getFieldProps('company', { initialValue: props.record.company })}
-              disabled={true}
-            >
-              {props.customerDataSource.map(v => {
-                return (
-                  <Option
-                    key={v.id}
-                    value={v.id}
-                  >
-                    {v.name}
-                  </Option>
-                );
-              })}
-            </Select>
+            {getFieldDecorator('company', {
+              initialValue: record.company
+            })(
+              <Select disabled={true}>
+                {customerDataSource.map(v => {
+                  return (
+                    <Option key={v.id} value={v.id}>
+                      {v.name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            )}
           </FormItem>
           <FormItem
             {...formItemLayout}
             label={language.JOB_DESCRIPTION_CONTENT}
           >
-            <Input
-              {...getFieldProps('description', {
-                initialValue: props.record.description,
-                rules: [{ required: true }]
-              })}
-              type="textarea"
-              rows="6"
-              disabled={props.record.committer !== localStorage.user}
-            />
+            {getFieldDecorator('description', {
+              initialValue: record.description,
+              rules: [{ required: true }]
+            })(
+              <Input
+                type="textarea"
+                rows="6"
+                disabled={record.committer !== localStorage.user}
+              />
+            )}
           </FormItem>
           <FormItem
             {...formItemLayout}
             label={language.COMMENTARY}
           >
-            <Input
-              {...getFieldProps('commentary', {
-                initialValue: props.record.commentary,
-              })}
-              type="textarea"
-              rows="2"
-            />
+            {getFieldDecorator('commentary', {
+              initialValue: record.commentary
+            })(<Input type="textarea" rows="2" />)}
           </FormItem>
           <FormItem
             {...formItemLayout}
             label={language.CURRENT_STATUS}
           >
-            <Select {...getFieldProps('status', { initialValue: props.record.status })}>
-              {status.map(item => {
-                return (
-                  <Option
-                    key={item.value}
-                    value={item.value}
-                  >
-                    {item.text}
-                  </Option>
-                );
-              })}
+            <Select value={status} onChange={this.handleStatusChange}>
+              {statusOptions.map(v => <Option key={v.value}>{v.text}</Option>)}
             </Select>
           </FormItem>
         </Form>
@@ -131,11 +141,13 @@ class EditJobDescriptionForm extends Component {
 }
 
 EditJobDescriptionForm.propTypes = {
-  form: PropTypes.shape({
-    getFieldProps: PropTypes.func,
-    validateFields: PropTypes.func
-  }),
-  onSubmit: PropTypes.func
+  form: PropTypes.object,
+  visible: PropTypes.bool,
+  confirmLoading: PropTypes.bool,
+  record: PropTypes.object,
+  customerDataSource: PropTypes.array,
+  onSubmit: PropTypes.func,
+  onCancel: PropTypes.func
 };
 
 export default EditJobDescriptionForm = Form.create({})(EditJobDescriptionForm);

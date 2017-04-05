@@ -257,15 +257,15 @@ class Mining(object):
             if lsimodel.getconfig('autoupdate') is True:
                 updated = self.lsi_model[modelname].update(
                     [self.services['default'][modelname]])
-                if updated:
-                    self.update_sims()
+                self.update_sims(newmodel=updated)
 
-    def update_sims(self):
+    def update_sims(self, newmodel=False):
         for modelname in self.sim:
             for simname in self.sim[modelname]:
                 svc = self.services['all'][simname]
-                self.sim[modelname][simname].update([svc])
-                self.sim[modelname][simname].save()
+                updated = self.sim[modelname][simname].update([svc], newmodel)
+                if newmodel or updated:
+                    self.sim[modelname][simname].save()
 
     def probability(self, basemodel, doc, uses=None, top=None):
         result = []

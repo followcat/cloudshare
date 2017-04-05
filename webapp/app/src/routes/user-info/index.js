@@ -1,4 +1,5 @@
 'use strict';
+import checkStatus from 'utils/check-status';
 
 module.exports = {
   path: 'userInfo',
@@ -7,6 +8,7 @@ module.exports = {
       callback(null, require('views/user-info').default);
     });
   },
+  onEnter: checkStatus,
   childRoutes: [
     require('./history'),
     require('./bookmark'),

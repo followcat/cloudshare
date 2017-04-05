@@ -1,4 +1,5 @@
 'use strict';
+import checkStatus from 'utils/check-status';
 
 module.exports = {
   path: 'company',
@@ -10,5 +11,6 @@ module.exports = {
   childRoutes: [
     require('./list'),
     require('./uploader')
-  ]
+  ],
+  onEnter: checkStatus
 };

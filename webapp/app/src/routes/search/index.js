@@ -1,4 +1,5 @@
 'use strict';
+import checkStatus from 'utils/check-status';
 
 module.exports = {
   path: 'search',
@@ -14,6 +15,7 @@ module.exports = {
       }, 'search');
     }
   },
+  onEnter: checkStatus,
   childRoutes: [
     require('./result')
   ]

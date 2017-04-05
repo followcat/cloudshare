@@ -1,4 +1,5 @@
 'use strict';
+import checkStatus from 'utils/check-status';
 
 module.exports = {
   path: 'pm',
@@ -14,6 +15,7 @@ module.exports = {
       }, 'job-description');
     }
   },
+  onEnter: checkStatus,
   childRoutes: [
     require('./job-description'),
     require('./customer'),

@@ -1,4 +1,5 @@
 'use strict';
+import checkStatus from 'utils/check-status';
 
 module.exports = {
   path: 'preview',
@@ -7,6 +8,7 @@ module.exports = {
       callback(null, require('views/layout/Layout').default);
     });
   },
+  onEnter: checkStatus,
   indexRoute: {
     getComponent(nextState, callback) {
       require.ensure([], (require) => {

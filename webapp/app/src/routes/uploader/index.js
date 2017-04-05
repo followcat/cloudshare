@@ -1,4 +1,5 @@
 'use strict';
+import checkStatus from 'utils/check-status';
 
 module.exports = {
   path: 'uploader',
@@ -14,6 +15,7 @@ module.exports = {
       }, 'upload');
     }
   },
+  onEnter: checkStatus,
   childRoutes: [
     require('./upload')
   ]

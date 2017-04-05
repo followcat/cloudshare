@@ -1,4 +1,5 @@
 'use strict';
+import checkStatus from 'utils/check-status';
 
 module.exports = {
   path: 'result',
@@ -6,5 +7,6 @@ module.exports = {
     require.ensure([], (require) => {
       callback(null, require('views/uploader/result').default);
     }, 'upload-result');
-  }
+  },
+  onEnter: checkStatus
 };

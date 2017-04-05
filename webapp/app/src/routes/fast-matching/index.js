@@ -1,4 +1,5 @@
 'use strict';
+import checkStatus from 'utils/check-status';
 
 module.exports = {
   path: 'fastmatching',
@@ -13,5 +14,6 @@ module.exports = {
         callback(null, require('views/fast-matching').default);
       }, 'fast-matching');
     }
-  }
+  },
+  onEnter: checkStatus
 };

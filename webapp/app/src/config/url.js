@@ -43,7 +43,7 @@ export const URL = {
   },
 
   getProjectManagement: () => {
-    return `/pm`;
+    return `/pm/jobdescription`;
   },
 
 };

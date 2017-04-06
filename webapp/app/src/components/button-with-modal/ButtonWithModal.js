@@ -23,6 +23,7 @@ class ButtonWithModal extends Component {
           width={props.modalWidth}
           style={props.modalStyle}
           wrapClassName={props.modalWrapClassName}
+          onCancel={props.onModalCancel}
           footer={[
             <Button size="large" onClick={props.onModalCancel}>{props.modalCancelText}</Button>,
             <Button

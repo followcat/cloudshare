@@ -13,8 +13,6 @@ import core.outputstorage
 import core.docprocessor
 import extractor.information_explorer
 
-import json
-
 
 class LoginRedirect(flask.views.MethodView):
 

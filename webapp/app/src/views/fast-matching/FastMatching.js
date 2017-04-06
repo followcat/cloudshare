@@ -46,7 +46,10 @@ class FastMatching extends Component {
     let postAPI;
 
     this.getIndustryDataSource();
-    this.getClassifyDataSource();
+    // this.getClassifyDataSource();
+    var promise = new Promise((resolve, reject) => {
+      this.getClassifyDataSource(resolve);
+    });
     
     if (location.query.jd_id) {
       postAPI = API.LSI_BY_JD_ID_API;
@@ -57,9 +60,11 @@ class FastMatching extends Component {
         siderbarVisible: true
       });
 
-      this.getResultDataSource(postAPI, {
-        id: location.query.jd_id,
-        uses: classify
+      promise.then((data) => {
+        this.getResultDataSource(postAPI, {
+          id: location.query.jd_id,
+          uses: data
+        });
       });
     } else if (location.query.cv_id) {
       postAPI = API.LSI_BY_CV_ID_API;
@@ -70,9 +75,11 @@ class FastMatching extends Component {
         siderbarClosable: true
       });
 
-      this.getResultDataSource(postAPI, {
-        id: location.query.cv_id,
-        uses: classify
+      promise.then((data) => {
+        this.getResultDataSource(postAPI, {
+          id: location.query.cv_id,
+          uses: data
+        });
       });
     } else {
       this.setState({
@@ -183,12 +190,13 @@ class FastMatching extends Component {
     });
   }
 
-  getClassifyDataSource() {
+  getClassifyDataSource(resolve) {
     getClassify(json => {
       if (json.code === 200) {
         this.setState({
           classify: json.data
         });
+        resolve(json.data);
       }
     });
   }

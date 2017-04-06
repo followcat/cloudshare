@@ -6,7 +6,6 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.builtin
-import core.outputstorage
 
 
 class CurrivulumvitaeAPI(Resource):
@@ -86,36 +85,11 @@ class SearchCVbyTextAPI(Resource):
         project = args['project']
         text = args['search_text']
         cur_page = args['page']
+        filterdict = args['filterdict'] if args['filterdict'] else {}
         results = self.svc_mult_cv.search(text, project)
         yaml_results = self.svc_mult_cv.search_yaml(text, project)
         results.update(yaml_results)
-
-        filterdict = args['filterdict'] if args['filterdict'] else {}
-        def nemudate(dates):
-            str_result = []
-            datetimes_result = []
-            datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
-            tstart = min(datetimes)
-            tend = max(datetimes)
-            while(tstart <= tend):
-                datetimes_result.append(tstart)
-                tstart += datetime.timedelta(days = 1)
-            for each in datetimes_result:
-                str_result.append(each.strftime('%Y%m%d'))
-            return str_result
-        indexdict = {}
-        if 'date' in filterdict:
-            try:
-                filterdict['date'] = nemudate(filterdict['date'])
-            except ValueError:
-                filterdict.pop('date')
-        for key in filterdict:
-            if filterdict[key]:
-                indexdict[key] = self.index.get_indexkeys([key], filterdict[key], uses)
-        filteset = self.index.get(filterdict, uses=uses)
-        if filterdict:
-            results = filter(lambda x: os.path.splitext(x[0])[0] in filteset, results)
-
+        results = self.index.filter_ids(results, filterdict, uses=[project])
         count = 20
         datas, pages = self.paginate(list(results), cur_page, count, project)
         return {

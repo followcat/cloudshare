@@ -159,7 +159,7 @@ class LSIbaseAPI(Resource):
                 'match': score
             }
             datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
-        return datas, pages, totals
+        return { 'datas': datas, 'pages': pages, 'totals': totals }
 
 
 class LSIbyJDidAPI(LSIbaseAPI):

@@ -74,10 +74,12 @@ class SearchCVbyTextAPI(Resource):
     def __init__(self):
         super(SearchCVbyTextAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.index = flask.current_app.config['SVC_INDEX']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -87,6 +89,33 @@ class SearchCVbyTextAPI(Resource):
         results = self.svc_mult_cv.search(text, project)
         yaml_results = self.svc_mult_cv.search_yaml(text, project)
         results.update(yaml_results)
+
+        filterdict = args['filterdict'] if args['filterdict'] else {}
+        def nemudate(dates):
+            str_result = []
+            datetimes_result = []
+            datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
+            tstart = min(datetimes)
+            tend = max(datetimes)
+            while(tstart <= tend):
+                datetimes_result.append(tstart)
+                tstart += datetime.timedelta(days = 1)
+            for each in datetimes_result:
+                str_result.append(each.strftime('%Y%m%d'))
+            return str_result
+        indexdict = {}
+        if 'date' in filterdict:
+            try:
+                filterdict['date'] = nemudate(filterdict['date'])
+            except ValueError:
+                filterdict.pop('date')
+        for key in filterdict:
+            if filterdict[key]:
+                indexdict[key] = self.index.get_indexkeys([key], filterdict[key], uses)
+        filteset = self.index.get(filterdict, uses=uses)
+        if filterdict:
+            results = filter(lambda x: os.path.splitext(x[0])[0] in filteset, results)
+
         count = 20
         datas, pages = self.paginate(list(results), cur_page, count, project)
         return {

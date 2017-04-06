@@ -133,7 +133,7 @@ class BaseFSInterface(interface.base.Interface):
         os.remove(path)
         return True
 
-    def add_files(self, filenames, filedatas, message=None, committer=None):
+    def add_files(self, filenames, filedatas, message=None, committer=None, do_commit=True):
         assert len(filenames) == len(filedatas)
         for filename, filedata in zip(filenames, filedatas):
             self.add(filename, filedata)

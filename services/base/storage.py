@@ -216,8 +216,8 @@ class BaseStorage(services.base.service.Service):
             >>> SVC_BSSTO = services.base.storage.BaseStorage(DIR)
             >>> assert SVC_BSSTO.interface.lsfiles('.', 'blr6dter.yaml')
         """
-        return [os.path.splitext(f)[0]
-                for f in self.interface.lsfiles('.', '*.yaml')]
+        return set([os.path.splitext(f)[0]
+                    for f in self.interface.lsfiles('.', '*.yaml')])
 
     @property
     def NUMS(self):

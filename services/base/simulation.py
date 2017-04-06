@@ -7,7 +7,7 @@ import ujson
 import utils._yaml
 import utils.builtin
 import core.outputstorage
-import services.memsorted
+import services.memdatas
 import services.base.storage
 
 
@@ -39,7 +39,7 @@ class Simulation(services.base.storage.BaseStorage):
         self._ids = None
         self.storage = storage
         self.yamlpath = self.YAML_DIR
-        self.memsorted = services.memsorted.MemerySorted(self)
+        self.memdatas = services.memdatas.MemeryDatas(self)
         idsfile = os.path.join(path, Simulation.ids_file)
         if not os.path.exists(idsfile):
             dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
@@ -93,7 +93,7 @@ class Simulation(services.base.storage.BaseStorage):
             self.interface.add_files(filenames, filedatas,
                                      message='Add new data %s.'%id,
                                      committer=committer, do_commit=do_commit)
-            self.memsorted.update('modifytime', id)
+            self.memdatas.update('modifytime', id)
             result = True
         return result
 
@@ -142,7 +142,7 @@ class Simulation(services.base.storage.BaseStorage):
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
         result = super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
-        self.memsorted.update('modifytime', id)
+        self.memdatas.update('modifytime', id)
         return result
 
     def search(self, keyword):
@@ -163,19 +163,10 @@ class Simulation(services.base.storage.BaseStorage):
         return results
 
     def search_key(self, key, value, ids=None):
-        if ids is None:
-            ids = self.ids
-        formatted_value = value.__repr__().replace('u', '', 1).replace('\'', '')
-        result = list()
-        for id in ids:
-            info = self.getyaml(id)
-            searched = info[key]
-            if formatted_value in searched.__repr__():
-                result.append(id)
-        return result
+        return self.memdatas.search_key(key, value, ids)
 
     def sorted_ids(self, key, ids=None, reverse=True):
-        return self.memsorted.sorted_ids(key, ids=ids, reverse=reverse)
+        return self.memdatas.sorted_ids(key, ids=ids, reverse=reverse)
 
     @property
     def ids(self):

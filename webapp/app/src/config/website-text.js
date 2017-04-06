@@ -8,6 +8,8 @@ const websiteText = {
     SIGN_OUT: '登出',
     SIGN_OUT_CONFIRM_MSG: '是否确定登出?',
 
+    NAME: '姓名',
+
     PROFILE: '个人中心',
     SEARCH: '搜索',
     MATCH: '匹配',
@@ -104,7 +106,10 @@ const websiteText = {
 
     BROWSING_HISTORY: '浏览历史',
     BOOKMARK: '书签',
-    SETTING: '设置'
+    SETTING: '设置',
+
+    RESET_PWD_SUCCESS_MSG: '重置密码成功',
+    RESET_PWD_FAIL_MSG: '重置密码失败'
   },
 
   // 待扩展语言

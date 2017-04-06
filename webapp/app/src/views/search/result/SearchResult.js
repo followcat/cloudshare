@@ -21,6 +21,7 @@ class SearchResult extends Component {
     };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
+    this.handleFilter = this.handleFilter.bind(this);
     this.loadResultDataSource = this.loadResultDataSource.bind(this);
   }
 
@@ -61,6 +62,10 @@ class SearchResult extends Component {
     });
   }
 
+  handleFilter() {
+
+  }
+
   loadResultDataSource(searchText) {
     this.setState({
       spinning: true
@@ -99,6 +104,7 @@ class SearchResult extends Component {
             total={totals}
             keyword={searchText}
             dataSource={dataSource}
+            onFilter={this.handleFilter}
           />
           <SearchResultBox
             visible={true}

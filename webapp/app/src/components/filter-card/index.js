@@ -2,5 +2,6 @@
 import './index.less';
 
 import FilterCard from './FilterCard';
+import FilterForm from './FilterForm';
 
-export { FilterCard };
+export { FilterCard, FilterForm };

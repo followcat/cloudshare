@@ -6,6 +6,7 @@ import {
   Experience,
   Position
 } from 'components/analyse-charts';
+import { FilterForm } from 'components/filter-card';
 
 class ResultInfo extends Component {
 
@@ -38,6 +39,11 @@ class ResultInfo extends Component {
             dataSource={dataSource}
           />
         </div>
+        <div className="search-filter">
+          <p>过滤条件:</p>
+          <FilterForm databaseDisplay={false} onSearch={this.props.onFilter} />
+        </div>
+        
       </div>
     );
   }
@@ -46,7 +52,8 @@ class ResultInfo extends Component {
 ResultInfo.propTypes = {
   total: PropTypes.number,
   keyword: PropTypes.string,
-  dataSource: PropTypes.array
+  dataSource: PropTypes.array,
+  onFilter: PropTypes.func
 };
 
 export default ResultInfo;

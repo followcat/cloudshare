@@ -116,7 +116,7 @@ class FilterForm extends Component {
   }
 
   render() {
-    const { textarea, classify  } = this.props;
+    const { textarea, databaseDisplay, classify  } = this.props;
     const { getFieldDecorator } = this.props.form;
     const { expand } = this.state;
 
@@ -157,25 +157,26 @@ class FilterForm extends Component {
               </FormItem>
             </Col>
           </Row> : null}
-        <Row>
-          <Col span={24}>
-            <Form.Item
-              label="选择数据库"
-              className="classify-selection"
-              labelCol={{ span: 3 }}
-              wrapperCol={{ span: 19 }}
-            >
-              {getFieldDecorator('uses', {
-                initialValue: textarea ? [] : classify,
-                rules: [{ type: 'array' }]
-              })(<Select multiple>
-                   {classify.map((item, index) => {
-                     return <Option key={index} value={item} >{item}</Option>
-                   })}
-                 </Select>)}
-            </Form.Item>
-          </Col>
-        </Row>
+        {databaseDisplay ? 
+          <Row>
+            <Col span={24}>
+              <Form.Item
+                label="选择数据库"
+                className="classify-selection"
+                labelCol={{ span: 3 }}
+                wrapperCol={{ span: 19 }}
+              >
+                {getFieldDecorator('uses', {
+                  initialValue: textarea ? [] : classify,
+                  rules: [{ type: 'array' }]
+                })(<Select multiple>
+                    {classify.map((item, index) => {
+                      return <Option key={index} value={item} >{item}</Option>
+                    })}
+                  </Select>)}
+              </Form.Item>
+            </Col>
+          </Row> : null}
         <Row gutter={8}>
           <Col span={8}>
             <FormItem
@@ -271,6 +272,10 @@ class FilterForm extends Component {
     );
   }
 }
+
+FilterForm.defaultProps = {
+  databaseDisplay: true
+};
 
 FilterForm.propTypes = {
   textarea: PropTypes.bool,

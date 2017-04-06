@@ -40,7 +40,8 @@ const rootRoute = {
     require('./routes/user-info'),
     require('./routes/resume'),
     require('./routes/upload-preview'),
-    require('./routes/go-to-signin')
+    require('./routes/go-to-signin'),
+    require('./routes/manage')
   ]
 };
 

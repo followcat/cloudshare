@@ -11,7 +11,7 @@ import { FilterForm } from 'components/filter-card';
 class ResultInfo extends Component {
 
   render() {
-    const { total, keyword, dataSource } = this.props;
+    const { total, keyword, dataSource, industry } = this.props;
 
     const btnStyle = {
       display: 'inline-block',
@@ -41,7 +41,11 @@ class ResultInfo extends Component {
         </div>
         <div className="search-filter">
           <p>过滤条件:</p>
-          <FilterForm databaseDisplay={false} onSearch={this.props.onFilter} />
+          <FilterForm
+            databaseDisplay={false}
+            industry={industry}
+            onSearch={this.props.onFilter}
+          />
         </div>
         
       </div>
@@ -53,6 +57,7 @@ ResultInfo.propTypes = {
   total: PropTypes.number,
   keyword: PropTypes.string,
   dataSource: PropTypes.array,
+  industry: PropTypes.object,
   onFilter: PropTypes.func
 };
 

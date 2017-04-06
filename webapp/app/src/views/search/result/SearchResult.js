@@ -7,6 +7,7 @@ import SearchResultBox from 'components/search-result-box';
 import ResultInfo from './ResultInfo';
 
 import { getResultData } from 'request/search';
+import { getIndustry } from 'request/classify';
 
 class SearchResult extends Component {
   constructor(props) {
@@ -17,16 +18,20 @@ class SearchResult extends Component {
       pages: 0,
       current: 1,
       totals: 0,
-      spinning: false
+      spinning: false,
+      filterValue: {},
+      industry: {}
     };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
     this.handleFilter = this.handleFilter.bind(this);
+    this.getIndustryDataSource = this.getIndustryDataSource.bind(this);
     this.loadResultDataSource = this.loadResultDataSource.bind(this);
   }
 
   componentDidMount() {
     this.loadResultDataSource(this.state.searchText);
+    this.getIndustryDataSource();
   }
 
   handleSearch(value) {
@@ -43,15 +48,18 @@ class SearchResult extends Component {
   }
 
   handleSwitchPage(page) {
+    const { filterValue } = this.state;
+
     this.setState({
       current: page,
       spinning: true,
-      dataSource: [],
+      dataSource: []
     });
 
     getResultData({
       'search_text': this.state.searchText,
-      'page': page
+      'page': page,
+      'filterdict': filterValue
     }, json => {
       if (json.code === 200) {
         this.setState({
@@ -62,8 +70,38 @@ class SearchResult extends Component {
     });
   }
 
-  handleFilter() {
+  handleFilter(fieldValue) {
+    const { searchText } = this.state;
+  
+    this.setState({
+      spinning: true,
+      filterValue: fieldValue
+    });
 
+    getResultData({
+      'search_text': searchText,
+      'page': 1,
+      'filterdict': fieldValue
+    }, (json) => {
+      if (json.code === 200) {
+        this.setState({
+          spinning: false,
+          pages: json.data.pages,
+          totals: json.data.totals,
+          dataSource: json.data.datas
+        });
+      }
+    });
+  }
+
+  getIndustryDataSource() {
+    getIndustry(json => {
+      if (json.code === 200) {
+        this.setState({
+          industry: json.data
+        });
+      }
+    });
   }
 
   loadResultDataSource(searchText) {
@@ -87,7 +125,13 @@ class SearchResult extends Component {
 
   render() {
     const { prefixCls, location } = this.props,
-          { totals, searchText, current, spinning, dataSource } = this.state;
+          { totals,
+            searchText,
+            current,
+            spinning,
+            dataSource,
+            industry
+          } = this.state;
 
     return (
       <div className={prefixCls}>
@@ -104,6 +148,7 @@ class SearchResult extends Component {
             total={totals}
             keyword={searchText}
             dataSource={dataSource}
+            industry={industry}
             onFilter={this.handleFilter}
           />
           <SearchResultBox

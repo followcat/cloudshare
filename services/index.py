@@ -200,7 +200,7 @@ class ReverseIndexing(object):
                 indexdict[key] = self.get_indexkeys([key], filterdict[key], uses)
         filteset = self.get(filterdict, uses=uses)
         if filterdict:
-            ids = filter(lambda x: os.path.splitext(x[0])[0] in filteset, ids)
+            ids = filter(lambda x: x in filteset, ids)
         return ids
 
     def _cur_places(self, yamlinfo):

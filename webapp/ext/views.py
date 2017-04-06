@@ -33,15 +33,15 @@ def configure(app):
     #     return flask.redirect(flask.url_for('index'))
 
     # #RESTful Manage page entrance
-    app.add_url_rule(
-        '/manage',
-        view_func=webapp.views.views.Manage.as_view('manage'),
-    )
+    # app.add_url_rule(
+    #     '/manage',
+    #     view_func=webapp.views.views.Manage.as_view('manage'),
+    # )
 
-    app.add_url_rule(
-        '/gotologin',
-        view_func=webapp.views.views.LoginRedirect.as_view('gotologin'),
-    )
+    # app.add_url_rule(
+    #     '/gotologin',
+    #     view_func=webapp.views.views.LoginRedirect.as_view('gotologin'),
+    # )
 
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')

@@ -3,6 +3,7 @@ import flask.ext.restful
 
 from webapp.restful.people import *
 from webapp.restful.mining import *
+from webapp.restful.reload import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
 from webapp.restful.company import *
@@ -15,6 +16,7 @@ from webapp.restful.databases import *
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
+    api.add_resource(SyncReloadAPI, '/api/syncreload', endpoint = 'syncreload')
     api.add_resource(SessionAPI, '/api/session')
     api.add_resource(AccountAPI, '/api/accounts/<string:id>')
     api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')

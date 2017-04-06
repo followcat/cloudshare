@@ -43,12 +43,6 @@ def configure(app):
         view_func=webapp.views.views.Uploader.as_view('uploader'),
     )
 
-    #RESTful Sync Reload request entrance
-    app.add_url_rule(
-        '/syncreload',
-        view_func=webapp.views.views.SyncReload.as_view('syncreload'),
-    )
-
     #RESTful Manage page entrance
     app.add_url_rule(
         '/manage',

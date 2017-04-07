@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 
 import CompanyInfo from './CompanyInfo';
 import CreateNewCompany from './CreateNewCompany';
+import FilterCondition from './FilterCondition';
 import ButtonWithModal from 'components/button-with-modal';
 import HeaderTitle from 'components/header-title';
 
@@ -13,9 +14,7 @@ import {
   Spin,
   Upload,
   Button,
-  Icon,
-  Select,
-  Input
+  Icon
 } from 'antd';
 
 import {
@@ -25,29 +24,12 @@ import {
   createCompany,
 } from 'request/company';
 
+import cloneDeep from 'lodash/cloneDeep';
+import remove from 'lodash/remove';
+import findIndex from 'lodash/findIndex';
 import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
-
-const options = [{
-  key: 'name',
-  text: language.COMPANY_NAME
-}, {
-  key: 'responsible',
-  text: language.RESPONSIBLE
-}, {
-  key: 'priority',
-  text: language.PRIORITY
-}, {
-  key: 'clientcontact',
-  text: language.CONTACT
-}, {
-  key: 'progress',
-  text: language.VISITING_SITUATION
-}, {
-  key: 'district',
-  text: language.DISTRICT
-}];
 
 class CompanyList extends Component {
   constructor() {
@@ -60,8 +42,7 @@ class CompanyList extends Component {
       customerIDList: [],
       loading: false,
       visible: false,
-      filterKey: options[0].key,
-      filterValue: ''
+      filterData: [{ index: 0, data: [] }]
     };
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
@@ -69,9 +50,9 @@ class CompanyList extends Component {
     this.handleUploadBtnClick = this.handleUploadBtnClick.bind(this);
     this.handleUploadModalCancel = this.handleUploadModalCancel.bind(this);
     this.handleUploadModalOk = this.handleUploadModalOk.bind(this);
-    this.handleFilterSelect = this.handleFilterSelect.bind(this);
-    this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.handleAddFilterCondition = this.handleAddFilterCondition.bind(this);
     this.handleFilterClick = this.handleFilterClick.bind(this);
+    this.updateFilterCondition = this.updateFilterCondition.bind(this);
     this.updateDataSource = this.updateDataSource.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getDataSourceBySearch = this.getDataSourceBySearch.bind(this);
@@ -87,8 +68,6 @@ class CompanyList extends Component {
   }
 
   handleShowSizeChange(current, pageSize) {
-    const { filterKey, filterValue } = this.state;
-
     this.setState({
       current: current,
       pageSize: pageSize
@@ -97,16 +76,12 @@ class CompanyList extends Component {
     if (this._isFilterValueNull()) {
       this.getDataSource(current, pageSize);
     } else {
-      this.getDataSourceBySearch(filterKey, filterValue, current, pageSize);
+      this.getDataSourceBySearch(current, pageSize);
     }
   }
 
   handlePaginationChange(current) {
-    const {
-      pageSize,
-      filterKey,
-      filterValue
-    } = this.state;
+    const { pageSize } = this.state;
 
     this.setState({
       current: current
@@ -115,7 +90,7 @@ class CompanyList extends Component {
     if (this._isFilterValueNull()) {
       this.getDataSource(current, pageSize);
     } else {
-      this.getDataSourceBySearch(filterKey, filterValue, current, pageSize);
+      this.getDataSourceBySearch(current, pageSize);
     }
   }
 
@@ -158,24 +133,31 @@ class CompanyList extends Component {
     this.props.history.push('/company/uploader');
   }
 
-  handleFilterSelect(value) {
+  handleAddFilterCondition(e) {
+    e.preventDefault();
+    const { filterData } = this.state;
+    let datas = cloneDeep(filterData),
+        len = datas.length;
+    
+    if (len > 0) {
+      datas.push({
+        index: datas[len - 1].index + 1,
+        data: []
+      });
+    } else {
+      datas.push({
+        index: 0,
+        data: []
+      });
+    }
+  
     this.setState({
-      filterKey: value
-    });
-  }
-
-  handleFilterChange(e) {
-    this.setState({
-      filterValue: e.target.value
+      filterData: datas
     });
   }
 
   handleFilterClick() {
-    const {
-      filterKey,
-      filterValue,
-      pageSize
-    } = this.state,
+    const { pageSize } = this.state,
       current = 1;
     
     this.setState({ current });
@@ -183,20 +165,40 @@ class CompanyList extends Component {
     if (this._isFilterValueNull()) {
       this.getDataSource(current, pageSize);
     } else {
-      this.getDataSourceBySearch(filterKey, filterValue, current, pageSize);
+      this.getDataSourceBySearch(current, pageSize);
     }
   }
 
   _isFilterValueNull() {
-    const { filterValue } = this.state;
+    const { filterData } = this.state;
 
-    return filterValue.trim() === '';
+    return filterData.length === 0;
+  }
+
+  updateFilterCondition(index, dataIndex, fieldValue = null) {
+    const { filterData } = this.state;
+    let datas = cloneDeep(filterData),
+        i = findIndex(datas, (v) => v.index === index);
+
+    switch(dataIndex) {
+      case 'key':
+        datas[i].data[0] = fieldValue;
+        break;
+      case 'value':
+        datas[i].data[1] = fieldValue;
+        break;
+      case 'delete':
+        remove(datas, (v) => v.index === index);
+        break;
+    }
+
+    this.setState({
+      filterData: datas
+    });
   }
 
   updateDataSource() {
     const {
-      filterKey,
-      filterValue,
       current,
       pageSize
     } = this.state;
@@ -204,7 +206,7 @@ class CompanyList extends Component {
     if (this._isFilterValueNull()) {
       this.getDataSource(current, pageSize);
     } else {
-      this.getDataSourceBySearch(filterKey, filterValue, current, pageSize);
+      this.getDataSourceBySearch(current, pageSize);
     }
   }
 
@@ -227,7 +229,10 @@ class CompanyList extends Component {
     });
   }
 
-  getDataSourceBySearch(key, value, current, pageSize) {
+  getDataSourceBySearch(current, pageSize) {
+    const { filterData } = this.state;
+    let searchItems = filterData.map(v => v.data);
+
     this.setState({
       loading: true
     });
@@ -235,8 +240,7 @@ class CompanyList extends Component {
     getAllCompanyBySearch({
       current_page: current,
       page_size: pageSize,
-      search_key: key,
-      search_text: value
+      search_items: searchItems
     }, json => {
       if (json.code === 200) {
         this.setState({
@@ -265,8 +269,7 @@ class CompanyList extends Component {
       total,
       pageSize,
       visible,
-      filterKey,
-      filterValue
+      filterData
     } = this.state;
 
     const { uploading, disabled } = this.props;
@@ -343,14 +346,16 @@ class CompanyList extends Component {
           </div>
           <div className="cs-card-inner-top-filter">
             <label className="cs-label">过滤条件</label>
-            <Select value={filterKey} onSelect={this.handleFilterSelect}>
-              {options.map(item => <Select.Option key={item.key}>{item.text}</Select.Option>)}
-            </Select>
-            <Input
-              placeholder="请输入关键字"
-              value={filterValue}
-              onChange={this.handleFilterChange}
-            />
+            {filterData.map((item) => {
+              return (
+                <FilterCondition
+                  key={item.index}
+                  index={item.index}
+                  updateFilterCondition={this.updateFilterCondition}
+                />
+              );
+            })}
+            <a onClick={this.handleAddFilterCondition}>添加条件</a>
             <Button onClick={this.handleFilterClick}>{language.SUBMIT}</Button>
           </div>
         </div>

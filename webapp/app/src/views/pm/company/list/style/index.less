@@ -122,19 +122,11 @@
 
   .cs-card-inner-top {
     overflow: hidden;
+    padding: 10px 0;
     
     &-col, &-filter {
       display: inline-block;
       margin-left: 8px;
-    }
-
-    &-filter {
-      width: 360px;
-
-      & > input {
-        width: 120px;
-        margin: 0 8px;
-      }
     }
 
     &-col:first-of-type {
@@ -147,10 +139,6 @@
 
     .cs-label::after {
       content: ': ';
-    }
-    
-    .ant-select {
-      width: 100px;
     }
   }
 
@@ -165,6 +153,32 @@
     .ant-pagination {
       float: right;
     }
+  }
+}
+
+.filter-condition {
+  position: relative;
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid #c2c2c2;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  margin-right: 4px;
+
+  .ant-select {
+    width: 80px;
+  }
+
+  & > input {
+    width: 100px;
+    margin-left: 2px;
+  }
+
+  .close-icon {
+    position: absolute;
+    top: 0;
+    right: 2px;
+    cursor: pointer;
   }
 }
 

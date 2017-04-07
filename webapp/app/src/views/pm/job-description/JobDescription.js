@@ -84,7 +84,8 @@ class JobDescription extends Component {
       jd_id: fieldValues.id,
       description: fieldValues.description,
       status: fieldValues.status,
-      commentary: fieldValues.commentary
+      commentary: fieldValues.commentary,
+      followup: fieldValues.followup
     };
 
     updateJobDescription(params, (json) => {
@@ -223,7 +224,11 @@ class JobDescription extends Component {
     return (
       <div>
         <div>
-          {record.description.split('\n').map((item, index) => { return <p key={index}>{item}</p>})}
+          {record.description.split('\n').map((item, index) => { return (<p key={index}>{item}</p>); })}
+        </div>
+        <div className="commentary-box">
+          <label>{`${language.REMARKS}：`}</label>
+          <p>{record.followup}</p>
         </div>
         <div className="commentary-box">
           <label>{`${language.COMMENTARY}：`}</label>

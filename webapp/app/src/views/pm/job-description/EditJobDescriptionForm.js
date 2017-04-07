@@ -16,33 +16,74 @@ class EditJobDescriptionForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      status: props.record.status
+      description: props.record.description,
+      status: props.record.status,
+      followup: props.record.followup,
+      commentary: props.record.commentary
     };
     this.handleModalOK = this.handleModalOK.bind(this);
+    this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     this.handleStatusChange = this.handleStatusChange.bind(this);
+    this.handleFollowupChange = this.handleFollowupChange.bind(this);
+    this.handleCommentaryChange = this.handleCommentaryChange.bind(this);
   }
   
   componentWillReceiveProps(nextProps) {
+    const { record } = nextProps;
+
     if (nextProps.visible) {
       this.setState({
-        status: nextProps.record.status
+        description: record.description,
+        status: record.status,
+        followup: record.followup,
+        commentary: record.commentary
       });
     }
   }
 
   handleModalOK() {
+    const {
+      description,
+      status,
+      followup,
+      commentary
+    } = this.state;
+
     this.props.form.validateFields((errors, values) => {
       if (!!errors) {
         return;
       } else {
-        this.props.onSubmit(Object.assign({}, values, { status: this.state.status }));
+        this.props.onSubmit(Object.assign({}, values, {
+          description: description,
+          status: status,
+          followup: followup,
+          commentary: commentary
+        }));
       }
+    });
+  }
+
+  handleDescriptionChange(e) {
+    this.setState({
+      description: e.target.value
     });
   }
 
   handleStatusChange(value) {
     this.setState({
       status: value
+    });
+  }
+
+  handleFollowupChange(e) {
+    this.setState({
+      followup: e.target.value
+    });
+  }
+
+  handleCommentaryChange(e) {
+    this.setState({
+      commentary: e.target.value
     });
   }
 
@@ -55,7 +96,7 @@ class EditJobDescriptionForm extends Component {
       customerDataSource
     } = this.props,
     { getFieldDecorator } = form,
-    { status } = this.state;
+    { description, status, followup, commentary } = this.state;
     
     const formItemLayout = {
       labelCol: { span: 6 },
@@ -69,10 +110,10 @@ class EditJobDescriptionForm extends Component {
       value: 'Closed',
       text: language.CLOSED
     }];
-
     return (
       <Modal
         title={language.EDIT_JOB_DESCRIPTION}
+        style={{ top: 24 }}
         okText={language.SUBMIT}
         visible={visible}
         confirmLoading={confirmLoading}
@@ -110,24 +151,35 @@ class EditJobDescriptionForm extends Component {
             {...formItemLayout}
             label={language.JOB_DESCRIPTION_CONTENT}
           >
-            {getFieldDecorator('description', {
-              initialValue: record.description,
-              rules: [{ required: true }]
-            })(
-              <Input
-                type="textarea"
-                rows="6"
-                disabled={record.committer !== localStorage.user}
-              />
-            )}
+            <Input
+              type="textarea"
+              rows="4"
+              value={description}
+              onChange={this.handleDescriptionChange}
+              readOnly={record.committer !== localStorage.user}
+            />
+          </Form.Item>
+          <Form.Item
+            {...formItemLayout}
+            label={language.REMARKS}
+          >
+            <Input
+              type="textarea"
+              rows="2"
+              value={followup}
+              onChange={this.handleFollowupChange}
+            />
           </Form.Item>
           <Form.Item
             {...formItemLayout}
             label={language.COMMENTARY}
           >
-            {getFieldDecorator('commentary', {
-              initialValue: record.commentary
-            })(<Input type="textarea" rows="2" />)}
+            <Input
+              type="textarea"
+              rows="2"
+              value={commentary}
+              onChange={this.handleCommentaryChange}
+            />
           </Form.Item>
           <Form.Item
             {...formItemLayout}

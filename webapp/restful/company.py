@@ -254,26 +254,26 @@ class SearchCObyKeyAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('current_page', type = int, location = 'json')
         self.reqparse.add_argument('page_size', type = int, location = 'json')
-        self.reqparse.add_argument('search_items', location = 'json')
+        self.reqparse.add_argument('search_items', type = list, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
         cur_page = args['current_page']
         page_size = args['page_size']
+        search_items = args['search_items']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         results = set(project.company.ids)
         for each in search_items:
             key = each[0]
             value = each[1]
-            results.intersection_update(set(project.company.search_key(key, text)))
+            results.intersection_update(set(project.company.search_key(key, value)))
         sorted_results = project.company.sorted_ids('modifytime', ids=results)
         datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
         return {
             'code': 200,
             'data': datas,
-            'keyword': text,
             'pages': pages,
             'total': total
         }

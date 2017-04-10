@@ -42,7 +42,7 @@ class CompanyList extends Component {
       customerIDList: [],
       loading: false,
       visible: false,
-      filterData: [{ index: 0, data: [] }]
+      filterData: []
     };
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
@@ -172,7 +172,15 @@ class CompanyList extends Component {
   _isFilterValueNull() {
     const { filterData } = this.state;
 
-    return filterData.length === 0;
+    let data = filterData.map(v => v.data);
+
+    for (var i = 0, len = data.length; i < len; i++) {
+      if (typeof data[i][1] === 'undefined' || data[i][1] === '') {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   updateFilterCondition(index, dataIndex, fieldValue = null) {

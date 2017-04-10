@@ -129,7 +129,6 @@ class Uploader extends Component {
 
   handleRemove(file) {
     let {
-      fileList,
       completedList,
       confirmList,
       failedList,
@@ -139,14 +138,11 @@ class Uploader extends Component {
       index = null;
 
     index = findIndex(completedList, item => item.uid === file.uid);
-
-    fileList = removeItem('uid', file.uid, fileList);
     completedList = removeItem('uid', file.uid, completedList);
     failedList = removeItem('uid', file.uid, failedList);
     confirmList = removeItem('filename', file.filename, confirmList);
 
     this.setState({
-      fileList: fileList,
       completedList: completedList,
       confirmList: confirmList,
       failedList: failedList,

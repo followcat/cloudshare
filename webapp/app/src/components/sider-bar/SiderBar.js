@@ -99,10 +99,10 @@ class SiderBar extends Component {
     } else {
       return (
         <div className={classSet} ref="siderbar">
-          <div className="siderbar-button" onClick={this.handleSiderbarBtnClick}>
+          <div className={`${prefixCls}-button`} onClick={this.handleSiderbarBtnClick}>
             {panelVisible ? <Icon type="caret-right" /> : <Icon type="caret-left" />}
           </div>
-          <Card className="siderbar-container">
+          <Card className={`${prefixCls}-container`}>
             <div className="analyse">
               <div className="title">
                 <h3>分析</h3>

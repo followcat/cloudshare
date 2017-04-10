@@ -198,9 +198,9 @@ class ReverseIndexing(object):
         for key in filterdict:
             if filterdict[key]:
                 indexdict[key] = self.get_indexkeys([key], filterdict[key], uses)
-        filteset = self.get(filterdict, uses=uses)
-        if filterdict:
-            ids = filter(lambda x: x in filteset or x[0] in filteset, ids)
+        filterset = self.get(filterdict, uses=uses)
+        if indexdict:
+            ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
         return ids
 
     def _cur_places(self, yamlinfo):

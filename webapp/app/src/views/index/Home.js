@@ -8,7 +8,6 @@ import Feature from 'components/feature';
 import { message } from 'antd';
 
 import { getFeature } from 'request/feature';
-import { getProject } from 'request/project';
 
 import StorageUtil from 'utils/storage';
 import { signIn } from 'request/sign';
@@ -26,11 +25,6 @@ class Home extends Component {
     this.handleFeatureClose = this.handleFeatureClose.bind(this);
     this.handleSignInSubmit = this.handleSignInSubmit.bind(this);
     this.getFeatureData = this.getFeatureData.bind(this);
-    this.getProjectData = this.getProjectData.bind(this);
-  }
-
-  componentDidMount() {
-    this.getProjectData();
   }
 
   handleFeatureClick() {
@@ -53,7 +47,6 @@ class Home extends Component {
     }, (json) => {
       if (json.code === 200) {
         StorageUtil.setAll({
-          _pj: feildValue.project,
           token: json.token,
           user: json.user
         });
@@ -69,16 +62,6 @@ class Home extends Component {
       if (json.code === 200) {
         this.setState({
           dataSource: json.data,
-        });
-      }
-    });
-  }
-
-  getProjectData() {
-    getProject((json) => {
-      if (json.code === 200) {
-        this.setState({
-          projects: json.data,
         });
       }
     });

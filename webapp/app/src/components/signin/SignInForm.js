@@ -4,12 +4,10 @@ import React, { Component, PropTypes } from 'react';
 import {
   Form,
   Input,
-  Button,
-  Select
+  Button
 } from 'antd';
 
-const FormItem = Form.Item,
-      SelectOption = Select.Option;
+const FormItem = Form.Item;
 
 class SignInForm extends Component {
   constructor() {
@@ -51,27 +49,6 @@ class SignInForm extends Component {
               { min: 6, max: 18, message: '无效密码，密码长度为6-18位' }
             ]
           })(<Input type="password" placeholder="请输入密码" />)}
-        </FormItem>
-        <FormItem
-          label="项目"
-          id="project"
-        >
-          {getFieldDecorator('project', {
-            rules: [
-              { required: true, message: '项目是必填项' }
-            ],
-          })(<Select>
-              {this.props.projects.map((item, index) => {
-                return (
-                  <SelectOption
-                    key={index}
-                    value={item}
-                  >
-                    {item}
-                  </SelectOption>
-                );
-              })}
-            </Select>)}
         </FormItem>
         <FormItem wrapperCol={wrapperCol}>
           <Button

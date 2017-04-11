@@ -27,9 +27,9 @@ if os.path.exists(RAW_DIR):
         RAW_DB[name] = interface.predator.PredatorInterface(namepath)
 SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_PEO_STO, SVC_CV_STO, RAW_DB)
 
-def load_classify():
+def load_mult_classify():
     SVC_MULT_CLSIFY = services.multiclsify.MultiClassify(SVC_CV_STO)
     SVC_CLS_CV = SVC_MULT_CLSIFY.classifies
     return SVC_MULT_CLSIFY, SVC_CLS_CV
 
-SVC_MULT_CLSIFY, SVC_CLS_CV = load_classify()
+SVC_MULT_CLSIFY, SVC_CLS_CV = load_mult_classify()

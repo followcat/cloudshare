@@ -1,5 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+import { browserHistory } from 'react-router';
 
 import CompanyInfo from './CompanyInfo';
 import CreateNewCompany from './CreateNewCompany';
@@ -130,7 +131,7 @@ class CompanyList extends Component {
     this.setState({
       visible: false
     });
-    this.props.history.push('/company/uploader');
+    browserHistory.push('/pm/company/uploader');
   }
 
   handleAddFilterCondition(e) {

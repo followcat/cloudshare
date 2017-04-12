@@ -105,8 +105,12 @@ class Project(services.base.service.Service):
 
     def cv_updateyaml(self, id, key, value, userid):
         result = None
+        if key in dict(self.curriculumvitae.YAML_TEMPLATE):
+            cv_service = self.curriculumvitae
+        else:
+            cv_service = self.cvrepo
         try:
-            result = self.curriculumvitae.updateinfo(id, key, value, userid)
+            result = cv_service.updateinfo(id, key, value, userid)
         except AssertionError:
             pass
         return result

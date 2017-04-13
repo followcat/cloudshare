@@ -1,5 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+import { browserHistory } from 'react-router';
 
 import { message } from 'antd';
 
@@ -114,7 +115,7 @@ class Company extends Component {
         });
         
         setTimeout(() => {
-          this.props.history.push('/company/list');
+          browserHistory.push('/pm/company/list');
         }, 1000);
       }
     });

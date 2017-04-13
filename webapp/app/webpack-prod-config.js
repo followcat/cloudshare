@@ -14,9 +14,9 @@ module.exports = {
   ],
 
   output: {
-    path: path.join(config.STATIC_PATH, '/dist'),
-    publicPath: '/static/dist/',
-    filename: '[name].[hash].js',
+    path: config.STATIC_PATH,
+    publicPath: '/static/',
+    filename: 'js/[name].[hash].js',
   },
 
   plugins: [
@@ -31,7 +31,7 @@ module.exports = {
       __DEVELOPMENT__: false,
     }),
     new ExtractTextPlugin({
-      filename: '[name].[contenthash].css',
+      filename: 'css/[name].[contenthash].css',
       allChunks: true
     }),
     new webpack.optimize.UglifyJsPlugin({

@@ -6,37 +6,14 @@ const folderPath = require('./webpack/config/folder-path');
 
 const port = 3000;
 
-//遍历每个入口文件并加入热加载插件
-// let entry = webpackConf.entry;
+// 入口加入热加载插件
 webpackConf.entry.unshift('react-hot-loader/patch', `webpack-dev-server/client?http://localhost:${port}/`, 'webpack/hot/only-dev-server');
-
-// for (let key in entryObject) {
-//   let arr = [];
-//   arr.push('react-hot-loader/patch');
-//   arr.push(`webpack-dev-server/client?http://localhost:${port}/`);
-//   arr.push('webpack/hot/only-dev-server');
-//   arr.push(entryObject[key]);
-//   entryObject[key] = arr;
-
-//   if (typeof historyApifallback.rewrites === 'undefined') {
-//     historyApifallback.rewrites = [];
-//   }
-
-//   historyApifallback.rewrites.push({
-//     from: new RegExp(`/${key}`),
-//     to: `/assert/${key}.html`
-//   });
-// }
-
-// webpackConf.entry = Object.assign({}, entryObject, {
-//   devServerClient: 'webpack-dev-server/client?http://0.0.0.0:3000'
-// });
-// webpackConf.entry.unshift('webpack-dev-server/client?http://0.0.0.0:4888/', 'webpack/hot/only-dev-server');
 
 const compiler = webpack(webpackConf);
 
 const server = new WebpackDevServer(compiler, {
   // webpack-dev-server options
+  port: port,
 
   contentBase: folderPath.PATHS.BUILD_PATH,
 

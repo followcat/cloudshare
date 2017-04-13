@@ -3,7 +3,6 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const path = require('path');
 
-const getEntryFile = require('./config/entry-file');
 const folderPath = require('./config/folder-path');
 const theme = require('../cloudshare-theme-default');
 
@@ -17,13 +16,14 @@ const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
 
 let webpackConfig = {
-  // entry: getEntryFile(),
-  entry: ['./src/index.js'],
+
+  entry: ['babel-polyfill', './src/index.js'],
 
   resolve: {
     extensions: ['.js', '.jsx'],
     alias: {
       'components': path.resolve(folderPath.PATHS.SRC_PATH, 'components/'),
+      'routes': path.resolve(folderPath.PATHS.SRC_PATH, 'routes/'),
       'views': path.resolve(folderPath.PATHS.SRC_PATH, 'views/'),
       'utils': path.resolve(folderPath.PATHS.SRC_PATH, 'utils/'),
       'request': path.resolve(folderPath.PATHS.SRC_PATH, 'request/'),
@@ -61,16 +61,12 @@ let webpackConfig = {
   },
   
   plugins: [
-    // new webpack.DllReferencePlugin({
-    //   context: __dirname,
-    //   manifest: require('../lib/vendor-manifest.json')
-    // }),
+    new webpack.NamedModulesPlugin(),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons'
     })
   ]
 };
-
 
 // module.exports = webpackConfig;
 if (TARGET === 'dev' || !TARGET) {

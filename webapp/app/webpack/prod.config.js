@@ -2,7 +2,6 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const getHTMLFile = require('./config/html-file');
 const folderPath = require('./config/folder-path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');

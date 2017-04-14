@@ -20,7 +20,9 @@ const kv = {
   clientcontact: language.CONTACT,
   progress: language.VISITING_SITUATION,
   relatedcompany: language.RELATED_COMPANY,
-  updatednumber: language.CONTACT_WAY
+  updatednumber: language.CONTACT_WAY,
+  priority: language.PRIORITY,
+  responsible: language.RESPONSIBLE
 };
 
 class CompanyUploader extends Component {

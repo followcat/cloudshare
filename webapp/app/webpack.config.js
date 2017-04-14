@@ -3,34 +3,33 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const path = require('path');
 
-const getEntryFile = require('./config/entry-file');
-const folderPath = require('./config/folder-path');
-const theme = require('../cloudshare-theme-default');
+// const folderPath = require('./config/folder-path');
+const theme = require('./cloudshare-theme-default');
+const config = require('./config');
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const development = require('./dev.config');
-const production = require('./prod.config');
+const development = require('./webpack-dev-config');
+const production = require('./webpack-prod-config');
 
 const TARGET = process.env.npm_lifecycle_event;
 
 process.env.BABEL_ENV = TARGET;
 
 let webpackConfig = {
-  // entry: getEntryFile(),
-  entry: ['./src/index.js'],
 
   resolve: {
     extensions: ['.js', '.jsx'],
     alias: {
-      'components': path.resolve(folderPath.PATHS.SRC_PATH, 'components/'),
-      'views': path.resolve(folderPath.PATHS.SRC_PATH, 'views/'),
-      'utils': path.resolve(folderPath.PATHS.SRC_PATH, 'utils/'),
-      'request': path.resolve(folderPath.PATHS.SRC_PATH, 'request/'),
-      'config': path.resolve(folderPath.PATHS.SRC_PATH, 'config/'),
-      'API': path.resolve(folderPath.PATHS.SRC_PATH, 'config/api.js'),
-      'URL': path.resolve(folderPath.PATHS.SRC_PATH, 'config/url.js'),
-      'image': path.resolve(folderPath.PATHS.SRC_PATH, 'image/')
+      'components': path.resolve(config.SRC_PATH, 'components/'),
+      'routes': path.resolve(config.SRC_PATH, 'routes/'),
+      'views': path.resolve(config.SRC_PATH, 'views/'),
+      'utils': path.resolve(config.SRC_PATH, 'utils/'),
+      'request': path.resolve(config.SRC_PATH, 'request/'),
+      'config': path.resolve(config.SRC_PATH, 'config/'),
+      'API': path.resolve(config.SRC_PATH, 'config/api.js'),
+      'URL': path.resolve(config.SRC_PATH, 'config/url.js'),
+      'image': path.resolve(config.SRC_PATH, 'image/')
     }
   },
 
@@ -39,7 +38,7 @@ let webpackConfig = {
       test: /\.js|jsx$/,
       exclude: /node_modules/,
       use: ['babel-loader'],
-      include: folderPath.PATHS.SRC_PATH,
+      include: config.SRC_PATH,
     }, {
       test: '/\.css$/',
       exclude: /node_modules/,
@@ -61,16 +60,11 @@ let webpackConfig = {
   },
   
   plugins: [
-    // new webpack.DllReferencePlugin({
-    //   context: __dirname,
-    //   manifest: require('../lib/vendor-manifest.json')
-    // }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons'
     })
   ]
 };
-
 
 // module.exports = webpackConfig;
 if (TARGET === 'dev' || !TARGET) {

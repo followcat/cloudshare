@@ -1,18 +1,22 @@
 'use strict';
-const path = require('path');
 const webpack = require('webpack');
-
-const getHTMLFile = require('./config/html-file');
-const folderPath = require('./config/folder-path');
+const path = require('path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+const config = require('./config');
+
 module.exports = {
+  entry: [
+    'babel-polyfill',
+    './src/index.js'
+  ],
+
   output: {
-    path: path.join(folderPath.PATHS.STATIC_PATH, '/dist'),
-    publicPath: '/static/dist/',
-    filename: '[name].[hash].js',
+    path: config.STATIC_PATH,
+    publicPath: '/static/',
+    filename: 'js/[name].[hash].js',
   },
 
   plugins: [
@@ -27,7 +31,7 @@ module.exports = {
       __DEVELOPMENT__: false,
     }),
     new ExtractTextPlugin({
-      filename: '[name].[contenthash].css',
+      filename: 'css/[name].[contenthash].css',
       allChunks: true
     }),
     new webpack.optimize.UglifyJsPlugin({
@@ -45,9 +49,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       hash: false,
       title: 'Cloudshare - Willendare',
-      template: path.join(folderPath.PATHS.SRC_PATH, '/template.html'),
+      template: path.join(config.SRC_PATH, '/template.html'),
       inject: true,
-      filename: path.join(folderPath.PATHS.ROOT_PATH, '/templates_dist/index.html'),
+      filename: path.join(config.ROOT_PATH, '/templates_dist/index.html'),
       minify: {    // 压缩HTML文件
         removeComments: true,    // 移除HTML中的注释
         collapseWhitespace: false,   // 删除空白符与换行符

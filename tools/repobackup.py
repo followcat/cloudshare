@@ -1,10 +1,12 @@
 import os
 import time
+import tarfile
 
 import utils.builtin
 import baseapp.backup
 import baseapp.datadbs
 import baseapp.projects
+import webapp.settings
 
 
 backup_folders = baseapp.backup.BACKUP_DIRS
@@ -18,6 +20,15 @@ BT_repo = baseapp.projects.SVC_PRJ_BT
 IA_repo = baseapp.projects.SVC_PRJ_IA
 NE_repo = baseapp.projects.SVC_PRJ_NE
 
+def backup_upload_output():
+    for folder in backup_folders:
+        output_backup_path = os.path.join(folder, 'data', 'upload_output.tar.gz')
+        tar = tarfile.open(output_backup_path, 'w:gz')
+        for root, dir, files in os.walk(webapp.settings.UPLOAD_TEMP):
+            for file in files:
+                fullpath=os.path.join(root, file)
+                tar.add(fullpath, arcname=file)
+        tar.close()
 
 if __name__ == '__main__':
     backup_name = time.strftime(ISOTIMEFORMAT, time.localtime())
@@ -46,3 +57,4 @@ if __name__ == '__main__':
         BT_repo.backup(BT_backup_path, bare=True)
         IA_repo.backup(IA_backup_path, bare=True)
         NE_repo.backup(NE_backup_path, bare=True)
+    backup_upload_output()

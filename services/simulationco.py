@@ -50,7 +50,7 @@ class SimulationCO(services.base.simulation.Simulation,
                 output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
             else:
                 info = self.getyaml(id)
-            for key in self.list_item:
+            for key in dict(self.YAML_TEMPLATE):
                 if dict(self.YAML_TEMPLATE)[key] == list:
                     existvalues = [v['content'] for v in info[key]]\
                                     if self.exists(id) else list()
@@ -62,7 +62,8 @@ class SimulationCO(services.base.simulation.Simulation,
                             output.append(('listadd', id, (id, key, value, responsible)))
                 else:
                     if not self.exists(id) or info[key] != excel[key]:
-                         output.append(('listadd', id, (id, key, value, responsible)))
+                        output.append(('listadd', id,
+                                       (id, key, excel[key], responsible)))
         return output
 
     def addcustomer(self, id, user, do_commit=True):

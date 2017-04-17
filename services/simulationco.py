@@ -39,7 +39,7 @@ class SimulationCO(services.base.simulation.Simulation,
         output = list()
         excels = utils.companyexcel.convert(stream)
         for excel in excels:
-            metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
+            metadata = extractor.information_explorer.catch_coinfo(excel)
             data = core.basedata.DataObject(metadata, excel)
             id = data.name
             responsible = excel['responsible'] if excel['responsible'] else committer

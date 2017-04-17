@@ -299,14 +299,12 @@ def catch_cvinfo(stream, filename, catch_info=True):
     return info
 
 
-def catch_coinfo(stream, name):
+def catch_coinfo(stream):
     """
-        >>> intro = {'introduction': 'introduction'}
-        >>> assert catch_coinfo(name='sgwgewtgqe', stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
+        >>> intro = {'name': 'sgwgewtgqe', 'introduction': 'introduction'}
+        >>> assert catch_coinfo(stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
     """
     info = generate_info_template(co_template)
-    info['name'] = name
-    info['id'] = extractor.unique_id.company_id(name)
     if isinstance(stream, dict):
         for key in info:
             if key in stream and stream[key]:
@@ -320,6 +318,7 @@ def catch_coinfo(stream, name):
             info['business'].append(stream['business'])
         except KeyError:
             pass
+    info['id'] = extractor.unique_id.company_id(info['name'])
     return info
 
 def catch_peopinfo(stream):

@@ -7,16 +7,10 @@ export default class SearchResultPagination extends Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      current: 1,
-    };
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(page) {
-    this.setState({
-      current: page,
-    });
     this.props.onSwitchPage(page);
   }
 
@@ -26,7 +20,7 @@ export default class SearchResultPagination extends Component {
         <Col span={12} offset={12}>
           <Pagination
             showQuickJumper
-            current={this.state.current}
+            current={this.props.current}
             defaultCurrent={1}
             total={this.props.total}
             defaultPageSize={20}

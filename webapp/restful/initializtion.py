@@ -3,6 +3,7 @@ import flask.ext.restful
 
 from webapp.restful.people import *
 from webapp.restful.mining import *
+from webapp.restful.reload import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
 from webapp.restful.company import *
@@ -15,6 +16,7 @@ from webapp.restful.databases import *
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
+    api.add_resource(SyncReloadAPI, '/api/syncreload', endpoint = 'syncreload')
     api.add_resource(SessionAPI, '/api/session')
     api.add_resource(AccountAPI, '/api/accounts/<string:id>')
     api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')
@@ -24,12 +26,14 @@ def initialize(app):
 
     api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyAllAPI, '/api/companyall', endpoint = 'companyall')
+    api.add_resource(AddedCompanyListAPI, '/api/addedcompanylist', endpoint = 'adddedcompanylist')
     api.add_resource(CompanyUploadExcelAPI, '/api/couploadexcel',
                      endpoint = 'couploadexcel')
     api.add_resource(CompanyConfirmExcelAPI, '/api/coconfirmexcel',
                      endpoint = 'coconfirmexcel')
     api.add_resource(CustomerListAPI, '/api/customerlist', endpoint = 'customerlist')
     api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
+    api.add_resource(SearchCObyKeyAPI, '/api/searchcobykey', endpoint = 'searchcobykey')
     api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
     api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate',
                      endpoint = 'companyinfoupdate')
@@ -76,8 +80,8 @@ def initialize(app):
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
 
 
-    api.add_resource(PeopleByIDAPI, '/api/projuectbyid/<string:id>', endpoint = 'projuectbyid')
-    api.add_resource(PeopleByUniqueIDAPI, '/api/projectbyuni', endpoint = 'projectbyuni')
+    api.add_resource(PeopleAPI, '/api/people', endpoint = 'people')
+    api.add_resource(PeopleByCVAPI, '/api/peoplebycv', endpoint = 'peoplebycv')
 
     api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')
     api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')

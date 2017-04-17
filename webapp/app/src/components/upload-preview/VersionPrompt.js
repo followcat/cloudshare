@@ -1,19 +1,24 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import AlertPrompt from '../alert-prompt';
-import { URL } from '../../config/url';
+
+import AlertPrompt from 'components/alert-prompt';
+
+import { URL } from 'config/url';
 
 class VersionPrompt extends Component {
   render() {
+    const {
+      title,
+      message,
+      dataSource
+    } = this.props;
+
     return (
       <div>
-      {this.props.dataSource.length ?
-          <AlertPrompt
-            type="info"
-            title="Information: "
-          >
-            <span>There may be same resume content </span>
-            {this.props.dataSource.map((id, index) => {
+        {dataSource.length > 0 ?
+          <AlertPrompt type="info" title={title}>
+            <span>{message}</span>
+            {dataSource.map((id, index) => {
               return (
                 <a
                   key={id}
@@ -27,18 +32,22 @@ class VersionPrompt extends Component {
             })}
           </AlertPrompt> :
           null
-      }
+        }
       </div>
     );
   }
 }
 
 VersionPrompt.defaultProps = {
-  dataSource: [],
+  title: 'Informations',
+  message: 'There may be same resume content ',
+  dataSource: []
 };
 
 VersionPrompt.propTypes = {
-  dataSource: PropTypes.array,
+  title: PropTypes.string,
+  message: PropTypes.string,
+  dataSource: PropTypes.array
 };
 
 export default VersionPrompt;

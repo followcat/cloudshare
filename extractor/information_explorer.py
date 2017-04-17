@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
+import time
 import string
 import os.path
 import functools
+
 import extractor.unique_id
 import extractor.education
 import extractor.expectation
@@ -35,6 +37,7 @@ cv_template = (
     ("comment",             list),
     ("tag",                 list),
     ("tracking",            list),
+    ("date",                time.time),
 )
 
 co_template = (
@@ -47,6 +50,7 @@ co_template = (
     ("address",             str),
     ("introduction",        str),
     ("email",               str),
+    ("date",                time.time),
 )
 
 peo_template = (
@@ -267,8 +271,8 @@ def catch_selected(stream, selected, name=None):
     if 'experience' in selected:
         info_dict.update(get_experience(stream, name))    # experience, company, position
     if 'expectation' in selected:
-        info_dict.update(get_expectation(stream))   # expectation, current, gender, marital_status,
-                                                    # age
+        info_dict.update(get_expectation(stream))   # expectation, current, gender,
+                                                    # marital_status, age
     if 'unique_id' in selected:
         extractor.unique_id.unique_id(info_dict)
     if 'classify' in selected and 'classify' not in info_dict:
@@ -290,11 +294,7 @@ def catch_cvinfo(stream, filename, catch_info=True):
     if catch_info is True:
         catchinfo = catch(stream)
         info.update(catchinfo)
-    extractor.unique_id.unique_id(info)
-    try:
-        info['id'] = info['unique_id']
-    except KeyError:
-        info['id'] = extractor.unique_id.cv_id(stream)
+    info["id"] = extractor.unique_id.cv_id(stream)
     info["filename"] = filename
     return info
 

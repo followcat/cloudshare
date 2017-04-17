@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 import shutil
 
 import utils.chsname
@@ -129,6 +130,14 @@ def update_selected(svc_cv, yamlname, selected):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
+def update_uniqueid(svc_cv, yamlname):
+    obj = svc_cv.getyaml(yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, yamlname)
+    extractor.unique_id.unique_id(obj)
+    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    with open(yamlpathfile, 'w') as fp:
+        fp.write(yamlstream)
+
 def update_xp(svc_cv, yamlname):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.path, yamlname)
@@ -158,22 +167,34 @@ def originid(svc_cv, yamlname):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
-def yamlaction(svc_cv, action, *args, **kwargs):
-    import time
+def timeout_yamlaction(svc_cv, action, *args, **kwargs):
     import utils.timeout.process
     i = 0
+    t1 = time.time()
     for yamlname in svc_cv.yamls():
         i += 1
-        t1 = time.time()
         try:
             utils.timeout.process.process_timeout_call(action, 120,
                                     args=tuple([svc_cv, yamlname]+list(args)),
                                     kwargs=kwargs)
         except utils.timeout.process.KilledExecTimeout as e:
             print(yamlname, action, e)
-        usetime = time.time() - t1
-        print("CV %s use %s."%(yamlname, str(usetime)))
         if i % 100 == 0:
+            usetime = time.time() - t1
+            t1 = time.time()
+            print("100 Action use %s."%(str(usetime)))
+            print i
+
+def yamlaction(svc_cv, action, *args, **kwargs):
+    i = 0
+    t1 = time.time()
+    for yamlname in svc_cv.yamls():
+        i += 1
+        action(svc_cv, yamlname, *args, **kwargs)
+        if i % 100 == 0:
+            usetime = time.time() - t1
+            t1 = time.time()
+            print("100 Action use %s."%(str(usetime)))
             print i
 
 def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
@@ -329,6 +350,39 @@ def update_jd_co_id(SVC_JD, SVC_CO):
             filename = SVC_JD.filename(jd_id)
             with open(os.path.join(SVC_JD.path, filename), 'w') as f:
                 f.write(dump_data)
+
+
+def update_jd_commentary(SVC_JD, comments_dict):
+    import yaml
+    for jd in SVC_JD.lists():
+        if 'commentary' in jd:
+            continue
+        jd_id = jd['id']
+        if jd_id in comments_dict:
+            jd['commentary'] = comments_dict[jd_id]
+        else:
+            jd['commentary'] = ''
+        dump_data = yaml.safe_dump(jd, allow_unicode=True)
+        filename = SVC_JD.filename(jd_id)
+        with open(os.path.join(SVC_JD.path, filename), 'w') as f:
+            f.write(dump_data)
+
+
+def add_jd_followup(SVC_PRJ):
+    import yaml
+    SVC_JD = SVC_PRJ.jobdescription
+    for jd in SVC_JD.lists():
+        if 'followup' in jd:
+            continue
+        jd_id = jd['id']
+        jd['followup'] = ''
+        if '\n' in jd['commentary']:
+            jd['followup'] = jd['commentary']
+            jd['commentary'] = ''
+        dump_data = yaml.safe_dump(jd, allow_unicode=True)
+        filename = SVC_JD.filename(jd_id)
+        with open(os.path.join(SVC_JD.path, filename), 'w') as f:
+            f.write(dump_data)
 
 
 def init_people(SVC_CV, SVC_PEO):

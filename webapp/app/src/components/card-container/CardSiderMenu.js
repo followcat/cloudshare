@@ -7,17 +7,22 @@ const SubMenu = Menu.SubMenu,
 
 class CardSiderMenu extends Component {
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      selectedKeys,
+      defaultOpenKeys,
+      menus
+    } = this.props;
 
     return (
-      <div className="cs-card-sider">
+      <div className={prefixCls}>
         <Menu
-          selectedKeys={props.selectedKeys}
-          defaultOpenKeys={props.defaultOpenKeys}
+          selectedKeys={selectedKeys}
+          defaultOpenKeys={defaultOpenKeys}
           mode="inline"
-          onClick={props.onClick}
+          onClick={this.props.onClick}
         >
-          {props.menus.map(menu => {
+          {menus.map(menu => {
             return (
               <SubMenu key={menu.subMenu.key} title={menu.subMenu.title}>
                 {menu.menuItem.map(item => {
@@ -25,7 +30,7 @@ class CardSiderMenu extends Component {
                     <MenuItem key={item.key}>
                       <Link to={item.url}>{item.title}</Link>
                     </MenuItem>
-                  )
+                  );
                 })}
               </SubMenu>
             );
@@ -37,13 +42,18 @@ class CardSiderMenu extends Component {
 }
 
 CardSiderMenu.defaultProps = {
+  prefixCls: 'cs-card-sider',
   menus: [],
   selectedKeys: [],
+  onClick() {}
 };
 
 CardSiderMenu.propTypes = {
+  prefixCls: PropTypes.string,
   menus: PropTypes.array,
   selectedKeys: PropTypes.array,
+  defaultOpenKeys: PropTypes.array,
+  onClick: PropTypes.func
 };
 
 export default CardSiderMenu;

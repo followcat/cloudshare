@@ -11,9 +11,13 @@ export const getMenu = (childRoutes) => {
 };
 
 export const getCurrentActive = (props, nextProps=null) => {
+  let path;
+
   if (nextProps) {
-    return nextProps.location.pathname.split('/')[1] || props.route.indexRoute.name;
+    path = nextProps.location.pathname.split('/');
   } else {
-    return props.location.pathname.split('/')[1] || props.route.indexRoute.name;
+    path = props.location.pathname.split('/');
   }
+
+  return path[path.length - 1] || props.route.indexRoute.name;
 };

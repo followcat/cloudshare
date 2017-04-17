@@ -41,18 +41,18 @@ def predate(xp, to):
         output['date_to'] = u'至今'
     return output
 
-def acceptable_education(ed, to_date=u'至今', low_level=u'大专'):
+def acceptable_education(ed, to_date=u'至今', low_level=u'中专'):
     u"""
         >>> ed = {
         ...     'date_from':  '2014.01',
         ...     'date_to':    '2014.04',
         ...     'school':     'XXX',
-        ...     'education':  u'中专',
+        ...     'education':  u'初中',
         ...     }
         >>> assert not acceptable_education(ed)
-        >>> assert acceptable_education(ed, low_level=u'中专')
+        >>> assert acceptable_education(ed, low_level=u'初中')
 
-        >>> ed['education'] = u'大专'
+        >>> ed['education'] = u'中专'
         >>> assert acceptable_education(ed)
         >>> assert not acceptable_education(ed, to_date='2013.01')
     """
@@ -100,7 +100,7 @@ def history(cv_yaml, to_date=u'至今'):
         >>> SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare')
         >>> yaml = SVC_CV_REPO.getyaml('0mlcw5kf.yaml')
         >>> assert yaml['education_history'][-1]['education'] == u'中专'
-        >>> assert not is_education(history(yaml)[0])
+        >>> assert is_education(history(yaml)[0])
 
         >>> cv = lambda xp: {'education_history': [], 'experience': {'company': [xp.copy()]}}
         >>> ed = {
@@ -250,26 +250,19 @@ def unique_id(cv_yaml, to_date=u'至今'):
         >>> cv_yaml.update({'education_history': [ed]})
         >>> assert id == unique_id(cv_yaml, '2016.01')
     """
-    try:
-        unique_id_hash = set([tuple(v) for v in cv_yaml['unique_id_hash']])
-    except KeyError:
-        unique_id_hash = set()
-    except TypeError:
-        raise Exception(cv_yaml)
+    unique_id_hash = set()
     for date, history in hash_history(cv_yaml, to_date):
         unique_id_hash.add((date, history))
     if len(unique_id_hash):
         # Sort history hash value by hashdate
         cv_yaml['unique_id_hash'] = sorted(unique_id_hash, key=lambda x: x[0])
-
-    if 'unique_id' not in cv_yaml:
-        try:
-            cv_yaml['unique_id'] = cv_yaml['unique_id_hash'][-1][1]
-            cv_yaml['unique_id_hashdate'] = cv_yaml['unique_id_hash'][-1][0]
-        except KeyError:
-            pass
-        except IndexError:
-            pass
+    try:
+        cv_yaml['unique_id'] = cv_yaml['unique_id_hash'][-1][1]
+        cv_yaml['unique_id_hashdate'] = cv_yaml['unique_id_hash'][-1][0]
+    except KeyError:
+        pass
+    except IndexError:
+        pass
     return cv_yaml
 
 def company_id(name):

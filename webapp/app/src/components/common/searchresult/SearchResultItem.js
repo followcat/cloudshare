@@ -6,6 +6,8 @@ import { Row, Col, Card, Checkbox, Button } from 'antd';
 import WorkExperience from './WorkExperience';
 import EducationExperience from './EducationExperience';
 
+import { generateWorkExperience } from '../../../utils/summary-generator';
+
 export default class SearchResultItem extends Component {
 
   constructor(props) {
@@ -80,7 +82,7 @@ export default class SearchResultItem extends Component {
           <Row>
             <Col span={18}>
               <EducationExperience education={education}/>
-              <WorkExperience experience={experience}/>
+              <WorkExperience experience={generateWorkExperience(experience)}/>
             </Col>
 
             <Col span={6}>

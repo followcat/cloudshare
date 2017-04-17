@@ -9,6 +9,7 @@ import utils.chsname
 import utils.timeout.process
 import utils.timeout.exception
 import core.basedata
+import core.exception
 import core.docprocessor
 import extractor.information_explorer
 
@@ -35,14 +36,11 @@ class UploadCVAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         updates = args['updates']
-        project = args['project']
+        project_name = args['project']
         names = []
         documents = []
-        project_name = self.svc_mult_cv.getproject(project).name
+        project = self.svc_mult_cv.getproject(project_name)
         for item in updates:
-            id = ''
-            status = 'fail'
-            message = 'Existed CV or The contact information is empty.'
             cvobj = upload[user.id].pop(item['filename'])
             if cvobj is not None:
                 id = cvobj.metadata['id']
@@ -52,19 +50,31 @@ class UploadCVAPI(Resource):
                 if 'unique_id' in cvobj.metadata:
                     peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
                     peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-                    peo_result = self.svc_peo.add(peopobj, user.id)
-                cv_result = self.svc_mult_cv.add(cvobj, user.id,
-                                                 project_name, unique=True)
-                if cv_result is True:
-                    names.append(cvobj.name.md)
-                    documents.append(cvobj.data)
-                    status = 'success'
-                    message = 'Upload success.'
-            results.append({ 'id': id,
-                             'status': status,
-                             'message': message,
-                             'filename': item['filename'] })
-        self.svc_min.sim[project_name][project_name].add_documents(names, documents)
+                    try:
+                        cv_result = self.svc_mult_cv.add(cvobj, user.id,
+                                                         project_name, unique=True)
+                        peo_result = self.svc_peo.add(peopobj, user.id)
+                        if cv_result is True:
+                            project.peo_add(peopobj, user.id)
+                            names.append(cvobj.name.md)
+                            documents.append(cvobj.data)
+                            status = 'success'
+                            message = 'Upload success.'
+                        else:
+                            status = 'failed'
+                            message = 'Existed CV.'
+                    except core.exception.NotExistsContactException:
+                        status = 'failed'
+                        message = 'The contact information is empty.'
+                else:
+                    status = 'failed'
+                    message = 'Unable to extract personal information, please modify and try again'
+                results.append({ 'id': id,
+                                 'status': status,
+                                 'message': message,
+                                 'filename': item['filename'] })
+        if project_name in self.svc_min.sim:
+            self.svc_min.sim[project_name][project_name].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):
@@ -89,8 +99,8 @@ class UploadCVAPI(Resource):
                                             'resultid': '',
                                             'name': '', 'filename': filename } }
         filepro.renameconvert(yamlinfo['id'])
-        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
-                                           metadata=yamlinfo)
+        dataobj = core.basedata.DataObject(metadata=yamlinfo,
+                                           data=filepro.markdown_stream,)
         if not dataobj.metadata['name']:
             dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
         name = dataobj.metadata['name']
@@ -129,7 +139,7 @@ class UploadEnglishCVAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         project = args['project']
-        yaml_data = self.svc_mult_cv.getproject(project).cv_getyaml(id)
+        yaml_data = self.svc_mult_cv.repodb.getyaml(id)
         dataobj = uploadeng[user.id]
         result = self.svc_mult_cv.add_md(dataobj, user.id)
         yaml_data['enversion'] = dataobj.ID.md
@@ -149,8 +159,8 @@ class UploadEnglishCVAPI(Resource):
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
                                               filename=filepro.base.base, catch_info=False)
-        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
-                                           metadata=yamlinfo)
+        dataobj = core.basedata.DataObject(metadata=yamlinfo,
+                                           data=filepro.markdown_stream)
         uploadeng[user.id] = dataobj
         return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/uploadpreview' } }
 

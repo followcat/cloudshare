@@ -6,7 +6,6 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.builtin
-import core.outputstorage
 
 
 class CurrivulumvitaeAPI(Resource):
@@ -15,7 +14,6 @@ class CurrivulumvitaeAPI(Resource):
 
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
-        self.svc_peo = flask.current_app.config['SVC_PEO_STO']
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
@@ -48,7 +46,6 @@ class UpdateCurrivulumvitaeInformation(Resource):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('date', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('update_info', type = dict, location = 'json')
 
@@ -68,24 +65,6 @@ class UpdateCurrivulumvitaeInformation(Resource):
                 break
         return response
 
-    def delete(self):
-        args = self.reqparse.parse_args()
-        user = flask.ext.login.current_user
-        id = args['id']
-        date = args['date']
-        project = args['project']
-        update_info = args['update_info']
-
-        for key, value in update_info.iteritems():
-            data = self.svc_mult_cv.getproject(project).cv_deleteyaml(id, key, value,
-                                                                      user.id, date)
-            if data is not None:
-                response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
-            else:
-                response = { 'code': 400, 'message': 'Delete information error.'}
-                break
-        return response
-
 
 class SearchCVbyTextAPI(Resource):
 
@@ -94,21 +73,25 @@ class SearchCVbyTextAPI(Resource):
     def __init__(self):
         super(SearchCVbyTextAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.index = flask.current_app.config['SVC_INDEX']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
         project = args['project']
         text = args['search_text']
         cur_page = args['page']
+        filterdict = args['filterdict'] if args['filterdict'] else {}
         results = self.svc_mult_cv.search(text, project)
         yaml_results = self.svc_mult_cv.search_yaml(text, project)
         results.update(yaml_results)
+        results = self.index.filter_ids(results, filterdict, uses=[project])
         count = 20
-        datas, pages = self.paginate(list(results), cur_page, count)
+        datas, pages = self.paginate(list(results), cur_page, count, project)
         return {
             'code': 200,
             'data': {
@@ -119,7 +102,7 @@ class SearchCVbyTextAPI(Resource):
             }
         }
 
-    def paginate(self, results, cur_page, eve_count):
+    def paginate(self, results, cur_page, eve_count, project):
         if not cur_page:
             cur_page = 1
         sum = len(results)
@@ -135,7 +118,7 @@ class SearchCVbyTextAPI(Resource):
             else:
                 continue
             try:
-                yaml_info = self.svc_mult_cv.getyaml(id)
+                yaml_info = self.svc_mult_cv.getyaml(id, projectname=project)
             except IOError:
                 ids.remove(id)
                 continue
@@ -143,21 +126,5 @@ class SearchCVbyTextAPI(Resource):
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
             }
-            yaml_info['experience'] = self.experience_process(yaml_info['experience'])
             datas.append({ 'cv_id': id, 'yaml_info': yaml_info, 'info': info})
         return datas, pages
-
-    def experience_process(self, experience):
-        ex_company = experience['company'] if len(experience) and 'company' in experience else []
-        ex_position = experience['position'] if len(experience) and 'position' in experience else []
-
-        if len(ex_position) > 0:
-            for position in ex_position:
-                for company in ex_company:
-                    if position['at_company'] == company['id']:
-                        position['company'] = company['name']
-                        if 'business' in company:
-                            position['business'] = company['business']
-            return ex_position
-        else:
-            return ex_company

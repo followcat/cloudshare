@@ -5,26 +5,39 @@ const Dragger = Upload.Dragger;
 
 class DraggerUpload extends Component {
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      name,
+      fileList,
+      action,
+      headers,
+      multiple,
+      accept,
+      disabled,
+      beforeUpload,
+      text,
+      hint
+    } = this.props;
 
     return (
-      <div className={`${props.prefixCls}`}>
+      <div className={prefixCls}>
         <Dragger
-          name={props.name}
-          fileList={props.fileList}
-          action={props.action}
-          headers={props.headers}
-          multiple={props.multiple}
-          accept={props.accept}
-          onChange={props.onChange}
-          onRemove={props.onRemove}
-          disabled={props.disabled}
+          name={name}
+          fileList={fileList}
+          action={action}
+          headers={headers}
+          multiple={multiple}
+          accept={accept}
+          onChange={this.props.onChange}
+          onRemove={this.props.onRemove}
+          disabled={disabled}
+          beforeUpload={beforeUpload}
         >
           <p className="ant-upload-drag-icon">
             <Icon type="inbox" />
           </p>
-          <p className="ant-upload-text">{props.text}</p>
-          <p className="ant-upload-hint">{props.hint}</p>
+          <p className="ant-upload-text">{text}</p>
+          <p className="ant-upload-hint">{hint}</p>
         </Dragger>
       </div>
     );
@@ -47,6 +60,7 @@ DraggerUpload.propTypes = {
   headers: PropTypes.object,
   multiple: PropTypes.bool,
   accept: PropTypes.string,
+  beforeUpload: PropTypes.func,
   onChange: PropTypes.func,
   onRemove: PropTypes.func,
   disabled: PropTypes.bool,

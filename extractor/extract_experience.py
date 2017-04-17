@@ -15,12 +15,13 @@ AXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?((((工'+ASP+u'?作'+ASP+u'?)|(�
 TXP = re.compile(ur'-{9}[\-'+SP+u']*(?P<expe>'+PERIOD+ur'.*?)(?=-{9}[\-'+SP+u']*)', re.DOTALL)
 
 PXP = re.compile(ur'^'+ASP+u'*'+ UNIBRALEFT +u'?项目经历'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?(((教'+ASP+u'?育))'+ASP+u'?((经'+ASP+u'?[历验])|(背景)|(培训)))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+EXP = re.compile(ur'^'+PREFIX+u'*'+ASP+u'*'+ UNIBRALEFT +u'?Experience'+ UNIBRARIGHT +u'?(?P<expe>.*?)^'+PREFIX+u'*'+ASP+u'*(?='+ UNIBRALEFT +u'?(?:Languages|Skills|Education)'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
 
 
 # Allow multiline once in company name when duration is present
 # As company has at least one char, need to handle break just as company tail
 # Catching all employees is too expensive on parenthesis repetition, some will be post processed
-ECO = re.compile(u'^(?P<position>(\S[\S ]+\n)*)\n+(?P<company>(\S[\S ]+\n)*)\n+' + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
+ECO = re.compile(u'^'+PREFIX+u'*'+ASP+u'*(?P<position>(\S[\S ]+\n)*)\n+'+PREFIX+u'*'+ASP+u'*(?P<company>(\S[\S ]+\n)*)\n+' + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
 CO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*\*?))(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)'+BEMPLOYEES+'?\*?'+ASP+u'*\*?'+BDURATION+'\*?'+ASP+u'*$', re.DOTALL+re.M)
 CCO = re.compile(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*\*?))(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)'+BEMPLOYEES+'?\*?'+ASP+u'*\*?'+BDURATION+'\*?'+ASP+u'*$', re.DOTALL+re.M)
 TCO = re.compile(u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+PREFIX+u'*'+CONTEXT+u'?'+POASP+u'*'+PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*\*?))(?P<company>'+COMPANY+u')'+BEMPLOYEES+'?\*?'+ASP+u'*\*?'+BDURATION+'?\*?$', re.DOTALL+re.M)
@@ -128,7 +129,8 @@ DRPATTERN = u'(?<!(?:职责|工作)描述：\n{2})^'+PERIOD+ur'[:：]?(?!\n{2}�
 DRTACO = re.compile(DRPATTERN.replace('__COMPANY__', u'('+COMPANY+u'\n)?'+COMPANY.replace(u'、', '')+u'?'+ASP+u'*').replace('__SEP__', '\|').replace('__ITEM__', u'([^\|（\(\[【]+'+COMPANYTAIL+u')*([^\|（\(\[【]*)'), re.DOTALL+re.M)
 
 WYJCO_DPT = u'(\S+?[部处室册科]|QA|R&D|XP|\S*[\w\s]+)'
-WYJCO = re.compile(u'^'+PREFIX+u'*'+POASP+u'*'+PERIOD+POASP+u'{3,}(?P<position>'+POSITION+u')'+POASP+u'*(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+'+POASP+u'*\*?(?P<company>[^\|\n]+?)'+POASP+u'*'+BDURATION+'\*?(?=(?!\n+(?:.+?'+POASP+u'*(?=\|))?'+position_details(re.compile('')).replace('{3,17}', '{2,17}')+u'))$', re.M)
+# Company using (?P<company>[^\|\n]+?) is too slow to fail on long empty lines
+WYJCO = re.compile(u'^'+PREFIX+u'*'+POASP+u'*'+PERIOD+POASP+u'{3,}(?P<position>'+POSITION+u')'+POASP+u'*(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+'+POASP+u'*\*?(?P<company>[^\|'+SP+u']+(?: [^\|'+SP+u']+)*)'+POASP+u'*'+BDURATION+'\*?(?=(?!\n+(?:.+?'+POASP+u'*(?=\|))?'+position_details(re.compile('')).replace('{3,17}', '{2,17}')+u'))$', re.M)
 BTCO = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'+(?P<company>[^'+SP+u']+)'+ASP+u'+'+u'(?P<position>'+POSITION+u'?)'+ASP+u'+(?P<dpt>'+WYJCO_DPT+u')$', re.M)
 
 # Combine presence of duration and bracket around period for safer searching
@@ -158,7 +160,9 @@ TAPO = re.compile(u'^([所担]任)?职'+ASP+u'*[位务](类别)?[:：]?'+ASP+u'*
 BPO = re.compile(u'^(?P<aposition>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'*(?P<second>[^元/月'+SP+u']+)'+ASP+u'*)?($|(\|'+ASP+u'*('+SALARY+u')$))', re.M)
 
 LIEPPO = re.compile(u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+POASP+u'*'+APERIOD+ASP+ur'*(?P<position>'+POSITION+u'?)'+SALARY+u'?'+POASP+u'*$', re.M)
-NLIEPO = re.compile(u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+POASP+u'*(?:工作岗位：'+ASP+u'*)?(?P<position>'+POSITION+u'?)'+POASP+u'*('+SALARY+POASP+u'*)?'+APERIOD, re.M)
+NLIEPOBASE = u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+POASP+u'*(?:工作岗位：'+ASP+u'*)?(?P<position>'+POSITION+u'?)'+POASP+u'*('+SALARY+POASP+u'*)?'
+NLIEPO = re.compile(NLIEPOBASE+APERIOD, re.M)
+NLIEPONOPER = re.compile(NLIEPOBASE+u'(?:'+APERIOD+u'|'+POASP+u'*$)', re.M)
 
 NOBRPOS = POSITION.replace(u'：', u'（）：'+ENDLINESEP)
 YIPOSITION = NOBRPOS+u'(?P<lbr>[\(（])?(?(lbr)'+NOBRPOS+u'[\)）]('+NOBRPOS+u')?)'
@@ -368,7 +372,7 @@ def find_xp(RE, text):
 
 def work_xp_new_liepin(text):
     u"""
-    Test for NLIEPO
+    Test for NLIEPO (period mandatory)
         >>> assert '1000' in employees(company_1(work_xp_new_liepin(u'2009/07-至今   强生上海医疗器材有限公司\\n'
         ...     u'    公司性质： 外商独资·外企办事处 | 公司规模： 1000-2000人 | 公司行业： 医疗设备/器械\\n   产品经理   2014/09 - 至今  \\n'
         ...     u'    所在地区：北京    所在部门：杨森诊断中国事业部   汇报对象：事业部经理\\n下属人数： 0   薪酬情况： 22000')))
@@ -381,6 +385,11 @@ def work_xp_new_liepin(text):
         ...     u'  公司行业： 制药/生物工程\\n   运营中心总监   2014.01-至今\\n   薪酬状况：  25000 元 / 月\\n 工作地点： 北京\\n 下属人数： 30')))
         >>> assert u'软件开发' in name(position_1(work_xp_new_liepin(u'2002.09-2005.04         东洋网蓝软件服务有限公司\\n'
         ...     u'工作岗位：软件开发工程师    2002.09-2005.04\\n下属人数：   0\\n工作职责：         负责MRP软件的开发和维护')))
+
+    Test for NLIEPONOPER (no period)
+        >>> assert u'工程师' in name(position_1(work_xp_new_liepin(u'2012/10-至今    泰康资产管理有限责任公司\\n'
+        ...     u'    公司性质： 私营·民营企业 | 公司规模： 500-999人 | 公司行业： 基金/证券/期货/投资\\n    运维工程师\\n'
+        ...     u'    所在地区：北京          所在部门：信息科技部          汇报对象：部门经理\\n下属人数： 10   薪酬情况： 保密')))
 
     Test for PIPEPO
         >>> assert u'专员' in position_1(work_xp_new_liepin(u'2013.02-至今       迈瑞生物医疗电子股份有限公司\\n\\n'
@@ -398,10 +407,10 @@ def work_xp_new_liepin(text):
             out = {'company': [], 'position': []}
             pattern = company_business_noborder(RE)
             if re.compile(SALARY).search(text):
-                popattern = position_details(NLIEPO)
+                popattern = position_details(NLIEPONOPER)
             else:
                 # Speed up non-matching
-                popattern = position_details(NLIEPO).replace(u'('+SALARY+POASP+u'*)?', '')
+                popattern = position_details(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
             MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
             res = MA.search(text)
             if res:
@@ -425,10 +434,10 @@ def work_xp_new_liepin(text):
                 out = {'company': [], 'position': []}
                 pattern = company_business_noborder(RE)
                 if re.compile(SALARY).search(text):
-                    popattern = position_details_spaceonly(NLIEPO)
+                    popattern = position_details_spaceonly(NLIEPONOPER)
                 else:
                     # Speed up non-matching
-                    popattern = position_details_spaceonly(NLIEPO).replace(u'('+SALARY+POASP+u'*)?', '')
+                    popattern = position_details_spaceonly(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
                 MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
                 res = MA.search(text)
                 if res:
@@ -1427,6 +1436,16 @@ def fix(d, as_dict=False):
                 reject = 2
             else:
                 processed = out
+        elif EXP.search(d):
+            pos = 0
+            out = {'company': [], 'position': []}
+            res = EXP.search(d)
+            if ECO.search(res.group('expe')):
+                for r in ECO.finditer(res.group('expe')):
+                    company_output(out, r.groupdict())
+                    pos +=1
+                    position_output(out, r.groupdict())
+            processed = out
         else:
             reject = 4
     return fix_output_legacy(processed, reject)

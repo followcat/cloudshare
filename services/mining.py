@@ -221,6 +221,21 @@ class Mining(object):
                     index.save()
                 self.sim[modelname][svc_name] = index
 
+    def getsims(self, basemodel, uses=None):
+        sims = []
+        if uses is None:
+            try:
+                uses = self.sim[basemodel].keys()
+            except KeyError:
+                return sims
+        for each in uses:
+            try:
+                sim = self.sim[basemodel][each]
+            except KeyError:
+                continue
+            sims.append(sim)
+        return sims
+
     def make_lsi(self):
         self.lsi_model = dict()
         for project in self.projects.values():
@@ -242,32 +257,28 @@ class Mining(object):
             if lsimodel.getconfig('autoupdate') is True:
                 updated = self.lsi_model[modelname].update(
                     [self.services['default'][modelname]])
-                if updated:
-                    self.update_sims()
+                self.update_sims(newmodel=updated)
 
-    def update_sims(self):
+    def update_sims(self, newmodel=False):
         for modelname in self.sim:
             for simname in self.sim[modelname]:
                 svc = self.services['all'][simname]
-                self.sim[modelname][simname].update([svc])
-                self.sim[modelname][simname].save()
+                updated = self.sim[modelname][simname].update([svc], newmodel)
+                if newmodel or updated:
+                    self.sim[modelname][simname].save()
 
     def probability(self, basemodel, doc, uses=None, top=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
         result = []
-        for name in uses:
-            sim = self.sim[basemodel][name]
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
             result.extend(sim.probability(doc, top=top))
         results_set = set(result)
         return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
 
     def probability_by_id(self, basemodel, doc, id, uses=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
         result = tuple()
-        for dbname in uses:
-            sim = self.sim[basemodel][dbname]
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
             probability = sim.probability_by_id(doc, id)
             if probability is not None:
                 result = probability
@@ -275,11 +286,9 @@ class Mining(object):
         return result
 
     def lenght(self, basemodel, uses=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
         result = 0
-        for name in uses:
-            sim = self.sim[basemodel][name]
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
             result += len(sim.names)
         return result
 

@@ -3,6 +3,7 @@ import time
 import os.path
 import datetime
 
+import core.exception
 import core.docprocessor
 import core.outputstorage
 import services.base.storage
@@ -16,7 +17,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
         mdname = core.outputstorage.ConvertName(id).md
         return os.path.exists(os.path.join(self.path, mdname))
 
-    def add_md(self, cvobj, committer=None):
+    def add_md(self, cvobj, committer=None, do_commit=True):
         """
             >>> import glob
             >>> import shutil
@@ -48,8 +49,16 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> shutil.rmtree(test_path)
         """
         name = core.outputstorage.ConvertName(cvobj.metadata['id'])
-        self.interface.add(name.md, cvobj.data, committer=committer)
+        self.interface.add(name.md, cvobj.data, committer=committer, do_commit=do_commit)
         return True
+
+    def getuniqueid(self, id):
+        info = self.getyaml(id)
+        try:
+            uniqueid = info['unique_id']
+        except KeyError:
+            uniqueid = info['id']
+        return uniqueid
 
     def gethtml(self, name):
         htmlname = core.outputstorage.ConvertName(name).html
@@ -76,16 +85,16 @@ class CurriculumVitae(services.base.storage.BaseStorage):
                 yield id
 
     def add(self, bsobj, committer=None, unique=True,
-            yamlfile=True, mdfile=True, contacts=True):
+            yamlfile=True, mdfile=True, contacts=True, do_commit=True):
         if contacts and not bsobj.metadata['email'] and not bsobj.metadata['phone']:
-            return False
+            raise core.exception.NotExistsContactException
         return super(CurriculumVitae, self).add(bsobj, committer, unique,
-                                                yamlfile, mdfile)
+                                                yamlfile, mdfile, do_commit=do_commit)
 
-    def addcv(self, bsobj, rawdata=None):
+    def addcv(self, bsobj, rawdata=None, do_commit=True):
         result = self.add(bsobj, contacts=False)
         if result is True:
             cn_id = core.outputstorage.ConvertName(bsobj.name)
             if rawdata is not None:
-                self.interface.add(cn_id.html, rawdata)
+                self.interface.add(cn_id.html, rawdata, do_commit=do_commit)
         return result

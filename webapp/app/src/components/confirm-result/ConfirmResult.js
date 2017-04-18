@@ -4,13 +4,17 @@ import { Table } from 'antd';
 
 class ConfirmResult extends Component {
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      columns,
+      dataSource
+    } = this.props;
 
     return (
-      <div className={`${props.prefixCls}`}>
+      <div className={prefixCls}>
         <Table
-          columns={props.columns}
-          dataSource={props.dataSource}
+          columns={columns}
+          dataSource={dataSource}
           pagination={false}
           bordered={true}
         />

@@ -7,7 +7,7 @@ class ButtonWithModal extends Component {
     const props = this.props;
 
     return (
-      <div className="cs-button-with-modal">
+      <div className={props.prefixCls}>
         <Button
           style={props.buttonStyle}
           type={props.buttonType}
@@ -19,15 +19,23 @@ class ButtonWithModal extends Component {
         </Button>
         <Modal
           visible={props.visible}
-          confirmLoading={props.confirmLoading}
           title={props.modalTitle}
           width={props.modalWidth}
-          okText={props.modalOkText}
-          cancelText={props.modalCancelText}
           style={props.modalStyle}
           wrapClassName={props.modalWrapClassName}
-          onOk={props.onModalOk}
           onCancel={props.onModalCancel}
+          footer={[
+            <Button size="large" onClick={props.onModalCancel}>{props.modalCancelText}</Button>,
+            <Button
+              type="primary"
+              size="large"
+              loading={props.confirmLoading}
+              onClick={props.onModalOk}
+              disabled={props.disabled}
+            >
+              {props.modalOkText}
+            </Button>
+          ]}
         >
           {props.children}
         </Modal>
@@ -37,19 +45,22 @@ class ButtonWithModal extends Component {
 }
 
 ButtonWithModal.defaultProps = {
+  prefixCls: 'cs-button-with-modal',
   buttonType: 'ghost',
   buttonLoading: false,
   buttonText: '',
   onButtonClick() {},
   visible: false,
   confirmLoading: false,
+  disabled: false,
   modalOkText: 'Ok',
   modalCancelText: 'Cancel',
   onModalOk() {},
-  onModalCancel() {},
-};  
+  onModalCancel() {}
+};
 
 ButtonWithModal.propTypes = {
+  prefixCls: PropTypes.string,
   buttonStyle: PropTypes.object,
   buttonType: PropTypes.string,
   buttonSize: PropTypes.string,
@@ -58,6 +69,7 @@ ButtonWithModal.propTypes = {
   onButtonClick: PropTypes.func,
   visible: PropTypes.bool,
   confirmLoading: PropTypes.bool,
+  disabled: PropTypes.bool,
   modalTitle: PropTypes.string,
   modalWidth: PropTypes.number,
   modalOkText: PropTypes.string,

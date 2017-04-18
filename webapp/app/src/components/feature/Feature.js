@@ -14,31 +14,49 @@ class Feature extends Component {
   }
 
   render() {
-    const props = this.props;
-    let classes = props.prefixCls;
-    if (props.className) {
-      classes = `${props.prefixCls} ${props.className}`;
+    const {
+      prefixCls,
+      className,
+      style,
+      text,
+      title,
+      visible,
+      width,
+      cancelText,
+      modalStyle,
+      wrapClassName,
+      footer
+    } = this.props;
+
+    let classes = prefixCls,
+        wrapCls = 'cs-feature-wrap';
+
+    if (className) {
+      classes = `${prefixCls} ${className}`;
+    }
+
+    if (wrapClassName) {
+      wrapCls += ` ${wrapClassName}`;
     }
 
     return (
       <div
         className={classes}
-        style={props.style}
-        onClick={props.onClick}
+        style={style}
+        onClick={this.props.onClick}
       >
-        <div className={`${props.prefixCls}-text`}>
-          {props.text}
+        <div className={`${prefixCls}-text`}>
+          {text}
         </div>
         <Modal
-          title={props.title}
-          visible={props.visible}
-          onOk={props.onOk}
-          onCancel={props.onCancel}
-          width={props.width}
-          okText={props.okText}
-          cancelText={props.cancelText}
-          style={props.modalStyle}
-          wrapClassName={props.wrapClassName}
+          title={title}
+          visible={visible}
+          style={modalStyle}
+          width={width}
+          wrapClassName={wrapCls}
+          cancelText={cancelText}
+          footer={footer}
+          onCancel={this.props.onCancel}
         >
           <div dangerouslySetInnerHTML={{__html: this.getMarkup()}}></div>
         </Modal>
@@ -48,21 +66,21 @@ class Feature extends Component {
 }
 
 Feature.defaultProps = {
+  prefixCls: 'cs-feature',
+  wrapClassName: '',
   className: '',
-  text: 'Feature',
-  onClick() {},
+  text: '更新日志',
   dataSource: '',
-  title: 'Feature',
+  title: '更新日志',
   visible: false,
-  onOk() {},
-  onCancel() {},
   width: 520,
-  okText: 'OK',
-  cancelText: 'Cancel',
+  okText: '',
+  cancelText: '取消',
   style: {},
   modalStyle: {},
-  wrapClassName: '',
-  prefixCls: 'cs-feature',
+  onClick() {},
+  onOk() {},
+  onCancel() {}
 };
 
 Feature.propTypes = {
@@ -81,6 +99,7 @@ Feature.propTypes = {
   modalStyle: PropTypes.object,
   wrapClassName: PropTypes.string,
   prefixCls: PropTypes.string,
+  footer: PropTypes.string
 };
 
 export default Feature;

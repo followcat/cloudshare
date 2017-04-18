@@ -1,6 +1,9 @@
-@import '../default.less';
+@csTablePrefixCls: cs-table;
 @toolbarPrefixCls: cs-table-toolbar;
 
-.@{toolbarPrefixCls} {
-  padding: 8px 0;
+.@{csTablePrefixCls} {
+
+  .@{toolbarPrefixCls} {
+    padding: 8px 0;
+  }
 }

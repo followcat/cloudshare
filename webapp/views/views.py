@@ -13,8 +13,6 @@ import core.outputstorage
 import core.docprocessor
 import extractor.information_explorer
 
-import json
-
 
 class LoginRedirect(flask.views.MethodView):
 
@@ -24,9 +22,7 @@ class LoginRedirect(flask.views.MethodView):
 class Index(flask.views.MethodView):
 
     def get(self):
-        with codecs.open('webapp/features.md', 'r', encoding='utf-8') as fp:
-            data = fp.read()
-        return flask.render_template('index.html', features=data)
+        return flask.render_template('index.html')
 
 #Render mange page of RESTful
 class Manage(flask.views.MethodView):
@@ -40,7 +36,7 @@ class Uploader(flask.views.MethodView):
 
     @flask.ext.login.login_required
     def get(self):
-        return flask.render_template('upload.html')
+        return flask.render_template('uploader.html')
 
 #Render userinfo page of RESTful
 class UserInfo(flask.views.MethodView):

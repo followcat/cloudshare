@@ -1,12 +1,12 @@
 'use strict';
-import { API } from '../config/api';
+import { API } from 'API';
 import { callbackFunction } from './callback';
-import StorageUtil from '../utils/storage';
-import Generator from '../utils/generator';
+import StorageUtil from 'utils/storage';
+import Generator from 'utils/generator';
 import 'whatwg-fetch';
 
 export const getEnglishResume = (callback) => {
-  return fetch(API.UPLOAD_ENGLISH_RESUME, {
+  return fetch(API.UPLOAD_ENGLISH_RESUME_API, {
     method: 'GET',
     credentials: 'include',
     headers: {

@@ -368,6 +368,23 @@ def update_jd_commentary(SVC_JD, comments_dict):
             f.write(dump_data)
 
 
+def add_jd_followup(SVC_PRJ):
+    import yaml
+    SVC_JD = SVC_PRJ.jobdescription
+    for jd in SVC_JD.lists():
+        if 'followup' in jd:
+            continue
+        jd_id = jd['id']
+        jd['followup'] = ''
+        if '\n' in jd['commentary']:
+            jd['followup'] = jd['commentary']
+            jd['commentary'] = ''
+        dump_data = yaml.safe_dump(jd, allow_unicode=True)
+        filename = SVC_JD.filename(jd_id)
+        with open(os.path.join(SVC_JD.path, filename), 'w') as f:
+            f.write(dump_data)
+
+
 def init_people(SVC_CV, SVC_PEO):
     import core.basedata
     for y in SVC_CV.yamls():

@@ -24,7 +24,7 @@ class JobDescription(services.base.service.Service):
         >>> data = svc_jd.get(results[0])
         >>> data['description']
         'JD-A description'
-        >>> svc_jd.modify(data['id'], 'JD-B description', 'Closed', '', 'Dever')
+        >>> svc_jd.modify(data['id'], 'JD-B description', 'Closed', '', '', 'Dever')
         True
         >>> data = svc_jd.get(results[0])
         >>> data['description']
@@ -33,18 +33,18 @@ class JobDescription(services.base.service.Service):
         >>> lists[0]['company'], lists[0]['description']
         ('CompanyA', 'JD-B description')
         >>> svc_jd.add('CompanyC', 'JD-C', 'JD-C description', 'Dever',
-        ...     commentary='this is JD-C commentary')
+        ...     commentary='this is JD-C commentary', followup='JD-C followup')
         True
         >>> results = svc_jd.search('JD-C')
         >>> data = svc_jd.get(results[0])
         >>> data['description'], data['commentary']
         ('JD-C description', 'this is JD-C commentary')
         >>> svc_jd.modify(data['id'], 'JD-C description', 'Opening',
-        ...     'this is UPDATED JD-C commentary', 'Dever')
+        ...     'this is UPDATED JD-C commentary', 'UPDATED JD-C followup', 'Dever')
         True
         >>> data = svc_jd.get(results[0])
-        >>> data['description'], data['commentary']
-        ('JD-C description', 'this is UPDATED JD-C commentary')
+        >>> data['description'], data['commentary'], data['followup']
+        ('JD-C description', 'this is UPDATED JD-C commentary', 'UPDATED JD-C followup')
         >>> shutil.rmtree(repo_name)
     """
 
@@ -58,7 +58,7 @@ class JobDescription(services.base.service.Service):
         return yaml.load(yaml_str)
 
     def add(self, company, name, description, committer, status=None,
-            commentary=''):
+            commentary='', followup=''):
         if status is None:
             status = 'Opening'
 
@@ -71,6 +71,7 @@ class JobDescription(services.base.service.Service):
             'description': description,
             'committer': committer,
             'commentary': commentary,
+            'followup': followup,
             'status': status
         }
         filename = self.filename(hex_id)
@@ -79,7 +80,7 @@ class JobDescription(services.base.service.Service):
                            "Add job description file: " + filename)
         return True
 
-    def modify(self, hex_id, description, status, commentary, committer):
+    def modify(self, hex_id, description, status, commentary, followup, committer):
         data = self.get(hex_id)
         if data['description'] != description and data['committer'] != committer:
             return False
@@ -87,6 +88,7 @@ class JobDescription(services.base.service.Service):
         data['status'] = status
         data['description'] = description
         data['commentary'] = commentary
+        data['followup'] = followup
         dump_data = yaml.safe_dump(data, allow_unicode=True)
         self.interface.modify(filename, dump_data,
                               message="Modify job description: " + filename,

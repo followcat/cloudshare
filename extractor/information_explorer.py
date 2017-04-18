@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import time
 import string
 import os.path
 import functools
@@ -37,6 +38,7 @@ cv_template = (
     ("comment",             list),
     ("tag",                 list),
     ("tracking",            list),
+    ("date",                time.time),
 )
 
 co_template = (
@@ -49,6 +51,7 @@ co_template = (
     ("address",             str),
     ("introduction",        str),
     ("email",               str),
+    ("date",                time.time),
 )
 
 peo_template = (

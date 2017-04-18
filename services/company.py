@@ -51,5 +51,9 @@ class Company(services.base.storage.BaseStorage):
             metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
             data = core.basedata.DataObject(metadata, excel)
             if not self.exists(data.name):
-                output.append('add', (data, committer))
+                output.append(('companyadd', metadata['id'], (metadata, excel, committer)))
         return output
+
+    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False, do_commit=True):
+        return super(Company, self).add(bsobj, committer, unique,
+                                        yamlfile, mdfile, do_commit=do_commit)

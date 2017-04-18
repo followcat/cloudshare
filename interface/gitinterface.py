@@ -58,6 +58,16 @@ class GitInterface(interface.base.Interface):
     def getraw(self, filename):
         raise IOError
 
+    def do_commit(self, filenames, message=None, committer=None):
+        commit_id = ''
+        if message is None:
+            message = "Batch commits."
+        if filenames:
+            committer = self.committer(committer)
+            self.repo.stage(filenames)
+            commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
+        return commit_id
+
     def add(self, filename, filedata, message=None, committer=None, do_commit=True):
         """
             >>> import shutil
@@ -145,6 +155,31 @@ class GitInterface(interface.base.Interface):
             commit_id = self.repo.do_commit(message, committer=bytes(committer))
         return commit_id
 
+    def delete(self, filename, message=None, committer=None, do_commit=True):
+        """
+            >>> import shutil
+            >>> import interface.gitinterface
+            >>> repo_name = 'interface/test_repo'
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
+            >>> commit_id = interface.add_files(['test_file'], ['test'],
+            ... 'Test commit', 'test<test@test.com>')
+            >>> commit_id = interface.delete('test_file')
+            >>> commit_id == interface.repo.head()
+            True
+            >>> shutil.rmtree(repo_name)
+        """
+        commit_id = ''
+        if not self.exists(filename):
+            raise Exception('Not exists file:', filename)
+        if message is None:
+            message = "Delete %s." % filename
+        committer = self.committer(committer)
+        os.remove(os.path.join(self.repo.path, filename))
+        if do_commit is True:
+            self.repo.stage([bytes(filename)])
+            commit_id = self.repo.do_commit(message, committer=bytes(committer))
+        return commit_id
+
     def grep(self, restrings, path='', files=None):
         if files is None:
             files = []
@@ -152,7 +187,7 @@ class GitInterface(interface.base.Interface):
         greppath = os.path.join(self.repo.path, path)
         if not os.path.exists(greppath):
             return grep_list
-        keywords = restrings.split()
+        keywords = [restrings]
         if keywords:
             command = ['git', 'grep', '-l', '--all-match']
             for each in keywords:

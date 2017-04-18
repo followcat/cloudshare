@@ -7,11 +7,11 @@ export const URL = {
   },
 
   getFastMatchingByCV: (id) => {
-    return `/fastmatching?cv_id=${id}`
+    return `/fastmatching?cv_id=${id}`;
   },
 
   getFastMatchingByDoc: () => {
-    return `/fastmatching`
+    return `/fastmatching`;
   },
 
   getListJDURL: () => {
@@ -35,7 +35,7 @@ export const URL = {
   },
 
   getUserInfoURL: () => {
-    return `/userinfo`;
+    return `/userinfo/history`;
   },
 
   getDownloadURL: (id, fileName) => {
@@ -43,7 +43,7 @@ export const URL = {
   },
 
   getProjectManagement: () => {
-    return `/pm`;
+    return `/pm/jobdescription`;
   },
 
 };

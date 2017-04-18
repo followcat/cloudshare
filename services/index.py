@@ -1,5 +1,4 @@
 import os
-import glob
 import time
 import cPickle
 import collections
@@ -188,6 +187,21 @@ class ReverseIndexing(object):
                                 index[selecte])
                 results.update(result)
         return results
+
+    def filter_ids(self, ids, filterdict, uses=None):
+        indexdict = {}
+        if 'date' in filterdict:
+            try:
+                filterdict['date'] = utils.builtin.nemudate(filterdict['date'])
+            except ValueError:
+                filterdict.pop('date')
+        for key in filterdict:
+            if filterdict[key]:
+                indexdict[key] = self.get_indexkeys([key], filterdict[key], uses)
+        filterset = self.get(filterdict, uses=uses)
+        if indexdict:
+            ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
+        return ids
 
     def _cur_places(self, yamlinfo):
         result = dict()

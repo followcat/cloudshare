@@ -74,7 +74,8 @@ class UploadCVAPI(Resource):
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
-        self.svc_min.sim[project_name][project_name].add_documents(names, documents)
+        if project_name in self.svc_min.sim:
+            self.svc_min.sim[project_name][project_name].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):
@@ -99,9 +100,12 @@ class UploadCVAPI(Resource):
                                             'resultid': '',
                                             'name': '', 'filename': filename } }
         filepro.renameconvert(yamlinfo['id'])
-        unique_peo = 'unique_id' not in yamlinfo or self.svc_mult_peo.unique(yamlinfo['unique_id'])
         dataobj = core.basedata.DataObject(metadata=yamlinfo,
-                                           data=filepro.markdown_stream)
+                                           data=filepro.markdown_stream,)
+        if not dataobj.metadata['name']:
+            dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
+        unique_peo = ('unique_id' not in yamlinfo or
+                      self.svc_mult_peo.unique(dataobj.metadata['unique_id']))
         upload[user.id][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
@@ -153,8 +157,8 @@ class UploadEnglishCVAPI(Resource):
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
                                               filename=filepro.base.base, catch_info=False)
-        dataobj = core.basedata.DataObject(data=filepro.markdown_stream,
-                                           metadata=yamlinfo)
+        dataobj = core.basedata.DataObject(metadata=yamlinfo,
+                                           data=filepro.markdown_stream)
         uploadeng[user.id] = dataobj
         return { 'code': 200, 'data': { 'status': filepro.result, 'url': '/uploadpreview' } }
 

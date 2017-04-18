@@ -1,0 +1,28 @@
+{
+  "root": true,
+  "plugins": ["react"],
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "env": {
+    "node": true,
+    "browser": true,
+    "mocha": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+    "semi": ["error", "always"],
+    "no-class-assign": "off",
+    "no-extra-boolean-cast": "warn"
+  },
+  "globals": {
+    "require": true,
+    "module": true,
+    "__dirname": true
+  }
+}

@@ -119,13 +119,21 @@ class BaseFSInterface(interface.base.Interface):
                     grep_list.append(each)
         return grep_list
 
+    def do_commit(self, filenames, message=None, committer=None):
+        return ''
+
     def add(self, filepath, filedate, message=None, committer=None, do_commit=True):
         path = os.path.join(self.path, filepath)
         with open(path, 'w') as f:
             f.write(filedate)
         return True
 
-    def add_files(self, filenames, filedatas, message=None, committer=None):
+    def delete(self, filepath, message=None, committer=None, do_commit=True):
+        path = os.path.join(self.path, filepath)
+        os.remove(path)
+        return True
+
+    def add_files(self, filenames, filedatas, message=None, committer=None, do_commit=True):
         assert len(filenames) == len(filedatas)
         for filename, filedata in zip(filenames, filedatas):
             self.add(filename, filedata)

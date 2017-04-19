@@ -417,7 +417,6 @@ class Resume extends Component {
                               <ResumeContent html={enHTML} />
                             </Tabs.TabPane>
                           </Tabs>
-                          <ResumeContent html={html} />
                         </div>
                       </div>
                     </Spin>

@@ -25,17 +25,17 @@ SVC_PRJ_AI = services.project.Project(os.path.join(PRJ_PATH, 'ArtificialIntellig
 SVC_PRJ_AI.setup(AI_needed, config={'autoupdate': False, 'autosetup': False})
 
 SVC_PRJ_BT = services.project.Project(os.path.join(PRJ_PATH, 'BioTechnology'),
-                                      SVC_CO_REPO, SVC_CV_REPO, SVC_PEO_STO,
+                                      SVC_CO_REPO, SVC_CV_REPO, SVC_MULT_PEO,
                                       'BioTechnology')
 SVC_PRJ_BT.setup({}, config={'autoupdate': False, 'autosetup': False})
 
 SVC_PRJ_IA = services.project.Project(os.path.join(PRJ_PATH, 'IndustrialAccelerator'),
-                                      SVC_CO_REPO, SVC_CV_REPO, SVC_PEO_STO,
+                                      SVC_CO_REPO, SVC_CV_REPO, SVC_MULT_PEO,
                                       'IndustrialAccelerator')
 SVC_PRJ_IA.setup({}, config={'autoupdate': False, 'autosetup': False})
 
 SVC_PRJ_NE = services.project.Project(os.path.join(PRJ_PATH, 'NewEnergy'),
-                                      SVC_CO_REPO, SVC_CV_REPO, SVC_PEO_STO,
+                                      SVC_CO_REPO, SVC_CV_REPO, SVC_MULT_PEO,
                                       'NewEnergy')
 SVC_PRJ_NE.setup({}, config={'autoupdate': False, 'autosetup': False})
 

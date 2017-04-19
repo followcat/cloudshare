@@ -32,7 +32,7 @@ class CompanyAPI(Resource):
         coname = args['name']
         if args['introduction'] is None:
             args['introduction'] = str()
-        metadata = extractor.information_explorer.catch_coinfo(name=coname, stream=args)
+        metadata = extractor.information_explorer.catch_coinfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)
         if result:

@@ -42,7 +42,7 @@ def init_from_projectjd(SVC_PRJ, SVC_CO_REPO):
 def add_repo(excels, SVC_CO_REPO):
     objs = []
     for excel in excels:
-        metadata = catch_coinfo(excel, excel['name'])
+        metadata = catch_coinfo(excel)
         bsobj = core.basedata.DataObject(metadata, excel)
         if 'date' not in bsobj.metadata or not bsobj.metadata['date']:
             bsobj.metadata['date'] = time.time()
@@ -56,7 +56,7 @@ def add_repo(excels, SVC_CO_REPO):
 def convert_repo(SVC_CO_REPO):
     for each in SVC_CO_REPO.ids:
         info = SVC_CO_REPO.getyaml(each)
-        metadata = catch_coinfo(info, info['name'])
+        metadata = catch_coinfo(info)
         do = core.basedata.DataObject(metadata, metadata)
         with open(os.path.join(SVC_CO_REPO.interface.path, do.name+'.yaml'), 'w') as fp:
             fp.write(yaml.safe_dump(do.metadata, allow_unicode=True))
@@ -65,7 +65,7 @@ def convert_repo(SVC_CO_REPO):
 def init_simid(SVC_CO_SIM, SVC_CO_REPO, ids):
     for each in ids:
         info = SVC_CO_REPO.getyaml(each)
-        metadata = catch_coinfo(info, info['name'])
+        metadata = catch_coinfo(info)
         do = core.basedata.DataObject(metadata, metadata)
         SVC_CO_SIM.add(do, do_commit=False)
 

@@ -253,7 +253,7 @@ def company_knowledge(SVC_CV, SVC_CO):
         info = SVC_CV.getyaml(y)
         try:
             for c in [c for c in info['experience']['company'] if c['name']]:
-                company = extractor.information_explorer.catch_coinfo(name=c['name'], stream=c)
+                company = extractor.information_explorer.catch_coinfo(stream=c)
                 coobj = core.basedata.DataObject(company, data='')
                 try:
                     result = SVC_CO.add(coobj)
@@ -329,7 +329,7 @@ def convert_oldcompany(SVC_CO_REPO, filepath, filename):
     yamls = utils.builtin.load_yaml(filepath, filename)
     for y in yamls:
         args = y
-        metadata = extractor.information_explorer.catch_coinfo(name=args['name'], stream=args)
+        metadata = extractor.information_explorer.catch_coinfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         SVC_CO_REPO.add(coobj)
 

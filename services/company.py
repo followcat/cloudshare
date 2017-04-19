@@ -19,7 +19,8 @@ class Company(services.base.storage.BaseStorage):
         >>> DIR = 'services/test_repo'
         >>> svc_co = services.company.Company(DIR)
         >>> name, committer, introduction = 'CompanyA', 'tester', 'This is Co.A'
-        >>> metadata = extractor.information_explorer.catch_coinfo({'introduction': introduction,}, name)
+        >>> metadata = extractor.information_explorer.catch_coinfo({'introduction': introduction,
+        ...                                                         'name': name})
         >>> coobj = core.basedata.DataObject(metadata, data=introduction)
         >>> svc_co.add(coobj, 'Dever')
         True
@@ -48,7 +49,7 @@ class Company(services.base.storage.BaseStorage):
         output = list()
         excels = utils.companyexcel.convert(stream)
         for excel in excels:
-            metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
+            metadata = extractor.information_explorer.catch_coinfo(excel)
             data = core.basedata.DataObject(metadata, excel)
             if not self.exists(data.name):
                 output.append(('companyadd', metadata['id'], (metadata, excel, committer)))

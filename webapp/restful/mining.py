@@ -7,7 +7,6 @@ import utils.builtin
 import core.mining.info
 import core.mining.valuable
 
-import json
 
 class BaseAPI(Resource):
 

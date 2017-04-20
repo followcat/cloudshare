@@ -19,14 +19,6 @@ class MultiCV(object):
             project = self.default
         return project
 
-    def add(self, cvobj, committer=None, projectname=None, unique=True):
-        if projectname is None:
-            projectname = self.default.name
-        result = self.repodb.add(cvobj, committer, unique)
-        project = self.getproject(projectname)
-        result = project.cv_add(cvobj, committer)
-        return result
-
     def add_md(self, cvobj, committer=None):
         return self.repodb.add_md(cvobj, committer)
 

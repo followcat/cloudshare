@@ -183,9 +183,7 @@ class UploadCVPreviewAPI(Resource):
         try:
             people_info = self.svc_mult_peo.getyaml(yaml_info['unique_id'])
             cvs = people_info['cv']
-        except IOError:
-            cvs = []
-        except KeyError:
+        except (TypeError, IOError, KeyError) as e:
             cvs = []
         return { 'code': 200, 'data': { 'filename': filename,
                                         'markdown': md,

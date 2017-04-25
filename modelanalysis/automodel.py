@@ -64,10 +64,8 @@ class Automodels(object):
         d = collections.defaultdict(dict) 
         for id in self.sources:
             d[id] = collections.defaultdict(dict)
-            for unit in re.split(u'[\n,.。，;]', self.sources[id]):
-                d[id][unit] = {'used': set(),
-                               'todo': set(pos_extract(jieba_cut(unit, pos=True),
-                                           self.FLAGS))}
+            for unit in re.split(u'[\n。]', self.sources[id]):
+                d[id][unit] = set(pos_extract(jieba_cut(unit, pos=True), self.FLAGS))
         return d
 
     def model_generate(self, autosave=False, path=None, regression=False):
@@ -75,8 +73,8 @@ class Automodels(object):
             path = self.path
         sources = self.source_reloaded()
         for id in sources:
-            for requirement in sources[id]:
-                model = self.train_model(id, requirement, regression)
+            for unit in sources[id]:
+                model = self.train_model(id, unit, regression)
                 if model is None:
                     continue
                 yield model
@@ -87,27 +85,22 @@ class Automodels(object):
             candidates[model] = modelanalysis.judge.probably(requirement, model)
         results = sorted(candidates.items(), key=lambda d:d[1], reverse=True)
         if results and results[0][1] > effectline:
-            model = results[0][0]
-        else:
-            if self.maxmodels is None or len(self.models) < self.maxmodels:
-                model = self.new_model(id, requirement)
-            else:
-                try:
-                    model = results[0][0]
-                except IndexError:
-                    model = None
-        return model
+            return results[0][0]
+        return None
 
     def new_model(self, id, unit):
         model = core.mining.lsimodel.LSImodel(self.path)
         model.slicer = services.mining.silencer
+        model.setup([id], [model.slicer(unit)])
         return model
 
-    def upgrade_model(self, model, id, requirement):
+    def upgrade_model(self, model, id, unit):
         result = True
         try:
-            model.setup(model.names+[id], model.texts+[model.slicer(requirement)])
+            model.setup(model.names+[id], model.texts+[model.slicer(unit)])
         except ValueError:
+            result = False
+        except AttributeError:
             result = False
         return result
 
@@ -135,7 +128,16 @@ class Automodels(object):
 
     def train_model(self, id, requirement, regression=False):
         model = self.pick_model(id, requirement)
-        result = self.upgrade_model(model, id, requirement)
+        if model:
+            result = self.upgrade_model(model, id, requirement)
+        else:
+            result = False
+            if self.maxmodels is None or len(self.models) < self.maxmodels:
+                try:
+                    model = self.new_model(id, requirement)
+                    result = True
+                except ValueError:
+                    pass
         if result:
             if regression:
                 resources = self.source_reloaded()

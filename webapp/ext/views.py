@@ -24,8 +24,6 @@ def init_login(app):
 
 def configure(app):
 
-    init_login(app)
-
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def catch_all(path):

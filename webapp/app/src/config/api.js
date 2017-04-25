@@ -73,6 +73,8 @@ export const API = {
 
   LSI_BY_DOC_API: `${HOST}/api/mining/lsibydoc`,
 
+  ANALYSIS_BY_DOC_API: `${HOST}/api/mining/analysisdoc`,
+
   DATABASE_INFO_API: `${HOST}/api/dbnumbers`,
 
   MINING_ABILITY_API: `${HOST}/api/mining/ability`,
@@ -83,3 +85,4 @@ export const API = {
 
   MINING_VALUABLE_API: `${HOST}/api/mining/valuable`
 };
+

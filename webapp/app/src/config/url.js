@@ -14,6 +14,10 @@ export const URL = {
     return `/fastmatching`;
   },
 
+  getDocMining: () => {
+    return `/docmining`;
+  },
+
   getListJDURL: () => {
     return `/pm`;
   },

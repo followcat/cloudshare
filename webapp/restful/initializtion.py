@@ -3,6 +3,7 @@ import flask.ext.restful
 
 from webapp.restful.people import *
 from webapp.restful.mining import *
+from webapp.restful.docmining import *
 from webapp.restful.reload import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
@@ -67,6 +68,8 @@ def initialize(app):
 
     api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
     api.add_resource(LSIbyCVidAPI, '/api/mining/lsibycvid', endpoint = 'lsibycvid')
+
+    api.add_resource(DocMiningAPI, '/api/mining/analysisdoc', endpoint = 'docmining')
 
     api.add_resource(SimilarAPI, '/api/mining/similar', endpoint = 'similar')
 

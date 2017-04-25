@@ -34,6 +34,7 @@ const rootRoute = {
     require('../routes/uploader'),
     require('../routes/pm'),
     require('../routes/fast-matching'),
+    require('../routes/doc-mining'),
     require('../routes/user-info'),
     require('../routes/resume'),
     require('../routes/upload-preview'),

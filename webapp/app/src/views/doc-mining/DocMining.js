@@ -28,7 +28,6 @@ class DocMining extends Component {
     };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
-    this.getClassifyDataSource = this.getClassifyDataSource.bind(this);
     this.getResultDataSource = this.getResultDataSource.bind(this);
   }
 
@@ -36,11 +35,6 @@ class DocMining extends Component {
     const { classify } = this.state,
           { location } = this.props;
     let postAPI;
-
-    // this.getClassifyDataSource();
-    var promise = new Promise((resolve, reject) => {
-      this.getClassifyDataSource(resolve);
-    });
 
     this.setState({
       textarea: true,
@@ -123,17 +117,6 @@ class DocMining extends Component {
           spinning: false,
           dataSource: json.data.datas
         });
-      }
-    });
-  }
-
-  getClassifyDataSource(resolve) {
-    getClassify(json => {
-      if (json.code === 200) {
-        this.setState({
-          classify: json.data
-        });
-        resolve(json.data);
       }
     });
   }

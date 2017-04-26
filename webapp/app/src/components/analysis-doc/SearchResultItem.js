@@ -1,8 +1,8 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import WorkExperience from 'components/search-result-box';
-import EducationExperience from 'components/search-result-box';
+import WorkExperience from 'components/search-result-box/WorkExperience';
+import EducationExperience from 'components/search-result-box/EducationExperience';
 
 import {
   Row,

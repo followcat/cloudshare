@@ -1,13 +1,8 @@
 'use strict';
+import './index.less';
 
 import FilterForm from './FilterForm';
 import FilterCard from './FilterCard';
-import SearchResultItem from './SearchResultItem';
 import SearchResultBox from './SearchResultBox';
 
-export {
-  FilterForm,
-  FilterCard,
-  SearchResultItem,
-  SearchResultBox,
-};
+export { FilterForm,  FilterCard,  SearchResultBox };

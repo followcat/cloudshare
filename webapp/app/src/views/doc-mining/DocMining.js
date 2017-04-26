@@ -1,12 +1,8 @@
 'use strict';
 import React, { Component } from 'react';
 
-import { FilterCard } from 'components/analysis-doc';
-import SearchResultBox from 'components/search-result-box';
+import { FilterCard, SearchResultBox } from 'components/analysis-doc';
 
-import {
-  getClassify
-} from 'request/classify';
 import { getDocMining } from 'request/docmining';
 
 import { API } from 'API';
@@ -18,10 +14,7 @@ class DocMining extends Component {
       current: 1,
       id: '',
       postAPI: '',
-      classify: [],
-      industry: {},
       dataSource: [],
-      selection: [],
       visible: false,
       spinning: false,
       textarea: false
@@ -32,8 +25,7 @@ class DocMining extends Component {
   }
 
   componentDidMount() {
-    const { classify } = this.state,
-          { location } = this.props;
+    const { location } = this.props;
     let postAPI;
 
     this.setState({
@@ -143,8 +135,6 @@ class DocMining extends Component {
   render() {
     const {
       textarea,
-      classify,
-      industry,
       postData,
       visible,
       spinning,
@@ -157,7 +147,6 @@ class DocMining extends Component {
       <div className="cs-fast-matching">
         <FilterCard
           textarea={textarea}
-          classify={classify}
           onSearch={this.handleSearch}
         />
         <SearchResultBox

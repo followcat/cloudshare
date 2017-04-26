@@ -1,9 +1,9 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import SearchResultHeader from 'components/search-result-box';
-import SearchResultPagination from 'components/search-result-box';
-import SearchResultItem from './SearchResultItem';
+import SearchResultHeader from 'components/search-result-box/SearchResultHeader';
+import SearchResultItem from 'components/search-result-box/SearchResultItem';
+import SearchResultPagination from 'components/search-result-box/SearchResultPagination';
 
 import { Spin } from 'antd';
 

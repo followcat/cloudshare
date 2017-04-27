@@ -5,8 +5,6 @@ import SearchResultHeader from './SearchResultHeader';
 import SearchResultItem from './SearchResultItem';
 import SearchResultPagination from 'components/search-result-box/SearchResultPagination';
 
-import RadarChart from 'components/analyse-charts/RadarChart';
-
 import { Spin } from 'antd';
 
 import ColorGrad from 'utils/color-grad';
@@ -34,6 +32,7 @@ class SearchResultBox extends Component {
       educationExperienceText,
       workExperienceText,
       dataSource,
+      postData,
       selection,
       foldText,
       unfoldText
@@ -66,6 +65,7 @@ class SearchResultBox extends Component {
             foldText={foldText}
             unfoldText={unfoldText}
             selection={selection}
+            postData={postData}
             onClick={this.props.onClick}
             gradient={this.state.gradient}
           />
@@ -92,11 +92,6 @@ class SearchResultBox extends Component {
 
     return (
       <div className={classSet}>
-        <RadarChart 
-          selection={selection}
-          postData={postData}
-          onClick={this.props.onClick}
-        />
         <Spin spinning={spinning}>
           <SearchResultHeader />
           {this.getResultDOMRender()}
@@ -126,6 +121,7 @@ SearchResultBox.propTypes = {
   educationExperienceText: PropTypes.string,
   workExperienceText: PropTypes.string,
   selection: PropTypes.array,
+  postData: PropTypes.object,
   foldText: PropTypes.string,
   unfoldText: PropTypes.string,
   onSwitchPage: PropTypes.func,

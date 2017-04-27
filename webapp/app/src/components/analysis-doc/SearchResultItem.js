@@ -4,6 +4,12 @@ import React, { Component, PropTypes } from 'react';
 import WorkExperience from 'components/search-result-box/WorkExperience';
 import EducationExperience from 'components/search-result-box/EducationExperience';
 
+import Charts from './Charts';
+import { getValuableData } from 'request/analyse';
+import { getRadarOption } from 'utils/chart_option';
+
+import classNames from 'classnames';
+
 import {
   Row,
   Col,
@@ -17,16 +23,49 @@ import { generateWorkExperience } from 'utils/summary-generator';
 class SearchResultItem extends Component {
   constructor() {
     super();
+    var option = {
+    title: { text: '正在分析' },
+    tooltip: {},
+    legend: { data: [] },
+    radar: { indicator: [] },
+    series: [{
+        name: '',
+        type: 'radar',
+        data : []}]
+    };
+    this.state = {
+      option: option,
+      chartVisible: false,
+      anonymized: false,
+    };
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.getNameTextRender = this.getNameTextRender.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick(e) {
-    console.log(e);
-    this.props.onClick({
-      id: e.target['data-id'],
-      name: e.target['data-name']
+    const {
+      cv_id,
+      postData,
+    } = this.props;
+    const { chartVisible } = this.state;
+
+    getValuableData(Object.assign({}, {
+        doc: postData.doc,
+        name_list: [cv_id+'.md'],
+        uses: ['medical'],
+      }), json => {
+        if (json.code === 200) {
+          this.setState({
+            data: json.data.result,
+            option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
+          });
+        }
+      });
+
+    this.setState({
+      option: {},
+      chartVisible: !chartVisible,
     });
   }
 
@@ -47,6 +86,7 @@ class SearchResultItem extends Component {
 
   render() {
     const {
+      prefixCls,
       yaml_info,
       gradient,
       info,
@@ -57,7 +97,13 @@ class SearchResultItem extends Component {
       educationExperienceText,
       foldText,
       unfoldText
-    } = this.props;
+    } = this.props,
+    { option, chartVisible } = this.state;
+    const classSet = classNames({
+      [`${prefixCls}`]: true,
+      'showed': chartVisible === true,
+      'hidden': chartVisible === false,
+    });
 
     const education = yaml_info.education_history || [];
     const experience = yaml_info.experience;
@@ -150,11 +196,20 @@ class SearchResultItem extends Component {
               </Row>
             </Col>
           </Row>
+          <div className={classSet}>
+            <Charts
+              option={option}
+              style={{ width: 900, height: 460, margin: '0 auto' }} />
+          </div>
         </div>
       </Card>
     );
   }
 }
+
+SearchResultItem.defaultProps = {
+  prefixCls: 'cs-search-result'
+};
 
 SearchResultItem.propTypes = {
   cv_id: PropTypes.string,
@@ -165,6 +220,7 @@ SearchResultItem.propTypes = {
   gradient: PropTypes.array,
   info: PropTypes.object,
   type: PropTypes.string,
+  postData: PropTypes.object,
   selection: PropTypes.array,
   yaml_info: PropTypes.shape({
     name: PropTypes.string,
@@ -180,7 +236,6 @@ SearchResultItem.propTypes = {
     company: PropTypes.string,
     author: PropTypes.string,
   }),
-  onClick: PropTypes.func
 };
 
 export default SearchResultItem;

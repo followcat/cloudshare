@@ -28,10 +28,7 @@ class SearchResultHeader extends Component {
       span: 3
     }, {
       title: '任职公司',
-      span: 4
-    }, {
-      title: '上传人',
-      span: 3
+      span: 7
     },];
 
     return (

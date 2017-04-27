@@ -121,7 +121,7 @@ class SearchResultItem extends Component {
       <Card className="cs-ls-i">
         <div className="basic-info">
           <Row>
-            <Col span={type === 'default' ? 4 : 3} className="omit">
+            <Col span={type === 'default' ? 3 : 4} className="omit">
               <a
                 style={linkColor}
                 onClick={this.handleClick}
@@ -135,8 +135,7 @@ class SearchResultItem extends Component {
             <Col span={3} className="omit">{yaml_info.education}</Col>
             <Col span={3} className="omit" title={yaml_info.school}>{yaml_info.school}</Col>
             <Col span={3} className="omit" title={yaml_info.position}>{yaml_info.position}</Col>
-            <Col span={4} className="omit" title={yaml_info.company}>{yaml_info.company}</Col>
-            <Col span={3} className="omit">{info.author ? info.author : 'null'}, {info.time.split(' ')[0].replace(/\-/g, '/')}</Col>
+            <Col span={7} className="omit" title={yaml_info.company}>{yaml_info.company}</Col>
           </Row>
         </div>
         <div className="extend-info">

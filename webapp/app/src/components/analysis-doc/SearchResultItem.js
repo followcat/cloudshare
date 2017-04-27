@@ -91,7 +91,6 @@ class SearchResultItem extends Component {
       gradient,
       info,
       type,
-      selection,
       cv_id,
       workExperienceText,
       educationExperienceText,
@@ -122,17 +121,6 @@ class SearchResultItem extends Component {
       <Card className="cs-ls-i">
         <div className="basic-info">
           <Row>
-            {type === 'default' ?
-              null : 
-              <Col span={1}>
-                <Checkbox
-                  data-id={yaml_info.id}
-                  data-name={yaml_info.name}
-                  onChange={this.handleCheckboxChange}
-                  checked={findIndex(selection, (o) => o.id === yaml_info.id) > - 1 ? true : false}
-                />
-              </Col>
-            }
             <Col span={type === 'default' ? 4 : 3} className="omit">
               <a
                 style={linkColor}
@@ -221,7 +209,6 @@ SearchResultItem.propTypes = {
   info: PropTypes.object,
   type: PropTypes.string,
   postData: PropTypes.object,
-  selection: PropTypes.array,
   yaml_info: PropTypes.shape({
     name: PropTypes.string,
     education_history: PropTypes.array,

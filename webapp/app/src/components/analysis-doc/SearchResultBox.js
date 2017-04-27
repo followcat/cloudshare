@@ -33,7 +33,6 @@ class SearchResultBox extends Component {
       workExperienceText,
       dataSource,
       postData,
-      selection,
       foldText,
       unfoldText
     } = this.props;
@@ -64,7 +63,6 @@ class SearchResultBox extends Component {
             workExperienceText={workExperienceText}
             foldText={foldText}
             unfoldText={unfoldText}
-            selection={selection}
             postData={postData}
             onClick={this.props.onClick}
             gradient={this.state.gradient}
@@ -120,7 +118,6 @@ SearchResultBox.propTypes = {
   dataSource: PropTypes.array,
   educationExperienceText: PropTypes.string,
   workExperienceText: PropTypes.string,
-  selection: PropTypes.array,
   postData: PropTypes.object,
   foldText: PropTypes.string,
   unfoldText: PropTypes.string,

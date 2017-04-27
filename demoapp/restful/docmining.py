@@ -46,3 +46,21 @@ class DocMiningAPI(Resource):
             datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
+
+class DocValuableAPI(webapp.restful.mining.ValuableAPI):
+
+    decorators = []
+
+    def __init__(self):
+        super(DocValuableAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('doc', location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        projectname = 'medical'
+        project = self.svc_mult_cv.getproject(projectname)
+        doc = args['doc']
+        result = self._get(doc, project)
+        return { 'code': 200, 'data': result }

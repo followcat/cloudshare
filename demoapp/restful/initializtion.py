@@ -6,3 +6,4 @@ def initialize(app):
     api = flask.ext.restful.Api(app)
 
     api.add_resource(DocMiningAPI, '/api/mining/analysisdoc', endpoint = 'docmining')
+    api.add_resource(DocValuableAPI, '/api/mining/valuable', endpoint = 'valuable')

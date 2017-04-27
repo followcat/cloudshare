@@ -62,29 +62,23 @@ class DocMining extends Component {
         uses: fieldValue.uses,
         filterdict: filterData
       };
-    } else {
-      postData = {
-        doc: '',
-        uses: fieldValue.uses,
-        filterdict: filterData
-      };
-    }
 
-    this.setState({
-      current: 1,
-      postData: Object.assign({}, postData, { page: 1 }),
-      visible: true,
-      spinning: true,
-    });
-
-    getDocMining(postAPI, postData, json => {
       this.setState({
-        spinning: false,
-        dataSource: json.data.datas,
-        pages: json.data.pages,
-        total: json.data.totals,
+        current: 1,
+        postData: Object.assign({}, postData, { page: 1 }),
+        visible: true,
+        spinning: true,
       });
-    });
+
+      getDocMining(postAPI, postData, json => {
+        this.setState({
+          spinning: false,
+          dataSource: json.data.datas,
+          pages: json.data.pages,
+          total: json.data.totals,
+        });
+      });
+    }
   }
 
   /**

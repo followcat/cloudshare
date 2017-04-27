@@ -39,10 +39,11 @@ class DocMiningAPI(Resource):
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
             yaml_info = self.svc_mult_cv.getyaml(name, projectname=model)
             info = {
-                'author': yaml_info['committer'],
+                'author': '', # yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
                 'match': score
             }
+            yaml_info['origin'] = ''
             datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 

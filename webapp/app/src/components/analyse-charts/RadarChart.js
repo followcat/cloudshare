@@ -86,7 +86,8 @@ class RadarChart extends Component {
 
 RadarChart.propTypes = {
   postData: PropTypes.object,
-  selection: PropTypes.array
+  selection: PropTypes.array,
+  onClick: PropTypes.func
 };
 
 export default RadarChart;

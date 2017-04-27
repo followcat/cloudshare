@@ -19,6 +19,15 @@ class SearchResultItem extends Component {
     super();
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.getNameTextRender = this.getNameTextRender.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(e) {
+    console.log(e);
+    this.props.onClick({
+      id: e.target['data-id'],
+      name: e.target['data-name']
+    });
   }
 
   handleCheckboxChange(e) {
@@ -80,9 +89,8 @@ class SearchResultItem extends Component {
             }
             <Col span={type === 'default' ? 4 : 3} className="omit">
               <a
-                href={`/resume/${cv_id}`}
                 style={linkColor}
-                target="_blank"
+                onClick={this.handleClick}
               >
                 {this.getNameTextRender()}
               </a>
@@ -172,7 +180,7 @@ SearchResultItem.propTypes = {
     company: PropTypes.string,
     author: PropTypes.string,
   }),
-  onToggleSelection: PropTypes.func
+  onClick: PropTypes.func
 };
 
 export default SearchResultItem;

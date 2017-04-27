@@ -15,6 +15,7 @@ class DocMining extends Component {
       id: '',
       postAPI: '',
       dataSource: [],
+      selection: [],
       visible: false,
       spinning: false,
       textarea: false
@@ -141,6 +142,7 @@ class DocMining extends Component {
       current,
       total,
       dataSource,
+      selection,
     } = this.state;
 
     return (
@@ -155,7 +157,9 @@ class DocMining extends Component {
           spinning={spinning}
           current={current}
           total={total}
+          postData={postData}
           dataSource={dataSource}
+          selection={selection}
           educationExperienceText="教育经历"
           workExperienceText="工作经历"
           foldText="展开"

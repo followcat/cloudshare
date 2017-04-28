@@ -4,10 +4,8 @@ import flask
 import jinja2.ext
 
 import webapp.ext.views
-import demoapp.restful.initializtion
-
-
 import webapp.jsonencoder
+import demoapp.restful.initializtion
 
 app = flask.Flask(__name__, template_folder="../webapp/templates_dist")
 app.config.from_object('demoapp.settings')

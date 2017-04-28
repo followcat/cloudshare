@@ -5,7 +5,8 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.builtin
-import webapp.restful.mining
+import core.mining.valuable
+import demoapp.tools.caesarcipher
 
 
 class DocMiningAPI(Resource):
@@ -13,8 +14,9 @@ class DocMiningAPI(Resource):
     def __init__(self):
         super(DocMiningAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
 
@@ -43,24 +45,57 @@ class DocMiningAPI(Resource):
                 'time': utils.builtin.strftime(yaml_info['date']),
                 'match': score
             }
-            datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
+            yaml_info['id'] = demoapp.tools.caesarcipher.encrypt(
+                                self.caesar_cipher_num, yaml_info['id'])
+            ename = demoapp.tools.caesarcipher.encrypt(
+                                self.caesar_cipher_num, name)
+            datas.append({ 'cv_id': ename, 'yaml_info': yaml_info, 'info': info})
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
 
-class DocValuableAPI(webapp.restful.mining.ValuableAPI):
+class DocValuableAPI(Resource):
 
     decorators = []
 
     def __init__(self):
         super(DocValuableAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.miner = flask.current_app.config['SVC_MIN']
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse.add_argument('doc', location = 'json')
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('name_list', type = list, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
-        projectname = 'medical'
-        project = self.svc_mult_cv.getproject(projectname)
         doc = args['doc']
-        result = self._get(doc, project)
+        result = self._get(doc, 'medical')
         return { 'code': 200, 'data': result }
+
+    def _get(self, doc, projectname):
+        args = self.reqparse.parse_args()
+        uses = [projectname]
+        name_list = [demoapp.tools.caesarcipher.decrypt(self.caesar_cipher_num, name)
+                     for name in args['name_list']]
+        result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
+                                           doc, projectname, uses=uses, name_list=name_list)
+        response = dict()
+        datas = []
+        for index in result:
+            item = dict()
+            item['description'] = index[0]
+            values = []
+            for match_item in index[1]:
+                name = match_item[0]
+                yaml_data = self.svc_mult_cv.getyaml(name+'.yaml', projectname=projectname)
+                yaml_data['match'] = match_item[1]
+                values.append({ 'match': match_item[1],
+                                'id': demoapp.tools.caesarcipher.encrypt(
+                                      self.caesar_cipher_num, yaml_data['id']),
+                                'name': yaml_data['name'] })
+            item['value'] = values
+            datas.append(item)
+        response['result'] = datas
+        response['max'] = 100
+        return response

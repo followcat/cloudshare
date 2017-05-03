@@ -1,10 +1,7 @@
 import flask
 import flask.ext.login
-import utils.builtin
 
-import webapp.views.mining
 import webapp.views.account
-import webapp.views.jobdescription
 
 def init_login(app):
     login_manager = flask.ext.login.LoginManager()

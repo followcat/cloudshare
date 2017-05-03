@@ -1,4 +1,3 @@
-import flask
 import flask.ext.restful
 
 from webapp.restful.people import *

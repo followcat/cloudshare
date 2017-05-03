@@ -14,9 +14,6 @@ app.jinja_env.add_extension(jinja2.ext.loopcontrols)
 webapp.ext.views.configure(app)
 demoapp.restful.initializtion.initialize(app)
 
-@app.route('/static/<path:path>')
-def static_proxy(path):
-    return flask.send_from_directory('../static', path)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=4888, threaded=True)

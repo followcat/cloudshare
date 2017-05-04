@@ -4,8 +4,8 @@ import os.path
 import datetime
 
 import core.exception
-import core.docprocessor
 import core.outputstorage
+import utils.pandocconverter
 import services.base.storage
 
 
@@ -23,6 +23,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> import shutil
             >>> import os.path
             >>> import core.basedata
+            >>> import core.docprocessor
             >>> import services.curriculumvitae
             >>> import extractor.information_explorer
             >>> root = "core/test"
@@ -67,7 +68,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
         except IOError:
             md = self.getmd(name)
             if md is not None:
-                result = core.docprocessor.md_to_html(md)
+                result = utils.pandocconverter.md_to_html(md)
         return result
 
     def getmd_en(self, id):

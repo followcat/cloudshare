@@ -16,4 +16,8 @@ demoapp.restful.initializtion.initialize(app)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=4888, threaded=True)
+    app.debug = True
+    if not app.debug:
+        import logging
+        logging.basicConfig(filename='demoapp_flask.log', level=logging.INFO)
+    app.run(host='0.0.0.0', port=4888, threaded=True)

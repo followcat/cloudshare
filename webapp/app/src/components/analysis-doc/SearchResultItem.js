@@ -122,12 +122,13 @@ class SearchResultItem extends Component {
       <Card className="cs-ls-i">
         <div className="basic-info">
           <Row>
-            <Col span={1} className="omit">
+            /*<Col span={1} className="omit">
               <a href={`/docminingcv/${cv_id}`} target="_blank">
                 <Icon type="solution" size="large" />
               </a>
             </Col>
-            <Col span={type === 'default' ? 2 : 3} className="omit">
+            <Col span={type === 'default' ? 2 : 3} className="omit">*/
+            <Col span={type === 'default' ? 3 : 4} className="omit">
               <a
                 style={linkColor}
                 onClick={this.handleClick}

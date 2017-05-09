@@ -44,6 +44,7 @@ const label = [
   'company',
   'experience',
   'education_history',
+  'classify',
 ];
 
 const getCompanyNameById = (id, companyList) => {

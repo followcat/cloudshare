@@ -83,6 +83,8 @@ export const API = {
 
   MINING_POSITION_API: `${HOST}/api/mining/position`,
 
-  MINING_VALUABLE_API: `${HOST}/api/mining/valuable`
+  MINING_VALUABLE_API: `${HOST}/api/mining/valuable`,
+
+  MINING_CV_API: `${HOST}/api/mining/cv`
 };
 

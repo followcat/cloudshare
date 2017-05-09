@@ -7,7 +7,8 @@ import webapp.ext.views
 import webapp.jsonencoder
 import demoapp.restful.initializtion
 
-app = flask.Flask(__name__, template_folder="../webapp/templates_dist")
+app = flask.Flask(__name__, template_folder="../webapp/templates_dist"
+                          , static_folder="../webapp/static")
 app.config.from_object('demoapp.settings')
 app.json_encoder = webapp.jsonencoder.CustomJSONEncoder
 app.jinja_env.add_extension(jinja2.ext.loopcontrols)

@@ -41,9 +41,7 @@ class ParallelNutrients extends Component {
     getDocWrodMining(API.ANALYSIS_BY_DOC_WORD_API, postData, json => {
         if (json.code === 200) {
           var data = json.data;
-          console.log(data)
           this.normalizeData(data);
-          console.log(data)
           this.setState({
             data: json.data,
             option: this.getOption(data),

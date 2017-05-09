@@ -99,3 +99,21 @@ class DocValuableAPI(Resource):
         response['result'] = datas
         response['max'] = 100
         return response
+
+class CurrivulumvitaeAPI(Resource):
+
+    decorators = []
+
+    def __init__(self):
+        super(CurrivulumvitaeAPI, self).__init__()
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('id', type = str, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        id = args['id']
+        realid = demoapp.tools.caesarcipher.decrypt(self.caesar_cipher_num, id)
+        yaml = self.svc_mult_cv.getyaml(realid, projectname='medical')
+        return { 'code': 200, 'data': { 'yaml_info': yaml } }

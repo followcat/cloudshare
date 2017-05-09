@@ -40,7 +40,7 @@ let webpackConfig = {
       use: ['babel-loader'],
       include: config.SRC_PATH,
     }, {
-      test: '/\.css$/',
+      test: /\.css$/,
       exclude: /node_modules/,
       loader: ExtractTextPlugin.extract({
           fallback: 'style-loader',
@@ -56,7 +56,9 @@ let webpackConfig = {
       test: /\.(png|jpg)$/,
       exclude: /node_modules/,
       use: 'url-loader?limit=40000',
-    }]
+    }, {
+      test: /\.(woff|woff2|eot|ttf|svg)$/,
+      loader: 'url-loader?limit=100000' }]
   },
   
   plugins: [

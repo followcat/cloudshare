@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import flask
+import hashlib
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
@@ -99,6 +100,54 @@ class DocValuableAPI(Resource):
         response['result'] = datas
         response['max'] = 100
         return response
+
+
+class DocCVValuableAPI(DocValuableAPI):
+
+    def __init__(self):
+        super(DocCVValuableAPI, self).__init__()
+        self.reqparse.add_argument('cv', location = 'json')
+
+    def temprate(self, cv, doc, projectname):
+        name_list = []
+        lsisim = self.miner.getsims(projectname, [projectname])[0]
+        tmpSha1 = hashlib.sha1()
+        tmpSha1.update(cv.encode('utf-8'))
+        tmpSha1_Digest = tmpSha1.hexdigest()
+        lsisim.add(tmpSha1_Digest, cv)
+        lsisim.set_index()
+        result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
+                                           doc, projectname, uses=[projectname],
+                                           name_list=[tmpSha1_Digest],
+                                           education_req=False)
+        lsisim.delete(tmpSha1_Digest)
+        lsisim.set_index()
+        return result
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        cv = args['cv']
+        doc = args['doc']
+        projectname = 'medical'
+        uses = [projectname]
+        response = dict()
+        datas = []
+        result = self.temprate(cv, doc, projectname)
+        for index in result:
+            item = dict()
+            item['description'] = index[0]
+            values = []
+            for match_item in index[1]:
+                name = match_item[0]
+                values.append({ 'match': match_item[1],
+                                'id': name,
+                                'name': name })
+            item['value'] = values
+            datas.append(item)
+        response['result'] = datas
+        response['max'] = 100
+        return { 'code': 200, 'data': response }
+
 
 class CurrivulumvitaeAPI(Resource):
 

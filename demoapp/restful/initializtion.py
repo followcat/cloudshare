@@ -7,4 +7,5 @@ def initialize(app):
 
     api.add_resource(DocMiningAPI, '/api/mining/analysisdoc', endpoint = 'docmining')
     api.add_resource(DocValuableAPI, '/api/mining/valuable', endpoint = 'valuable')
+    api.add_resource(DocCVValuableAPI, '/api/mining/cvvaluable', endpoint = 'cvvaluable')
     api.add_resource(CurrivulumvitaeAPI, '/api/mining/cv', endpoint = 'currivulumvitae')

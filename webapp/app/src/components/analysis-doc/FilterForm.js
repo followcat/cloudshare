@@ -116,7 +116,8 @@ class FilterForm extends Component {
   }
 
   render() {
-    const { textarea, filterfromDisplay, databaseDisplay, classify  } = this.props;
+    const { textarea, textareaWithCV, filterfromDisplay,
+            databaseDisplay, classify  } = this.props;
     const { getFieldDecorator } = this.props.form;
     const { expand } = this.state;
 
@@ -154,6 +155,29 @@ class FilterForm extends Component {
               >
                 {getFieldDecorator('doc')(
                   <Input type="textarea" rows={8} />)}
+              </FormItem>
+            </Col>
+          </Row> : null}
+        {textareaWithCV ?
+          <Row gutter={24}>
+            <Col span={11}>
+              <FormItem
+                label="职位描述"
+                labelCol={{ span: 3 }}
+                 wrapperCol={{ span: 21 }}
+              >
+                {getFieldDecorator('doc')(
+                  <Input type="textarea" rows={12} />)}
+              </FormItem>
+            </Col>
+            <Col span={13}>
+              <FormItem
+                label="简历描述"
+                labelCol={{ span: 3 }}
+                 wrapperCol={{ span: 21 }}
+              >
+                {getFieldDecorator('cv')(
+                  <Input type="textarea" rows={12} />)}
               </FormItem>
             </Col>
           </Row> : null}
@@ -285,6 +309,7 @@ FilterForm.defaultProps = {
 
 FilterForm.propTypes = {
   textarea: PropTypes.bool,
+  textareaWithCV: PropTypes.bool,
   industry: PropTypes.objectOf(PropTypes.array),
   classify: PropTypes.array,
   form: PropTypes.object,

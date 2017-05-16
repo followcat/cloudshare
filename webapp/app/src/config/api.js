@@ -75,6 +75,8 @@ export const API = {
 
   ANALYSIS_BY_DOC_API: `${HOST}/api/mining/analysisdoc`,
 
+  MINING_CV_VALUABLE_API: `${HOST}/api/mining/cvvaluable`,
+
   DATABASE_INFO_API: `${HOST}/api/dbnumbers`,
 
   MINING_ABILITY_API: `${HOST}/api/mining/ability`,

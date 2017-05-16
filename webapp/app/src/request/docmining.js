@@ -20,6 +20,20 @@ export const getDocMining = (api, params, callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
+export const getDocCVValuable = (api, params, callback) => {
+  return fetch(api, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
 export const getDocMiningCV = (params, callback) => {
   return fetch(API.MINING_CV_API, {
     method: 'POST',

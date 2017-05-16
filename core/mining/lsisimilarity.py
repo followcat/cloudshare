@@ -73,6 +73,16 @@ class LSIsimilarity(object):
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
 
+    def delete(self, name):
+        assert(self.lsi_model.dictionary)
+        result = False
+        index = self.names.index(name)
+        if self.corpus[index]:
+            self.names.pop(index)
+            self.corpus.pop(index)
+            result = True
+        return result
+
     def add_documents(self, names, documents):
         assert(self.lsi_model.dictionary)
         assert len(names) == len(documents)

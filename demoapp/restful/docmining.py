@@ -8,6 +8,7 @@ from flask.ext.restful import Resource
 import utils.builtin
 import core.mining.valuable
 import demoapp.tools.caesarcipher
+from baseapp.mining import load_mining
 
 
 class DocMiningAPI(Resource):
@@ -104,24 +105,25 @@ class DocValuableAPI(Resource):
 
 class DocCVValuableAPI(DocValuableAPI):
 
+    tmpminer = load_mining('tmplsimodel', 'tmpcutwords')[1]
+
     def __init__(self):
         super(DocCVValuableAPI, self).__init__()
         self.reqparse.add_argument('cv', location = 'json')
 
     def temprate(self, cv, doc, projectname):
         name_list = []
-        lsisim = self.miner.getsims(projectname, [projectname])[0]
+        lsisim = self.tmpminer.getsims(projectname, [projectname])[0]
         tmpSha1 = hashlib.sha1()
         tmpSha1.update(cv.encode('utf-8'))
         tmpSha1_Digest = tmpSha1.hexdigest()
-        lsisim.add(tmpSha1_Digest, cv)
-        lsisim.set_index()
-        result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
+        if not tmpSha1_Digest in lsisim.names:
+            lsisim.add(tmpSha1_Digest, cv)
+            lsisim.set_index()
+        result = core.mining.valuable.rate(self.tmpminer, self.svc_mult_cv,
                                            doc, projectname, uses=[projectname],
                                            name_list=[tmpSha1_Digest],
                                            education_req=False)
-        lsisim.delete(tmpSha1_Digest)
-        lsisim.set_index()
         return result
 
     def post(self):

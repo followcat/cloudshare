@@ -141,7 +141,7 @@ class DocCVValuableAPI(DocValuableAPI):
                 name = match_item[0]
                 values.append({ 'match': match_item[1],
                                 'id': name,
-                                'name': name })
+                                'name': 'My CV' })
             item['value'] = values
             datas.append(item)
         response['result'] = datas

@@ -48,6 +48,7 @@ class SearchResultItem extends Component {
     const {
       cv_id,
       postData,
+      addedChartResult,
     } = this.props;
     const { chartVisible } = this.state;
 
@@ -57,9 +58,19 @@ class SearchResultItem extends Component {
         uses: ['medical'],
       }), json => {
         if (json.code === 200) {
+          json.data.result.forEach(function (item) {
+            addedChartResult.forEach(function (cresult) {
+              cresult.forEach(function (critem) {
+                if (critem['description'] === item['description']) {
+                  item['value'] = item['value'].concat(critem['value']); }
+              })
+            })
+          });
           this.setState({
             data: json.data.result,
-            option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
+            option: getRadarOption(json.data.max,
+                                   json.data.result,
+                                   this.state.anonymized),
           });
         }
       });
@@ -213,6 +224,7 @@ SearchResultItem.propTypes = {
   gradient: PropTypes.array,
   info: PropTypes.object,
   type: PropTypes.string,
+  addedChartResult: PropTypes.array,
   postData: PropTypes.object,
   yaml_info: PropTypes.shape({
     name: PropTypes.string,

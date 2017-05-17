@@ -36,6 +36,7 @@ class CVDocMining extends Component {
       cvtextarea: false,
       anonymized: false,
       chartVisible: false,
+      addedChartResult: [],
     };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
@@ -61,7 +62,7 @@ class CVDocMining extends Component {
    * @memberOf CVDocMining
    */
   handleSearch(fieldValue) {
-    const { id, postAPI, cvpostAPI, chartVisible } = this.state;
+    const { id, postAPI, cvpostAPI, chartVisible, addedChartResult } = this.state;
     let filterData = {},
         postData = {};
 
@@ -93,19 +94,19 @@ class CVDocMining extends Component {
       getDocMining(postAPI, postData, json => {
         this.setState({
           spinning: false,
+          chartVisible: true,
           dataSource: json.data.datas,
           pages: json.data.pages,
           total: json.data.totals,
         });
-      });
-
-      getDocCVValuable(cvpostAPI, postData, json => {
-        if (json.code === 200) {
-          this.setState({
-            chartVisible: true,
-            option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
-          });
-        }
+        getDocCVValuable(cvpostAPI, postData, json => {
+          if (json.code === 200) {
+            this.setState({
+              addedChartResult: [json.data.result],
+              option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
+            });
+          }
+        });
       });
 
     }
@@ -168,6 +169,7 @@ class CVDocMining extends Component {
       total,
       dataSource,
       chartVisible,
+      addedChartResult,
     } = this.state;
 
     const { prefixCls } = this.props;
@@ -197,6 +199,7 @@ class CVDocMining extends Component {
           total={total}
           postData={postData}
           dataSource={dataSource}
+          addedChartResult={addedChartResult}
           educationExperienceText="教育经历"
           workExperienceText="工作经历"
           foldText="展开"

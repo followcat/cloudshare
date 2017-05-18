@@ -169,7 +169,7 @@ class FilterForm extends Component {
               >
                 {getFieldDecorator('doc')(
                   <Input type="textarea" rows={12}
-                    placeholder="在此处添加岗位要求,建议包含技术要求."/>)}
+                    placeholder="在此处填写岗位要求,建议包含技术要求."/>)}
               </FormItem>
             </Col>
             <Col span={13}>
@@ -180,7 +180,7 @@ class FilterForm extends Component {
               >
                 {getFieldDecorator('cv')(
                   <Input type="textarea" rows={12}
-                    placeholder="在此处填入简历内容,建议包含工作项目经验和擅长技术内容."/>)}
+                    placeholder="在此处填写简历内容,建议包含工作项目经验和擅长技术."/>)}
               </FormItem>
             </Col>
           </Row> : null}

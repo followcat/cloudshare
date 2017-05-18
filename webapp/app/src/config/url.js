@@ -18,6 +18,10 @@ export const URL = {
     return `/docmining`;
   },
 
+  getCVDocMining: () => {
+    return `/cvdocmining`;
+  },
+
   getListJDURL: () => {
     return `/pm`;
   },

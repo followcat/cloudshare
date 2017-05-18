@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import re
 import flask
+import hashlib
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.builtin
 import core.mining.valuable
 import demoapp.tools.caesarcipher
+from baseapp.mining import load_mining
 
 
 class DocMiningAPI(Resource):
@@ -99,6 +101,66 @@ class DocValuableAPI(Resource):
         response['result'] = datas
         response['max'] = 100
         return response
+
+
+class DocCVValuableAPI(DocValuableAPI):
+
+    tmpminer = load_mining('tmplsimodel', 'tmpcutwords')[1]
+
+    def __init__(self):
+        super(DocCVValuableAPI, self).__init__()
+        self.reqparse.add_argument('cv', location = 'json')
+
+    def temprate(self, cv, doc, projectname, top=200):
+        rank = 0
+        stars = 0
+        name_list = []
+        lsisim = self.tmpminer.getsims(projectname, [projectname])[0]
+        tmpSha1 = hashlib.sha1()
+        tmpSha1.update(cv.encode('utf-8'))
+        tmpSha1_Digest = tmpSha1.hexdigest()
+        if not tmpSha1_Digest in lsisim.names:
+            lsisim.add(tmpSha1_Digest, cv)
+            lsisim.set_index()
+        result = core.mining.valuable.rate(self.tmpminer, self.svc_mult_cv,
+                                           doc, projectname, uses=[projectname],
+                                           name_list=[tmpSha1_Digest],
+                                           education_req=False)
+        ranklist = self.tmpminer.probability(projectname, doc, top=top)
+        rate = self.tmpminer.probability_by_id(projectname, doc,
+                                                tmpSha1_Digest, uses=[projectname])
+        try:
+            rank = ranklist.index(rate) + 1
+            stars = 5-int(rank/(len(self.tmpminer.sim[projectname])*top/5))
+        except ValueError:
+            pass
+        return result, rate[1], rank, stars
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        cv = args['cv']
+        doc = args['doc']
+        projectname = 'medical'
+        uses = [projectname]
+        response = dict()
+        datas = []
+        result, rate, rank, stars = self.temprate(cv, doc, projectname)
+        for index in result:
+            item = dict()
+            item['description'] = index[0]
+            values = []
+            for match_item in index[1]:
+                name = match_item[0]
+                values.append({ 'match': match_item[1],
+                                'id': name,
+                                'name': 'My CV' })
+            item['value'] = values
+            datas.append(item)
+        response['result'] = datas
+        response['max'] = 100
+        return { 'code': 200, 'data': response,
+                 'rate': rate, 'rank': rank, 'stars': stars }
+
 
 class CurrivulumvitaeAPI(Resource):
 

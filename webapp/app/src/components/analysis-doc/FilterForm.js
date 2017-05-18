@@ -154,7 +154,8 @@ class FilterForm extends Component {
                  wrapperCol={{ span: 19 }}
               >
                 {getFieldDecorator('doc')(
-                  <Input type="textarea" rows={8} />)}
+                  <Input type="textarea" rows={8}
+                    placeholder="在此处添加岗位要求,建议包含技术要求."/>)}
               </FormItem>
             </Col>
           </Row> : null}
@@ -167,7 +168,8 @@ class FilterForm extends Component {
                  wrapperCol={{ span: 21 }}
               >
                 {getFieldDecorator('doc')(
-                  <Input type="textarea" rows={12} />)}
+                  <Input type="textarea" rows={12}
+                    placeholder="在此处添加岗位要求,建议包含技术要求."/>)}
               </FormItem>
             </Col>
             <Col span={13}>
@@ -177,7 +179,8 @@ class FilterForm extends Component {
                  wrapperCol={{ span: 21 }}
               >
                 {getFieldDecorator('cv')(
-                  <Input type="textarea" rows={12} />)}
+                  <Input type="textarea" rows={12}
+                    placeholder="在此处填入简历内容,建议包含工作项目经验和擅长技术内容."/>)}
               </FormItem>
             </Col>
           </Row> : null}

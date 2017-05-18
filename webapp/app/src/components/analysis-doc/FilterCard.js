@@ -10,7 +10,7 @@ class FilterCard extends Component {
     const { prefixCls } = this.props;
 
     return (
-      <Card className={prefixCls}>
+      <Card className={prefixCls} style={{ margin: '0px auto'}}>
         <FilterForm {...this.props} />
       </Card>
     );

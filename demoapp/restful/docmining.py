@@ -111,7 +111,9 @@ class DocCVValuableAPI(DocValuableAPI):
         super(DocCVValuableAPI, self).__init__()
         self.reqparse.add_argument('cv', location = 'json')
 
-    def temprate(self, cv, doc, projectname):
+    def temprate(self, cv, doc, projectname, top=200):
+        rank = 0
+        stars = 0
         name_list = []
         lsisim = self.tmpminer.getsims(projectname, [projectname])[0]
         tmpSha1 = hashlib.sha1()
@@ -124,7 +126,15 @@ class DocCVValuableAPI(DocValuableAPI):
                                            doc, projectname, uses=[projectname],
                                            name_list=[tmpSha1_Digest],
                                            education_req=False)
-        return result
+        ranklist = self.tmpminer.probability(projectname, doc, top=top)
+        rate = self.tmpminer.probability_by_id(projectname, doc,
+                                                tmpSha1_Digest, uses=[projectname])
+        try:
+            rank = ranklist.index(rate) + 1
+            stars = 5-int(rank/(len(self.tmpminer.sim[projectname])*top/5))
+        except ValueError:
+            pass
+        return result, rate[1], rank, stars
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -134,7 +144,7 @@ class DocCVValuableAPI(DocValuableAPI):
         uses = [projectname]
         response = dict()
         datas = []
-        result = self.temprate(cv, doc, projectname)
+        result, rate, rank, stars = self.temprate(cv, doc, projectname)
         for index in result:
             item = dict()
             item['description'] = index[0]
@@ -148,7 +158,8 @@ class DocCVValuableAPI(DocValuableAPI):
             datas.append(item)
         response['result'] = datas
         response['max'] = 100
-        return { 'code': 200, 'data': response }
+        return { 'code': 200, 'data': response,
+                 'rate': rate, 'rank': rank, 'stars': stars }
 
 
 class CurrivulumvitaeAPI(Resource):

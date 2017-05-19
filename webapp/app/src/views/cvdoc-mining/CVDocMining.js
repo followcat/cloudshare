@@ -217,8 +217,8 @@ class CVDocMining extends Component {
             <font>评分为</font><font style={linkColor}>{rate}</font>.
             { (stars
                 ?
-                  <font>恭喜!你名列前矛,你在我们的人才库中排名
-                  <Tag color="#2db7f5">{rank}</Tag>
+                  <font>恭喜!你名列前矛,在人才库中排名前
+                  <Tag color="#2db7f5">{rank}%</Tag>
                   被系统判断为
                   <Rate disabled={true}
                         value={stars}

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import math
 import flask
 import hashlib
 from flask.ext.restful import reqparse
@@ -111,7 +112,7 @@ class DocCVValuableAPI(DocValuableAPI):
         super(DocCVValuableAPI, self).__init__()
         self.reqparse.add_argument('cv', location = 'json')
 
-    def temprate(self, cv, doc, projectname, top=200):
+    def temprate(self, cv, doc, projectname, top=0.1):
         rank = 0
         stars = 0
         name_list = []
@@ -130,8 +131,8 @@ class DocCVValuableAPI(DocValuableAPI):
         rate = self.tmpminer.probability_by_id(projectname, doc,
                                                 tmpSha1_Digest, uses=[projectname])
         try:
-            rank = ranklist.index(rate) + 1
-            stars = 5-int(rank/(len(self.tmpminer.sim[projectname])*top/5))
+            rank = int(float(ranklist.index(rate))/len(ranklist)*100)+1
+            stars = math.ceil(float(rate[1])/0.2)
         except ValueError:
             pass
         return result, rate[1], rank, stars
@@ -153,7 +154,7 @@ class DocCVValuableAPI(DocValuableAPI):
                 name = match_item[0]
                 values.append({ 'match': match_item[1],
                                 'id': name,
-                                'name': 'My CV' })
+                                'name': u'我的简历' })
             item['value'] = values
             datas.append(item)
         response['result'] = datas

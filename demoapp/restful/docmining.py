@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import math
 import flask
 import hashlib
 from flask.ext.restful import reqparse
@@ -130,8 +131,8 @@ class DocCVValuableAPI(DocValuableAPI):
         rate = self.tmpminer.probability_by_id(projectname, doc,
                                                 tmpSha1_Digest, uses=[projectname])
         try:
-            rank = ranklist.index(rate) + 1
-            stars = 5-int(rank/(len(self.tmpminer.sim[projectname])*top/5))
+            rank = int(ranklist.index(rate)/len(ranklist))+1
+            stars = math.ceil(float(rate[1])/0.2)
         except ValueError:
             pass
         return result, rate[1], rank, stars

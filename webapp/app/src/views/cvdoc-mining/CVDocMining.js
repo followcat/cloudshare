@@ -108,27 +108,26 @@ class CVDocMining extends Component {
         option: option,
       });
 
-      getDocMining(postAPI, postData, json => {
-        this.setState({
-          spinning: false,
-          chartVisible: true,
-          dataSource: json.data.datas,
-          pages: json.data.pages,
-          total: json.data.totals,
-        });
-        getDocCVValuable(cvpostAPI, postData, json => {
-          if (json.code === 200) {
-            this.setState({
-              rate: json.rate,
-              rank: json.rank,
-              stars: json.stars,
-              addedChartResult: [json.data.result],
-              option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
-            });
-          }
+      getDocCVValuable(cvpostAPI, postData, json => {
+        if (json.code === 200) {
+          this.setState({
+            rate: json.rate,
+            rank: json.rank,
+            stars: json.stars,
+            addedChartResult: [json.data.result],
+            option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
+          });
+        }
+        getDocMining(postAPI, postData, json => {
+          this.setState({
+            spinning: false,
+            chartVisible: true,
+            dataSource: json.data.datas,
+            pages: json.data.pages,
+            total: json.data.totals,
+          });
         });
       });
-
     }
   }
 

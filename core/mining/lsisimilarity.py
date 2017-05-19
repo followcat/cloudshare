@@ -184,6 +184,8 @@ class LSIsimilarity(object):
         """
         if top is None:
             top = len(self.index)
+        elif top < 1:
+            top = int(len(self.index)*top)
         results = []
         vec_lsi = self.lsi_model.probability(doc)
         try:

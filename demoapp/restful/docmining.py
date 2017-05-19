@@ -112,7 +112,7 @@ class DocCVValuableAPI(DocValuableAPI):
         super(DocCVValuableAPI, self).__init__()
         self.reqparse.add_argument('cv', location = 'json')
 
-    def temprate(self, cv, doc, projectname, top=200):
+    def temprate(self, cv, doc, projectname, top=0.1):
         rank = 0
         stars = 0
         name_list = []
@@ -131,7 +131,7 @@ class DocCVValuableAPI(DocValuableAPI):
         rate = self.tmpminer.probability_by_id(projectname, doc,
                                                 tmpSha1_Digest, uses=[projectname])
         try:
-            rank = int(ranklist.index(rate)/len(ranklist))+1
+            rank = int(float(ranklist.index(rate))/len(ranklist)*100)+1
             stars = math.ceil(float(rate[1])/0.2)
         except ValueError:
             pass

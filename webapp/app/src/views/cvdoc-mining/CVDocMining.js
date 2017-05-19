@@ -108,27 +108,26 @@ class CVDocMining extends Component {
         option: option,
       });
 
-      getDocMining(postAPI, postData, json => {
-        this.setState({
-          spinning: false,
-          chartVisible: true,
-          dataSource: json.data.datas,
-          pages: json.data.pages,
-          total: json.data.totals,
-        });
-        getDocCVValuable(cvpostAPI, postData, json => {
-          if (json.code === 200) {
-            this.setState({
-              rate: json.rate,
-              rank: json.rank,
-              stars: json.stars,
-              addedChartResult: [json.data.result],
-              option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
-            });
-          }
+      getDocCVValuable(cvpostAPI, postData, json => {
+        if (json.code === 200) {
+          this.setState({
+            rate: json.rate,
+            rank: json.rank,
+            stars: json.stars,
+            addedChartResult: [json.data.result],
+            option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
+          });
+        }
+        getDocMining(postAPI, postData, json => {
+          this.setState({
+            spinning: false,
+            chartVisible: true,
+            dataSource: json.data.datas,
+            pages: json.data.pages,
+            total: json.data.totals,
+          });
         });
       });
-
     }
   }
 
@@ -217,8 +216,8 @@ class CVDocMining extends Component {
             <font>评分为</font><font style={linkColor}>{rate}</font>.
             { (stars
                 ?
-                  <font>恭喜!你名列前矛,你在我们的人才库中排名
-                  <Tag color="#2db7f5">{rank}</Tag>
+                  <font>恭喜!你名列前矛,在人才库中排名前
+                  <Tag color="#2db7f5">{rank}%</Tag>
                   被系统判断为
                   <Rate disabled={true}
                         value={stars}

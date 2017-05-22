@@ -195,10 +195,6 @@ class ReverseIndexing(object):
                 filterdict['date'] = utils.builtin.nemudate(filterdict['date'])
             except ValueError:
                 filterdict.pop('date')
-        if 'current_places' in filterdict:
-            filterdict['current_places'] = filterdict['current_places'].split(' ')
-        if 'expectation_places' in filterdict:
-            filterdict['expectation_places'] = filterdict['expectation_places'].split(' ')
         for key in filterdict:
             if filterdict[key]:
                 indexdict[key] = self.get_indexkeys([key], filterdict[key], uses)

@@ -3,9 +3,9 @@ import React, { Component, PropTypes } from 'react';
 
 import { generateSummary } from 'utils/summary-generator';
 
-import './css/bootstrap.css';
-import './css/dashboard.css';
-import './css/style.css';
+//import './css/bootstrap.css';
+//import './css/dashboard.css';
+//import './css/style.css';
 
 class Resume extends Component {
 

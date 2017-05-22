@@ -72,16 +72,25 @@ class SearchResult extends Component {
 
   handleFilter(fieldValue) {
     const { searchText } = this.state;
+    let filterData = {};
   
     this.setState({
       spinning: true,
       filterValue: fieldValue
     });
 
+    for (let key in fieldValue) {
+      if (fieldValue[key] instanceof Array) {
+        filterData[key] = fieldValue[key];
+      } else {
+        filterData[key] = fieldValue[key] ? fieldValue[key].split(' ') : [];
+      }
+    }
+
     getResultData({
       'search_text': searchText,
       'page': 1,
-      'filterdict': fieldValue
+      'filterdict': filterData
     }, (json) => {
       if (json.code === 200) {
         this.setState({

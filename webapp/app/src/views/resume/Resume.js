@@ -375,7 +375,6 @@ class Resume extends Component {
       },
       onChange: this.handleUploadChange,
     };
-    console.log(resumeList);
     return (
       <Layout>
         <div className="cs-layout-resume">

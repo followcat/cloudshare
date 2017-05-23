@@ -116,7 +116,7 @@ class FilterForm extends Component {
   }
 
   render() {
-    const { textarea, databaseDisplay, classify  } = this.props;
+    const { textarea, databaseDisplay, classify, postData } = this.props;
     const { getFieldDecorator } = this.props.form;
     const { expand } = this.state;
 
@@ -142,6 +142,7 @@ class FilterForm extends Component {
       wrapperCol: { span: 19 }
     };
 
+    const dateFormat = 'YYYY-MM-DD';
     return (
       <Form layout="horizontal">
         {textarea ?
@@ -218,10 +219,13 @@ class FilterForm extends Component {
                   label="时间"
                   {...formItemLayout}
                 >
-                  {getFieldDecorator('date')(
-                    <RangePicker
-                      disabledDate={this.disabledDate}
-                    />)}
+                  {getFieldDecorator('date', {
+                    initialValue: postData && postData.filterdict.date && postData.filterdict.date[0]?
+                      [moment(postData.filterdict.date[0], dateFormat),
+                       moment(postData.filterdict.date[1], dateFormat)] : null,
+                    })(
+                    <RangePicker disabledDate={this.disabledDate}/>
+                  )}
                 </FormItem>
               </Col>
               <Col span={8}>
@@ -281,6 +285,7 @@ FilterForm.propTypes = {
   textarea: PropTypes.bool,
   industry: PropTypes.objectOf(PropTypes.array),
   classify: PropTypes.array,
+  postData: PropTypes.object,
   form: PropTypes.object,
   onSearch: PropTypes.func
 };

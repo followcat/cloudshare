@@ -1,4 +1,5 @@
 'use strict';
+import moment from 'moment';
 import React, { Component } from 'react';
 
 import { FilterCard } from 'components/filter-card';
@@ -50,6 +51,10 @@ class FastMatching extends Component {
     var promise = new Promise((resolve, reject) => {
       this.getClassifyDataSource(resolve);
     });
+
+    const date = new Date();
+    const defFilterData = {date: [moment(date).add(-15, 'days').format('YYYY-MM-DD'),
+                                  moment(date).format('YYYY-MM-DD')]};
     
     if (location.query.jd_id) {
       postAPI = API.LSI_BY_JD_ID_API;
@@ -60,10 +65,12 @@ class FastMatching extends Component {
         siderbarVisible: true
       });
 
+
       promise.then((data) => {
         this.getResultDataSource(postAPI, {
           id: location.query.jd_id,
-          uses: data
+          uses: data,
+          filterdict: defFilterData,
         });
       });
     } else if (location.query.cv_id) {
@@ -74,16 +81,17 @@ class FastMatching extends Component {
         postAPI: postAPI,
         siderbarClosable: true
       });
-
       promise.then((data) => {
         this.getResultDataSource(postAPI, {
           id: location.query.cv_id,
-          uses: data
+          uses: data,
+          filterdict: defFilterData,
         });
       });
     } else {
       this.setState({
         textarea: true,
+        postData: Object.assign({}, {filterdict: defFilterData}),
         postAPI: API.LSI_BY_DOC_API
       });
     }
@@ -252,6 +260,7 @@ class FastMatching extends Component {
           textarea={textarea}
           classify={classify}
           industry={industry}
+          postData={postData}
           visible={visible}
           total={total}
           onSearch={this.handleSearch}

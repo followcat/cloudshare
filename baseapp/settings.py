@@ -16,8 +16,8 @@ def sync_reload():
             self.SVC_MIN = SVC_MIN
             self.SVC_INDEX = SVC_INDEX
     SVC_MULT_CLSIFY, SVC_CLS_CV = load_mult_classify()
-    SVC_MULT_CV = load_mult_cv(SVC_CLS_CV)
-    SVC_CUTWORD, SVC_MIN = load_mining()
+    SVC_MULT_CV = load_mult_cv(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV)
+    SVC_CUTWORD, SVC_MIN = load_mining(SVC_MULT_CV, services.mining.silencer)
     SVC_INDEX = load_index()
     reloadobj = ReloadObj(SVC_MULT_CLSIFY, SVC_CLS_CV, SVC_MULT_CV,
                           SVC_CUTWORD, SVC_MIN, SVC_INDEX)

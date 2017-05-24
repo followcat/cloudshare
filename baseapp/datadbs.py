@@ -1,13 +1,11 @@
 import os
 
+import baseapp.loader
 import services.account
-import services.multiclsify
-import services.multipeople
 import services.people
 import services.company
+import services.multipeople
 import services.curriculumvitae
-import interface.basefs
-import interface.gitinterface
 
 
 SVC_ACCOUNT = services.account.Account('account')
@@ -20,9 +18,4 @@ SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')
 SVC_PEO_STO = services.people.People('storage/PEO', SVC_CV_STO, iotype='base')
 SVC_MULT_PEO = services.multipeople.MultiPeople([SVC_PEO_REPO, SVC_PEO_STO])
 
-def load_mult_classify():
-    SVC_MULT_CLSIFY = services.multiclsify.MultiClassify(SVC_CV_STO)
-    SVC_CLS_CV = SVC_MULT_CLSIFY.classifies
-    return SVC_MULT_CLSIFY, SVC_CLS_CV
-
-SVC_MULT_CLSIFY, SVC_CLS_CV = load_mult_classify()
+SVC_MULT_CLSIFY, SVC_CLS_CV = baseapp.loader.load_mult_classify(SVC_CV_STO)

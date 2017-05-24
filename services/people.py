@@ -10,9 +10,9 @@ class People(services.base.storage.BaseStorage):
 
     commitinfo = 'People'
 
-    def __init__(self, path, storages, iotype):
+    def __init__(self, path, storage, iotype):
         super(People, self).__init__(path, iotype=iotype)
-        self.storages = storages
+        self.storage = storage
 
     def exists(self, id):
         id_yaml = core.outputstorage.ConvertName(id).yaml
@@ -21,20 +21,16 @@ class People(services.base.storage.BaseStorage):
     def getmd(self, id):
         info = self.getyaml(id)
         for id in info['cv']:
-            for sto in self.storages:
-                if sto.exists(id):
-                    yield sto.getmd(id)
-                    break
+            if self.storage.exists(id):
+                yield self.storage.getmd(id)
 
     def getinfo(self, id):
         info = self.getyaml(id)
         for id in info['cv']:
-            for sto in self.storages:
-                if sto.exists(id):
-                    yield sto.getyaml(id)
-                    break
+            if self.storage.exists(id):
+                yield self.storage.getyaml(id)
 
-    def add(self, peopobj, committer=None, unique=True, yamlfile=True):
+    def add(self, peopobj, committer=None, unique=True, yamlfile=True, do_commit=True):
         name = core.outputstorage.ConvertName(peopobj.name)
         if unique is True and self.unique(peopobj.name) is not True:
             savedobj = self.getyaml(name)
@@ -43,6 +39,6 @@ class People(services.base.storage.BaseStorage):
             peopobj.metadata['cv'] = savedobj['cv'] + peopobj.metadata['cv']
         message = "Add %s: %s metadata." % (self.commitinfo, name)
         self.interface.add(name.yaml, yaml.safe_dump(peopobj.metadata, allow_unicode=True),
-                           message=message, committer=committer)
+                           message=message, committer=committer, do_commit=do_commit)
         self._nums += 1
         return True

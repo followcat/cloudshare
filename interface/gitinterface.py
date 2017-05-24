@@ -58,7 +58,17 @@ class GitInterface(interface.base.Interface):
     def getraw(self, filename):
         raise IOError
 
-    def add(self, filename, filedata, message=None, committer=None):
+    def do_commit(self, filenames, message=None, committer=None):
+        commit_id = ''
+        if message is None:
+            message = "Batch commits."
+        if filenames:
+            committer = self.committer(committer)
+            self.repo.stage(filenames)
+            commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
+        return commit_id
+
+    def add(self, filename, filedata, message=None, committer=None, do_commit=True):
         """
             >>> import shutil
             >>> import interface.gitinterface
@@ -70,20 +80,22 @@ class GitInterface(interface.base.Interface):
             True
             >>> shutil.rmtree(repo_name)
         """
+        commit_id = ''
+        if message is None:
+            message = "Add file: " + filename + ".\n"
+        committer = self.committer(committer)
         full_path = os.path.join(self.path, filename)
         path, name = os.path.split(full_path)
         if not os.path.exists(path):
             os.makedirs(path)
         with open(full_path, 'w') as fp:
             fp.write(filedata)
-        self.repo.stage(filename)
-        committer = self.committer(committer)
-        if message is None:
-            message = "Add file: " + filename + ".\n"
-        commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
+        if do_commit is True:
+            self.repo.stage(filename)
+            commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
         return commit_id
 
-    def add_files(self, filenames, filedatas, message=None, committer=None):
+    def add_files(self, filenames, filedatas, message=None, committer=None, do_commit=True):
         """
             >>> import shutil
             >>> import interface.gitinterface
@@ -96,6 +108,12 @@ class GitInterface(interface.base.Interface):
             >>> shutil.rmtree(repo_name)
         """
         assert len(filenames) == len(filedatas)
+        commit_id = ''
+        if message is None:
+            message = ""
+            for each in filenames:
+                message += "Add file: " + each + ".\n"
+        committer = self.committer(committer)
         for filename, filedata in zip(filenames, filedatas):
             full_path = os.path.join(self.path, filename)
             path, name = os.path.split(full_path)
@@ -103,16 +121,13 @@ class GitInterface(interface.base.Interface):
                 os.makedirs(path)
             with open(full_path, 'w') as fp:
                 fp.write(filedata)
-            self.repo.stage(filename)
-        committer = self.committer(committer)
-        if message is None:
-            message = ""
-            for each in filenames:
-                message += "Add file: " + each + ".\n"
-        commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
+            if do_commit is True:
+                self.repo.stage(filename)
+        if do_commit is True:
+            commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
         return commit_id
 
-    def modify(self, filename, stream, message=None, committer=None):
+    def modify(self, filename, stream, message=None, committer=None, do_commit=True):
         """
             >>> import shutil
             >>> import interface.gitinterface
@@ -127,6 +142,7 @@ class GitInterface(interface.base.Interface):
             'Modify test'
             >>> shutil.rmtree(repo_name)
         """
+        commit_id = ''
         if not self.exists(filename):
             raise Exception('Not exists file:', filename)
         if message is None:
@@ -134,8 +150,34 @@ class GitInterface(interface.base.Interface):
         committer = self.committer(committer)
         with open(os.path.join(self.repo.path, filename), 'w') as f:
             f.write(stream)
-        self.repo.stage([bytes(filename)])
-        commit_id = self.repo.do_commit(message, committer=bytes(committer))
+        if do_commit is True:
+            self.repo.stage([bytes(filename)])
+            commit_id = self.repo.do_commit(message, committer=bytes(committer))
+        return commit_id
+
+    def delete(self, filename, message=None, committer=None, do_commit=True):
+        """
+            >>> import shutil
+            >>> import interface.gitinterface
+            >>> repo_name = 'interface/test_repo'
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
+            >>> commit_id = interface.add_files(['test_file'], ['test'],
+            ... 'Test commit', 'test<test@test.com>')
+            >>> commit_id = interface.delete('test_file')
+            >>> commit_id == interface.repo.head()
+            True
+            >>> shutil.rmtree(repo_name)
+        """
+        commit_id = ''
+        if not self.exists(filename):
+            raise Exception('Not exists file:', filename)
+        if message is None:
+            message = "Delete %s." % filename
+        committer = self.committer(committer)
+        os.remove(os.path.join(self.repo.path, filename))
+        if do_commit is True:
+            self.repo.stage([bytes(filename)])
+            commit_id = self.repo.do_commit(message, committer=bytes(committer))
         return commit_id
 
     def grep(self, restrings, path='', files=None):
@@ -145,7 +187,7 @@ class GitInterface(interface.base.Interface):
         greppath = os.path.join(self.repo.path, path)
         if not os.path.exists(greppath):
             return grep_list
-        keywords = restrings.split()
+        keywords = [restrings]
         if keywords:
             command = ['git', 'grep', '-l', '--all-match']
             for each in keywords:

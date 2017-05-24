@@ -1,4 +1,31 @@
 'use strict';
+import findIndex from 'lodash/findIndex';
+
+const generateWorkExperience = (experience) => {
+  if (typeof experience !== 'undefined') {
+    let company = experience.company || [],
+        position = experience.position || [];
+
+    if (position.length > 0) {
+      for (let i = 0, len = position.length; i < len; i++) {
+        let id = position[i].at_company,
+            index = findIndex(company, ['id', id]);
+        
+        if (index > -1) {
+          position[i] = Object.assign({}, position[i], {
+            companyName: company[index].name,
+            business: company[index].business || null
+          });
+        }
+      }
+      return position;
+    } else {
+      return company;
+    }
+  }
+
+  return [];
+};
 
 /*
  * summary组件数据结构: [{ name: ,value: }]
@@ -17,6 +44,7 @@ const label = [
   'company',
   'experience',
   'education_history',
+  'classify',
 ];
 
 const getCompanyNameById = (id, companyList) => {
@@ -29,21 +57,17 @@ const getCompanyNameById = (id, companyList) => {
 };
 
 const parseExperience = (experience) => {
-  let value = [];
+  let value = [],
+      expArray = generateWorkExperience(experience);
 
-  if (typeof experience !== 'undefined') {
-    const company = experience.company || [],
-          position = experience.position || [];
+  for (let i = expArray.length - 1; i >= 0; i--) {
+    let workTime = `${expArray[i].date_from} - ${expArray[i].date_to}`,
+        business = expArray[i].business || null,
+        positionName = expArray[i].name || null,
+        companyName = expArray[i].companyName || null,
+        duration = expArray[i].duration;
 
-    for (let i = position.length - 1; i >= 0; i--) {
-      let workTime = `${position[i].date_from} - ${position[i].date_to}`,
-          business = position[i].business,
-          positionName = position[i].name,
-          companyName = getCompanyNameById(position[i].at_company, company),
-          duration = position[i].duration;
-
-      value.push([workTime, positionName, companyName, duration]);
-    }
+    value.push([workTime, business, positionName, companyName, duration]);
   }
   
   return value;
@@ -60,10 +84,14 @@ const parseEducation = (education) => {
           school = education[i].school;
 
       value.push([educationTime, degree, major, school]);
-    } 
+    }
   }
 
   return value;
+};
+
+const parseClassify = (classify) => {
+  return [classify];
 };
 
 const generateSummary = (dataSource) => {
@@ -78,6 +106,8 @@ const generateSummary = (dataSource) => {
         obj.value = parseExperience(dataSource[label[i]]);
       } else if (label[i] === 'education_history') {  // 特殊处理: 解析education_history, 生成数组, 赋值给value
         obj.value = parseEducation(dataSource[label[i]]);
+      } else if (label[i] === 'classify') { // 特殊处理: 解析classify, 生成数组, 赋值给value
+        obj.value = parseClassify(dataSource[label[i]]);
       } else {  // 一般情况, 直接赋值
         obj.value = dataSource[label[i]];
       }
@@ -94,4 +124,7 @@ const generateSummary = (dataSource) => {
   return result;
 }
 
-module.exports = generateSummary;
+module.exports = {
+  generateSummary,
+  generateWorkExperience
+};

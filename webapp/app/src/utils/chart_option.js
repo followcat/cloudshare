@@ -71,7 +71,7 @@ const getRadarOption = (max, data, anonymized = false, cutNumber = 20) => {
 
   const option = {
     title: {
-      text: 'Charts',
+      text: '匹配度雷达图',
     },
     tooltip: {
       trigger: 'item',

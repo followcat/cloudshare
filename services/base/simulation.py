@@ -7,6 +7,7 @@ import ujson
 import utils._yaml
 import utils.builtin
 import core.outputstorage
+import services.memdatas
 import services.base.storage
 
 
@@ -33,11 +34,12 @@ class Simulation(services.base.storage.BaseStorage):
         return not os.path.exists(path) or (
             os.path.exists(path) and os.path.exists(idsfile))
 
-    def __init__(self, path, name, cvstorage, iotype='git'):
+    def __init__(self, path, name, storage, iotype='git'):
         super(Simulation, self).__init__(path, name, iotype)
         self._ids = None
-        self.cvstorage = cvstorage
+        self.storage = storage
         self.yamlpath = self.YAML_DIR
+        self.memdatas = services.memdatas.MemeryDatas(self)
         idsfile = os.path.join(path, Simulation.ids_file)
         if not os.path.exists(idsfile):
             dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
@@ -61,7 +63,16 @@ class Simulation(services.base.storage.BaseStorage):
         self.ids.add(id)
         return True
 
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False):
+    def _templateinfo(self, committer):
+        info = self.generate_info_template()
+        info['committer'] = committer
+        info['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if 'date' not in info or not info['date']:
+            info['date'] = time.time()
+        return info
+
+    def add(self, bsobj, committer=None, unique=True,
+            yamlfile=True, mdfile=False, do_commit=True):
         result = False
         id = bsobj.ID
         if (unique and not self.exists(id)) or not unique:
@@ -73,8 +84,7 @@ class Simulation(services.base.storage.BaseStorage):
             if yamlfile is True:
                 if not os.path.exists(os.path.join(self.path, self.yamlpath)):
                     os.makedirs(os.path.join(self.path, self.yamlpath))
-                info = self.generate_info_template()
-                info['committer'] = committer
+                info = self._templateinfo(committer)
                 name = core.outputstorage.ConvertName(id).yaml
                 dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                      allow_unicode=True, default_flow_style=False)
@@ -82,7 +92,8 @@ class Simulation(services.base.storage.BaseStorage):
                 filedatas.append(dumpinfo)
             self.interface.add_files(filenames, filedatas,
                                      message='Add new data %s.'%id,
-                                     committer=committer)
+                                     committer=committer, do_commit=do_commit)
+            self.memdatas.update('modifytime', id)
             result = True
         return result
 
@@ -95,86 +106,48 @@ class Simulation(services.base.storage.BaseStorage):
         return yaml.load(yamlstream, Loader=utils._yaml.Loader)
 
     def getmd(self, name):
-        return self.cvstorage.getmd(name)
+        return self.storage.getmd(name)
 
     def getyaml(self, id):
-        yaml = self.cvstorage.getyaml(id)
-        info = self.getinfo(id)
-        yaml.update(info)
-        return yaml
+        baseinfo = self.storage.getyaml(id)
+        prjinfo = self.getinfo(id)
+        basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
+        prjtime = prjinfo['modifytime'] if 'modifytime' in prjinfo else 0
+        prjinfo.update(baseinfo)
+        prjinfo['modifytime'] = max(basetime, prjtime)
+        return prjinfo
 
-    def _modifyinfo(self, id, key, value, committer):
-        result = {}
-        projectinfo = self.getinfo(id)
-        projectyaml = self.getyaml(id)
-        if not projectyaml[key] == value:
-            projectinfo[key] = value
-            self.saveinfo(id, projectinfo,
-                          'Modify %s key %s.' % (id, key), committer)
-            result = {key: value}
-        return result
-
-    def _addinfo(self, id, key, value, committer):
-        projectinfo = self.getinfo(id)
-        data = self._infoframe(value, committer)
-        projectinfo[key].insert(0, data)
-        self.saveinfo(id, projectinfo,
-                      'Add %s key %s.' % (id, key), committer)
-        return data
-
-    def _deleteinfo(self, id, key, value, date, committer):
-        projectinfo = self.getinfo(id)
-        data = self._infoframe(value, committer, date)
-        if data in projectinfo[key]:
-            projectinfo[key].remove(data)
-            self.saveinfo(id, projectinfo,
-                          'Delete %s key %s.' % (id, key), committer)
-            return data
-
-    @utils.issue.fix_issue('issues/update_name.rst')
-    def updateinfo(self, id, key, value, committer):
+    def updateinfo(self, id, key, value, committer, do_commit=True):
         assert key not in self.fix_item
         assert self.exists(id)
         projectinfo = self.getinfo(id)
-        baseinfo = self.getyaml(id)
         result = None
-        if key not in projectinfo and key not in baseinfo:
-            return result
-        if key in self.list_item:
-            result = self._addinfo(id, key, value, committer)
-        else:
-            result = self._modifyinfo(id, key, value, committer)
+        if key in projectinfo:
+            if key in self.list_item:
+                result = self._addinfo(id, key, value, committer, do_commit=do_commit)
+            else:
+                result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
-    def deleteinfo(self, id, key, value, committer, date):
+    def deleteinfo(self, id, key, value, committer, date, do_commit=True):
         assert key not in self.fix_item
         assert key in self.list_item
         assert self.exists(id)
         projectinfo = self.getinfo(id)
-        baseinfo = self.getyaml(id)
         result = None
-        if key not in projectinfo and key not in baseinfo:
+        if key not in projectinfo:
             return result
-        result = self._deleteinfo(id, key, value, date, committer)
+        result = self._deleteinfo(id, key, value, date, committer, do_commit=do_commit)
         return result
 
-    def _infoframe(self, value, username, date=None):
-        if date is None:
-            date = time.strftime('%Y-%m-%d %H:%M:%S')
-        data = {'author': username,
-                'content': value,
-                'date': date}
-        return data
-
-    def saveinfo(self, id, info, message, committer):
-        name = core.outputstorage.ConvertName(id).yaml
-        dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
-                             allow_unicode=True, default_flow_style=False)
-        self.interface.modify(name, dumpinfo, message=message, committer=committer)
+    def saveinfo(self, id, info, message, committer, do_commit=True):
+        result = super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
+        self.memdatas.update('modifytime', id)
+        return result
 
     def search(self, keyword):
         results = set()
-        allfile = self.cvstorage.search(keyword)
+        allfile = self.storage.search(keyword)
         for filename in allfile:
             id = core.outputstorage.ConvertName(filename).base
             if id in self.ids:
@@ -189,12 +162,11 @@ class Simulation(services.base.storage.BaseStorage):
             results.add(id)
         return results
 
-    def saveinfo(self, id, info, message, committer):
-        name = core.outputstorage.ConvertName(id).yaml
-        dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
-                             allow_unicode=True, default_flow_style=False)
-        self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
-                              message=message, committer=committer)
+    def search_key(self, key, value, ids=None):
+        return self.memdatas.search_key(key, value, ids)
+
+    def sorted_ids(self, key, ids=None, reverse=True):
+        return self.memdatas.sorted_ids(key, ids=ids, reverse=reverse)
 
     @property
     def ids(self):
@@ -213,17 +185,17 @@ class Simulation(services.base.storage.BaseStorage):
     def dump(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
-        def storage(filepath, stream):
+        def writefile(filepath, stream):
             with open(filepath, 'w') as f:
                 f.write(stream.encode('utf-8'))
         for i in self.ids:
             name = core.outputstorage.ConvertName(i)
             try:
                 mdpath = os.path.join(path, name.md)
-                mdstream = self.cvstorage.getmd(i)
-                storage(mdpath, mdstream)
+                mdstream = self.getmd(i)
+                writefile(mdpath, mdstream)
             except IOError:
                 pass
-            storage(htmlpath, htmlstream)
-            yamlinfo = self.cvstorage.getyaml(i)
+            writefile(htmlpath, htmlstream)
+            yamlinfo = self.getyaml(i)
             utils.builtin.save_yaml(yamlinfo, path, name.yaml)

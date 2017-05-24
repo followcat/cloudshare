@@ -7,7 +7,7 @@ import SearchResultHeader from './SearchResultHeader';
 import SearchResultItem from './SearchResultItem';
 import SearchResultPagination from './SearchResultPagination';
 
-import ColorGrad from '../../../utils/color_grad';
+import ColorGrad from '../../../utils/color-grad';
 
 import classNames from 'classnames';
 import './searchresult.less';
@@ -72,6 +72,7 @@ export default class SearchResultBox extends Component {
           {this.renderResultDOM()}
         </Spin>
         <SearchResultPagination
+          current={this.props.current}
           total={this.props.total}
           onSwitchPage={this.props.onSwitchPage}
         />

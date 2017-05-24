@@ -14,22 +14,22 @@ class Mask extends Component {
   }
 
   render() {
+    const { prefixCls } = this.props;
+
     return (
-      <div
-        className="sider-panel-mask"
-        onClick={this.handleClick}  
-      >
-      </div>
+      <div className={prefixCls} onClick={this.handleClick} />
     );
   }
 }
 
 Mask.defaultProps = {
+  prefixCls: 'sider-panel-mask',
   maskClosable: true,
   onClose() {}
 };
 
 Mask.propTypes = {
+  prefixCls: PropTypes.string,
   maskClosable: PropTypes.bool,
   onClose: PropTypes.func,
 };

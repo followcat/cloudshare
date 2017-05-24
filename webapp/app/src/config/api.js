@@ -15,9 +15,13 @@ export const API = {
 
   COMPANY_API: `${HOST}/api/company`,
 
+  ADDED_COMPANY_LIST_API: `${HOST}/api/addedcompanylist`,
+
   ALL_COMPANY_API: `${HOST}/api/companyall`,
 
-  ALL_COMPANY_BY_SEARCH_API: `${HOST}/api/searchcobytext`,
+  COMPANY_BY_SEARCH_TEXT_API: `${HOST}/api/searchcobytext`,
+  
+  COMPANY_BY_SEARCH_KEY_API: `${HOST}/api/searchcobykey`,
 
   UPDATE_COMPANY_INFO_API: `${HOST}/api/companyinfoupdate`,
 
@@ -45,6 +49,20 @@ export const API = {
 
   UPLOAD_ENGLISH_RESUME_API: `${HOST}/api/uploadengcv`,
 
+  UPLOAD_EXCEL_API: `${HOST}/api/couploadexcel`,
+
+  CONFIRM_UPLOAD_EXCEL_API: `${HOST}/api/coconfirmexcel`,
+
+  RESUME_INFO_API: `${HOST}/api/resume`,
+
+  SIMILAR_API: `${HOST}/api/mining/similar`,
+
+  RESUME_LIST_API: `${HOST}/api/peoplebycv`,
+
+  ADDITIONAL_INFO_API: `${HOST}/api/people`,
+
+  UPDATE_RESUME_INFO_API: `${HOST}/api/cv/updateinfo`,
+
   BOOKMARK_API: `bookmark`,  // {host}/api/accounts/{id}/bookmark
 
   //UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}
@@ -54,4 +72,21 @@ export const API = {
   LSI_BY_CV_ID_API: `${HOST}/api/mining/lsibycvid`,
 
   LSI_BY_DOC_API: `${HOST}/api/mining/lsibydoc`,
+
+  ANALYSIS_BY_DOC_API: `${HOST}/api/mining/analysisdoc`,
+
+  MINING_CV_VALUABLE_API: `${HOST}/api/mining/cvvaluable`,
+
+  DATABASE_INFO_API: `${HOST}/api/dbnumbers`,
+
+  MINING_ABILITY_API: `${HOST}/api/mining/ability`,
+
+  MINING_EXPERIENCE_API: `${HOST}/api/mining/experience`,
+
+  MINING_POSITION_API: `${HOST}/api/mining/position`,
+
+  MINING_VALUABLE_API: `${HOST}/api/mining/valuable`,
+
+  MINING_CV_API: `${HOST}/api/mining/cv`
 };
+

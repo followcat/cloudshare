@@ -15,6 +15,8 @@ class JobDescriptionAPI(Resource):
         self.reqparse.add_argument('co_id', location = 'json')
         self.reqparse.add_argument('status', location = 'json')
         self.reqparse.add_argument('description', location = 'json')
+        self.reqparse.add_argument('commentary', location = 'json')
+        self.reqparse.add_argument('followup', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         super(JobDescriptionAPI, self).__init__()
 
@@ -35,11 +37,16 @@ class JobDescriptionAPI(Resource):
         project = args['project']
         status = args['status']
         description = args['description']
-        result = self.svc_mult_cv.getproject(project).jd_modify(jd_id, description, status, user.id)
+        commentary = args['commentary'] if args['commentary'] else ''
+        followup = args['followup'] if args['followup'] else ''
+        result = self.svc_mult_cv.getproject(project).jd_modify(jd_id, description,
+                    status, commentary, followup, user.id)
         if result: 
-            response = { 'code': 200, 'data': result, 'message': 'Update job description successed.' }
+            response = { 'code': 200, 'data': result,
+                         'message': 'Update job description successed.' }
         else:
-            response = { 'code': 400, 'data': result, 'message': 'Update job description failed. You are not the committer.' }
+            response = { 'code': 400, 'data': result,
+                         'message': 'Update job description failed. You are not the committer.' }
         return response
 
 
@@ -53,6 +60,8 @@ class JobDescriptionUploadAPI(Resource):
         self.reqparse.add_argument('jd_name', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
         self.reqparse.add_argument('jd_description', location = 'json')
+        self.reqparse.add_argument('commentary', location = 'json')
+        self.reqparse.add_argument('followup', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         super(JobDescriptionUploadAPI, self).__init__()
 
@@ -63,7 +72,10 @@ class JobDescriptionUploadAPI(Resource):
         co_id = args['co_id']
         jd_name = args['jd_name']
         description = args['jd_description']
-        result = self.svc_mult_cv.getproject(project).jd_add(co_id, jd_name, description, user.id)
+        commentary = args['commentary'] if args['commentary'] else ''
+        followup = args['followup'] if args['followup'] else ''
+        result = self.svc_mult_cv.getproject(project).jd_add(co_id, jd_name, description,
+                                                             commentary, followup, user.id)
         return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 

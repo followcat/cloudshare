@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import re
+import time
 import string
 import os.path
 import functools
+
+import utils.chsname
 import extractor.unique_id
 import extractor.education
 import extractor.expectation
@@ -35,6 +38,7 @@ cv_template = (
     ("comment",             list),
     ("tag",                 list),
     ("tracking",            list),
+    ("date",                time.time),
 )
 
 co_template = (
@@ -47,6 +51,7 @@ co_template = (
     ("address",             str),
     ("introduction",        str),
     ("email",               str),
+    ("date",                time.time),
 )
 
 peo_template = (
@@ -290,19 +295,19 @@ def catch_cvinfo(stream, filename, catch_info=True):
     if catch_info is True:
         catchinfo = catch(stream)
         info.update(catchinfo)
+        if not info['name']:
+            info['name'] = utils.chsname.name_from_filename(filename)
     info["id"] = extractor.unique_id.cv_id(stream)
     info["filename"] = filename
     return info
 
 
-def catch_coinfo(stream, name):
+def catch_coinfo(stream):
     """
-        >>> intro = {'introduction': 'introduction'}
-        >>> assert catch_coinfo(name='sgwgewtgqe', stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
+        >>> intro = {'name': 'sgwgewtgqe', 'introduction': 'introduction'}
+        >>> assert catch_coinfo(stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
     """
     info = generate_info_template(co_template)
-    info['name'] = name
-    info['id'] = extractor.unique_id.company_id(name)
     if isinstance(stream, dict):
         for key in info:
             if key in stream and stream[key]:
@@ -316,6 +321,7 @@ def catch_coinfo(stream, name):
             info['business'].append(stream['business'])
         except KeyError:
             pass
+    info['id'] = extractor.unique_id.company_id(info['name'])
     return info
 
 def catch_peopinfo(stream):

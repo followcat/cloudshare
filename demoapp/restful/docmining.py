@@ -9,7 +9,6 @@ from flask.ext.restful import Resource
 import utils.builtin
 import core.mining.valuable
 import demoapp.tools.caesarcipher
-from baseapp.mining import load_mining
 
 
 class DocMiningAPI(Resource):
@@ -27,7 +26,7 @@ class DocMiningAPI(Resource):
         args = self.reqparse.parse_args()
         doc = args['doc']
         cur_page = args['page']
-        model = 'medical'
+        model = 'temporary'
         result = self.process(model, doc, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -73,7 +72,7 @@ class DocValuableAPI(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         doc = args['doc']
-        result = self._get(doc, 'medical')
+        result = self._get(doc, 'temporary')
         return { 'code': 200, 'data': result }
 
     def _get(self, doc, projectname):
@@ -106,8 +105,6 @@ class DocValuableAPI(Resource):
 
 class DocCVValuableAPI(DocValuableAPI):
 
-    tmpminer = load_mining('tmplsimodel', 'tmpcutwords')[1]
-
     def __init__(self):
         super(DocCVValuableAPI, self).__init__()
         self.reqparse.add_argument('cv', location = 'json')
@@ -116,19 +113,19 @@ class DocCVValuableAPI(DocValuableAPI):
         rank = 0
         stars = 0
         name_list = []
-        lsisim = self.tmpminer.getsims(projectname, [projectname])[0]
+        lsisim = self.miner.getsims(projectname, [projectname])[0]
         tmpSha1 = hashlib.sha1()
         tmpSha1.update(cv.encode('utf-8'))
         tmpSha1_Digest = tmpSha1.hexdigest()
         if not tmpSha1_Digest in lsisim.names:
             lsisim.add(tmpSha1_Digest, cv)
             lsisim.set_index()
-        result = core.mining.valuable.rate(self.tmpminer, self.svc_mult_cv,
+        result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
                                            doc, projectname, uses=[projectname],
                                            name_list=[tmpSha1_Digest],
                                            education_req=False)
-        ranklist = self.tmpminer.probability(projectname, doc, top=top)
-        rate = self.tmpminer.probability_by_id(projectname, doc,
+        ranklist = self.miner.probability(projectname, doc, top=top)
+        rate = self.miner.probability_by_id(projectname, doc,
                                                 tmpSha1_Digest, uses=[projectname])
         try:
             rank = int(float(ranklist.index(rate))/len(ranklist)*100)+1
@@ -141,7 +138,7 @@ class DocCVValuableAPI(DocValuableAPI):
         args = self.reqparse.parse_args()
         cv = args['cv']
         doc = args['doc']
-        projectname = 'medical'
+        projectname = 'temporary'
         uses = [projectname]
         response = dict()
         datas = []
@@ -178,5 +175,5 @@ class CurrivulumvitaeAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         realid = demoapp.tools.caesarcipher.decrypt(self.caesar_cipher_num, id)
-        yaml = self.svc_mult_cv.getyaml(realid, projectname='medical')
+        yaml = self.svc_mult_cv.getyaml(realid, projectname='temporary')
         return { 'code': 200, 'data': { 'yaml_info': yaml } }

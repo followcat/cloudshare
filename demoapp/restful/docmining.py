@@ -13,6 +13,8 @@ import demoapp.tools.caesarcipher
 
 class DocMiningAPI(Resource):
 
+    projectname = 'temporary'
+
     def __init__(self):
         super(DocMiningAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -26,7 +28,7 @@ class DocMiningAPI(Resource):
         args = self.reqparse.parse_args()
         doc = args['doc']
         cur_page = args['page']
-        model = 'temporary'
+        model = self.projectname
         result = self.process(model, doc, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -34,7 +36,8 @@ class DocMiningAPI(Resource):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(model, doc, top=500)
+        project = self.svc_mult_cv.getproject(self.projectname)
+        result = self.miner.probability(model, doc, uses=project.getclassify(), top=500)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

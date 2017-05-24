@@ -68,7 +68,7 @@ class FilterForm extends Component {
 
       const formValues = Object.assign({}, {
         ...values,
-        'date': dateValue ? [dateValue[0].format('YYYY-MM-DD'), dateValue[1].format('YYYY-MM-DD')] : ['', '']
+        'date': dateValue && dateValue[0] ? [dateValue[0].format('YYYY-MM-DD'), dateValue[1].format('YYYY-MM-DD')] : ['', '']
       }, {
         gender: this.state.gender,
         education: this.state.education,

@@ -267,11 +267,11 @@ class Mining(object):
                 if newmodel or updated:
                     self.sim[modelname][simname].save()
 
-    def probability(self, basemodel, doc, uses=None, top=None):
+    def probability(self, basemodel, doc, uses=None, top=None, minimum=None):
         result = []
         sims = self.getsims(basemodel, uses=uses)
         for sim in sims:
-            result.extend(sim.probability(doc, top=top))
+            result.extend(sim.probability(doc, top=top, minimum=minimum))
         results_set = set(result)
         return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
 

@@ -57,7 +57,7 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
     for root, dirs, files in os.walk(path):
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
-            filepro = core.docprocessor.Processor(filename, f, temp_output)
+            filepro = core.docprocessor.LibreOfficeProcessor(filename, f, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
                                         filename=filepro.base.base)
@@ -81,7 +81,7 @@ def classify(path, temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for name in files:
-            filepro = core.docprocessor.Processor(root, name, temp_output)
+            filepro = core.docprocessor.LibreOfficeProcessor(root, name, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
                                         filename=filepro.base.base)

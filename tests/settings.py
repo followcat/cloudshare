@@ -61,7 +61,7 @@ class Config(object):
     def init_samplecv(self):
         filename = 'cv_1.doc'
         f = open(os.path.join('core/test', filename))
-        filepro = core.docprocessor.Processor(f, filename, self.UPLOAD_TEMP)
+        filepro = core.docprocessor.LibreOfficeProcessor(f, filename, self.UPLOAD_TEMP)
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                     stream=filepro.markdown_stream.decode('utf8'),
                                     filename=filename)

@@ -84,8 +84,9 @@ class UploadCVAPI(Resource):
             upload[user.id] = dict()
         network_file = flask.request.files['files']
         filename = network_file.filename
-        filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
-                                              flask.current_app.config['UPLOAD_TEMP'])
+        filepro = core.docprocessor.LibreOfficeProcessor(network_file,
+                                            filename.encode('utf-8'),
+                                            flask.current_app.config['UPLOAD_TEMP'])
         if filepro.result is False:
             return { 'code': 401, 'data': { 'result': False,
                                             'resultid': filepro.resultcode,
@@ -151,7 +152,7 @@ class UploadEnglishCVAPI(Resource):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
         filename = network_file.filename
-        filepro = core.docprocessor.Processor(network_file,
+        filepro = core.docprocessor.LibreOfficeProcessor(network_file,
                                               filename.encode('utf-8'),
                                               flask.current_app.config['UPLOAD_TEMP'])
         yamlinfo = extractor.information_explorer.catch_cvinfo(

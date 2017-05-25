@@ -127,7 +127,7 @@ class DocCVValuableAPI(DocValuableAPI):
                                            doc, projectname, uses=[projectname],
                                            name_list=[tmpSha1_Digest],
                                            education_req=False)
-        ranklist = self.miner.probability(projectname, doc, top=top)
+        ranklist = self.miner.probability(projectname, doc, top=0.05, minimum=1000)
         rate = self.miner.probability_by_id(projectname, doc,
                                                 tmpSha1_Digest, uses=[projectname])
         try:

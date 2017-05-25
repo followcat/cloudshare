@@ -53,7 +53,7 @@ class FastMatching extends Component {
     });
 
     const date = new Date();
-    const defFilterData = {date: [moment(date).add(-15, 'days').format('YYYY-MM-DD'),
+    const defFilterData = {date: [moment(date).add(-180, 'days').format('YYYY-MM-DD'),
                                   moment(date).format('YYYY-MM-DD')]};
     
     if (location.query.jd_id) {

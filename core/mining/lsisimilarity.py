@@ -102,7 +102,7 @@ class LSIsimilarity(object):
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 
-    def probability(self, doc, top=None):
+    def probability(self, doc, top=None, minimum=0):
         """
             >>> from tests.test_model import *
             >>> from webapp.settings import *
@@ -186,6 +186,7 @@ class LSIsimilarity(object):
             top = len(self.index)
         elif top < 1:
             top = int(len(self.index)*top)
+        top = top if top > minimum else minimum
         results = []
         vec_lsi = self.lsi_model.probability(doc)
         try:

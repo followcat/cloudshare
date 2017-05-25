@@ -143,7 +143,7 @@ class LSIbaseAPI(Resource):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(project, doc, uses=uses, top=500)
+        result = self.miner.probability(project, doc, uses=uses, top=0.05, minimum=1000)
         result = self.index.filter_ids(result, filterdict, uses=uses)
         totals = len(result)
         if totals%eve_count != 0:

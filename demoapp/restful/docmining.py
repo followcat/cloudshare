@@ -37,7 +37,7 @@ class DocMiningAPI(Resource):
             cur_page = 1
         datas = []
         project = self.svc_mult_cv.getproject(self.projectname)
-        result = self.miner.probability(model, doc, uses=project.getclassify(), top=500)
+        result = self.miner.probability(model, doc, uses=project.getclassify(), top=0.05, minimum=1000)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

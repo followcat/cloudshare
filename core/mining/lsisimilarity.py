@@ -188,12 +188,11 @@ class LSIsimilarity(object):
             top = int(len(self.index)*top)
         top = top if top > minimum else minimum
         results = []
+        self.num_best = top
         vec_lsi = self.lsi_model.probability(doc)
-        try:
-            sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
-        except IndexError:
-            return results
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims[0:top])
+        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])),
+                                self.index[vec_lsi])
+        self.num_best = None
         return results
 
     def probability_by_id(self, doc, id):
@@ -203,6 +202,14 @@ class LSIsimilarity(object):
         vec_lsi = self.lsi_model.probability(doc)
         result = abs(self.index[vec_lsi][index])
         return (id, str(result))
+
+    @property
+    def num_best(self):
+        return self.index.num_best
+
+    @num_best.setter
+    def num_best(self, value):
+        self.index.num_best = value
 
     @property
     def corpus(self):

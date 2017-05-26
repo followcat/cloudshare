@@ -41,7 +41,8 @@ const rootRoute = {
     require('../routes/resume'),
     require('../routes/upload-preview'),
     require('../routes/go-to-signin'),
-    require('../routes/manage')
+    require('../routes/manage'),
+    require('../routes/best-excellent'),
   ]
 };
 

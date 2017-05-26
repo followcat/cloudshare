@@ -34,6 +34,9 @@ const navMenus = [{
 }, {
   url: URL.getProjectManagement(),
   text: language.PROJECT_MANAGEMENT
+}, {
+  url: URL.getBestExcellent(),
+  text: language.BEST_EXCELLENT
 }];
 
 class LayoutHeader extends Component {

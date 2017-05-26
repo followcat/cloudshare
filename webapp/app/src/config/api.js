@@ -69,6 +69,8 @@ export const API = {
 
   LSI_BY_JD_ID_API: `${HOST}/api/mining/lsibyjdid`,
 
+  LSI_BY_ALL_JD_API: `${HOST}/api/mining/lsibyalljd`,
+
   LSI_BY_CV_ID_API: `${HOST}/api/mining/lsibycvid`,
 
   LSI_BY_DOC_API: `${HOST}/api/mining/lsibydoc`,

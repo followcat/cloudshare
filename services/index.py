@@ -1,4 +1,5 @@
 import os
+import copy
 import time
 import cPickle
 import collections
@@ -190,6 +191,7 @@ class ReverseIndexing(object):
 
     def filter_ids(self, ids, filterdict, uses=None):
         indexdict = {}
+        filterdict = copy.deepcopy(filterdict)
         if 'date' in filterdict:
             try:
                 filterdict['date'] = utils.builtin.nemudate(filterdict['date'])

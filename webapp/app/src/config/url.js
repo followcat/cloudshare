@@ -54,4 +54,8 @@ export const URL = {
     return `/pm/jobdescription`;
   },
 
+  getBestExcellent: () => {
+    return `/excellent`;
+  },
+
 };

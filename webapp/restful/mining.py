@@ -190,6 +190,46 @@ class LSIbyJDidAPI(LSIbaseAPI):
         return { 'code': 200, 'data': result }
 
 
+class LSIbyAllJDAPI(LSIbaseAPI):
+
+    def __init__(self):
+        super(LSIbyAllJDAPI, self).__init__()
+        self.index = flask.current_app.config['SVC_INDEX']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
+        self.reqparse.add_argument('threshold', location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        projectname = args['project']
+        filterdict = args['filterdict']
+        threshold = args['threshold'] if args['threshold'] else 0.8
+        results = []
+        project = self.svc_mult_cv.getproject(projectname)
+        for jd in project.jobdescription.lists():
+            try:
+                if jd['status'] == 'Closed':
+                    continue
+            except KeyError:
+                continue
+            doc = jd['description']
+            doc += jd['commentary']
+            result = self.miner.probability(project.name, doc, top=0.001, minimum=100)
+            print len(result)
+            result = self.index.filter_ids(result, filterdict)
+            print len(result)
+            output = {}
+            output['JDcompany'] = project.company_get(jd['company'])['name']
+            output['JDname'] = jd['name']
+            if result:
+                print float(result[0][1])
+                output.update(self.svc_mult_cv.getyaml(result[0][0]))
+                output['CVvalue'] = result[0][1]
+            results.append(output)
+        return { 'code': 200, 'data': results }
+
+
 class LSIbyCVidAPI(LSIbaseAPI):
 
     def __init__(self):

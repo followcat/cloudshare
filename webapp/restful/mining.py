@@ -215,18 +215,16 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 continue
             doc = jd['description']
             doc += jd['commentary']
-            result = self.miner.probability(project.name, doc, top=0.001, minimum=100)
-            print len(result)
+            result = self.miner.probability(project.name, doc, top=0.001, minimum=1000)
             result = self.index.filter_ids(result, filterdict)
-            print len(result)
             output = {}
-            output['JDcompany'] = project.company_get(jd['company'])['name']
+            output['JDid'] = jd['id']
             output['JDname'] = jd['name']
-            if result:
-                print float(result[0][1])
+            output['JDcompany'] = project.company_get(jd['company'])['name']
+            if result and result[0][1]>threshold:
                 output.update(self.svc_mult_cv.getyaml(result[0][0]))
                 output['CVvalue'] = result[0][1]
-            results.append(output)
+                results.append(output)
         return { 'code': 200, 'data': results }
 
 

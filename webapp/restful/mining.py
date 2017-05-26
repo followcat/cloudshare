@@ -1,3 +1,5 @@
+import datetime
+
 import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
@@ -192,19 +194,34 @@ class LSIbyJDidAPI(LSIbaseAPI):
 
 class LSIbyAllJDAPI(LSIbaseAPI):
 
+    cache = {}
+
     def __init__(self):
         super(LSIbyAllJDAPI, self).__init__()
         self.index = flask.current_app.config['SVC_INDEX']
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('fromcache', location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
-        self.reqparse.add_argument('threshold', location = 'json')
+        self.reqparse.add_argument('threshold', type=float, location = 'json')
 
-    def post(self):
-        args = self.reqparse.parse_args()
-        projectname = args['project']
-        filterdict = args['filterdict']
-        threshold = args['threshold'] if args['threshold'] else 0.8
+    def fromcache(self, projectname, filterdict, threshold):
+        results = []
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        if today not in self.cache:
+            self.cache[today] = {}
+            self.cache[today][projectname] = self.findbest(projectname,
+                                                           filterdict,
+                                                           threshold)
+        elif projectname not in self.cache[today]:
+            self.cache[today][projectname] = self.findbest(projectname,
+                                                           filterdict,
+                                                           threshold)
+        return self.cache[today][projectname]
+
+    def findbest(self, projectname, filterdict, threshold=None):
+        if threshold is None:
+            threshold = 0.8
         results = []
         project = self.svc_mult_cv.getproject(projectname)
         for jd in project.jobdescription.lists():
@@ -221,10 +238,22 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             output['JDid'] = jd['id']
             output['JDname'] = jd['name']
             output['JDcompany'] = project.company_get(jd['company'])['name']
-            if result and result[0][1]>threshold:
+            if result and float(result[0][1])>float(threshold):
                 output.update(self.svc_mult_cv.getyaml(result[0][0]))
                 output['CVvalue'] = result[0][1]
                 results.append(output)
+        return results
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        threshold = args['threshold']
+        fromcache = args['fromcache']
+        projectname = args['project']
+        filterdict = args['filterdict']
+        if fromcache:
+            results = self.fromcache(projectname, filterdict, threshold)
+        else:
+            retults = self.findbest(projectname, filterdict, threshold)
         return { 'code': 200, 'data': results }
 
 

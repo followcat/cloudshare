@@ -47,6 +47,9 @@ export default class Header extends Component {
               <div className="cs-layout-item">
                 <a href="/pm" target="_blank">JD List</a>
               </div>
+              <div className="cs-layout-item">
+                <a href="/excellent" target="_blank">Best Excellent</a>
+              </div>
             </div>
           </div>
         </div>

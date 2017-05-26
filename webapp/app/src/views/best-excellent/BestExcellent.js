@@ -12,20 +12,21 @@ class BestExcellent extends Component {
     super();
     this.state = {
       dataSource: [],
-      pagesize: 20,
+      pagesize: '20',
       loading: true,
+      fromcache: true,
       allJDAPI: API.LSI_BY_ALL_JD_API,
     };
   }
 
   componentDidMount() {
-    const { allJDAPI } = this.state;
+    const { fromcache, allJDAPI } = this.state;
     const date = new Date();
     const colorGrad = new ColorGrad();
     const gradient = colorGrad.gradient();
-    const defFilterData = { date: [moment(date).add(0, 'days').format('YYYY-MM-DD'),
+    const defFilterData = { date: [moment(date).add(-1, 'days').format('YYYY-MM-DD'),
                                    moment(date).add(0, 'days').format('YYYY-MM-DD')] };
-    var postData = { filterdict: defFilterData, threshold: 0.75 };
+    var postData = { filterdict: defFilterData, threshold: 0.75, fromcache: fromcache };
     getFastMatching(allJDAPI, postData, json => {
       if (json.code === 200) {
         json.data.forEach((value) => {

@@ -252,7 +252,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         projectname = args['project']
         filterdict = args['filterdict']
         if fromcache is False:
-            retults = self.findbest(projectname, filterdict, threshold)
+            results = self.findbest(projectname, filterdict, threshold)
         else:
             results = self.fromcache(projectname, filterdict, threshold)
         return { 'code': 200, 'data': results }

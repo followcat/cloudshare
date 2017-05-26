@@ -200,8 +200,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         super(LSIbyAllJDAPI, self).__init__()
         self.index = flask.current_app.config['SVC_INDEX']
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.reqparse.add_argument('fromcache', location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('fromcache', type=bool, location = 'json')
+        self.reqparse.add_argument('project', type=str, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
         self.reqparse.add_argument('threshold', type=float, location = 'json')
 
@@ -245,15 +245,16 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         return results
 
     def post(self):
+        results = []
         args = self.reqparse.parse_args()
         threshold = args['threshold']
         fromcache = args['fromcache']
         projectname = args['project']
         filterdict = args['filterdict']
-        if fromcache:
-            results = self.fromcache(projectname, filterdict, threshold)
-        else:
+        if fromcache is False:
             retults = self.findbest(projectname, filterdict, threshold)
+        else:
+            results = self.fromcache(projectname, filterdict, threshold)
         return { 'code': 200, 'data': results }
 
 

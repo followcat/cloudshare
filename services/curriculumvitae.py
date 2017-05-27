@@ -23,8 +23,8 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> import shutil
             >>> import os.path
             >>> import core.basedata
-            >>> import core.docprocessor
             >>> import services.curriculumvitae
+            >>> import utils.docprocessor.libreoffice
             >>> import extractor.information_explorer
             >>> root = "core/test"
             >>> name = "cv_1.doc"
@@ -33,7 +33,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
             >>> svc_cv = services.curriculumvitae.CurriculumVitae(DIR)
             >>> obj = open(os.path.join(root, name))
             >>> os.makedirs(test_path)
-            >>> fp1 = core.docprocessor.LibreOfficeProcessor(obj, name, test_path)
+            >>> fp1 = utils.docprocessor.libreoffice.LibreOfficeProcessor(obj, name, test_path)
             >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
             ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
             >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)

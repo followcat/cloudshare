@@ -5,11 +5,10 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
-import utils.timeout.process
-import utils.timeout.exception
 import core.basedata
 import core.exception
-import core.docprocessor
+import utils.timeout.process
+import utils.timeout.exception
 import extractor.information_explorer
 
 

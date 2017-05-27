@@ -10,7 +10,7 @@ import services.project
 import services.company
 import services.curriculumvitae
 import interface.gitinterface
-import core.docprocessor
+import utils.docprocessor.libreoffice
 import extractor.information_explorer
 
 class Config(object):
@@ -61,7 +61,8 @@ class Config(object):
     def init_samplecv(self):
         filename = 'cv_1.doc'
         f = open(os.path.join('core/test', filename))
-        filepro = core.docprocessor.LibreOfficeProcessor(f, filename, self.UPLOAD_TEMP)
+        filepro = utils.docprocessor.libreoffice.LibreOfficeProcessor(f, filename,
+                                                                      self.UPLOAD_TEMP)
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                     stream=filepro.markdown_stream.decode('utf8'),
                                     filename=filename)

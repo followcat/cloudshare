@@ -30,26 +30,33 @@ class VisitingForm extends Component {
   }
 
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      currentUser,
+      placeholder,
+      btnType,
+      btnText
+    } = this.props,
+    { value } = this.state;
 
     return (
-      <div className="cs-visiting-form">
-        <div className="cs-visiting-form-icon">
-          <span className="cs-visiting-form-user">
-            {props.currentUser && props.currentUser.split('')[0].toUpperCase()}
+      <div className={prefixCls}>
+        <div className={`${prefixCls}-icon`}>
+          <span className={`${prefixCls}-user`}>
+            {currentUser && currentUser.split('')[0].toUpperCase()}
           </span>
         </div>
-        <div className="cs-visiting-form-field">
+        <div className={`${prefixCls}-field`}>
           <Input
-            value={this.state.value}
-            placeholder={props.placeholder}
+            value={value}
+            placeholder={placeholder}
             onChange={this.handleChange}
           />
           <Button
-            type={props.btnType}
+            type={btnType}
             onClick={this.handleClick}
           >
-            {props.btnText}
+            {btnText}
           </Button>
         </div>
       </div>
@@ -58,17 +65,20 @@ class VisitingForm extends Component {
 }
 
 VisitingForm.defaultProps = {
+  prefixCls: 'cs-visiting-form',
   placeholder: '',
   btnType: 'primary',
   btnText: 'Submit',
-  onSubmit() {},
+  onSubmit() {}
 };
 
-VisitingForm.propTypess = {
+VisitingForm.propTypes = {
+  prefixCls: PropTypes.string,
   placeholder: PropTypes.string,
+  currentUser: PropTypes.array,
   btnType: PropTypes.string,
   btnText: PropTypes.string,
-  onSubmit: PropTypes.func,
+  onSubmit: PropTypes.func
 };
 
 export default VisitingForm;

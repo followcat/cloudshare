@@ -26,7 +26,7 @@ export default class Header extends Component {
     const fixCls = this.props.fixed ? 'cs-layout-top fixed' : 'cs-layout-top';
     return (
       <div className={fixCls}>
-        <div className="cs-layout-herader">
+        <div className="cs-layout-header">
           <div className="cs-layout-wrapper">
             <div className="cs-layout-logo">
               <a href="/search">
@@ -46,6 +46,9 @@ export default class Header extends Component {
               </div>
               <div className="cs-layout-item">
                 <a href="/pm" target="_blank">JD List</a>
+              </div>
+              <div className="cs-layout-item">
+                <a href="/excellent" target="_blank">Best Excellent</a>
               </div>
             </div>
           </div>

@@ -7,11 +7,19 @@ export const URL = {
   },
 
   getFastMatchingByCV: (id) => {
-    return `/fastmatching?cv_id=${id}`
+    return `/fastmatching?cv_id=${id}`;
   },
 
   getFastMatchingByDoc: () => {
-    return `/fastmatching`
+    return `/fastmatching`;
+  },
+
+  getDocMining: () => {
+    return `/docmining`;
+  },
+
+  getCVDocMining: () => {
+    return `/cvdocmining`;
   },
 
   getListJDURL: () => {
@@ -35,7 +43,7 @@ export const URL = {
   },
 
   getUserInfoURL: () => {
-    return `/userinfo`;
+    return `/userinfo/history`;
   },
 
   getDownloadURL: (id, fileName) => {
@@ -43,7 +51,11 @@ export const URL = {
   },
 
   getProjectManagement: () => {
-    return `/pm`;
+    return `/pm/jobdescription`;
+  },
+
+  getBestExcellent: () => {
+    return `/excellent`;
   },
 
 };

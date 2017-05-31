@@ -16,7 +16,11 @@ class Header extends Component {
           menus={props.navMenus}
           selectedKeys={props.selectedKeys}
         />
-        <ProjectMessage project={props.project} />
+        <ProjectMessage
+          project={props.project}
+          projects={props.projects}
+          onChange={this.props.onChange}
+        />
         <Profile>
           <Dropdown overlay={props.profileMenu}>
             <a className="cs-dropdown-link" href="javascript: void(0);">

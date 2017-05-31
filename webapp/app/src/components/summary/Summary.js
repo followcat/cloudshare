@@ -34,51 +34,51 @@ class Summary extends Component {
           colValue = TOTAL_COLUMN / props.number;
 
     return (
-      <Card>
-      {data.map((dataItem, index) => {
-        if (Array.isArray(dataItem)) {
-          return (
-            <Row key={index}>
-              {dataItem.map((v, i) => {
-                return (
-                  <Col
-                    key={i}
-                    span={colValue}
-                  >
-                    <Col
-                      span={10}
-                      className={`${props.prefixCls}-label`}
-                    >
-                      {`${v.name}: `}
-                    </Col>  
-                    <Col span={14}>
-                      {v.value}
-                    </Col>
-                  </Col>
-                );
-              })}
-            </Row>
-          );
-        } else {
-          return (
-            <Row key={index}>
-              <Col
-                span={5}
-                className={`${props.prefixCls}-label`}
-              >
-                {`${dataItem.name}: `}
-              </Col>
-              <Col span={19}>
-                {dataItem.value.reverse().map((valueItem, index) => {
+      <Card className={props.prefixCls}>
+        {data.map((dataItem, index) => {
+          if (Array.isArray(dataItem)) {
+            return (
+              <Row key={index}>
+                {dataItem.map((v, i) => {
                   return (
-                    <p key={index}>{valueItem.join(' | ')}</p>
+                    <Col
+                      key={i}
+                      span={colValue}
+                    >
+                      <Col
+                        span={10}
+                        className={`${props.prefixCls}-label`}
+                      >
+                        {`${v.name}: `}
+                      </Col>  
+                      <Col span={14}>
+                        {v.value}
+                      </Col>
+                    </Col>
                   );
                 })}
-              </Col>
-            </Row>
-          );
-        }
-      })}
+              </Row>
+            );
+          } else {
+            return (
+              <Row key={index}>
+                <Col
+                  span={5}
+                  className={`${props.prefixCls}-label`}
+                >
+                  {`${dataItem.name}: `}
+                </Col>
+                <Col span={19}>
+                  {dataItem.value.reverse().map((valueItem, index) => {
+                    return (
+                      <p key={index}>{valueItem.join(' | ')}</p>
+                    );
+                  })}
+                </Col>
+              </Row>
+            );
+          }
+        })}
       </Card>
     );
   }

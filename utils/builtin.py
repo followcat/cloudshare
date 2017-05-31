@@ -3,6 +3,7 @@ import os
 import time
 import socket
 import hashlib
+import datetime
 
 import yaml
 import utils._yaml
@@ -60,6 +61,20 @@ except ImportError:
 
 def strftime(t, format='%Y-%m-%d %H:%M:%S'):
     return time.strftime(format, time.localtime(t))
+
+
+def nemudate(dates):
+    str_result = []
+    datetimes_result = []
+    datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
+    tstart = min(datetimes)
+    tend = max(datetimes)
+    while(tstart <= tend):
+        datetimes_result.append(tstart)
+        tstart += datetime.timedelta(days = 1)
+    for each in datetimes_result:
+        str_result.append(each.strftime('%Y%m%d'))
+    return str_result
 
 
 def is_port_open(ip, port):

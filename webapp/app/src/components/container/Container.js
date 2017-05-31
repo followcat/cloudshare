@@ -3,12 +3,21 @@ import React, { Component, PropTypes } from 'react';
 
 class Container extends Component {
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      className,
+      children
+    } = this.props;
+
+    let classes = prefixCls;
+    if (className) {
+      classes += ` ${className}`;
+    }
 
     return(
-      <div className={`${props.prefixCls}`}>
-        <div className={`${props.prefixCls}-wrapper`}>
-            {props.children}
+      <div className={classes}>
+        <div className={`${prefixCls}-wrapper`}>
+            {children}
         </div>
       </div>
     );
@@ -16,11 +25,13 @@ class Container extends Component {
 }
 
 Container.defaultProps = {
-  prefixCls: 'cs-container',
+  prefixCls: 'cs-container'
 };
 
 Container.propTypes = {
   prefixCls: PropTypes.string,
+  className: PropTypes.string,
+  children: PropTypes.element
 };
 
 export default Container;

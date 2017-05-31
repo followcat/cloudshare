@@ -19,15 +19,15 @@ class LSIsimilarity(object):
         self.lsi_model = lsi_model
         self.index = None
 
-    def update(self, svccv_list):
+    def update(self, svccv_list, newmodel=False):
         added = False
         for svc_cv in svccv_list:
-            for name in svc_cv.names():
-                if name not in self.names:
-                    doc = svc_cv.getmd(name)
-                    self.add(name, doc)
-                    added = True
-        self.set_index()
+            for name in set(svc_cv.names()).difference(set(self.names)):
+                doc = svc_cv.getmd(name)
+                self.add(name, doc)
+                added = True
+        if added or newmodel:
+            self.set_index()
         return added
 
     def build(self, svccv_list):
@@ -51,8 +51,9 @@ class LSIsimilarity(object):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
             ujson.dump(self.names, f)
-        with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-            ujson.dump(self.corpus, f)
+        if self.corpus:
+            with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
+                ujson.dump(self.corpus, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
         self.clear()
 
@@ -71,6 +72,16 @@ class LSIsimilarity(object):
         self.names.append(name)
         corpu = self.lsi_model.dictionary.doc2bow(text)
         self.corpus.append(corpu)
+
+    def delete(self, name):
+        assert(self.lsi_model.dictionary)
+        result = False
+        index = self.names.index(name)
+        if self.corpus[index]:
+            self.names.pop(index)
+            self.corpus.pop(index)
+            result = True
+        return result
 
     def add_documents(self, names, documents):
         assert(self.lsi_model.dictionary)
@@ -91,7 +102,7 @@ class LSIsimilarity(object):
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
                                              self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
 
-    def probability(self, doc, top=None):
+    def probability(self, doc, top=None, minimum=0):
         """
             >>> from tests.test_model import *
             >>> from webapp.settings import *
@@ -173,13 +184,15 @@ class LSIsimilarity(object):
         """
         if top is None:
             top = len(self.index)
+        elif top < 1:
+            top = int(len(self.index)*top)
+        top = top if top > minimum else minimum
         results = []
+        self.num_best = top
         vec_lsi = self.lsi_model.probability(doc)
-        try:
-            sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
-        except IndexError:
-            return results
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims[0:top])
+        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])),
+                                self.index[vec_lsi])
+        self.num_best = None
         return results
 
     def probability_by_id(self, doc, id):
@@ -189,6 +202,14 @@ class LSIsimilarity(object):
         vec_lsi = self.lsi_model.probability(doc)
         result = abs(self.index[vec_lsi][index])
         return (id, str(result))
+
+    @property
+    def num_best(self):
+        return self.index.num_best
+
+    @num_best.setter
+    def num_best(self, value):
+        self.index.num_best = value
 
     @property
     def corpus(self):

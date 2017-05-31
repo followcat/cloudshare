@@ -1,8 +1,13 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import { Row, Col, Form, Input, Select, Button, Icon } from 'antd';
-const FormItem = Form.Item,
-      Option = Select.Option;
+
+import PreviewTopBarForm from './PreviewTopBarForm';
+
+import {
+  Form,
+  Button,
+  Icon
+} from 'antd';
 
 class PreviewTopBar extends Component {
   constructor() {
@@ -13,7 +18,9 @@ class PreviewTopBar extends Component {
 
   handlePrevClick(e) {
     e.preventDefault();
+
     const fieldsValue = this.props.form.getFieldsValue();
+
     this.props.onPrevClick({
       id: this.props.id,
       fieldsValue: fieldsValue
@@ -22,7 +29,9 @@ class PreviewTopBar extends Component {
 
   handleNextClick(e) {
     e.preventDefault();
+
     const fieldsValue = this.props.form.getFieldsValue();
+
     this.props.onNextClick({
       id: this.props.id,
       fieldsValue: fieldsValue
@@ -30,28 +39,36 @@ class PreviewTopBar extends Component {
   }
 
   render() {
-    const props = this.props;
+    const {
+      prefixCls,
+      currentPreview,
+      prevText,
+      nextText,
+      total
+    } = this.props;
 
     return (
-      <div className={`${props.prefixCls}`}>
+      <div className={`${prefixCls}`}>
         <Button
           type="primary"
           size="small"
-          className={`${props.prefixCls}-prev`}
-          disabled={props.currentPreview === 0}
+          className={`${prefixCls}-prev`}
+          disabled={currentPreview === 0}
           onClick={this.handlePrevClick}
         >
-          <Icon type="left" />Prev
+          <Icon type="left" />{prevText}
         </Button>
-        {props.children}
+        <PreviewTopBarForm
+          {...this.props}
+        />
         <Button
           type="primary"
           size="small"
-          className={`${props.prefixCls}-next`}
-          disabled={props.currentPreview === props.total - 1}
+          className={`${prefixCls}-next`}
+          disabled={currentPreview === total - 1}
           onClick={this.handleNextClick}
         >
-          Next<Icon type="right" />
+          {nextText}<Icon type="right" />
         </Button>
       </div>
     );
@@ -62,12 +79,20 @@ PreviewTopBar.defaultProps = {
   prefixCls: 'cs-preview-top-bar',
   currentPreview: 0,
   total: 0,
+  prevText: 'Prev',
+  nextText: 'Next'
 };
 
 PreviewTopBar.propTypes = {
   prefixCls: PropTypes.string,
+  id: PropTypes.string,
   currentPreview: PropTypes.number,
   total: PropTypes.number,
+  prevText: PropTypes.string,
+  nextText: PropTypes.string,
+  form: PropTypes.object,
+  onPrevClick: PropTypes.func,
+  onNextClick: PropTypes.func
 };
 
-export default PreviewTopBar;
+export default PreviewTopBar = Form.create({})(PreviewTopBar);

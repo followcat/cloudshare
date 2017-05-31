@@ -1,5 +1,6 @@
 #ignore node_modules
 .hg/
+webapp/static/
 webapp/static/js/node_modules/
 webapp/static/js/PhantomJS*/
 flask_session/
@@ -11,7 +12,6 @@ flask_session/
 *.pyc
 *.bak
 celerybeat-schedule
-similarity.*
 output/
 repo/
 Index/
@@ -24,10 +24,11 @@ cutwords/
 projects/
 classify/
 storage/
-cvstorage/
-additional/
+webapp/app/dist
 webapp/static/node_modules/
 webapp/static/dist/
 webapp/static/rev/
 webapp/app/node_modules/
 webapp/templates_dist/
+tests/lsisim
+tests/lsimodel_words

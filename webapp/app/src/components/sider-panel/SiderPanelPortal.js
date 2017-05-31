@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import Layout from './Layout';
+
 import Animation from './Animation';
 import Mask from './Mask';
 import Panel from './Panel';
@@ -10,7 +10,7 @@ class SiderPanelPortal extends Component {
     const props = this.props;
 
     return (
-      <Layout>
+      <div>
         <Animation
           visible={props.visible}
           transitionName="mask"
@@ -34,7 +34,7 @@ class SiderPanelPortal extends Component {
             children={props.children}
           />
         </Animation>
-      </Layout>
+      </div>
     );
   }
 }

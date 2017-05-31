@@ -212,7 +212,8 @@ class Mining(object):
             for svc_name in service_names:
                 svc = self.services['all'][svc_name]
                 industrypath = industrytopath(svc_name)
-                index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
+                index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
+                                                                os.path.join(save_path,
                                                                 industrypath), model)
                 try:
                     index.load()
@@ -285,12 +286,27 @@ class Mining(object):
                 break
         return result
 
-    def lenght(self, basemodel, uses=None):
+    def lenght(self, basemodel, uses=None, top=None):
         result = 0
         sims = self.getsims(basemodel, uses=uses)
         for sim in sims:
-            result += len(sim.names)
+            nums = len(sim.names)
+            if top is not None:
+                if top < 1:
+                    nums = nums*top
+                elif nums > top:
+                    nums = top
+            result += nums
         return result
+
+    def idsims(self, modelname, ids):
+        results = list()
+        for id in ids:
+            for sim in self.sim[modelname].values():
+                if id in sim.names:
+                    results.append(sim.name)
+                    break
+        return results
 
     def minetop(self, doc, basemodel, top=None, uses=None):
         results = self.probability(basemodel, doc, uses=uses)
@@ -301,8 +317,9 @@ class Mining(object):
     def minelist(self, doc, lists, basemodel, uses=None):
         return map(lambda x: self.probability_by_id(basemodel, doc, x, uses=uses), lists)
 
-    def minelistrank(self, doc, lists, basemodel, uses=None):
-        probalist = set(self.probability(basemodel, doc, uses=uses))
+    def minelistrank(self, doc, lists, basemodel, uses=None, top=None, minimum=None):
+        probalist = set(self.probability(basemodel, doc, uses=uses,
+                                         top=top, minimum=minimum))
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return map(lambda x: (x[0], ranklist.index(x)), lists)

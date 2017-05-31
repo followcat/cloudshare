@@ -1,23 +1,16 @@
-import re
-import email
-import logging
-import os.path
+import os
+import xml
 import mimetypes
-import logging.config
-import xml.etree.ElementTree
 
 import pypandoc
-import emaildata.text
 
-import utils.unoconverter
 import core.outputstorage
+import utils.docprocessor.base
+import utils.docprocessor.unoconverter
+from utils.docprocessor.base import logger
 
 
-logging.config.fileConfig("core/logger.conf")
-logger = logging.getLogger("converterinfo")
-
-
-class Processor():
+class LibreOfficeProcessor(utils.docprocessor.base.Processor):
     """
         result code:
             0 - success
@@ -29,65 +22,21 @@ class Processor():
     converter = None
 
     def __init__(self, fileobj, name, output_base):
+        super(LibreOfficeProcessor, self).__init__(fileobj, name, output_base)
         if self.converter is None:
-            self.__class__.converter = utils.unoconverter.DocumentConverter()
-
-        self.markdown_stream = str()
-
-        self.base = core.outputstorage.ConvertName(name)
-        self.name = self.base.random
-        self.stream = fileobj.read()
-
-        self.output_path = core.outputstorage.OutputPath(output_base)
-        self.source_path = self.output_path.source
-        self.docx_path = self.output_path.docx
+            self.__class__.converter = utils.docprocessor.unoconverter.DocumentConverter()
+        self.resultcode = None
         self.html_path = self.output_path.html
         self.docbook_path = self.output_path.docbook
-        self.markdown_path = self.output_path.markdown
 
         self.mimetype = self.mimetype()
         logger.info('Mimetype: %s' % self.mimetype)
-
-        location = self.copy()
-        logger.info('Backup to: %s' % location)
-
-        self.resultcode = None
         self.result = self.convert()
 
     def mimetype(self):
         mimetype = mimetypes.guess_type(os.path.join(
                                         self.source_path, self.name.origin))[0]
         return mimetype
-
-    def copy(self, des=None, name=None):
-        """
-            >>> import shutil
-            >>> import core.docprocessor
-            >>> basepath = 'core/test_output'
-            >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
-            >>> cv1.result
-            True
-            >>> ori = cv1.name
-            >>> des = cv1.copy()
-            >>> cv1.name == ori
-            False
-            >>> f.close()
-            >>> shutil.rmtree(basepath)
-        """
-        if des is None:
-            des = self.source_path
-        if name is None:
-            name = self.name
-        location = os.path.join(des, name)
-        while os.path.isfile(location) is True:
-            self.base.reset_random()
-            self.name = self.base
-            name = self.name
-            location = os.path.join(des, name)
-        with open(location, 'wb') as f:
-            f.write(self.stream)
-        return location
 
     def convert_docfile(self, input, filename, output, outputname):
         result = True
@@ -138,11 +87,11 @@ class Processor():
         """
             >>> import os
             >>> import shutil
-            >>> import core.docprocessor
+            >>> import utils.docprocessor.libreoffice
             >>> import xml.etree.ElementTree
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
+            >>> cv1 = utils.docprocessor.libreoffice.LibreOfficeProcessor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> e = xml.etree.ElementTree.parse(os.path.join(
@@ -195,10 +144,10 @@ class Processor():
         """
             >>> import shutil
             >>> import os.path
-            >>> import core.docprocessor
+            >>> import utils.docprocessor.libreoffice
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
+            >>> cv1 = utils.docprocessor.libreoffice.LibreOfficeProcessor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> os.path.isfile(os.path.join(cv1.markdown_path,
@@ -244,10 +193,10 @@ class Processor():
         """
             >>> import shutil
             >>> import os.path
-            >>> import core.docprocessor
+            >>> import utils.docprocessor.libreoffice
             >>> basepath = 'core/test_output'
             >>> f = open('core/test/cv_1.doc', 'r')
-            >>> cv1 = core.docprocessor.Processor(f, 'cv_1.doc', basepath)
+            >>> cv1 = utils.docprocessor.libreoffice.LibreOfficeProcessor(f, 'cv_1.doc', basepath)
             >>> cv1.result
             True
             >>> os.path.isfile(os.path.join(cv1.markdown_path,

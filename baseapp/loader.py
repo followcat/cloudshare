@@ -6,6 +6,19 @@ import services.multicv
 import services.multiclsify
 import services.analysis.cutword
 
+SUPPORT_DOCPROCESSOR = {}
+try:
+    import utils.docprocessor.pandoc
+    SUPPORT_DOCPROCESSOR['pandoc'] = utils.docprocessor.pandoc.PandocProcessor
+except ImportError:
+    pass
+
+try:
+    import utils.docprocessor.libreoffice
+    SUPPORT_DOCPROCESSOR['libreoffice'] = utils.docprocessor.libreoffice.LibreOfficeProcessor
+except ImportError:
+    pass
+
 
 LSI_PATH = 'lsimodel'
 CUTWORD_PATH = 'cutwords'
@@ -34,3 +47,6 @@ def load_mult_cv(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV):
     SVC_MULT_CV = services.multicv.MultiCV(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV)
     return SVC_MULT_CV
 
+def load_doc_processor(name):
+    global SUPPORT_DOCPROCESSOR
+    return SUPPORT_DOCPROCESSOR[name]

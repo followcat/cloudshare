@@ -78,7 +78,7 @@ def build_models(jds, path):
     return models
 
 def build_sim(path, model, svcs):
-    sim = core.mining.lsisimilarity.LSIsimilarity(path, model)
+    sim = core.mining.lsisimilarity.LSIsimilarity('test', path, model)
     try:
         sim.load()
     except IOError:

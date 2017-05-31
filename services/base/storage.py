@@ -37,8 +37,8 @@ class BaseStorage(services.base.service.Service):
             >>> import extractor.information_explorer
             >>> repo_name = 'core/test_repo'
             >>> test_path = 'core/test_output'
-            >>> f1 = open('core/test/cv_1.doc', 'r')
-            >>> fp1 = core.docprocessor.Processor(f1, 'cv_1.doc', test_path)
+            >>> f1 = open('core/test/cv_1.docx', 'r')
+            >>> fp1 = utils.docprocessor.libreoffice.LibreOfficeProcessor(f1, 'cv_1.docx', test_path)
             >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
             ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
             >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)

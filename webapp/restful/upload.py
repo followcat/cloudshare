@@ -5,11 +5,10 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
-import utils.timeout.process
-import utils.timeout.exception
 import core.basedata
 import core.exception
-import core.docprocessor
+import utils.timeout.process
+import utils.timeout.exception
 import extractor.information_explorer
 
 
@@ -25,6 +24,7 @@ class UploadCVAPI(Resource):
         self.svc_peo = flask.current_app.config['SVC_PEO_REPO']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_min = flask.current_app.config['SVC_MIN']
+        self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type = str, location = 'json')
@@ -84,8 +84,8 @@ class UploadCVAPI(Resource):
             upload[user.id] = dict()
         network_file = flask.request.files['files']
         filename = network_file.filename
-        filepro = core.docprocessor.Processor(network_file, filename.encode('utf-8'),
-                                              flask.current_app.config['UPLOAD_TEMP'])
+        filepro = self.svc_docpro(network_file, filename.encode('utf-8'),
+                                  flask.current_app.config['UPLOAD_TEMP'])
         if filepro.result is False:
             return { 'code': 401, 'data': { 'result': False,
                                             'resultid': filepro.resultcode,
@@ -151,9 +151,8 @@ class UploadEnglishCVAPI(Resource):
         user = flask.ext.login.current_user
         network_file = flask.request.files['file']
         filename = network_file.filename
-        filepro = core.docprocessor.Processor(network_file,
-                                              filename.encode('utf-8'),
-                                              flask.current_app.config['UPLOAD_TEMP'])
+        filepro = self.svc_docpro(network_file, filename.encode('utf-8'),
+                                  flask.current_app.config['UPLOAD_TEMP'])
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                               stream=filepro.markdown_stream.decode('utf8'),
                                               filename=filepro.base.base, catch_info=False)

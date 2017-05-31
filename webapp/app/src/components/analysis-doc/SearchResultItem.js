@@ -59,12 +59,14 @@ class SearchResultItem extends Component {
       }), json => {
         if (json.code === 200) {
           json.data.result.forEach(function (item) {
-            addedChartResult.forEach(function (cresult) {
+            if (addedChartResult !== undefined) {
+              addedChartResult.forEach(function (cresult) {
               cresult.forEach(function (critem) {
                 if (critem['description'] === item['description']) {
                   item['value'] = item['value'].concat(critem['value']); }
+                })
               })
-            })
+            };
           });
           this.setState({
             data: json.data.result,

@@ -352,6 +352,22 @@ def update_jd_co_id(SVC_JD, SVC_CO):
                 f.write(dump_data)
 
 
+def update_jd_commentary(SVC_JD, comments_dict):
+    import yaml
+    for jd in SVC_JD.lists():
+        if 'commentary' in jd:
+            continue
+        jd_id = jd['id']
+        if jd_id in comments_dict:
+            jd['commentary'] = comments_dict[jd_id]
+        else:
+            jd['commentary'] = ''
+        dump_data = yaml.safe_dump(jd, allow_unicode=True)
+        filename = SVC_JD.filename(jd_id)
+        with open(os.path.join(SVC_JD.path, filename), 'w') as f:
+            f.write(dump_data)
+
+
 def init_people(SVC_CV, SVC_PEO):
     import core.basedata
     for y in SVC_CV.yamls():

@@ -11,7 +11,8 @@ class LSIsimilarity(object):
     matrix_save_name = 'lsi.matrix'
     corpus_save_name = 'lsi.corpus'
 
-    def __init__(self, savepath, lsi_model):
+    def __init__(self, name, savepath, lsi_model):
+        self.name = name
         self.path = savepath
         self.names = []
         self._corpus = []

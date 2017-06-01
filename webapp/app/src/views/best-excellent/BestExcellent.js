@@ -26,7 +26,7 @@ class BestExcellent extends Component {
     const gradient = colorGrad.gradient();
     const defFilterData = { date: [moment(date).add(-1, 'days').format('YYYY-MM-DD'),
                                    moment(date).add(0, 'days').format('YYYY-MM-DD')] };
-    var postData = { filterdict: defFilterData, threshold: 0.75, fromcache: fromcache };
+    var postData = { filterdict: defFilterData, threshold: 0.78, fromcache: fromcache };
     getFastMatching(allJDAPI, postData, json => {
       if (json.code === 200) {
         json.data.forEach((value) => {

@@ -232,7 +232,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 continue
             doc = jd['description']
             doc += jd['commentary']
-            result = self.miner.probability(project.name, doc, top=0.001, minimum=1000)
+            result = self.miner.probability(project.name, doc, uses=project.getclassify(),
+                                            top=0.001, minimum=1000)
             result = self.index.filter_ids(result, filterdict)
             output = {}
             output['JDid'] = jd['id']

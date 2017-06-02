@@ -4,7 +4,7 @@ from baseapp.projects import *
 from baseapp.index import *
 from baseapp.mining import *
 from baseapp.multicv import *
-
+from baseapp.docprocessor import *
 
 def sync_reload():
     class ReloadObj(object):

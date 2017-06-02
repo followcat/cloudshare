@@ -202,7 +202,7 @@ class LSIsimilarity(object):
         index = self.names.index(id)
         vec_lsi = self.lsi_model.probability(doc)
         result = abs(self.index[vec_lsi][index])
-        return (id, str(result))
+        return (os.path.splitext(id)[0], str(result))
 
     @property
     def num_best(self):

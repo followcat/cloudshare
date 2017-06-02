@@ -1,5 +1,6 @@
 @import '../default.less';
 @showcardPrefixCls: cs-show-card;
+@cvsdocshowcardPrefixCls: cvsdoc-show-card;
 @backgroudColor: #FFF;
 
 .@{showcardPrefixCls} {
@@ -8,6 +9,16 @@
   background-color: @backgroudColor;
   margin: 0 auto;
   padding: 30px 20px;
+  overflow: hidden;
+  zoom: 1;
+}
+
+.@{cvsdocshowcardPrefixCls} {
+  width: 100%;
+  height: 100%;
+  background-color: @backgroudColor;
+  margin: 0 auto;
+  padding: 40px 0px;
   overflow: hidden;
   zoom: 1;
 }

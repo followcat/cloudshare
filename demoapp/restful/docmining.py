@@ -7,9 +7,67 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.builtin
+import core.outputstorage
 import core.mining.valuable
+import utils.timeout.process
 import demoapp.tools.caesarcipher
+import extractor.information_explorer
 
+
+class UploadCVAPI(Resource):
+
+    projectname = 'temporary'
+
+    def __init__(self):
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_min = flask.current_app.config['SVC_MIN']
+        self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
+        super(UploadCVAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('files', type = str, location = 'json')
+
+    def post(self):
+        results = []
+        network_file = flask.request.files['files']
+        project = self.svc_mult_cv.getproject(self.projectname)
+        id = None
+        code = 401
+        added = False
+        result = False
+        filename = network_file.filename
+        filepro = self.svc_docpro(network_file, filename.encode('utf-8'),
+                                  flask.current_app.config['UPLOAD_TEMP'])
+        result = filepro.result
+        if result is True:
+            try:
+                yamlinfo = utils.timeout.process.process_timeout_call(
+                                     extractor.information_explorer.catch_cvinfo, 2000,
+                                     kwargs={'stream': filepro.markdown_stream.decode('utf8'),
+                                             'filename': filename})
+            except utils.timeout.process.KilledExecTimeout as e:
+                result = False
+            if result is not False:
+                id = yamlinfo['id']
+                if project.curriculumvitae.exists(id):
+                    added = True
+                if not added:
+                    filepro.renameconvert(id)
+                    dataobj = core.basedata.DataObject(metadata=yamlinfo,
+                                                       data=filepro.markdown_stream,)
+                    yamlinfo = dataobj.metadata
+                    if not yamlinfo['name']:
+                        yamlinfo['name'] = utils.chsname.name_from_filename(filename)
+                    repo_cv_result = self.svc_mult_cv.repodb.add(dataobj, 'temporary',
+                                                                 unique=True,
+                                                                 contacts=False)
+                    project_cv_result = project.cv_add(dataobj, 'temporary')
+                    result = project_cv_result and repo_cv_result
+                code = 200
+        results.append({ 'id': id,
+                         'added': added,
+                         'result': result,
+                         'filename': filename })
+        return { 'code': code, 'data': results }
 
 class DocMiningAPI(Resource):
 
@@ -23,21 +81,41 @@ class DocMiningAPI(Resource):
         self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('CVlist', type = list, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
         doc = args['doc']
         cur_page = args['page']
+        cvlist = args['CVlist'] if args['CVlist'] else []
         model = self.projectname
-        result = self.process(model, doc, cur_page)
+        result = self.process(model, doc, cvlist, cur_page)
         return { 'code': 200, 'data': result }
 
-    def process(self, model, doc, cur_page, eve_count=20):
+    def process(self, model, doc, cvlist, cur_page, eve_count=20):
         if not cur_page:
             cur_page = 1
         datas = []
+        result = []
         project = self.svc_mult_cv.getproject(self.projectname)
-        result = self.miner.probability(model, doc, uses=project.getclassify(), top=0.05, minimum=1000)
+        if cvlist:
+            names = []
+            documents = []
+            sim = self.miner.sim[self.projectname][self.projectname]
+            for cv in cvlist:
+                mdid = core.outputstorage.ConvertName(cv['id']).md
+                if mdid not in sim.names:
+                    names.append(mdid)
+                    documents.append(project.cv_getmd(cv['id']))
+            sim.add_documents(names, documents)
+            for cv in cvlist:
+                mdid = core.outputstorage.ConvertName(cv['id']).md
+                result.append(self.miner.probability_by_id(model, doc, mdid,
+                                                           uses=[project.name]))
+        else:
+            result = self.miner.probability(model, doc,
+                                            uses=project.getclassify(),
+                                            top=0.05, minimum=1000)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

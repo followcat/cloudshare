@@ -74,11 +74,8 @@ class CVsDocMining extends Component {
       if (file.response && file.status === 'done' && !file.completed) {
         file.completed = true;  // 标记已经上传文件, 避免重复请求preview API
         if (file.response.code === 200) {  // 上传成功后,请求预览数据
+          file.status = 'done';
           confirmList.push(file.response.data[0]);
-          this.setState({
-            confirmList: confirmList,
-            total: confirmList.length,
-          });
         } else {  // 上传失败
           message.error(`${file.name} 上传失败!`, 3);
           file.status = 'error';
@@ -89,17 +86,18 @@ class CVsDocMining extends Component {
             filename: file.name,
             uid: file.uid,
           });
-          this.setState({
-            failedList: failedList,
-          });
         }
       }
-
       return file;
     });
-
+    var showedList = fileList.filter(function (value) {
+              return (value.status === 'uploading' || value.status === 'error');
+             })
     this.setState({
-      fileList: fileList,
+      confirmList: confirmList,
+      failedList: failedList,
+      total: confirmList.length,
+      fileList: showedList,
     });
   }
 

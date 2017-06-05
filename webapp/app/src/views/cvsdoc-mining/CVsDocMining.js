@@ -46,10 +46,12 @@ class CVsDocMining extends Component {
       anonymized: false,
       chartVisible: false,
       addedChartResult: [],
+      processList: [],
       fileList: [],
       failedList: [],
       confirmList: [],
     };
+    this.handleBeforeUpload = this.handleBeforeUpload.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
@@ -62,15 +64,33 @@ class CVsDocMining extends Component {
     let postAPI;
 
     this.setState({
+      total: 0,
       postAPI: API.ANALYSIS_BY_DOC_API,
       cvpostAPI: API.MINING_CV_VALUABLE_API
     });
   }
 
+  handleBeforeUpload(file) {
+    let {
+      confirmList, processList,
+    } = this.state;
+    var existsList = confirmList.filter(function (value) {
+              return (value.filename === file.name);
+             })
+    var result = processList.length < 5 &&
+                 confirmList.length < 5 &&
+                 existsList.length === 0;
+    if (result === true) {
+      processList.push(file);
+    }
+    return result;
+  }
+
   handleChange(info) {
-    let fileList = info.fileList,
-        { confirmList, failedList } = this.state;
+    let fileList = info.fileList.slice(0, 5),
+        { confirmList, failedList, processList } = this.state;
     fileList = fileList.map(file => {
+      processList.pop(file);
       if (file.response && file.status === 'done' && !file.completed) {
         file.completed = true;  // 标记已经上传文件, 避免重复请求preview API
         if (file.response.code === 200) {  // 上传成功后,请求预览数据
@@ -247,6 +267,7 @@ class CVsDocMining extends Component {
       hint: '支持单文件或多文件上传',
       onChange: this.handleChange,
       onRemove: this.handleRemove,
+      beforeUpload: this.handleBeforeUpload,
     };
 
     return (
@@ -271,6 +292,7 @@ class CVsDocMining extends Component {
                   failedList: failedList,
                   fileList: fileList,
                 })}
+                  <p style={{ textAlign: 'center', padding: 16 }}>已有{total}份简历待分析</p>
                 </ShowCard>
               </div>
             </Col>

@@ -91,12 +91,12 @@ class CVsDocMining extends Component {
         { confirmList, failedList, processList } = this.state;
     fileList = fileList.map(file => {
       processList.pop(file);
-      if (file.response && file.status === 'done' && !file.completed) {
-        file.completed = true;  // 标记已经上传文件, 避免重复请求preview API
+      if (file.response && file.status === 'done') {
         if (file.response.code === 200) {  // 上传成功后,请求预览数据
           file.status = 'done';
           confirmList.push(file.response.data[0]);
         } else {  // 上传失败
+          processList.pop(file);
           message.error(`${file.name} 上传失败!`, 3);
           file.status = 'error';
           failedList.push({
@@ -263,8 +263,8 @@ class CVsDocMining extends Component {
       name: 'files',
       action: API.UPLOAD_RESUME_API,
       multiple: true,
-      text: '点击或拖曳到此区域',
-      hint: '支持单文件或多文件上传',
+      text: '最多支持5个文件 仅支持docx格式',
+      hint: '点击或拖曳到此区域',
       onChange: this.handleChange,
       onRemove: this.handleRemove,
       beforeUpload: this.handleBeforeUpload,

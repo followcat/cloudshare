@@ -112,6 +112,7 @@ class DocMiningAPI(Resource):
                 mdid = core.outputstorage.ConvertName(cv['id']).md
                 result.append(self.miner.probability_by_id(model, doc, mdid,
                                                            uses=[project.name]))
+            result = sorted(result, key=lambda x:float(x[1]), reverse=True)
         else:
             result = self.miner.probability(model, doc,
                                             uses=project.getclassify(),

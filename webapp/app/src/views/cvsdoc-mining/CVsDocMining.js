@@ -280,7 +280,7 @@ class CVsDocMining extends Component {
               />
             </Col>
             <Col span={12}>
-              <div className="cs-uploader">
+              <div className="cs-uploader" style={{ margin: '0px auto' }} >
                 <ShowCard
                     prefixCls={"cvsdoc-show-card"}>
                   <DraggerUpload

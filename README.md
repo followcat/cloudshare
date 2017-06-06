@@ -5,6 +5,12 @@ share，edit your doc，pdf，md and so on...
 
     See requirement.txt
 
+    pandoc==1.13.2.1 in webapp.
+
+    or
+
+    pandoc==1.19.2.1 in demoapp.
+
 ### for test
 
     nose==1.3.7

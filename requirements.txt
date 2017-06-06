@@ -3,7 +3,7 @@ Flask==0.10.1
 Flask-Login==0.3.2
 Flask-Session==0.2.2
 dulwich==0.11.2
-pypandoc==1.0.1
+pypandoc==1.4
 jieba==0.38
 gensim==0.12.3
 Theano==0.7.0

@@ -5,6 +5,7 @@ from demoapp.restful.docmining import *
 def initialize(app):
     api = flask.ext.restful.Api(app)
 
+    api.add_resource(UploadCVAPI, '/api/uploadcv', endpoint = 'uploadcv')
     api.add_resource(DocMiningAPI, '/api/mining/analysisdoc', endpoint = 'docmining')
     api.add_resource(DocValuableAPI, '/api/mining/valuable', endpoint = 'valuable')
     api.add_resource(DocCVValuableAPI, '/api/mining/cvvaluable', endpoint = 'cvvaluable')

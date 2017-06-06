@@ -10,10 +10,11 @@ import services.curriculumvitae
 
 
 PRJ_PATH = 'projects'
+UPLOAD_TEMP = 'output'
 MED_needed = sources.industry_id.needed_medical
 
-SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'repostorage')
-SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')
+SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('demorepo/CV', 'repostorage')
+SVC_CV_STO = services.curriculumvitae.CurriculumVitae('demostorage/CV', 'cvstorage')
 SVC_PRJ_TMP = services.project.Project(os.path.join(PRJ_PATH, 'temporary'),
                                        None, SVC_CV_REPO, None, 'temporary')
 SVC_PRJ_TMP.setup(MED_needed, config={'autoupdate': False, 'autosetup': False})

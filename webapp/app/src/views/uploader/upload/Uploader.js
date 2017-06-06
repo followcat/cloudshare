@@ -90,6 +90,7 @@ class Uploader extends Component {
             filename: file.response.data.filename
           }, json => {
             if (json.code === 200) {
+              file.status = 'done';
               file.response.data = Object.assign({}, file.response.data, json.data);
               file.filename = json.data.filename;
 
@@ -103,7 +104,7 @@ class Uploader extends Component {
           });
         } else {  // 上传失败
           message.error(`${file.name} 上传失败!`, 3);
-
+          file.status = 'error';
           failedList.push({
             id: '',
             status: 'error',

@@ -95,7 +95,7 @@ class ReverseIndexing(object):
         if svc_name in self.index:
             cv_index = self.index[svc_name]
         for name in svc.names():
-            if (ids is None and name in cv_index['names']) or
+            if (ids is None and name in cv_index['names']) or\
                 (ids is not None and name in ids):
                 yamlinfo = svc.getyaml(name)
                 index = self.genindex(name, yamlinfo, selected)

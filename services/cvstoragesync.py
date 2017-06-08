@@ -68,8 +68,8 @@ class CVStorageSync(object):
             result = self.cv_storage.updateinfo(id, 'date', raw_info['date'], 'DEV')
             logidname = os.path.join(rawdb.path, id)
             self.logger.info((' ').join(["Update", logidname, "date",
-                                         "from", des_info['date'],
-                                         "to", raw_info['date']]))
+                                         "from", str(des_info['date']),
+                                         "to", str(raw_info['date'])]))
         return result
 
     def add_new(self, rawdb, id, dbname):

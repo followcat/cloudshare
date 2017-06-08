@@ -34,7 +34,7 @@ class CVStorageSync(object):
         self.rawdb = rawdb
         self.logger = logging.getLogger("CVStorageSyncLogger.UPDATE")
 
-    def update(self, raws=None, filterfunc=None):
+    def yamls_gen(self, raws=None, filterfunc=None):
         def filter(info):
             id = info['id']
             return not self.cv_storage.exists(id)
@@ -47,13 +47,17 @@ class CVStorageSync(object):
         for dbname in interfaces:
             raw_db = interfaces[dbname]
             for yamlinfo in raw_db.lscly_yaml():
-                id = yamlinfo['id']
-                if filterfunc(yamlinfo):
-                    if raw_db.exists(id+'.html'):
-                        if not self.cv_storage.exists(id):
-                            result = self.add_new(raw_db, id, dbname)
-                        else:
-                            result = self.update_exists(raw_db, id)
+                yield dbname, raw_db, yamlinfo
+
+    def update(self, raws=None, filterfunc=None):
+        for dbname, raw_db, yamlinfo in self.yamls_gen(raws, filterfunc):
+            id = yamlinfo['id']
+            if filterfunc(yamlinfo):
+                if raw_db.exists(id+'.html'):
+                    if not self.cv_storage.exists(id):
+                        result = self.add_new(raw_db, id, dbname)
+                    else:
+                        result = self.update_exists(raw_db, id)
 
     def update_exists(self, rawdb, id):
         result = False

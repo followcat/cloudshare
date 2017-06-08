@@ -83,19 +83,20 @@ class ReverseIndexing(object):
                 self.merge(cv_index, index)
         self.index[svc_name] = cv_index
 
-    def upgrade(self, selected):
+    def upgrade(self, selected, ids=None):
         assert set(selected).issubset(set(self.indexkeys))
         for svc in self.cvs:
-            self.upgradecv(svc, selected)
+            self.upgradecv(svc, selected, ids)
         self.save()
 
-    def upgradecv(self, svc, selected):
+    def upgradecv(self, svc, selected, ids=None):
         assert svc.name
         svc_name = svc.name
         if svc_name in self.index:
             cv_index = self.index[svc_name]
         for name in svc.names():
-            if name in cv_index['names']:
+            if (ids is None and name in cv_index['names']) or
+                (ids is not None and name in ids):
                 yamlinfo = svc.getyaml(name)
                 index = self.genindex(name, yamlinfo, selected)
                 self.merge(cv_index, index)

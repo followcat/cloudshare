@@ -14,6 +14,7 @@ class PredatorLiteInterface(interface.base.Interface):
 
     cvdir = 'CV'
     rawdir = 'RAW'
+    clydir = 'JOBTITLES'
     rawextention = '.html'
     mdextention = '.md'
     yamlextention = '.yaml'
@@ -22,13 +23,14 @@ class PredatorLiteInterface(interface.base.Interface):
         self.path = path
         self.cvpath = os.path.join(self.path, self.cvdir)
         self.rawpath = os.path.join(self.path, self.rawdir)
+        self.clypath = os.path.join(self.path, self.clydir)
         super(PredatorLiteInterface, self).__init__(path)
         if not os.path.exists(self.cvpath):
             os.makedirs(self.cvpath)
 
     def exists(self, filename):
         result = False
-        path_file = os.path.join(self.cvpath, filename)
+        path_file = os.path.join(self.rawpath, filename)
         if os.path.exists(path_file):
             result = True
         return result
@@ -95,6 +97,16 @@ class PredatorLiteInterface(interface.base.Interface):
     def lsid_raw(self):
         return [os.path.splitext(os.path.split(f)[1])[0] for f in glob.glob(
                 os.path.join(self.rawpath, '*'+self.rawextention))]
+
+    def lscly_yaml(self):
+        for f in glob.glob(os.path.join(self.clypath, '*'+self.yamlextention)):
+            yamlinfo = utils.builtin.load_yaml(*os.path.split(f))
+            if 'datas' in yamlinfo:
+                for each in yamlinfo['datas'].values():
+                    yield each
+            else:
+                for each in yamlinfo.values():
+                    yield each
 
     def getraw(self, filename):
         def get_namespaces(raw):

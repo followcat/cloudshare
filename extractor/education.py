@@ -410,16 +410,17 @@ def fix_yingcai(d):
     if not maj:
         r = SINGLEYIED.search(d)
         edu = re.compile(u'^'+ASP+u'*'+EDUCATION+u'$', re.M).search(d)
+        try:
+            education = edu.group('education')
+        except AttributeError:
+            education = ''
         if r:
             res = r.groupdict()
-            try:
-                res['education'] = edu.group('education')
-            except AttributeError:
-                res['education'] = ''
+            res['education'] = education
             maj +=1
             format_output(processed, res)
         else:
-            summary['education'] = edu.group('education')
+            summary['education'] = education
     return fix_output(processed)
 
 def fix(d):

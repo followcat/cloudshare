@@ -6,6 +6,7 @@ import shutil
 
 import utils.chsname
 import core.exception
+import core.outputstorage
 import utils.docprocessor.libreoffice
 import extractor.information_explorer
 
@@ -117,7 +118,7 @@ def get_explorer_name(svc_cv, yamlname):
 
 def update_selected(svc_cv, yamlname, selected):
     obj = svc_cv.getyaml(yamlname)
-    yamlpathfile = os.path.join(svc_cv.path, yamlname)
+    yamlpathfile = os.path.join(svc_cv.path, core.outputstorage.ConvertName(yamlname).yaml)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),

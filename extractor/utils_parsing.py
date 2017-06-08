@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import time
+import functools
 
 import sources.industry_id
 
@@ -39,7 +40,7 @@ FDSEP = u'(?P<fromsep>['+SEP+u'\.．年])'
 DATE = _PDATE.replace('__DATE_SEP__', FDSEP.replace('P<fromsep>', ':'))
 SDSEP = u'(?P=fromsep)'
 PERIOD = u'(?P<from>' + _PDATE.replace('__DATE_SEP__', FDSEP) + ur')' + DATESEP + ASP+ u'*(?P<to>' + _PDATE.replace('__DATE_SEP__', SDSEP) + ')(?:'+UNIBRALEFT+u'含[^（\(\[【]+?期'+UNIBRARIGHT+u')?'
-CHDURATION = ur'(?:(?:\-?\d{1,2}(?:\.\d)?'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(?:['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?))'
+CHDURATION = ur'(?:(?:\-?\d{1,2}(?:\.\d)?'+ASP+u'?年'+ASP+u'?(?:\d{1,2}'+ASP+u'?个月)?)|(?:(?:(?:\d{1,2})|(?:['+CHNUMBERS+u']{1,3}))'+ASP+u'?个月内?)|\d{2,3}天)'
 ENDURATION = ur'(?:(?:\d{1,2}'+ASP+u'?years?'+ASP+u'?)?(?:(?:\d{1,2})'+ASP+u'?months?))'
 DURATION = ur'(?P<duration>'+CHDURATION+'|'+ENDURATION+')'
 AGE = u'(?P<age>\d{2})'+ASP+u'?岁'
@@ -49,10 +50,16 @@ ENDLINESEP = u'。'
 SENTENCESEP = FIELDSEP+ENDLINESEP
 EDUFIELDSEP = u'，'+FIELDSEP
 
+IMAGELINK = u'!\[[^（\(\[【]+\]\([^（\(\[【]+\){[^（\(\[【]+}'
 exclude_with_parenthesis = lambda x: u'(?:'+UNIBRALEFT+u'[^（\(\[【' +x+ u']+?'+UNIBRARIGHT+ASP+u'*)'
 
 CONTEXT = exclude_with_parenthesis(u'年月'+CHNUMBERS)
 PREFIX = u'(?:(?:(?:\d+(?:['+SENTENCESEP+u'\.]|'+ASP+u'{2}))|\- {3}|#|◆|■|·|\?|\uf0d8\xa0|\uf0b7|\uf075|\u258c)|'+POASP+u')'
+
+ANYB = u'((?:'
+ANYS = u')|(?:'
+ANYE = u'))'
+RE_ANY = lambda l : ANYB + ANYS.join([_ for _ in l]) + ANYE
 
 LIST_SEPARATOR = u')|(?:'
 COMPANY_BUSINESS_KEYWORD = u'((?:'
@@ -72,7 +79,7 @@ COMPANY_TYPE = u'(?:(?:[^/\|\n\- ：]*?(('+COMPANY_TYPE_KEYWORD+u')[^\|\n\- ]*)+
 COMPANYTAIL = u'(?:、[^' + SENTENCESEP + u'=\n\*\u2013◆■]+?)?'+exclude_with_parenthesis(u'人年月')
 # use re.DOTALL for better results
 # \u2014, \u2015 and \u4e00 are found in company
-COMPANY = u'(?:\\\\\*|(?:[^' + SENTENCESEP + u'=\n\*\u2013◆■]+?(?:(?:\\\\)?\*(?=(?!'+POASP+u')))+)?(?:(?:(?:\\\\\*){3})|(?:[^' + SENTENCESEP + u'=\n\*\u2013◆■]+?))(?:'+COMPANYTAIL+u')?)'
+COMPANY = u'(?:\\\\\*|(?:[^!' + SENTENCESEP + u'=\n\*\u2013◆■]+?(?:(?:\\\\)?\*(?=(?!'+POASP+u')))+)?(?:(?:(?:\\\\\*){3})|(?:[^!' + SENTENCESEP + u'=\n\*\u2013◆■]+?))(?:'+IMAGELINK+u')?(?:'+COMPANYTAIL+u')?)'
 SENTENCESEP = SENTENCESEP+ur'，'
 POSITION = ur'[^=\n\*：:\|\u2013\u2015\u3002]+'
 
@@ -130,9 +137,35 @@ SALARY = u'(?:(?P<salarylabel>月薪(?:（税前）)?[:：]?)?'+ASP+u'*(?:(?P<sa
 EMPLOYEES = u'((?:(?P<employees>(少于)?\d+([ '+SEP+u']+(?:(?<= )-0 )?\d+)?'+ASP+u'*人(以[上下])?)|未填写))'
 BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + u'(['+FIELDSEP+u']('+COMPANY_TYPE+u'))?' +ASP+u'*' + UNIBRARIGHT +u')'
 BEMPLOYEES = u'('+ BEMPLOYEES + u'('+BEMPLOYEES.replace('P<employees>', ':')+u')?)'
-BDURATION = u'(((?P<br>(?P<dit>\*)?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + DURATION + u'(?(br)[\n'+SP+u']*' +UNIBRARIGHT + u'(?(dit)\*)))'
+BDURATION = u'(((?P<br>(?P<dit>\*)?\\\\?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']*' + DURATION + u'(?(br)[\n'+SP+u']*\\\\?' +UNIBRARIGHT + u'(?(dit)\*)))'
 
 PLACES = u'(?:(\S+)['+SENTENCESEP+SEP+']?)+'
+
+ANONYMOUS = lambda x: re.compile('\?P<\S+?>').sub('?:', x)
+MATCH_SPACE_OR = lambda x: u'(?:'+x+u'|'+POASP+u'*)'
+PRJ_ITEM_KEYS = lambda p: [_[0][0] for _ in p.values()]+[ANONYMOUS(PERIOD+POASP+u'*[:：]')]
+EXCLUDE_ITEM_KEYS = lambda x: u'(?=(?!'+RE_ANY(PRJ_ITEM_KEYS(x))+u'))'
+
+SEPRTED = lambda l:u'(?:(?:__SEP__)|(?:'+u')|(?:'.join([POASP+u'*'+_ for _ in l])+u'))'
+# Can't have newline followed by (ASP*) as it breaks (^...)
+PIPESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ASP+u'*?(\n|\||；)+')
+PIPEONLYSEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ASP+u'*\|'+ASP+u'*')
+SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '[ \n]+')
+
+def any_separated(item, ANY):
+    try:
+        output = item[0][0]+item[0][2]+item[0][1]
+    except IndexError:
+        output = item[0][0]+ANY+u'*'+item[0][1]
+    try:
+        return u'('+output+u'|'+item[1]+u')'
+    except IndexError:
+        return output
+
+
+space_separated = functools.partial(any_separated, ANY=POASP)
+newline_separated = functools.partial(any_separated, ANY=ASP)
+label_separated = lambda x: lambda y: x(((y[1][0][0], u'(?P<'+y[0]+u'>'+y[1][0][1]+u')'),))
 
 
 MONTH_ID = re.compile('(?P<emonth>'+ENMONTH+')')
@@ -163,11 +196,12 @@ fix_decimal = lambda x: re.compile(u'(?P<year>\d+\.\d)年').sub(decimal_repl, x)
 duration_to_ch = lambda x: re.compile('months?').sub(u'个月', re.compile('years?').sub(u'年',x))
 fix_duration = lambda x: re.compile(ASP+'+').sub('', fix_decimal(duration_to_ch(x)))
 
+fix_imagelink = lambda x : re.compile(IMAGELINK).sub('', x)
 fix_prefix = lambda x: aspstrip(re.compile(PREFIX).sub('', x)).strip('*')
-fix_star = lambda x: x.replace('\*', '*')
+fix_star = lambda x: fix_imagelink(x).replace('\*', '*')
 remove_escape = lambda x: x.group(1)
 fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, fix_star(x))
-fix_name = lambda x: re.compile(ASP+'+').sub(' ', aspstrip(fix_escape(x)))
+fix_name = lambda x: re.compile(ASP+'+').sub(' ', aspstrip(fix_escape(x))).rstrip('\\')
 fix_position = lambda x: fix_name(x).replace('*', '')
 
 range_repl = lambda x: x.group('low')+'-'+x.group('high')+u'元/月'

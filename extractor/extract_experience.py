@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
 import functools
+try:
+    import regex
+except ImportError:
+    regex = re
 
 import sources.industry_id
 
@@ -41,25 +45,6 @@ ABDURATION = BDURATION.replace('duration', 'aduration').replace('br', 'abr').rep
 AAEMPLOYEES = EMPLOYEES.replace('employees', 'aaemployees')
 AASALARY = SALARY.replace('salary', 'aasalary')
 
-SEPRTED = lambda l:u'(?:(?:__SEP__)|(?:'+u')|(?:'.join([POASP+u'*'+_ for _ in l])+u'))'
-# Can't have newline followed by (ASP*) as it breaks (^...)
-PIPESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ASP+u'*?(\n|\||；)+')
-PIPEONLYSEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ASP+u'*\|'+ASP+u'*')
-SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '[ \n]+')
-
-def any_separated(item, ANY):
-    try:
-        output = item[0][0]+item[0][2]+item[0][1]
-    except IndexError:
-        output = item[0][0]+ANY+u'*'+item[0][1]
-    try:
-        return u'('+output+u'|'+item[1]+u')'
-    except IndexError:
-        return output
-
-space_separated = functools.partial(any_separated, ANY=POASP)
-newline_separated = functools.partial(any_separated, ANY=ASP)
-
 # Don't use (?(label) ...|...) as they are defined through all repetitions
 company_items = {
     'place': ((u'(?:所在地区|工作地点)[:：]?', u'\S*?(?=[\n\|])'), ),
@@ -82,46 +67,57 @@ company_details_pipeonly = lambda RE:RE.pattern+BORDERTOP('coborder')+PIPEONLYSE
 empty_company_details_pipeonly = lambda RE:RE.pattern+company_details_pipeonly(re.compile('')).replace('{1,13}', '{,13}')
 
 # Special handling for 部门 and 职位 with no [:：]: following space and value are enforced
-DEFAULT_ITEM = u'(?:.+?(?=[\n\|]))?'
+DEFAULT_ITEM = '__DEFAULT_ITEM__'
+
+__POSALARY__ = u'\**(?:薪酬[情状]况|职位月薪（税前）)[:：]?\**'
+__PODESCRIPTION__ = u'\**(?:工作描述|(?:(:?主要)?工作)?职'+POASP+u'*责(?:[及和]业绩|描述)?)[:：]?\**'
+__ACHIEVEMENT__ = u'\**(?:(?:主要)?工作|重点)业绩(?:[及和]成果)?[:：]?\**'
 position_items = {
+    'description': ((__PODESCRIPTION__, DEFAULT_ITEM), ),
     'place': ((u'\**(?:所在地区|工作地点)[:：]?\**', DEFAULT_ITEM), ),
     'department': ((u'\**(?:所[属在]部'+POASP+u'*门|科室)[:：]?\**', DEFAULT_ITEM), ),
     'department_short': ((u'\**部'+POASP+u'*门[:： \xa0]\**', DEFAULT_ITEM), ),
     'report_to': ((u'\**(?:汇报对象|直接上司职位)[:：]?\**', DEFAULT_ITEM), ),
-    'people_under': ((u'\**下属人数[:：]?\**', u'(?:\d+)?'), ),
-    'salary': ((u'\**(?P<salbl>(?:薪酬[情状]况|职位月薪（税前）)[:：]?)?\**', u'(?(salbl)'+ASALARY+u'?|'+AASALARY+u')'), ),
-    'description': ((u'\**(?:工作(?:职责|描述)|(?:主要)?职'+POASP+u'*责)[:：]?\**', DEFAULT_ITEM), ),
+    'people_under': ((u'\**下属(?:人数|员工)[:：]?\**', u'(?:\d+)?(?:'+POASP+u'*人)?'), ),
     'reason_leave': ((u'\**离职原因[:：]?\**', DEFAULT_ITEM), ),
     'contact': ((u'\**证 ?明 ?人[:：]?\**', DEFAULT_ITEM), ),
-    'position': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0])\**', u'(?P<aposition>'+POSITION+u'?)'+POASP+u'*(?:(?=[\n\|])|$)'), ),
+    'name': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0])\**', u'(?P<aposition>'+POSITION+u'?)'+POASP+u'*(?:(?=[\n\|])|$)'), ),
     'type': ((u'\**职[位务]类别[:：]?\**', DEFAULT_ITEM), ),
+    'achievement': ((__ACHIEVEMENT__, DEFAULT_ITEM), ),
+    'posalary': ((__POSALARY__, ASALARY), ),
     }
+key_items = position_items.copy()
+position_items['achievement'] = ((__ACHIEVEMENT__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(position_items)+DEFAULT_ITEM)), )
+position_items['description'] = ((__PODESCRIPTION__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(position_items)+DEFAULT_ITEM)), )
+position_items['posalary'] = ((u'\**(?P<salbl>(?:薪酬[情状]况|职位月薪（税前）)[:：]?)?\**', u'(?(salbl)'+ASALARY+u'?|'+AASALARY+u')'), )
+
+# Cannot use "'\\\\)\n'+POASP+u'*'" as it would conflict with "'(?!(?:'+RE_ANY"
+SET_DEFAULT = lambda x: x.replace(DEFAULT_ITEM, u'(?:(?:(?:[;；]|\\\\)\n(?!(?:'+POASP+u'*'+DATE+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|'+PREFIX+u'*\-{3,}))|.)*?)(?=$|\|)')
 # If pipe separated, the position is inside the table
 # but sometimes it is inside the company business table
 # (position details are then outside all tables.
-position_details = lambda RE:BORDERTOP('posdettab')+RE.pattern+u'\n*(?P<cobutab>\-{3,}(?: \-+)* *\n+)?'+PIPESEPRTED(map(space_separated, position_items.values()))+u'{3,17}\n*'+BORDERBOTTOM('posdettab')
+position_details = lambda RE:BORDERTOP('posdettab')+RE.pattern+u'\n*(?P<cobutab>\-{3,}(?: \-+)* *\n+)?'+SET_DEFAULT(PIPESEPRTED(map(label_separated(newline_separated), position_items.items())))+u'{3,17}\n*'+BORDERBOTTOM('posdettab')
 empty_position_details = lambda RE:RE.pattern+position_details(re.compile('')).replace('{3,17}', '{,17}')
 
 lp_position_items = position_items.copy()
-lp_position_items.pop('position')
-lp_position_details = lambda RE:BORDERTOP('posdettab')+RE.pattern+u'\n*(?P<cobutab>\-{3,}(?: \-+)* *\n+)?'+PIPESEPRTED(map(space_separated, lp_position_items.values()))+u'{3,17}\n*'+BORDERBOTTOM('posdettab')
+lp_position_items.pop('name')
+lp_position_details = lambda RE:BORDERTOP('posdettab')+RE.pattern+u'\n*(?P<cobutab>\-{3,}(?: \-+)* *\n+)?'+SET_DEFAULT(PIPESEPRTED(map(label_separated(newline_separated), lp_position_items.items())))+u'{3,17}\n*'+BORDERBOTTOM('posdettab')
 
-DEFAULT_ITEM_NS = u'(?:\S+)?'
 position_items_nospace = position_items.copy()
 position_items_nospace.update({
-    'place': ((u'\**(?:所在地区|工作地点)[:：]?\**', DEFAULT_ITEM_NS), ),
-    'department': ((u'\**(?:所[属在]部'+POASP+u'*门|科室)[:：]?\**', DEFAULT_ITEM_NS), ),
     'department_short': ((u'\**部'+POASP+u'*门[:： \xa0]\**', u'\S+'), ),
-    'report_to': ((u'\**(?:汇报对象|直接上司职位)[:：]?\**', DEFAULT_ITEM_NS), ),
-    'description': ((u'\**(?:工作(?:职责|描述)|(?:主要)?职'+POASP+u'*责)[:：]?\**', DEFAULT_ITEM_NS), ),
-    'reason_leave': ((u'\**离职原因[:：]?\**', DEFAULT_ITEM_NS), ),
-    'contact': ((u'\**证 ?明 ?人[:：]?\**', DEFAULT_ITEM_NS), ),
-    'position': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0])\**', u'(?P<aposition>\S+)'), ),
-    'type': ((u'\**职[位务]类别[:：]?\**', DEFAULT_ITEM_NS), ),
+    'name': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0])\**', u'(?P<aposition>\S+)'), ),
     })
-# If space only, the position is outside the table
-position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+SPACESEPRTED(map(space_separated, position_items_nospace.values()))+u'{3,17}\n*'+BORDERBOTTOM('posdettab')
 
+DEFAULT_ITEM_NS = u'(?:(?:(?:[;；]|\\\\)\n'+POASP+u'*(?!(?:'+DATE+u'|(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\s+(?=(?!(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\S)*?)(?=$|\s+(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\|)'
+SET_DEFAULT_NS = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_NS)
+# If space only, the position is outside the table
+position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+SET_DEFAULT_NS(SPACESEPRTED(map(label_separated(space_separated), position_items_nospace.items())))+u'{3,17}\n*'+BORDERBOTTOM('posdettab')
+
+position_decription_items = {}
+#position_decription_items['description'] = position_items_nospace.pop('description')
+position_decription_items['description'] = ((u'(?:'+position_items_nospace['description'][0][0]+u')?', u'(?=(?!\s*'+ANONYMOUS(CCO.pattern)+u'))'+position_items_nospace['description'][0][1]), )
+position_description_details_spaceonly = lambda RE:RE.pattern+ASP+u'*'+SET_DEFAULT(PIPESEPRTED(map(label_separated(space_separated), position_decription_items.items())))+u'\n*'+BORDERTOP('posdettab')+SET_DEFAULT_NS(SPACESEPRTED(map(label_separated(space_separated), position_items_nospace.items())))+u'{3,17}\n*'+BORDERBOTTOM('posdettab')
 
 # TACO related grammar
 TACOMODEL = u'(?P<companylabel>公司：)?\**(\\\\\*)*(?P<company>__COMPANY__)\**__SEP__'+ASP+u'*(__ITEM____SEP__'+ASP+u'*){0,2}'
@@ -147,6 +143,7 @@ WYJCO_DPT = u'(\S+?[部处室册科]|研发|QA|R&D|XP|\S*[\w\s]+)'
 WYJCOBASE = u'(?P<position>'+WYJCO_POS+u')'+POASP+u'*(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+'+POASP+u'*\**(?P<company>[^\|'+SP+u']+(?: [^\|'+SP+u']+)*)'
 WYJCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+POASP+u'{3,}'+WYJCOBASE+POASP+u'*'+BDURATION+'\**(?=(?!\n+(?:.+?'+POASP+u'*(?=\|))?'+position_details(re.compile('')).replace('{3,17}', '{2,17}')+u'))$', re.M)
 DUFRTWYJCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+BDURATION+POASP+u'{2,}'+WYJCOBASE+'\**'+POASP+u'*'+position_details(re.compile('')).replace('{3,17}', '{2,17}')+u'$', re.M)
+DUFRTDPTWYJCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+BDURATION+POASP+u'+'+WYJCOBASE.replace(u'(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+', u'(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))')+'\**'+POASP+u'*'+position_details(re.compile('')).replace('{3,17}', '{2,17}')+u'$', re.M)
 BTCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+ASP+u'+(?P<company>[^'+SP+u']+)'+ASP+u'+'+u'(?P<position>'+POSITION+u'?)'+ASP+u'+(?P<dpt>'+WYJCO_DPT+u')$', re.M)
 
 # Combine presence of duration and bracket around period for safer searching
@@ -284,7 +281,7 @@ def format_salary(result, groupdict):
     return result
 
 def position_output(output, groupdict, begin='', end=''):
-    if 'position' in groupdict or 'aposition' in groupdict:
+    if 'position' in groupdict or 'aposition' in groupdict or 'name' in groupdict:
         result = {}
         output_cleanup(groupdict)
         if 'from' in groupdict and groupdict['from']:
@@ -304,6 +301,8 @@ def position_output(output, groupdict, begin='', end=''):
                 result['name'] = fix_position(groupdict['aposition'])
             elif 'second' in groupdict and groupdict['second']:
                 result['name'] = fix_position(groupdict['second'])
+            elif 'name' in groupdict and groupdict['name']:
+                result['name'] = fix_position(groupdict['name'])
             else:
                 result['name'] = fix_position(groupdict['position'])
         if 'aduration' in groupdict and groupdict['aduration']:
@@ -330,6 +329,12 @@ def position_output(output, groupdict, begin='', end=''):
         # Hack: limit is a guess (sure thing: 50 not enough)
         if (not result['name'] or len(result['name']) > 100):
             return
+        for key in position_items:
+            if key in groupdict and groupdict[key]:
+                if key == 'people_under':
+                    result[key] = fix_people(groupdict[key])
+                else:
+                    result[key] = fix_name(groupdict[key])
         format_salary(result, groupdict)
         output['position'].append(result)
 
@@ -370,7 +375,7 @@ def find_xp(RE, text):
     if re.compile(u'职'+POASP+u'*[位务]').search(text):
         out = {'company': [], 'position': []}
         pattern = position_details(RE).replace('{3,17}', '{1,17}')
-        MA = re.compile(pattern,re.M)
+        MA = regex.compile(pattern,re.M)
         for r in MA.finditer(text):
             company_output(out, r.groupdict())
             if r.group('aposition'):
@@ -378,14 +383,14 @@ def find_xp(RE, text):
         if not len(out['position']):
             out = {'company': [], 'position': []}
             pattern = position_details_spaceonly(RE).replace('{3,17}', '{1,17}')
-            MA = re.compile(pattern,re.M)
+            MA = regex.compile(pattern,re.M)
             for r in MA.finditer(text):
                 company_output(out, r.groupdict())
                 if r.group('aposition'):
                     position_output(out, r.groupdict())
     if not len(out['position']):
         out = {'company': [], 'position': []}
-        MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+APO.pattern+u'))', re.M)
+        MA = regex.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+APO.pattern+u'))', re.M)
         for r in MA.finditer(text):
             if r.group('co'):
                 company_output(out, r.groupdict())
@@ -436,17 +441,17 @@ def work_xp_new_liepin(text):
             else:
                 # Speed up non-matching
                 popattern = position_details(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
-            MA = re.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
+            MA = regex.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
             res = MA.search(text)
             if res:
                 if res.group('co'):
                     if (res.group('typelabel') or res.group('businesslabel') or
                             res.group('employlabel') or res.group('desclabel')):
                         pattern = empty_company_details(RE)
-                        MA = re.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
+                        MA = regex.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
                     else:
                         pattern = empty_company_details_pipeonly(RE)
-                        MA = re.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
+                        MA = regex.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
                 for r in MA.finditer(text):
                     company_output(out, r.groupdict())
                     position_output(out, r.groupdict())
@@ -458,17 +463,17 @@ def work_xp_new_liepin(text):
                 else:
                     # Speed up non-matching
                     popattern = position_details_spaceonly(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
-                MA = re.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
+                MA = regex.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
                 res = MA.search(text)
                 if res:
                     if res.group('co'):
                         if (res.group('typelabel') or res.group('businesslabel') or
                                 res.group('employlabel') or res.group('desclabel')):
                             pattern = empty_company_details(RE)
-                            MA = re.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
+                            MA = regex.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
                         else:
                             pattern = empty_company_details_pipeonly(RE)
-                            MA = re.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
+                            MA = regex.compile(u'((?P<co>'+pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+popattern+u'))', re.M)
                     for r in MA.finditer(text):
                         company_output(out, r.groupdict())
                         position_output(out, r.groupdict())
@@ -521,17 +526,17 @@ def work_xp_liepin(text):
             else:
                 # Speed up non-matching
                 popattern = position_details(NLIEPO).replace(u'('+SALARY+POASP+u'*)?', '')
-            MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
+            MA = regex.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
             res = MA.search(text)
             if res:
                 if res.group('co'):
                     if (res.group('typelabel') or res.group('businesslabel') or
                             res.group('employlabel') or res.group('desclabel')):
                         pattern = empty_company_details(RE)
-                        MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
+                        MA = regex.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
                     else:
                         pattern = empty_company_details_pipeonly(RE)
-                        MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
+                        MA = regex.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
                 for r in MA.finditer(text):
                     if r.group('co'):
                         company_output(out, r.groupdict())
@@ -547,17 +552,17 @@ def work_xp_liepin(text):
                 else:
                     # Speed up non-matching
                     popattern = lp_position_details(LIEPPO).replace(SALARY+u'?', '')
-                MA = re.compile(u'((?P<po>'+popattern+u')|(?P<co>'+pattern+u'))', re.M)
+                MA = regex.compile(u'((?P<po>'+popattern+u')|(?P<co>'+pattern+u'))', re.M)
                 res = MA.search(text)
                 if res:
                     if res.group('co'):
                         if (res.group('typelabel') or res.group('businesslabel') or
                                 res.group('employlabel') or res.group('desclabel')):
                             pattern = empty_company_details(RE)
-                            MA = re.compile(u'((?P<po>'+popattern+u')|(?P<co>'+pattern+u'))', re.M)
+                            MA = regex.compile(u'((?P<po>'+popattern+u')|(?P<co>'+pattern+u'))', re.M)
                         else:
                             pattern = empty_company_details_pipeonly(RE)
-                            MA = re.compile(u'((?P<po>'+popattern+u')|(?P<co>'+pattern+u'))', re.M)
+                            MA = regex.compile(u'((?P<po>'+popattern+u')|(?P<co>'+pattern+u'))', re.M)
                     for r in MA.finditer(text):
                         if r.group('co'):
                             company_output(out, r.groupdict())
@@ -573,7 +578,7 @@ def work_xp_liepin(text):
                 else:
                     # Speed up non-matching
                     popattern = position_details_spaceonly(LIEPPO).replace(SALARY+u'?', '')
-                MA = re.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
+                MA = regex.compile(u'((?P<co>'+pattern+u')|(?P<po>'+popattern+u'))', re.M)
                 for r in MA.finditer(text):
                     if r.group('co'):
                         company_output(out, r.groupdict())
@@ -695,7 +700,7 @@ def work_xp_zhilian(text):
     """
     out = {'company': [], 'position': []}
     if DRTACO.search(text):
-        MA = re.compile(empty_company_details(re.compile(u'((?P<pip>'+DRTACO.pattern+u')|(?P<nop>'+NOPIPETACO.pattern+u'))')), re.M)
+        MA = regex.compile(empty_position_details(re.compile(empty_company_details(re.compile(u'((?P<pip>'+DRTACO.pattern+u')|(?P<nop>'+NOPIPETACO.pattern+u'))')))), re.M)
         for r in MA.finditer(text):
             company_output(out, r.groupdict())
             d = r.groupdict()
@@ -705,7 +710,7 @@ def work_xp_zhilian(text):
     elif ALLTACO.search(text):
         if not len(out['position']):
             # Support missing pipe in company definition by using NOPIPETACO
-            MA = re.compile(empty_company_details(ALLTACO), re.M)
+            MA = regex.compile(empty_company_details(ALLTACO), re.M)
             for r in MA.finditer(text):
                 company_output(out, r.groupdict())
                 d = r.groupdict()
@@ -734,6 +739,9 @@ def work_xp_modified_wyjco(text):
         >>> assert '11' in duration(company_1(work_xp_modified_wyjco(u'2012/1―至今\[4年11个月\]  高级软件工程师 | 研发\\n'
         ...     u'北京大基康明医疗设备有限公司\\n\\n工作描述：')))
 
+    DUFRTDPTWYJCO related
+        >>> assert 7 == len(name(position_1(work_xp_modified_wyjco(u'2012/1―至今\[4年11个月\] 高级软件工程师 | 研发 北京大基康明医疗设备有限公司\\n'
+        ...     u'工作描述：'))))
     """
     res = None
     out = {'company': [], 'position': []}
@@ -742,13 +750,19 @@ def work_xp_modified_wyjco(text):
         RE = re.compile(WYJCO.pattern.replace(u'{3,}', '+'), re.M)
         res = RE.search(text)
         if res:
-            MA = re.compile(company_details_pipeonly(RE).replace(u'{1,13}', '{3,13}'), re.M)
+            MA = regex.compile(company_details_pipeonly(RE).replace(u'{1,13}', '{3,13}'), re.M)
             for r in MA.finditer(text):
                 company_output(out, r.groupdict())
                 position_output(out, r.groupdict())
         if not len(out['position']):
             out = {'company': [], 'position': []}
             MA = DUFRTWYJCO
+            for r in MA.finditer(text):
+                company_output(out, r.groupdict())
+                position_output(out, r.groupdict())
+        if not len(out['position']):
+            out = {'company': [], 'position': []}
+            MA = DUFRTDPTWYJCO
             for r in MA.finditer(text):
                 company_output(out, r.groupdict())
                 position_output(out, r.groupdict())
@@ -825,7 +839,7 @@ def work_xp_jingying(text):
     out = {'company': [], 'position': []}
     # Speed up non-matching
     if re.compile(BDURATION, re.M).search(text) and WYJCO.search(text):
-        MA = re.compile(company_details(WYJCO), re.M)
+        MA = regex.compile(company_details(WYJCO), re.M)
         for r in MA.finditer(text):
             company_output(out, r.groupdict())
             position_output(out, r.groupdict())
@@ -837,7 +851,7 @@ def work_xp_jingying(text):
             dto = ''
             dfrom = ''
             out = {'company': [], 'position': []}
-            MA = re.compile(u'((?P<co>'+RE.pattern+ASP+u'*)|(?P<po>'+PONL.pattern+u'))', re.M)
+            MA = regex.compile(u'((?P<co>'+RE.pattern+ASP+u'*)|(?P<po>'+PONL.pattern+u'))', re.M)
             for r in MA.finditer(text):
                 if r.group('co'):
                     dfrom, dto = r.group('from'), r.group('to')
@@ -848,7 +862,8 @@ def work_xp_jingying(text):
             if len(out['position']):
                 break
             out = {'company': [], 'position': []}
-            MA = re.compile(append_po(company_details_pipeonly(RE), u'(?P<po>'+POFINISH+u')?'), re.M)
+            MA = regex.compile(append_po(company_details_pipeonly(RE),
+                    u'(?P<po>'+position_description_details_spaceonly(re.compile(POFINISH))+u')?'), re.M)
             for r in MA.finditer(text):
                 company_output(out, r.groupdict())
                 if r.group('po'):
@@ -858,7 +873,7 @@ def work_xp_jingying(text):
             dto = ''
             dfrom = ''
             out = {'company': [], 'position': []}
-            MA = re.compile(u'((?P<co>'+RE.pattern+ASP+u'*)|(?P<po>'+PO.pattern+u'))', re.M)
+            MA = regex.compile(u'((?P<co>'+RE.pattern+ASP+u'*)|(?P<po>'+PO.pattern+u'))', re.M)
             for r in MA.finditer(text):
                 if r.group('co'):
                     dfrom, dto = r.group('from'), r.group('to')
@@ -1001,8 +1016,10 @@ def work_xp(text):
         ...     u'   公司性质：外商独资 | 公司规模： 5000人 | 公司行业：机械制造/机电/重工 \\n 公司描述：未填写 \\n\\n'
         ...     u'品质主任      2007.06 - 2011.02 \\n\\n 下属人数：20 | 所在地区：深圳')))
 
-    WYJCO related
-        >>> # See work_xp_jingying releated doctests
+    MOD WYJCO related
+        >>> model = u'2012-07 – Now(2年)  Position\\nCompany。\\n\\n工作描述：'; assert DUFRTWYJCO.search(model).group('position')
+        >>> model = u'2012-07 – Now(2年)  Position | fixed处\\nCompany。\\n\\n工作描述：'; assert DUFRTWYJCO.search(model).group('position')
+        >>> model = u'2012-07 – Now\\[2年\\] Position | fixed处 Company。\\n\\n工作描述：'; assert DUFRTDPTWYJCO.search(model).group('position')
 
     find_xp related
         >>> model = u'2012-07 – Now Company\\n职位：Position'; assert find_xp(TCO, model)[0]
@@ -1150,7 +1167,7 @@ def work_xp(text):
         # Only run SPO if WYJCO does not match (for speed up)
         if not res:
             # Can't use CO/TCO as they expect EOL
-            MA = re.compile(u'^'+ASP+u'*'+PERIOD+ASP+u'*(?P<company>[^' + SENTENCESEP + '=\n\*]+?)'+ASP+u'*'+SPO.pattern, re.M)
+            MA = regex.compile(u'^'+ASP+u'*'+PERIOD+ASP+u'*(?P<company>[^' + SENTENCESEP + '=\n\*]+?)'+ASP+u'*'+SPO.pattern, re.M)
             for r in MA.finditer(text):
                 company_output(out, r.groupdict())
                 position_output(out, r.groupdict())
@@ -1160,27 +1177,27 @@ def work_xp(text):
             if pos:
                 return pos, out
             if not pos:
-                pos, out = work_xp_jingying(text)
+                pos, out = work_xp_modified_wyjco(text)
                 if pos:
                     return pos, out
             if not pos:
-                pos, out = work_xp_modified_wyjco(text)
+                pos, out = work_xp_jingying(text)
                 if pos:
                     return pos, out
             for RE in [CCO, CO, TCO]:
                 if (RE == TCO or re.compile(BDURATION).search(text)) and RE.search(text):
                     out = {'company': [], 'position': []}
                     if not len(out['position']):
-                        MA = re.compile(company_details(RE).replace('{1,13}', '{3,13}'), re.M)
+                        MA = regex.compile(company_details(RE).replace('{1,13}', '{3,13}'), re.M)
                         if not MA.search(text):
                             # company_business always matches what RE matches
-                            MA = re.compile(empty_company_details(RE), re.M)
+                            MA = regex.compile(empty_company_details(RE), re.M)
                         pos, out = find_xp(MA, text)
                         if pos:
                             return pos, out
                     if not len(out['position']):
                         out = {'company': [], 'position': []}
-                        MA = re.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+RESPPO.pattern+u'))', re.M)
+                        MA = regex.compile(u'((?P<co>'+RE.pattern+u')|(?P<po>'+RESPPO.pattern+u'))', re.M)
                         for r in MA.finditer(text):
                             if r.group('co'):
                                 dfrom, dto = r.group('from'), r.group('to')
@@ -1195,7 +1212,7 @@ def work_xp(text):
             if BPO.search(text):
                 out = {'company': [], 'position': []}
                 # While we have a BPO-like document, also match BPONOSAL inside
-                MA = re.compile(u'((?P<co>'+CO.pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+empty_company_details_pipeonly(BPONOSAL)+u'))', re.M)
+                MA = regex.compile(u'((?P<co>'+CO.pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+empty_company_details_pipeonly(BPONOSAL)+u'))', re.M)
                 for r in MA.finditer(text):
                     company_output(out, r.groupdict())
                     position_output(out, r.groupdict())
@@ -1205,13 +1222,13 @@ def work_xp(text):
                     return pos, out
             if not len(out['position']):
                 out = {'company': [], 'position': []}
-                MA = re.compile(u'((?P<co>'+CO.pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+empty_company_details_pipeonly(BPONOSAL)+u'))', re.M)
+                MA = regex.compile(u'((?P<co>'+CO.pattern+u')'+ASP+u'*(\-{3,}(?: \-+)* *\n+)?'+ASP+u'*(?P<po>'+empty_company_details_pipeonly(BPONOSAL)+u'))', re.M)
                 for r in MA.finditer(text):
                     company_output(out, r.groupdict())
                     position_output(out, r.groupdict())
             if not len(out['position']):
                 out = {'company': [], 'position': []}
-                MA = re.compile(u'(?P<co>'+CO.pattern+u')(\n+'+COULDDEPO.pattern+u')?', re.M)
+                MA = regex.compile(u'(?P<co>'+CO.pattern+u')(\n+'+COULDDEPO.pattern+u')?', re.M)
                 for r in MA.finditer(text):
                     company_output(out, r.groupdict())
                     if r.group('position'):
@@ -1220,7 +1237,7 @@ def work_xp(text):
             pos, out = work_xp_zhilian(text)
         elif PCO.search(text):
             out = {'company': [], 'position': []}
-            MA = re.compile(empty_company_details(PCO), re.M)
+            MA = regex.compile(empty_company_details(PCO), re.M)
             for r in MA.finditer(text):
                 company_output(out, r.groupdict())
                 position_output(out, r.groupdict())
@@ -1235,7 +1252,7 @@ def work_xp(text):
                 out = {'company': [], 'position': []}
                 pattern = empty_company_details(TCO)
                 # If position was present, it would have been catched in find_xp
-                MA = re.compile(empty_position_details(re.compile(pattern)), re.M)
+                MA = regex.compile(empty_position_details(re.compile(pattern)), re.M)
                 for r in MA.finditer(text):
                     company_output(out, r.groupdict())
         elif RCO.search(text):
@@ -1246,7 +1263,7 @@ def work_xp(text):
         elif RTACPO.search(text):
             out = {'company': [], 'position': []}
             pattern = empty_company_details(RTACPO)
-            MA = re.compile(pattern+ASP+u'+'+TAPO.pattern[1:], re.M)
+            MA = regex.compile(pattern+ASP+u'+'+TAPO.pattern[1:], re.M)
             for r in MA.finditer(text):
                 company_output(out, r.groupdict())
                 position_output(out, r.groupdict())
@@ -1267,7 +1284,7 @@ def table_based_xp(text):
     out = {'company': [], 'position': []}
     if HCO.search(text):
         pattern = empty_company_details(HCO)
-        MA = re.compile(empty_position_details(re.compile(pattern)), re.M)
+        MA = regex.compile(empty_position_details(re.compile(pattern)), re.M)
         for r in MA.finditer(text):
             company_output(out, r.groupdict())
             if r.group('aposition'):
@@ -1595,7 +1612,7 @@ def fix(d, as_dict=False):
                 return fix_output_legacy(out, reject)
             if TCO.search(res.group('expe')):
                 complement = u'\n*'+ASP+u'*公司性质：\S+ \| 公司规模： '+AEMPLOYEES+u' \| 公司行业：(?P<business>\S+)$'
-                MA = re.compile(u'((?P<co>'+TCO.pattern+u'('+complement+u')?)|(?P<po>'+TPO.pattern+u'))', re.M)
+                MA = regex.compile(u'((?P<co>'+TCO.pattern+u'('+complement+u')?)|(?P<po>'+TPO.pattern+u'))', re.M)
                 for r in MA.finditer(res.group('expe')):
                     if r.group('co'):
                         company_output(out, r.groupdict())
@@ -1605,7 +1622,7 @@ def fix(d, as_dict=False):
                     out = {'company': [], 'position': []}
                     dto = ''
                     dfrom = ''
-                    MA = re.compile(u'((?P<co>'+TCO.pattern+u')|(?P<po>'+TAPO.pattern+u'))', re.M)
+                    MA = regex.compile(u'((?P<co>'+TCO.pattern+u')|(?P<po>'+TAPO.pattern+u'))', re.M)
                     for r in MA.finditer(res.group('expe')):
                         if r.group('co'):
                             dfrom, dto = r.group('from'), r.group('to')

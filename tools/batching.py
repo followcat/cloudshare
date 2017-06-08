@@ -6,7 +6,7 @@ import shutil
 
 import utils.chsname
 import core.exception
-import core.docprocessor
+import utils.docprocessor.libreoffice
 import extractor.information_explorer
 
 
@@ -57,7 +57,7 @@ def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origi
     for root, dirs, files in os.walk(path):
         for filename in files:
             f = open(os.path.join(root, filename), 'r')
-            filepro = core.docprocessor.Processor(filename, f, temp_output)
+            filepro = utils.docprocessor.libreoffice.LibreOfficeProcessor(filename, f, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
                                         filename=filepro.base.base)
@@ -81,7 +81,7 @@ def classify(path, temp_output):
         os.makedirs(temp_output)
     for root, dirs, files in os.walk(path):
         for name in files:
-            filepro = core.docprocessor.Processor(root, name, temp_output)
+            filepro = utils.docprocessor.libreoffice.LibreOfficeProcessor(root, name, temp_output)
             yamlinfo = extractor.information_explorer.catch_cvinfo(
                                         stream=filepro.markdown_stream.decode('utf8'),
                                         filename=filepro.base.base)
@@ -253,7 +253,7 @@ def company_knowledge(SVC_CV, SVC_CO):
         info = SVC_CV.getyaml(y)
         try:
             for c in [c for c in info['experience']['company'] if c['name']]:
-                company = extractor.information_explorer.catch_coinfo(name=c['name'], stream=c)
+                company = extractor.information_explorer.catch_coinfo(stream=c)
                 coobj = core.basedata.DataObject(company, data='')
                 try:
                     result = SVC_CO.add(coobj)
@@ -329,7 +329,7 @@ def convert_oldcompany(SVC_CO_REPO, filepath, filename):
     yamls = utils.builtin.load_yaml(filepath, filename)
     for y in yamls:
         args = y
-        metadata = extractor.information_explorer.catch_coinfo(name=args['name'], stream=args)
+        metadata = extractor.information_explorer.catch_coinfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         SVC_CO_REPO.add(coobj)
 
@@ -350,6 +350,39 @@ def update_jd_co_id(SVC_JD, SVC_CO):
             filename = SVC_JD.filename(jd_id)
             with open(os.path.join(SVC_JD.path, filename), 'w') as f:
                 f.write(dump_data)
+
+
+def update_jd_commentary(SVC_JD, comments_dict):
+    import yaml
+    for jd in SVC_JD.lists():
+        if 'commentary' in jd:
+            continue
+        jd_id = jd['id']
+        if jd_id in comments_dict:
+            jd['commentary'] = comments_dict[jd_id]
+        else:
+            jd['commentary'] = ''
+        dump_data = yaml.safe_dump(jd, allow_unicode=True)
+        filename = SVC_JD.filename(jd_id)
+        with open(os.path.join(SVC_JD.path, filename), 'w') as f:
+            f.write(dump_data)
+
+
+def add_jd_followup(SVC_PRJ):
+    import yaml
+    SVC_JD = SVC_PRJ.jobdescription
+    for jd in SVC_JD.lists():
+        if 'followup' in jd:
+            continue
+        jd_id = jd['id']
+        jd['followup'] = ''
+        if '\n' in jd['commentary']:
+            jd['followup'] = jd['commentary']
+            jd['commentary'] = ''
+        dump_data = yaml.safe_dump(jd, allow_unicode=True)
+        filename = SVC_JD.filename(jd_id)
+        with open(os.path.join(SVC_JD.path, filename), 'w') as f:
+            f.write(dump_data)
 
 
 def init_people(SVC_CV, SVC_PEO):

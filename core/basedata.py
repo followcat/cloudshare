@@ -1,5 +1,5 @@
 import core.outputstorage
-import core.docprocessor
+import utils.pandocconverter
 
 
 class DataObject(object):
@@ -34,5 +34,5 @@ class DataObject(object):
         return self._metadata
 
     def preview_data(self):
-        output = core.docprocessor.md_to_html(self.data)
+        output = utils.pandocconverter.md_to_html(self.data)
         return output

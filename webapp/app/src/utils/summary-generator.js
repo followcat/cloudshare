@@ -44,6 +44,7 @@ const label = [
   'company',
   'experience',
   'education_history',
+  'classify',
 ];
 
 const getCompanyNameById = (id, companyList) => {
@@ -89,6 +90,10 @@ const parseEducation = (education) => {
   return value;
 };
 
+const parseClassify = (classify) => {
+  return [classify];
+};
+
 const generateSummary = (dataSource) => {
   let result = [];
 
@@ -101,6 +106,8 @@ const generateSummary = (dataSource) => {
         obj.value = parseExperience(dataSource[label[i]]);
       } else if (label[i] === 'education_history') {  // 特殊处理: 解析education_history, 生成数组, 赋值给value
         obj.value = parseEducation(dataSource[label[i]]);
+      } else if (label[i] === 'classify') { // 特殊处理: 解析classify, 生成数组, 赋值给value
+        obj.value = parseClassify(dataSource[label[i]]);
       } else {  // 一般情况, 直接赋值
         obj.value = dataSource[label[i]];
       }

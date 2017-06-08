@@ -1,16 +1,14 @@
 {
-  "presets": ["react", "es2015", "stage-0"],
+  "presets": [
+    ["es2015", { "module": false }],
+    "stage-0",
+    "react"
+  ],
+
   "plugins": [[
     "import",
     { "libraryName": "antd", "style": true }
   ], [
     "transform-object-assign"
-  ]],
-  "env": {
-    "start": {
-      "presets": [
-        "react-hmre"
-      ]
-    }
-  }
+  ], "react-hot-loader/babel"]
 }

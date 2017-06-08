@@ -16,7 +16,7 @@ class TableToolbar extends Component {
     const props = this.props;
 
     return (
-      <Row className={`${props.prefixCls}`}>
+      <Row className={props.prefixCls}>
         {(props.isSearched)
           ? <Col {...props.searchCol}>
               <Input
@@ -48,7 +48,7 @@ TableToolbar.defaultProps = {
   searchCol: {
     span: 6,
   },
-  searchPlaceholder: "search",
+  searchPlaceholder: 'search',
   elements: [],
   onSearch() {},
 };

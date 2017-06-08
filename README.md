@@ -3,25 +3,13 @@ share，edit your doc，pdf，md and so on...
 
 ## Dependencies
 
-    PyYAML==3.11
-    Flask==0.10.1
-    Flask-Login==0.3.2
-    Flask-Session==0.2.2
-    Flask-RESTful==0.3.5
-    Flask-Cors==2.1.2
-    dulwich==0.10.2
-    pypandoc==1.0.1
-    emaildata==0.3.2
-    jieba==0.38
-    gensim==0.12.3
-    APScheduler==3.0.6
-    ujson==1.35
-    Theano==0.7.0(choosable)
-    Pattern==2.6(choosable)
+    See requirement.txt
 
-    pandoc 1.13.2.1
-    pdftohtml 0.18.4
-    LibreOffice 4.3
+    pandoc==1.13.2.1 in webapp.
+
+    or
+
+    pandoc==1.19.2.1 in demoapp.
 
 ### for test
 
@@ -65,11 +53,6 @@ Here is a demo bash script to run Jenkins test:
     node@6.1.0
     npm@3.8.6
     gulp@3.9.1
-
-### Install
-
-Enter ```/static``` folder, run ```npm install``` to install the packages.
-
 
 ## How to
 

@@ -1,4 +1,3 @@
-import os.path
 import datetime
 
 import flask
@@ -10,7 +9,6 @@ import utils.builtin
 import core.mining.info
 import core.mining.valuable
 
-import json
 
 class BaseAPI(Resource):
 
@@ -49,7 +47,7 @@ class PositionAPI(BaseAPI):
         for name in searches:
             positions = []
             try:
-                yaml_data = self.svc_mult_cv.getyaml(name)
+                yaml_data = self.svc_mult_cv.getyaml(name, projectname=projectname)
             except IOError:
                 continue
             if 'position' in yaml_data['experience']:
@@ -143,54 +141,26 @@ class LSIbaseAPI(Resource):
         self.index = flask.current_app.config['SVC_INDEX']
         self.sim_names = self.miner.addition_names()
 
-    def _post(self, project, doc, uses, filterdict, cur_page):
-        def nemudate(dates):
-            str_result = []
-            datetimes_result = []
-            datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
-            tstart = min(datetimes)
-            tend = max(datetimes)
-            while(tstart <= tend):
-                datetimes_result.append(tstart)
-                tstart += datetime.timedelta(days = 1)
-            for each in datetimes_result:
-                str_result.append(each.strftime('%Y%m%d'))
-            return str_result
-        indexdict = {}
-        if 'date' in filterdict:
-            try:
-                filterdict['date'] = nemudate(filterdict['date'])
-            except ValueError:
-                filterdict.pop('date')
-        for key in filterdict:
-            if filterdict[key]:
-                indexdict[key] = self.index.get_indexkeys([key], filterdict[key], uses)
-        count = 20
-        datas, pages, totals = self.process(project, uses, doc, cur_page, count, indexdict)
-        return { 'datas': datas, 'pages': pages, 'totals': totals }
-
-    def process(self, project, uses, doc, cur_page, eve_count, filterdict=None):
+    def process(self, project, doc, uses, filterdict, cur_page, eve_count=20):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(project, doc, uses=uses, top=500)
-        filteset = self.index.get(filterdict, uses=uses)
-        if filterdict:
-            result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
+        result = self.miner.probability(project, doc, uses=uses, top=0.05, minimum=1000)
+        result = self.index.filter_ids(result, filterdict, uses=uses)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1
         else:
             pages = totals/eve_count
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = self.svc_mult_cv.getyaml(name)
+            yaml_info = self.svc_mult_cv.getyaml(name, projectname=project)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
                 'match': score
             }
             datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
-        return datas, pages, totals
+        return { 'datas': datas, 'pages': pages, 'totals': totals }
 
 
 class LSIbyJDidAPI(LSIbaseAPI):
@@ -200,6 +170,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('appendcomment', type = bool, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -211,11 +182,81 @@ class LSIbyJDidAPI(LSIbaseAPI):
         project = self.svc_mult_cv.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
+        append_comment = args['appendcomment'] if args['appendcomment'] else False
+        if append_comment:
+            doc += jd_yaml['commentary']
         uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(projectname, doc, uses, filterdict, cur_page)
+        result = self.process(projectname, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
+
+
+class LSIbyAllJDAPI(LSIbaseAPI):
+
+    cache = {}
+
+    def __init__(self):
+        super(LSIbyAllJDAPI, self).__init__()
+        self.index = flask.current_app.config['SVC_INDEX']
+        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.reqparse.add_argument('fromcache', type=bool, location = 'json')
+        self.reqparse.add_argument('project', type=str, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
+        self.reqparse.add_argument('threshold', type=float, location = 'json')
+
+    def fromcache(self, projectname, filterdict, threshold):
+        results = []
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        if today not in self.cache:
+            self.cache[today] = {}
+            self.cache[today][projectname] = self.findbest(projectname,
+                                                           filterdict,
+                                                           threshold)
+        elif projectname not in self.cache[today]:
+            self.cache[today][projectname] = self.findbest(projectname,
+                                                           filterdict,
+                                                           threshold)
+        return self.cache[today][projectname]
+
+    def findbest(self, projectname, filterdict, threshold=None):
+        if threshold is None:
+            threshold = 0.8
+        results = []
+        project = self.svc_mult_cv.getproject(projectname)
+        for jd in project.jobdescription.lists():
+            try:
+                if jd['status'] == 'Closed':
+                    continue
+            except KeyError:
+                continue
+            doc = jd['description']
+            doc += jd['commentary']
+            result = self.miner.probability(project.name, doc, uses=project.getclassify(),
+                                            top=0.001, minimum=1000)
+            result = self.index.filter_ids(result, filterdict)
+            output = {}
+            output['JDid'] = jd['id']
+            output['JDname'] = jd['name']
+            output['JDcompany'] = project.company_get(jd['company'])['name']
+            if result and float(result[0][1])>float(threshold):
+                output.update(self.svc_mult_cv.getyaml(result[0][0]))
+                output['CVvalue'] = result[0][1]
+                results.append(output)
+        return results
+
+    def post(self):
+        results = []
+        args = self.reqparse.parse_args()
+        threshold = args['threshold']
+        fromcache = args['fromcache']
+        projectname = args['project']
+        filterdict = args['filterdict']
+        if fromcache is False:
+            results = self.findbest(projectname, filterdict, threshold)
+        else:
+            results = self.fromcache(projectname, filterdict, threshold)
+        return { 'code': 200, 'data': results }
 
 
 class LSIbyCVidAPI(LSIbaseAPI):
@@ -238,7 +279,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
         uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(projectname, doc, uses, filterdict, cur_page)
+        result = self.process(projectname, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -260,7 +301,7 @@ class LSIbydocAPI(LSIbaseAPI):
         uses = [projectname] + args['uses'] if args['uses'] else [projectname]
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(projectname, doc, uses, filterdict, cur_page)
+        result = self.process(projectname, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -284,13 +325,13 @@ class SimilarAPI(Resource):
         uses = [projectname]
         project = self.svc_mult_cv.getproject(projectname)
         project_classify = project.getclassify()
-        for classify in self.svc_mult_cv.getyaml(id)['classify']:
+        for classify in self.svc_mult_cv.getyaml(id, projectname=projectname)['classify']:
             if classify in project_classify:
                 uses.append(classify)
         datas = []
         for name, score in self.miner.probability(projectname, doc,
                                                   uses=uses, top=6)[1:6]:
-            yaml_info = self.svc_mult_cv.getyaml(name)
+            yaml_info = self.svc_mult_cv.getyaml(name, projectname=projectname)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
         return { 'code': 200, 'data': datas }
 
@@ -326,7 +367,7 @@ class ValuablebaseAPI(Resource):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = self.svc_mult_cv.getyaml(name+'.yaml')
+                yaml_data = self.svc_mult_cv.getyaml(name+'.yaml', projectname=projectname)
                 yaml_data['match'] = match_item[1]
                 values.append({ 'match': match_item[1],
                                 'id': yaml_data['id'],

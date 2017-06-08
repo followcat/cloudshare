@@ -1,8 +1,8 @@
-import flask
 import flask.ext.restful
 
 from webapp.restful.people import *
 from webapp.restful.mining import *
+from webapp.restful.reload import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
 from webapp.restful.company import *
@@ -15,6 +15,7 @@ from webapp.restful.databases import *
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
+    api.add_resource(SyncReloadAPI, '/api/syncreload', endpoint = 'syncreload')
     api.add_resource(SessionAPI, '/api/session')
     api.add_resource(AccountAPI, '/api/accounts/<string:id>')
     api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')
@@ -24,12 +25,14 @@ def initialize(app):
 
     api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyAllAPI, '/api/companyall', endpoint = 'companyall')
+    api.add_resource(AddedCompanyListAPI, '/api/addedcompanylist', endpoint = 'adddedcompanylist')
     api.add_resource(CompanyUploadExcelAPI, '/api/couploadexcel',
                      endpoint = 'couploadexcel')
     api.add_resource(CompanyConfirmExcelAPI, '/api/coconfirmexcel',
                      endpoint = 'coconfirmexcel')
     api.add_resource(CustomerListAPI, '/api/customerlist', endpoint = 'customerlist')
     api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
+    api.add_resource(SearchCObyKeyAPI, '/api/searchcobykey', endpoint = 'searchcobykey')
     api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
     api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate',
                      endpoint = 'companyinfoupdate')
@@ -62,6 +65,7 @@ def initialize(app):
     api.add_resource(LSIbydocAPI, '/api/mining/lsibydoc', endpoint = 'lsibydoc')
 
     api.add_resource(LSIbyJDidAPI, '/api/mining/lsibyjdid', endpoint = 'lsibyjdid')
+    api.add_resource(LSIbyAllJDAPI, '/api/mining/lsibyalljd', endpoint = 'lsibyalljd')
     api.add_resource(LSIbyCVidAPI, '/api/mining/lsibycvid', endpoint = 'lsibycvid')
 
     api.add_resource(SimilarAPI, '/api/mining/similar', endpoint = 'similar')

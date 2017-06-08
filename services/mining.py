@@ -212,7 +212,8 @@ class Mining(object):
             for svc_name in service_names:
                 svc = self.services['all'][svc_name]
                 industrypath = industrytopath(svc_name)
-                index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
+                index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
+                                                                os.path.join(save_path,
                                                                 industrypath), model)
                 try:
                     index.load()
@@ -220,6 +221,21 @@ class Mining(object):
                     index.build([svc])
                     index.save()
                 self.sim[modelname][svc_name] = index
+
+    def getsims(self, basemodel, uses=None):
+        sims = []
+        if uses is None:
+            try:
+                uses = self.sim[basemodel].keys()
+            except KeyError:
+                return sims
+        for each in uses:
+            try:
+                sim = self.sim[basemodel][each]
+            except KeyError:
+                continue
+            sims.append(sim)
+        return sims
 
     def make_lsi(self):
         self.lsi_model = dict()
@@ -242,46 +258,55 @@ class Mining(object):
             if lsimodel.getconfig('autoupdate') is True:
                 updated = self.lsi_model[modelname].update(
                     [self.services['default'][modelname]])
-                if updated:
-                    self.update_sims()
+                self.update_sims(newmodel=updated)
 
-    def update_sims(self):
+    def update_sims(self, newmodel=False):
         for modelname in self.sim:
             for simname in self.sim[modelname]:
                 svc = self.services['all'][simname]
-                self.sim[modelname][simname].update([svc])
-                self.sim[modelname][simname].save()
+                updated = self.sim[modelname][simname].update([svc], newmodel)
+                if newmodel or updated:
+                    self.sim[modelname][simname].save()
 
-    def probability(self, basemodel, doc, uses=None, top=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
+    def probability(self, basemodel, doc, uses=None, top=None, minimum=None):
         result = []
-        for name in uses:
-            sim = self.sim[basemodel][name]
-            result.extend(sim.probability(doc, top=top))
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
+            result.extend(sim.probability(doc, top=top, minimum=minimum))
         results_set = set(result)
         return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
 
     def probability_by_id(self, basemodel, doc, id, uses=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
         result = tuple()
-        for dbname in uses:
-            sim = self.sim[basemodel][dbname]
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
             probability = sim.probability_by_id(doc, id)
             if probability is not None:
                 result = probability
                 break
         return result
 
-    def lenght(self, basemodel, uses=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
+    def lenght(self, basemodel, uses=None, top=None):
         result = 0
-        for name in uses:
-            sim = self.sim[basemodel][name]
-            result += len(sim.names)
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
+            nums = len(sim.names)
+            if top is not None:
+                if top < 1:
+                    nums = nums*top
+                elif nums > top:
+                    nums = top
+            result += nums
         return result
+
+    def idsims(self, modelname, ids):
+        results = list()
+        for id in ids:
+            for sim in self.sim[modelname].values():
+                if id in sim.names:
+                    results.append(sim.name)
+                    break
+        return results
 
     def minetop(self, doc, basemodel, top=None, uses=None):
         results = self.probability(basemodel, doc, uses=uses)
@@ -292,8 +317,9 @@ class Mining(object):
     def minelist(self, doc, lists, basemodel, uses=None):
         return map(lambda x: self.probability_by_id(basemodel, doc, x, uses=uses), lists)
 
-    def minelistrank(self, doc, lists, basemodel, uses=None):
-        probalist = set(self.probability(basemodel, doc, uses=uses))
+    def minelistrank(self, doc, lists, basemodel, uses=None, top=None, minimum=None):
+        probalist = set(self.probability(basemodel, doc, uses=uses,
+                                         top=top, minimum=minimum))
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return map(lambda x: (x[0], ranklist.index(x)), lists)

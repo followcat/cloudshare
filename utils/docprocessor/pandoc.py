@@ -46,8 +46,10 @@ class PandocProcessor(utils.docprocessor.base.Processor):
         logger.info('Convert: %s' % self.base)
         self.file_docx_to_markdown()
         if not os.path.exists(os.path.join(self.markdown_path, self.name.md)):
+            self.resultcode = 2
             return False
         logger.info(' '.join([self.base.base, self.name.base, 'Success']))
+        self.resultcode = 0
         return True
 
     def renameconvert(self, new):

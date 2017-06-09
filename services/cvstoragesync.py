@@ -46,8 +46,15 @@ class CVStorageSync(object):
             filterfunc = filter
         for dbname in interfaces:
             raw_db = interfaces[dbname]
+            for id in raw_db.lsid_raw():
+                filepath = os.path.join(raw_db.rawpath, id+raw_db.yamlextention)
+                date = os.path.getmtime(filepath)
+                yamlinfo = {'date': date, 'id': id}
+                yield dbname, raw_db, yamlinfo
+        """
             for yamlinfo in raw_db.lscly_yaml():
                 yield dbname, raw_db, yamlinfo
+        """
 
     def update(self, raws=None, filterfunc=None):
         for dbname, raw_db, yamlinfo in self.yamls_gen(raws, filterfunc):

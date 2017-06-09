@@ -54,7 +54,7 @@ SUMMARYEDU = re.compile(u'学'+ASP+u'*[历位][:：]'+ASP+u'*(?P<education>\S+)'
 SUMMARYMAJOR = re.compile(u'专'+ASP+u'*业[:：]'+ASP+u'*(?P<major>\S+)', re.M)
 SUMMARYSCHOOL = re.compile(u'((毕业院)|(学))'+ASP+u'*校[:：]'+ASP+u'*'+SCHOOL, re.M)
 
-EMA = re.compile('^'+PREFIX+'*'+ASP+'*'+SCHOOL+u'\n+'+PREFIX+'*'+ASP+'*'+EDUCATION+','+ASP+'*'+MAJOR+u'\n+(?P<from>\d{4}|'+ENPDATE+u')'+DATESEP+'(?P<to>\d{4}|'+ENPDATE+u')', re.M)
+EMA = re.compile('^'+PREFIX+'*'+ASP+'*\**'+SCHOOL+u'\**\n+'+PREFIX+'*'+ASP+'*'+EDUCATION+','+ASP+'*'+MAJOR+u'\n+(?P<from>\d{4}|'+ENPDATE+u')'+DATESEP+'(?P<to>\d{4}|'+ENPDATE+u')', re.M)
 
 def format_output(output, groupdict, summary=None):
     result = {

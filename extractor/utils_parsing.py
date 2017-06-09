@@ -102,8 +102,10 @@ education_list = {
     #3: Show clearly step before graduate
     4: (u'本'+POASP+u'{0,3}科', u'学'+POASP+u'士', u'\S{0,5}(?P<shorted4>学士)', u'全日制本科', u'统招本科', "Bachelor's degree", 'B.S.E'),
     5: (u'在职硕士', ),
-    6: (u'硕'+POASP+u'{0,3}士', u'\S{0,5}(?P<shorted6>硕士)', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA', "Master's degree"),
-    7: (u'博'+POASP+u'{0,3}士', u'\S{0,5}(?P<shorted7>博士)', u'博士研究生'),
+    6: (u'硕'+POASP+u'{0,3}士', u'\S{0,5}(?P<shorted6>硕士)', u'硕士研究生', u'研究生/硕士学位', u'MBA', u'MBA/EMBA', u'EMBA',
+        "Master's degree", "Master (?:of|in) .+?"+exclude_with_parenthesis('')),
+    7: (u'博'+POASP+u'{0,3}士', u'\S{0,5}(?P<shorted7>博士)', u'博士研究生',
+        "Doctor(?:ate)?'s degree", "Doctor (?:of|in) .+?"+exclude_with_parenthesis('')),
     8: (u'博士后', )
     }
 
@@ -197,7 +199,7 @@ duration_to_ch = lambda x: re.compile('months?').sub(u'个月', re.compile('year
 fix_duration = lambda x: re.compile(ASP+'+').sub('', fix_decimal(duration_to_ch(x)))
 
 fix_imagelink = lambda x : re.compile(IMAGELINK).sub('', x)
-fix_prefix = lambda x: aspstrip(re.compile(PREFIX).sub('', x)).strip('*')
+fix_prefix = lambda x: aspstrip(re.compile(u'^'+PREFIX+'*').sub('', x)).strip('*')
 fix_star = lambda x: fix_imagelink(x).replace('\*', '*')
 remove_escape = lambda x: x.group(1)
 fix_escape = lambda x: re.compile(u'\\\\([_'+SEP+'])').sub(remove_escape, fix_star(x))
@@ -214,7 +216,7 @@ fix_range = lambda x: x.replace(' -0 ', '')
 fix_people = lambda x: re.compile(ASP+u'+人').sub(u'人', x)
 fix_employees = lambda x: re.compile(u'[ '+SEP+u']+').sub(u'-', fix_people(fix_range(x)))
 
-fix_education = lambda x: re.compile(ASP+'+').sub('', aspstrip(x))
+fix_education = lambda x: re.compile(ASP+'+').sub(' ', aspstrip(x))
 
 WORKXP = PERIOD + ur'[:：\ufffd]?\s*' + UNIBRALEFT + DURATION + UNIBRARIGHT +ASP+ ur'*[：:\| ]*(?P<company>'+COMPANY+u')[：:\| ]*(?P<position>'+POSITION+u'?)$'
 STUDIES = PERIOD+ ur'[:：\ufffd]?\s*' + u'(?P<school>'+COMPANY+u')[：:\| ]*(?P<major>'+POSITION+u'?)[：:\| ]*'+EDUCATION+u'?$'

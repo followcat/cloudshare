@@ -27,7 +27,7 @@ no_project_detail = lambda STR: u'(?<!(?:(?:职责|工作)(?:描述|内容)|项�
 # Allow multiline once in company name when duration is present
 # As company has at least one char, need to handle break just as company tail
 # Catching all employees is too expensive on parenthesis repetition, some will be post processed
-ECO = re.compile(u'^'+PREFIX+u'*(?P<position>(\S[\S ]+\n)*)\n+(?P<company>(\S[\S ]+\n)*)\n+' + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
+ECO = re.compile(u'^'+heading(PREFIX+u'*(?P<position>(\S[\S ]+\n)*)\n+')+heading(PREFIX+u'*(?P<company>(\S[\S ]+\n)*)\n+') + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
 CO = re.compile(heading(PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))(?:'+BROKENOLELINK+u')?\**(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)\**'+POASP+u'*'+BEMPLOYEES+'?\**'+ASP+u'*\**'+BDURATION+POASP+u'*\**'+POASP+u'*$'), re.DOTALL+re.M)
 CCO = re.compile(heading(PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))(?:'+BROKENOLELINK+u')?\**(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)\**'+POASP+u'*'+BEMPLOYEES+'?\**'+ASP+u'*\**'+BDURATION+POASP+u'*\**'+POASP+u'*$'), re.DOTALL+re.M)
 TCO = re.compile(no_project_detail(u'^'+heading(PREFIX+u'*'+CONTEXT+u'?'+POASP+u'*\**'+PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))(?:'+BROKENOLELINK+u')?\**(?P<company>'+COMPANY+u')\**'+POASP+u'*'+BEMPLOYEES+'?\**('+ASP+u'*\**'+BDURATION+'\**)?'+POASP+u'*$')), re.DOTALL+re.M)
@@ -329,12 +329,6 @@ def position_output(output, groupdict, begin='', end=''):
         # Hack: limit is a guess (sure thing: 50 not enough)
         if (not result['name'] or len(result['name']) > 100):
             return
-        for key in position_items:
-            if key in groupdict and groupdict[key]:
-                if key == 'people_under':
-                    result[key] = fix_people(groupdict[key])
-                else:
-                    result[key] = fix_name(groupdict[key])
         format_salary(result, groupdict)
         output['position'].append(result)
 

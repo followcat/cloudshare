@@ -11,13 +11,6 @@ from utils.docprocessor.base import logger
 
 
 class LibreOfficeProcessor(utils.docprocessor.base.Processor):
-    """
-        result code:
-            0 - success
-            1 - can not generate docbook
-            2 - convert exception
-            3 - not support doc type
-    """
 
     converter = None
 
@@ -25,7 +18,6 @@ class LibreOfficeProcessor(utils.docprocessor.base.Processor):
         super(LibreOfficeProcessor, self).__init__(fileobj, name, output_base)
         if self.converter is None:
             self.__class__.converter = utils.docprocessor.unoconverter.DocumentConverter()
-        self.resultcode = None
         self.html_path = self.output_path.html
         self.docbook_path = self.output_path.docbook
 

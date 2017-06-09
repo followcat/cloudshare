@@ -9,8 +9,16 @@ logger = logging.getLogger("converterinfo")
 
 
 class Processor(object):
+    """
+        result code:
+            0 - success
+            1 - can not generate docbook
+            2 - convert exception
+            3 - not support doc type
+    """
 
     def __init__(self, fileobj, name, output_base):
+        self.resultcode = None
         self.markdown_stream = str()
 
         self.base = core.outputstorage.ConvertName(name)

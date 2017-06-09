@@ -20,5 +20,9 @@ if __name__ == '__main__':
     app.debug = True
     if not app.debug:
         import logging
-        logging.basicConfig(filename='demoapp_flask.log', level=logging.INFO)
+        logger = logging.getLogger()
+        handler = logging.handlers.RotatingFileHandler('demoapp_flask.log')
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s: \t%(message)s")
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
     app.run(host='0.0.0.0', port=4888, threaded=True)

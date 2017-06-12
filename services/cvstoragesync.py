@@ -50,7 +50,8 @@ class CVStorageSync(object):
                 filepath = os.path.join(raw_db.rawpath, id+raw_db.yamlextention)
                 date = os.path.getmtime(filepath)
                 yamlinfo = {'date': date, 'id': id}
-                yield dbname, raw_db, yamlinfo
+                if filterfunc(yamlinfo):
+                    yield dbname, raw_db, yamlinfo
         """
             for yamlinfo in raw_db.lscly_yaml():
                 yield dbname, raw_db, yamlinfo
@@ -59,12 +60,11 @@ class CVStorageSync(object):
     def update(self, raws=None, filterfunc=None):
         for dbname, raw_db, yamlinfo in self.yamls_gen(raws, filterfunc):
             id = yamlinfo['id']
-            if filterfunc(yamlinfo):
-                if raw_db.exists(id+'.html'):
-                    if not self.cv_storage.exists(id):
-                        result = self.add_new(raw_db, id, dbname)
-                    else:
-                        result = self.update_exists(raw_db, id)
+            if raw_db.exists(id+'.html'):
+                if not self.cv_storage.exists(id):
+                    result = self.add_new(raw_db, id, dbname)
+                else:
+                    result = self.update_exists(raw_db, id)
 
     def update_exists(self, rawdb, id):
         result = False

@@ -63,7 +63,7 @@ def strftime(t, format='%Y-%m-%d %H:%M:%S'):
     return time.strftime(format, time.localtime(t))
 
 
-def nemudate(dates):
+def nemudate(dates, outformat='%Y%m%d'):
     str_result = []
     datetimes_result = []
     datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
@@ -73,7 +73,7 @@ def nemudate(dates):
         datetimes_result.append(tstart)
         tstart += datetime.timedelta(days = 1)
     for each in datetimes_result:
-        str_result.append(each.strftime('%Y%m%d'))
+        str_result.append(each.strftime(outformat))
     return str_result
 
 

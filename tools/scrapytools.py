@@ -8,6 +8,11 @@ def generate_keywords(path, projects=PRJ_LIST):
         os.makedirs(path)
     for project in PRJ_LIST:
         for jd in project.jobdescription.lists():
+            try:
+                if jd['status'] == 'Closed':
+                    continue
+            except KeyError:
+                continue
             jdname = jd['name']
             commentary = jd['commentary'].split('\n')
             companyname = project.company.getyaml(jd['company'])['name']

@@ -3,6 +3,7 @@ import time
 import yaml
 import logging
 
+import bs4
 import pypandoc
 
 import utils._yaml
@@ -24,6 +25,23 @@ logger.setLevel(log_level)
 
 def update_bydate(yamlinfo, lastdate):
     return lastdate < yamlinfo['date']
+
+def generate_md(raw_html):
+    return pypandoc.convert(raw_html, 'markdown', format='docbook')
+
+def generate_yaml(md, yamlobj, selected=None, name=None):
+    if selected is None:
+        catchinfo = extractor.information_explorer.catch(md, name=name)
+    else:
+        catchinfo = extractor.information_explorer.catch_selected(md, selected, name=name)
+    for key in catchinfo:
+        if catchinfo[key] or (selected is not None and key in selected):
+            yamlobj[key] = catchinfo[key]
+        elif key not in yamlobj:
+            yamlobj[key] = catchinfo[key]
+        elif not yamlobj[key] and type(yamlobj[key]) != type(catchinfo[key]):
+            yamlobj[key] = catchinfo[key]
+    return yamlobj
 
 
 class CVStorageSync(object):
@@ -83,14 +101,14 @@ class CVStorageSync(object):
         result = False
         raw_html = rawdb.getraw(id+'.html')
         raw_yaml = rawdb.getraw(id+'.yaml')
-        md = self.generate_md(raw_html)
+        md = generate_md(raw_html)
         logidname = os.path.join(rawdb.path, id)
         if len(md) < 100:
             self.logger.info((' ').join(["Skip", logidname]))
             return result
         t1 = time.time()
         try:
-            info = self.generate_yaml(md, raw_yaml, name=dbname)
+            info = generate_yaml(md, raw_yaml, name=dbname)
         except KeyboardInterrupt:
             usetime = time.time() - t1
             self.logger.info((' ').join(["KeyboardInterrupt", logidname,
@@ -112,20 +130,58 @@ class CVStorageSync(object):
         result = True
         return result
 
-    def generate_md(self, raw_html):
-        return pypandoc.convert(raw_html, 'markdown', format='docbook')
 
-    def generate_yaml(self, md, raw_yaml, selected=None, name=None):
-        obj = yaml.load(raw_yaml, Loader=utils._yaml.Loader)
-        if selected is None:
-            catchinfo = extractor.information_explorer.catch(md, name=name)
+class LiepinPluginSyncObject(object):
+
+    committer = 'PLUGIN'
+
+    def __init__(self, url, htmlsource):
+        self.url = url
+        self.htmlsource = htmlsource
+        self.raw_html, self.raw_yaml = self.parse_source()
+        self.md = generate_md(self.raw_html)
+        self.info = generate_yaml(self.md, self.raw_yaml, name='Liepin')
+        self.logger = logging.getLogger("CVStorageSyncLogger.UPDATE")
+
+    def parse_source(self):
+        bs = bs4.BeautifulSoup(self.htmlsource, 'lxml')
+
+        details = dict()
+        details['date'] = time.time()
+        details['filename'] = self.url
+        idtag = bs.find('span', attrs={'data-nick':'res_id'})
+        details['id'] = idtag.text
+        details['originid'] = idtag.text
+
+        login_form = bs.find(class_='user-login-reg')
+        if login_form is not None:
+            raise Exception('NoLoginError')
+        side = bs.find(class_='side')
+        side.decompose()
+        footer = bs.find('footer')
+        footer.decompose()
+        javascripts = bs.findAll('script')
+        for js in javascripts:
+            js.decompose()
+        alinks = bs.findAll('a')
+        for a in alinks:
+            a.decompose()
+        content = bs.find(class_='resume')
+        return content.prettify(), details
+
+    def add_new(self, cvstorage, peostorage):
+        result = False
+        if self.info['id']:
+            dataobj = core.basedata.DataObject(data=self.md.encode('utf-8'),
+                                               metadata=self.info)
+            peoinfo = extractor.information_explorer.catch_peopinfo(self.info)
+            peoobj = core.basedata.DataObject(data=peoinfo,
+                                              metadata=peoinfo)
+            result = cvstorage.addcv(dataobj, self.raw_html.encode('utf-8'))
+            if result is True:
+                result = peostorage.add(peoobj)
+        if result is True:
+            self.logger.info((' ').join(["Plugin add Liepin", self.info['id']]))
         else:
-            catchinfo = extractor.information_explorer.catch_selected(md, selected, name=name)
-        for key in catchinfo:
-            if catchinfo[key] or (selected is not None and key in selected):
-                obj[key] = catchinfo[key]
-            elif key not in obj:
-                obj[key] = catchinfo[key]
-            elif not obj[key] and type(obj[key]) != type(catchinfo[key]):
-                obj[key] = catchinfo[key]
-        return obj
+            self.logger.info((' ').join(["Failed Plugin add Liepin", self.info['id']]))
+        return result

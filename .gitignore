@@ -32,3 +32,5 @@ webapp/app/node_modules/
 webapp/templates_dist/
 tests/lsisim
 tests/lsimodel_words
+demostorage/
+demorepo/

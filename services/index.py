@@ -5,6 +5,7 @@ import cPickle
 import collections
 
 import utils.builtin
+import core.outputstorage
 
 
 class ReverseIndexing(object):
@@ -83,22 +84,26 @@ class ReverseIndexing(object):
                 self.merge(cv_index, index)
         self.index[svc_name] = cv_index
 
-    def upgrade(self, selected):
+    def upgrade(self, selected, ids=None):
         assert set(selected).issubset(set(self.indexkeys))
         for svc in self.cvs:
-            self.upgradecv(svc, selected)
+            self.upgradecv(svc, selected, ids)
         self.save()
 
-    def upgradecv(self, svc, selected):
+    def upgradecv(self, svc, selected, ids=None):
         assert svc.name
         svc_name = svc.name
         if svc_name in self.index:
             cv_index = self.index[svc_name]
-        for name in svc.names():
-            if name in cv_index['names']:
-                yamlinfo = svc.getyaml(name)
-                index = self.genindex(name, yamlinfo, selected)
-                self.merge(cv_index, index)
+        if ids is not None:
+            ids = set([core.outputstorage.ConvertName(id).md for id in ids])
+            names = set(svc.names()) & ids
+        else:
+            names = svc.names()
+        for name in names:
+            yamlinfo = svc.getyaml(name)
+            index = self.genindex(name, yamlinfo, selected)
+            self.merge(cv_index, index)
         self.index[svc_name] = cv_index
         self.save()
 

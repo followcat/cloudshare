@@ -1,5 +1,7 @@
-import services.cvstoragesync
+import flask
 from flask.ext.restful import Resource, reqparse
+
+import services.cvstoragesync
 
 
 class BrowserSyncAPI(Resource):
@@ -18,4 +20,7 @@ class BrowserSyncAPI(Resource):
         html = args['html']
         lpso = services.cvstoragesync.LiepinPluginSyncObject(url, html)
         result = lpso.add_new(self.svc_cv_sto, self.svc_peo_sto)
-        return {'code': 200}
+        id = ''
+        if result is True:
+            id = lpso.info['id']
+        return {'code': 200, 'url': url, 'result': result, 'id': id}

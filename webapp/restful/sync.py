@@ -18,9 +18,11 @@ class BrowserSyncAPI(Resource):
         args = self.reqparse.parse_args()
         url = args['url']
         html = args['html']
-        lpso = services.cvstoragesync.LiepinPluginSyncObject(url, html)
-        result = lpso.add_new(self.svc_cv_sto, self.svc_peo_sto)
         id = ''
+        result = False
+        if 'liepin' in url:
+            lpso = services.cvstoragesync.LiepinPluginSyncObject(url, html)
+            result = lpso.add_new(self.svc_cv_sto, self.svc_peo_sto)
         if result is True:
             id = lpso.info['id']
         return {'code': 200, 'url': url, 'result': result, 'id': id}

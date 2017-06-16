@@ -1,5 +1,6 @@
 import flask.ext.restful
 
+from webapp.restful.sync import *
 from webapp.restful.people import *
 from webapp.restful.mining import *
 from webapp.restful.reload import *
@@ -15,6 +16,7 @@ from webapp.restful.databases import *
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
+    api.add_resource(BrowserSyncAPI, '/api/browsersync', endpoint = 'browsersync')
     api.add_resource(SyncReloadAPI, '/api/syncreload', endpoint = 'syncreload')
     api.add_resource(SessionAPI, '/api/session')
     api.add_resource(AccountAPI, '/api/accounts/<string:id>')

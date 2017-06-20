@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import time
 import yaml
@@ -124,7 +125,7 @@ class CVStorageSync(object):
                                            metadata=info)
         peoinfo = extractor.information_explorer.catch_peopinfo(info)
         peoobj = core.basedata.DataObject(data=peoinfo,
-                                           metadata=peoinfo)
+                                          metadata=peoinfo)
         self.cv_storage.addcv(dataobj, raw_html.encode('utf-8'))
         self.peo_storage.add(peoobj)
         result = True
@@ -140,8 +141,16 @@ class LiepinPluginSyncObject(object):
         self.htmlsource = htmlsource
         self.raw_html, self.raw_yaml = self.parse_source()
         self.md = generate_md(self.raw_html)
-        self.info = generate_yaml(self.md, self.raw_yaml, name='Liepin')
+        self.info = self.generate_yaml(self.md, self.raw_yaml, name='liepin')
         self.logger = logging.getLogger("CVStorageSyncLogger.UPDATE")
+        self.loginfo = ''
+        self.parse_result = False
+
+    def generate_yaml(self, md, yamlobj, selected=None, name=None):
+        info = generate_yaml(self.md, self.raw_yaml, selected=selected, name=name)
+        info['committer'] = 'PLUGIN'
+        info['origin'] = u'猎聘爬取'
+        return info
 
     def parse_source(self):
         bs = bs4.BeautifulSoup(self.htmlsource, 'lxml')
@@ -155,7 +164,9 @@ class LiepinPluginSyncObject(object):
 
         login_form = bs.find(class_='user-login-reg')
         if login_form is not None:
-            raise Exception('NoLoginError')
+            self.loginfo = 'NoLoginError'
+            self.parse_result = False
+            return '', {}
         side = bs.find(class_='side')
         side.decompose()
         footer = bs.find('footer')
@@ -167,21 +178,31 @@ class LiepinPluginSyncObject(object):
         for a in alinks:
             a.decompose()
         content = bs.find(class_='resume')
+        self.parse_result = True
         return content.prettify(), details
 
     def add_new(self, cvstorage, peostorage):
         result = False
         if self.info['id']:
-            dataobj = core.basedata.DataObject(data=self.md.encode('utf-8'),
-                                               metadata=self.info)
-            peoinfo = extractor.information_explorer.catch_peopinfo(self.info)
-            peoobj = core.basedata.DataObject(data=peoinfo,
-                                              metadata=peoinfo)
-            result = cvstorage.addcv(dataobj, self.raw_html.encode('utf-8'))
-            if result is True:
-                result = peostorage.add(peoobj)
+            if len(self.md) < 100:
+                self.loginfo = (' ').join([self.info['id'], 'too short.'])
+            else:
+                dataobj = core.basedata.DataObject(data=self.md.encode('utf-8'),
+                                                   metadata=self.info)
+                peoinfo = extractor.information_explorer.catch_peopinfo(self.info)
+                peoobj = core.basedata.DataObject(data=peoinfo,
+                                                  metadata=peoinfo)
+                result = cvstorage.addcv(dataobj, self.raw_html.encode('utf-8'))
+                if result is True:
+                    result = peostorage.add(peoobj)
+                    if result is False:
+                        self.loginfo = "add People failed."
+                else:
+                    self.loginfo = (' ').join([self.info['id'], cvstorage.info])
+        else:
+            self.loginfo = "without ID."
         if result is True:
             self.logger.info((' ').join(["Plugin add Liepin", self.info['id']]))
         else:
-            self.logger.info((' ').join(["Failed Plugin add Liepin", self.info['id']]))
+            self.logger.info((' ').join(["Plugin add Liepin failed", self.loginfo]))
         return result

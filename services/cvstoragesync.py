@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import time
 import yaml
@@ -140,10 +141,16 @@ class LiepinPluginSyncObject(object):
         self.htmlsource = htmlsource
         self.raw_html, self.raw_yaml = self.parse_source()
         self.md = generate_md(self.raw_html)
-        self.info = generate_yaml(self.md, self.raw_yaml, name='Liepin')
+        self.info = self.generate_yaml(self.md, self.raw_yaml, name='liepin')
         self.logger = logging.getLogger("CVStorageSyncLogger.UPDATE")
         self.loginfo = ''
         self.parse_result = False
+
+    def generate_yaml(self, md, yamlobj, selected=None, name=None):
+        info = generate_yaml(self.md, self.raw_yaml, selected=selected, name=name)
+        info['committer'] = 'PLUGIN'
+        info['origin'] = u'猎聘爬取'
+        return info
 
     def parse_source(self):
         bs = bs4.BeautifulSoup(self.htmlsource, 'lxml')

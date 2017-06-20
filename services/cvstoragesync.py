@@ -143,6 +143,7 @@ class LiepinPluginSyncObject(object):
         self.info = generate_yaml(self.md, self.raw_yaml, name='Liepin')
         self.logger = logging.getLogger("CVStorageSyncLogger.UPDATE")
         self.loginfo = ''
+        self.parse_result = False
 
     def parse_source(self):
         bs = bs4.BeautifulSoup(self.htmlsource, 'lxml')
@@ -156,7 +157,9 @@ class LiepinPluginSyncObject(object):
 
         login_form = bs.find(class_='user-login-reg')
         if login_form is not None:
-            raise Exception('NoLoginError')
+            self.loginfo = 'NoLoginError'
+            self.parse_result = False
+            return '', {}
         side = bs.find(class_='side')
         side.decompose()
         footer = bs.find('footer')
@@ -168,23 +171,27 @@ class LiepinPluginSyncObject(object):
         for a in alinks:
             a.decompose()
         content = bs.find(class_='resume')
+        self.parse_result = True
         return content.prettify(), details
 
     def add_new(self, cvstorage, peostorage):
         result = False
         if self.info['id']:
-            dataobj = core.basedata.DataObject(data=self.md.encode('utf-8'),
-                                               metadata=self.info)
-            peoinfo = extractor.information_explorer.catch_peopinfo(self.info)
-            peoobj = core.basedata.DataObject(data=peoinfo,
-                                              metadata=peoinfo)
-            result = cvstorage.addcv(dataobj, self.raw_html.encode('utf-8'))
-            if result is True:
-                result = peostorage.add(peoobj)
-                if result is False:
-                    self.loginfo = "add People failed."
+            if len(self.md) < 100:
+                self.loginfo = (' ').join([self.info['id'], 'too short.'])
             else:
-                self.loginfo = cvstorage.info
+                dataobj = core.basedata.DataObject(data=self.md.encode('utf-8'),
+                                                   metadata=self.info)
+                peoinfo = extractor.information_explorer.catch_peopinfo(self.info)
+                peoobj = core.basedata.DataObject(data=peoinfo,
+                                                  metadata=peoinfo)
+                result = cvstorage.addcv(dataobj, self.raw_html.encode('utf-8'))
+                if result is True:
+                    result = peostorage.add(peoobj)
+                    if result is False:
+                        self.loginfo = "add People failed."
+                else:
+                    self.loginfo = cvstorage.info
         else:
             self.loginfo = "without ID."
         if result is True:

@@ -124,7 +124,7 @@ class CVStorageSync(object):
                                            metadata=info)
         peoinfo = extractor.information_explorer.catch_peopinfo(info)
         peoobj = core.basedata.DataObject(data=peoinfo,
-                                           metadata=peoinfo)
+                                          metadata=peoinfo)
         self.cv_storage.addcv(dataobj, raw_html.encode('utf-8'))
         self.peo_storage.add(peoobj)
         result = True
@@ -142,6 +142,7 @@ class LiepinPluginSyncObject(object):
         self.md = generate_md(self.raw_html)
         self.info = generate_yaml(self.md, self.raw_yaml, name='Liepin')
         self.logger = logging.getLogger("CVStorageSyncLogger.UPDATE")
+        self.loginfo = ''
 
     def parse_source(self):
         bs = bs4.BeautifulSoup(self.htmlsource, 'lxml')
@@ -180,8 +181,14 @@ class LiepinPluginSyncObject(object):
             result = cvstorage.addcv(dataobj, self.raw_html.encode('utf-8'))
             if result is True:
                 result = peostorage.add(peoobj)
+                if result is False:
+                    self.loginfo = "add People failed."
+            else:
+                self.loginfo = cvstorage.info
+        else:
+            self.loginfo = "without ID."
         if result is True:
             self.logger.info((' ').join(["Plugin add Liepin", self.info['id']]))
         else:
-            self.logger.info((' ').join(["Failed Plugin add Liepin", self.info['id']]))
+            self.logger.info((' ').join(["Plugin add Liepin failed", self.loginfo]))
         return result

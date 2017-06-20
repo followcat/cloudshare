@@ -198,7 +198,7 @@ class LiepinPluginSyncObject(object):
                     if result is False:
                         self.loginfo = "add People failed."
                 else:
-                    self.loginfo = cvstorage.info
+                    self.loginfo = (' ').join([self.info['id'], cvstorage.info])
         else:
             self.loginfo = "without ID."
         if result is True:

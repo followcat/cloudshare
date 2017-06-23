@@ -69,13 +69,13 @@ company_items = {
     'description': ((u'(?P<desclabel>(?:公司|企业)(?:描述|介绍|简介|背景)[:：]?)', u'.*?(?=[\n\|])'), )
     }
 
-company_business_noborder = lambda RE:RE.pattern+u'\n*(?:\-{3}[\- ]*\n+)*'+PIPESEPRTED(map(newline_separated, company_items.values()))+u'{1,7}'
+company_business_noborder = lambda RE:RE.pattern+u'\n*(?:'+POASP+u'*\-{3}[\- ]*\n+)*'+PIPESEPRTED(map(newline_separated, company_items.values()))+u'{1,7}'
 support_no_business = lambda RE:RE.pattern+company_business_noborder(re.compile('')).replace('{1,7}', '{,7}')
 
 company_items_pipeonly = company_items.copy()
 company_items_pipeonly['business'] = ((u'(?P<businesslabel>(?:单位|所属|公司)行业[:：]?)', ACOMPANY_BUSINESS+u'|\S*?(?=[\|\n'+SP+u'])'),
         COMPANY_BUSINESS)
-company_business_noborder_pipeonly = lambda RE:RE.pattern+u'\n*(?:\-{3}[\- ]*\n+)*'+PIPEONLYSEPRTED(map(space_separated, company_items.values()))+u'{1,7}'
+company_business_noborder_pipeonly = lambda RE:RE.pattern+u'\n*(?:'+POASP+u'*\-{3}[\- ]*\n+)*'+PIPEONLYSEPRTED(map(space_separated, company_items.values()))+u'{1,7}'
 support_no_business_pipeonly = lambda RE:RE.pattern+company_business_noborder_pipeonly(re.compile('')).replace('{1,7}', '{,7}')
 
 # Special handling for 部门 and 职位 with no [:：]: following space and value are enforced

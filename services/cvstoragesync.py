@@ -4,13 +4,10 @@ import time
 import yaml
 import logging
 
-import bs4
 import pypandoc
 
 import utils._yaml
 import core.basedata
-import interface.predator
-import services.curriculumvitae
 import extractor.information_explorer
 
 

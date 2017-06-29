@@ -1,14 +1,14 @@
 def encrypt(n, plaintext, key='1234567890'):
     result = ''
 
-    for l in plaintext.lower():
+    for l in plaintext:
         try:
             i = (key.index(l) + n) % 10
             result += key[i]
         except ValueError:
             result += l
 
-    return result.lower()
+    return result
 
 
 def decrypt(n, ciphertext, key='1234567890'):

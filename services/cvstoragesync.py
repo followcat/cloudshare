@@ -99,6 +99,7 @@ class CVStorageSync(object):
         result = False
         raw_html = rawdb.getraw(id+'.html')
         raw_yaml = rawdb.getraw(id+'.yaml')
+        raw_yaml_obj = yaml.load(raw_yaml, Loader=utils._yaml.Loader)
         md = generate_md(raw_html)
         logidname = os.path.join(rawdb.path, id)
         if len(md) < 100:
@@ -106,7 +107,7 @@ class CVStorageSync(object):
             return result
         t1 = time.time()
         try:
-            info = generate_yaml(md, raw_yaml, name=dbname)
+            info = generate_yaml(md, raw_yaml_obj, name=dbname)
         except KeyboardInterrupt:
             usetime = time.time() - t1
             self.logger.info((' ').join(["KeyboardInterrupt", logidname,

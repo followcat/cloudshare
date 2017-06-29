@@ -11,6 +11,7 @@ import { getDocMining, getDocCVValuable } from 'request/docmining';
 
 import { API } from 'API';
 import classNames from 'classnames';
+import {demoDefaultJD, demoDefaultCV} from 'config/defaultCVJD';
 
 class CVDocMining extends Component {
   constructor() {
@@ -209,6 +210,8 @@ class CVDocMining extends Component {
         <FilterCard
           textarea={false}
           textareaWithCV={cvtextarea}
+          defaultJD={demoDefaultJD}
+          defaultCV={demoDefaultCV}
           onSearch={this.handleSearch}
         />
         <div className={classSet}>

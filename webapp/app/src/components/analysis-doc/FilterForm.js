@@ -117,7 +117,7 @@ class FilterForm extends Component {
 
   render() {
     const { textarea, textareaWithCV, filterfromDisplay,
-            databaseDisplay, classify  } = this.props;
+            databaseDisplay, classify, defaultJD, defaultCV  } = this.props;
     const { getFieldDecorator } = this.props.form;
     const { expand } = this.state;
 
@@ -167,7 +167,9 @@ class FilterForm extends Component {
                 labelCol={{ span: 3 }}
                  wrapperCol={{ span: 21 }}
               >
-                {getFieldDecorator('doc')(
+                {getFieldDecorator('doc',{
+                  rules: [{ required: true, message: '需要在此处填写岗位要求!' }],
+                  initialValue: defaultJD})(
                   <Input type="textarea" rows={12}
                     placeholder="在此处填写岗位要求,建议包含技术要求."/>)}
               </FormItem>
@@ -178,7 +180,9 @@ class FilterForm extends Component {
                 labelCol={{ span: 3 }}
                  wrapperCol={{ span: 21 }}
               >
-                {getFieldDecorator('cv')(
+                {getFieldDecorator('cv',{
+                  rules: [{ required: true, message: '需要在此处填写简历内容!' }],
+                  initialValue: defaultCV})(
                   <Input type="textarea" rows={12}
                     placeholder="在此处填写简历内容,建议包含工作项目经验和擅长技术."/>)}
               </FormItem>
@@ -313,6 +317,8 @@ FilterForm.defaultProps = {
 FilterForm.propTypes = {
   textarea: PropTypes.bool,
   textareaWithCV: PropTypes.bool,
+  defaultJD: PropTypes.string,
+  defaultCV: PropTypes.string,
   industry: PropTypes.objectOf(PropTypes.array),
   classify: PropTypes.array,
   form: PropTypes.object,

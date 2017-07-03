@@ -7,7 +7,7 @@ import SearchResultBox from 'components/search-result-box';
 import SiderBar from 'components/sider-bar';
 
 import {
-  getClassify,
+  getLSIAllSIMS,
   getIndustry
 } from 'request/classify';
 import { getFastMatching } from 'request/fastmatching';
@@ -36,7 +36,7 @@ class FastMatching extends Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.handleToggleSelection = this.handleToggleSelection.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
-    this.getClassifyDataSource = this.getClassifyDataSource.bind(this);
+    this.getLSIAllSIMSDataSource = this.getLSIAllSIMSDataSource.bind(this);
     this.getIndustryDataSource = this.getIndustryDataSource.bind(this);
     this.getResultDataSource = this.getResultDataSource.bind(this);
   }
@@ -47,9 +47,8 @@ class FastMatching extends Component {
     let postAPI;
 
     this.getIndustryDataSource();
-    // this.getClassifyDataSource();
     var promise = new Promise((resolve, reject) => {
-      this.getClassifyDataSource(resolve);
+      this.getLSIAllSIMSDataSource(resolve);
     });
 
     const date = new Date();
@@ -89,10 +88,12 @@ class FastMatching extends Component {
         });
       });
     } else {
-      this.setState({
-        textarea: true,
-        postData: Object.assign({}, {filterdict: defFilterData}),
-        postAPI: API.LSI_BY_DOC_API
+      promise.then((data) => {
+        this.setState({
+          textarea: true,
+          postData: Object.assign({}, {filterdict: defFilterData}),
+          postAPI: API.LSI_BY_DOC_API
+        });
       });
     }
   }
@@ -198,8 +199,8 @@ class FastMatching extends Component {
     });
   }
 
-  getClassifyDataSource(resolve) {
-    getClassify(json => {
+  getLSIAllSIMSDataSource(resolve) {
+    getLSIAllSIMS(json => {
       if (json.code === 200) {
         this.setState({
           classify: json.data

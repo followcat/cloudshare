@@ -52,6 +52,20 @@ class DBNumbersAPI(flask.views.MethodView):
         return { 'code': 200, 'data': self.svc_mult_cv.getprjnums(project) }
 
 
+class AllSIMSAPI(flask.views.MethodView):
+
+    def __init__(self):
+        self.svc_min = flask.current_app.config['SVC_MIN']
+        super(AllSIMSAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', type = str, location = 'json')
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        project = args['project']
+        return { 'code': 200, 'data': self.svc_min.sim[project].keys() }
+
+
 class ClassifyAPI(flask.views.MethodView):
 
     def __init__(self):

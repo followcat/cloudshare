@@ -67,7 +67,11 @@ class CVStorageSync(object):
             raw_db = interfaces[dbname]
             for id in raw_db.lsid_raw():
                 filepath = os.path.join(raw_db.rawpath, id+raw_db.yamlextention)
-                date = os.path.getmtime(filepath)
+                try:
+                    date = os.path.getmtime(filepath)
+                except OSError:
+                    self.logger.info((' ').join(["Error RAWYAML not exists", id]))
+                    continue
                 yamlinfo = {'date': date, 'id': id}
                 if filterfunc(yamlinfo):
                     yield dbname, raw_db, yamlinfo

@@ -24,6 +24,7 @@ class FastMatching extends Component {
       id: '',
       postAPI: '',
       classify: [],
+      projects: [],
       industry: {},
       dataSource: [],
       selection: [],
@@ -42,7 +43,7 @@ class FastMatching extends Component {
   }
 
   componentDidMount() {
-    const { classify } = this.state,
+    const { classify, projects } = this.state,
           { location } = this.props;
     let postAPI;
 
@@ -203,9 +204,10 @@ class FastMatching extends Component {
     getLSIAllSIMS(json => {
       if (json.code === 200) {
         this.setState({
-          classify: json.data
+          classify: json.classify,
+          projects: json.projects
         });
-        resolve(json.data);
+        resolve(json.projects.concat(json.classify));
       }
     });
   }
@@ -243,6 +245,7 @@ class FastMatching extends Component {
     const {
       textarea,
       classify,
+      projects,
       industry,
       postData,
       visible,
@@ -260,6 +263,7 @@ class FastMatching extends Component {
         <FilterCard
           textarea={textarea}
           classify={classify}
+          projects={projects}
           industry={industry}
           postData={postData}
           visible={visible}

@@ -185,7 +185,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         append_comment = args['appendcomment'] if args['appendcomment'] else False
         if append_comment:
             doc += jd_yaml['commentary']
-        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
+        uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self.process(projectname, doc, uses, filterdict, cur_page)
@@ -276,7 +276,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
         doc = project.cv_getmd(id)
-        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
+        uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self.process(projectname, doc, uses, filterdict, cur_page)
@@ -298,7 +298,7 @@ class LSIbydocAPI(LSIbaseAPI):
         doc = args['doc']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
+        uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
         result = self.process(projectname, doc, uses, filterdict, cur_page)
@@ -351,7 +351,7 @@ class ValuablebaseAPI(Resource):
     def _get(self, doc, project):
         args = self.reqparse.parse_args()
         projectname = project.name
-        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
+        uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
         if len(name_list) == 0:
             result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,

@@ -9,6 +9,8 @@ export const API = {
 
   CLASSIFY_API: `${HOST}/api/classify`,
 
+  LSIALLSIMS_API: `${HOST}/api/lsiallsims`,
+
   INDUSTRY_API: `${HOST}/api/industry`,
 
   COMPANYLIST_API: `${HOST}/api/companylist`,

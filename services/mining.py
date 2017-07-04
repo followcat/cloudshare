@@ -208,7 +208,7 @@ class Mining(object):
             model = self.lsi_model[modelname]
             save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
             self.sim[modelname] = dict()
-            service_names = [modelname] + self.projects[modelname].getclassify()
+            service_names = self.projects.keys() + self.projects[modelname].getclassify()
             for svc_name in service_names:
                 svc = self.services['all'][svc_name]
                 industrypath = industrytopath(svc_name)

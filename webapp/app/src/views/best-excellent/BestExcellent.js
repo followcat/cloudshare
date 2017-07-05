@@ -3,30 +3,44 @@ import moment from 'moment';
 import React, { Component } from 'react';
 
 import { API } from 'API';
-import { Table } from 'antd';
+import { Row, Col, Table, Radio, DatePicker } from 'antd';
 import ColorGrad from 'utils/color-grad';
 import { getFastMatching } from 'request/fastmatching';
 
 class BestExcellent extends Component {
   constructor() {
     super();
+    const date = new Date();
     this.state = {
       dataSource: [],
+      date: moment(date).add(0, 'days'),
+      numbers: "1",
+      dateFormat: 'YYYY-MM-DD',
       pagesize: '20',
       loading: true,
       fromcache: true,
       allJDAPI: API.LSI_BY_ALL_JD_API,
     };
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleNumbersChange = this.handleNumbersChange.bind(this);
+    this.getAllJDDataSource = this.getAllJDDataSource.bind(this);
   }
 
   componentDidMount() {
-    const { fromcache, allJDAPI } = this.state;
-    const date = new Date();
+    this.getAllJDDataSource();
+  }
+
+  getAllJDDataSource() {
+    const { fromcache, allJDAPI, dateFormat, date, numbers } = this.state;
     const colorGrad = new ColorGrad();
     const gradient = colorGrad.gradient();
-    const defFilterData = { date: [moment(date).add(-1, 'days').format('YYYY-MM-DD'),
-                                   moment(date).add(0, 'days').format('YYYY-MM-DD')] };
-    var postData = { filterdict: defFilterData, threshold: 0.78, fromcache: fromcache };
+    const defFilterData = { date: [moment(date).add(-1, 'days').format(dateFormat),
+                                   date.format(dateFormat)] };
+    var postData = { filterdict: defFilterData, threshold: 0.78,
+                     fromcache: fromcache, numbers: parseInt(numbers) };
+    this.setState({
+      loading: true,
+    });
     getFastMatching(allJDAPI, postData, json => {
       if (json.code === 200) {
         json.data.forEach((value) => {
@@ -40,11 +54,22 @@ class BestExcellent extends Component {
     });
   }
 
+  handleDateChange(e) {
+    this.setState({ date: moment(e) }, this.getAllJDDataSource);
+  }
+
+  handleNumbersChange(e) {
+    this.setState({ numbers: e.target.value }, this.getAllJDDataSource);
+  }
+
   render() {
     const {
       dataSource,
       loading,
       pagesize,
+      date,
+      dateFormat,
+      numbers
     } = this.state;
     const columns = [{
       title: '公司',
@@ -75,6 +100,30 @@ class BestExcellent extends Component {
     } ];
     return (
       <div>
+        <Row gutter={16}>
+          <Col span={5} />
+          <Col span={2}>
+            <span>
+              选择日期
+            </span>
+          </Col>
+          <Col span={5}>
+              <DatePicker defaultValue={date} format={dateFormat} onChange={this.handleDateChange}/>
+          </Col>
+          <Col span={2}>
+            <span>
+              选择显示人数
+            </span>
+          </Col>
+          <Col span={5}>
+            <Radio.Group defaultValue={numbers} onChange={this.handleNumbersChange}>
+              <Radio.Button value="1">1</Radio.Button>
+              <Radio.Button value="2">2</Radio.Button>
+              <Radio.Button value="3">3</Radio.Button>
+            </Radio.Group>
+          </Col>
+          <Col span={5} />
+        </Row>
         <Table columns={columns}
                dataSource={dataSource}
                size={pagesize}

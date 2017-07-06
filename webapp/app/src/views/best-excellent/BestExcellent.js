@@ -13,7 +13,7 @@ class BestExcellent extends Component {
     const date = new Date();
     this.state = {
       dataSource: [],
-      date: moment(date).add(0, 'days'),
+      daterange: [moment(date).add(-1, 'days'), moment(date).add(0, 'days')],
       numbers: "3",
       dateFormat: 'YYYY-MM-DD',
       pagesize: '20',
@@ -21,6 +21,7 @@ class BestExcellent extends Component {
       fromcache: true,
       allJDAPI: API.LSI_BY_ALL_JD_API,
     };
+    this.disabledDate = this.disabledDate.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleNumbersChange = this.handleNumbersChange.bind(this);
     this.getAllJDDataSource = this.getAllJDDataSource.bind(this);
@@ -32,11 +33,11 @@ class BestExcellent extends Component {
   }
 
   getAllJDDataSource() {
-    const { fromcache, allJDAPI, dateFormat, date, numbers } = this.state;
+    const { fromcache, allJDAPI, dateFormat, daterange, numbers } = this.state;
     const colorGrad = new ColorGrad();
     const gradient = colorGrad.gradient();
-    const defFilterData = { date: [moment(date).add(-1, 'days').format(dateFormat),
-                                   date.format(dateFormat)] };
+    const defFilterData = { date: [daterange[0].format(dateFormat),
+                                   daterange[1].format(dateFormat)] };
     var postData = { filterdict: defFilterData, threshold: 0.78,
                      fromcache: fromcache, numbers: parseInt(numbers) };
     this.setState({
@@ -57,12 +58,16 @@ class BestExcellent extends Component {
     });
   }
 
-  handleDateChange(e) {
-    this.setState({ date: moment(e) }, this.getAllJDDataSource);
+  handleDateChange(dates) {
+    this.setState({ daterange: dates }, this.getAllJDDataSource);
   }
 
   handleNumbersChange(e) {
     this.setState({ numbers: e.target.value }, this.getAllJDDataSource);
+  }
+
+  disabledDate(current) {
+    return current && current.valueOf() > Date.now();
   }
 
   getExpandedRowRender(record) {
@@ -80,7 +85,7 @@ class BestExcellent extends Component {
       dataSource,
       loading,
       pagesize,
-      date,
+      daterange,
       dateFormat,
       numbers
     } = this.state;
@@ -103,7 +108,6 @@ class BestExcellent extends Component {
           <div>
           {
             record.CV.map((item) => {
-              console.log(item);
               return (
                 <Row gutter={16}>
                   <Col span={16}>
@@ -134,7 +138,10 @@ class BestExcellent extends Component {
             </span>
           </Col>
           <Col span={5}>
-              <DatePicker defaultValue={date} format={dateFormat} onChange={this.handleDateChange}/>
+              <DatePicker.RangePicker
+               defaultValue={daterange}
+               disabledDate={this.disabledDate}
+               onChange={this.handleDateChange}/>
           </Col>
           <Col span={2}>
             <span>
@@ -146,6 +153,7 @@ class BestExcellent extends Component {
               <Radio.Button value="1">1</Radio.Button>
               <Radio.Button value="3">3</Radio.Button>
               <Radio.Button value="5">5</Radio.Button>
+              <Radio.Button value="10">10</Radio.Button>
             </Radio.Group>
           </Col>
           <Col span={5} />

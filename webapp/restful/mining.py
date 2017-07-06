@@ -208,7 +208,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
 
     def fromcache(self, projectname, filterdict, threshold):
         results = []
-        date = filterdict['date'][0]
+        date = ' '.join(filterdict['date'])
         if date not in self.cache:
             self.cache[date] = {}
             self.cache[date][projectname] = self.findbest(projectname,
@@ -237,17 +237,19 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                                             top=0.001, minimum=1000)
             result = self.index.filter_ids(result, filterdict)
             output = {}
-            output['JDid'] = jd['id']
-            output['JDname'] = jd['name']
-            output['JDcompany'] = project.company_get(jd['company'])['name']
+            output['id'] = jd['id']
+            output['name'] = jd['name']
+            output['description'] = jd['description']
+            output['company'] = project.company_get(jd['company'])['name']
             if result:
-                candidates = filter(lambda x: float(x[1])>float(threshold), result)
-                if candidates[:10]:
-                    results[jd['id']] = list()
+                candidates = filter(lambda x: float(x[1])>float(threshold), result)[:10]
+                if candidates:
+                    output['CV'] = list()
                     for each in candidates:
-                        output.update(self.svc_mult_cv.getyaml(each[0]))
-                        output['CVvalue'] = each[1]
-                        results[jd['id']].append(output)
+                        cvinfo = self.svc_mult_cv.getyaml(each[0])
+                        cvinfo['CVvalue'] = each[1]
+                        output['CV'].append(cvinfo)
+                    results[jd['id']] = output
         return results
 
     def post(self):
@@ -263,7 +265,10 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         else:
             alls = self.fromcache(projectname, filterdict, threshold)
         for jdid in alls:
-            results.extend(alls[jdid][0:numbers])
+            results.append({'ID': jdid, 'name': alls[jdid]['name'],
+                            'company': alls[jdid]['company'],
+                            'description': alls[jdid]['description'],
+                            'CV': alls[jdid]['CV'][0:numbers]})
         return { 'code': 200, 'data': results }
 
 

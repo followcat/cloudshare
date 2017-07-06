@@ -204,25 +204,26 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         self.reqparse.add_argument('project', type=str, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
         self.reqparse.add_argument('threshold', type=float, location = 'json')
+        self.reqparse.add_argument('numbers', type=int, location = 'json')
 
     def fromcache(self, projectname, filterdict, threshold):
         results = []
-        today = datetime.datetime.now().strftime("%Y-%m-%d")
-        if today not in self.cache:
-            self.cache[today] = {}
-            self.cache[today][projectname] = self.findbest(projectname,
+        date = ' '.join(filterdict['date'])
+        if date not in self.cache:
+            self.cache[date] = {}
+            self.cache[date][projectname] = self.findbest(projectname,
                                                            filterdict,
                                                            threshold)
-        elif projectname not in self.cache[today]:
-            self.cache[today][projectname] = self.findbest(projectname,
+        elif projectname not in self.cache[date]:
+            self.cache[date][projectname] = self.findbest(projectname,
                                                            filterdict,
                                                            threshold)
-        return self.cache[today][projectname]
+        return self.cache[date][projectname]
 
     def findbest(self, projectname, filterdict, threshold=None):
         if threshold is None:
             threshold = 0.8
-        results = []
+        results = {}
         project = self.svc_mult_cv.getproject(projectname)
         for jd in project.jobdescription.lists():
             try:
@@ -236,26 +237,38 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                                             top=0.001, minimum=1000)
             result = self.index.filter_ids(result, filterdict)
             output = {}
-            output['JDid'] = jd['id']
-            output['JDname'] = jd['name']
-            output['JDcompany'] = project.company_get(jd['company'])['name']
-            if result and float(result[0][1])>float(threshold):
-                output.update(self.svc_mult_cv.getyaml(result[0][0]))
-                output['CVvalue'] = result[0][1]
-                results.append(output)
+            output['id'] = jd['id']
+            output['name'] = jd['name']
+            output['description'] = jd['description']
+            output['company'] = project.company_get(jd['company'])['name']
+            if result:
+                candidates = filter(lambda x: float(x[1])>float(threshold), result)[:10]
+                if candidates:
+                    output['CV'] = list()
+                    for each in candidates:
+                        cvinfo = self.svc_mult_cv.getyaml(each[0])
+                        cvinfo['CVvalue'] = each[1]
+                        output['CV'].append(cvinfo)
+                    results[jd['id']] = output
         return results
 
     def post(self):
-        results = []
+        results = list()
         args = self.reqparse.parse_args()
         threshold = args['threshold']
         fromcache = args['fromcache']
         projectname = args['project']
         filterdict = args['filterdict']
+        numbers = args['numbers']
         if fromcache is False:
-            results = self.findbest(projectname, filterdict, threshold)
+            alls = self.findbest(projectname, filterdict, threshold)
         else:
-            results = self.fromcache(projectname, filterdict, threshold)
+            alls = self.fromcache(projectname, filterdict, threshold)
+        for jdid in alls:
+            results.append({'ID': jdid, 'name': alls[jdid]['name'],
+                            'company': alls[jdid]['company'],
+                            'description': alls[jdid]['description'],
+                            'CV': alls[jdid]['CV'][0:numbers]})
         return { 'code': 200, 'data': results }
 
 

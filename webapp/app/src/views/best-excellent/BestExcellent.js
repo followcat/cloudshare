@@ -67,7 +67,7 @@ class BestExcellent extends Component {
   }
 
   disabledDate(current) {
-    return current && current.valueOf() > Date.now();
+    return current.valueOf() > Date.now() || current.valueOf() < Date.now()-14*24*60*60*1000;
   }
 
   getExpandedRowRender(record) {

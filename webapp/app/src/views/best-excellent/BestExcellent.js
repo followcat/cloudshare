@@ -14,7 +14,7 @@ class BestExcellent extends Component {
     this.state = {
       dataSource: [],
       date: moment(date).add(0, 'days'),
-      numbers: "1",
+      numbers: "3",
       dateFormat: 'YYYY-MM-DD',
       pagesize: '20',
       loading: true,
@@ -24,6 +24,7 @@ class BestExcellent extends Component {
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleNumbersChange = this.handleNumbersChange.bind(this);
     this.getAllJDDataSource = this.getAllJDDataSource.bind(this);
+    this.getExpandedRowRender = this.getExpandedRowRender.bind(this);
   }
 
   componentDidMount() {
@@ -43,8 +44,10 @@ class BestExcellent extends Component {
     });
     getFastMatching(allJDAPI, postData, json => {
       if (json.code === 200) {
-        json.data.forEach((value) => {
-          value.color = gradient[parseInt(value.CVvalue*100)];
+        json.data.forEach((JDid) => {
+          JDid.CV.forEach((item) => {
+            item.color = gradient[parseInt(item.CVvalue*100)];
+          });
         });
         this.setState({
           dataSource: json.data,
@@ -62,6 +65,16 @@ class BestExcellent extends Component {
     this.setState({ numbers: e.target.value }, this.getAllJDDataSource);
   }
 
+  getExpandedRowRender(record) {
+    return (
+      <div>
+      {
+        record.description
+      }
+      </div>
+    );
+  };
+
   render() {
     const {
       dataSource,
@@ -71,33 +84,46 @@ class BestExcellent extends Component {
       dateFormat,
       numbers
     } = this.state;
-    const columns = [{
-      title: '公司',
-      key: 'JDcompany',
-      render: (text, record) => (
-        <a href={ `/fastmatching?jd_id=${record.JDid}&init_append_commentary=true` }
-           target="_blank">
-          { record.JDcompany } 
-        </a>
-      )
-    }, {
-      title: '职位',
-      dataIndex: 'JDname',
-      key: 'JDname',
-    },{
-      title: '候选人资料',
-      key: 'CVid',
-      render: (text, record) => (
-        <a href={`/resume/${record.id}`} target="_blank"
-           style={ { color: record.color } }>
-          { record.id } | { record.name } | { record.company } | { record.position } 
-        </a>
-      ),
-    },{
-      title: '来源',
-      dataIndex: 'origin',
-      key: 'CVorigin',
-    } ];
+
+    const columns = [
+      {
+        title: '公司职位',
+        key: 'name',
+        width: 300,
+        render: (text, record) => (
+          <a href={ `/fastmatching?jd_id=${record.ID}&init_append_commentary=true` }
+             target="_blank">
+            { record.company } | { record.name }
+          </a>
+        )
+      }, {
+        title: '人选',
+        key: 'CV',
+        render: (text, record) => (
+          <div>
+          {
+            record.CV.map((item) => {
+              console.log(item);
+              return (
+                <Row gutter={16}>
+                  <Col span={16}>
+                    <a href={`/resume/${item.id}`} target="_blank"
+                     style={ { color: item.color } }>
+                    { item.id } | { item.name } | { item.company } | { item.position } | { item.school }
+                    </a>
+                  </Col>
+                  <Col span={8}>
+                    <span>{ item.origin }</span>
+                  </Col>
+                </Row>
+              );
+            })
+          }
+          </div>
+        )
+      }
+    ];
+
     return (
       <div>
         <Row gutter={16}>
@@ -118,16 +144,21 @@ class BestExcellent extends Component {
           <Col span={5}>
             <Radio.Group defaultValue={numbers} onChange={this.handleNumbersChange}>
               <Radio.Button value="1">1</Radio.Button>
-              <Radio.Button value="2">2</Radio.Button>
               <Radio.Button value="3">3</Radio.Button>
+              <Radio.Button value="5">5</Radio.Button>
             </Radio.Group>
           </Col>
           <Col span={5} />
         </Row>
-        <Table columns={columns}
+        {dataSource && dataSource.length 
+          ?    <Table columns={columns}
                dataSource={dataSource}
+               defaultExpandAllRows={true}
+               rowKey={record => record.JDid}
+               expandedRowRender={record => this.getExpandedRowRender(record)}
                size={pagesize}
                loading={loading} />
+          : '暂无数据' }
       </div>
     );
   }

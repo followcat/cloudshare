@@ -73,9 +73,7 @@ class BestExcellent extends Component {
   getExpandedRowRender(record) {
     return (
       <div>
-      {
-        record.description
-      }
+      {record.description.split('\n').map((item, index) => { return (<p key={index}>{item}</p>); })}
       </div>
     );
   };
@@ -94,7 +92,7 @@ class BestExcellent extends Component {
       {
         title: '公司职位',
         key: 'name',
-        width: 300,
+        width: 400,
         render: (text, record) => (
           <a href={ `/fastmatching?jd_id=${record.ID}&init_append_commentary=true` }
              target="_blank">
@@ -109,7 +107,7 @@ class BestExcellent extends Component {
           {
             record.CV.map((item) => {
               return (
-                <Row gutter={16}>
+                <Row gutter={16} key={item.id}>
                   <Col span={16}>
                     <a href={`/resume/${item.id}`} target="_blank"
                      style={ { color: item.color } }>
@@ -161,8 +159,8 @@ class BestExcellent extends Component {
         {dataSource && dataSource.length 
           ?    <Table columns={columns}
                dataSource={dataSource}
-               defaultExpandAllRows={true}
-               rowKey={record => record.JDid}
+               defaultExpandAllRows={false}
+               rowKey={record => record.ID}
                expandedRowRender={record => this.getExpandedRowRender(record)}
                size={pagesize}
                loading={loading} />

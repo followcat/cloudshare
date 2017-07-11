@@ -3,7 +3,6 @@ import io
 import os
 import glob
 import tarfile
-import subprocess
 import xml.etree.ElementTree
 
 import interface.base
@@ -82,18 +81,18 @@ class BaseFSInterface(interface.base.Interface):
     def grep(self, restrings, path='', files=None):
         if files is None:
             files = ['*']
-        command = self.grep_str(restrings, files)
+        command = self.gencommand(restrings, files)
         result = self.subprocess_grep(command, path, shell=True)
         return result
 
     def grep_yaml(self, restrings, path='', files=None):
         if files is None:
             files = ['*.yaml']
-        command = self.grep_str(restrings, files)
+        command = self.gencommand(restrings, files)
         result = self.subprocess_grep(command, path, shell=True)
         return result
 
-    def grep_str(self, restrings, files):
+    def gencommand(self, restrings, files):
         command = ''
         keywords = restrings.split()
         if keywords:

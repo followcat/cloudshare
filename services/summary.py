@@ -56,11 +56,11 @@ class CandidateSummary(services.base.service.Service):
             yield name, text
 
     def search(self, keyword):
-        results = self.interface.grep(keyword, self.path)
+        results = self.interface.search(keyword, self.path)
         return results
 
     def search_yaml(self, keyword):
-        results = self.interface.grep_yaml(keyword, self.path)
+        results = self.interface.search_yaml(keyword, self.path)
         return results
 
     def getmd(self, name):

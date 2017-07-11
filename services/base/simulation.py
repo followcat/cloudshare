@@ -156,7 +156,7 @@ class Simulation(services.base.storage.BaseStorage):
 
     def search_yaml(self, keyword):
         results = set()
-        allfile = self.interface.grep(keyword, self.YAML_DIR)
+        allfile = self.interface.search(keyword, self.YAML_DIR)
         for filename in allfile:
             id = core.outputstorage.ConvertName(filename).base
             results.add(id)

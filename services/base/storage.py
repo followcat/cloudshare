@@ -177,7 +177,7 @@ class BaseStorage(services.base.service.Service):
 
     def search(self, keyword):
         results = set()
-        allfile = self.interface.grep(keyword)
+        allfile = self.interface.search(keyword)
         for filename in allfile:
             id = core.outputstorage.ConvertName(filename).base
             results.add(id)
@@ -185,7 +185,7 @@ class BaseStorage(services.base.service.Service):
 
     def search_yaml(self, keyword):
         results = set()
-        allfile = self.interface.grep_yaml(keyword)
+        allfile = self.interface.search_yaml(keyword)
         for filename in allfile:
             id = core.outputstorage.ConvertName(filename).base
             results.add(id)

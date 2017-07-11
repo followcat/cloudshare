@@ -31,11 +31,11 @@ class Interface(object):
     def lsfiles(self):
         raise NotImplementedInterface
 
-    def search(self):
-        raise NotImplementedInterface
+    def search(self, restrings, path='', files=None):
+        return self.grep(restrings, path=path, files=files)
 
-    def search_yaml(self):
-        raise NotImplementedInterface
+    def search_yaml(self, restrings, path='', files=None):
+        return self.grep_yaml(restrings, path=path, files=files)
 
     def grep(self):
         raise NotImplementedInterface

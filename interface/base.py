@@ -7,8 +7,9 @@ class NotImplementedInterface(Exception):
 
 class Interface(object):
 
-    def __init__(self, path):
+    def __init__(self, path, searchengine=None):
         self.path = path
+        self.searchengine = searchengine
 
     def do_commit(self, filenames):
         raise NotImplementedInterface
@@ -31,11 +32,19 @@ class Interface(object):
     def lsfiles(self):
         raise NotImplementedInterface
 
-    def search(self, restrings, path='', files=None):
-        return self.grep(restrings, path=path, files=files)
+    def search(self, keywords, path='', files=None):
+        if self.searchengine is None:
+            result = self.grep(keywords, path=path, files=files)
+        else:
+            result = self.searchengine(keywords)
+        return result
 
     def search_yaml(self, restrings, path='', files=None):
-        return self.grep_yaml(restrings, path=path, files=files)
+        if self.searchengine is None:
+            result = self.grep_yaml(restrings, path=path, files=files)
+        else:
+            result = self.searchengine_yaml(keywords)
+        return result
 
     def grep(self):
         raise NotImplementedInterface
@@ -43,10 +52,10 @@ class Interface(object):
     def grep_yaml(self):
         raise NotImplementedInterface
 
-    def searchengine(self):
+    def searchengine(self, keywords):
         raise NotImplementedInterface
 
-    def searchengine_yaml(self):
+    def searchengine_yaml(self, keywords):
         raise NotImplementedInterface
 
     def subprocess_grep(self, command, path, shell):

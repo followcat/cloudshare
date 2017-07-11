@@ -14,9 +14,9 @@ class BaseFSInterface(interface.base.Interface):
     mdextention = '.md'
     yamlextention = '.yaml'
     
-    def __init__(self, path):
+    def __init__(self, path, searchengine=None):
         self.path = path
-        super(BaseFSInterface, self).__init__(path)
+        super(BaseFSInterface, self).__init__(path, searchengine)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
 

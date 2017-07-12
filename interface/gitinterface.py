@@ -14,7 +14,7 @@ class GitInterface(interface.base.Interface):
     author = 'developer<developer@email.com>'
     encoding = 'UTF-8'
 
-    def __init__(self, path, searchengine=None):
+    def __init__(self, path, name=None, searchengine=None):
         """
             >>> import shutil
             >>> import interface.gitinterface
@@ -24,7 +24,7 @@ class GitInterface(interface.base.Interface):
             <Repo at ...
             >>> shutil.rmtree(repo_name)
         """
-        super(GitInterface, self).__init__(path, searchengine)
+        super(GitInterface, self).__init__(path, name=name, searchengine=searchengine)
         try:
             self.repo = dulwich.repo.Repo.init(path, mkdir=True)
         except OSError:

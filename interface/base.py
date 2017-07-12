@@ -7,8 +7,9 @@ class NotImplementedInterface(Exception):
 
 class Interface(object):
 
-    def __init__(self, path, searchengine=None):
+    def __init__(self, path, name, searchengine=None):
         self.path = path
+        self.name = name
         self.searchengine = searchengine
 
     def do_commit(self, filenames):
@@ -36,14 +37,14 @@ class Interface(object):
         if self.searchengine is None:
             result = self.grep(keywords, path=path, files=files)
         else:
-            result = self.searchengine(keywords)
+            result = self.SEsearch(keywords)
         return result
 
     def search_yaml(self, restrings, path='', files=None):
         if self.searchengine is None:
             result = self.grep_yaml(restrings, path=path, files=files)
         else:
-            result = self.searchengine_yaml(keywords)
+            result = self.SEsearch_yaml(keywords)
         return result
 
     def grep(self):
@@ -52,11 +53,17 @@ class Interface(object):
     def grep_yaml(self):
         raise NotImplementedInterface
 
-    def searchengine(self, keywords):
-        raise NotImplementedInterface
+    def SEsearch(self, keywords):
+        indexname = '.'.join([self.name])
+        result = self.searchengine.search(index=indexname,
+            body={"query": {"match": {"content": keywords}}})
+        return set(map(lambda x: x['_id'], result['hits']['hits']))
 
-    def searchengine_yaml(self, keywords):
-        raise NotImplementedInterface
+    def SEsearch_yaml(self, keywords):
+        indexname = '.'.join([self.name, 'yaml'])
+        result = self.searchengine.search(index=indexname,
+            body={"query": {"match": {"content": keywords}}})
+        return set(map(lambda x: x['_id'], result['hits']['hits']))
 
     def subprocess_grep(self, command, path, shell):
         grep_list = []

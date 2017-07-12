@@ -5,13 +5,15 @@ import services.account
 import services.people
 import services.company
 import services.multipeople
+import baseapp.searchengine
 import services.curriculumvitae
 
 
 SVC_ACCOUNT = services.account.Account('account')
 
 SVC_CO_REPO = services.company.Company('repo/CO', 'corepo')
-SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare')
+SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare',
+                                                       searchengine=baseapp.searchengine.ES)
 SVC_PEO_REPO = services.people.People(SVC_CV_REPO, 'repo/PEO', 'peorepo', iotype='base')
 
 SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')

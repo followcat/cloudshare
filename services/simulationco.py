@@ -27,7 +27,7 @@ class SimulationCO(services.base.simulation.Simulation,
     customers_file = 'customers.json'
 
     def __init__(self, path, name, costorage, iotype='git'):
-        super(SimulationCO, self).__init__(path, name, costorage, iotype)
+        super(SimulationCO, self).__init__(path, name, costorage, iotype=iotype)
         self._customers = None
 
     def _templateinfo(self, committer):

@@ -55,15 +55,29 @@ class Interface(object):
 
     def SEsearch(self, keywords):
         indexname = '.'.join([self.name])
-        result = self.searchengine.search(index=indexname,
-            body={"query": {"match": {"content": keywords}}})
-        return set(map(lambda x: x['_id'], result['hits']['hits']))
+        result = self.searchengine.search(index=indexname, size=500,
+            body={"query": {
+                    "bool": {
+                        "must": [{"match":
+                            {"content": {"query": keywords, "analyzer": "ik_max_word"}}}]
+                        }
+                    }
+                })
+        return set(map(lambda x: os.path.splitext(x['_source']['file']['filename'])[0],
+                       result['hits']['hits']))
 
     def SEsearch_yaml(self, keywords):
         indexname = '.'.join([self.name, 'yaml'])
-        result = self.searchengine.search(index=indexname,
-            body={"query": {"match": {"content": keywords}}})
-        return set(map(lambda x: x['_id'], result['hits']['hits']))
+        result = self.searchengine.search(index=indexname, size=500,
+            body={"query": {
+                    "bool": {
+                        "must": [{"match":
+                            {"content": {"query": keywords, "analyzer": "ik_max_word"}}}]
+                        }
+                    }
+                })
+        return set(map(lambda x: os.path.splitext(x['_source']['file']['filename'])[0],
+                       result['hits']['hits']))
 
     def subprocess_grep(self, command, path, shell):
         grep_list = []

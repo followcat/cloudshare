@@ -55,11 +55,14 @@ class Interface(object):
 
     def SEsearch(self, keywords):
         indexname = '.'.join([self.name])
+        keyword_list = list()
+        for keyword in keywords.split():
+            keyword_list.append({"match":
+                            {"content": {"query": keyword, "analyzer": "ik_max_word"}}})
         result = self.searchengine.search(index=indexname, size=500,
             body={"query": {
                     "bool": {
-                        "must": [{"match":
-                            {"content": {"query": keywords, "analyzer": "ik_max_word"}}}]
+                        "must": keyword_list
                         }
                     }
                 })
@@ -68,11 +71,14 @@ class Interface(object):
 
     def SEsearch_yaml(self, keywords):
         indexname = '.'.join([self.name, 'yaml'])
+        keyword_list = list()
+        for keyword in keywords.split():
+            keyword_list.append({"match":
+                            {"content": {"query": keyword, "analyzer": "ik_max_word"}}})
         result = self.searchengine.search(index=indexname, size=500,
             body={"query": {
                     "bool": {
-                        "must": [{"match":
-                            {"content": {"query": keywords, "analyzer": "ik_max_word"}}}]
+                        "must": keyword_list
                         }
                     }
                 })

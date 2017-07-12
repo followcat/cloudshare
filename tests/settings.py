@@ -41,8 +41,9 @@ class Config(object):
         self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB_NAME,
                                                                     'cloudshare')
         self.SVC_CO_REPO = services.company.Company(self.REPO_DB_NAME, 'corepo')
-        self.SVC_PEO_REPO = services.people.People(os.path.join(self.REPO_DB_NAME, 'PEO'),
-                                                   [self.SVC_CV_REPO], iotype='base')
+        self.SVC_PEO_REPO = services.people.People(self.SVC_CV_REPO,
+                                                   os.path.join(self.REPO_DB_NAME, 'PEO'),
+                                                   name='peorepo', iotype='base')
         self.SVC_PRJ_TEST = services.project.Project(os.path.join(self.PRJ_PATH,
                                                                  'project_test'),
                                                     self.SVC_CO_REPO, self.SVC_CV_REPO,

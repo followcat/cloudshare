@@ -22,7 +22,7 @@ class SimulationCV(services.base.simulation.Simulation,
             {'committer': 'dev'}
             >>> config.destory()
         """
-        super(SimulationCV, self).__init__(path, name, storage, iotype)
+        super(SimulationCV, self).__init__(path, name, storage, iotype=iotype)
 
     def getmd_en(self, id):
         yamlinfo = self.getyaml(id)

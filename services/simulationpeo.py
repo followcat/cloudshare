@@ -14,7 +14,7 @@ class SimulationPEO(services.base.simulation.Simulation,
 
     list_item = {"tag", "comment", "tracking"}
 
-    def __init__(self, path, name, peostorage, iotype='git'):
+    def __init__(self, path, name, storage, iotype='git'):
         """
             >>> from tests.settings import *
             >>> config = Config()
@@ -37,7 +37,7 @@ class SimulationPEO(services.base.simulation.Simulation,
             True
             >>> config.destory()
         """
-        super(SimulationPEO, self).__init__(path, name, peostorage, iotype)
+        super(SimulationPEO, self).__init__(path, name, storage, iotype=iotype)
 
     def getyaml(self, id):
         try:

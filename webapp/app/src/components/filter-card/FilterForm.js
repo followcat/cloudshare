@@ -116,7 +116,7 @@ class FilterForm extends Component {
   }
 
   render() {
-    const { textarea, databaseDisplay, classify, postData } = this.props;
+    const { textarea, databaseDisplay, classify, projects, postData } = this.props;
     const { getFieldDecorator } = this.props.form;
     const { expand } = this.state;
 
@@ -168,12 +168,19 @@ class FilterForm extends Component {
                 wrapperCol={{ span: 19 }}
               >
                 {getFieldDecorator('uses', {
-                  initialValue: textarea ? [] : classify,
+                  initialValue: textarea ? [] : projects.concat(classify),
                   rules: [{ type: 'array' }]
                 })(<Select multiple>
-                    {classify.map((item, index) => {
-                      return <Option key={index} value={item} >{item}</Option>
-                    })}
+                    <OptGroup key='projects' label="项目数据库">
+                      {projects.map((item, index) => {
+                        return <Option key={index} value={item} >{item}</Option>
+                      })}
+                    </OptGroup>
+                    <OptGroup key='classify' label="分类数据库">
+                      {classify.map((item, index) => {
+                        return <Option key={index} value={item} >{item}</Option>
+                      })}
+                    </OptGroup>
                   </Select>)}
               </Form.Item>
             </Col>
@@ -285,6 +292,7 @@ FilterForm.propTypes = {
   textarea: PropTypes.bool,
   industry: PropTypes.objectOf(PropTypes.array),
   classify: PropTypes.array,
+  projects: PropTypes.array,
   postData: PropTypes.object,
   form: PropTypes.object,
   onSearch: PropTypes.func

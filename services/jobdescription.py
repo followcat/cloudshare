@@ -100,7 +100,7 @@ class JobDescription(services.base.service.Service):
 
     def search(self, keyword):
         results = list()
-        for name in self.interface.grep_yaml(keyword):
+        for name in self.interface.search_yaml(keyword):
             results.append(os.path.splitext(name)[0])
         return results
 

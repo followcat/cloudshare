@@ -17,15 +17,19 @@ class MultiPeople(object):
     def getmd(self, id):
         results = list()
         for people in self.peoples:
+            if not people.exists(id):
+                continue
             for md in people.getmd(id):
                 if md not in results:
-                    result.append(md)
+                    results.append(md)
         for result in results:
             yield result
 
     def getinfo(self, id):
         results = list()
         for people in self.peoples:
+            if not people.exists(id):
+                continue
             for info in people.getinfo(id):
                 if info not in results:
                     results.append(info)

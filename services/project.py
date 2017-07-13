@@ -19,7 +19,7 @@ class Project(services.base.service.Service):
     config_file = 'config.yaml'
 
     def __init__(self, path, corepo, cvrepo, svcpeo, name, iotype='git'):
-        super(Project, self).__init__(path, name, iotype)
+        super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
         self.corepo = corepo
         self.cvrepo = cvrepo
@@ -32,7 +32,7 @@ class Project(services.base.service.Service):
                                                         cvpath, name, cvrepo)
         self.company = services.simulationco.SimulationCO.autoservice(
                                                         copath, name, corepo)
-        self.jobdescription = services.jobdescription.JobDescription(jdpath)
+        self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeo)
         self.config = dict()
         try:

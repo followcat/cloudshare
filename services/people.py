@@ -10,9 +10,9 @@ class People(services.base.storage.BaseStorage):
 
     commitinfo = 'People'
 
-    def __init__(self, path, storage, iotype):
-        super(People, self).__init__(path, iotype=iotype)
+    def __init__(self, storage, path, name=None, searchengine=None, iotype=None):
         self.storage = storage
+        super(People, self).__init__(path, name=name, searchengine=None, iotype=iotype)
 
     def exists(self, id):
         id_yaml = core.outputstorage.ConvertName(id).yaml

@@ -24,9 +24,9 @@ class Simulation(services.base.storage.BaseStorage):
     @classmethod
     def autoservice(cls, path, name, storage, iotype='git'):
         if cls.check(path):
-            return cls(path, name, storage, iotype)
+            return cls(path, name, storage, iotype=iotype)
         else:
-            return cls.__bases__[1](path, name, iotype)
+            return cls.__bases__[1](path, name, iotype=iotype)
 
     @classmethod
     def check(cls, path):
@@ -35,7 +35,7 @@ class Simulation(services.base.storage.BaseStorage):
             os.path.exists(path) and os.path.exists(idsfile))
 
     def __init__(self, path, name, storage, iotype='git'):
-        super(Simulation, self).__init__(path, name, iotype)
+        super(Simulation, self).__init__(path, name, iotype=iotype)
         self._ids = None
         self.storage = storage
         self.yamlpath = self.YAML_DIR
@@ -148,18 +148,19 @@ class Simulation(services.base.storage.BaseStorage):
     def search(self, keyword):
         results = set()
         allfile = self.storage.search(keyword)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
+        for result in allfile:
+            id = core.outputstorage.ConvertName(result[0]).base
             if id in self.ids:
-                results.add(id)
+                results.add((id, result[1]))
         return results
 
     def search_yaml(self, keyword):
         results = set()
-        allfile = self.interface.grep(keyword, self.YAML_DIR)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            results.add(id)
+        allfile = self.storage.search_yaml(keyword)
+        for result in allfile:
+            id = core.outputstorage.ConvertName(result[0]).base
+            if id in self.ids:
+                results.add((id, result[1]))
         return results
 
     def search_key(self, key, value, ids=None):

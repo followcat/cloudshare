@@ -3,7 +3,6 @@ import io
 import os
 import glob
 import tarfile
-import subprocess
 import xml.etree.ElementTree
 
 import interface.base
@@ -15,9 +14,9 @@ class BaseFSInterface(interface.base.Interface):
     mdextention = '.md'
     yamlextention = '.yaml'
     
-    def __init__(self, path):
+    def __init__(self, path, name=None, searchengine=None):
         self.path = path
-        super(BaseFSInterface, self).__init__(path)
+        super(BaseFSInterface, self).__init__(path, name=name, searchengine=searchengine)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
 
@@ -79,45 +78,31 @@ class BaseFSInterface(interface.base.Interface):
         return [os.path.split(f)[1] for f in glob.glob(
                 os.path.join(self.path, prefix, filterfile))]
 
-    def grep(self, restrings, path=''):
-        grep_list = []
-        keywords = restrings.split()
-        if keywords:
-            command = 'grep -l '
-            command += keywords[0].encode('utf-8')
-            command += ' *'
-            for each in keywords[1:]:
-                command += ' | grep '
-                command += each.encode('utf-8')
-            p = subprocess.Popen(command,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT,
-                                 cwd=os.path.join(self.path, path), shell=True)
-            returncode = p.communicate()[0]
-            for each in returncode.split('\n'):
-                if each:
-                    grep_list.append(each)
-        return grep_list
+    def grep(self, restrings, path='', files=None):
+        if files is None:
+            files = ['*']
+        command = self.gencommand(restrings, files)
+        result = self.subprocess_grep(command, path, shell=True)
+        return result
 
-    def grep_yaml(self, restrings, path=''):
-        grep_list = []
+    def grep_yaml(self, restrings, path='', files=None):
+        if files is None:
+            files = ['*.yaml']
+        command = self.gencommand(restrings, files)
+        result = self.subprocess_grep(command, path, shell=True)
+        return result
+
+    def gencommand(self, restrings, files):
+        command = ''
         keywords = restrings.split()
         if keywords:
             command = 'grep -l '
             command += keywords[0].encode('utf-8')
-            command += ' *.yaml'
+            command += ' ' + ' '.join(files)
             for each in keywords[1:]:
                 command += ' | grep '
                 command += each.encode('utf-8')
-            p = subprocess.Popen(command,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT,
-                                 cwd=os.path.join(self.path, path), shell=True)
-            returncode = p.communicate()[0]
-            for each in returncode.split('\n'):
-                if each:
-                    grep_list.append(each)
-        return grep_list
+        return command
 
     def do_commit(self, filenames, message=None, committer=None):
         return ''

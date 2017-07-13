@@ -12,10 +12,11 @@ class BaseStorage(services.base.service.Service):
 
     commitinfo = 'BaseData'
 
-    def __init__(self, path, name=None, iotype=None):
+    def __init__(self, path, name=None, searchengine=None, iotype=None):
         self.path = path
         self.yamlpath = ''
-        super(BaseStorage, self).__init__(self.path, name, iotype)
+        super(BaseStorage, self).__init__(path, name=name,
+                                          searchengine=searchengine, iotype=iotype)
         self.unique_checker = None
         self.info = ""
         self._nums = 0
@@ -177,18 +178,18 @@ class BaseStorage(services.base.service.Service):
 
     def search(self, keyword):
         results = set()
-        allfile = self.interface.grep(keyword)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            results.add(id)
+        allfile = self.interface.search(keyword)
+        for result in allfile:
+            id = core.outputstorage.ConvertName(result[0]).base
+            results.add((id, result[1]))
         return results
 
     def search_yaml(self, keyword):
         results = set()
-        allfile = self.interface.grep_yaml(keyword)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            results.add(id)
+        allfile = self.interface.search_yaml(keyword)
+        for result in allfile:
+            id = core.outputstorage.ConvertName(result[0]).base
+            results.add((id, result[1]))
         return results
 
     def names(self):

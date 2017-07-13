@@ -40,9 +40,9 @@ class Interface(object):
             result = self.SEsearch(keywords)
         return result
 
-    def search_yaml(self, restrings, path='', files=None):
+    def search_yaml(self, keywords, path='', files=None):
         if self.searchengine is None:
-            result = self.grep_yaml(restrings, path=path, files=files)
+            result = self.grep_yaml(keywords, path=path, files=files)
         else:
             result = self.SEsearch_yaml(keywords)
         return result
@@ -66,8 +66,8 @@ class Interface(object):
                         }
                     }
                 })
-        return set(map(lambda x: os.path.splitext(x['_source']['file']['filename'])[0],
-                       result['hits']['hits']))
+        return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
+                                  x['_score']), result['hits']['hits']))
 
     def SEsearch_yaml(self, keywords):
         indexname = '.'.join([self.name, 'yaml'])
@@ -82,8 +82,8 @@ class Interface(object):
                         }
                     }
                 })
-        return set(map(lambda x: os.path.splitext(x['_source']['file']['filename'])[0],
-                       result['hits']['hits']))
+        return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
+                                  x['_score']), result['hits']['hits']))
 
     def subprocess_grep(self, command, path, shell):
         grep_list = []
@@ -97,7 +97,7 @@ class Interface(object):
         returncode = p.communicate()[0]
         for each in returncode.split('\n'):
             if each:
-                grep_list.append(each)
+                grep_list.append((each, 1))
         return grep_list
 
     def delete(self):

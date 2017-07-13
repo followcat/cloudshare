@@ -86,12 +86,13 @@ class SearchCVbyTextAPI(Resource):
         text = args['search_text']
         cur_page = args['page']
         filterdict = args['filterdict'] if args['filterdict'] else {}
-        results = self.svc_mult_cv.search(text, project)
-        yaml_results = self.svc_mult_cv.search_yaml(text, project)
-        results.update(yaml_results)
-        results = self.index.filter_ids(results, filterdict, uses=[project])
+        searchs = self.svc_mult_cv.search(text, project)
+        yaml_searchs = self.svc_mult_cv.search_yaml(text, project)
+        searchs.update(yaml_searchs)
+        results = map(lambda x: x[0], sorted(searchs, lambda x, y: cmp(x[1], y[1]), reverse=True))
+        results = self.index.filter_ids(rank, filterdict, uses=[project])
         count = 20
-        datas, pages = self.paginate(list(results), cur_page, count, project)
+        datas, pages = self.paginate(results, cur_page, count, project)
         return {
             'code': 200,
             'data': {

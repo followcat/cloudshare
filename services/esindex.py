@@ -3,6 +3,7 @@ import time
 import collections
 
 import elasticsearch
+import elasticsearch.helpers
 
 import utils.builtin
 
@@ -37,31 +38,61 @@ class ElasticsearchIndexing(object):
         for svc in self.cvs:
             self.updatecv(svc)
 
-    def updatecv(self, svc):
+    def updatecv(self, svc, numbers=5000):
         assert svc.name
         update_ids = self.ESids({})
         cv_ids = svc.ids
+        ACTIONS = list()
+        times = 0
+        count = 0
         for id in cv_ids-update_ids:
             yamlinfo = self.genindex(svc.getyaml(id))
-            try:
-                self.es.index(index=self.indexname, doc_type='index',
-                              id=id, body=yamlinfo)
-            except Exception as e:
-                print(e)
-                print(yamlinfo)
+            action = {
+                "_op_type": "index",
+                "_index": self.indexname,
+                "_type": 'index',
+                "_source": yamlinfo,
+                '_id': id
+                }
+            ACTIONS.append(action)
+            count += 1
+            if count%numbers == 0:
+                times += 1
+                elasticsearch.helpers.bulk(self.es, ACTIONS, raise_on_error=True)
+                ACTIONS = list()
+                print("Add numbers %d to index."%(times*numbers))
+        else:
+            elasticsearch.helpers.bulk(self.es, ACTIONS, raise_on_error=True)
+            print("Add numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
     def upgrade(self):
         for svc in self.cvs:
-            self.upgradecv(svc, selected)
+            self.upgradecv(svc)
 
-    def upgradecv(self, sv):
+    def upgradecv(self, sv, numbers=5000):
         assert svc.name
-        update_ids = self.ESids({})
-        cv_ids = svc.ids
-        for id in cv_ids-update_ids:
+        ACTIONS = list()
+        times = 0
+        count = 0
+        for id in svc.ids:
             yamlinfo = self.genindex(svc.getyaml(id))
-            self.es.update(index=self.indexname, doc_type='index',
-                           id=id, body=yamlinfo)
+            action = {
+                "_op_type": "update",
+                "_index": self.indexname,
+                "_type": 'index',
+                "_source": yamlinfo,
+                '_id': id
+                }
+            ACTIONS.append(action)
+            count += 1
+            if count%numbers == 0:
+                times += 1
+                elasticsearch.helpers.bulk(self.es, ACTIONS, raise_on_error=True)
+                ACTIONS = list()
+                print("Update numbers %d to index."%(times*numbers))
+        else:
+            elasticsearch.helpers.bulk(self.es, ACTIONS, raise_on_error=True)
+            print("Update numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
     def get(self, querydict):
         kwargs={'body': querydict}

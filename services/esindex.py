@@ -1,19 +1,37 @@
 import math
 import time
+import collections
+
 import elasticsearch
+
+import utils.builtin
 
 
 class ElasticsearchIndexing(object):
 
     indexname = 'cloudshare.index'
     doctype = 'index'
+    index_config_body = {
+      "settings": {
+            "analyzer": {
+                "autocomplete": {
+                    "type": "custom",
+                    "tokenizer": "ik_max_word",
+                },
+                "content":{
+                    "type":"custom",
+                    "tokenizer":"whitespace",
+                }
+          }
+        }
+    }
 
     def __init__(self, cvsvcs):
         self.cvs = cvsvcs
 
     def setup(self):
         self.es = elasticsearch.Elasticsearch()
-        self.es.indices.create(index=self.indexname, ignore=400)
+        self.es.indices.create(index=self.indexname, body=self.index_config_body, ignore=400)
 
     def update(self):
         for svc in self.cvs:
@@ -45,9 +63,9 @@ class ElasticsearchIndexing(object):
             self.es.update(index=self.indexname, doc_type='index',
                            id=id, body=yamlinfo)
 
-    def get(self, filtedict):
-        kwargs={'body': {'query': { 'match': filtedict}}}
-        results = self.ESids(**kwargs)
+    def get(self, querydict):
+        kwargs={'body': querydict}
+        results = self.ESids(kwargs)
         return results
 
     def ESids(self, kwargs, size=10000):
@@ -71,14 +89,29 @@ class ElasticsearchIndexing(object):
             ids.symmetric_difference_update(set([item['_id'] for item in page['hits']['hits']]))
         return ids
 
-    def filter_ids(self, ids, filterdict):
+    def filter_ids(self, ids, filterdict, uses=None):
         if 'date' in filterdict:
-            try:
-                filterdict['date'] = utils.builtin.nemudate(filterdict['date'])
-            except ValueError:
-                filterdict.pop('date')
-        filterset = self.get(filterdict)
-        return filterset & ids
+            for index in range(len(filterdict['date'])):
+                filterdict['date'][index] = filterdict['date'][index].replace('-', '')
+        querydict = {'query': {'bool': {'must': []}}}
+        mustlist = querydict['query']['bool']['must']
+        for key, value in filterdict.items():
+            if not value:
+                continue
+            if key == 'date':
+                if len(value[0]) > 0:
+                    daterange = {'range': {'date': {'gte': value[0], 'lte': value[1]}}}
+                    mustlist.append(daterange)
+            else:
+                if isinstance(value, list):
+                    mustlist.append({'terms': {key.lower(): [v.lower() for v in value]}})
+                else:
+                    mustlist.append({'term': {key.lower(): value.lower()}})
+        print querydict
+        if mustlist:
+            filterset = self.get(querydict)
+            ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
+        return ids
 
     def genindex(self, yamlinfo):
         yamlinfo = self._date(yamlinfo)

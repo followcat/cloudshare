@@ -60,11 +60,11 @@ class ElasticsearchIndexing(object):
             count += 1
             if count%numbers == 0:
                 times += 1
-                elasticsearch.helpers.bulk(self.es, ACTIONS, raise_on_error=True)
+                elasticsearch.helpers.bulk(self.es, ACTIONS, stats_only=True)
                 ACTIONS = list()
                 print("Add numbers %d to index."%(times*numbers))
         else:
-            elasticsearch.helpers.bulk(self.es, ACTIONS, raise_on_error=True)
+            elasticsearch.helpers.bulk(self.es, ACTIONS, stats_only=True)
             print("Add numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
     def upgrade(self):
@@ -89,11 +89,11 @@ class ElasticsearchIndexing(object):
             count += 1
             if count%numbers == 0:
                 times += 1
-                elasticsearch.helpers.bulk(self.es, ACTIONS, raise_on_error=True)
+                elasticsearch.helpers.bulk(self.es, ACTIONS, stats_only=True)
                 ACTIONS = list()
                 print("Update numbers %d to index."%(times*numbers))
         else:
-            elasticsearch.helpers.bulk(self.es, ACTIONS, raise_on_error=True)
+            elasticsearch.helpers.bulk(self.es, ACTIONS, stats_only=True)
             print("Update numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
     def get(self, querydict):

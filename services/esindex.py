@@ -140,12 +140,15 @@ class ElasticsearchIndexing(object):
                 if len(value[0]) > 0:
                     daterange = {'range': {'date': {'gte': value[0], 'lte': value[1]}}}
                     mustlist.append(daterange)
+            elif key == 'expectation_places':
+                mustlist.append({'terms': {'expectation.places': value}})
+            elif key == 'current_places':
+                mustlist.append({'terms': {'current.places': value}})
             else:
                 if isinstance(value, list):
-                    mustlist.append({'terms': {key.lower(): [v.lower() for v in value]}})
+                    mustlist.append({'terms': {key.lower(): value}})
                 else:
-                    mustlist.append({'term': {key.lower(): value.lower()}})
-        print querydict
+                    mustlist.append({'term': {key.lower(): value}})
         if mustlist:
             filterset = self.get(querydict)
             ids = filter(lambda x: x in filterset or x[0] in filterset, ids)

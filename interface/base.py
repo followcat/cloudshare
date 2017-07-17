@@ -59,7 +59,7 @@ class Interface(object):
         for keyword in keywords.split():
             keyword_list.append({"match":
                             {"content": {"query": keyword, "analyzer": "ik_max_word"}}})
-        result = self.searchengine.search(index=indexname, size=500,
+        result = self.searchengine.search(index=indexname, size=500, _source_include="file",
             body={"query": {
                     "bool": {
                         "must": keyword_list
@@ -75,7 +75,7 @@ class Interface(object):
         for keyword in keywords.split():
             keyword_list.append({"match":
                             {"content": {"query": keyword, "analyzer": "ik_max_word"}}})
-        result = self.searchengine.search(index=indexname, size=500,
+        result = self.searchengine.search(index=indexname, size=500, _source_include="file",
             body={"query": {
                     "bool": {
                         "must": keyword_list

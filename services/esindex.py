@@ -13,18 +13,19 @@ class ElasticsearchIndexing(object):
     indexname = 'cloudshare.index'
     doctype = 'index'
     index_config_body = {
-        "settings": {
-            "analysis": {
-                "analyzer": {
-                    "autocomplete": {
-                        "type": "custom",
-                        "tokenizer": "ik_max_word",
-                    },
-                    "content":{
-                        "type":"custom",
-                        "tokenizer":"ik_max_word",
+        "template": doctype,
+        "mappings": {
+            "_default_": {
+                "dynamic_templates": [
+                {
+                    "strings": {
+                        "match_mapping_type": "string",
+                            "mapping": {
+                                "type": "keyword"
+                            }
+                        }
                     }
-                }
+                ]
             }
         }
     }

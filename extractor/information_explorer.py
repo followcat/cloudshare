@@ -223,10 +223,11 @@ def get_name(stream):
 
 
 def get_email(stream):
-    email_restr = u'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'
-    email = info_by_re_iter(stream, email_restr)
-    result = get_tagfromstring(u'邮件', stream, email_restr) or \
-        get_tagfromstring(u'邮箱', stream) or email
+    clean_stream = stream.replace('\\', '')
+    email_restr = u'[\w\.-]+@[\w\.-]+\.\w+'
+    email = info_by_re_iter(clean_stream, email_restr)
+    result = get_tagfromstring(u'邮件', clean_stream, email_restr) or \
+        get_tagfromstring(u'邮箱', clean_stream) or email
     return result
 
 

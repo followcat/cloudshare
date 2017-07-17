@@ -36,6 +36,7 @@ const rootRoute = {
     require('../routes/fast-matching'),
     require('../routes/doc-mining'),
     require('../routes/cvdoc-mining'),
+    require('../routes/cvsdoc-mining'),
     require('../routes/doc-mining-cv'),
     require('../routes/user-info'),
     require('../routes/resume'),

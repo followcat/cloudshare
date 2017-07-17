@@ -22,6 +22,10 @@ export const URL = {
     return `/cvdocmining`;
   },
 
+  getCVsDocMining: () => {
+    return `/cvsdocmining`;
+  },
+
   getListJDURL: () => {
     return `/pm`;
   },

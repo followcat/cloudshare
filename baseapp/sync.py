@@ -13,7 +13,7 @@ RAW_DB = dict()
 if os.path.exists(RAW_DIR):
     for name in os.listdir(RAW_DIR):
         namepath = os.path.join(RAW_DIR, name)
-        RAW_DB[name] = interface.predator.PredatorInterface(namepath)
+        RAW_DB[name] = interface.predator.PredatorInterface(namepath, name=name)
 
 SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_PEO_STO, SVC_CV_STO, RAW_DB)
 lastday = max([max(i['date'].keys()) for i in SVC_INDEX.index.values() if i['date']])

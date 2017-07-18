@@ -12,4 +12,4 @@ AI_needed = sources.industry_id.needed_ai
 customer = services.customer.Customer(SVC_CO_REPO, SVC_CV_REPO, SVC_MULT_PEO,
                                       'willendare', 'willendare')
 
-PRJ_LIST = customer.projects
+PRJ_LIST = customer.projects.values()

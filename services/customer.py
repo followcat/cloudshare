@@ -47,11 +47,22 @@ class Customer(services.base.storage.BaseStorage):
     def load_projects(self):
         if not os.path.exists(self.projects_path):
             os.makedirs(self.projects_path)
-        self.projects = list()
+        self.projects = dict()
         for path in glob.glob(os.path.join(self.projects_path, '*')):
             if os.path.isdir(path):
                 name = os.path.split(path)[1]
                 tmp_project = services.project.Project(path, self.co_repo, self.cv_repo,
                                                        self.mult_peo, name)
                 tmp_project.setup()
-                self.projects.append(tmp_project)
+                self.projects[name] = tmp_project
+
+    def add_projects(self, name, classify, autosetup=False, autoupdate=False):
+        result = False
+        if name not in self.projects:
+            path = os.path.join(self.projects_path, name)
+            tmp_project = services.project.Project(path, self.co_repo, self.cv_repa,
+                                                   self.mult_peo, name)
+            tmp_project.setup(classify, config={'autosetup': autosetup, 'autoupdate': autoupdate})
+            self.project.append(tmp_project)
+            result = True
+        return result

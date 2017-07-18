@@ -47,17 +47,19 @@ class Project(services.base.service.Service):
         utils.builtin.save_yaml(self.config, self.path, self.config_file,
                                 default_flow_style=False)
 
-    def setup(self, classify, committer=None, config=None):
-        if config is None:
-            config = {}
-        if not os.path.exists(os.path.join(self.path, self.config_file)):
-            self.update(classify, committer)
-        self.config.update(config)
-        self.save()
+    def setup(self, classify=None, committer=None, config=None):
+        self.setconfig(config)
+        self.setclassify(classify, committer=committer)
 
-    def update(self, classify, committer=None):
-        self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
-        self.save()
+    def setconfig(self, config):
+        if config is not None:
+            self.config.update(config)
+            self.save()
+
+    def setclassify(self, classify, committer=None):
+        if not os.path.exists(os.path.join(self.path, self.config_file)) or classify is not None:
+            self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
+            self.save()
 
     def getclassify(self):
         return self.config['classify']

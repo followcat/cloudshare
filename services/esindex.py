@@ -131,7 +131,8 @@ class ElasticsearchIndexing(object):
             ids.symmetric_difference_update(set([item['_id'] for item in page['hits']['hits']]))
         return ids
 
-    def filter_ids(self, ids, filterdict, uses=None):
+    def filter(self, filterdict):
+        ids = set()
         if 'date' in filterdict:
             for index in range(len(filterdict['date'])):
                 filterdict['date'][index] = filterdict['date'][index].replace('-', '')
@@ -154,8 +155,12 @@ class ElasticsearchIndexing(object):
                 else:
                     mustlist.append({'term': {key.lower(): value}})
         if mustlist:
-            filterset = self.get(querydict)
-            ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
+            ids = self.get(querydict)
+        return ids
+
+    def filter_ids(self, ids, filterdict, uses=None):
+        filterset = self.filter(filterdict)
+        ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
         return ids
 
     def lastday(self):

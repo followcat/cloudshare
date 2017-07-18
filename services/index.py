@@ -210,6 +210,9 @@ class ReverseIndexing(object):
             ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
         return ids
 
+    def lastday(self):
+        return max([max(i['date'].keys()) for i in self.index.values() if i['date']])
+
     def _cur_places(self, yamlinfo):
         result = dict()
         if 'current' in yamlinfo and 'places' in yamlinfo['current']:

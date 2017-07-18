@@ -19,12 +19,12 @@ class PredatorLiteInterface(interface.base.Interface):
     mdextention = '.md'
     yamlextention = '.yaml'
     
-    def __init__(self, path):
+    def __init__(self, path, name=None, searchengine=None):
         self.path = path
         self.cvpath = os.path.join(self.path, self.cvdir)
         self.rawpath = os.path.join(self.path, self.rawdir)
         self.clypath = os.path.join(self.path, self.clydir)
-        super(PredatorLiteInterface, self).__init__(path)
+        super(PredatorLiteInterface, self).__init__(path, name=name, searchengine=searchengine)
         if not os.path.exists(self.cvpath):
             os.makedirs(self.cvpath)
 

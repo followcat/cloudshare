@@ -159,8 +159,9 @@ class ElasticsearchIndexing(object):
         return ids
 
     def filter_ids(self, ids, filterdict, uses=None):
-        filterset = self.filter(filterdict)
-        ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
+        if filterdict:
+            filterset = self.filter(filterdict)
+            ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
         return ids
 
     def lastday(self):

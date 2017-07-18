@@ -224,6 +224,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         if threshold is None:
             threshold = 0.8
         results = {}
+        filterset = self.index.filter(filterdict)
         project = self.svc_mult_cv.getproject(projectname)
         for jd in project.jobdescription.lists():
             try:
@@ -235,7 +236,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             doc += jd['commentary']
             result = self.miner.probability(project.name, doc, uses=project.getclassify(),
                                             top=0.001, minimum=1000)
-            result = self.index.filter_ids(result, filterdict)
+            result = filter(lambda x: x in filterset or x[0] in filterset, result)
             output = {}
             output['id'] = jd['id']
             output['name'] = jd['name']

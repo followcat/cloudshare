@@ -156,10 +156,10 @@ class ElasticsearchIndexing(object):
 
     def lastday(self):
         lastday = '19800101'
-        date = self.es.search(index=self.indexname, doc_type=self.doctype,
-                              sort='_score,date:desc', size = 1)
+        search_result = self.es.search(index=self.indexname, doc_type=self.doctype,
+                                       sort='_score,date:desc', size = 1)
         try:
-            lastday = x['hits']['hits'][0]['_source']['date']
+            lastday = search_result['hits']['hits'][0]['_source']['date']
         except IndexError:
             pass
         return lastday

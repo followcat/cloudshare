@@ -70,16 +70,20 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Add numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def upgrade(self):
+    def upgrade(self, selected, ids=None):
         for svc in self.cvs:
-            self.upgradecv(svc)
+            self.upgradecv(svc, selected, ids=ids)
 
-    def upgradecv(self, sv, numbers=5000):
+    def upgradecv(self, svc, selected, ids=None, numbers=5000):
         assert svc.name
-        ACTIONS = list()
+        if ids is None:
+            ids = svc.ids
+        else:
+            ids = ids & svc.ids
         times = 0
         count = 0
-        for id in svc.ids:
+        ACTIONS = list()
+        for id in ids:
             yamlinfo = self.genindex(svc.getyaml(id))
             action = {
                 "_op_type": "update",

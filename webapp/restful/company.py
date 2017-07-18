@@ -86,7 +86,8 @@ class AddedCompanyListAPI(Resource):
         text = args['text']
         project = self.svc_mult_cv.getproject(projectname)
         customer_ids = project.company_customers()
-        company_ids = project.company.search('name: '+text)
+        search_results = project.company.search('name: '+text)
+        company_ids = map(lambda x:x[0], search_results)
         data = []
         for company_id in company_ids:
             if company_id in customer_ids:
@@ -219,9 +220,10 @@ class SearchCObyTextAPI(Resource):
         text = args['search_text']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        results = project.company.search(text)
-        yaml_results = project.company.search_yaml(text)
-        results.update(yaml_results)
+        search_results = project.company.search(text)
+        search_yaml_results = project.company.search_yaml(text)
+        search_results.update(search_yaml_results)
+        results = map(lambda x:x[0], search_results)
         sorted_results = project.company.sorted_ids('modifytime', ids=results)
         datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
         return {

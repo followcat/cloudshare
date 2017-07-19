@@ -79,7 +79,7 @@ class ElasticsearchIndexing(object):
         if ids is None:
             ids = svc.ids
         else:
-            ids = ids & svc.ids
+            ids = set(ids) & svc.ids
         times = 0
         count = 0
         ACTIONS = list()

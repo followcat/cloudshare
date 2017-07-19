@@ -19,7 +19,7 @@ def sync_reload():
     SVC_MULT_CLSIFY, SVC_CLS_CV = baseapp.loader.load_mult_classify(SVC_CV_STO)
     SVC_MULT_CV = baseapp.loader.load_mult_cv(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV)
     SVC_CUTWORD, SVC_MIN = baseapp.loader.load_mining(SVC_MULT_CV, services.mining.silencer)
-    SVC_INDEX = load_index()
+    SVC_INDEX = load_esindex()
     reloadobj = ReloadObj(SVC_MULT_CLSIFY, SVC_CLS_CV, SVC_MULT_CV,
                           SVC_CUTWORD, SVC_MIN, SVC_INDEX)
     return reloadobj

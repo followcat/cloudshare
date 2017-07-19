@@ -56,13 +56,13 @@ class Customer(services.base.storage.BaseStorage):
                 tmp_project.setup()
                 self.projects[name] = tmp_project
 
-    def add_projects(self, name, classify, autosetup=False, autoupdate=False):
+    def add_project(self, name, classify, autosetup=False, autoupdate=False):
         result = False
         if name not in self.projects:
             path = os.path.join(self.projects_path, name)
-            tmp_project = services.project.Project(path, self.co_repo, self.cv_repa,
+            tmp_project = services.project.Project(path, self.co_repo, self.cv_repo,
                                                    self.mult_peo, name)
             tmp_project.setup(classify, config={'autosetup': autosetup, 'autoupdate': autoupdate})
-            self.project.append(tmp_project)
+            self.projects.append(tmp_project)
             result = True
         return result

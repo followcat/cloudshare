@@ -149,6 +149,8 @@ class ElasticsearchIndexing(object):
                 mustlist.append({'terms': {'expectation.places': value}})
             elif key == 'current_places':
                 mustlist.append({'terms': {'current.places': value}})
+            elif key == 'business':
+                mustlist.append({'terms': {'classify': value}})
             else:
                 if isinstance(value, list):
                     mustlist.append({'terms': {key.lower(): value}})

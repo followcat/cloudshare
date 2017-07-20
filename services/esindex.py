@@ -119,6 +119,7 @@ class ElasticsearchIndexing(object):
                 size = size,
                 _source='false',
                 index=self.indexname,
+                request_timeout=30,
                 **kwargs)
         ids.symmetric_difference_update(set([item['_id'] for item in page['hits']['hits']]))
         sid = page['_scroll_id']

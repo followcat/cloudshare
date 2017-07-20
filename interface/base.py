@@ -65,7 +65,7 @@ class Interface(object):
                         "must": keyword_list
                         }
                     }
-                })
+                }, request_timeout=30)
         return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
                                   x['_score']), result['hits']['hits']))
 
@@ -81,7 +81,7 @@ class Interface(object):
                         "must": keyword_list
                         }
                     }
-                })
+                }, request_timeout=30)
         return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
                                   x['_score']), result['hits']['hits']))
 

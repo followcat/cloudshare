@@ -4,6 +4,7 @@ import glob
 import utils.builtin
 import services.project
 import services.base.storage
+import services.simulationacc
 
 
 class Customer(services.base.storage.BaseStorage):
@@ -13,7 +14,7 @@ class Customer(services.base.storage.BaseStorage):
     ACC_PATH = 'accounts'
     config_file = 'config.yaml' 
 
-    def __init__(self, co_repo, cv_repo, mult_peo, path, name, iotype='git'):
+    def __init__(self, acc_repo, co_repo, cv_repo, mult_peo, path, name, iotype='git'):
         super(Customer, self).__init__(path, name, iotype=iotype)
         self.name = name
         self.path = path
@@ -23,6 +24,7 @@ class Customer(services.base.storage.BaseStorage):
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.load_projects()
+        self.accounts = services.simulationacc.SimulationACC(self.accounts_path, name, acc_repo)
         self.config = dict()
         try:
             self.load()

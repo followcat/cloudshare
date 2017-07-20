@@ -156,15 +156,13 @@ class BestExcellent extends Component {
           </Col>
           <Col span={5} />
         </Row>
-        {dataSource && dataSource.length 
-          ?    <Table columns={columns}
+        <Table columns={columns}
                dataSource={dataSource}
                defaultExpandAllRows={false}
                rowKey={record => record.ID}
                expandedRowRender={record => this.getExpandedRowRender(record)}
                size={pagesize}
                loading={loading} />
-          : '暂无数据' }
       </div>
     );
   }

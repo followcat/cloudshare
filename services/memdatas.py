@@ -46,3 +46,12 @@ class MemeryDatas(object):
             self.memdict[key][id] = 0
         else:
            self.memdict[key][id] = info[key]
+
+    def remove(self, id):
+        result = False
+        for key in self.memdict:
+            if id in self.memdict[key]:
+                self.memdict[key].remove(id)
+                result = True
+        return result
+

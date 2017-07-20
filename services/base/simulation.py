@@ -63,6 +63,11 @@ class Simulation(services.base.storage.BaseStorage):
         self.ids.add(id)
         return True
 
+    def _remove(self, name):
+        id = core.outputstorage.ConvertName(name).base
+        self.ids.remove(id)
+        return True
+
     def _templateinfo(self, committer):
         info = self.generate_info_template()
         info['committer'] = committer

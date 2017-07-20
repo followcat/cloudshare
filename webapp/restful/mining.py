@@ -1,3 +1,4 @@
+import time
 import datetime
 
 import flask
@@ -206,25 +207,44 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
 
-    def fromcache(self, projectname, filterdict, threshold):
-        results = []
-        date = ' '.join(filterdict['date'])
-        if date not in self.cache:
-            self.cache[date] = {}
-            self.cache[date][projectname] = self.findbest(projectname,
-                                                           filterdict,
-                                                           threshold)
-        elif projectname not in self.cache[date]:
-            self.cache[date][projectname] = self.findbest(projectname,
-                                                           filterdict,
-                                                           threshold)
-        return self.cache[date][projectname]
+    def fromcache(self, projectname, filterdict, threshold, cache=True):
+        date = int(time.strftime('%Y%m%d',time.localtime(time.time())))
+        if cache is True:
+            if projectname not in self.cache:
+                bestids = self.findbest(projectname, threshold)
+                self.cache[projectname] = (date, bestids)
+            elif self.cache[projectname][0] < date:
+                bestids = self.findbest(projectname, threshold)
+                self.cache[projectname] = (date, bestids)
+            else:
+                bestids = self.cache[projectname][1]
+        else:
+            bestids = self.findbest(projectname, threshold)
+        results = dict()
+        filterids = self.index.filter(filterdict)
+        project = self.svc_mult_cv.getproject(projectname)
+        for jdid in bestids:
+            output = {}
+            output['CV'] = list()
+            for cv in bestids[jdid]:
+                if cv[0] in filterids:
+                    cvinfo = self.svc_mult_cv.getyaml(cv[0])
+                    cvinfo['CVvalue'] = cv[1]
+                    output['CV'].append(cvinfo)
+            if not output['CV']:
+                continue
+            jd = project.jd_get(jdid)
+            output['id'] = jdid
+            output['name'] = jd['name']
+            output['description'] = jd['description']
+            output['company'] = project.company_get(jd['company'])['name']
+            results[jdid] = output
+        return results
 
-    def findbest(self, projectname, filterdict, threshold=None):
+    def findbest(self, projectname, threshold=None):
         if threshold is None:
             threshold = 0.8
         results = {}
-        filterset = self.index.filter(filterdict)
         project = self.svc_mult_cv.getproject(projectname)
         for jd in project.jobdescription.lists():
             try:
@@ -235,22 +255,10 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             doc = jd['description']
             doc += jd['commentary']
             result = self.miner.probability(project.name, doc, uses=project.getclassify(),
-                                            top=0.001, minimum=1000)
-            result = filter(lambda x: x in filterset or x[0] in filterset, result)
-            output = {}
-            output['id'] = jd['id']
-            output['name'] = jd['name']
-            output['description'] = jd['description']
-            output['company'] = project.company_get(jd['company'])['name']
+                                            top=0.05, minimum=1000)
             if result:
                 candidates = filter(lambda x: float(x[1])>float(threshold), result)[:10]
-                if candidates:
-                    output['CV'] = list()
-                    for each in candidates:
-                        cvinfo = self.svc_mult_cv.getyaml(each[0])
-                        cvinfo['CVvalue'] = each[1]
-                        output['CV'].append(cvinfo)
-                    results[jd['id']] = output
+                results[jd['id']] = candidates
         return results
 
     def post(self):
@@ -261,10 +269,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         projectname = args['project']
         filterdict = args['filterdict']
         numbers = args['numbers']
-        if fromcache is False:
-            alls = self.findbest(projectname, filterdict, threshold)
-        else:
-            alls = self.fromcache(projectname, filterdict, threshold)
+        alls = self.fromcache(projectname, filterdict, threshold, cache=fromcache)
         for jdid in alls:
             results.append({'ID': jdid, 'name': alls[jdid]['name'],
                             'company': alls[jdid]['company'],

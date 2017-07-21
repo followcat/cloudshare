@@ -256,7 +256,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             doc = jd['description']
             doc += jd['commentary']
             result = self.miner.probability(project.name, doc, uses=project.getclassify(),
-                                            top=0.05, minimum=1000)
+                                            top=0.01, minimum=3000)
             if result:
                 candidates = filter(lambda x: float(x[1])>float(threshold), result)
                 results[jd['id']] = candidates

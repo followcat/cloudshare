@@ -147,7 +147,8 @@ class LSIbaseAPI(Resource):
             cur_page = 1
         datas = []
         result = self.miner.probability(project, doc, uses=uses, top=0.03, minimum=1000)
-        result = self.index.filter_ids(result, filterdict, uses=uses)
+        ids = set([cv[0] for cv in result])
+        result = self.index.filter_ids(result, filterdict, ids, uses=uses)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1
@@ -211,26 +212,26 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         date = int(time.strftime('%Y%m%d',time.localtime(time.time())))
         if cache is True:
             if projectname not in self.cache:
-                bestids = self.findbest(projectname, threshold)
-                self.cache[projectname] = (date, bestids)
+                bestjds = self.findbest(projectname, threshold)
+                self.cache[projectname] = (date, bestjds)
             elif self.cache[projectname][0] < date:
-                bestids = self.findbest(projectname, threshold)
-                self.cache[projectname] = (date, bestids)
+                bestjds = self.findbest(projectname, threshold)
+                self.cache[projectname] = (date, bestjds)
             else:
-                bestids = self.cache[projectname][1]
+                bestjds = self.cache[projectname][1]
         else:
-            bestids = self.findbest(projectname, threshold)
+            bestjds = self.findbest(projectname, threshold)
         results = dict()
-        filterids = self.index.filter(filterdict)
         project = self.svc_mult_cv.getproject(projectname)
-        for jdid in bestids:
+        for jdid in bestjds:
             output = {}
             output['CV'] = list()
-            for cv in bestids[jdid]:
-                if cv[0] in filterids:
-                    cvinfo = self.svc_mult_cv.getyaml(cv[0])
-                    cvinfo['CVvalue'] = cv[1]
-                    output['CV'].append(cvinfo)
+            bestids = set([cv[0] for cv in bestjds[jdid]])
+            filterids = self.index.filter_ids(bestjds[jdid], filterdict, bestids)
+            for cv in filterids:
+                cvinfo = self.svc_mult_cv.getyaml(cv[0])
+                cvinfo['CVvalue'] = cv[1]
+                output['CV'].append(cvinfo)
             if not output['CV']:
                 continue
             jd = project.jd_get(jdid)

@@ -164,6 +164,7 @@ class ElasticsearchIndexing(object):
         return results
 
     def filter_ids(self, source, filterdict, ids, uses=None):
+        result = source
         if filterdict:
             if not isinstance(ids, set):
                 ids = set(ids)

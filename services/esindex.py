@@ -132,13 +132,15 @@ class ElasticsearchIndexing(object):
             ids.symmetric_difference_update(set([item['_id'] for item in page['hits']['hits']]))
         return ids
 
-    def filter(self, filterdict):
-        ids = set()
+    def filter(self, filterdict, ids=None):
+        results = set()
+        if ids is not None:
+            filterdict['_id'] = list(ids)
         if 'date' in filterdict:
             for index in range(len(filterdict['date'])):
                 filterdict['date'][index] = filterdict['date'][index].replace('-', '')
-        querydict = {'query': {'bool': {'must': []}}}
-        mustlist = querydict['query']['bool']['must']
+        querydict = {'query': {'bool': {'filter': []}}}
+        mustlist = querydict['query']['bool']['filter']
         for key, value in filterdict.items():
             if not value:
                 continue
@@ -158,14 +160,17 @@ class ElasticsearchIndexing(object):
                 else:
                     mustlist.append({'term': {key.lower(): value}})
         if mustlist:
-            ids = self.get(querydict)
-        return ids
+            results = self.get(querydict)
+        return results
 
-    def filter_ids(self, ids, filterdict, uses=None):
+    def filter_ids(self, source, filterdict, ids, uses=None):
+        result = source
         if filterdict:
-            filterset = self.filter(filterdict)
-            ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
-        return ids
+            if not isinstance(ids, set):
+                ids = set(ids)
+            filterset = self.filter(filterdict, ids=ids)
+            result = filter(lambda x: x in filterset or x[0] in filterset, source)
+        return result
 
     def lastday(self):
         lastday = '19800101'

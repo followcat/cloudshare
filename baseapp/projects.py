@@ -39,4 +39,9 @@ SVC_PRJ_NE = services.project.Project(os.path.join(PRJ_PATH, 'NewEnergy'),
                                       'NewEnergy')
 SVC_PRJ_NE.setup({}, config={'autoupdate': False, 'autosetup': False})
 
-PRJ_LIST = [SVC_PRJ_MED, SVC_PRJ_AI, SVC_PRJ_BT, SVC_PRJ_IA, SVC_PRJ_NE]
+SVC_PRJ_OTS = services.project.Project(os.path.join(PRJ_PATH, 'Others'),
+                                      SVC_CO_REPO, SVC_CV_REPO, SVC_MULT_PEO,
+                                      'Others')
+SVC_PRJ_OTS.setup({}, config={'autoupdate': False, 'autosetup': False})
+
+PRJ_LIST = [SVC_PRJ_MED, SVC_PRJ_AI, SVC_PRJ_BT, SVC_PRJ_IA, SVC_PRJ_NE, SVC_PRJ_OTS]

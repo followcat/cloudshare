@@ -51,7 +51,7 @@ class MemeryDatas(object):
         result = False
         for key in self.memdict:
             if id in self.memdict[key]:
-                self.memdict[key].remove(id)
+                self.memdict[key].pop(id)
                 result = True
         return result
 

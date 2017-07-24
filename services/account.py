@@ -111,6 +111,13 @@ class Account(services.base.service.Service):
         account_file.close()
         return data
 
+    def getyaml(self, id):
+        return self.getinfo(id)
+
+    def getmd(self, id):
+        result = unicode()
+        return result
+
     def saveinfo(self, id, data, message=None):
         if message is None:
             message = "Modify %s data." % id

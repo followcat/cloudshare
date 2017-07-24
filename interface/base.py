@@ -59,13 +59,13 @@ class Interface(object):
         for keyword in keywords.split():
             keyword_list.append({"match":
                             {"content": {"query": keyword, "analyzer": "ik_max_word"}}})
-        result = self.searchengine.search(index=indexname, size=500,
+        result = self.searchengine.search(index=indexname, size=500, _source_include="file",
             body={"query": {
                     "bool": {
                         "must": keyword_list
                         }
                     }
-                })
+                }, request_timeout=30)
         return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
                                   x['_score']), result['hits']['hits']))
 
@@ -75,13 +75,13 @@ class Interface(object):
         for keyword in keywords.split():
             keyword_list.append({"match":
                             {"content": {"query": keyword, "analyzer": "ik_max_word"}}})
-        result = self.searchengine.search(index=indexname, size=500,
+        result = self.searchengine.search(index=indexname, size=500, _source_include="file",
             body={"query": {
                     "bool": {
                         "must": keyword_list
                         }
                     }
-                })
+                }, request_timeout=30)
         return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
                                   x['_score']), result['hits']['hits']))
 

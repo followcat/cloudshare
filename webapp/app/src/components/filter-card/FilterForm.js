@@ -108,6 +108,7 @@ class FilterForm extends Component {
     for (let key in industry) {
       optGroup.push(
         <OptGroup key={key} label={key}>
+          <Option key={key} value={key}>{key}</Option>
           {industry[key].map(item => <Option key={item} value={item}>{item}</Option>)}
         </OptGroup>
       );

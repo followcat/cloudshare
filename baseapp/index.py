@@ -6,4 +6,11 @@ def load_index():
     SVC_INDEX.setup()
     return SVC_INDEX
 
-SVC_INDEX = load_index()
+def load_esindex():
+    import services.esindex
+    from baseapp.datadbs import SVC_CV_REPO, SVC_CV_STO
+    SVC_INDEX = services.esindex.ElasticsearchIndexing([SVC_CV_REPO, SVC_CV_STO])
+    SVC_INDEX.setup()
+    return SVC_INDEX
+
+SVC_INDEX = load_esindex()

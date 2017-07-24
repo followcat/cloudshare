@@ -1,4 +1,8 @@
+import os
+import ujson
+
 import core.exception
+import core.outputstorage
 import services.base.simulation
 
 
@@ -10,6 +14,11 @@ class SimulationACC(services.base.simulation.Simulation):
 
     def __init__(self, path, name, storage, iotype='git'):
         super(SimulationACC, self).__init__(path, name, storage, iotype=iotype)
+
+    def _templateinfo(self, committer):
+        info = super(SimulationACC, self)._templateinfo(committer)
+        info['inviter'] = committer
+        return info
 
     def getinfo(self, id):
         if self.exists(id):
@@ -23,8 +32,31 @@ class SimulationACC(services.base.simulation.Simulation):
         else:
             raise core.exception.NotExistsIDException(id)
 
+    def getid_byname(self, name):
+        return self.storage.USERS[name]
+
     def getmd(self, id):
         if self.exists(id):
             return super(SimulationACC, self).getmd(id)
         else:
             raise core.exception.NotExistsIDException(id)
+
+    def remove(self, id, committer=None, do_commit=True):
+        result = False
+        committer_id = self.getid_byname(committer)
+        if self.exists(id) and self.exists(committer_id):
+            self._remove(id)
+            filenames = []
+            filedatas = []
+            filenames.append(bytes(self.ids_file))
+            filedatas.append(ujson.dumps(sorted(self.ids), indent=4))
+            yamlname = core.outputstorage.ConvertName(id).yaml
+            filedir = os.path.join(self.yamlpath, yamlname)
+            self.interface.delete(filedir, message='Remove user %s'%id,
+                                  committer=committer, do_commit=do_commit)
+            self.interface.add_files(filenames, filedatas,
+                                     message='Remove %s in ids file.'%id,
+                                     committer=committer, do_commit=do_commit)
+            self.memdatas.remove(id)
+            result = True
+        return result

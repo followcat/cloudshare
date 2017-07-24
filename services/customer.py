@@ -1,11 +1,11 @@
 import os
 import glob
 
+import core.basedata
 import utils.builtin
 import services.project
 import services.base.storage
 import services.simulationacc
-
 
 class Customer(services.base.storage.BaseStorage):
 
@@ -68,3 +68,10 @@ class Customer(services.base.storage.BaseStorage):
             self.projects.append(tmp_project)
             result = True
         return result
+
+    def add_account(self, id, committer):
+        bsobj = core.basedata.DataObject(metadata={'id': id}, data=None)
+        return self.accounts.add(bsobj, committer=committer)
+
+    def rm_account(self, id, committer):
+        return self.accounts.remove(id, committer=committer)

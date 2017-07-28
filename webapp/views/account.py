@@ -11,14 +11,18 @@ class User(flask.ext.login.UserMixin):
         self.svc_account = svc_account
         if id not in svc_account.USERS:
             raise services.exception.UserNotFoundError()
-        self.password = svc_account.USERS[unicode(id)]
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id })
 
-    def changepassword(self, password):
-        self.svc_account.modify(self.id, password)
+    def checkpassword(self, password):
+        return self.svc_account.checkpwd(self.id, password)
+
+    def changepassword(self, oldpassword, newpassword):
+        name = self.id
+        id = self.svc_account.USERS[name]['id']
+        self.svc_account.updatepwd(id, oldpassword, newpassword)
 
     def getbookmark(self):
         return self.svc_account.getbookmark(self.id)
@@ -35,18 +39,22 @@ class User(flask.ext.login.UserMixin):
             >>> import shutil
             >>> import services.account
             >>> import webapp.views.account
-            >>> import interface.gitinterface
-            >>> repo_name = 'webapp/views/test_repo'
-            >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_account = services.account.Account(interface.path)
-            >>> user = webapp.views.account.User.get('root', svc_account)
+            >>> pwd_path = 'webapp/views/test_pwd'
+            >>> acc_path = 'webapp/views/test_acc'
+            >>> svc_password = services.account.Password(pwd_path)
+            >>> svc_account = services.account.Account(svc_password, acc_path)
+            >>> accobj = svc_account.baseobj({'name': u'admin'})
+            >>> svc_account.add(accobj, 'password')
+            True
+            >>> user = webapp.views.account.User.get('admin', svc_account)
             >>> user.id
-            'root'
-            >>> user.password
-            u'5f4dcc3b5aa765d61d8327deb882cf99'
+            'admin'
+            >>> user.checkpassword('password')
+            True
             >>> type(webapp.views.account.User.get('None', svc_account))
             <type 'NoneType'>
-            >>> shutil.rmtree(repo_name)
+            >>> shutil.rmtree(pwd_path)
+            >>> shutil.rmtree(acc_path)
         """
         try:
             return self_class(id, svc_account)
@@ -59,5 +67,5 @@ class User(flask.ext.login.UserMixin):
             token = token.replace('Basic ', '', 1)
             s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
             data = s.loads(token)
-            return User.get(data['id'], svc_account)
+            return User.get(data['name'], svc_account)
         return None

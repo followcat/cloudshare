@@ -2,136 +2,160 @@ import os.path
 
 import yaml
 
+import core.basedata
 import utils.builtin
-import services.base.service
 import services.exception
 import core.outputstorage
+import services.base.storage
 
 
-class Account(services.base.service.Service):
+class Password(services.base.storage.BaseStorage):
     """
         >>> import shutil
         >>> import services.account
-        >>> import interface.gitinterface
-        >>> repo_name = 'services/test_repo'
-        >>> interface = interface.gitinterface.GitInterface(repo_name)
-        >>> svc_account = services.account.Account(interface.path)
-        >>> svc_account.USERS
-        {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
-        >>> svc_account.add('root', 'admin', 'password')
+        >>> repo_path = 'services/test_pwd'
+        >>> svc_password = services.account.Password(repo_path)
+        >>> bsobj = svc_password.baseobj({'id': 'admin', 'password': 'pwd'})
+        >>> svc_password.add(bsobj)
         True
-        >>> svc_account.USERS['admin']
-        u'5f4dcc3b5aa765d61d8327deb882cf99'
-        >>> svc_account.get_user_list()
-        [u'admin']
-        >>> svc_account.add('root', 'admin', 'password') # doctest: +ELLIPSIS
-        Traceback (most recent call last):
-        ...
-        ExistsUser: admin
-        >>> svc_account.delete('root', 'admin')
+        >>> svc_password.add(bsobj)
+        False
+        >>> svc_password.updatepwd('admin', 'pwd', 'npwd')
         True
-        >>> svc_account.USERS
-        {u'root': u'5f4dcc3b5aa765d61d8327deb882cf99'}
-        >>> shutil.rmtree(repo_name)
+        >>> shutil.rmtree(repo_path)
     """
-    default_root_name = u'root'
-    default_root_password = 'password'
-    account_filename = 'account.yaml'
 
-    def __init__(self, interface, name=None):
-        super(Account, self).__init__(interface, name)
+    YAML_TEMPLATE = (
+        ("id",                  str),
+        ("password",            str),
+    )
 
-    def create(self):
-        upassword = utils.builtin.md5(self.default_root_password)
-        empty_dict = {self.default_root_name: upassword}
-        self.interface.add(self.account_filename, yaml.dump(empty_dict),
-                           "Add account file.")
+    MUST_KEY = ['id', 'password']
 
-    def add(self, mender, id, password):
-        if mender != u'root':
-            return False
-        data = self.USERS
-        uid = unicode(id)
-        upw = utils.builtin.md5(password)
-        if uid in data:
-            raise services.exception.ExistsUser(uid)
-        data[uid] = upw
-        dump_data = yaml.dump(data)
-        self.interface.modify(self.account_filename, dump_data,
-                              self.default_root_name)
-        self.initaccount(uid)
-        return True
+    def __init__(self, path, name=None, searchengine=None, iotype='git'):
+        super(Password, self).__init__(path, name=name,
+                                       searchengine=searchengine, iotype=iotype)
 
-    def modify(self, id, password):
-        data = self.USERS
-        uid = unicode(id)
-        upw = utils.builtin.md5(password)
-        data[uid] = upw
-        dump_data = yaml.dump(data)
-        self.interface.modify(self.account_filename, dump_data,
-                              "Modify %s password." % id, self.default_root_name)
+    def baseobj(self, info):
+        metadata = self._metadata(info)
+        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+        return bsobj
 
-    def delete(self, mender, id):
-        if mender != u'root':
-            return False
-        data = self.USERS
-        data.pop(unicode(id))
-        dump_data = yaml.dump(data)
-        self.interface.modify(self.account_filename, dump_data,
-                              "Delete %s user." % id, self.default_root_name)
-        return True
+    def _metadata(self, info):
+        assert set(self.MUST_KEY).issubset(set(info.keys()))
+        origin = self.generate_info_template()
+        for key, datatype in self.YAML_TEMPLATE:
+            if key in info and isinstance(info[key], datatype):
+                origin[key] = info[key]
+        origin['password'] = utils.builtin.md5(origin['password'])
+        return origin
+
+    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False, do_commit=True):
+        return super(Password, self).add(bsobj, committer, unique,
+                                         yamlfile, mdfile, do_commit=do_commit)
+
+    def updatepwd(self, id, oldpassword, newpassword):
+        assert self.exists(id)
+        result = False
+        info = self.getinfo(id)
+        md5_opwd = utils.builtin.md5(oldpassword)
+        if info['password'] == md5_opwd:
+            md5_npwd = utils.builtin.md5(newpassword)
+            self.updateinfo(id, 'password', md5_npwd, id)
+            result = True
+        return result
+
+    def get(self, id):
+        info = self.getinfo(id)
+        return info['password']
+
+
+class Account(services.base.storage.BaseStorage):
+    """
+        >>> import shutil
+        >>> import services.account
+        >>> acc_path = 'services/test_acc'
+        >>> pwd_path = 'services/test_pwd'
+        >>> svc_password = services.account.Password(pwd_path)
+        >>> svc_account = services.account.Account(svc_password, acc_path)
+        >>> accobj = svc_account.baseobj({'name': u'admin'})
+        >>> svc_account.add(accobj, 'password')
+        True
+        >>> svc_account.USERS.keys()
+        ['admin']
+        >>> svc_account.USERS['admin']['id']
+        '21232f297a57a5a743894a0e4a801fc3'
+        >>> svc_account.get_user_list()
+        ['admin']
+        >>> svc_account.add(accobj, 'password')
+        False
+        >>> shutil.rmtree(acc_path)
+        >>> shutil.rmtree(pwd_path)
+    """
+
+    MUST_KEY = ['name']
+    YAML_TEMPLATE = (
+        ("id",                  str),
+        ("name",                unicode),
+        ("bookmark",            set),
+        ("phone",               str),
+        ("email",               str),
+    )
+
+    def __init__(self, svc_password, path, name=None, searchengine=None, iotype='git'):
+        self.svc_password = svc_password
+        super(Account, self).__init__(path, name=name,
+                                      searchengine=searchengine, iotype=iotype)
+
+    def baseobj(self, info):
+        metadata = self._metadata(info)
+        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+        return bsobj
+
+    def _metadata(self, info):
+        assert set(self.MUST_KEY).issubset(set(info.keys()))
+        origin = self.generate_info_template()
+        for key, datatype in self.YAML_TEMPLATE:
+            if key in info and isinstance(info[key], datatype):
+                origin[key] = info[key]
+        origin['id'] = utils.builtin.md5(info['name'])
+        return origin
+
+    def add(self, bsobj, password, committer=None, unique=True,
+            yamlfile=True, mdfile=False, do_commit=True):
+        result = False
+        pwd_result = False
+        result = super(Account, self).add(bsobj, committer, unique,
+                                          yamlfile, mdfile, do_commit=do_commit)
+        if result is True:
+            pwdobj = self.svc_password.baseobj({'id': str(bsobj.ID), 'password': password})
+            pwd_result = self.svc_password.add(pwdobj)
+        return result and pwd_result
+
+    def checkpwd(self, name, password):
+        id = self.USERS[name]['id']
+        return self.svc_password.get(id) == utils.builtin.md5(password)
+
+    def updatepwd(self, id, oldpassword, newpassword):
+        result = False
+        if self.exists(id):
+            result = self.svc_password.updatepwd(id, oldpassword, newpassword)
+        return result
 
     @property
     def USERS(self):
-        account_file = self.interface.repo.get_named_file(
-            os.path.join('..', self.account_filename))
-        if account_file is None:
-            self.create()
-            account_file = self.interface.repo.get_named_file(
-                os.path.join('..', self.account_filename))
-        data = yaml.load(account_file.read())
-        account_file.close()
-        return data
-
-    def get_user_list(self):
-        account_list = self.USERS.keys()
-        account_list.remove(self.default_root_name)
-        user_list = account_list
-        return user_list
-
-    def getinfo(self, id):
-        filename = core.outputstorage.ConvertName(id).yaml
-        account_file = self.interface.repo.get_named_file(
-            os.path.join('..', filename))
-        if account_file is None:
-            self.initaccount(id)
-            account_file = self.interface.repo.get_named_file(
-            os.path.join('..', filename))
-        data = yaml.load(account_file.read())
-        account_file.close()
-        return data
-
-    def getyaml(self, id):
-        return self.getinfo(id)
-
-    def getmd(self, id):
-        result = unicode()
+        result = dict()
+        for id in self.ids:
+            info = self.getyaml(id)
+            result[info['name']] = self.getyaml(id)
         return result
 
-    def saveinfo(self, id, data, message=None):
-        if message is None:
-            message = "Modify %s data." % id
-        filename = core.outputstorage.ConvertName(id).yaml
-        dump_data = yaml.dump(data)
-        self.interface.modify(filename, dump_data, message)
-        return True
-
-    def initaccount(self, id):
-        empty_dict = {'id': id, 'bookmark': set()}
-        filename = core.outputstorage.ConvertName(id).yaml
-        self.interface.add(filename, yaml.dump(empty_dict),
-                           "Add %s account setting." % id)
-        return True
+    def get_user_list(self):
+        result = list()
+        for id in self.ids:
+            info = self.getyaml(id)
+            result.append(info['name'])
+        return result
 
     def getbookmark(self, id):
         info = self.getinfo(id)
@@ -143,7 +167,7 @@ class Account(services.base.service.Service):
         if id in bookmark:
             return False
         bookmark.add(book)
-        self.saveinfo(id, info, "Add %s bookmark." % id)
+        self.saveinfo(id, info, "Add %s bookmark." % id, id)
         return True
 
     def delbookmark(self, id, book):
@@ -152,5 +176,5 @@ class Account(services.base.service.Service):
         if book not in bookmark:
             return False
         bookmark.remove(book)
-        self.saveinfo(id, info, "Delete %s bookmark." % id)
+        self.saveinfo(id, info, "Delete %s bookmark." % id, id)
         return True

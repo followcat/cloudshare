@@ -34,7 +34,7 @@ class ElasticsearchIndexing(object):
         self.cvs = cvsvcs
 
     def setup(self):
-        self.es = elasticsearch.Elasticsearch()
+        self.es = elasticsearch.Elasticsearch(hosts=['elastic:changeme@localhost:9200'])
         self.es.indices.create(index=self.indexname, body=self.index_config_body, ignore=400)
 
     def update(self):

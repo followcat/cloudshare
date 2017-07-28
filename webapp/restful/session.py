@@ -4,7 +4,6 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import webapp.views.account
-import utils.builtin
 
 class SessionAPI(Resource):
 
@@ -23,9 +22,8 @@ class SessionAPI(Resource):
         username = args['username']
         password = args['password']
         user = webapp.views.account.User.get(username, self.svc_account)
-        upassword = utils.builtin.md5(password)
         error = None
-        if (user and user.password == upassword):
+        if (user and user.checkpassword(password)):
             flask.ext.login.login_user(user, remember=True)
             token = flask.ext.login.current_user.get_auth_token()
             if(user.id == "root"):
@@ -37,12 +35,11 @@ class SessionAPI(Resource):
             result =  { 'code': 400 , 'message': 'Username or Password Incorrect.' }
         return result
 
-    @flask.ext.login.login_required
     def delete(self):
         result = dict()
         try:
             flask.ext.login.logout_user()
             result = { 'code': 200, 'massage': 'Sign out successed.', 'redirect_url': '/' }
         except Exception:
-            result = { 'code': 400, 'massage': Exception }
+            result = { 'code': 200, 'massage': 'Sign out successed.', 'redirect_url': '/' }
         return result

@@ -78,13 +78,13 @@ class Account(services.base.storage.BaseStorage):
         >>> pwd_path = 'services/test_pwd'
         >>> svc_password = services.account.Password(pwd_path)
         >>> svc_account = services.account.Account(svc_password, acc_path)
-        >>> accobj = svc_account.baseobj({'name': 'admin'})
+        >>> accobj = svc_account.baseobj({'name': u'admin'})
         >>> svc_account.add(accobj, 'password')
         True
         >>> svc_account.USERS.keys()
         ['admin']
         >>> svc_account.USERS['admin']['id']
-        'd41d8cd98f00b204e9800998ecf8427e'
+        '21232f297a57a5a743894a0e4a801fc3'
         >>> svc_account.get_user_list()
         ['admin']
         >>> svc_account.add(accobj, 'password')

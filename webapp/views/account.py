@@ -43,8 +43,9 @@ class User(flask.ext.login.UserMixin):
             >>> acc_path = 'webapp/views/test_acc'
             >>> svc_password = services.account.Password(pwd_path)
             >>> svc_account = services.account.Account(svc_password, acc_path)
-            >>> accobj = svc_account.baseobj({'name': 'admin'})
+            >>> accobj = svc_account.baseobj({'name': u'admin'})
             >>> svc_account.add(accobj, 'password')
+            True
             >>> user = webapp.views.account.User.get('admin', svc_account)
             >>> user.id
             'admin'

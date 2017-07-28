@@ -194,7 +194,7 @@ class ReverseIndexing(object):
                 results.update(result)
         return results
 
-    def filter_ids(self, ids, filterdict, uses=None):
+    def filter(self, filterdict, ids, uses=None):
         indexdict = {}
         filterdict = copy.deepcopy(filterdict)
         if 'date' in filterdict:
@@ -209,6 +209,15 @@ class ReverseIndexing(object):
         if indexdict:
             ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
         return ids
+
+    def filter_ids(self, source, filterdict, ids, uses=None):
+        result = source
+        if filterdict:
+            if not isinstance(ids, set):
+                ids = set(ids)
+            filterset = self.filter(filterdict, ids=ids)
+            result = filter(lambda x: x in filterset or x[0] in filterset, source)
+        return result
 
     def lastday(self):
         return max([max(i['date'].keys()) for i in self.index.values() if i['date']])

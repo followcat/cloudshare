@@ -86,10 +86,14 @@ class SearchCVbyTextAPI(Resource):
         text = args['search_text']
         cur_page = args['page']
         filterdict = args['filterdict'] if args['filterdict'] else {}
-        searchs = self.svc_mult_cv.search(text, project)
-        yaml_searchs = self.svc_mult_cv.search_yaml(text, project)
-        searchs.update(yaml_searchs)
-        results = sorted(searchs, lambda x, y: cmp(x[1], y[1]), reverse=True)
+        searchs = dict(self.svc_mult_cv.search(text, project))
+        yaml_searchs = dict(self.svc_mult_cv.search_yaml(text, project))
+        for id in yaml_searchs:
+            if id in searchs:
+                searchs[id] += yaml_searchs[id]
+            else:
+                searchs[id] = yaml_searchs[id]
+        results = sorted(searchs.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
         ids = set([cv[0] for cv in results])
         results = self.index.filter_ids(results, filterdict, ids, uses=[project])
         results = [result[0] for result in results]

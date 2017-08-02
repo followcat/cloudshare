@@ -21,10 +21,10 @@ def industrytopath(industry):
     return industry.replace('/', '-')
 
 
-def md5(text):
+def hash(text):
     m = hashlib.md5()
     m.update(text)
-    return unicode(m.hexdigest())
+    return m.hexdigest()
 
 
 def save_yaml(infodict, path, filename, default_flow_style=None):

@@ -21,16 +21,18 @@ class SessionAPI(Resource):
         args = self.reqparse.parse_args()
         username = args['username']
         password = args['password']
-        user = webapp.views.account.User.get(username, self.svc_account)
+        user = webapp.views.account.User.get_fromname(username, self.svc_account)
         error = None
         if (user and user.checkpassword(password)):
             flask.ext.login.login_user(user, remember=True)
             token = flask.ext.login.current_user.get_auth_token()
-            if(user.id == "root"):
-                result = { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/manage' }
+            if(user.name == "root"):
+                result = { 'code': 200, 'token': token, 'user': user.name,
+                           'id': user.id, 'redirect_url': '/manage' }
             else:
                 flask.session[user.id] = dict()
-                result =  { 'code': 200, 'token': token, 'user': user.id, 'redirect_url': '/search' }
+                result = { 'code': 200, 'token': token, 'user': user.name,
+                           'id': user.id, 'redirect_url': '/search' }
         else:
             result =  { 'code': 400 , 'message': 'Username or Password Incorrect.' }
         return result

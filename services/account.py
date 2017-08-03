@@ -135,8 +135,7 @@ class Account(services.base.storage.BaseStorage):
             pwd_result = self.svc_password.add(pwdobj)
         return result and pwd_result
 
-    def checkpwd(self, name, password):
-        id = self.USERS[name]['id']
+    def checkpwd(self, id, password):
         return self.svc_password.get(id) == utils.builtin.hash(password)
 
     def updatepwd(self, id, oldpassword, newpassword):

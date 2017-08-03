@@ -55,9 +55,9 @@ class AccountAPI(Resource):
         result = self.svc_account.add(name, password)
         return { 'data': result }
 """
-    def delete(self, id):
+    def delete(self, name):
         root_user = flask.ext.login.current_user
-        if self.svc_account.delete(root_user.id, id):
+        if self.svc_account.delete(root_user.name, name):
             result = { 'code': 200, 'message': 'Delete ' + id + ' successed.' }
         else:
             result = { 'code': 400, 'message': 'Deleted ' + id + ' failed.' }
@@ -115,7 +115,7 @@ class AccountHistoryAPI(Resource):
 
     def get(self, project):
         user = flask.ext.login.current_user
-        info_list = self.svc_mult_cv.getproject(project).cv_history(user.id, entries=10)
+        info_list = self.svc_mult_cv.getproject(project).cv_history(user.name, entries=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:

@@ -6,11 +6,11 @@ from itsdangerous import JSONWebSignatureSerializer
 
 class User(flask.ext.login.UserMixin):
 
-    def __init__(self, id, svc_account):
-        self.id = id
-        self.svc_account = svc_account
-        if id not in svc_account.USERS:
+    def __init__(self, name, svc_account):
+        if name not in svc_account.USERS:
             raise services.exception.UserNotFoundError()
+        self.svc_account = svc_account
+        self.info = svc_account.getinfo_byname(name)
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
@@ -33,8 +33,16 @@ class User(flask.ext.login.UserMixin):
     def delbookmark(self, id):
         return self.svc_account.delbookmark(self.id, id)
 
+    @property
+    def id(self):
+        return self.info['name']
+
+    @property
+    def name(self):
+        return self.info['name']
+
     @classmethod
-    def get(self_class, id, svc_account):
+    def get(self_class, name, svc_account):
         """
             >>> import shutil
             >>> import services.account
@@ -47,7 +55,7 @@ class User(flask.ext.login.UserMixin):
             >>> svc_account.add(accobj, 'password')
             True
             >>> user = webapp.views.account.User.get('admin', svc_account)
-            >>> user.id
+            >>> user.name
             'admin'
             >>> user.checkpassword('password')
             True
@@ -57,7 +65,7 @@ class User(flask.ext.login.UserMixin):
             >>> shutil.rmtree(acc_path)
         """
         try:
-            return self_class(id, svc_account)
+            return self_class(name, svc_account)
         except services.exception.UserNotFoundError:
             return None
 

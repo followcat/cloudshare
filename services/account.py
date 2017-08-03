@@ -107,6 +107,9 @@ class Account(services.base.storage.BaseStorage):
         super(Account, self).__init__(path, name=name,
                                       searchengine=searchengine, iotype=iotype)
 
+    def getinfo_byname(self, name):
+        return self.USERS[name]
+
     def baseobj(self, info):
         metadata = self._metadata(info)
         bsobj = core.basedata.DataObject(metadata=metadata, data=None)
@@ -146,14 +149,14 @@ class Account(services.base.storage.BaseStorage):
     def USERS(self):
         result = dict()
         for id in self.ids:
-            info = self.getyaml(id)
-            result[info['name']] = self.getyaml(id)
+            info = self.getinfo(id)
+            result[info['name']] = info
         return result
 
     def get_user_list(self):
         result = list()
         for id in self.ids:
-            info = self.getyaml(id)
+            info = self.getinfo(id)
             result.append(info['name'])
         return result
 

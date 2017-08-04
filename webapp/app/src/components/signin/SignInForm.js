@@ -13,10 +13,11 @@ class SignInForm extends Component {
   constructor() {
     super();
     this.handleClick = this.handleClick.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
   }
 
   handleClick(e) {
-    e.preventDefault();
+    // e.preventDefault();
 
     this.props.form.validateFields((errors, values) => {
       if (!errors) {
@@ -25,12 +26,18 @@ class SignInForm extends Component {
     });
   }
 
+  handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      this.handleClick();
+    }
+  }
+
   render() {
     const { wrapperCol, btnText } = this.props,
           { getFieldDecorator } = this.props.form;
 
     return (
-      <Form layout="horizontal">
+      <Form layout="horizontal" onKeyPress={this.handleKeyPress}>
         <FormItem
           label="用户名"
           id="account"

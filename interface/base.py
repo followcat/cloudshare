@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 
 
@@ -53,35 +54,43 @@ class Interface(object):
     def grep_yaml(self):
         raise NotImplementedInterface
 
+    def SEquery(self, indexname, keywords):
+        match_str = re.sub('"(.*?)"', '', keywords)
+        match_phrase_list = re.findall('"(.*?)"', keywords)
+        query_dict = {
+            "query": {
+                "bool": {
+                    "must": list()
+                }
+            }
+        }
+        keyword_list = list()
+        if len(match_str.replace(' ', '')) > 0:
+            query_dict["query"]["bool"]["should"] = {
+                    "match_phrase": {
+                        "content": {
+                            "query": match_str,
+                            "slop":  50}
+                        }
+                }
+            keyword_list.append({"match": {"content": {"query": match_str,
+                                                       "minimum_should_match": "30%"}}})
+        for keyword in match_phrase_list:
+            keyword_list.append({"match_phrase": {"content": {"query": keyword}}})
+        query_dict['query']['bool']['must'] = keyword_list
+        result = self.searchengine.search(index=indexname, size=500, _source_include="file",
+                                          body=query_dict, request_timeout=30)
+        return result
+
     def SEsearch(self, keywords):
         indexname = '.'.join([self.name])
-        keyword_list = list()
-        for keyword in keywords.split():
-            keyword_list.append({"match":
-                            {"content": {"query": keyword, "analyzer": "ik_max_word"}}})
-        result = self.searchengine.search(index=indexname, size=500, _source_include="file",
-            body={"query": {
-                    "bool": {
-                        "must": keyword_list
-                        }
-                    }
-                }, request_timeout=30)
+        result = self.SEquery(indexname, keywords)
         return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
                                   x['_score']), result['hits']['hits']))
 
     def SEsearch_yaml(self, keywords):
         indexname = '.'.join([self.name, 'yaml'])
-        keyword_list = list()
-        for keyword in keywords.split():
-            keyword_list.append({"match":
-                            {"content": {"query": keyword, "analyzer": "ik_max_word"}}})
-        result = self.searchengine.search(index=indexname, size=500, _source_include="file",
-            body={"query": {
-                    "bool": {
-                        "must": keyword_list
-                        }
-                    }
-                }, request_timeout=30)
+        result = self.SEquery(indexname, keywords)
         return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
                                   x['_score']), result['hits']['hits']))
 

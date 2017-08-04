@@ -148,6 +148,10 @@ class ElasticsearchIndexing(object):
                 if len(value[0]) > 0:
                     daterange = {'range': {'date': {'gte': value[0], 'lte': value[1]}}}
                     mustlist.append(daterange)
+            elif key == 'age':
+                if len(value[0]) > 0 and len(value[1]) > 0:
+                    agerange = {'range': {'age': {'gte': value[0], 'lte': value[1]}}}
+                    mustlist.append(agerange)
             elif key == 'expectation_places':
                 mustlist.append({'terms': {'expectation.places': value}})
             elif key == 'current_places':

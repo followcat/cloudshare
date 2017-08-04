@@ -47,7 +47,7 @@ class Password(services.base.storage.BaseStorage):
         for key, datatype in self.YAML_TEMPLATE:
             if key in info and isinstance(info[key], datatype):
                 origin[key] = info[key]
-        origin['password'] = utils.builtin.md5(origin['password'])
+        origin['password'] = utils.builtin.hash(origin['password'])
         return origin
 
     def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False, do_commit=True):
@@ -58,9 +58,9 @@ class Password(services.base.storage.BaseStorage):
         assert self.exists(id)
         result = False
         info = self.getinfo(id)
-        md5_opwd = utils.builtin.md5(oldpassword)
+        md5_opwd = utils.builtin.hash(oldpassword)
         if info['password'] == md5_opwd:
-            md5_npwd = utils.builtin.md5(newpassword)
+            md5_npwd = utils.builtin.hash(newpassword)
             self.updateinfo(id, 'password', md5_npwd, id)
             result = True
         return result
@@ -107,6 +107,9 @@ class Account(services.base.storage.BaseStorage):
         super(Account, self).__init__(path, name=name,
                                       searchengine=searchengine, iotype=iotype)
 
+    def getinfo_byname(self, name):
+        return self.USERS[name]
+
     def baseobj(self, info):
         metadata = self._metadata(info)
         bsobj = core.basedata.DataObject(metadata=metadata, data=None)
@@ -118,7 +121,7 @@ class Account(services.base.storage.BaseStorage):
         for key, datatype in self.YAML_TEMPLATE:
             if key in info and isinstance(info[key], datatype):
                 origin[key] = info[key]
-        origin['id'] = utils.builtin.md5(info['name'])
+        origin['id'] = utils.builtin.hash(info['name'])
         return origin
 
     def add(self, bsobj, password, committer=None, unique=True,
@@ -132,9 +135,8 @@ class Account(services.base.storage.BaseStorage):
             pwd_result = self.svc_password.add(pwdobj)
         return result and pwd_result
 
-    def checkpwd(self, name, password):
-        id = self.USERS[name]['id']
-        return self.svc_password.get(id) == utils.builtin.md5(password)
+    def checkpwd(self, id, password):
+        return self.svc_password.get(id) == utils.builtin.hash(password)
 
     def updatepwd(self, id, oldpassword, newpassword):
         result = False
@@ -146,14 +148,14 @@ class Account(services.base.storage.BaseStorage):
     def USERS(self):
         result = dict()
         for id in self.ids:
-            info = self.getyaml(id)
-            result[info['name']] = self.getyaml(id)
+            info = self.getinfo(id)
+            result[info['name']] = info
         return result
 
     def get_user_list(self):
         result = list()
         for id in self.ids:
-            info = self.getyaml(id)
+            info = self.getinfo(id)
             result.append(info['name'])
         return result
 

@@ -34,7 +34,7 @@ class CompanyAPI(Resource):
             args['introduction'] = str()
         metadata = extractor.information_explorer.catch_coinfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
-        result = self.svc_mult_cv.getproject(project).company_add(coobj, user.id)
+        result = self.svc_mult_cv.getproject(project).company_add(coobj, user.name)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -138,7 +138,7 @@ class CustomerAPI(Resource):
         id = args['id']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        result = project.company.addcustomer(id, user.id)
+        result = project.company.addcustomer(id, user.name)
         if result:
             response = { 'code': 200, 'message': 'Add customer success.' }
         else:
@@ -151,7 +151,7 @@ class CustomerAPI(Resource):
         id = args['id']
         projectname = args['project']
         project = self.svc_mult_cv.getproject(projectname)
-        result = project.company.deletecustomer(id, user.id)
+        result = project.company.deletecustomer(id, user.name)
         if result:
             response = { 'code': 200, 'message': 'Delete customer success.' }
         else:
@@ -187,12 +187,12 @@ class CompanyInfoUpdateAPI(Resource):
             if vtype == 'PUT':
                 origin_info[key] = content
             elif vtype == 'CREATE':
-                data = project.company._listframe(content, user.id)
+                data = project.company._listframe(content, user.name)
                 origin_info[key].insert(0, data)
             elif vtype == 'DELETE':
                 data = project.company._listframe(content, value['author'], value['date'])
                 origin_info[key].remove(data)
-        result = project.company_update_info(id, origin_info, user.id)
+        result = project.company_update_info(id, origin_info, user.name)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
@@ -311,7 +311,8 @@ class CompanyUploadExcelAPI(Resource):
         project_name = flask.request.form['project']
         network_file = flask.request.files['files']
         project = self.svc_mult_cv.getproject(project_name)
-        compare_result = project.company_compare_excel(network_file.read(), committer=user.id)
+        compare_result = project.company_compare_excel(network_file.read(),
+                                                       committer=user.name)
         infos = dict()
         for item in compare_result:
             coid = item[1]
@@ -344,7 +345,7 @@ class CompanyConfirmExcelAPI(Resource):
         project_name = args['project']
         user = flask.ext.login.current_user
         project = self.svc_mult_cv.getproject(project_name)
-        results = project.company_add_excel(datas, user.id)
+        results = project.company_add_excel(datas, user.name)
         return {
             'code': 200,
             'data': results

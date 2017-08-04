@@ -40,7 +40,7 @@ class JobDescriptionAPI(Resource):
         commentary = args['commentary'] if args['commentary'] else ''
         followup = args['followup'] if args['followup'] else ''
         result = self.svc_mult_cv.getproject(project).jd_modify(jd_id, description,
-                    status, commentary, followup, user.id)
+                    status, commentary, followup, user.name)
         if result: 
             response = { 'code': 200, 'data': result,
                          'message': 'Update job description successed.' }
@@ -75,7 +75,7 @@ class JobDescriptionUploadAPI(Resource):
         commentary = args['commentary'] if args['commentary'] else ''
         followup = args['followup'] if args['followup'] else ''
         result = self.svc_mult_cv.getproject(project).jd_add(co_id, jd_name, description,
-                                                             commentary, followup, user.id)
+                                                             commentary, followup, user.name)
         return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 

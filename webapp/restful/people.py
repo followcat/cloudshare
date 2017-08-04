@@ -33,7 +33,7 @@ class PeopleAPI(Resource):
         update_info = args['update_info']
         project = self.svc_mult_cv.getproject(projectname)
         for key, value in update_info.iteritems():
-            data = project.peo_updateyaml(unique_id, key, value, user.id)
+            data = project.peo_updateyaml(unique_id, key, value, user.name)
             if data is not None:
                 response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
             else:
@@ -50,7 +50,7 @@ class PeopleAPI(Resource):
         update_info = args['update_info']
         project = self.svc_mult_cv.getproject(projectname)
         for key, value in update_info.iteritems():
-            data = project.peo_deleteyaml(unique_id, key, value, user.id, date)
+            data = project.peo_deleteyaml(unique_id, key, value, user.name, date)
             if data is not None:
                 response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
             else:

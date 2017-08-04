@@ -46,6 +46,12 @@ class Customer(services.base.storage.BaseStorage):
         self.config.update(config)
         self.save()
 
+    def use(self, id):
+        result = None
+        if self.accounts.exists(id):
+            result = self
+        return result
+
     def load_projects(self):
         if not os.path.exists(self.projects_path):
             os.makedirs(self.projects_path)

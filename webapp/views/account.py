@@ -10,13 +10,35 @@ class User(flask.ext.login.UserMixin):
         if not svc_account.exists(id):
             raise services.exception.UserNotFoundError()
         self.svc_account = svc_account
+        self.svc_customer = svc_customer
         self.info = svc_account.getinfo(id)
+        self.customer = None
         if svc_customer is not None:
             self.customer = svc_customer.use(self.info['customer'], id)
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
+
+    def createcustomer(self, name):
+        result = False
+        if not self.info['customer']:
+            customer = self.svc_customer.create(name)
+            customer.add_account(self.name, self.name, creator=True)
+            self.customer = svc_customer.use(self.info['customer'], self.id)
+            self.svc_account.updateinfo(self.id, 'customer', name, self.id)
+            self.info = self.svc_account.getinfo(self.id)
+            result = True
+        return result
+
+    def awaycustomer(self):
+        result = False
+        result = self.svc_account.updateinfo(self.id, 'customer', name, self.id)
+        if result is True:
+            result = self.customer.rm_account(self.id, self.id)
+            if result is True:
+                self.info = self.svc_account.getinfo(self.id)
+        return result
 
     def checkpassword(self, password):
         return self.svc_account.checkpwd(self.id, password)

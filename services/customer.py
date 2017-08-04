@@ -75,9 +75,15 @@ class Customer(services.base.storage.BaseStorage):
             result = True
         return result
 
-    def add_account(self, id, committer):
-        bsobj = core.basedata.DataObject(metadata={'id': id}, data=None)
-        return self.accounts.add(bsobj, committer=committer)
+    def add_account(self, id, committer, creator=False):
+        result = False
+        if creator is True or self.accounts.exists(committer):
+            bsobj = core.basedata.DataObject(metadata={'id': id}, data=None)
+            result = self.accounts.add(bsobj, committer=committer)
+        return result
 
     def rm_account(self, id, committer):
-        return self.accounts.remove(id, committer=committer)
+        result = False
+        if len(self.accounts.ids) > 0 and self.accounts.exists(committer):
+            result = self.accounts.remove(id, committer=committer)
+        return result

@@ -100,6 +100,7 @@ class Account(services.base.storage.BaseStorage):
         ("bookmark",            set),
         ("phone",               str),
         ("email",               str),
+        ("customer",            str),
     )
 
     def __init__(self, svc_password, path, name=None, searchengine=None, iotype='git'):

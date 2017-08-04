@@ -6,11 +6,13 @@ from itsdangerous import JSONWebSignatureSerializer
 
 class User(flask.ext.login.UserMixin):
 
-    def __init__(self, id, svc_account):
+    def __init__(self, id, svc_account, svc_customer=None):
         if not svc_account.exists(id):
             raise services.exception.UserNotFoundError()
         self.svc_account = svc_account
         self.info = svc_account.getinfo(id)
+        if svc_customer is not None:
+            self.customer = svc_customer.use(self.info['customer'], id)
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
@@ -40,14 +42,14 @@ class User(flask.ext.login.UserMixin):
         return self.info['name']
 
     @classmethod
-    def get(self_class, id, svc_account):
+    def get(self_class, id, svc_account, svc_customer):
         try:
-            return self_class(id, svc_account)
+            return self_class(id, svc_account, svc_customer)
         except services.exception.UserNotFoundError:
             return None
 
     @classmethod
-    def get_fromname(self_class, name, svc_account):
+    def get_fromname(self_class, name, svc_account, svc_customer):
         """
             >>> import shutil
             >>> import services.account
@@ -70,13 +72,13 @@ class User(flask.ext.login.UserMixin):
             >>> shutil.rmtree(acc_path)
         """
         info = svc_account.getinfo_byname(name)
-        return self_class.get(info['id'], svc_account)
+        return self_class.get(info['id'], svc_account, svc_customer)
 
     @classmethod
-    def get_by_authorization(self_class, token, svc_account):
+    def get_by_authorization(self_class, token, svc_account, svc_customer):
         if token:
             token = token.replace('Basic ', '', 1)
             s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
             data = s.loads(token)
-            return User.get_fromname(data['name'], svc_account)
+            return User.get_fromname(data['name'], svc_account, svc_customer)
         return None

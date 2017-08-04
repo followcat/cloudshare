@@ -38,7 +38,7 @@ class Customers(object):
         return self.customers[name]
 
     def use(self, name, id):
-        return self.customers.use(id)
+        return self.customers[name].use(id)
 
     def names(self):
         return self.customers.keys()

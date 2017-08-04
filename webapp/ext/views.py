@@ -10,13 +10,16 @@ def init_login(app):
 
     @login_manager.user_loader
     def load_user(id):
-        return webapp.views.account.User.get(id, app.config['SVC_ACCOUNT'])
+        svc_account = app.config['SVC_ACCOUNT']
+        svc_customer = app.config['SVC_CUSTOMERS']
+        return webapp.views.account.User.get(id, svc_account, svc_customer)
 
     @login_manager.request_loader
     def load_user_from_request(request):
         token = request.headers.get('Authorization')
-        svcaccount = flask.current_app.config['SVC_ACCOUNT']
-        return webapp.views.account.User.get_by_authorization(token, svcaccount)
+        svc_account = app.config['SVC_ACCOUNT']
+        svc_customer = app.config['SVC_CUSTOMERS']
+        return webapp.views.account.User.get_by_authorization(token, svc_account, svc_customer)
 
 
 def configure(app):

@@ -83,7 +83,6 @@ class FilterForm extends Component {
   handleReset(e) {
     e.preventDefault();
     this.props.form.resetFields();
-
     this.setState({
       gender: [],
       education: [],
@@ -173,7 +172,7 @@ class FilterForm extends Component {
                 {getFieldDecorator('uses', {
                   initialValue: textarea ? [] : projects.concat(classify),
                   rules: [{ type: 'array' }]
-                })(<Select multiple>
+                })(<Select mode="multiple">
                     <OptGroup key='projects' label="项目数据库">
                       {projects.map((item, index) => {
                         return <Option key={index} value={item} >{item}</Option>
@@ -266,9 +265,8 @@ class FilterForm extends Component {
                   {...formItemLayout}
                 >
                   {getFieldDecorator('business')(
-                    <Select
+                    <Select mode="multiple"
                       showSearch={true}
-                      multiple={true}
                     >
                       {this.renderIndustry()}
                     </Select>)}

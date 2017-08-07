@@ -22,10 +22,9 @@ class Config(object):
     TESTDATA_PATH = 'tests/testcase_data'
     UPLOAD_TEMP = os.path.join(TESTDATA_PATH, 'output')
     REPO_DB_NAME = os.path.join(TESTDATA_PATH, 'repo')
-    PWD_DB_NAME = os.path.join(TESTDATA_PATH, 'account')
+    PWD_DB_NAME = os.path.join(TESTDATA_PATH, 'password')
     ACCOUNT_DB_NAME = os.path.join(TESTDATA_PATH, 'account')
     LSI_PATH = os.path.join(TESTDATA_PATH, 'lsimodel')
-    PRJ_PATH = os.path.join(TESTDATA_PATH, 'projects')
     CUSTOMERS_PATH = os.path.join(TESTDATA_PATH, 'customers')
 
     def __init__(self):
@@ -38,8 +37,6 @@ class Config(object):
             os.mkdir(self.TESTDATA_PATH)
         if not os.path.exists(self.UPLOAD_TEMP):
             os.mkdir(self.UPLOAD_TEMP)
-        if not os.path.exists(self.PRJ_PATH):
-            os.mkdir(self.PRJ_PATH)
 
         self.SVC_PWD = services.account.Password(self.PWD_DB_NAME, 'pwdrepo')
         self.SVC_ACCOUNT = services.account.Account(self.SVC_PWD, self.ACCOUNT_DB_NAME,

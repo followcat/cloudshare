@@ -164,7 +164,7 @@ SearchResultItem.propTypes = {
     experience: PropTypes.object,
     current: PropTypes.object,
     gender: PropTypes.string,
-    age: PropTypes.number,
+    age: PropTypes.string,
     marital_status: PropTypes.string,
     education: PropTypes.string,
     school: PropTypes.string,

@@ -145,6 +145,60 @@ class Account(services.base.storage.BaseStorage):
             result = self.svc_password.updatepwd(id, oldpassword, newpassword)
         return result
 
+    def createcustomer(self, id, name, svc_customers):
+        """
+            >>> from tests.settings import *
+            >>> config = Config()
+            >>> svc_account = config.SVC_ACCOUNT
+            >>> svc_customers = config.SVC_CUSTOMERS
+            >>> accobj = svc_account.baseobj({'name': u'user'})
+            >>> svc_account.add(accobj1, 'password')
+            True
+            >>> info = svc_account.getinfo_byname(u'user')
+            >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
+            True
+            >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
+            False
+            >>> config.destory()
+        """
+        result = False
+        info = self.getinfo(id)
+        if not info['customer']:
+            svc_customers.create(name)
+            customer = svc_customers.get(name)
+            customer.add_account(info['id'], info['id'], creator=True)
+            self.updateinfo(id, 'customer', name, info['name'])
+            result = True
+        return result
+
+    def awaycustomer(self, id, svc_customers):
+        """
+            >>> from tests.settings import *
+            >>> config = Config()
+            >>> svc_account = config.SVC_ACCOUNT
+            >>> svc_customers = config.SVC_CUSTOMERS
+            >>> accobj = svc_account.baseobj({'name': u'user'})
+            >>> svc_account.add(accobj, 'password')
+            True
+            >>> info = svc_account.getinfo_byname(u'user')
+            >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
+            True
+            >>> svc_account.awaycustomer(info['id'], svc_customers)
+            True
+            >>> info = svc_account.getinfo_byname(u'user')
+            >>> info['customer']
+            ''
+            >>> config.destory()
+        """
+        result = False
+        info = self.getinfo(id)
+        customer = svc_customers.use(info['customer'], id)
+        if customer:
+            result = customer.rm_account(id, info['name'])
+            if result is True:
+                self.updateinfo(id, 'customer', '', info['name'])
+        return result
+
     @property
     def USERS(self):
         result = dict()

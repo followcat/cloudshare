@@ -33,7 +33,7 @@ class SimulationACC(services.base.simulation.Simulation):
             raise core.exception.NotExistsIDException(id)
 
     def getid_byname(self, name):
-        return self.storage.USERS[name]
+        return self.storage.USERS[name]['id']
 
     def getmd(self, id):
         if self.exists(id):

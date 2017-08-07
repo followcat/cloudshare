@@ -82,8 +82,7 @@ class Customer(services.base.storage.BaseStorage):
             result = self.accounts.add(bsobj, committer=committer)
         return result
 
-    def rm_account(self, id, committer):
+    def rm_account(self, id, inviter):
         result = False
-        if len(self.accounts.ids) > 0 and self.accounts.exists(committer):
-            result = self.accounts.remove(id, committer=committer)
+        result = self.accounts.remove(id, committer=inviter)
         return result

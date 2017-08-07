@@ -21,23 +21,16 @@ class User(flask.ext.login.UserMixin):
         return s.dumps({ 'id': self.id, 'name': self.name })
 
     def createcustomer(self, name):
-        result = False
-        if not self.info['customer']:
-            customer = self.svc_customer.create(name)
-            customer.add_account(self.name, self.name, creator=True)
-            self.customer = svc_customer.use(self.info['customer'], self.id)
-            self.svc_account.updateinfo(self.id, 'customer', name, self.id)
-            self.info = self.svc_account.getinfo(self.id)
-            result = True
+        result = self.svc_account.createcustomer(self.id, name, self.svc_customer)
+        if result is True:
+            info = self.getinfo(self.id)
+            self.customer = self.svc_customer.use(info['customer'], self.id)
         return result
 
     def awaycustomer(self):
-        result = False
-        result = self.svc_account.updateinfo(self.id, 'customer', name, self.id)
+        result = self.svc_account.awaycustomer(self.id, self.svc_customer)
         if result is True:
-            result = self.customer.rm_account(self.id, self.id)
-            if result is True:
-                self.info = self.svc_account.getinfo(self.id)
+            info = self.getinfo(self.id)
         return result
 
     def checkpassword(self, password):

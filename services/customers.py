@@ -31,7 +31,7 @@ class Customers(object):
         path = os.path.join(self.path, name)
         customer = services.customer.Customer(self.acc_repo, self.co_repo,
                                               self.cv_repo, self.mult_peo,
-                                              self.customer_path, name)
+                                              path, name)
         self.customers[name] = customer
 
     def get(self, name):

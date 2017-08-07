@@ -71,7 +71,7 @@ class Customer(services.base.storage.BaseStorage):
             tmp_project = services.project.Project(path, self.co_repo, self.cv_repo,
                                                    self.mult_peo, name)
             tmp_project.setup(classify, config={'autosetup': autosetup, 'autoupdate': autoupdate})
-            self.projects.append(tmp_project)
+            self.projects[name] = tmp_project
             result = True
         return result
 

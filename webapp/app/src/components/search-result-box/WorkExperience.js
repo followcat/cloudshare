@@ -89,7 +89,7 @@ WorkExperience.defaultProps = {
 
 WorkExperience.propTypes = {
   workExperienceText: PropTypes.string,
-  experience: PropTypes.object,
+  experience: PropTypes.array,
   foldText: PropTypes.string,
   unfoldText: PropTypes.string
 };

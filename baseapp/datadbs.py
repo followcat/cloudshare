@@ -9,6 +9,7 @@ import baseapp.searchengine
 import services.curriculumvitae
 
 
+SVC_MSG = services.account.Message('message', 'msgrepo')
 SVC_PWD = services.account.Password('password', 'pwdrepo')
 SVC_ACCOUNT = services.account.Account(SVC_PWD, 'account', 'accrepo')
 

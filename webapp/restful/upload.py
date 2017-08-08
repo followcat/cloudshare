@@ -24,6 +24,7 @@ class UploadCVAPI(Resource):
         self.svc_peo = flask.current_app.config['SVC_PEO_REPO']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_min = flask.current_app.config['SVC_MIN']
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -55,6 +56,7 @@ class UploadCVAPI(Resource):
                         repo_cv_result = self.svc_mult_cv.repodb.add(cvobj, user.id, unique=True)
                         project_cv_result = project.cv_add(cvobj, user.id)
                         if repo_cv_result:
+                            self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
                             repo_peo_result = self.svc_peo.add(peopobj, user.id)
                         if project_cv_result:
                             project_peo_result = project.peo_add(peopobj, user.id)

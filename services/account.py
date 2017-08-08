@@ -1,6 +1,5 @@
+import time
 import os.path
-
-import yaml
 
 import core.basedata
 import utils.builtin
@@ -68,6 +67,153 @@ class Password(services.base.storage.BaseStorage):
     def get(self, id):
         info = self.getinfo(id)
         return info['password']
+
+
+class Message(services.base.storage.BaseStorage):
+    """
+        >>> import shutil
+        >>> import services.account
+        >>> repo_path = 'services/test_msg'
+        >>> svc_message = services.account.Message(repo_path)
+        >>> svc_message.add(svc_message.baseobj({'id': 'id1'}))
+        True
+        >>> svc_message.add(svc_message.baseobj({'id': 'id2'}))
+        True
+        >>> send, receive = svc_message.send_chat('id1', 'id2', 'hello world', 'name1')
+        >>> send['relation'] == 'id2'
+        True
+        >>> receive['relation'] == 'id1'
+        True
+        >>> info1 = svc_message.getinfo('id1')
+        >>> info2 = svc_message.getinfo('id2')
+        >>> info1['send_chat'][0] == send
+        True
+        >>> info2['unread_chat'][0] == receive
+        True
+        >>> svc_message.read('id2', receive['id'], 'name2')
+        True
+        >>> info2 = svc_message.getinfo('id2')
+        >>> len(info2['unread_chat']) == 0
+        True
+        >>> info2['read_chat'][0] == receive
+        True
+        >>> invitation = svc_message.send_invitation('id1', 'id2', 'mock_customer', 'name1')
+        >>> info2 = svc_message.getinfo('id2')
+        >>> info2['invited_customer'][0] == invitation
+        True
+        >>> shutil.rmtree(repo_path)
+    """
+    YAML_TEMPLATE = (
+        ("id",                  str),
+        ("invited_customer",    list),
+        ("send_chat",           list),
+        ("read_chat",           list),
+        ("unread_chat",         list),
+    )
+
+    MUST_KEY = ['id']
+    list_item = {"invited_customer", "send_chat", "read_chat", "unread_chat"}
+    fix_item  = {"id"}
+
+    def __init__(self, path, name=None, searchengine=None, iotype='git'):
+        super(Message, self).__init__(path, name=name,
+                                      searchengine=searchengine, iotype=iotype)
+
+    def baseobj(self, info):
+        metadata = self._metadata(info)
+        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+        return bsobj
+
+    def _metadata(self, info):
+        assert set(self.MUST_KEY).issubset(set(info.keys()))
+        origin = self.generate_info_template()
+        for key, datatype in self.YAML_TEMPLATE:
+            if key in info and isinstance(info[key], datatype):
+                origin[key] = info[key]
+        return origin
+
+    def add(self, bsobj, committer=None, unique=True, yamlfile=True,
+        mdfile=False, do_commit=True):
+        return super(Message, self).add(bsobj, committer, unique,
+                                        yamlfile, mdfile, do_commit=do_commit)
+
+    def _listframe(self, value, username, date=None):
+        if date is None:
+            date = time.strftime('%Y-%m-%d %H:%M:%S')
+        data = {'id': utils.builtin.hash(' '.join([str(time.time()), value, username])),
+                'relation': username,
+                'content': value,
+                'date': date}
+        return data
+
+    def _addinfo(self, id, key, value, relation, committer, do_commit=True):
+        projectinfo = self.getinfo(id)
+        data = self._listframe(value, relation)
+        projectinfo[key].insert(0, data)
+        self.saveinfo(id, projectinfo,
+                      'Add %s key %s.' % (id, key), committer, do_commit=do_commit)
+        return data
+
+    def _move(self, id, msgid, origin_key, des_key, committer, do_commit=True):
+        result = False
+        projectinfo = self.getinfo(id)
+        for msg in projectinfo[origin_key]:
+            if msg['id'] == msgid:
+                projectinfo[origin_key].remove(msg)
+                projectinfo[des_key].insert(0, msg)
+                self.saveinfo(id, projectinfo, 'Move %s message id %s from %s to %s.' %
+                              (id, msgid, origin_key, des_key),
+                              committer, do_commit=do_commit)
+                result =True
+                break
+        return result
+
+    def _deleteinfo(self, id, key, msgid, committer, do_commit=True):
+        result = None
+        projectinfo = self.getinfo(id)
+        for msg in projectinfo[key]:
+            if msg['id'] == msgid:
+                projectinfo[key].remove(msg)
+                self.saveinfo(id, projectinfo, 'Delete %s key %s %s.' % (id, key, msgid),
+                              committer, do_commit=do_commit)
+                result = msg
+                break
+        return result
+
+    def updateinfo(self, id, key, value, relation, committer, do_commit=True):
+        assert key not in self.fix_item
+        assert self.exists(id)
+        projectinfo = self.getinfo(id)
+        result = None
+        if key in projectinfo:
+            if key in self.list_item:
+                result = self._addinfo(id, key, value, relation,
+                                       committer, do_commit=do_commit)
+            else:
+                result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
+        return result
+
+    def deleteinfo(self, id, key, value, committer, date, do_commit=True):
+        assert key not in self.fix_item
+        assert key in self.list_item
+        assert self.exists(id)
+        projectinfo = self.getinfo(id)
+        result = None
+        if key not in projectinfo:
+            return result
+        result = self._deleteinfo(id, key, msgid, committer, do_commit=do_commit)
+        return result
+
+    def read(self, id, msgid, committer):
+        return self._move(id, msgid, 'unread_chat', 'read_chat', committer)
+
+    def send_chat(self, ori_id, des_id, content, committer):
+        send = self.updateinfo(ori_id, 'send_chat', content, des_id, committer)
+        receive = self.updateinfo(des_id, 'unread_chat', content, ori_id, committer)
+        return send, receive
+
+    def send_invitation(self, ori_id, des_id, customer, committer):
+        return self.updateinfo(des_id, 'invited_customer', customer, ori_id, committer)
 
 
 class Account(services.base.storage.BaseStorage):
@@ -220,18 +366,20 @@ class Account(services.base.storage.BaseStorage):
 
     def addbookmark(self, id, book):
         info = self.getinfo(id)
+        name = info['name']
         bookmark = info['bookmark']
         if id in bookmark:
             return False
         bookmark.add(book)
-        self.saveinfo(id, info, "Add %s bookmark." % id, id)
+        self.saveinfo(id, info, "Add %s bookmark." % id, name)
         return True
 
     def delbookmark(self, id, book):
         info = self.getinfo(id)
+        name = info['name']
         bookmark = info['bookmark']
         if book not in bookmark:
             return False
         bookmark.remove(book)
-        self.saveinfo(id, info, "Delete %s bookmark." % id, id)
+        self.saveinfo(id, info, "Delete %s bookmark." % id, name)
         return True

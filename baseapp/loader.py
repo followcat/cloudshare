@@ -1,10 +1,13 @@
 import os
+import yaml
 import functools
 
+import services.index
 import services.mining
 import services.multicv
 import services.multiclsify
 import services.analysis.cutword
+
 
 SUPPORT_DOCPROCESSOR = {}
 try:
@@ -21,6 +24,7 @@ except ImportError:
 
 
 LSI_PATH = 'lsimodel'
+CONFIG_PATH = 'config'
 CUTWORD_PATH = 'cutwords'
 
 
@@ -47,6 +51,34 @@ def load_mult_cv(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV):
     SVC_MULT_CV = services.multicv.MultiCV(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV)
     return SVC_MULT_CV
 
+
 def load_doc_processor(name):
     global SUPPORT_DOCPROCESSOR
     return SUPPORT_DOCPROCESSOR[name]
+
+
+def load_index(svc_mult_cv):
+    SVC_INDEX = services.index.ReverseIndexing('Index', svc_mult_cv)
+    SVC_INDEX.setup()
+    return SVC_INDEX
+
+
+def load_esindex(es_conn, cv_storages):
+    import services.esindex
+    from elasticsearch import Elasticsearch
+    SVC_INDEX = services.esindex.ElasticsearchIndexing(cv_storages)
+    SVC_INDEX.setup(es_conn)
+    return SVC_INDEX
+
+
+def load_es_searchengine():
+    from elasticsearch import Elasticsearch
+    global CONFIG_PATH
+    config = dict()
+    try:
+        stream = open(os.path.join(CONFIG_PATH, 'es.yaml')).read()
+        config = yaml.load(stream)
+    except IOError:
+        pass
+    ES = Elasticsearch(**config)
+    return ES

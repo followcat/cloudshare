@@ -11,6 +11,7 @@ import services.base.service
 class BaseStorage(services.base.service.Service):
 
     commitinfo = 'BaseData'
+    YAML_TEMPLATE = ()
 
     def __init__(self, path, name=None, searchengine=None, iotype=None):
         self.path = path
@@ -59,6 +60,12 @@ class BaseStorage(services.base.service.Service):
             >>> shutil.rmtree(test_path)
         """
         return not self.exists(id)
+
+    def generate_info_template(self):
+        info = {}
+        for each in self.YAML_TEMPLATE:
+            info[each[0]] = each[1]()
+        return info
 
     def _listframe(self, value, username, date=None):
         if date is None:

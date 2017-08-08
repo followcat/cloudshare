@@ -16,8 +16,10 @@ output/
 repo/
 Index/
 account/
+password/
 lsimodel/
 raw
+config/
 raw/
 tags/
 cutwords/

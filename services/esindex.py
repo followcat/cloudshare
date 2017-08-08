@@ -2,7 +2,6 @@ import math
 import time
 import collections
 
-import elasticsearch
 import elasticsearch.helpers
 
 import utils.builtin
@@ -33,8 +32,8 @@ class ElasticsearchIndexing(object):
     def __init__(self, cvsvcs):
         self.cvs = cvsvcs
 
-    def setup(self):
-        self.es = elasticsearch.Elasticsearch()
+    def setup(self, esconn):
+        self.es = esconn
         self.es.indices.create(index=self.indexname, body=self.index_config_body, ignore=400)
 
     def update(self):
@@ -49,12 +48,13 @@ class ElasticsearchIndexing(object):
         times = 0
         count = 0
         for id in cv_ids-update_ids:
-            yamlinfo = self.genindex(svc.getyaml(id))
+            info = svc.getyaml(id)
+            geninfo = self.genindex(info)
             action = {
                 "_op_type": "index",
                 "_index": self.indexname,
                 "_type": 'index',
-                "_source": yamlinfo,
+                "_source": geninfo,
                 '_id': id
                 }
             ACTIONS.append(action)
@@ -69,6 +69,20 @@ class ElasticsearchIndexing(object):
             elasticsearch.helpers.bulk(self.es, ACTIONS,
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Add numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
+
+    def add(self, id, info):
+        ACTIONS = list()
+        geninfo = self.genindex(info)
+        action = {
+            "_op_type": "index",
+            "_index": self.indexname,
+            "_type": 'index',
+            "_source": geninfo,
+            '_id': id
+            }
+        ACTIONS.append(action)
+        elasticsearch.helpers.bulk(self.es, ACTIONS,
+                raise_on_error=False, raise_on_exception=False, stats_only=True)
 
     def upgrade(self, selected, ids=None):
         for svc in self.cvs:
@@ -149,9 +163,9 @@ class ElasticsearchIndexing(object):
                     daterange = {'range': {'date': {'gte': value[0], 'lte': value[1]}}}
                     mustlist.append(daterange)
             elif key == 'age':
-                if value[0] and value[1]:
-                    agerange = {'range': {'age': {'gte': str(value[0]),
-                                                  'lte': str(value[1])}}}
+                if value[0] is not None or value[1] is not None:
+                    agerange = {'range': {'age': {'gte': str(value[0]) if value[0] else '0',
+                                                  'lte': str(value[1]) if value[1] else '99'}}}
                     mustlist.append(agerange)
             elif key == 'expectation_places':
                 mustlist.append({'terms': {'expectation.places': value}})

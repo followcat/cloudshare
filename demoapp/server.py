@@ -36,7 +36,7 @@ if __name__ == '__main__':
             logger = logging.getLogger('demoapp')
             user = ''
             try:
-                user = flask.ext.login.current_user.id
+                user = flask.ext.login.current_user.name
             except AttributeError:
                 pass
             ipaddr = request.remote_addr

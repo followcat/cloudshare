@@ -7,18 +7,20 @@ from itsdangerous import JSONWebSignatureSerializer
 class User(flask.ext.login.UserMixin):
 
     def __init__(self, id, svc_account):
-        self.id = id
-        self.svc_account = svc_account
-        if id not in svc_account.USERS:
+        if not svc_account.exists(id):
             raise services.exception.UserNotFoundError()
-        self.password = svc_account.USERS[unicode(id)]
+        self.svc_account = svc_account
+        self.info = svc_account.getinfo(id)
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
-        return s.dumps({ 'id': self.id })
+        return s.dumps({ 'id': self.id, 'name': self.name })
 
-    def changepassword(self, password):
-        self.svc_account.modify(self.id, password)
+    def checkpassword(self, password):
+        return self.svc_account.checkpwd(self.id, password)
+
+    def changepassword(self, oldpassword, newpassword):
+        return self.svc_account.updatepwd(self.id, oldpassword, newpassword)
 
     def getbookmark(self):
         return self.svc_account.getbookmark(self.id)
@@ -29,29 +31,46 @@ class User(flask.ext.login.UserMixin):
     def delbookmark(self, id):
         return self.svc_account.delbookmark(self.id, id)
 
+    @property
+    def id(self):
+        return self.info['id']
+
+    @property
+    def name(self):
+        return self.info['name']
+
     @classmethod
     def get(self_class, id, svc_account):
-        """
-            >>> import shutil
-            >>> import services.account
-            >>> import webapp.views.account
-            >>> import interface.gitinterface
-            >>> repo_name = 'webapp/views/test_repo'
-            >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> svc_account = services.account.Account(interface.path)
-            >>> user = webapp.views.account.User.get('root', svc_account)
-            >>> user.id
-            'root'
-            >>> user.password
-            u'5f4dcc3b5aa765d61d8327deb882cf99'
-            >>> type(webapp.views.account.User.get('None', svc_account))
-            <type 'NoneType'>
-            >>> shutil.rmtree(repo_name)
-        """
         try:
             return self_class(id, svc_account)
         except services.exception.UserNotFoundError:
             return None
+
+    @classmethod
+    def get_fromname(self_class, name, svc_account):
+        """
+            >>> import shutil
+            >>> import services.account
+            >>> import webapp.views.account
+            >>> pwd_path = 'webapp/views/test_pwd'
+            >>> acc_path = 'webapp/views/test_acc'
+            >>> svc_password = services.account.Password(pwd_path)
+            >>> svc_account = services.account.Account(svc_password, acc_path)
+            >>> accobj = svc_account.baseobj({'name': u'admin'})
+            >>> svc_account.add(accobj, 'password')
+            True
+            >>> user = webapp.views.account.User.get_fromname('admin', svc_account)
+            >>> user.name
+            'admin'
+            >>> user.checkpassword('password')
+            True
+            >>> type(webapp.views.account.User.get_fromname('None', svc_account))
+            <type 'NoneType'>
+            >>> shutil.rmtree(pwd_path)
+            >>> shutil.rmtree(acc_path)
+        """
+        info = svc_account.getinfo_byname(name)
+        return self_class.get(info['id'], svc_account)
 
     @classmethod
     def get_by_authorization(self_class, token, svc_account):
@@ -59,5 +78,5 @@ class User(flask.ext.login.UserMixin):
             token = token.replace('Basic ', '', 1)
             s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
             data = s.loads(token)
-            return User.get(data['id'], svc_account)
+            return User.get_fromname(data['name'], svc_account)
         return None

@@ -9,7 +9,8 @@ import baseapp.searchengine
 import services.curriculumvitae
 
 
-SVC_ACCOUNT = services.account.Account('account')
+SVC_PWD = services.account.Password('password', 'pwdrepo')
+SVC_ACCOUNT = services.account.Account(SVC_PWD, 'account', 'accrepo')
 
 SVC_CO_REPO = services.company.Company('repo/CO', 'corepo')
 SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare',

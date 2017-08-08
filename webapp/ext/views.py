@@ -5,7 +5,7 @@ import webapp.views.account
 
 def init_login(app):
     login_manager = flask.ext.login.LoginManager()
-    login_manager.login_view = "/gotologin"
+    login_manager.login_view = "/"
     login_manager.setup_app(app)
 
     @login_manager.user_loader

@@ -104,14 +104,14 @@ class Project(services.base.service.Service):
     def cv_history(self, author=None, entries=10, skip=0):
         return self.curriculumvitae.history(author, entries, skip)
 
-    def cv_updateyaml(self, id, key, value, userid):
+    def cv_updateyaml(self, id, key, value, username):
         result = None
         if key in dict(self.curriculumvitae.YAML_TEMPLATE):
             cv_service = self.curriculumvitae
         else:
             cv_service = self.cvrepo
         try:
-            result = cv_service.updateinfo(id, key, value, userid)
+            result = cv_service.updateinfo(id, key, value, username)
         except AssertionError:
             pass
         return result
@@ -208,16 +208,16 @@ class Project(services.base.service.Service):
     def peo_getyaml(self, id):
         return self.people.getyaml(id)
 
-    def peo_updateyaml(self, id, key, value, userid):
+    def peo_updateyaml(self, id, key, value, username):
         result = None
         try:
-            result = self.people.updateinfo(id, key, value, userid)
+            result = self.people.updateinfo(id, key, value, username)
         except AssertionError:
             pass
         return result
 
-    def peo_deleteyaml(self, id, key, value, userid, date):
-        return self.people.deleteinfo(id, key, value, userid, date)
+    def peo_deleteyaml(self, id, key, value, username, date):
+        return self.people.deleteinfo(id, key, value, username, date)
 
     def backup(self, path, bare=True):
         project_path = os.path.join(path, 'project')

@@ -57,7 +57,8 @@ class UpdateCurrivulumvitaeInformation(Resource):
         update_info = args['update_info']
 
         for key, value in update_info.iteritems():
-            data = self.svc_mult_cv.getproject(project).cv_updateyaml(id, key, value, user.id)
+            data = self.svc_mult_cv.getproject(project).cv_updateyaml(id, key,
+                                                                      value, user.name)
             if data is not None:
                 response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
             else:

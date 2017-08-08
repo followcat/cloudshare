@@ -2,7 +2,6 @@ import math
 import time
 import collections
 
-import elasticsearch
 import elasticsearch.helpers
 
 import utils.builtin
@@ -33,8 +32,8 @@ class ElasticsearchIndexing(object):
     def __init__(self, cvsvcs):
         self.cvs = cvsvcs
 
-    def setup(self):
-        self.es = elasticsearch.Elasticsearch()
+    def setup(self, esconn):
+        self.es = esconn
         self.es.indices.create(index=self.indexname, body=self.index_config_body, ignore=400)
 
     def update(self):

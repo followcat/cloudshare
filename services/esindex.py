@@ -49,12 +49,13 @@ class ElasticsearchIndexing(object):
         times = 0
         count = 0
         for id in cv_ids-update_ids:
-            yamlinfo = self.genindex(svc.getyaml(id))
+            info = svc.getyaml(id)
+            geninfo = self.genindex(info)
             action = {
                 "_op_type": "index",
                 "_index": self.indexname,
                 "_type": 'index',
-                "_source": yamlinfo,
+                "_source": geninfo,
                 '_id': id
                 }
             ACTIONS.append(action)
@@ -69,6 +70,20 @@ class ElasticsearchIndexing(object):
             elasticsearch.helpers.bulk(self.es, ACTIONS,
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Add numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
+
+    def add(self, id, info):
+        ACTIONS = list()
+        geninfo = self.genindex(info)
+        action = {
+            "_op_type": "index",
+            "_index": self.indexname,
+            "_type": 'index',
+            "_source": geninfo,
+            '_id': id
+            }
+        ACTIONS.append(action)
+        elasticsearch.helpers.bulk(self.es, ACTIONS,
+                raise_on_error=False, raise_on_exception=False, stats_only=True)
 
     def upgrade(self, selected, ids=None):
         for svc in self.cvs:

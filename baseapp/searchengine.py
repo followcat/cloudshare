@@ -1,5 +1,4 @@
-import json
-from elasticsearch import Elasticsearch
+import baseapp.loader
 
 
-ES = Elasticsearch()
+ES = baseapp.loader.load_es_searchengine()

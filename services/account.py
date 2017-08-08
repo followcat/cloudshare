@@ -165,18 +165,20 @@ class Account(services.base.storage.BaseStorage):
 
     def addbookmark(self, id, book):
         info = self.getinfo(id)
+        name = info['name']
         bookmark = info['bookmark']
         if id in bookmark:
             return False
         bookmark.add(book)
-        self.saveinfo(id, info, "Add %s bookmark." % id, id)
+        self.saveinfo(id, info, "Add %s bookmark." % id, name)
         return True
 
     def delbookmark(self, id, book):
         info = self.getinfo(id)
+        name = info['name']
         bookmark = info['bookmark']
         if book not in bookmark:
             return False
         bookmark.remove(book)
-        self.saveinfo(id, info, "Delete %s bookmark." % id, id)
+        self.saveinfo(id, info, "Delete %s bookmark." % id, name)
         return True

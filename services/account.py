@@ -298,7 +298,7 @@ class Account(services.base.storage.BaseStorage):
             >>> svc_account = config.SVC_ACCOUNT
             >>> svc_customers = config.SVC_CUSTOMERS
             >>> accobj = svc_account.baseobj({'name': u'user'})
-            >>> svc_account.add(accobj1, 'password')
+            >>> svc_account.add(accobj, 'password')
             True
             >>> info = svc_account.getinfo_byname(u'user')
             >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
@@ -312,7 +312,7 @@ class Account(services.base.storage.BaseStorage):
         if not info['customer']:
             svc_customers.create(name)
             customer = svc_customers.get(name)
-            customer.add_account(info['id'], info['id'], creator=True)
+            customer.add_account(info['id'], info['id'], info['name'], creator=True)
             self.updateinfo(id, 'customer', name, info['name'])
             result = True
         return result
@@ -340,9 +340,47 @@ class Account(services.base.storage.BaseStorage):
         info = self.getinfo(id)
         customer = svc_customers.use(info['customer'], id)
         if customer:
-            result = customer.rm_account(id, info['name'])
+            result = customer.rm_account(id, id, info['name'])
             if result is True:
                 self.updateinfo(id, 'customer', '', info['name'])
+        return result
+
+    def joincustomer(self, inviter_id, invited_id, name, svc_customers):
+        """
+            >>> from tests.settings import *
+            >>> config = Config()
+            >>> svc_account = config.SVC_ACCOUNT
+            >>> svc_customers = config.SVC_CUSTOMERS
+            >>> accobj = svc_account.baseobj({'name': u'user'})
+            >>> svc_account.add(accobj, 'password')
+            True
+            >>> invited_accobj = svc_account.baseobj({'name': u'invited'})
+            >>> svc_account.add(invited_accobj, 'password')
+            True
+            >>> info = svc_account.getinfo_byname(u'user')
+            >>> invited_info = svc_account.getinfo_byname(u'invited')
+            >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
+            True
+            >>> svc_account.joincustomer(info['id'], invited_info['id'],
+            ...                          'added_customer', svc_customers)
+            {'customer': 'added_customer'}
+            >>> customer = svc_customers.get('added_customer')
+            >>> customer.accounts.exists(invited_info['id'])
+            True
+            >>> validateinfo = customer.accounts.getinfo(invited_info['id'])
+            >>> validateinfo['inviter'] == 'user'
+            True
+            >>> config.destory()
+        """
+        assert svc_customers.exists(name)
+        result = False
+        inviter_info = self.getinfo(inviter_id)
+        invited_info = self.getinfo(invited_id)
+        if inviter_info['customer'] == name and not invited_info['customer']:
+            customer = svc_customers.use(name, inviter_id)
+            result = customer.add_account(inviter_id, invited_id, inviter_info['name'])
+            if result is True:
+                result = self.updateinfo(invited_id, 'customer', name, invited_info['name'])
         return result
 
     @property

@@ -16,16 +16,22 @@ class User(flask.ext.login.UserMixin):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
 
-    def createcustomer(self, name, svc_customer):
-        result = self.svc_account.createcustomer(self.id, name, svc_customer)
+    def createcustomer(self, name, svc_customers):
+        result = self.svc_account.createcustomer(self.id, name, svc_customers)
         if result is True:
             self.info = self.getinfo(self.id)
         return result
 
-    def awaycustomer(self, svc_customer):
-        result = self.svc_account.awaycustomer(self.id, svc_customer)
+    def awaycustomer(self, svc_customers):
+        result = self.svc_account.awaycustomer(self.id, svc_customers)
         if result is True:
-            info = self.getinfo(self.id)
+            self.info = self.getinfo(self.id)
+        return result
+
+    def joincustomer(self, inviter_id, name, svc_customers):
+        result = self.svc_account.joincustomer(inviter_id, self.id, name, svc_customers)
+        if result is True:
+            self.info = self.getinfo(self.id)
         return result
 
     def checkpassword(self, password):

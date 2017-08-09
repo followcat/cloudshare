@@ -380,7 +380,7 @@ class Account(services.base.storage.BaseStorage):
             customer = svc_customers.use(name, inviter_id)
             result = customer.add_account(inviter_id, invited_id, inviter_info['name'])
             if result is True:
-                result = self.updateinfo(invited_id, 'customer', name, invited_info['name'])
+                self.updateinfo(invited_id, 'customer', name, invited_info['name'])
         return result
 
     @property

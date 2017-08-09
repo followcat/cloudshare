@@ -6,29 +6,24 @@ from itsdangerous import JSONWebSignatureSerializer
 
 class User(flask.ext.login.UserMixin):
 
-    def __init__(self, id, svc_account, svc_customer=None):
+    def __init__(self, id, svc_account):
         if not svc_account.exists(id):
             raise services.exception.UserNotFoundError()
         self.svc_account = svc_account
-        self.svc_customer = svc_customer
         self.info = svc_account.getinfo(id)
-        self.customer = None
-        if svc_customer is not None:
-            self.customer = svc_customer.use(self.info['customer'], id)
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
 
-    def createcustomer(self, name):
-        result = self.svc_account.createcustomer(self.id, name, self.svc_customer)
+    def createcustomer(self, name, svc_customer):
+        result = self.svc_account.createcustomer(self.id, name, svc_customer)
         if result is True:
-            info = self.getinfo(self.id)
-            self.customer = self.svc_customer.use(info['customer'], self.id)
+            self.info = self.getinfo(self.id)
         return result
 
-    def awaycustomer(self):
-        result = self.svc_account.awaycustomer(self.id, self.svc_customer)
+    def awaycustomer(self, svc_customer):
+        result = self.svc_account.awaycustomer(self.id, svc_customer)
         if result is True:
             info = self.getinfo(self.id)
         return result
@@ -57,14 +52,14 @@ class User(flask.ext.login.UserMixin):
         return self.info['name']
 
     @classmethod
-    def get(self_class, id, svc_account, svc_customer):
+    def get(self_class, id, svc_account):
         try:
-            return self_class(id, svc_account, svc_customer)
+            return self_class(id, svc_account)
         except services.exception.UserNotFoundError:
             return None
 
     @classmethod
-    def get_fromname(self_class, name, svc_account, svc_customer):
+    def get_fromname(self_class, name, svc_account):
         """
             >>> import shutil
             >>> import services.account
@@ -86,14 +81,17 @@ class User(flask.ext.login.UserMixin):
             >>> shutil.rmtree(pwd_path)
             >>> shutil.rmtree(acc_path)
         """
-        info = svc_account.getinfo_byname(name)
-        return self_class.get(info['id'], svc_account, svc_customer)
+        try:
+            info = svc_account.getinfo_byname(name)
+        except KeyError:
+            return None
+        return self_class.get(info['id'], svc_account)
 
     @classmethod
-    def get_by_authorization(self_class, token, svc_account, svc_customer):
+    def get_by_authorization(self_class, token, svc_account):
         if token:
             token = token.replace('Basic ', '', 1)
             s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
             data = s.loads(token)
-            return User.get_fromname(data['name'], svc_account, svc_customer)
+            return User.get_fromname(data['name'], svc_account)
         return None

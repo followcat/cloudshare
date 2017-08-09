@@ -10,7 +10,6 @@ class SessionAPI(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
-        self.svc_customer = flask.current_app.config['SVC_CUSTOMERS']
         super(SessionAPI, self).__init__()
         self.reqparse.add_argument('username', type = str, required = True,
                                    help = 'No name provided', location = 'json')
@@ -22,8 +21,7 @@ class SessionAPI(Resource):
         args = self.reqparse.parse_args()
         username = args['username']
         password = args['password']
-        user = webapp.views.account.User.get_fromname(username, self.svc_account,
-                                                      self.svc_customer)
+        user = webapp.views.account.User.get_fromname(username, self.svc_account)
         error = None
         if (user and user.checkpassword(password)):
             flask.ext.login.login_user(user, remember=True)

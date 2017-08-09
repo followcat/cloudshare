@@ -17,7 +17,7 @@
   "author": "kabessC",
   "license": "MIT",
   "dependencies": {
-    "antd": "^2.7.3",
+    "antd": "^2.8.1",
     "babel-plugin-transform-object-assign": "^6.8.0",
     "babel-polyfill": "^6.16.0",
     "classnames": "^2.2.5",

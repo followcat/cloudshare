@@ -178,7 +178,7 @@ class FilterForm extends Component {
                 {getFieldDecorator('uses', {
                   initialValue: textarea ? [] : projects.concat(classify),
                   rules: [{ type: 'array' }]
-                })(<Select mode="multiple">
+                })(<Select multiple={true}>
                     <OptGroup key='projects' label="项目数据库">
                       {projects.map((item, index) => {
                         return <Option key={index} value={item} >{item}</Option>
@@ -271,7 +271,8 @@ class FilterForm extends Component {
                   {...formItemLayout}
                 >
                   {getFieldDecorator('business')(
-                    <Select mode="multiple"
+                    <Select 
+                      multiple={true}
                       showSearch={true}
                     >
                       {this.renderIndustry()}

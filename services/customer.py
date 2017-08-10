@@ -87,3 +87,16 @@ class Customer(services.base.service.Service):
         if self.accounts.exists(inviter_id) and self.accounts.exists(invited_id):
             result = self.accounts.remove(invited_id, committer=committer)
         return result
+
+    def getproject(self, projectname):
+        return self.projects[projectname]
+
+    def getnums(self):
+        result = dict()
+        result['total'] = 0
+        for name in self.projects:
+            project = self.projects[name]
+            numbers = project.cv_numbers()
+            result[name] = numbers
+            result['total'] += numbers
+        return result

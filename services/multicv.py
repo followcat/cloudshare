@@ -9,7 +9,7 @@ class MultiCV(object):
             self.additionals = dict()
         else:
             self.additionals = additionals
-        self.svcls = [p.curriculumvitae for p in projects] + self.additionals.values()
+        self.svcls = self.additionals.values()
 
     def getproject(self, name=None):
         if name is not None:

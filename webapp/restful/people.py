@@ -76,6 +76,7 @@ class PeopleByCVAPI(Resource):
         self.reqparse.add_argument('project', type = str, location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         cv_id = args['cv_id']
         projectname = args['project']

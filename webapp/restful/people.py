@@ -10,7 +10,7 @@ class PeopleAPI(Resource):
 
     def __init__(self):
         super(PeopleAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('date', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -18,20 +18,23 @@ class PeopleAPI(Resource):
         self.reqparse.add_argument('update_info', type = dict, location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         unique_id = args['unique_id']
         projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
+        customer = user.getcustomer(self.svc_customers)
+        project = customer.getproject(projectname)
         peopleinfo = project.peo_getyaml(unique_id)
         return { 'code': 200, 'data': peopleinfo }
 
     def put(self):
-        args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
         unique_id = args['unique_id']
         projectname = args['project']
         update_info = args['update_info']
-        project = self.svc_mult_cv.getproject(projectname)
+        customer = user.getcustomer(self.svc_customers)
+        project = customer.getproject(projectname)
         for key, value in update_info.iteritems():
             data = project.peo_updateyaml(unique_id, key, value, user.name)
             if data is not None:
@@ -42,13 +45,14 @@ class PeopleAPI(Resource):
         return response
 
     def delete(self):
-        args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
         unique_id = args['unique_id']
         date = args['date']
         projectname = args['project']
         update_info = args['update_info']
-        project = self.svc_mult_cv.getproject(projectname)
+        customer = user.getcustomer(self.svc_customers)
+        project = customer.getproject(projectname)
         for key, value in update_info.iteritems():
             data = project.peo_deleteyaml(unique_id, key, value, user.name, date)
             if data is not None:
@@ -66,6 +70,7 @@ class PeopleByCVAPI(Resource):
     def __init__(self):
         super(PeopleByCVAPI, self).__init__()
         self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('cv_id', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -74,7 +79,8 @@ class PeopleByCVAPI(Resource):
         args = self.reqparse.parse_args()
         cv_id = args['cv_id']
         projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
+        customer = user.getcustomer(self.svc_customers)
+        project = customer.getproject(projectname)
         yamlinfo = self.svc_mult_cv.getyaml(cv_id, projectname)
         try:
             unique_id = yamlinfo['unique_id']

@@ -95,13 +95,11 @@ class MultiCV(object):
             result['total'] += svc_cv.NUMS
         return result
 
-    def getprjnums(self, projectname):
+    def getclassifynums(self, classifies):
         result = dict()
         result['total'] = 0
-        cvservice = self.getproject(projectname)
-        classifies = cvservice.getclassify()
         for svc_cv in self.svcls:
-            if svc_cv.name in classifies or svc_cv.name == projectname:
+            if svc_cv.name in classifies:
                 result[svc_cv.name] = svc_cv.NUMS
                 result['total'] += svc_cv.NUMS
         return result

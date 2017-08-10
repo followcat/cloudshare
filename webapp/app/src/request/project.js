@@ -1,5 +1,6 @@
 'use strict';
 import { API } from '../config/api';
+import StorageUtil from '../utils/storage';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
@@ -11,6 +12,12 @@ import 'whatwg-fetch';
 export const getProject = (callback) => {
   return fetch(API.PROJECTS_API, {
     method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
   })
   .then(response => response.json())
   .then(json => {

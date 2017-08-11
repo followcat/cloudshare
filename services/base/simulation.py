@@ -22,9 +22,9 @@ class Simulation(services.base.storage.BaseStorage):
     list_item = {}
 
     @classmethod
-    def autoservice(cls, path, name, storage, iotype='git'):
+    def autoservice(cls, path, name, storages, iotype='git'):
         if cls.check(path):
-            return cls(path, name, storage, iotype=iotype)
+            return cls(path, name, storages, iotype=iotype)
         else:
             return cls.__bases__[1](path, name, iotype=iotype)
 
@@ -34,10 +34,10 @@ class Simulation(services.base.storage.BaseStorage):
         return not os.path.exists(path) or (
             os.path.exists(path) and os.path.exists(idsfile))
 
-    def __init__(self, path, name, storage, iotype='git'):
+    def __init__(self, path, name, storages, iotype='git'):
         super(Simulation, self).__init__(path, name, iotype=iotype)
         self._ids = None
-        self.storage = storage
+        self.storages = storages
         self.yamlpath = self.YAML_DIR
         self.memdatas = services.memdatas.MemeryDatas(self)
         idsfile = os.path.join(path, Simulation.ids_file)
@@ -110,11 +110,24 @@ class Simulation(services.base.storage.BaseStorage):
             yamlstream = '{}'
         return yaml.load(yamlstream, Loader=utils._yaml.Loader)
 
-    def getmd(self, name):
-        return self.storage.getmd(name)
+    def getmd(self, id):
+        md = None
+        for storage in self.storages:
+            try:
+                md = storage.getmd(id)
+                break
+            except IOError:
+                continue
+        return md
 
     def getyaml(self, id):
-        baseinfo = self.storage.getyaml(id)
+        baseinfo = dict()
+        for storage in self.storages:
+            try:
+                baseinfo = storage.getyaml(id)
+                break
+            except IOError:
+                continue
         prjinfo = self.getinfo(id)
         basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
         prjtime = prjinfo['modifytime'] if 'modifytime' in prjinfo else 0
@@ -150,18 +163,28 @@ class Simulation(services.base.storage.BaseStorage):
         self.memdatas.update('modifytime', id)
         return result
 
-    def search(self, keyword):
+    def search(self, keyword, selected=None):
+        if selected is None:
+            selected = [storage.name for storage in self.storages]
         results = set()
-        allfile = self.storage.search(keyword)
+        allfile = set()
+        for storage in self.storages:
+            if storage.name in selected:
+                allfile.update(storage.search(keyword))
         for result in allfile:
             id = core.outputstorage.ConvertName(result[0]).base
             if id in self.ids:
                 results.add((id, result[1]))
         return results
 
-    def search_yaml(self, keyword):
+    def search_yaml(self, keyword, selected=None):
+        if selected is None:
+            selected = [storage.name for storage in self.storages]
         results = set()
-        allfile = self.storage.search_yaml(keyword)
+        allfile = set()
+        for storage in self.storages:
+            if storage.name in selected:
+                allfile.update(storage.search_yaml(keyword))
         for result in allfile:
             id = core.outputstorage.ConvertName(result[0]).base
             if id in self.ids:

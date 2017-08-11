@@ -28,8 +28,8 @@ CONFIG_PATH = 'config'
 CUTWORD_PATH = 'cutwords'
 
 
-def load_mult_classify(SVC_CV_STO):
-    SVC_MULT_CLSIFY = services.multiclsify.MultiClassify(SVC_CV_STO)
+def load_mult_classify(svc_storages):
+    SVC_MULT_CLSIFY = services.multiclsify.MultiClassify(svc_storages)
     SVC_CLS_CV = SVC_MULT_CLSIFY.classifies
     return SVC_MULT_CLSIFY, SVC_CLS_CV
 

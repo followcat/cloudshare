@@ -22,4 +22,4 @@ SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')
 SVC_PEO_STO = services.people.People(SVC_CV_STO, 'storage/PEO', 'peostorage', iotype='base')
 SVC_MULT_PEO = services.multipeople.MultiPeople([SVC_PEO_REPO, SVC_PEO_STO])
 
-SVC_MULT_CLSIFY, SVC_CLS_CV = baseapp.loader.load_mult_classify(SVC_CV_STO)
+SVC_MULT_CLSIFY, SVC_CLS_CV = baseapp.loader.load_mult_classify([SVC_CV_STO])

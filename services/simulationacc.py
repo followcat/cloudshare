@@ -12,8 +12,8 @@ class SimulationACC(services.base.simulation.Simulation):
         ("inviter",             str),
     )
 
-    def __init__(self, path, name, storage, iotype='git'):
-        super(SimulationACC, self).__init__(path, name, storage, iotype=iotype)
+    def __init__(self, path, name, storages, iotype='git'):
+        super(SimulationACC, self).__init__(path, name, storages, iotype=iotype)
 
     def _templateinfo(self, committer):
         info = super(SimulationACC, self)._templateinfo(committer)
@@ -33,7 +33,9 @@ class SimulationACC(services.base.simulation.Simulation):
             raise core.exception.NotExistsIDException(id)
 
     def getid_byname(self, name):
-        return self.storage.USERS[name]['id']
+        for storage in self.storages:
+            if name in storage.USERS:
+                return storage.USERS[name]['id']
 
     def getmd(self, id):
         if self.exists(id):

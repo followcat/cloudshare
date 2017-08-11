@@ -24,7 +24,8 @@ class Customer(services.base.service.Service):
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.load_projects()
-        self.accounts = services.simulationacc.SimulationACC(self.accounts_path, name, acc_repo)
+        self.accounts = services.simulationacc.SimulationACC(self.accounts_path, name,
+                                                             [acc_repo])
         self.config = dict()
         try:
             self.load()

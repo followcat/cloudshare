@@ -29,11 +29,11 @@ class Project(services.base.service.Service):
         peopath = os.path.join(path, self.PEO_PATH)
 
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
-                                                        cvpath, name, cvrepo)
+                                                        cvpath, name, [cvrepo])
         self.company = services.simulationco.SimulationCO.autoservice(
-                                                        copath, name, corepo)
+                                                        copath, name, [corepo])
         self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
-        self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeo)
+        self.people = services.simulationpeo.SimulationPEO(peopath, name, [svcpeo])
         self.config = dict()
         try:
             self.load()
@@ -126,18 +126,8 @@ class Project(services.base.service.Service):
                                               end_y, end_m, end_d)
 
     def company_update_info(self, id, info, committer):
-        baseinfo = dict()
-        projectinfo = dict()
-        for item in info:
-            if item in dict(self.company.YAML_TEMPLATE):
-                projectinfo[item] = info[item]
-            else:
-                baseinfo[item] = info[item]
-        prj_res = self.company.saveinfo(id, projectinfo,
-                                        "Update %s information."%id, committer)
-        bas_res = self.company.storage.saveinfo(id, baseinfo,
-                                        "Update %s information."%id, committer)
-        return prj_res or bas_res
+        result = self.company.update_info(id, info, committer)
+        return result
 
     def company_compare_excel(self, stream, committer):
         outputs = list()

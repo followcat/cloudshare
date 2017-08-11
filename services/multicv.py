@@ -35,11 +35,11 @@ class MultiCV(object):
 
     def search(self, keyword, projectname=None):
         cvservice = self.getproject(projectname)
-        return cvservice.cv_search(keyword)
+        return cvservice.cv_search(keyword, selected=['cloudshare'])
 
     def search_yaml(self, keyword, projectname=None):
         cvservice = self.getproject(projectname)
-        return cvservice.cv_search_yaml(keyword)
+        return cvservice.cv_search_yaml(keyword, selected=['cloudshare'])
 
     def gethtml(self, id, projectname=None):
         cvservice = self.getproject(projectname)

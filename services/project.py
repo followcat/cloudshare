@@ -18,22 +18,22 @@ class Project(services.base.service.Service):
     PEO_PATH = 'PEO'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepo, cvrepo, svcpeo, name, iotype='git'):
+    def __init__(self, path, corepos, cvrepos, svcpeos, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
-        self.corepo = corepo
-        self.cvrepo = cvrepo
+        self.corepos = corepos
+        self.cvrepos = cvrepos
         cvpath = os.path.join(path, self.CV_PATH)
         copath = os.path.join(path, self.CO_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
 
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
-                                                        cvpath, name, [cvrepo])
+                                                        cvpath, name, cvrepos)
         self.company = services.simulationco.SimulationCO.autoservice(
-                                                        copath, name, [corepo])
+                                                        copath, name, corepos)
         self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
-        self.people = services.simulationpeo.SimulationPEO(peopath, name, [svcpeo])
+        self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
         self.config = dict()
         try:
             self.load()
@@ -82,11 +82,11 @@ class Project(services.base.service.Service):
     def cv_datas(self):
         return self.curriculumvitae.datas()
 
-    def cv_search(self, keyword):
-        return self.curriculumvitae.search(keyword)
+    def cv_search(self, keyword, selected=None):
+        return self.curriculumvitae.search(keyword, selected=selected)
 
-    def cv_search_yaml(self, keyword):
-        return self.curriculumvitae.search_yaml(keyword)
+    def cv_search_yaml(self, keyword, selected=None):
+        return self.curriculumvitae.search_yaml(keyword, selected=selected)
 
     def cv_gethtml(self, id):
         return self.curriculumvitae.gethtml(id)
@@ -109,13 +109,10 @@ class Project(services.base.service.Service):
     def cv_updateyaml(self, id, key, value, username):
         result = None
         if key in dict(self.curriculumvitae.YAML_TEMPLATE):
-            cv_service = self.curriculumvitae
-        else:
-            cv_service = self.cvrepo
-        try:
-            result = cv_service.updateinfo(id, key, value, username)
-        except AssertionError:
-            pass
+            try:
+                result = self.curriculumvitae.updateinfo(id, key, value, username)
+            except AssertionError:
+                pass
         return result
 
     def cv_ids(self):
@@ -131,7 +128,7 @@ class Project(services.base.service.Service):
 
     def company_compare_excel(self, stream, committer):
         outputs = list()
-        outputs.extend(self.corepo.compare_excel(stream, committer))
+        outputs.extend(self.corepos.compare_excel(stream, committer))
         outputs.extend(self.company.compare_excel(stream, committer))
         return outputs
 
@@ -144,7 +141,7 @@ class Project(services.base.service.Service):
             if item[0] == 'companyadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 repo_result.add(yamlname)
-                result = self.corepo.add(baseobj, committer=item[2][-1], do_commit=False)
+                result = self.corepos.add(baseobj, committer=item[2][-1], do_commit=False)
             elif item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 project_result.add(self.company.ids_file)
@@ -154,12 +151,12 @@ class Project(services.base.service.Service):
                 project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
                 result = self.company.updateinfo(*item[2], do_commit=False)
             results[item[1]] = result
-        self.corepo.interface.do_commit(list(repo_result), committer=committer)
+        self.corepos.interface.do_commit(list(repo_result), committer=committer)
         self.company.interface.do_commit(list(project_result), committer=committer)
         return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
-        self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
+        self.corepos.add(coobj, committer, unique, yamlfile, mdfile)
         self.company.add(coobj, committer, unique, yamlfile, mdfile)
         return self.company.addcustomer(coobj.name, committer)
 
@@ -188,8 +185,8 @@ class Project(services.base.service.Service):
         return self.jobdescription.modify(hex_id, description, status,
                                             commentary, followup, committer)
 
-    def jd_search(self, keyword):
-        return self.jobdescription.search(keyword)
+    def jd_search(self, keyword, selected=None):
+        return self.jobdescription.search(keyword, selected=selected)
 
     def jd_lists(self):
         return self.jobdescription.lists()

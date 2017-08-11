@@ -14,18 +14,18 @@ class Customer(services.base.service.Service):
     ACC_PATH = 'accounts'
     config_file = 'config.yaml' 
 
-    def __init__(self, acc_repo, co_repo, cv_repo, mult_peo, path, name, iotype='git'):
+    def __init__(self, acc_repos, co_repos, cv_repos, mult_peo, path, name, iotype='git'):
         super(Customer, self).__init__(path, name, iotype=iotype)
         self.name = name
         self.path = path
-        self.co_repo = co_repo
-        self.cv_repo = cv_repo
+        self.co_repos = co_repos
+        self.cv_repos = cv_repos
         self.mult_peo = mult_peo
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.load_projects()
         self.accounts = services.simulationacc.SimulationACC(self.accounts_path, name,
-                                                             [acc_repo])
+                                                             acc_repos)
         self.config = dict()
         try:
             self.load()
@@ -60,7 +60,7 @@ class Customer(services.base.service.Service):
         for path in glob.glob(os.path.join(self.projects_path, '*')):
             if os.path.isdir(path):
                 name = os.path.split(path)[1]
-                tmp_project = services.project.Project(path, self.co_repo, self.cv_repo,
+                tmp_project = services.project.Project(path, self.co_repos, self.cv_repos,
                                                        self.mult_peo, name)
                 tmp_project.setup()
                 self.projects[name] = tmp_project
@@ -69,9 +69,10 @@ class Customer(services.base.service.Service):
         result = False
         if name not in self.projects:
             path = os.path.join(self.projects_path, name)
-            tmp_project = services.project.Project(path, self.co_repo, self.cv_repo,
+            tmp_project = services.project.Project(path, self.co_repos, self.cv_repos,
                                                    self.mult_peo, name)
-            tmp_project.setup(classify, config={'autosetup': autosetup, 'autoupdate': autoupdate})
+            tmp_project.setup(classify, config={'autosetup': autosetup,
+                                                'autoupdate': autoupdate})
             self.projects[name] = tmp_project
             result = True
         return result

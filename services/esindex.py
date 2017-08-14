@@ -5,6 +5,7 @@ import collections
 import elasticsearch.helpers
 
 import utils.builtin
+import utils.esquery
 
 
 class ElasticsearchIndexing(object):
@@ -148,37 +149,8 @@ class ElasticsearchIndexing(object):
 
     def filter(self, filterdict, ids=None):
         results = set()
-        if ids is not None:
-            filterdict['_id'] = list(ids)
-        if 'date' in filterdict:
-            for index in range(len(filterdict['date'])):
-                filterdict['date'][index] = filterdict['date'][index].replace('-', '')
-        querydict = {'query': {'bool': {'filter': []}}}
-        mustlist = querydict['query']['bool']['filter']
-        for key, value in filterdict.items():
-            if not value:
-                continue
-            if key == 'date':
-                if len(value[0]) > 0:
-                    daterange = {'range': {'date': {'gte': value[0], 'lte': value[1]}}}
-                    mustlist.append(daterange)
-            elif key == 'age':
-                if value[0] is not None or value[1] is not None:
-                    agerange = {'range': {'age': {'gte': str(value[0]) if value[0] else '0',
-                                                  'lte': str(value[1]) if value[1] else '99'}}}
-                    mustlist.append(agerange)
-            elif key == 'expectation_places':
-                mustlist.append({'terms': {'expectation.places': value}})
-            elif key == 'current_places':
-                mustlist.append({'terms': {'current.places': value}})
-            elif key == 'business':
-                mustlist.append({'terms': {'classify': value}})
-            else:
-                if isinstance(value, list):
-                    mustlist.append({'terms': {key.lower(): value}})
-                else:
-                    mustlist.append({'term': {key.lower(): value}})
-        if mustlist:
+        querydict = utils.esquery.request_gen(filterdict=filterdict, ids=ids)
+        if querydict['query']['bool']['filter']:
             results = self.get(querydict)
         return results
 

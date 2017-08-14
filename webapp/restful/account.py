@@ -21,15 +21,22 @@ class AccountAPI(Resource):
                 Delete account.
     """
 
-    decorators = [flask.ext.login.login_required]
-
     def __init__(self):
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type = unicode, required = True,
+                                   help = 'No name provided', location = 'json')
+        self.reqparse.add_argument('email', type = str, required = True,
+                                   help = 'No email provided', location = 'json')
+        self.reqparse.add_argument('phone', type = str, required = True,
+                                   help = 'No phone provided', location = 'json')
+        self.reqparse.add_argument('password', type = str, required = True,
+                                   help = 'No password provided', location = 'json')
         self.reqparse.add_argument('oldpassword', type = str, location = 'json')
         self.reqparse.add_argument('newpassword', type = str, location = 'json')
         super(AccountAPI, self).__init__()
 
+    @flask.ext.login.login_required
     def put(self, id):
         result = False
         info = ''
@@ -48,12 +55,17 @@ class AccountAPI(Resource):
         return  result
 
     def post(self, name):
-        result = False
         args = self.reqparse.parse_args()
+        phone = args['phone']
+        email = args['email']
         password = args['password']
-        accobj = self.svc_account.baseobj({'name': name})
-        result = self.svc_account.add(name, password)
-        return { 'data': result }
+        bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
+        addresult = self.svc_account.add(bsobj, password)
+        if addresult is True:
+            result = { 'code': 200, 'message': 'Create user successed.'}
+        else:
+            result = { 'code': 400, 'message': 'This username is existed.'}
+        return result
 """
     def delete(self, name):
         root_user = flask.ext.login.current_user
@@ -72,8 +84,6 @@ class AccountListAPI(Resource):
         GET    Get Account List.
     """
 
-    decorators = [flask.ext.login.login_required]
-
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
@@ -83,22 +93,10 @@ class AccountListAPI(Resource):
         self.reqparse.add_argument('password', type = str, required = True,
                                    help = 'No password provided', location = 'json')
 
+    @flask.ext.login.login_required
     def get(self):
         userlist = self.svc_account.get_user_list()
         return { 'code': 200, 'data': userlist }
-
-    def post(self):
-        args = self.reqparse.parse_args()
-        name = args['name']
-        password = args['password']
-        root_user = flask.ext.login.current_user
-        bsobj = self.svc_account.baseobj({'name': name})
-        addresult = self.svc_account.add(bsobj, password)
-        if addresult is True:
-            result = { 'code': 200, 'message': 'Create user successed.'}
-        else:
-            result = { 'code': 400, 'message': 'This username is existed.'}
-        return result
 
 
 class AccountHistoryAPI(Resource):

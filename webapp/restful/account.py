@@ -36,8 +36,12 @@ class AccountAPI(Resource):
         self.reqparse.add_argument('newpassword', type = str, location = 'json')
         super(AccountAPI, self).__init__()
 
+    def get(self, name):
+        result = name in self.svc_account.USERS
+        return { 'code': 200, 'result': result }
+
     @flask.ext.login.login_required
-    def put(self, id):
+    def put(self, name):
         result = False
         info = ''
         args = self.reqparse.parse_args()

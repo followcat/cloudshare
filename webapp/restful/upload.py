@@ -20,7 +20,8 @@ class UploadCVAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_cv_repo = flask.current_app.config['SVC_CV_REPO']
         self.svc_peo = flask.current_app.config['SVC_PEO_REPO']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_min = flask.current_app.config['SVC_MIN']
@@ -37,10 +38,11 @@ class UploadCVAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         updates = args['updates']
-        project_name = args['project']
+        projectname = args['project']
         names = []
         documents = []
-        project = self.svc_mult_cv.getproject(project_name)
+        customer = user.getcustomer(self.svc_customers)
+        project = customer.getproject(projectname)
         for item in updates:
             status = 'failed'
             cvobj = upload[user.name].pop(item['filename'])
@@ -53,8 +55,8 @@ class UploadCVAPI(Resource):
                     peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
                     peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
                     try:
-                        repo_cv_result = self.svc_mult_cv.repodb.add(cvobj, user.name,
-                                                                     unique=True)
+                        repo_cv_result = self.svc_cv_repo.add(cvobj, user.name,
+                                                              unique=True)
                         project_cv_result = project.cv_add(cvobj, user.name)
                         if repo_cv_result:
                             self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
@@ -77,8 +79,8 @@ class UploadCVAPI(Resource):
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
-        if project_name in self.svc_min.sim:
-            self.svc_min.sim[project_name][project_name].add_documents(names, documents)
+        if projectname in self.svc_min.sim:
+            self.svc_min.sim[projectname][projectname].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):
@@ -123,7 +125,8 @@ class UploadEnglishCVAPI(Resource):
 
     def __init__(self):
         super(UploadEnglishCVAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_cv_repo = flask.current_app.config['SVC_CV_REPO']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('file', type = str, location = 'json')
@@ -140,15 +143,17 @@ class UploadEnglishCVAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        project = args['project']
-        yaml_data = self.svc_mult_cv.repodb.getyaml(id)
+        projectname = args['project']
+        customer = user.getcustomer(self.svc_customers)
+        project = customer.getproject(projectname)
+        yaml_data = self.svc_cv_repo.getyaml(id)
         dataobj = uploadeng[user.name]
-        result = self.svc_mult_cv.add_md(dataobj, user.name)
+        result = self.svc_cv_repo.add_md(dataobj, user.name)
         yaml_data['enversion'] = dataobj.ID.md
-        self.svc_mult_cv.modify(id + '.yaml', yaml.safe_dump(yaml_data, allow_unicode=True),
+        self.svc_cv_repo.modify(id + '.yaml', yaml.safe_dump(yaml_data, allow_unicode=True),
                                 committer=user.name)
         user.uploadeng = None
-        en_html = self.svc_mult_cv.getproject(project).cv_getmd_en(id)
+        en_html = project.cv_getmd_en(id)
         return { 'code': 200, 'data': { 'status': result, 'en_html': en_html } }
 
     def post(self):

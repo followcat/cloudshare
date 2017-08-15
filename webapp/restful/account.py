@@ -62,10 +62,11 @@ class AccountAPI(Resource):
         bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
         addresult = self.svc_account.add(bsobj, password)
         if addresult is True:
-            result = { 'code': 200, 'message': 'Create user successed.'}
+            result = { 'code': 200, 'message': 'Create user successed.','redirect_url': '/'}
         else:
             result = { 'code': 400, 'message': 'This username is existed.'}
         return result
+
 """
     def delete(self, name):
         root_user = flask.ext.login.current_user

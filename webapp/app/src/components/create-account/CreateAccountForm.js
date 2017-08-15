@@ -24,7 +24,7 @@ class CreateAccountForm extends Component {
   handleClick(e) {
     // e.preventDefault();
 
-    this.props.form.validateFields((errors, values) => {
+  this.props.form.validateFields((errors, values) => {
       if (!errors) {
         this.props.onSubmit(values);
       }
@@ -37,10 +37,11 @@ class CreateAccountForm extends Component {
     }
   }
 
-    handleConfirmBlur = (e) => {
+  handleConfirmBlur = (e) => {
     const value = e.target.value;
     this.setState({ confirmDirty: this.state.confirmDirty || !!value });
   }
+
   checkPassword = (rule, value, callback) => {
     const form = this.props.form;
     if (value && value !== form.getFieldValue('password')) {
@@ -49,6 +50,7 @@ class CreateAccountForm extends Component {
       callback();
     }
   }
+
   checkConfirm = (rule, value, callback) => {
     const form = this.props.form;
     if (value && this.state.confirmDirty) {
@@ -66,13 +68,14 @@ class CreateAccountForm extends Component {
         <FormItem
           label="用户名"
           id="account"
+          hasFeedback
         >
           {getFieldDecorator('name', {
-            rules: [{ required: true, message: '用户名是必填项' }]
+            rules: [{ required: true, message: '用户名是必填项',whitespace: true }]
           })(<Input placeholder="请输入用户名" />)}
         </FormItem>
                 <FormItem
-          label="Password"
+          label="密码"
           hasFeedback
         >
           {getFieldDecorator('password', {
@@ -86,7 +89,7 @@ class CreateAccountForm extends Component {
           )}
         </FormItem>
         <FormItem
-          label="Confirm Password"
+          label="确认密码"
           hasFeedback
         >
           {getFieldDecorator('confirm', {
@@ -100,31 +103,30 @@ class CreateAccountForm extends Component {
           )}
         </FormItem>
         <FormItem
-          label="E-mail"
+          label="电子邮箱"
           hasFeedback
         >
           {getFieldDecorator('email', {
             rules: [{
-              type: 'email', message: '请输入正确邮箱地址',
+              type: 'email', message: '请输入正确邮箱地址'
             },{
-              required: true, message: '邮箱是地址必填项',}
+              required: true, message: '邮箱地址是必填项'}
             ],
           })(
             <Input />
           )}
         </FormItem>
-        <FormItem
-          label="Phone Number"
-        >
-          {getFieldDecorator('phone')(
+        <FormItem label="联系电话"  hasFeedback>
+          {getFieldDecorator('phone',{
+            rules: [{
+              required: true, message: '手机号码是地址必填项',}
+            ],
+          })(
             <Input />
           )}
         </FormItem>
-        <FormItem wrapperCol={wrapperCol}>
-          <Button
-            type="primary"
-            onClick={this.handleClick}
-          >
+        <FormItem>
+          <Button type="primary" onClick={this.handleClick}>
             {btnText}
           </Button>
         </FormItem>

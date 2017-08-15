@@ -6,6 +6,8 @@ import services.customer
 
 class Customers(object):
 
+    default_customer_name = 'default'
+
     def __init__(self, path, acc_repos, co_repos, cv_repos, mult_peo):
         self.path = path
         if not os.path.exists(self.path):
@@ -22,6 +24,11 @@ class Customers(object):
                                                       cv_repos, mult_peo,
                                                       customer_path, name)
                 self.customers[name] = customer
+        self.load_default_customer()
+
+    def load_default_customer(self):
+        if not self.exists(self.default_customer_name):
+            self.create(self.default_customer_name)
 
     def exists(self, name):
         return name in self.customers

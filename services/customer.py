@@ -102,3 +102,27 @@ class Customer(services.base.service.Service):
             result[name] = numbers
             result['total'] += numbers
         return result
+
+
+class DefaultCustomer(Customer):
+
+    default_name = 'default'
+
+    def __init__(self, acc_repos, co_repos, cv_repos, mult_peo, path,
+                 name='default', iotype='git'):
+        super(DefaultCustomer, self).__init__(acc_repos, co_repos, cv_repos,
+                                              mult_peo, path, name, iotype=iotype)
+        if self.default_name not in self.projects:
+            super(DefaultCustomer, self).add_project(self.default_name, {})
+
+    def use(self, id):
+        return self
+
+    def getproject(self, projectname=None):
+        return self.projects[self.default_name]
+
+    def add_account(self, **kwargs):
+        return False
+
+    def add_project(self, **kwargs):
+        return False

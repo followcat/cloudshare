@@ -5,6 +5,7 @@ import collections
 import elasticsearch.helpers
 
 import utils.builtin
+import utils.esquery
 
 
 class ElasticsearchIndexing(object):
@@ -125,60 +126,17 @@ class ElasticsearchIndexing(object):
         return results
 
     def ESids(self, kwargs, size=10000):
-        ids = set()
-        page = self.es.search(
-                doc_type = 'index',
-                scroll = '1m',
-                sort = '_doc',
-                size = size,
-                _source='false',
-                index=self.indexname,
-                request_timeout=30,
-                **kwargs)
-        ids.symmetric_difference_update(set([item['_id'] for item in page['hits']['hits']]))
-        sid = page['_scroll_id']
-        scroll_size = page['hits']['total']
-
-        while (scroll_size > 0):
-            page = self.es.scroll(scroll_id = sid, scroll = '1m', request_timeout=30)
-            sid = page['_scroll_id']
-            scroll_size = len(page['hits']['hits'])
-            ids.symmetric_difference_update(set([item['_id'] for item in page['hits']['hits']]))
+        kwargs['doc_type'] = 'index'
+        kwargs['sort'] = '_doc'
+        kwargs['_source'] = 'false'
+        result = utils.esquery.scroll_ids(self.es, self.indexname, kwargs)
+        ids = set([item['_id'] for item in result])
         return ids
 
     def filter(self, filterdict, ids=None):
         results = set()
-        if ids is not None:
-            filterdict['_id'] = list(ids)
-        if 'date' in filterdict:
-            for index in range(len(filterdict['date'])):
-                filterdict['date'][index] = filterdict['date'][index].replace('-', '')
-        querydict = {'query': {'bool': {'filter': []}}}
-        mustlist = querydict['query']['bool']['filter']
-        for key, value in filterdict.items():
-            if not value:
-                continue
-            if key == 'date':
-                if len(value[0]) > 0:
-                    daterange = {'range': {'date': {'gte': value[0], 'lte': value[1]}}}
-                    mustlist.append(daterange)
-            elif key == 'age':
-                if value[0] is not None or value[1] is not None:
-                    agerange = {'range': {'age': {'gte': str(value[0]) if value[0] else '0',
-                                                  'lte': str(value[1]) if value[1] else '99'}}}
-                    mustlist.append(agerange)
-            elif key == 'expectation_places':
-                mustlist.append({'terms': {'expectation.places': value}})
-            elif key == 'current_places':
-                mustlist.append({'terms': {'current.places': value}})
-            elif key == 'business':
-                mustlist.append({'terms': {'classify': value}})
-            else:
-                if isinstance(value, list):
-                    mustlist.append({'terms': {key.lower(): value}})
-                else:
-                    mustlist.append({'term': {key.lower(): value}})
-        if mustlist:
+        querydict = utils.esquery.request_gen(filterdict=filterdict, ids=ids)
+        if querydict['query']['bool']['filter']:
             results = self.get(querydict)
         return results
 

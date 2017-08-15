@@ -27,12 +27,14 @@ class CurrivulumvitaeAPI(Resource):
         customer = user.getcustomer(self.svc_customers)
         project = customer.getproject(projectname)
         result = user.getbookmark()
+        yaml = project.cv_getyaml(id)
         if yaml['id'] in result:
             yaml['collected'] = True
         else:
             yaml['collected'] = False
-        en_html = ''
         yaml['date'] = utils.builtin.strftime(yaml['date'])
+        en_html = ''
+        html = project.cv_gethtml(id)
         if 'enversion' in yaml:
             en_html = project.cv_getmd_en(id)
         return { 'code': 200, 'data': { 'html': html, 'en_html': en_html, 'yaml_info': yaml } }

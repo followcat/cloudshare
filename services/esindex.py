@@ -126,25 +126,11 @@ class ElasticsearchIndexing(object):
         return results
 
     def ESids(self, kwargs, size=10000):
-        ids = set()
-        page = self.es.search(
-                doc_type = 'index',
-                scroll = '1m',
-                sort = '_doc',
-                size = size,
-                _source='false',
-                index=self.indexname,
-                request_timeout=30,
-                **kwargs)
-        ids.symmetric_difference_update(set([item['_id'] for item in page['hits']['hits']]))
-        sid = page['_scroll_id']
-        scroll_size = page['hits']['total']
-
-        while (scroll_size > 0):
-            page = self.es.scroll(scroll_id = sid, scroll = '1m', request_timeout=30)
-            sid = page['_scroll_id']
-            scroll_size = len(page['hits']['hits'])
-            ids.symmetric_difference_update(set([item['_id'] for item in page['hits']['hits']]))
+        kwargs['doc_type'] = 'index'
+        kwargs['sort'] = '_doc'
+        kwargs['_source'] = 'false'
+        result = utils.esquery.scroll_ids(self.es, self.indexname, kwargs)
+        ids = set([item['_id'] for item in result])
         return ids
 
     def filter(self, filterdict, ids=None):

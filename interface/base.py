@@ -57,21 +57,23 @@ class Interface(object):
 
     def SEquery(self, indexname, keywords):
         query_dict = utils.esquery.request_gen(keywords=keywords)
-        result = self.searchengine.search(index=indexname, size=500, _source_include="file",
-                                          body=query_dict, request_timeout=30)
-        return result
+        kwargs = {
+            '_source_include': 'file',
+            'body': query_dict
+        }
+        result = utils.esquery.scroll_ids(self.searchengine, indexname, kwargs)
+        return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
+                                  x['_score']), result))
 
     def SEsearch(self, keywords):
         indexname = '.'.join([self.name])
         result = self.SEquery(indexname, keywords)
-        return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
-                                  x['_score']), result['hits']['hits']))
+        return result
 
     def SEsearch_yaml(self, keywords):
         indexname = '.'.join([self.name, 'yaml'])
         result = self.SEquery(indexname, keywords)
-        return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
-                                  x['_score']), result['hits']['hits']))
+        return result
 
     def subprocess_grep(self, command, path, shell):
         grep_list = []

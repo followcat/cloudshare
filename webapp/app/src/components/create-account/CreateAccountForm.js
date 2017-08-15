@@ -1,10 +1,12 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+import { getAccount } from 'request/account';
 
 import {
   Form,
   Input,
-  Button
+  Button,
+  message,
 } from 'antd';
 
 const FormItem = Form.Item;
@@ -18,7 +20,7 @@ class CreateAccountForm extends Component {
 
   state = {
     confirmDirty: false,
-    autoCompleteResult: [],
+    result: false,
   };
 
   handleClick(e) {
@@ -42,10 +44,42 @@ class CreateAccountForm extends Component {
     this.setState({ confirmDirty: this.state.confirmDirty || !!value });
   }
 
+  handleNameFocus = (e) => {
+    this.setState({result: false})
+  }
+
+  handleNameBlur = (e) => {
+    const form = this.props.form;
+    const value = e.target.value;
+    if (value){
+    getAccount({
+      name: form.getFieldValue('name'),
+    },(json) => {
+      if (json.code === 200) {
+        if (json.result) {
+          this.setState({result: json.result})
+          form.validateFields(['name'], { force: true });
+        }
+      } else {
+        message.error('系统繁忙，稍后再试！');
+      }
+    });
+    }
+  }
+
+  checkName = (rule, value, callback) => {
+    const form = this.props.form;
+    if (value && this.state.result) {
+      callback('用户名已存在，请重新输入!');
+    } else {
+      callback();
+    }
+  }
+
   checkPassword = (rule, value, callback) => {
     const form = this.props.form;
     if (value && value !== form.getFieldValue('password')) {
-      callback('Two passwords that you enter is inconsistent!');
+      callback('您输入的两个密码不一致!');
     } else {
       callback();
     }
@@ -71,8 +105,11 @@ class CreateAccountForm extends Component {
           hasFeedback
         >
           {getFieldDecorator('name', {
-            rules: [{ required: true, message: '用户名是必填项',whitespace: true }]
-          })(<Input placeholder="请输入用户名" />)}
+            rules: [{ required: true, message: '用户名是必填项',whitespace: true },
+            {
+              validator: this.checkName,
+            }]
+          })(<Input onBlur={this.handleNameBlur}  onFocus={this.handleNameFocus} placeholder="请输入用户名" />)}
         </FormItem>
                 <FormItem
           label="密码"

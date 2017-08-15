@@ -69,7 +69,6 @@ class PeopleByCVAPI(Resource):
 
     def __init__(self):
         super(PeopleByCVAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('cv_id', type = str, location = 'json')
@@ -82,7 +81,7 @@ class PeopleByCVAPI(Resource):
         projectname = args['project']
         customer = user.getcustomer(self.svc_customers)
         project = customer.getproject(projectname)
-        yamlinfo = self.svc_mult_cv.getyaml(cv_id, projectname)
+        yamlinfo = project.cv_getyaml(cv_id)
         try:
             unique_id = yamlinfo['unique_id']
         except KeyError:

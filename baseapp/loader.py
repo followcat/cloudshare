@@ -47,11 +47,6 @@ def load_mining(SVC_CUSTOMERS, SVC_CLS_CV, silencer, lsipath=None, cutwordpath=N
     return SVC_CUTWORD, SVC_MIN
 
 
-def load_mult_cv(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV):
-    SVC_MULT_CV = services.multicv.MultiCV(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV)
-    return SVC_MULT_CV
-
-
 def load_doc_processor(name):
     global SUPPORT_DOCPROCESSOR
     return SUPPORT_DOCPROCESSOR[name]

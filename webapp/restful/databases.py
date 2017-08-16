@@ -21,22 +21,11 @@ class ProjectNamesAPI(Resource):
 class AdditionNamesAPI(Resource):
 
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_cls_cv = flask.current_app.config['SVC_CLS_CV']
         super(AdditionNamesAPI, self).__init__()
 
     def get(self):
-        return { 'code': 200, 'data': self.svc_mult_cv.additionals.keys() }
-
-
-class DBNumberAPI(Resource):
-
-    def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        super(DBNumberAPI, self).__init__()
-
-    def get(self, name):
-        numbs = self.svc_mult_cv.getnums()
-        return { 'result': numbs[name] }
+        return { 'code': 200, 'data': self.svc_cls_cv.keys() }
 
 
 class DBNumbersAPI(flask.views.MethodView):
@@ -44,12 +33,13 @@ class DBNumbersAPI(flask.views.MethodView):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         super(DBNumbersAPI, self).__init__()
 
     def get(self):
-        return { 'code': 200, 'data': self.svc_mult_cv.getnums() }
+        user = flask.ext.login.current_user
+        customer = user.getcustomer(self.svc_customers)
+        return { 'code': 200, 'data': customer.getnums() }
 
     def post(self):
         user = flask.ext.login.current_user

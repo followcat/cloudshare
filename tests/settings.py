@@ -5,7 +5,6 @@ import core.basedata
 import services.mining
 import services.people
 import services.account
-import services.multicv
 import services.project
 import services.company
 import services.customers
@@ -57,8 +56,6 @@ class Config(object):
         self.SVC_CUSTOMER.add_project('project_test', {})
         self.SVC_PRJ_TEST = self.SVC_CUSTOMER.projects['project_test']
 
-        self.SVC_MULT_CV = services.multicv.MultiCV([self.SVC_PRJ_TEST],
-                                                    self.SVC_CV_REPO)
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_CUSTOMERS.allprojects(),
                                               self.SVC_CV_REPO)
         self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].no_above = 1
@@ -78,8 +75,8 @@ class Config(object):
                                            metadata=yamlinfo)
         peopmeta = extractor.information_explorer.catch_peopinfo(yamlinfo)
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-        project = self.SVC_MULT_CV.getproject('project_test')
-        self.SVC_MULT_CV.repodb.add(dataobj, 'tester', unique=True)
+        project = self.SVC_CUSTOMER.getproject('project_test')
+        self.SVC_CV_REPO.add(dataobj, 'tester', unique=True)
         project.cv_add(dataobj)
         self.SVC_PEO_REPO.add(peopobj)
         self.SVC_PRJ_TEST.peo_add(peopobj)

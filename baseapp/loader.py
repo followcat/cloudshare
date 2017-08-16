@@ -34,7 +34,7 @@ def load_mult_classify(svc_storages):
     return SVC_MULT_CLSIFY, SVC_CLS_CV
 
 
-def load_mining(SVC_MULT_CV, silencer, lsipath=None, cutwordpath=None):
+def load_mining(SVC_CUSTOMERS, SVC_CLS_CV, silencer, lsipath=None, cutwordpath=None):
     global LSI_PATH, CUTWORD_PATH
     if lsipath is None:
         lsipath = LSI_PATH
@@ -42,7 +42,7 @@ def load_mining(SVC_MULT_CV, silencer, lsipath=None, cutwordpath=None):
         cutwordpath = CUTWORD_PATH
     SVC_CUTWORD = services.analysis.cutword.Cutword(cutwordpath)
     slicer = functools.partial(silencer, cutservice=SVC_CUTWORD)
-    SVC_MIN = services.mining.Mining(lsipath, SVC_MULT_CV, slicer=slicer)
+    SVC_MIN = services.mining.Mining(lsipath, SVC_CUSTOMERS.allprojects(), SVC_CLS_CV, slicer=slicer)
     SVC_MIN.setup()
     return SVC_CUTWORD, SVC_MIN
 

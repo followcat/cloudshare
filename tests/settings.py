@@ -59,7 +59,8 @@ class Config(object):
 
         self.SVC_MULT_CV = services.multicv.MultiCV([self.SVC_PRJ_TEST],
                                                     self.SVC_CV_REPO)
-        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MULT_CV)
+        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_CUSTOMERS.allprojects(),
+                                              self.SVC_CV_REPO)
         self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].no_above = 1
         self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].setup(['first.md'],
             ['here is a text for testing.'])

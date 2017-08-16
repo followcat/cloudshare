@@ -42,19 +42,17 @@ class Register extends Component {
 
   handleCreateAccountSubmit(feildValue) {
     createAccount({
-      username: feildValue.account,
+      name: feildValue.name,
       password: feildValue.password,
       email: feildValue.email,
       phone: feildValue.phone,
     }, (json) => {
       if (json.code === 200) {
-        StorageUtil.setAll({
-          token: json.token,
-          user: json.user
+        message.success('注册成功',3,function(){
+          window.location.href = json.redirect_url;
         });
-        window.location.href = json.redirect_url;
       } else {
-        message.error('用户名或密码错误！');
+        message.error('注册信息有误！');
       }
     });
   }

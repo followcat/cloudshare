@@ -375,13 +375,13 @@ class SimilarAPI(Resource):
         doc = project.cv_getmd(id)
         uses = [projectname]
         project_classify = project.getclassify()
-        for classify in self.svc_mult_cv.getyaml(id, projectname=projectname)['classify']:
+        for classify in project.cv_getyaml(id)['classify']:
             if classify in project_classify:
                 uses.append(classify)
         datas = []
         for name, score in self.miner.probability(projectname, doc,
                                                   uses=uses, top=6)[1:6]:
-            yaml_info = self.svc_mult_cv.getyaml(name, projectname=projectname)
+            yaml_info = project.cv_getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
         return { 'code': 200, 'data': datas }
 
@@ -392,23 +392,21 @@ class ValuablebaseAPI(Resource):
 
     def __init__(self):
         super(ValuablebaseAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
 
     def _get(self, doc, project):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = project.name
         uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
         if len(name_list) == 0:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
-                                               doc, projectname, uses=uses)
+            result = core.mining.valuable.rate(self.miner, project, doc, uses=uses)
         else:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
-                                               doc, projectname, uses=uses, name_list=name_list)
+            result = core.mining.valuable.rate(self.miner, project,
+                                               doc, uses=uses, name_list=name_list)
         response = dict()
         datas = []
         for index in result:

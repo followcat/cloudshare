@@ -363,7 +363,7 @@ class Account(services.base.storage.BaseStorage):
             True
             >>> svc_account.joincustomer(info['id'], invited_info['id'],
             ...                          'added_customer', svc_customers)
-            {'customer': 'added_customer'}
+            True
             >>> customer = svc_customers.get('added_customer')
             >>> customer.accounts.exists(invited_info['id'])
             True

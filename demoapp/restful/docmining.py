@@ -19,8 +19,9 @@ class UploadCVAPI(Resource):
     projectname = 'temporary'
 
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.svc_min = flask.current_app.config['SVC_MIN']
+        self.svc_cv_repo = flask.current_app.config['SVC_CV_REPO']
+        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -29,7 +30,8 @@ class UploadCVAPI(Resource):
     def post(self):
         results = []
         network_file = flask.request.files['files']
-        project = self.svc_mult_cv.getproject(self.projectname)
+        customer = self.svc_customers.get(self.svc_customers.default_customer_name)
+        project = customer.getproject()
         id = None
         code = 401
         added = False
@@ -57,9 +59,9 @@ class UploadCVAPI(Resource):
                     yamlinfo = dataobj.metadata
                     if not yamlinfo['name']:
                         yamlinfo['name'] = utils.chsname.name_from_filename(filename)
-                    repo_cv_result = self.svc_mult_cv.repodb.add(dataobj, 'temporary',
-                                                                 unique=True,
-                                                                 contacts=False)
+                    repo_cv_result = self.svc_cv_repo.add(dataobj, 'temporary',
+                                                          unique=True,
+                                                          contacts=False)
                     project_cv_result = project.cv_add(dataobj, 'temporary')
                     result = project_cv_result and repo_cv_result
                 code = 200
@@ -77,7 +79,7 @@ class DocMiningAPI(Resource):
         super(DocMiningAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
@@ -97,7 +99,8 @@ class DocMiningAPI(Resource):
             cur_page = 1
         datas = []
         result = []
-        project = self.svc_mult_cv.getproject(self.projectname)
+        customer = self.svc_customers.get(self.svc_customers.default_customer_name)
+        project = customer.getproject()
         if cvlist:
             names = []
             documents = []
@@ -123,7 +126,7 @@ class DocMiningAPI(Resource):
         else:
             pages = totals/eve_count
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = self.svc_mult_cv.getyaml(name, projectname=model)
+            yaml_info = project.cv_getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),

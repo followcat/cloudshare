@@ -57,8 +57,12 @@ def load_doc_processor(name):
     return SUPPORT_DOCPROCESSOR[name]
 
 
-def load_index(svc_mult_cv):
-    SVC_INDEX = services.index.ReverseIndexing('Index', svc_mult_cv)
+def load_index(SVC_CUSTOMERS, SVC_CLS_CV):
+    svc_cvs = list()
+    for name, project in SVC_CUSTOMERS.allprojects().items():
+        svc_cvs.append(project.curriculumvitae)
+    svc_cvs.extend(SVC_CLS_CV.values())
+    SVC_INDEX = services.index.ReverseIndexing('Index', svc_cvs)
     SVC_INDEX.setup()
     return SVC_INDEX
 

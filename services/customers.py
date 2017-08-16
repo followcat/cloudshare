@@ -49,3 +49,10 @@ class Customers(object):
 
     def names(self):
         return self.customers.keys()
+
+    def allprojects(self):
+        result = dict()
+        for each in self.customers:
+            customer = self.customers[each]
+            result.update(customer.projects)
+        return result

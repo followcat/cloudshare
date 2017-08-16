@@ -61,6 +61,10 @@ class Project(services.base.service.Service):
             self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
             self.save()
 
+    @property
+    def id(self):
+        return self.name
+
     def getclassify(self):
         return self.config['classify']
 

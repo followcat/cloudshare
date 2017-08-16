@@ -13,6 +13,7 @@ import core.mining.valuable
 
 class BaseAPI(Resource):
 
+    numbers = 500
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
@@ -47,7 +48,8 @@ class PositionAPI(BaseAPI):
         else:
             searches = project.cv_search(text)
         result = []
-        for name in searches:
+        for search in list(searches)[:self.numbers]:
+            name = search[0]
             positions = []
             try:
                 yaml_data = project.cv_getyaml(name)
@@ -79,7 +81,7 @@ class RegionAPI(BaseAPI):
         customer = user.getcustomer(self.svc_customers)
         project = customer.getproject(projectname)
         result = []
-        for id in args['md_ids']:
+        for id in args['md_ids'][:self.numbers]:
             stream = project.cv_getmd(id)
             result.append(core.mining.info.region(stream))
         return { 'result': result }
@@ -94,7 +96,7 @@ class CapacityAPI(BaseAPI):
         customer = user.getcustomer(self.svc_customers)
         project = customer.getproject(projectname)
         result = []
-        for id in args['md_ids']:
+        for id in args['md_ids'][:self.numbers]:
             stream = project.cv_getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return { 'result': result }
@@ -131,7 +133,6 @@ class ExperienceAPI(BaseAPI):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        cv_id = args['cv_id']
         projectname = args['project']
         customer = user.getcustomer(self.svc_customers)
         project = customer.getproject(projectname)

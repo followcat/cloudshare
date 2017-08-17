@@ -28,7 +28,11 @@ class Customers(object):
 
     def load_default_customer(self):
         if not self.exists(self.default_customer_name):
-            self.create(self.default_customer_name)
+            path = os.path.join(self.path, self.default_customer_name)
+            customer = services.customer.DefaultCustomer(self.acc_repos, self.co_repos,
+                                                         self.cv_repos, self.mult_peo,
+                                                         path, self.default_customer_name)
+            self.customers[self.default_customer_name] = customer
 
     def exists(self, name):
         return name in self.customers

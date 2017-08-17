@@ -81,7 +81,7 @@ class User(flask.ext.login.UserMixin):
 
     @property
     def defaultcustomer(self):
-        return not self.info['customer']
+        return not self.customer
 
     @property
     def id(self):

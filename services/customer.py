@@ -7,6 +7,9 @@ import services.project
 import services.base.service
 import services.simulationacc
 
+import sources.industry_id
+
+
 class Customer(services.base.service.Service):
 
     commitinfo = 'Customer'
@@ -114,7 +117,8 @@ class DefaultCustomer(Customer):
         super(DefaultCustomer, self).__init__(acc_repos, co_repos, cv_repos,
                                               mult_peo, path, name, iotype=iotype)
         if self.default_name not in self.projects:
-            super(DefaultCustomer, self).add_project(self.default_name, {})
+            super(DefaultCustomer, self).add_project(self.default_name,
+                                                     sources.industry_id.sources)
         self.projects[self.default_name]._modelname = 'medical'
 
     def use(self, id):

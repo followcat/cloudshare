@@ -4,6 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import {
   Form,
   Input,
+  Icon,
   Button
 } from 'antd';
 
@@ -42,36 +43,27 @@ class SignInForm extends Component {
 
     return (
       <Form layout="horizontal" onKeyPress={this.handleKeyPress}>
-        <FormItem
-          label="用户名"
-          id="account"
-        >
+        <FormItem  id="account">
           {getFieldDecorator('account', {
             rules: [{ required: true, message: '用户名是必填项' }]
-          })(<Input placeholder="请输入用户名" />)}
+          })(<Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="用户名" />
+          )}
         </FormItem>
-        <FormItem
-          label="密码"
-          id="password"
-        >
+        <FormItem  id="password">
           {getFieldDecorator('password', {
             rules: [
               { required: true, message: '密码是必填项' },
               { min: 6, max: 18, message: '无效密码，密码长度为6-18位' }
             ]
-          })(<Input type="password" placeholder="请输入密码" />)}
+          })(<Input prefix={<Icon type="lock" style={{ fontSize: 13 }} />} type="password" placeholder="密码" />
+          )}
         </FormItem>
-        <FormItem wrapperCol={wrapperCol}>
-          <Button
-            type="primary"
-            onClick={this.handleClick}
-          >
-            {btnText}
+        <FormItem >
+          <Button style={{width : '100%'}} type="primary" onClick={this.handleClick}>
+          {btnText}
           </Button>
           </FormItem>
-          <FormItem wrapperCol={wrapperCol}>
-          <Button type="primary" onClick={this.handleRegisterClick}>注册</Button>
-        </FormItem>
+          Or <a href="/createaccount">创建用户!</a>
       </Form>
     );
   }

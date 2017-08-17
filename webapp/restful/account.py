@@ -8,32 +8,14 @@ from flask.ext.restful import Resource
 import services.exception
 
 class AccountAPI(Resource):
-    """
-        Accout RESTful API
-
-        PUT     str id
-                {'oldpassword': str, 'newpassword': str}
-                Modify password.
-        POST    str id
-                {'password': str}
-                Add new account, need root.
-        DELETE  str id
-                Delete account.
-    """
 
     def __init__(self):
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('name', type = unicode, required = True,
-                                   help = 'No name provided', location = 'json')
         self.reqparse.add_argument('email', type = str, required = True,
                                    help = 'No email provided', location = 'json')
         self.reqparse.add_argument('phone', type = str, required = True,
                                    help = 'No phone provided', location = 'json')
-        self.reqparse.add_argument('password', type = str, required = True,
-                                   help = 'No password provided', location = 'json')
-        self.reqparse.add_argument('oldpassword', type = str, location = 'json')
-        self.reqparse.add_argument('newpassword', type = str, location = 'json')
         super(AccountAPI, self).__init__()
 
     def get(self, name):
@@ -42,21 +24,12 @@ class AccountAPI(Resource):
 
     @flask.ext.login.login_required
     def put(self, name):
-        result = False
-        info = ''
         args = self.reqparse.parse_args()
-        if 'oldpassword' not in args or 'newpassword' not in args:
-            result = { 'code': 400, 'message': 'Change password failed.', 'error': 'Request arguments error.' }
-        else:
-            oldpassword = args['oldpassword']
-            newpassword = args['newpassword']
         user = flask.ext.login.current_user
-        changeresult = user.changepassword(oldpassword, newpassword)
-        if changeresult is True:
-            result = { 'code': 200, 'message': 'Change password successed.' }
-        else:
-            result = { 'code': 400, 'message': 'Old password validation errors.' }
-        return  result
+        phone = args['phone']
+        email = args['email']
+        result = user.updateinfo({'phone': phone, 'email': email})
+        return { 'code': 200, 'result': result }
 
     def post(self, name):
         args = self.reqparse.parse_args()
@@ -80,6 +53,35 @@ class AccountAPI(Resource):
             result = { 'code': 400, 'message': 'Deleted ' + id + ' failed.' }
         return result
 """
+
+
+class PasswordAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.svc_account = flask.current_app.config['SVC_ACCOUNT']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('password', type = str, required = True,
+                                   help = 'No password provided', location = 'json')
+        self.reqparse.add_argument('oldpassword', type = str, location = 'json')
+        self.reqparse.add_argument('newpassword', type = str, location = 'json')
+        super(PasswordAPI, self).__init__()
+
+    def put(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        result = { 'code': 400, 'message': 'Change password failed.',
+                   'error': 'Request arguments error.' }
+        if 'oldpassword' in args and 'newpassword' in args:
+            oldpassword = args['oldpassword']
+            newpassword = args['newpassword']
+            changeresult = user.changepassword(oldpassword, newpassword)
+            if changeresult is True:
+                result = { 'code': 200, 'message': 'Change password successed.' }
+            else:
+                result = { 'code': 400, 'message': 'Old password validation errors.' }
+        return  result
 
 
 class AccountListAPI(Resource):

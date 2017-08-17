@@ -16,6 +16,13 @@ class User(flask.ext.login.UserMixin):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
 
+    def updateinfo(self, info):
+        origininfo = self.svc_account.getinfo(self.id)
+        origininfo.update(info)
+        return self.svc_account.saveinfo(self.id, origininfo,
+                                         'User %s update info.'%(self.id),
+                                         self.name)
+
     def checkpassword(self, password):
         return self.svc_account.checkpwd(self.id, password)
 

@@ -2,6 +2,7 @@
 const HOST = '';
 
 export const API = {
+  ACCOUNT_API: `${HOST}/api/account`,
 
   ACCOUNTS_API: `${HOST}/api/accounts`,
 

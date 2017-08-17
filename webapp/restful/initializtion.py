@@ -17,7 +17,7 @@ def initialize(app):
     api = flask.ext.restful.Api(app)
     api.add_resource(SyncReloadAPI, '/api/syncreload', endpoint = 'syncreload')
     api.add_resource(SessionAPI, '/api/session')
-    api.add_resource(AccountAPI, '/api/accounts/<string:id>')
+    api.add_resource(AccountAPI, '/api/account/<string:name>')
     api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')
     api.add_resource(AccountHistoryAPI, '/api/accounthistory', endpoint = 'accounthistory')
 

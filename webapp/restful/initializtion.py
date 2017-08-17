@@ -5,6 +5,7 @@ from webapp.restful.mining import *
 from webapp.restful.reload import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
+from webapp.restful.message import *
 from webapp.restful.company import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
@@ -89,3 +90,9 @@ def initialize(app):
     api.add_resource(ClassifyAPI, '/api/classify', endpoint = 'classify')
     api.add_resource(AllSIMSAPI, '/api/lsiallsims', endpoint = 'lsiallsims')
     api.add_resource(IndustryAPI, '/api/industry', endpoint = 'industry')
+
+    api.add_resource(MessageAPI, '/api/message', endpoint = 'message')
+    api.add_resource(CustomerMessageAPI, '/api/customermessage', endpoint = 'customermessage')
+    api.add_resource(ListReadMessagesAPI, '/api/listreadmessages', endpoint = 'listreadmessages')
+    api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
+    api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')

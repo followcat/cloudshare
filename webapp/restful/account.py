@@ -1,5 +1,3 @@
-import json
-
 import flask
 import flask.ext.login
 from flask.ext.restful import reqparse

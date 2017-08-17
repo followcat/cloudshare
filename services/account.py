@@ -204,6 +204,26 @@ class Message(services.base.storage.BaseStorage):
         result = self._deleteinfo(id, key, msgid, committer, do_commit=do_commit)
         return result
 
+    def getcontent(self, id, msgid):
+        result = None
+        msginfo = svc_message.getinfo(self.id)
+        for each in msginfo:
+            if each in ['unread_chat', 'read_chat', 'send_chat']:
+                for msg in msginfo[each]:
+                    if msg['id'] == msgid:
+                        result = msg
+                        return result
+
+    def getinvitedcontent(self, id, msgid):
+        result = None
+        msginfo = svc_message.getinfo(self.id)
+        for each in msginfo:
+            if each in ['invited_customer']:
+                for msg in msginfo[each]:
+                    if msg['id'] == msgid:
+                        result = msg
+                        return result
+
     def read(self, id, msgid, committer):
         return self._move(id, msgid, 'unread_chat', 'read_chat', committer)
 

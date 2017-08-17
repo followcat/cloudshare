@@ -166,7 +166,7 @@ class LSIbaseAPI(Resource):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(project.name, doc, uses=uses, top=0.03, minimum=1000)
+        result = self.miner.probability(project.modelname, doc, uses=uses, top=0.03, minimum=1000)
         ids = set([cv[0] for cv in result])
         result = self.index.filter_ids(result, filterdict, ids, uses=uses)
         totals = len(result)
@@ -276,7 +276,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 continue
             doc = jd['description']
             doc += jd['commentary']
-            result = self.miner.probability(project.name, doc, uses=project.getclassify(),
+            result = self.miner.probability(project.modelname, doc, uses=project.getclassify(),
                                             top=0.01, minimum=3000)
             if result:
                 candidates = filter(lambda x: float(x[1])>float(threshold), result)
@@ -379,7 +379,7 @@ class SimilarAPI(Resource):
             if classify in project_classify:
                 uses.append(classify)
         datas = []
-        for name, score in self.miner.probability(projectname, doc,
+        for name, score in self.miner.probability(project.modelname, doc,
                                                   uses=uses, top=6)[1:6]:
             yaml_info = project.cv_getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })

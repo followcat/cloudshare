@@ -21,6 +21,7 @@ class Project(services.base.service.Service):
     def __init__(self, path, corepos, cvrepos, svcpeos, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
+        self._modelname = name
         self.corepos = corepos
         self.cvrepos = cvrepos
         cvpath = os.path.join(path, self.CV_PATH)
@@ -60,6 +61,10 @@ class Project(services.base.service.Service):
         if not os.path.exists(os.path.join(self.path, self.config_file)) or classify is not None:
             self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
             self.save()
+
+    @property
+    def modelname(self):
+        return self._modelname
 
     @property
     def id(self):

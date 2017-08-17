@@ -107,6 +107,7 @@ class Customer(services.base.service.Service):
 class DefaultCustomer(Customer):
 
     default_name = 'default'
+    default_model = 'medical'
 
     def __init__(self, acc_repos, co_repos, cv_repos, mult_peo, path,
                  name='default', iotype='git'):
@@ -114,6 +115,7 @@ class DefaultCustomer(Customer):
                                               mult_peo, path, name, iotype=iotype)
         if self.default_name not in self.projects:
             super(DefaultCustomer, self).add_project(self.default_name, {})
+        self.projects[self.default_name]._modelname = 'medical'
 
     def use(self, id):
         return self

@@ -74,7 +74,10 @@ class User(flask.ext.login.UserMixin):
 
     @property
     def customer(self):
-        return self.info['customer']
+        result = ''
+        if 'customer' in self.info:
+            result = self.info['customer']
+        return result
 
     @property
     def defaultcustomer(self):

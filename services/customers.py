@@ -45,7 +45,10 @@ class Customers(object):
         return self.customers[name]
 
     def use(self, name, id):
-        return self.customers[name].use(id)
+        result = self.customers[self.default_customer_name]
+        if name:
+            result = self.customers[name].use(id)
+        return result
 
     def names(self):
         return self.customers.keys()

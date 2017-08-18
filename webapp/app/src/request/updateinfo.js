@@ -4,8 +4,8 @@ import { API } from '../config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
-export const resetPassword = (params, callback) => {
-  return fetch(API.PASSWORD_API, {
+export const updateInfo = (params, callback) => {
+  return fetch(`${API.ACCOUNT_API}/${params.name}`, {
     method: 'PUT',
     credentials: 'include',
     headers: {

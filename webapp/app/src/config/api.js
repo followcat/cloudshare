@@ -2,6 +2,8 @@
 const HOST = '';
 
 export const API = {
+  PASSWORD_API: `${HOST}/api/password`,
+
   ACCOUNT_API: `${HOST}/api/account`,
 
   ACCOUNTS_API: `${HOST}/api/accounts`,

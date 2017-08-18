@@ -157,7 +157,12 @@ export default class UserInfo extends Component {
   }
 
   render() {
-    const menus = [{
+    const menus = [
+    {
+      key: 'manageinfo',
+      text: language.MANAGE_INFO,
+      url: '/userInfo/manageinfo'
+    },{
       key: 'history',
       text: language.BROWSING_HISTORY,
       url: '/userInfo/history'
@@ -169,7 +174,8 @@ export default class UserInfo extends Component {
       key: 'setting',
       text: language.SETTING,
       url: '/userInfo/setting'
-    }];
+    }
+    ];
 
     return (
       <Layout>

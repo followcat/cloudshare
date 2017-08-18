@@ -32,13 +32,26 @@ class CustomerAccountAPI(CustomerAPI):
 
     decorators = [flask.ext.login.login_required]
 
-    def post(self, name, userid):
+    def __init__(self):
+        super(CustomerAccountAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.svc_msg = flask.current_app.config['SVC_MSG']
+        self.reqparse.add_argument('msgid', type = str, location = 'json')
+        self.reqparse.add_argument('userid', type = str, location = 'json')
+
+    def post(self, name):
         user = flask.ext.login.current_user
-        result = user.joincustomer(userid, name, self.svc_customers)
+        args = self.reqparse.parse_args()
+        msgid = args['msgid']
+        result = svc_msg.process_invite(user.id, msgid, user.name)
+        if result is True:
+            result = user.joincustomer(user.id, name, self.svc_customers)
         return { 'code': 200, 'result': result }
 
-    def delete(self, name, userid):
+    def delete(self, name):
         user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        userid = args['userid']
         result = user.awaycustomer(userid, self.svc_customers)
         return { 'code': 200, 'result': result }
 

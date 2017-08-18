@@ -106,13 +106,15 @@ class Message(services.base.storage.BaseStorage):
     YAML_TEMPLATE = (
         ("id",                  str),
         ("invited_customer",    list),
+        ("inviter_customer",    list),
         ("send_chat",           list),
         ("read_chat",           list),
         ("unread_chat",         list),
     )
 
     MUST_KEY = ['id']
-    list_item = {"invited_customer", "send_chat", "read_chat", "unread_chat"}
+    list_item = {"invited_customer", "inviter_customer",
+                 "send_chat", "read_chat", "unread_chat"}
     fix_item  = {"id"}
 
     def __init__(self, path, name=None, searchengine=None, iotype='git'):
@@ -140,7 +142,7 @@ class Message(services.base.storage.BaseStorage):
     def _listframe(self, value, username, date=None):
         if date is None:
             date = time.strftime('%Y-%m-%d %H:%M:%S')
-        data = {'id': utils.builtin.hash(' '.join([str(time.time()), value, username])),
+        data = {'id': utils.builtin.hash(' '.join([str(time.time()), value])),
                 'relation': username,
                 'content': value,
                 'date': date}
@@ -193,7 +195,7 @@ class Message(services.base.storage.BaseStorage):
                 result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
-    def deleteinfo(self, id, key, value, committer, date, do_commit=True):
+    def deleteinfo(self, id, key, msgid, committer, date, do_commit=True):
         assert key not in self.fix_item
         assert key in self.list_item
         assert self.exists(id)
@@ -206,7 +208,7 @@ class Message(services.base.storage.BaseStorage):
 
     def getcontent(self, id, msgid):
         result = None
-        msginfo = svc_message.getinfo(self.id)
+        msginfo = svc_message.getinfo(id)
         for each in msginfo:
             if each in ['unread_chat', 'read_chat', 'send_chat']:
                 for msg in msginfo[each]:
@@ -216,13 +218,40 @@ class Message(services.base.storage.BaseStorage):
 
     def getinvitedcontent(self, id, msgid):
         result = None
-        msginfo = svc_message.getinfo(self.id)
+        msginfo = svc_message.getinfo(id)
         for each in msginfo:
             if each in ['invited_customer']:
                 for msg in msginfo[each]:
                     if msg['id'] == msgid:
                         result = msg
                         return result
+
+    def getinvitercontent(self, id, msgid):
+        result = None
+        msginfo = svc_message.getinfo(id)
+        for each in msginfo:
+            if each in ['inviter_customer']:
+                for msg in msginfo[each]:
+                    if msg['id'] == msgid:
+                        result = msg
+                        return result
+
+    def process_invite(self, invited_id, msgid, committer):
+        result = False
+        send_info = None
+        receive_info = self.getinvitedcontent(invited_id, msgid)
+        inviter_id = receive_info['relation']
+        for each in self.getinfo(inviter_id)['inviter_customer']:
+            if receive_info['content'] == each['content'] and inviter_id == each['relation']:
+                send_info = each
+                break
+        if send_info and receive_info:
+            send_result = self._move(inviter_id, send_info['id'], 'inviter_customer',
+                                     'read_chat', committer)
+            receive_result = self._move(invited_id, receive_info['id'], 'invited_customer',
+                                     'read_chat', committer)
+            result = send_result & receive_result
+        return result
 
     def read(self, id, msgid, committer):
         return self._move(id, msgid, 'unread_chat', 'read_chat', committer)
@@ -233,7 +262,9 @@ class Message(services.base.storage.BaseStorage):
         return send, receive
 
     def send_invitation(self, ori_id, des_id, customer, committer):
-        return self.updateinfo(des_id, 'invited_customer', customer, ori_id, committer)
+        send_result = self.updateinfo(ori_id, 'inviter_customer', customer, des_id, committer)
+        receive_result = self.updateinfo(des_id, 'invited_customer', customer, ori_id, committer)
+        return send_result & receive_result
 
 
 class Account(services.base.storage.BaseStorage):

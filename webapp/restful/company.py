@@ -113,13 +113,13 @@ class AddedCompanyListAPI(Resource):
         return { 'code': 200, 'data': data }
 
 #owner
-class CustomerListAPI(Resource):
+class CompanyCustomerListAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
-        super(CustomerListAPI, self).__init__()
+        super(CompanyCustomerListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
 
@@ -137,7 +137,7 @@ class CustomerListAPI(Resource):
         return { 'code': 200, 'data': data }
     
 #create, delete
-class CustomerAPI(Resource):
+class CompanyCustomerAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 

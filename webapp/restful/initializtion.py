@@ -5,8 +5,9 @@ from webapp.restful.mining import *
 from webapp.restful.reload import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
-from webapp.restful.message import *
 from webapp.restful.company import *
+from webapp.restful.message import *
+from webapp.restful.customer import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
 from webapp.restful.feature import *
@@ -31,10 +32,11 @@ def initialize(app):
                      endpoint = 'couploadexcel')
     api.add_resource(CompanyConfirmExcelAPI, '/api/coconfirmexcel',
                      endpoint = 'coconfirmexcel')
-    api.add_resource(CustomerListAPI, '/api/customerlist', endpoint = 'customerlist')
+    api.add_resource(CompanyCustomerListAPI, '/api/companycustomerlist',
+                     endpoint = 'companycustomerlist')
     api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
     api.add_resource(SearchCObyKeyAPI, '/api/searchcobykey', endpoint = 'searchcobykey')
-    api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
+    api.add_resource(CompanyCustomerAPI, '/api/companycustomer', endpoint = 'companycustomer')
     api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate',
                      endpoint = 'companyinfoupdate')
 
@@ -96,3 +98,9 @@ def initialize(app):
     api.add_resource(ListReadMessagesAPI, '/api/listreadmessages', endpoint = 'listreadmessages')
     api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
     api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')
+
+    api.add_resource(CustomerAPI, '/api/customer/<string:name>', endpoint = 'customer')
+    api.add_resource(CustomerAccountAPI, '/api/customeraccount/<string:name>/<string:userid>',
+                     endpoint = 'customeraccount')
+    api.add_resource(CustomerProjectAPI, '/api/customerproject/<string:projectname>',
+                     endpoint = 'customerproject')

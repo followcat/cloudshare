@@ -20,9 +20,17 @@ class AccountAPI(Resource):
                                    help = 'No phone provided', location = 'json')
         super(AccountAPI, self).__init__()
 
-    def get(self, name):
+    def head(self, name):
         result = name in self.svc_account.USERS
-        return { 'code': 200, 'result': result }
+        if not result:
+            return flask.make_response(flask.jsonify({}), 404)
+        else:
+            return flask.make_response(flask.jsonify({}), 200)
+
+    @flask.ext.login.login_required
+    def get(self, name):
+        user = flask.ext.login.current_user
+        return { 'code': 200, 'result': user.info }
 
     @flask.ext.login.login_required
     def put(self, name):

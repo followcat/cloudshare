@@ -20,13 +20,13 @@ class User(flask.ext.login.UserMixin):
     def createcustomer(self, name, svc_customers):
         result = self.svc_account.createcustomer(self.id, name, svc_customers)
         if result is True:
-            self.info = self.getinfo(self.id)
+            self.info = self.svc_account.getinfo(self.id)
         return result
 
     def awaycustomer(self, awayid, svc_customers):
         result = self.svc_account.awaycustomer(self.id, awayid, svc_customers)
         if result is True:
-            self.info = self.getinfo(self.id)
+            self.info = self.svc_account.getinfo(self.id)
         return result
 
     def joincustomer(self, inviter_id, name, svc_customers):

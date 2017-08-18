@@ -11,18 +11,22 @@ class CustomerAPI(Resource):
     def __init__(self):
         super(CustomerAPI, self).__init__()
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('customername', type = str, location = 'json')
 
-    def get(self, name):
+    def get(self):
         user = flask.ext.login.current_user
         customer = user.getcustomer(self.svc_customers)
-        return { 'code': 200, 'result': customer.config }
+        return { 'code': 200, 'result': customer.name }
 
-    def post(self, name):
+    def post(self):
         user = flask.ext.login.current_user
-        result = user.createcustomer(name, self.svc_customers)
+        args = self.reqparse.parse_args()
+        customername = args['customername']
+        result = user.createcustomer(customername, self.svc_customers)
         return { 'code': 200, 'result': result }
 
-    def delete(self, name):
+    def delete(self):
         user = flask.ext.login.current_user
         result = user.awaycustomer(user.id, self.svc_customers)
         return { 'code': 200, 'result': result }
@@ -41,7 +45,7 @@ class CustomerAccountAPI(CustomerAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         msgid = args['msgid']
-        result = svc_msg.process_invite(user.id, msgid, user.name)
+        result = self.svc_msg.process_invite(user.id, msgid, user.name)
         if result is True:
             result = user.joincustomer(user.id, name, self.svc_customers)
         return { 'code': 200, 'result': result }

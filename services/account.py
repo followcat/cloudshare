@@ -159,6 +159,8 @@ class Message(services.base.storage.BaseStorage):
 
     def _addinfo(self, id, key, value, relation, committer, do_commit=True):
         projectinfo = self.getinfo(id)
+        if key not in projectinfo:
+            projectinfo[key] = list()
         data = self._listframe(value, relation)
         projectinfo[key].insert(0, data)
         self.saveinfo(id, projectinfo,
@@ -196,7 +198,7 @@ class Message(services.base.storage.BaseStorage):
         assert self.exists(id)
         projectinfo = self.getinfo(id)
         result = None
-        if key in projectinfo:
+        if key in [each[0] for each in self.YAML_TEMPLATE]:
             if key in self.list_item:
                 result = self._addinfo(id, key, value, relation,
                                        committer, do_commit=do_commit)

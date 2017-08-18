@@ -39,8 +39,8 @@ class MessageAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_msg = flask.current_app.config['SVC_MSG']
         super(MessageAPI, self).__init__()
+        self.svc_msg = flask.current_app.config['SVC_MSG']
 
     # Get message
     def get(self, msgid):
@@ -54,15 +54,12 @@ class MessageAPI(Resource):
         return { 'code': 200, 'result': result }
 
 
-class SendMessageAPI(Resource):
-
-    decorators = [flask.ext.login.login_required]
+class SendMessageAPI(MessageAPI):
 
     def __init__(self):
-        self.svc_msg = flask.current_app.config['SVC_MSG']
+        super(SendMessageAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('msgcontent', type = str, location = 'json')
-        super(SendMessageAPI, self).__init__()
 
     # Send message
     def post(self, desname):
@@ -73,28 +70,16 @@ class SendMessageAPI(Resource):
         return { 'code': 200, 'result': result }
 
 
-class CustomerMessageAPI(Resource):
+class InvitedMessageAPI(MessageAPI):
 
-    decorators = [flask.ext.login.login_required]
-
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.svc_msg = flask.current_app.config['SVC_MSG']
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
-        super(CustomerMessageAPI, self).__init__()
-        self.reqparse.add_argument('msgid', type = str, location = 'json')
-        self.reqparse.add_argument('desname', type = str, location = 'json')
-        self.reqparse.add_argument('msgcontent', type = str, location = 'json')
-
-    def get(self):
+    def get(self, msgid):
         user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        msgid = args['msgid']
         return { 'code': 200, 'result': user.getinvitedmessage(msgid, self.svc_msg) }
+
+
+class SendInviteMessageAPI(MessageAPI):
         
-    def post(self):
+    def post(self, desname):
         user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        desname = args['desname']
         result = user.invitecustomer(desname, self.svc_msg)
         return { 'code': 200, 'result': result }

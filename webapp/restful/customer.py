@@ -30,8 +30,6 @@ class CustomerAPI(Resource):
 
 class CustomerAccountAPI(CustomerAPI):
 
-    decorators = [flask.ext.login.login_required]
-
     def __init__(self):
         super(CustomerAccountAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -57,8 +55,6 @@ class CustomerAccountAPI(CustomerAPI):
 
 
 class CustomerProjectAPI(CustomerAPI):
-
-    decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         super(CustomerProjectAPI, self).__init__()

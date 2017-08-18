@@ -93,10 +93,14 @@ def initialize(app):
     api.add_resource(AllSIMSAPI, '/api/lsiallsims', endpoint = 'lsiallsims')
     api.add_resource(IndustryAPI, '/api/industry', endpoint = 'industry')
 
-    api.add_resource(MessageAPI, '/api/message/<string:msgid>', endpoint = 'message')
+    api.add_resource(MessageAPI, '/api/message/<string:msgid>',
+                     endpoint = 'message')
     api.add_resource(SendMessageAPI, '/api/sendmessage/<string:desname>',
                      endpoint = 'sendmessage')
-    api.add_resource(CustomerMessageAPI, '/api/customermessage', endpoint = 'customermessage')
+    api.add_resource(InvitedMessageAPI, '/api/invitedmessage/<string:msgid>',
+                     endpoint = 'invitedmessage')
+    api.add_resource(SendInviteMessageAPI, '/api/sendinvitemessage/<string:desname>',
+                     endpoint = 'sendinvitemessage')
     api.add_resource(ListReadMessagesAPI, '/api/listreadmessages', endpoint = 'listreadmessages')
     api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
     api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')

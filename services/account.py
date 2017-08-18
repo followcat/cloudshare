@@ -98,9 +98,18 @@ class Message(services.base.storage.BaseStorage):
         >>> info2['read_chat'][0] == receive
         True
         >>> invitation = svc_message.send_invitation('id1', 'id2', 'mock_customer', 'name1')
+        >>> info1 = svc_message.getinfo('id1')
+        >>> info1['inviter_customer'][0]['relation'] == 'id2'
+        True
         >>> info2 = svc_message.getinfo('id2')
         >>> info2['invited_customer'][0] == invitation
         True
+        >>> svc_message.process_invite('id2', invitation['id'], 'id2')
+        True
+        >>> svc_message.getcontent('id2', invitation['id'])['relation']
+        'id1'
+        >>> len(svc_message.getinfo('id1')['inviter_customer'])
+        0
         >>> shutil.rmtree(repo_path)
     """
     YAML_TEMPLATE = (
@@ -139,11 +148,11 @@ class Message(services.base.storage.BaseStorage):
         return super(Message, self).add(bsobj, committer, unique,
                                         yamlfile, mdfile, do_commit=do_commit)
 
-    def _listframe(self, value, username, date=None):
+    def _listframe(self, value, userid, date=None):
         if date is None:
             date = time.strftime('%Y-%m-%d %H:%M:%S')
         data = {'id': utils.builtin.hash(' '.join([str(time.time()), value])),
-                'relation': username,
+                'relation': userid,
                 'content': value,
                 'date': date}
         return data
@@ -208,7 +217,7 @@ class Message(services.base.storage.BaseStorage):
 
     def getcontent(self, id, msgid):
         result = None
-        msginfo = svc_message.getinfo(id)
+        msginfo = self.getinfo(id)
         for each in msginfo:
             if each in ['unread_chat', 'read_chat', 'send_chat']:
                 for msg in msginfo[each]:
@@ -218,7 +227,7 @@ class Message(services.base.storage.BaseStorage):
 
     def getinvitedcontent(self, id, msgid):
         result = None
-        msginfo = svc_message.getinfo(id)
+        msginfo = self.getinfo(id)
         for each in msginfo:
             if each in ['invited_customer']:
                 for msg in msginfo[each]:
@@ -228,7 +237,7 @@ class Message(services.base.storage.BaseStorage):
 
     def getinvitercontent(self, id, msgid):
         result = None
-        msginfo = svc_message.getinfo(id)
+        msginfo = self.getinfo(id)
         for each in msginfo:
             if each in ['inviter_customer']:
                 for msg in msginfo[each]:
@@ -242,7 +251,7 @@ class Message(services.base.storage.BaseStorage):
         receive_info = self.getinvitedcontent(invited_id, msgid)
         inviter_id = receive_info['relation']
         for each in self.getinfo(inviter_id)['inviter_customer']:
-            if receive_info['content'] == each['content'] and inviter_id == each['relation']:
+            if receive_info['content'] == each['content'] and invited_id == each['relation']:
                 send_info = each
                 break
         if send_info and receive_info:
@@ -250,7 +259,7 @@ class Message(services.base.storage.BaseStorage):
                                      'read_chat', committer)
             receive_result = self._move(invited_id, receive_info['id'], 'invited_customer',
                                      'read_chat', committer)
-            result = send_result & receive_result
+            result = send_result and receive_result
         return result
 
     def read(self, id, msgid, committer):
@@ -264,7 +273,7 @@ class Message(services.base.storage.BaseStorage):
     def send_invitation(self, ori_id, des_id, customer, committer):
         send_result = self.updateinfo(ori_id, 'inviter_customer', customer, des_id, committer)
         receive_result = self.updateinfo(des_id, 'invited_customer', customer, ori_id, committer)
-        return send_result & receive_result
+        return send_result and receive_result
 
 
 class Account(services.base.storage.BaseStorage):
@@ -388,12 +397,12 @@ class Account(services.base.storage.BaseStorage):
             >>> config.destory()
         """
         result = False
-        info = self.getinfo(id)
-        customer = svc_customers.use(info['customer'], id)
+        info = self.getinfo(inviter_id)
+        customer = svc_customers.use(info['customer'], inviter_id)
         if customer:
             result = customer.rm_account(inviter_id, invited_id, info['name'])
             if result is True:
-                self.updateinfo(id, 'customer', '', info['name'])
+                self.updateinfo(invited_id, 'customer', '', info['name'])
         return result
 
     def joincustomer(self, inviter_id, invited_id, name, svc_customers):

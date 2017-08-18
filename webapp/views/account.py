@@ -9,8 +9,8 @@ class User(flask.ext.login.UserMixin):
     def __init__(self, id, svc_account):
         if not svc_account.exists(id):
             raise services.exception.UserNotFoundError()
+        self.id = id
         self.svc_account = svc_account
-        self.info = svc_account.getinfo(id)
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
@@ -39,8 +39,8 @@ class User(flask.ext.login.UserMixin):
         return self.svc_account.delbookmark(self.id, id)
 
     @property
-    def id(self):
-        return self.info['id']
+    def info(self):
+        return self.svc_account.getinfo(self.id)
 
     @property
     def name(self):

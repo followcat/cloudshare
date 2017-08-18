@@ -23,8 +23,8 @@ class User(flask.ext.login.UserMixin):
             self.info = self.getinfo(self.id)
         return result
 
-    def awaycustomer(self, svc_customers):
-        result = self.svc_account.awaycustomer(self.id, svc_customers)
+    def awaycustomer(self, awayid, svc_customers):
+        result = self.svc_account.awaycustomer(self.id, awayid, svc_customers)
         if result is True:
             self.info = self.getinfo(self.id)
         return result

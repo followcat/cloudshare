@@ -337,7 +337,7 @@ class Account(services.base.storage.BaseStorage):
             result = True
         return result
 
-    def awaycustomer(self, id, svc_customers):
+    def awaycustomer(self, inviter_id, invited_id, svc_customers):
         """
             >>> from tests.settings import *
             >>> config = Config()
@@ -349,7 +349,7 @@ class Account(services.base.storage.BaseStorage):
             >>> info = svc_account.getinfo_byname(u'user')
             >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
             True
-            >>> svc_account.awaycustomer(info['id'], svc_customers)
+            >>> svc_account.awaycustomer(info['id'], info['id'], svc_customers)
             True
             >>> info = svc_account.getinfo_byname(u'user')
             >>> info['customer']
@@ -360,7 +360,7 @@ class Account(services.base.storage.BaseStorage):
         info = self.getinfo(id)
         customer = svc_customers.use(info['customer'], id)
         if customer:
-            result = customer.rm_account(id, id, info['name'])
+            result = customer.rm_account(inviter_id, invited_id, info['name'])
             if result is True:
                 self.updateinfo(id, 'customer', '', info['name'])
         return result

@@ -23,7 +23,7 @@ class AccountAPI(Resource):
     def head(self, name):
         result = name in self.svc_account.USERS
         if not result:
-            return flask.make_response(flask.jsonify({}), 404)
+            return flask.make_response(flask.jsonify({}), 204)
         else:
             return flask.make_response(flask.jsonify({}), 200)
 

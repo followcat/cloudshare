@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import { getAccount } from 'request/account';
+import { checkAccount } from 'request/account';
 
 import {
   Form,
@@ -52,14 +52,12 @@ class CreateAccountForm extends Component {
     const form = this.props.form;
     const value = e.target.value;
     if (value){
-    getAccount({
+    checkAccount({
       name: form.getFieldValue('name'),
     },(json) => {
       if (json.code === 200) {
-        if (json.result) {
-          this.setState({result: json.result})
+          this.setState({result: true})
           form.validateFields(['name'], { force: true });
-        }
       } else {
         message.error('系统繁忙，稍后再试！');
       }

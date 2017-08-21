@@ -4,7 +4,6 @@ import functools
 
 import services.index
 import services.mining
-import services.multicv
 import services.multiclsify
 import services.analysis.cutword
 

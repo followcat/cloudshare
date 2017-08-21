@@ -17,7 +17,6 @@ class ManageInfo extends Component {
     super();
     this.handleReset = this.handleReset.bind(this);
     this.handleClick = this.handleClick.bind(this);
-    this.handleChange = this.handleChange.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
   }
 
@@ -25,7 +24,6 @@ class ManageInfo extends Component {
     name: StorageUtil.get('user'),
     email: '',
     phone: '',
-    btnstatus: false,
   }
     //重置表单方法
   handleReset(e) {
@@ -42,13 +40,6 @@ class ManageInfo extends Component {
         this.props.onSubmit(values);
       }
     });
-  }
-
-  handleChange(e) {
-    e.preventDefault();
-    this.setState({
-      btnstatus : true,
-    })
   }
 
   handleKeyPress(e) {
@@ -77,18 +68,13 @@ class ManageInfo extends Component {
           { getFieldDecorator } = this.props.form;
 
     return (
-      <Form layout="horizontal" onKeyPress={this.handleKeyPress} 
-        onChange={this.handleChange}>
+      <Form layout="horizontal" onKeyPress={this.handleKeyPress}>
         <FormItem
           label="用户名"
-          hasFeedback
         >
         <label>{this.state.name}</label>
         </FormItem>
-        <FormItem
-          label="电子邮箱"
-          hasFeedback
-        >
+        <FormItem label="电子邮箱">
           {getFieldDecorator('email', {
             initialValue: this.state.email,
             rules: [{
@@ -100,7 +86,7 @@ class ManageInfo extends Component {
             <Input />
           )}
         </FormItem>
-        <FormItem label="联系电话"  hasFeedback>
+        <FormItem label="联系电话">
           {getFieldDecorator('phone',{
             initialValue: this.state.phone,
             rules: [{
@@ -111,15 +97,9 @@ class ManageInfo extends Component {
           )}
         </FormItem>
         <FormItem>
-        { this.state.btnstatus ?
           <Button type="primary" onClick={this.handleClick}>
           {btnText}
           </Button>
-          :
-          <Button type="primary" onClick={this.handleClick} disabled>
-            {btnText}
-          </Button>
-        }
           <Button type="ghost" onClick={this.handleReset} >
           {resetText}
           </Button>

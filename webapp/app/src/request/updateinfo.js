@@ -5,7 +5,7 @@ import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
 export const updateInfo = (params, callback) => {
-  return fetch(`${API.ACCOUNT_API}/${params.name}`, {
+  return fetch(API.USER_API, {
     method: 'PUT',
     credentials: 'include',
     headers: {

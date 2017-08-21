@@ -26,8 +26,7 @@ class ManageInfo extends Component {
       phone: feildValue.phone,
     }, (json) => {
       if (json.code === 200) {
-        message.success('更新成功',3,function(){
-        });
+        message.success('更新成功',2);
       } else {
         message.error('更新失败！');
       }

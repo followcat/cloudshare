@@ -18,7 +18,7 @@ export const getAccounts = (callback) => {
 
 export const checkAccount = (params,callback) => {
   return fetch(`${API.ACCOUNT_API}/${params.name}`, {
-    method: 'HEAD',
+    method: 'GET',
     credentials: 'include',
     headers: {
       'Accept': 'application/json',
@@ -30,7 +30,7 @@ export const checkAccount = (params,callback) => {
 };
 
 export const getAccount = (params,callback) => {
-  return fetch(`${API.ACCOUNT_API}/${params.name}`, {
+  return fetch(API.USER_API, {
     method: 'GET',
     credentials: 'include',
     headers: {

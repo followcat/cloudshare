@@ -1,12 +1,11 @@
 import utils.builtin
-from baseapp.projects import *
 
 
-def generate_keywords(path, projects=PRJ_LIST):
+def generate_keywords(path, projects):
     results = dict()
     if not os.path.exists(path):
         os.makedirs(path)
-    for project in PRJ_LIST:
+    for project in projects:
         for jd in project.jobdescription.lists():
             try:
                 if jd['status'] == 'Closed':

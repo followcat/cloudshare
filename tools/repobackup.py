@@ -5,7 +5,6 @@ import tarfile
 import utils.builtin
 import baseapp.backup
 import baseapp.datadbs
-import baseapp.projects
 import webapp.settings
 
 

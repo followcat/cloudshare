@@ -7,6 +7,34 @@ from flask.ext.restful import Resource
 
 import services.exception
 
+class UserAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('email', type = str, required = True,
+                                   help = 'No email provided', location = 'json')
+        self.reqparse.add_argument('phone', type = str, required = True,
+                                   help = 'No phone provided', location = 'json')
+
+
+        super(UserAPI, self).__init__()
+
+
+    def get(self):
+        user = flask.ext.login.current_user
+        return { 'code': 200, 'result': user.info }
+
+    def put(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        phone = args['phone']
+        email = args['email']
+        result = user.updateinfo({'phone': phone, 'email': email})
+        return { 'code': 200, 'result': result }
+
+
 class AccountAPI(Resource):
 
     def __init__(self):
@@ -20,26 +48,9 @@ class AccountAPI(Resource):
                                    help = 'No phone provided', location = 'json')
         super(AccountAPI, self).__init__()
 
-    def head(self, name):
-        result = name in self.svc_account.USERS
-        if not result:
-            return flask.make_response(flask.jsonify({}), 204)
-        else:
-            return flask.make_response(flask.jsonify({}), 200)
-
-    @flask.ext.login.login_required
     def get(self, name):
-        user = flask.ext.login.current_user
-        return { 'code': 200, 'result': user.info }
-
-    @flask.ext.login.login_required
-    def put(self, name):
-        args = self.reqparse.parse_args()
-        user = flask.ext.login.current_user
-        phone = args['phone']
-        email = args['email']
-        result = user.updateinfo({'phone': phone, 'email': email})
-        return { 'code': 200, 'result': result }
+        result = name in self.svc_account.USERS
+        return { 'code': 200, 'result': result}
 
     def post(self, name):
         args = self.reqparse.parse_args()
@@ -53,16 +64,6 @@ class AccountAPI(Resource):
         else:
             result = { 'code': 400, 'message': 'This username is existed.'}
         return result
-
-"""
-    def delete(self, name):
-        root_user = flask.ext.login.current_user
-        if self.svc_account.delete(root_user.name, name):
-            result = { 'code': 200, 'message': 'Delete ' + id + ' successed.' }
-        else:
-            result = { 'code': 400, 'message': 'Deleted ' + id + ' failed.' }
-        return result
-"""
 
 
 class PasswordAPI(Resource):

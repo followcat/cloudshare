@@ -109,6 +109,7 @@ const websiteText = {
     BROWSING_HISTORY: '浏览历史',
     BOOKMARK: '书签',
     SETTING: '设置',
+    MANAGE_INFO: '信息管理',
 
     RESET_PWD_SUCCESS_MSG: '重置密码成功',
     RESET_PWD_FAIL_MSG: '重置密码失败'

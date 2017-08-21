@@ -3,6 +3,8 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
+import utils.builtin
+
 
 class CustomerAPI(Resource):
 
@@ -29,6 +31,20 @@ class CustomerAPI(Resource):
     def delete(self):
         user = flask.ext.login.current_user
         result = user.awaycustomer(user.id, self.svc_customers)
+        return { 'code': 200, 'result': result }
+
+
+class ListCustomerAccountsAPI(CustomerAPI):
+
+    def get(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        customer = user.getcustomer(self.svc_customers)
+        result = list()
+        for id in customer.accounts.ids:
+            info = customer.accounts.getinfo(id)
+            info['date'] = utils.builtin.strftime(info['date'])
+            result.append(info)
         return { 'code': 200, 'result': result }
 
 

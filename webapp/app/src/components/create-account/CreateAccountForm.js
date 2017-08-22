@@ -55,12 +55,10 @@ class CreateAccountForm extends Component {
     checkAccount({
       name: form.getFieldValue('name'),
     },(json) => {
-      if (json.code === 200) {
+      if (json.result === true) {
           this.setState({result: true})
           form.validateFields(['name'], { force: true });
-      } else {
-        message.error('系统繁忙，稍后再试！');
-      }
+      } 
     });
     }
   }

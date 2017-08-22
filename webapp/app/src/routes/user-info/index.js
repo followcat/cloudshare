@@ -12,6 +12,7 @@ module.exports = {
   childRoutes: [
     require('./history'),
     require('./bookmark'),
-    require('./setting')
+    require('./setting'),
+    require('./manageinfo'),
   ]
 };

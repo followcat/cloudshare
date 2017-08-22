@@ -75,8 +75,7 @@ class LayoutHeader extends Component {
       onOk() {
         signOut((json) => {
           if (json.code === 200) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+             localStorage.clear();
             location.href = json.redirect_url;
           }
         });

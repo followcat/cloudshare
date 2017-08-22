@@ -106,6 +106,13 @@ class Customer(services.base.service.Service):
             result['total'] += numbers
         return result
 
+    def backup(self, path):
+        customer_path = os.path.join(path, self.name)
+        for name in self.projects:
+            project = self.projects[name]
+            project.backup(customer_path)
+        self.accounts.backup(customer_path)
+
 
 class DefaultCustomer(Customer):
 

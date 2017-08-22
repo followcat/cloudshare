@@ -25,9 +25,9 @@ class GitInterface(interface.base.Interface):
             >>> shutil.rmtree(repo_name)
         """
         super(GitInterface, self).__init__(path, name=name, searchengine=searchengine)
-        try:
+        if not os.path.exists(path):
             self.repo = dulwich.repo.Repo.init(path, mkdir=True)
-        except OSError:
+        else:
             self.repo = dulwich.repo.Repo(path)
 
     def exists(self, filename):
@@ -309,4 +309,8 @@ class GitInterface(interface.base.Interface):
         return result
 
     def backup(self, path, bare=False):
-        dulwich.porcelain.clone(self.path, path, bare=bare)
+        try:
+            dulwich.porcelain.clone(self.path, path, bare=bare)
+        except KeyError:
+            self.repo.do_commit("Init repo %s."%(name), committer="Cloudshare")
+            dulwich.porcelain.clone(self.path, path, bare=bare)

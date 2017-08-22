@@ -62,3 +62,10 @@ class Customers(object):
             customer = self.customers[each]
             result.update(customer.projects)
         return result
+
+    def backup(self, path):
+        customers_path = os.path.join(path, "customers")
+        os.mkdir(customers_path)
+        for each in self.customers:
+            customer = self.customers[each]
+            customer.backup(customers_path)

@@ -218,11 +218,12 @@ class Project(services.base.service.Service):
         return self.people.deleteinfo(id, key, value, username, date)
 
     def backup(self, path, bare=True):
-        project_path = os.path.join(path, 'project')
-        cv_path = os.path.join(path, 'curriculumvitae')
-        jd_path = os.path.join(path, 'jobdescription')
-        co_path = os.path.join(path, 'company')
-        peo_path = os.path.join(path, 'people')
+        backup_path = os.path.join(path, self.name)
+        project_path = os.path.join(backup_path, 'project')
+        cv_path = os.path.join(backup_path, 'curriculumvitae')
+        jd_path = os.path.join(backup_path, 'jobdescription')
+        co_path = os.path.join(backup_path, 'company')
+        peo_path = os.path.join(backup_path, 'people')
         utils.builtin.assure_path_exists(project_path)
         utils.builtin.assure_path_exists(cv_path)
         utils.builtin.assure_path_exists(jd_path)

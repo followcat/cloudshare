@@ -14,8 +14,7 @@ class User(flask.ext.login.UserMixin):
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
-        return s.dumps({ 'id': self.id, 'name': self.name,
-                         'defaultcustomer': self.defaultcustomer })
+        return s.dumps({ 'id': self.id, 'name': self.name })
 
     def createcustomer(self, name, svc_customers):
         result = self.svc_account.createcustomer(self.id, name, svc_customers)

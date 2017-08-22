@@ -94,8 +94,8 @@ class SearchCVbyTextAPI(Resource):
         projectname = args['project']
         customer = user.getcustomer(self.svc_customers)
         project = customer.getproject(projectname)
-        searchs = dict(project.cv_search(text, selected=['cloudshare']))
-        yaml_searchs = dict(project.cv_search_yaml(text, selected=['cloudshare']))
+        searchs = dict(project.cv_search(text))
+        yaml_searchs = dict(project.cv_search_yaml(text))
         for id in yaml_searchs:
             if id in searchs:
                 searchs[id] += yaml_searchs[id]

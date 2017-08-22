@@ -23,6 +23,7 @@ class Customers(object):
                 customer = services.customer.Customer(acc_repos, co_repos,
                                                       cv_repos, mult_peo,
                                                       customer_path, name)
+                customer.setup({'storageCV': 'cloudshare'})
                 self.customers[name] = customer
         self.load_default_customer()
 
@@ -31,6 +32,7 @@ class Customers(object):
         customer = services.customer.DefaultCustomer(self.acc_repos, self.co_repos,
                                                      self.cv_repos, self.mult_peo,
                                                      path, self.default_customer_name)
+        customer.setup({'storageCV': 'cloudshare'})
         self.customers[self.default_customer_name] = customer
 
     def exists(self, name):

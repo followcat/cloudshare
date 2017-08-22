@@ -45,22 +45,38 @@ class Project(services.base.service.Service):
         self.config = utils.builtin.load_yaml(self.path, self.config_file)
 
     def save(self):
-        utils.builtin.save_yaml(self.config, self.path, self.config_file,
-                                default_flow_style=False)
+        dumpconfig = utils.builtin.dump_yaml(self.config)
+        self.interface.add(self.config_file, dumpconfig, message="Update config file.")
 
     def setup(self, classify=None, committer=None, config=None):
         self.setconfig(config)
         self.setclassify(classify, committer=committer)
 
-    def setconfig(self, config):
-        if config is not None:
-            self.config.update(config)
+    def setconfig(self, config=None):
+        if config is None:
+            config = {}
+        modified = False
+        for key in config:
+            if key not in self.config or self.config[key] != config[key]:
+                self.config[key] = config[key]
+                modified = True
+        if modified:
             self.save()
 
-    def setclassify(self, classify, committer=None):
+    def setclassify(self, classify=None, committer=None):
         if not os.path.exists(os.path.join(self.path, self.config_file)) or classify is not None:
             self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
             self.save()
+
+    @property
+    def storageCV(self):
+        result = None
+        servicename = self.config['storageCV']
+        for each in self.cvrepos:
+            if each.name == servicename:
+                result = each
+                break
+        return result
 
     @property
     def modelname(self):
@@ -92,9 +108,13 @@ class Project(services.base.service.Service):
         return self.curriculumvitae.datas()
 
     def cv_search(self, keyword, selected=None):
+        if selected is None:
+            selected = [self.storageCV.name]
         return self.curriculumvitae.search(keyword, selected=selected)
 
     def cv_search_yaml(self, keyword, selected=None):
+        if selected is None:
+            selected = [self.storageCV.name]
         return self.curriculumvitae.search_yaml(keyword, selected=selected)
 
     def cv_gethtml(self, id):

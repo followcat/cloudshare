@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
+
 import flask
 import flask.ext.session
 import jinja2.ext
+import flask_compress
 
 import ext.views
 import webapp.restful.initializtion
@@ -11,6 +13,7 @@ import webapp.restful.initializtion
 import webapp.jsonencoder
 
 app = flask.Flask(__name__, template_folder="templates_dist")
+flask_compress.Compress(app)
 app.config.from_object('webapp.settings')
 app.json_encoder = webapp.jsonencoder.CustomJSONEncoder
 app.jinja_env.add_extension(jinja2.ext.loopcontrols)

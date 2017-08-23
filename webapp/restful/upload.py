@@ -140,13 +140,9 @@ class UploadEnglishCVAPI(Resource):
         projectname = args['project']
         customer = user.getcustomer(self.svc_customers)
         project = customer.getproject(projectname)
-        yaml_data = self.svc_cv_repo.getyaml(id)
         dataobj = uploadeng[user.name]
-        result = self.svc_cv_repo.add_md(dataobj, user.name)
-        yaml_data['enversion'] = dataobj.ID.md
-        self.svc_cv_repo.modify(id + '.yaml', yaml.safe_dump(yaml_data, allow_unicode=True),
-                                committer=user.name)
-        user.uploadeng = None
+        result = project.cv_add_eng(id, dataobj, user.name)
+        uploadeng[user.name] = None
         en_html = project.cv_getmd_en(id)
         return { 'code': 200, 'data': { 'status': result, 'en_html': en_html } }
 

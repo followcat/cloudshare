@@ -112,6 +112,13 @@ class Project(services.base.service.Service):
             result['project_peo_result'] = project.peo_add(peopobj, committer)
         return result
 
+    def cv_add_eng(self, id, cvobj, committer):
+        yaml_data = self.storageCV.getyaml(id)
+        result = self.storageCV.add_md(cvobj, committer)
+        yaml_data['enversion'] = cvobj.ID.md
+        self.storageCV.modify(id+'.yaml', utils.builtin.dump_yaml(yaml_data), committer=committer)
+        return result
+
     def cv_yamls(self):
         return self.curriculumvitae.yamls()
 

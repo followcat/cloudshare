@@ -21,8 +21,6 @@ class UploadCVAPI(Resource):
 
     def __init__(self):
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
-        self.svc_cv_repo = flask.current_app.config['SVC_CV_REPO']
-        self.svc_peo = flask.current_app.config['SVC_PEO_REPO']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_min = flask.current_app.config['SVC_MIN']
         self.svc_index = flask.current_app.config['SVC_INDEX']
@@ -61,7 +59,7 @@ class UploadCVAPI(Resource):
                             message = 'Add to CV database and project.'
                             names.append(cvobj.name.md)
                             documents.append(cvobj.data)
-                            if not repo_cv_result:
+                            if not result['repo_cv_result']:
                                 message = 'Existed in other project.'
                         else:
                             message = 'Resume existed in database and project.'
@@ -120,7 +118,6 @@ class UploadEnglishCVAPI(Resource):
     def __init__(self):
         super(UploadEnglishCVAPI, self).__init__()
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
-        self.svc_cv_repo = flask.current_app.config['SVC_CV_REPO']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('file', type = str, location = 'json')

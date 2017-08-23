@@ -24,6 +24,7 @@ class Project(services.base.service.Service):
         self._modelname = name
         self.corepos = corepos
         self.cvrepos = cvrepos
+        self.svcpeos = svcpeos
         cvpath = os.path.join(path, self.CV_PATH)
         copath = os.path.join(path, self.CO_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
@@ -79,6 +80,16 @@ class Project(services.base.service.Service):
         return result
 
     @property
+    def storagePEO(self):
+        result = None
+        servicename = self.config['storagePEO']
+        for each in self.svcpeos[0].peoples:
+            if each.name == servicename:
+                result = each
+                break
+        return result
+
+    @property
     def modelname(self):
         return self._modelname
 
@@ -107,9 +118,8 @@ class Project(services.base.service.Service):
         result['repo_cv_result'] = self.storageCV.add(cvobj, committer, unique)
         result['project_cv_result'] = self.curriculumvitae.add(cvobj, committer, unique)
         if result['repo_cv_result']:
-            result['repo_peo_result'] = self.svc_peo.add(peopobj, committer)
-        if result['project_cv_result']:
-            result['project_peo_result'] = project.peo_add(peopobj, committer)
+            peoresult = self.peo_add(peopobj, committer)
+            result.update(peoresult)
         return result
 
     def cv_add_eng(self, id, cvobj, committer):
@@ -242,7 +252,13 @@ class Project(services.base.service.Service):
         return self.jobdescription.lists()
 
     def peo_add(self, peopobj, committer=None, unique=True):
-        return self.people.add(peopobj, committer, unique)
+        result = {
+            'repo_peo_result' : False,
+            'project_peo_result' :False,
+        }
+        result['repo_peo_result'] = self.storagePEO.add(peopobj, committer)
+        result['project_peo_result'] = self.people.add(peopobj, committer, unique)
+        return result
 
     def peo_getyaml(self, id):
         return self.people.getyaml(id)

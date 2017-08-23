@@ -70,7 +70,8 @@ class Customer(services.base.service.Service):
                 name = os.path.split(path)[1]
                 tmp_project = services.project.Project(path, self.co_repos, self.cv_repos,
                                                        self.mult_peo, name)
-                tmp_project.setup(config={'storageCV': self.config['storageCV']})
+                tmp_project.setup(config={'storageCV': self.config['storageCV'],
+                                          'storagePEO': self.config['storagePEO']})
                 self.projects[name] = tmp_project
 
     def add_project(self, name, classify, autosetup=False, autoupdate=False):
@@ -81,7 +82,8 @@ class Customer(services.base.service.Service):
                                                    self.mult_peo, name)
             tmp_project.setup(classify, config={'autosetup': autosetup,
                                                 'autoupdate': autoupdate,
-                                                'storageCV': self.config['storageCV']})
+                                                'storageCV': self.config['storageCV'],
+                                                'storagePEO': self.config['storagePEO']})
             self.projects[name] = tmp_project
             result = True
         return result

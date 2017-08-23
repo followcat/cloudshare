@@ -8,7 +8,7 @@ import services.simulationcv
 import services.simulationco
 import services.simulationpeo
 import services.jobdescription
-
+import extractor.information_explorer
 
 class Project(services.base.service.Service):
 
@@ -96,7 +96,21 @@ class Project(services.base.service.Service):
         return result
 
     def cv_add(self, cvobj, committer=None, unique=True):
-        return self.curriculumvitae.add(cvobj, committer, unique)
+        result = {
+            'repo_cv_result' : False,
+            'repo_peo_result' : False,
+            'project_cv_result' : False,
+            'project_peo_result' : False
+        }
+        peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
+        peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+        result['repo_cv_result'] = self.storageCV.add(cvobj, committer, unique)
+        result['project_cv_result'] = self.curriculumvitae.add(cvobj, committer, unique)
+        if result['repo_cv_result']:
+            result['repo_peo_result'] = self.svc_peo.add(peopobj, committer)
+        if result['project_cv_result']:
+            result['project_peo_result'] = project.peo_add(peopobj, committer)
+        return result
 
     def cv_yamls(self):
         return self.curriculumvitae.yamls()

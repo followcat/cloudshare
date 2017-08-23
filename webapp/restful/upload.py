@@ -52,17 +52,11 @@ class UploadCVAPI(Resource):
                     if key is not u'id':
                         cvobj.metadata[key] = value
                 if 'unique_id' in cvobj.metadata:
-                    peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
-                    peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
                     try:
-                        repo_cv_result = self.svc_cv_repo.add(cvobj, user.name,
-                                                              unique=True)
-                        project_cv_result = project.cv_add(cvobj, user.name)
-                        if repo_cv_result:
+                        result = project.cv_add(cvobj, user.name, unique=True)
+                        if result['repo_cv_result']:
                             self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
-                            repo_peo_result = self.svc_peo.add(peopobj, user.name)
-                        if project_cv_result:
-                            project_peo_result = project.peo_add(peopobj, user.name)
+                        if result['project_cv_result']:
                             status = 'success'
                             message = 'Add to CV database and project.'
                             names.append(cvobj.name.md)

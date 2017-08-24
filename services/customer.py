@@ -15,6 +15,7 @@ class Customer(services.base.service.Service):
     commitinfo = 'Customer'
     PRJ_PATH = 'projects'
     ACC_PATH = 'accounts'
+    CV_PATH = 'currivulumvitaes'
     config_file = 'config.yaml' 
 
     def __init__(self, acc_repos, co_repos, cv_repos,
@@ -22,12 +23,15 @@ class Customer(services.base.service.Service):
         super(Customer, self).__init__(path, name, iotype=iotype)
         self.name = name
         self.path = path
+        self.cv_path = os.path.join(path, self.CV_PATH)
         self.co_repos = co_repos
         self.cv_repos = cv_repos
         self.mult_peo = mult_peo
         self.acc_repos = acc_repos
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
+        self.curriculumvitae = [services.simulationcv.SimulationCV.autoservice(
+                                                            self.cv_path, name, cv_repos)]
         self.config = dict()
         try:
             self.load()
@@ -68,7 +72,7 @@ class Customer(services.base.service.Service):
         for path in glob.glob(os.path.join(self.projects_path, '*')):
             if os.path.isdir(path):
                 name = os.path.split(path)[1]
-                tmp_project = services.project.Project(path, self.co_repos, self.cv_repos,
+                tmp_project = services.project.Project(path, self.co_repos, self.curriculumvitae,
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'storageCV': self.config['storageCV'],
                                           'storagePEO': self.config['storagePEO']})
@@ -78,7 +82,7 @@ class Customer(services.base.service.Service):
         result = False
         if name not in self.projects:
             path = os.path.join(self.projects_path, name)
-            tmp_project = services.project.Project(path, self.co_repos, self.cv_repos,
+            tmp_project = services.project.Project(path, self.co_repos, self.curriculumvitae,
                                                    self.mult_peo, name)
             tmp_project.setup(classify, config={'autosetup': autosetup,
                                                 'autoupdate': autoupdate,

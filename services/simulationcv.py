@@ -9,6 +9,11 @@ class SimulationCV(services.base.simulation.Simulation,
         ("committer",           str),
     )
 
+    yaml_private_key = {
+        "number": str(),
+        "email": str()
+    }
+
     list_item = {}
 
     def __init__(self, path, name, storages, iotype='git'):
@@ -23,6 +28,7 @@ class SimulationCV(services.base.simulation.Simulation,
             >>> config.destory()
         """
         super(SimulationCV, self).__init__(path, name, storages, iotype=iotype)
+        self.yaml_private_default = True
 
     def getmd_en(self, id):
         yamlinfo = self.getyaml(id)
@@ -55,3 +61,14 @@ class SimulationCV(services.base.simulation.Simulation,
             except IOError:
                 continue
         return result
+
+    def getyaml(self, id, private=None):
+        if private is None:
+             private = self.yaml_private_default
+        result = super(SimulationCV, self).getyaml(id)
+        if private is True and self.exists(id) is False:
+            result.update(self.yaml_privatee_key)
+        return result
+
+    def getprivatekeys(self):
+        return self.yaml_private_key.keys()

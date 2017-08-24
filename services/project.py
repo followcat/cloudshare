@@ -32,6 +32,7 @@ class Project(services.base.service.Service):
 
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
                                                         cvpath, name, cvrepos)
+        self.curriculumvitae.privite = False
         self.company = services.simulationco.SimulationCO.autoservice(
                                                         copath, name, corepos)
         self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
@@ -73,9 +74,13 @@ class Project(services.base.service.Service):
     def storageCV(self):
         result = None
         servicename = self.config['storageCV']
-        for each in self.cvrepos:
-            if each.name == servicename:
+        for cvrepo in self.cvrepos:
+            if isinstance(cvrepo, services.simulationcv.SimulationCV):
+                for each in cvrepo.storages:
+                    result = each
+            elif cvrepo.name == servicename:
                 result = each
+            if result is not None:
                 break
         return result
 

@@ -55,6 +55,8 @@ class UploadCVAPI(Resource):
                         if result['repo_cv_result']:
                             self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
                         if result['project_cv_result']:
+                            result['customer_cv_result'] = customer.cv_add(cvobj, user.name,
+                                                                           unique=True)
                             status = 'success'
                             message = 'Add to CV database and project.'
                             names.append(cvobj.name.md)

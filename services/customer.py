@@ -30,8 +30,8 @@ class Customer(services.base.service.Service):
         self.acc_repos = acc_repos
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
-        self.curriculumvitae = [services.simulationcv.SimulationCV.autoservice(
-                                                            self.cv_path, name, cv_repos)]
+        self.curriculumvitaes = services.simulationcv.SimulationCV.autoservice(
+                                                            self.cv_path, name, cv_repos)
         self.config = dict()
         try:
             self.load()
@@ -72,7 +72,7 @@ class Customer(services.base.service.Service):
         for path in glob.glob(os.path.join(self.projects_path, '*')):
             if os.path.isdir(path):
                 name = os.path.split(path)[1]
-                tmp_project = services.project.Project(path, self.co_repos, self.curriculumvitae,
+                tmp_project = services.project.Project(path, self.co_repos, [self.curriculumvitaes],
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'storageCV': self.config['storageCV'],
                                           'storagePEO': self.config['storagePEO']})
@@ -82,7 +82,7 @@ class Customer(services.base.service.Service):
         result = False
         if name not in self.projects:
             path = os.path.join(self.projects_path, name)
-            tmp_project = services.project.Project(path, self.co_repos, self.curriculumvitae,
+            tmp_project = services.project.Project(path, self.co_repos, [self.curriculumvitaes],
                                                    self.mult_peo, name)
             tmp_project.setup(classify, config={'autosetup': autosetup,
                                                 'autoupdate': autoupdate,
@@ -105,6 +105,11 @@ class Customer(services.base.service.Service):
             result = self.accounts.remove(invited_id, committer=committer)
         return result
 
+    def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
+        result = self.curriculumvitaes.add(cvobj, committer,
+                                          unique=unique, do_commit=do_commit)
+        return result
+
     def getproject(self, projectname):
         return self.projects[projectname]
 
@@ -124,6 +129,7 @@ class Customer(services.base.service.Service):
             project = self.projects[name]
             project.backup(customer_path)
         self.accounts.backup(customer_path)
+        self.curriculumvitaes.backup(customer_path)
 
 
 class DefaultCustomer(Customer):

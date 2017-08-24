@@ -111,7 +111,7 @@ class Project(services.base.service.Service):
             result.update({each: sources.industry_id.sources[each]})
         return result
 
-    def cv_add(self, cvobj, committer=None, unique=True):
+    def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
         result = {
             'repo_cv_result' : False,
             'repo_peo_result' : False,
@@ -120,10 +120,12 @@ class Project(services.base.service.Service):
         }
         peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-        result['repo_cv_result'] = self.storageCV.add(cvobj, committer, unique)
-        result['project_cv_result'] = self.curriculumvitae.add(cvobj, committer, unique)
+        result['repo_cv_result'] = self.storageCV.add(cvobj, committer, unique=unique,
+                                                      do_commit=do_commit)
+        result['project_cv_result'] = self.curriculumvitae.add(cvobj, committer, unique=unique,
+                                                               do_commit=do_commit)
         if result['repo_cv_result']:
-            peoresult = self.peo_add(peopobj, committer)
+            peoresult = self.peo_add(peopobj, committer, unique=unique, do_commit=do_commit)
             result.update(peoresult)
         return result
 
@@ -256,13 +258,15 @@ class Project(services.base.service.Service):
     def jd_lists(self):
         return self.jobdescription.lists()
 
-    def peo_add(self, peopobj, committer=None, unique=True):
+    def peo_add(self, peopobj, committer=None, unique=True, do_commit=True):
         result = {
             'repo_peo_result' : False,
             'project_peo_result' :False,
         }
-        result['repo_peo_result'] = self.storagePEO.add(peopobj, committer)
-        result['project_peo_result'] = self.people.add(peopobj, committer, unique)
+        result['repo_peo_result'] = self.storagePEO.add(peopobj, committer,
+                                                        unique=unique, do_commit=do_commit)
+        result['project_peo_result'] = self.people.add(peopobj, committer,
+                                                       unique=unique, do_commit=do_commit)
         return result
 
     def peo_getyaml(self, id):

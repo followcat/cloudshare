@@ -10,7 +10,7 @@ class SimulationCV(services.base.simulation.Simulation,
     )
 
     yaml_private_key = {
-        "number": str(),
+        "phone": str(),
         "email": str()
     }
 
@@ -67,7 +67,7 @@ class SimulationCV(services.base.simulation.Simulation,
              private = self.yaml_private_default
         result = super(SimulationCV, self).getyaml(id)
         if private is True and self.exists(id) is False:
-            result.update(self.yaml_privatee_key)
+            result.update(self.yaml_private_key)
         return result
 
     def getprivatekeys(self):

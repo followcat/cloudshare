@@ -59,7 +59,8 @@ class AccountAPI(Resource):
         bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
         addresult = self.svc_account.add(bsobj, password)
         if addresult is True:
-            self.svc_msg.add(self.svc_msg.baseobj({'id': bsobj.id}), committer=name)
+            msgobj = self.svc_msg.baseobj({'id': bsobj.ID.base})
+            msgresult = self.svc_msg.add(msgobj, committer=name)
             result = { 'code': 200, 'message': 'Create user successed.','redirect_url': '/'}
         else:
             result = { 'code': 400, 'message': 'This username is existed.'}

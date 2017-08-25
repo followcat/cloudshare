@@ -44,6 +44,7 @@ class Customers(object):
         customer = services.customer.Customer(self.acc_repos, self.co_repos,
                                               self.cv_repos, self.mult_peo,
                                               path, name)
+        customer.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage'})
         self.customers[name] = customer
 
     def get(self, name):

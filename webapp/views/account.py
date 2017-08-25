@@ -10,6 +10,7 @@ class User(flask.ext.login.UserMixin):
         if not svc_account.exists(id):
             raise services.exception.UserNotFoundError()
         self.id = id
+        self._name = None
         self.svc_account = svc_account
 
     def get_auth_token(self):
@@ -18,20 +19,14 @@ class User(flask.ext.login.UserMixin):
 
     def createcustomer(self, name, svc_customers):
         result = self.svc_account.createcustomer(self.id, name, svc_customers)
-        if result is True:
-            self.info = self.svc_account.getinfo(self.id)
         return result
 
     def awaycustomer(self, awayid, svc_customers):
         result = self.svc_account.awaycustomer(self.id, awayid, svc_customers)
-        if result is True:
-            self.info = self.svc_account.getinfo(self.id)
         return result
 
     def joincustomer(self, inviter_id, name, svc_customers):
         result = self.svc_account.joincustomer(inviter_id, self.id, name, svc_customers)
-        if result is True:
-            self.info = self.getinfo(self.id)
         return result
 
     def updateinfo(self, info):
@@ -110,7 +105,9 @@ class User(flask.ext.login.UserMixin):
 
     @property
     def name(self):
-        return self.info['name']
+        if self._name is None:
+            self._name = self.info['name']
+        return self._name
 
     @classmethod
     def get(self_class, id, svc_account):

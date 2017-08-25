@@ -5,6 +5,8 @@ import { Link } from 'react-router';
 import { Menu } from 'antd';
 
 const MenuItem = Menu.Item;
+const MenuItemGroup = Menu.ItemGroup;
+const SubMenu = Menu.SubMenu;
 
 class SubheadNav extends Component {
   render() {
@@ -20,10 +22,14 @@ class SubheadNav extends Component {
         <div className={`${prefixCls}-wrap`}>
           <Menu
             selectedKeys={selectedKeys}
-            mode="horizontal"
+            defaultopenKeys={selectedKeys}
+            mode="inline"
             onClick={this.props.onClick}
-            style={style}
           >
+          <MenuItem key="project">
+            <Link to='/pm/projectlist'>project</Link>
+          </MenuItem>
+          <SubMenu key="service" title="service">
             {menus.map(item => {
               return (
                 <MenuItem key={item.key}>
@@ -31,6 +37,10 @@ class SubheadNav extends Component {
                 </MenuItem>
               );
             })}
+            </SubMenu>
+            <MenuItem key="invite" title="invite">
+              <Link to='/pm/invite'>invite</Link>
+            </MenuItem>
           </Menu>
         </div>
       </div>

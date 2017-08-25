@@ -15,12 +15,12 @@ class CustomerAPI(Resource):
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('customername', type = str, location = 'json')
-
+# get customer's projectname
     def get(self):
         user = flask.ext.login.current_user
         customer = user.getcustomer(self.svc_customers)
         return { 'code': 200, 'result': customer.name }
-
+# user become customer
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()

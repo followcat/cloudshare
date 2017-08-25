@@ -19,6 +19,7 @@ module.exports = {
   childRoutes: [
     require('./job-description'),
     require('./customer'),
-    require('./company')
+    require('./company'),
+    require('./project-list')
   ]
 };

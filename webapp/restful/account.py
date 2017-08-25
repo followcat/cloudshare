@@ -36,6 +36,7 @@ class UserAPI(Resource):
 class AccountAPI(Resource):
 
     def __init__(self):
+        self.svc_msg = flask.current_app.config['SVC_MSG']
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('password', type = str,
@@ -58,6 +59,7 @@ class AccountAPI(Resource):
         bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
         addresult = self.svc_account.add(bsobj, password)
         if addresult is True:
+            self.svc_msg.add(self.svc_msg.baseobj({'id': bsobj.id}), committer=name)
             result = { 'code': 200, 'message': 'Create user successed.','redirect_url': '/'}
         else:
             result = { 'code': 400, 'message': 'This username is existed.'}

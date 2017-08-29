@@ -87,4 +87,4 @@ class CustomerProjectAPI(CustomerAPI):
         classify = args['classify']
         customer = user.getcustomer(self.svc_customers)
         result = customer.add_project(projectname, classify)
-        return result
+        return { 'code': 200, 'result': result }

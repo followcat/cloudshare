@@ -43,7 +43,7 @@ class ProjectList extends Component {
   }
 
    componentDidMount() {
-   	this.getProjectData();
+    this.getProjectData();
     }
 
   render() {
@@ -59,13 +59,13 @@ class ProjectList extends Component {
 
   	const data = this.state.projects;
     return (
-      <div className="cs-project-list">
+    <div className="cs-project-list">
 		<Table
-   		 columns={columns}
-   		 dataSource={this.state.projects}
-   		 title={() => 'ProjectList'}
-  			/>
-      </div>
+     columns={columns}
+     dataSource={this.state.projects}
+      title={() => 'ProjectList'}
+    />
+    </div>
     );
   }
 }

@@ -38,7 +38,6 @@ class ListCustomerAccountsAPI(CustomerAPI):
 
     def get(self):
         user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
         customer = user.getcustomer(self.svc_customers)
         result = list()
         for id in customer.accounts.ids:

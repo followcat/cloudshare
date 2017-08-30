@@ -24,3 +24,24 @@ export const getProject = (callback) => {
     callbackFunction(callback, json);
   });
 };
+/**
+ * add project
+ * @param  {function} callback 回调函数
+ * @return {function} fetch    异步请求方法
+ */
+export const addProject = (params,callback) => {
+  return fetch(`${API.CUSTOMER_PROJECT_API}/${params.projectname}`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  })
+  .then(response => response.json())
+  .then(json => {
+    callbackFunction(callback, json);
+  });
+};

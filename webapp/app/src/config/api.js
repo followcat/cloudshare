@@ -2,6 +2,10 @@
 const HOST = '';
 
 export const API = {
+  SEND_INVITE_MESSAGE_API:`${HOST}/api/sendinvitemessage`,
+
+  LIST_CUSTOMER_ACCOUNTS_API:`${HOST}/api/listcustomeraccounts`,
+
   CUSTOMER_PROJECT_API:`${HOST}/api/customerproject`,
 
   USER_API:`${HOST}/api/user`,

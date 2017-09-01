@@ -3,52 +3,53 @@ import React, { Component } from 'react';
 
 import TablePlus from 'components/table-plus';
 import ButtonWithModal from 'components/button-with-modal';
-import ProjectListForm from 'components/project-list';
+import ListCustomerForm from 'components/project-list';
 
 import {   message,Form,Table, Input,Button, Popconfirm } from 'antd';
 
 import findIndex from 'lodash/findIndex';
 
-import { getProject,addProject } from 'request/project';
+import { getListCustomer,sendInviteMessage } from 'request/customer';
 
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
 
-import { URL } from 'config/url'
 
-class ProjectList extends Component {
+class ListCustomer extends Component {
 	constructor() {
     super();
     this.state = {
       selectedKeys: [],
       projects: [],
+      customers: [],
       visible: false,
       value: '',
-      projectName: '',
+      customerName: '',
     };
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleSubmit   = this.handleSubmit.bind(this);
     this.handleOkClick = this.handleOkClick.bind(this);
-    this.getProjectName = this.getProjectName.bind(this);
+    this.getListCustomerData = this.getListCustomerData.bind(this);
+    this.getCustomerName = this.getCustomerName.bind(this);
   }
 
-  getProjectData() {
-    getProject((json) => {
+  getListCustomerData() {
+    getListCustomer((json) => {
       if (json.code === 200) {
-		var jsontest = [];
-		var fin = [];
-		json.data.map((item,index) => { return jsontest.push('{"key"'+':"'+index+'",'+'projectname'+':"'+item+'"}') });
-		jsontest.map((item,index) => { return fin.push(eval('(' + item + ')')) });
-		this.setState({
-          projects: fin,
+		    var jsontest = [];
+		    var fin = [];
+		    json.result.map(item => item.inviter).map((item,index) => { return jsontest.push('{"key"'+':"'+index+'",'+'customername'+':"'+item+'"}') });
+		    jsontest.map((item,index) => { return fin.push(eval('(' + item + ')')) });
+		    this.setState({
+          customers: fin,
         });
       }
     });
   }
 
-  getProjectName(childname){
-    this.setState({ projectName: childname });
+  getCustomerName(childname){
+    this.setState({ customerName: childname.name });
   }
 
   handleButtonClick() {
@@ -62,16 +63,16 @@ class ProjectList extends Component {
   }
 
   handleSubmit (feildValue) {
-    addProject({
-      projectname: this.state.projectName || feildValue.projectname,
+    sendInviteMessage({
+      customerName: this.state.customerName || feildValue.customerName,
     }, (json) => {
-      if  (json.result === true) {
+      if  (json.code === 200) {
         this.setState({
         visible: false
     });
-      message.success(language.ADD_SUCCESS_MSG);
+      message.success(language.SENT_SUCCESS_MSG);
       } else {
-        message.error(language.ADD_FAIL_MSG);
+        message.error(language.SENT_FAIL_MSG);
       }
     })
   }
@@ -91,20 +92,20 @@ class ProjectList extends Component {
         <ButtonWithModal
           buttonStyle={{ marginLeft: 8 }}
           buttonType="primary"
-          buttonText="创建新的项目"
+          buttonText="邀请"
           visible={this.state.visible}
-          modalTitle="创建新的项目"
+          modalTitle="邀请"
           modalOkText="提交"
           modalCancelText="取消"
           onButtonClick={this.handleButtonClick}
           onModalOk={this.handleOkClick}
           onModalCancel={this.handleCancelClick}
         >
-        <ProjectListForm
-          inputLabel="项目名称"
-          getInput={this.getProjectName}
-          onChange={this.handleFormChange}
-          onSubmit={this.handleSubmit}
+        <ListCustomerForm
+              inputLabel="用户名称"
+              getInput={this.getCustomerName}
+              onChange={this.handleFormChange}
+              onSubmit={this.handleSubmit}
         />
         </ButtonWithModal>
       )
@@ -114,19 +115,19 @@ class ProjectList extends Component {
   }
 
   onDelete = (key) => {
-    const projects = [...this.state.projects];
-    this.setState({ projects: projects.filter(item => item.key !== key) });
+    const customers = [...this.state.customers];
+    this.setState({ customers: customers.filter(item => item.key !== key) });
   }
 
 
   componentDidMount() {
-    this.getProjectData();
+    this.getListCustomerData();
     }
 
   render() {
   	const columns = [{
-  		title: 'projectName',
-  		dataIndex: 'projectname',
+  		title: 'customerName',
+  		dataIndex: 'customername',
   		render: text => <a href="#">{text}</a>,
 		}, {
  		 title: 'action',
@@ -134,7 +135,7 @@ class ProjectList extends Component {
   		dataIndex: 'action',
       render: (text, record) => {
         return (
-          this.state.projects.length > 1 ?
+          this.state.customers.length > 1 ?
           (
             <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record.key)}>
               <a href="#">delete</a>
@@ -152,11 +153,11 @@ class ProjectList extends Component {
           isSearched={true}
           elements={this.getElements()}
           columns={columns}
-          dataSource={this.state.projects}
+          dataSource={this.state.customers}
           loading={this.state.loading}
       />
     </div>
     );
   }
 }
-export default ProjectList;
+export default ListCustomer;

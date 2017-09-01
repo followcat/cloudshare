@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import { checkAccount } from 'request/account';
+import { checkAccount } from 'request/account'; 
 
 import {
   Form,
@@ -15,7 +15,6 @@ class ProjectList extends Component {
   constructor() {
     super();
     this.handleClick = this.handleClick.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleGetInput = this.handleGetInput.bind(this);
   }
 
@@ -33,16 +32,11 @@ class ProjectList extends Component {
     });
   }
 
-  handleKeyPress(e) {
-    if (e.key === 'Enter') {
-      this.handleClick();
-    }
-  }
 
   handleGetInput() {
       this.props.form.validateFields((errors, values) => {
       if (!errors) {
-        this.props.getProjectName(values);
+        this.props.getInput(values);
       }
     });
   }
@@ -52,14 +46,14 @@ class ProjectList extends Component {
           { getFieldDecorator } = this.props.form;
 
     return (
-      <Form layout="horizontal" onSubmit={this.handleClick} onKeyPress={this.handleKeyPress}>
-        <FormItem label="项目名称">
-          {getFieldDecorator('projectname',{
+      <Form layout="horizontal" >
+        <FormItem label={this.props.inputLabel}>
+          {getFieldDecorator('name',{
             rules: [{
-              required: true, message: '项目名称是必填项',}
+              required: true, message: '该栏是必填项',}
             ],
           })(
-            <Input onChange={this.handleGetInput}/>
+            <Input onBlur={this.handleGetInput}/>
           )}
         </FormItem>
       </Form>
@@ -71,11 +65,13 @@ ProjectList.defaultProps = {
   projects: [],
   wrapperCol: {},
   onSubmit() {},
+  inputLabel: '',
 };
 
 ProjectList.propTypes = {
   projects: PropTypes.array,
   btnText: PropTypes.string,
+  inputLabel: PropTypes.string,
   wrapperCol: PropTypes.object,
   form: PropTypes.object,
   onSubmit: PropTypes.func,

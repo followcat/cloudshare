@@ -20,6 +20,7 @@ module.exports = {
     require('./job-description'),
     require('./customer'),
     require('./company'),
-    require('./project-list')
+    require('./project-list'),
+    require('./list-customer'),
   ]
 };

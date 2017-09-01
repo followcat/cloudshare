@@ -26,6 +26,9 @@ class SubheadNav extends Component {
             mode="inline"
             onClick={this.props.onClick}
           >
+          <MenuItem key="invite" title="invite">
+              <Link to='/pm/listcustomer'>Customer</Link>
+          </MenuItem>
           <MenuItem key="project">
             <Link to='/pm/projectlist'>project</Link>
           </MenuItem>
@@ -38,9 +41,6 @@ class SubheadNav extends Component {
               );
             })}
             </SubMenu>
-            <MenuItem key="invite" title="invite">
-              <Link to='/pm/invite'>invite</Link>
-            </MenuItem>
           </Menu>
         </div>
       </div>

@@ -11,6 +11,7 @@ const websiteText = {
     NAME: '姓名',
 
     PROFILE: '个人中心',
+    NOTICE: '消息',
     SEARCH: '搜索',
     MATCH: '匹配',
     RESUME_UPLOADER: '简历上传',
@@ -88,6 +89,9 @@ const websiteText = {
 
     ADD_CUSTOMER: '添加客户',
     ADDED_CUSTOMER: '已添加客户',
+
+    SENT_SUCCESS_MSG: '发送成功',
+    SENT_FAIL_MSG: '发送失败',
 
     SAVE_SUCCESS_MSG: '已保存!',
     SAVE_FAIL_MSG: '保存失败!',

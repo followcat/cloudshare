@@ -110,6 +110,10 @@ const websiteText = {
     FOLD_MSG: '收起所有信息',
     UNFOLD_MSG: '展开所有信息',
 
+    INVITE_MESSAGE: '邀请消息',
+    ACCEPT_INVITE_SUCCESS_MSG: '接受邀请成功！',
+    ACCEPT_INVITE_FAIL_MSG: '接受邀请失败！',
+
     BROWSING_HISTORY: '浏览历史',
     BOOKMARK: '书签',
     SETTING: '设置',

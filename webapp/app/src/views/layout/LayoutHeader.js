@@ -107,6 +107,10 @@ class LayoutHeader extends Component {
         </MenuItem>
         <MenuDivider />
         <MenuItem>
+          <a href={URL.getNotcieURL()}>{language.NOTICE}</a>
+        </MenuItem>
+        <MenuDivider />
+        <MenuItem>
           <a
             href="#"
             onClick={this.handleSignOutClick}

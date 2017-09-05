@@ -48,7 +48,7 @@ class ProjectList extends Component {
   }
 
   getProjectName(childname){
-    this.setState({ projectName: childname });
+    this.setState({ projectName: childname.name });
   }
 
   handleButtonClick() {
@@ -63,12 +63,14 @@ class ProjectList extends Component {
 
   handleSubmit (feildValue) {
     addProject({
-      projectname: this.state.projectName || feildValue.projectname,
+      projectname: this.state.projectName,
     }, (json) => {
       if  (json.result === true) {
         this.setState({
-        visible: false
+        visible: false,
+        projects: [...this.state.projects],
     });
+
       message.success(language.ADD_SUCCESS_MSG);
       } else {
         message.error(language.ADD_FAIL_MSG);
@@ -144,7 +146,6 @@ class ProjectList extends Component {
       },
 		}];
 
-  	const data = this.state.projects;
     return (
     <div className="cs-project-list">
       <TablePlus

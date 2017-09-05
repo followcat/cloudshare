@@ -9,7 +9,7 @@ import {   message,Form,Table, Input,Button, Popconfirm } from 'antd';
 
 import findIndex from 'lodash/findIndex';
 
-import { getListCustomer,sendInviteMessage } from 'request/customer';
+import { getListCustomer,deleteCustomer,sendInviteMessage } from 'request/customer';
 
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
@@ -37,12 +37,8 @@ class ListCustomer extends Component {
   getListCustomerData() {
     getListCustomer((json) => {
       if (json.code === 200) {
-		    var jsontest = [];
-		    var fin = [];
-		    json.result.map(item => item.inviter).map((item,index) => { return jsontest.push('{"key"'+':"'+index+'",'+'customername'+':"'+item+'"}') });
-		    jsontest.map((item,index) => { return fin.push(eval('(' + item + ')')) });
 		    this.setState({
-          customers: fin,
+          customers: json.result,
         });
       }
     });
@@ -64,7 +60,7 @@ class ListCustomer extends Component {
 
   handleSubmit (feildValue) {
     sendInviteMessage({
-      customerName: this.state.customerName || feildValue.customerName,
+      customerName: this.state.customerName,
     }, (json) => {
       if  (json.code === 200) {
         this.setState({
@@ -114,9 +110,19 @@ class ListCustomer extends Component {
     return elements;
   }
 
-  onDelete = (key) => {
-    const customers = [...this.state.customers];
-    this.setState({ customers: customers.filter(item => item.key !== key) });
+  onDelete = (record) => {
+    deleteCustomer({
+      customerName: record.name,
+      userid : record.id,
+    }, (json) => {
+      if  (json.code === 200) {
+      const customers = [...this.state.customers];
+      this.setState({ customers: customers.filter(item => item.id !== record.id) });
+      message.success(language.DELETE_SUCCESS_MSG);
+      } else {
+        message.error(language.DELETE_FAIL_MSG);
+      }
+    }) 
   }
 
 
@@ -126,18 +132,18 @@ class ListCustomer extends Component {
 
   render() {
   	const columns = [{
-  		title: 'customerName',
-  		dataIndex: 'customername',
+      title: 'memberName',
+      dataIndex: 'name',
   		render: text => <a href="#">{text}</a>,
 		}, {
- 		 title: 'action',
+      title: 'action',
   		className: 'action',
   		dataIndex: 'action',
       render: (text, record) => {
         return (
-          this.state.customers.length > 1 ?
+          this.state.customers.length > 0 ?
           (
-            <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record.key)}>
+            <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record)}>
               <a href="#">delete</a>
             </Popconfirm>
           ) : null
@@ -149,6 +155,7 @@ class ListCustomer extends Component {
     return (
     <div className="cs-project-list">
       <TablePlus
+          rowKey={record => record.id}
           isToolbarShowed={true}
           isSearched={true}
           elements={this.getElements()}

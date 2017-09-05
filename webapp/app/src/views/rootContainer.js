@@ -39,6 +39,7 @@ const rootRoute = {
     require('../routes/cvsdoc-mining'),
     require('../routes/doc-mining-cv'),
     require('../routes/user-info'),
+    require('../routes/notice'),
     require('../routes/resume'),
     require('../routes/upload-preview'),
     require('../routes/go-to-signin'),

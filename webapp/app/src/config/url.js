@@ -64,5 +64,11 @@ export const URL = {
   getProjectList: () => {
     return `/pm/projectlist`;
   },
+  getNotcieURL: () => {
+    return `/notice`;
+  },
+  getInviteMessageURL: () => {
+    return `/notice/invitemessage`;
+  },
 
 };

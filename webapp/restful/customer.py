@@ -36,14 +36,21 @@ class CustomerAPI(Resource):
 
 class ListCustomerAccountsAPI(CustomerAPI):
 
+    def __init__(self):
+        super(ListCustomerAccountsAPI, self).__init__()
+        self.svc_account = flask.current_app.config['SVC_ACCOUNT']
+
     def get(self):
         user = flask.ext.login.current_user
         customer = user.getcustomer(self.svc_customers)
         result = list()
         for id in customer.accounts.ids:
-            info = customer.accounts.getinfo(id)
-            info['date'] = utils.builtin.strftime(info['date'])
-            result.append(info)
+            info = self.svc_account.getinfo(id)
+            customer_info = customer.accounts.getinfo(id)
+            customer_info['date'] = utils.builtin.strftime(customer_info['date'])
+            customer_info['name'] = info['name']
+            customer_info['id'] = id
+            result.append(customer_info)
         return { 'code': 200, 'result': result }
 
 
@@ -62,7 +69,7 @@ class CustomerAccountAPI(CustomerAPI):
         msgid = args['msgid']
         result = self.svc_msg.process_invite(user.id, msgid, user.name)
         if result is True:
-            result = user.joincustomer(user.id, name, self.svc_customers)
+            result = user.joincustomer(args['userid'], name, self.svc_customers)
         return { 'code': 200, 'result': result }
 
     def delete(self, name):

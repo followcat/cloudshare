@@ -77,7 +77,9 @@ class Project(services.base.service.Service):
         for cvrepo in self.cvrepos:
             if isinstance(cvrepo, services.simulationcv.SimulationCV):
                 for each in cvrepo.storages:
-                    result = each
+                    if each.name == servicename:
+                        result = each
+                        break
             elif cvrepo.name == servicename:
                 result = each
             if result is not None:

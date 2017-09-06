@@ -8,20 +8,18 @@ class Customers(object):
 
     default_customer_name = 'default'
 
-    def __init__(self, path, acc_repos, co_repos, cv_repos, mult_peo):
+    def __init__(self, path, acc_repos, cv_repos, mult_peo):
         self.path = path
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         self.acc_repos = acc_repos
-        self.co_repos = co_repos
         self.cv_repos = cv_repos
         self.mult_peo = mult_peo
         self.customers = dict()
         for customer_path in glob.glob(os.path.join(self.path, '*')):
             if os.path.isdir(customer_path):
                 name = os.path.split(customer_path)[1]
-                customer = services.customer.Customer(acc_repos, co_repos,
-                                                      cv_repos, mult_peo,
+                customer = services.customer.Customer(acc_repos, cv_repos, mult_peo,
                                                       customer_path, name)
                 customer.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage'})
                 self.customers[name] = customer
@@ -29,7 +27,7 @@ class Customers(object):
 
     def load_default_customer(self):
         path = os.path.join(self.path, self.default_customer_name)
-        customer = services.customer.DefaultCustomer(self.acc_repos, self.co_repos,
+        customer = services.customer.DefaultCustomer(self.acc_repos,
                                                      self.cv_repos, self.mult_peo,
                                                      path, self.default_customer_name)
         customer.setup({'storageCV': 'cvindividual', 'storagePEO': 'peoindividual'})
@@ -41,7 +39,7 @@ class Customers(object):
     def create(self, name):
         assert not self.exists(name)
         path = os.path.join(self.path, name)
-        customer = services.customer.Customer(self.acc_repos, self.co_repos,
+        customer = services.customer.Customer(self.acc_repos,
                                               self.cv_repos, self.mult_peo,
                                               path, name)
         customer.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage'})

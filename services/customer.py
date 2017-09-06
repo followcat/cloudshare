@@ -3,6 +3,7 @@ import glob
 
 import core.basedata
 import utils.builtin
+import services.company
 import services.project
 import services.base.service
 import services.simulationacc
@@ -16,20 +17,23 @@ class Customer(services.base.service.Service):
     PRJ_PATH = 'projects'
     ACC_PATH = 'accounts'
     CV_PATH = 'currivulumvitaes'
+    CO_PATH = 'companies'
     config_file = 'config.yaml' 
 
-    def __init__(self, acc_repos, co_repos, cv_repos,
+    def __init__(self, acc_repos, cv_repos,
                  mult_peo, path, name, iotype='git'):
         super(Customer, self).__init__(path, name, iotype=iotype)
         self.name = name
         self.path = path
         self.cv_path = os.path.join(path, self.CV_PATH)
-        self.co_repos = co_repos
+        self.co_path = os.path.join(path, self.CO_PATH)
         self.cv_repos = cv_repos
         self.mult_peo = mult_peo
         self.acc_repos = acc_repos
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
+        self.companies = services.company.Company(self.co_path, name)
+        self.co_repos = [self.companies]
         self.curriculumvitaes = services.simulationcv.SimulationCV.autoservice(
                                                             self.cv_path, name, cv_repos)
         self.config = dict()
@@ -129,6 +133,7 @@ class Customer(services.base.service.Service):
             project = self.projects[name]
             project.backup(customer_path)
         self.accounts.backup(customer_path)
+        self.companies.backup(customer_path)
         self.curriculumvitaes.backup(customer_path)
 
 
@@ -137,9 +142,9 @@ class DefaultCustomer(Customer):
     default_name = 'default'
     default_model = 'medical'
 
-    def __init__(self, acc_repos, co_repos, cv_repos, mult_peo, path,
+    def __init__(self, acc_repos, cv_repos, mult_peo, path,
                  name='default', iotype='git'):
-        super(DefaultCustomer, self).__init__(acc_repos, co_repos, cv_repos,
+        super(DefaultCustomer, self).__init__(acc_repos, cv_repos,
                                               mult_peo, path, name, iotype=iotype)
 
     def load_projects(self):

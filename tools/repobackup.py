@@ -12,7 +12,6 @@ backup_folders = baseapp.backup.BACKUP_DIRS
 ISOTIMEFORMAT = '%Y-%m-%d-%X'
 source_repo = baseapp.datadbs.SVC_CV_REPO
 account_repo = baseapp.datadbs.SVC_ACCOUNT
-company_repo = baseapp.datadbs.SVC_CO_REPO
 people_repo = baseapp.datadbs.SVC_PEO_REPO
 medical_repo = baseapp.projects.SVC_PRJ_MED
 AI_repo = baseapp.projects.SVC_PRJ_AI
@@ -53,7 +52,6 @@ if __name__ == '__main__':
         utils.builtin.assure_path_exists(NE_backup_path)
         source_repo.backup(data_backup_path, bare=True)
         account_repo.backup(account_backup_path, bare=True)
-        company_repo.backup(company_backup_path, bare=True)
         people_repo.backup(people_backup_path, bare=True)
         medical_repo.backup(medical_backup_path, bare=True)
         AI_repo.backup(AI_backup_path, bare=True)

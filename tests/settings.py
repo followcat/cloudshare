@@ -6,7 +6,6 @@ import services.mining
 import services.people
 import services.account
 import services.project
-import services.company
 import services.customers
 import services.multipeople
 import services.curriculumvitae
@@ -42,14 +41,13 @@ class Config(object):
                                                     'accrepo')
         self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB_NAME,
                                                                     'cloudshare')
-        self.SVC_CO_REPO = services.company.Company(self.REPO_DB_NAME, 'corepo')
         self.SVC_PEO_REPO = services.people.People(self.SVC_CV_REPO,
                                                    os.path.join(self.REPO_DB_NAME, 'PEO'),
                                                    name='peorepo', iotype='base')
 
         self.SVC_MULT_PEO = services.multipeople.MultiPeople([self.SVC_PEO_REPO])
         self.SVC_CUSTOMERS = services.customers.Customers(self.CUSTOMERS_PATH,
-                                                          [self.SVC_ACCOUNT], [self.SVC_CO_REPO],
+                                                          [self.SVC_ACCOUNT],
                                                           [self.SVC_CV_REPO], [self.SVC_MULT_PEO])
         self.SVC_CUSTOMERS.create('test_customer')
         self.SVC_CUSTOMER = self.SVC_CUSTOMERS.get('test_customer')

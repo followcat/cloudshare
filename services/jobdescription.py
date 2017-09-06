@@ -11,7 +11,6 @@ import services.base.service
 class JobDescription(services.base.service.Service):
     """
         >>> import shutil
-        >>> import services.company
         >>> import services.jobdescription
         >>> import interface.gitinterface
 

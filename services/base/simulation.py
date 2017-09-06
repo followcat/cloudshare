@@ -169,7 +169,9 @@ class Simulation(services.base.storage.BaseStorage):
         results = set()
         allfile = set()
         for storage in self.storages:
-            if storage.name in selected:
+            if isinstance(storage, Simulation):
+                allfile.update(storage.search(keyword, selected=selected))
+            elif storage.name in selected:
                 allfile.update(storage.search(keyword))
         for result in allfile:
             id = core.outputstorage.ConvertName(result[0]).base
@@ -183,7 +185,9 @@ class Simulation(services.base.storage.BaseStorage):
         results = set()
         allfile = set()
         for storage in self.storages:
-            if storage.name in selected:
+            if isinstance(storage, Simulation):
+                allfile.update(storage.search_yaml(keyword, selected=selected))
+            elif storage.name in selected:
                 allfile.update(storage.search_yaml(keyword))
         for result in allfile:
             id = core.outputstorage.ConvertName(result[0]).base

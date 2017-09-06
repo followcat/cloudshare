@@ -97,6 +97,8 @@ def initialize(app):
 
     api.add_resource(MessageAPI, '/api/message/<string:msgid>',
                      endpoint = 'message')
+    api.add_resource(MessagesNotifyAPI, '/api/messagenotify',
+                     endpoint = 'messagenotify')
     api.add_resource(SendMessageAPI, '/api/sendmessage/<string:desname>',
                      endpoint = 'sendmessage')
     api.add_resource(InvitedMessageAPI, '/api/invitedmessage/<string:msgid>',

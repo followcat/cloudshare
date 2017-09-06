@@ -34,6 +34,18 @@ class ListInvitedMessagesAPI(Resource):
         return { 'code': 200, 'result': user.getinvitedmessages(svc_msg) }
 
 
+class MessagesNotifyAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def get(self):
+        user = flask.ext.login.current_user
+        svc_msg = flask.current_app.config['SVC_MSG']
+        msginfo = svc_msg.getinfo(user.id)
+        return { 'code': 200, 'result': {'unread_chat': len(msginfo['unread_chat']),
+                                         'invited_customer': len(msginfo['invited_customer'])} }
+
+
 class MessageAPI(Resource):
 
     decorators = [flask.ext.login.login_required]

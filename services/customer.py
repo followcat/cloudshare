@@ -133,6 +133,11 @@ class Customer(services.base.service.Service):
         accounts_path = os.path.join(customer_path, 'accounts')
         companies_path = os.path.join(customer_path, 'companies')
         curriculumvitaes_path = os.path.join(customer_path, 'curriculumvitaes')
+        utils.builtin.assure_path_exists(customer_path)
+        utils.builtin.assure_path_exists(projects_path)
+        utils.builtin.assure_path_exists(accounts_path)
+        utils.builtin.assure_path_exists(companies_path)
+        utils.builtin.assure_path_exists(curriculumvitaes_path)
         for name in self.projects:
             project = self.projects[name]
             project.backup(projects_path)

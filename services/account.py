@@ -248,7 +248,7 @@ class Message(services.base.storage.BaseStorage):
                         return result
 
     def process_invite(self, invited_id, msgid, committer):
-        result = False
+        result = None
         send_info = None
         receive_info = self.getinvitedcontent(invited_id, msgid)
         inviter_id = receive_info['relation']
@@ -261,7 +261,8 @@ class Message(services.base.storage.BaseStorage):
                                      'read_chat', committer)
             receive_result = self._move(invited_id, receive_info['id'], 'invited_customer',
                                      'read_chat', committer)
-            result = send_result and receive_result
+            if send_result and receive_result:
+                result = receive_info['content']
         return result
 
     def read(self, id, msgid, committer):

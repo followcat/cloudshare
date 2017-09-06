@@ -72,9 +72,20 @@ class SendMessageAPI(MessageAPI):
 
 class InvitedMessageAPI(MessageAPI):
 
+    def __init__(self):
+        super(InvitedMessageAPI, self).__init__()
+        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+
     def get(self, msgid):
         user = flask.ext.login.current_user
         return { 'code': 200, 'result': user.getinvitedmessage(msgid, self.svc_msg) }
+
+    def post(self, msgid):
+        user = flask.ext.login.current_user
+        result = self.svc_msg.process_invite(user.id, msgid, user.name)
+        if result is not None:
+            result = user.joincustomer(user.id, result, self.svc_customers)
+        return { 'code': 200, 'result': result }
 
 
 class SendInviteMessageAPI(MessageAPI):

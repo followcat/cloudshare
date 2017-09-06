@@ -110,7 +110,7 @@ def initialize(app):
     api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
     api.add_resource(ListCustomerAccountsAPI, '/api/listcustomeraccounts',
                      endpoint = 'listcustomeraccounts')
-    api.add_resource(CustomerAccountAPI, '/api/customeraccount/<string:name>',
+    api.add_resource(CustomerAccountAPI, '/api/customeraccount/<string:userid>',
                      endpoint = 'customeraccount')
     api.add_resource(CustomerProjectAPI, '/api/customerproject/<string:projectname>',
                      endpoint = 'customerproject')

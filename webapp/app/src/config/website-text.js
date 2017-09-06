@@ -11,6 +11,7 @@ const websiteText = {
     NAME: '姓名',
 
     PROFILE: '个人中心',
+    NOTICE: '消息',
     SEARCH: '搜索',
     MATCH: '匹配',
     RESUME_UPLOADER: '简历上传',
@@ -85,9 +86,12 @@ const websiteText = {
     COMPANY_NAME_VALIDATE_MSG: '请输入公司名称',
     JOB_DESCRIPTION_NAME_VALIDATE_MSG: '请输入职位名称',
     JOB_DESCRIPTION_CONTENT_VALIDATE_MSG: '请输入职位描述内容',
-    
+
     ADD_CUSTOMER: '添加客户',
     ADDED_CUSTOMER: '已添加客户',
+
+    SENT_SUCCESS_MSG: '发送成功',
+    SENT_FAIL_MSG: '发送失败',
 
     SAVE_SUCCESS_MSG: '已保存!',
     SAVE_FAIL_MSG: '保存失败!',
@@ -105,6 +109,10 @@ const websiteText = {
 
     FOLD_MSG: '收起所有信息',
     UNFOLD_MSG: '展开所有信息',
+
+    INVITE_MESSAGE: '邀请消息',
+    ACCEPT_INVITE_SUCCESS_MSG: '接受邀请成功！',
+    ACCEPT_INVITE_FAIL_MSG: '接受邀请失败！',
 
     BROWSING_HISTORY: '浏览历史',
     BOOKMARK: '书签',

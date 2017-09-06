@@ -2,6 +2,16 @@
 const HOST = '';
 
 export const API = {
+  ACCEPT_INVITE_MESSAGE_API:`${HOST}/api/customeraccount`,
+
+  LIST_INVITED_MESSAGES_API:`${HOST}/api/listinvitedmessages`,
+
+  SEND_INVITE_MESSAGE_API:`${HOST}/api/sendinvitemessage`,
+
+  LIST_CUSTOMER_ACCOUNTS_API:`${HOST}/api/listcustomeraccounts`,
+
+  CUSTOMER_PROJECT_API:`${HOST}/api/customerproject`,
+
   USER_API:`${HOST}/api/user`,
 
   PASSWORD_API: `${HOST}/api/password`,

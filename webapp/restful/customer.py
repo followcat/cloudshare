@@ -15,12 +15,12 @@ class CustomerAPI(Resource):
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('customername', type = str, location = 'json')
-
+# get customer's projectname
     def get(self):
         user = flask.ext.login.current_user
         customer = user.getcustomer(self.svc_customers)
         return { 'code': 200, 'result': customer.name }
-
+# user become customer
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
@@ -36,15 +36,21 @@ class CustomerAPI(Resource):
 
 class ListCustomerAccountsAPI(CustomerAPI):
 
+    def __init__(self):
+        super(ListCustomerAccountsAPI, self).__init__()
+        self.svc_account = flask.current_app.config['SVC_ACCOUNT']
+
     def get(self):
         user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
         customer = user.getcustomer(self.svc_customers)
         result = list()
         for id in customer.accounts.ids:
-            info = customer.accounts.getinfo(id)
-            info['date'] = utils.builtin.strftime(info['date'])
-            result.append(info)
+            info = self.svc_account.getinfo(id)
+            customer_info = customer.accounts.getinfo(id)
+            customer_info['date'] = utils.builtin.strftime(customer_info['date'])
+            customer_info['name'] = info['name']
+            customer_info['id'] = id
+            result.append(customer_info)
         return { 'code': 200, 'result': result }
 
 
@@ -68,4 +74,4 @@ class CustomerProjectAPI(CustomerAPI):
         classify = args['classify']
         customer = user.getcustomer(self.svc_customers)
         result = customer.add_project(projectname, classify)
-        return result
+        return { 'code': 200, 'result': result }

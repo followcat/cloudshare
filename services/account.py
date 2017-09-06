@@ -262,7 +262,7 @@ class Message(services.base.storage.BaseStorage):
             receive_result = self._move(invited_id, receive_info['id'], 'invited_customer',
                                      'read_chat', committer)
             if send_result and receive_result:
-                result = receive_info['content']
+                result = receive_info
         return result
 
     def read(self, id, msgid, committer):

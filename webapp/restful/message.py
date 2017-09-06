@@ -86,10 +86,10 @@ class InvitedMessageAPI(MessageAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         reply = args['reply']
-        name = self.svc_msg.process_invite(user.id, msgid, user.name)
+        message = self.svc_msg.process_invite(user.id, msgid, user.name)
         result = False
-        if name is not None and reply is True:
-            result = user.joincustomer(user.id, name, self.svc_customers)
+        if message is not None and reply is True:
+            result = user.joincustomer(message['relation'], message['content'], self.svc_customers)
         return { 'code': 200, 'result': result }
 
 

@@ -61,5 +61,14 @@ export const URL = {
   getBestExcellent: () => {
     return `/excellent`;
   },
+  getProjectList: () => {
+    return `/pm/projectlist`;
+  },
+  getNotcieURL: () => {
+    return `/notice`;
+  },
+  getInviteMessageURL: () => {
+    return `/notice/invitemessage`;
+  },
 
 };

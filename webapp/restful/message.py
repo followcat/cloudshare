@@ -75,6 +75,8 @@ class InvitedMessageAPI(MessageAPI):
     def __init__(self):
         super(InvitedMessageAPI, self).__init__()
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('reply', type = bool, location = 'json')
 
     def get(self, msgid):
         user = flask.ext.login.current_user
@@ -82,9 +84,12 @@ class InvitedMessageAPI(MessageAPI):
 
     def post(self, msgid):
         user = flask.ext.login.current_user
-        result = self.svc_msg.process_invite(user.id, msgid, user.name)
-        if result is not None:
-            result = user.joincustomer(user.id, result, self.svc_customers)
+        args = self.reqparse.parse_args()
+        reply = args['reply']
+        name = self.svc_msg.process_invite(user.id, msgid, user.name)
+        result = False
+        if name is not None and reply is True:
+            result = user.joincustomer(user.id, name, self.svc_customers)
         return { 'code': 200, 'result': result }
 
 

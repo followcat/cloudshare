@@ -16,7 +16,7 @@ class Customer(services.base.service.Service):
     commitinfo = 'Customer'
     PRJ_PATH = 'projects'
     ACC_PATH = 'accounts'
-    CV_PATH = 'currivulumvitaes'
+    CV_PATH = 'curriculumvitaes'
     CO_PATH = 'companies'
     config_file = 'config.yaml' 
 
@@ -129,12 +129,16 @@ class Customer(services.base.service.Service):
 
     def backup(self, path):
         customer_path = os.path.join(path, self.name)
+        projects_path = os.path.join(customer_path, 'projects')
+        accounts_path = os.path.join(customer_path, 'accounts')
+        companies_path = os.path.join(customer_path, 'companies')
+        curriculumvitaes_path = os.path.join(customer_path, 'curriculumvitaes')
         for name in self.projects:
             project = self.projects[name]
-            project.backup(customer_path)
-        self.accounts.backup(customer_path)
-        self.companies.backup(customer_path)
-        self.curriculumvitaes.backup(customer_path)
+            project.backup(projects_path)
+        self.accounts.backup(accounts_path)
+        self.companies.backup(companies_path)
+        self.curriculumvitaes.backup(curriculumvitaes_path)
 
 
 class DefaultCustomer(Customer):

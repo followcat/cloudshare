@@ -5,19 +5,23 @@ import tarfile
 import utils.builtin
 import baseapp.backup
 import baseapp.datadbs
+import baseapp.customer
 import webapp.settings
 
 
 backup_folders = baseapp.backup.BACKUP_DIRS
 ISOTIMEFORMAT = '%Y-%m-%d-%X'
-source_repo = baseapp.datadbs.SVC_CV_REPO
-account_repo = baseapp.datadbs.SVC_ACCOUNT
-people_repo = baseapp.datadbs.SVC_PEO_REPO
-medical_repo = baseapp.projects.SVC_PRJ_MED
-AI_repo = baseapp.projects.SVC_PRJ_AI
-BT_repo = baseapp.projects.SVC_PRJ_BT
-IA_repo = baseapp.projects.SVC_PRJ_IA
-NE_repo = baseapp.projects.SVC_PRJ_NE
+
+SVC_MSG = baseapp.datadbs.SVC_MSG
+SVC_PWD = baseapp.datadbs.SVC_PWD
+SVC_ACCOUNT = baseapp.datadbs.SVC_ACCOUNT
+
+SVC_CV_REPO = baseapp.datadbs.SVC_CV_REPO
+SVC_PEO_REPO = baseapp.datadbs.SVC_PEO_REPO
+SVC_CV_INDIV = baseapp.datadbs.SVC_CV_INDIV
+SVC_PEO_INDIV = baseapp.datadbs.SVC_PEO_INDIV
+SVC_CUSTOMERS =  baseapp.customer.SVC_CUSTOMERS
+
 
 def backup_upload_output():
     for folder in backup_folders:
@@ -32,30 +36,29 @@ def backup_upload_output():
 if __name__ == '__main__':
     backup_name = time.strftime(ISOTIMEFORMAT, time.localtime())
     for folder in backup_folders:
-        data_backup_path = os.path.join(folder, 'data', backup_name)
         account_backup_path = os.path.join(folder, 'account', backup_name)
-        medical_backup_path = os.path.join(folder, 'medical', backup_name)
-        company_backup_path = os.path.join(folder, 'company', backup_name)
-        people_backup_path = os.path.join(folder, 'people', backup_name)
-        AI_backup_path = os.path.join(folder, 'AI', backup_name)
-        BT_backup_path = os.path.join(folder, 'BT', backup_name)
-        IA_backup_path = os.path.join(folder, 'IA', backup_name)
-        NE_backup_path = os.path.join(folder, 'NE', backup_name)
-        utils.builtin.assure_path_exists(data_backup_path)
+        message_backup_path = os.path.join(folder, 'message', backup_name)
+        password_backup_path = os.path.join(folder, 'password', backup_name)
+        cvrepo_backup_path = os.path.join(folder, 'cvrepo', backup_name)
+        peorepo_backup_path = os.path.join(folder, 'peorepo', backup_name)
+        cvindiv_backup_path = os.path.join(folder, 'cvindiv', backup_name)
+        peoindiv_backup_path = os.path.join(folder, 'peoindiv', backup_name)
+        customers_backup_path = os.path.join(folder, 'customers', backup_name)
         utils.builtin.assure_path_exists(account_backup_path)
-        utils.builtin.assure_path_exists(company_backup_path)
-        utils.builtin.assure_path_exists(people_backup_path)
-        utils.builtin.assure_path_exists(medical_backup_path)
-        utils.builtin.assure_path_exists(AI_backup_path)
-        utils.builtin.assure_path_exists(BT_backup_path)
-        utils.builtin.assure_path_exists(IA_backup_path)
-        utils.builtin.assure_path_exists(NE_backup_path)
-        source_repo.backup(data_backup_path, bare=True)
-        account_repo.backup(account_backup_path, bare=True)
-        people_repo.backup(people_backup_path, bare=True)
-        medical_repo.backup(medical_backup_path, bare=True)
-        AI_repo.backup(AI_backup_path, bare=True)
-        BT_repo.backup(BT_backup_path, bare=True)
-        IA_repo.backup(IA_backup_path, bare=True)
-        NE_repo.backup(NE_backup_path, bare=True)
+        utils.builtin.assure_path_exists(message_backup_path)
+        utils.builtin.assure_path_exists(password_backup_path)
+        utils.builtin.assure_path_exists(cvrepo_backup_path)
+        utils.builtin.assure_path_exists(peorepo_backup_path)
+        utils.builtin.assure_path_exists(cvindiv_backup_path)
+        utils.builtin.assure_path_exists(peoindiv_backup_path)
+        utils.builtin.assure_path_exists(customers_backup_path)
+        SVC_MSG.backup(message_backup_path, bare=True)
+        SVC_PWD.backup(password_backup_path, bare=True)
+        SVC_ACCOUNT.backup(account_backup_path, bare=True)
+        SVC_CV_REPO.backup(cvrepo_backup_path, bare=True)
+        SVC_PEO_REPO.backup(peorepo_backup_path, bare=True)
+        SVC_CV_INDIV.backup(cvindiv_backup_path, bare=True)
+        SVC_PEO_INDIV.backup(peoindiv_backup_path, bare=True)
+        for customer in SVC_CUSTOMERS.customers.values():
+            customer.backup(customers_backup_path)
     backup_upload_output()

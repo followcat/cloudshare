@@ -73,5 +73,5 @@ class CustomerProjectAPI(CustomerAPI):
         args = self.reqparse.parse_args()
         classify = args['classify']
         customer = user.getcustomer(self.svc_customers)
-        result = customer.add_project(projectname, classify)
+        result = customer.add_project(projectname, classify, user.id)
         return { 'code': 200, 'result': result }

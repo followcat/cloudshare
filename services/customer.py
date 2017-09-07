@@ -71,6 +71,23 @@ class Customer(services.base.service.Service):
             result = self
         return result
 
+    def add_admin(self, inviter_id, invited_id, creator=False):
+        result = False
+        if 'administrator' not in self.config:
+            self.config['administrator'] = set()
+        if creator is Ture or (self.check_admin(inviter_id) and
+                               invited_id not in self.config['administrator']):
+            self.config['administrator'].add(invited_id)
+            self.save()
+            result = True
+        return result
+
+    def check_admin(self, id):
+        return id in self.config['administrator']
+
+    def get_admins(self):
+        return self.config['administrator']
+
     def load_projects(self):
         self.projects = dict()
         for path in glob.glob(os.path.join(self.projects_path, '*')):
@@ -82,7 +99,13 @@ class Customer(services.base.service.Service):
                                           'storagePEO': self.config['storagePEO']})
                 self.projects[name] = tmp_project
 
-    def add_project(self, name, classify, autosetup=False, autoupdate=False):
+    def add_project(self, name, classify, adminID, autosetup=False, autoupdate=False):
+        result = False
+        if self.check_admin(adminID):
+            result = self._add_project(name, classify, autosetup=autosetup, autoupdate=autoupdate)
+        return result
+
+    def _add_project(self, name, classify, autosetup=False, autoupdate=False):
         result = False
         if name not in self.projects:
             path = os.path.join(self.projects_path, name)
@@ -98,14 +121,16 @@ class Customer(services.base.service.Service):
 
     def add_account(self, inviter_id, invited_id, committer, creator=False):
         result = False
-        if creator is True or self.accounts.exists(inviter_id):
+        if creator is True or self.check_admin(inviter_id):
             bsobj = core.basedata.DataObject(metadata={'id': invited_id}, data=None)
             result = self.accounts.add(bsobj, committer=committer)
+        if creator is True and result is True:
+            self.add_admin(inviter_id, invited_id, creator=creator)
         return result
 
     def rm_account(self, inviter_id, invited_id, committer):
         result = False
-        if self.accounts.exists(inviter_id) and self.accounts.exists(invited_id):
+        if self.check_admin(inviter_id) and self.accounts.exists(invited_id):
             result = self.accounts.remove(invited_id, committer=committer)
         return result
 
@@ -159,8 +184,8 @@ class DefaultCustomer(Customer):
     def load_projects(self):
         super(DefaultCustomer, self).load_projects()
         if self.default_name not in self.projects:
-            super(DefaultCustomer, self).add_project(self.default_name,
-                                                     sources.industry_id.sources)
+            super(DefaultCustomer, self)._add_project(self.default_name,
+                                                      sources.industry_id.sources)
         self.projects[self.default_name]._modelname = self.default_model
 
     def use(self, id):
@@ -168,6 +193,9 @@ class DefaultCustomer(Customer):
 
     def getproject(self, projectname=None):
         return self.projects[self.default_name]
+
+    def add_admin(self, **kwargs):
+        return False
 
     def add_account(self, **kwargs):
         return False

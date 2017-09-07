@@ -130,7 +130,8 @@ class Customer(services.base.service.Service):
 
     def rm_account(self, inviter_id, invited_id, committer):
         result = False
-        if self.check_admin(inviter_id) and self.accounts.exists(invited_id):
+        if self.accounts.exists(invited_id) and (self.check_admin(inviter_id) or
+                                                 inviter_id == invited_id):
             result = self.accounts.remove(invited_id, committer=committer)
         return result
 

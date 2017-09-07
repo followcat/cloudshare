@@ -60,6 +60,36 @@ class CustomerAccountAPI(CustomerAPI):
         result = user.awaycustomer(userid, self.svc_customers)
         return { 'code': 200, 'result': result }
 
+class CustomerAdminAPI(CustomerAPI):
+
+    def __init__(self):
+        super(CustomerAdminAPI, self).__init__()
+        self.reqparse.add_argument('userid', type = str, location = 'json')
+
+    def get(self):
+        user = flask.ext.login.current_user
+        customer = user.getcustomer(self.svc_customers)
+        result = set()
+        if customer.check_admin(user.id):
+            result = customer.get_admins()
+        return { 'code': 200, 'result': result }
+
+    def post(self):
+        user = flask.ext.login.current_user
+        customer = user.getcustomer(self.svc_customers)
+        args = self.reqparse.parse_args()
+        userid = args['userid']
+        result = customer.add_admin(user.id, userid)
+        return { 'code': 200, 'result': result }
+
+    def delete(self):
+        user = flask.ext.login.current_user
+        customer = user.getcustomer(self.svc_customers)
+        args = self.reqparse.parse_args()
+        userid = args['userid']
+        result = customer.delete_admin(user.id, userid)
+        return { 'code': 200, 'result': result }
+
 
 class CustomerProjectAPI(CustomerAPI):
 

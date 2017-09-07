@@ -71,22 +71,30 @@ class Customer(services.base.service.Service):
             result = self
         return result
 
+    def get_admins(self):
+        return self.config['administrator']
+
+    def check_admin(self, id):
+        return id in self.config['administrator']
+
     def add_admin(self, inviter_id, invited_id, creator=False):
         result = False
         if 'administrator' not in self.config:
             self.config['administrator'] = set()
         if creator is Ture or (self.check_admin(inviter_id) and
-                               invited_id not in self.config['administrator']):
+                               self.check_admin(invited_id) is False):
             self.config['administrator'].add(invited_id)
             self.save()
             result = True
         return result
 
-    def check_admin(self, id):
-        return id in self.config['administrator']
-
-    def get_admins(self):
-        return self.config['administrator']
+    def delete_admin(self, inviter_id, invited_id):
+        result = False
+        if self.check_admin(inviter_id) and self.check_admin(invited_id):
+            self.config['administrator'].remove(invited_id)
+            self.save()
+            result = True
+        return result
 
     def load_projects(self):
         self.projects = dict()

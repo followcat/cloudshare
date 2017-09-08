@@ -26,8 +26,8 @@ app.secret_key = 'super secret key'
 app.config['SESSION_TYPE'] = 'filesystem'
 sess = flask.ext.session.Session()
 sess.init_app(app)
-cache = flask.ext.cache.Cache(config={'CACHE_TYPE': 'simple'})
-cache.init_app(app)
+app.config['CACHE_TYPE'] = 'simple'
+app.cache = flask.ext.cache.Cache(app)
 webapp.restful.initializtion.initialize(app)
 
 @app.route("/download/<path:filename>")

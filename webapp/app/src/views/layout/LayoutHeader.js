@@ -9,6 +9,8 @@ import { URL } from 'URL';
 
 import { getProject } from 'request/project';
 import { signOut } from 'request/sign';
+import { getListCustomer } from 'request/customer';
+
 import StorageUtil from 'utils/storage';
 
 import logo from '../../image/logo.png';
@@ -21,8 +23,8 @@ const MenuItem = Menu.Item,
       MenuDivider = Menu.Divider,
       confirm = Modal.confirm;
 
-
-const navMenus = [{
+//customer
+const navMenusCustomer = [{
   url: URL.getSearchURL(),
   text: language.SEARCH
 }, {
@@ -38,16 +40,44 @@ const navMenus = [{
   url: URL.getBestExcellent(),
   text: language.BEST_EXCELLENT
 }];
+//user
+const navMenuUser = [{
+  url: URL.getSearchURL(),
+  text: language.SEARCH
+}, {
+  url: URL.getFastMatchingByDoc(),
+  text: language.MATCH
+}, {
+  url: URL.getUploaderURL(),
+  text: language.RESUME_UPLOADER
+}, {
+  url: URL.getBecomeCustomer(),
+  text: language.BECOME_CUSTOMER
+}, {
+  url: URL.getBestExcellent(),
+  text: language.BEST_EXCELLENT
+}];
 
 class LayoutHeader extends Component {
   constructor() {
     super();
     this.state = {
       selectedKeys: [],
-      projects: []
+      projects: [],
+      navMenus: navMenusCustomer,
     };
     this.handleSignOutClick = this.handleSignOutClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
+  }
+
+  componentWillMount() {
+      getListCustomer((json) => {
+      if (json.result) {
+        this.setState({
+          navMenus: navMenuUser,
+        });
+      }
+      });
   }
 
   componentDidMount() {
@@ -56,7 +86,7 @@ class LayoutHeader extends Component {
     
     this.getProjectData();
 
-    navMenus.forEach(v => {
+    this.state.navMenus.forEach(v => {
       if (href.indexOf(v.url) > -1) {
         selectedKeys.push(v.url);
       }
@@ -128,7 +158,7 @@ class LayoutHeader extends Component {
     return (
       <Header
         logoImg={logo}
-        navMenus={navMenus}
+        navMenus={this.state.navMenus}
         profileMenu={profileMenu}
         projects={projects}
         project={StorageUtil.get('_pj')}

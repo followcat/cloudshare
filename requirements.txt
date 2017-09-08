@@ -6,6 +6,7 @@ Flask-Login==0.3.2
 Flask-RESTful==0.3.5
 Flask-Session==0.2.2
 Flask-Testing==0.4.2
+captcha==0.2.4
 dulwich==0.11.2
 pypandoc==1.4
 jieba==0.38

@@ -8,6 +8,7 @@ from webapp.restful.account import *
 from webapp.restful.company import *
 from webapp.restful.message import *
 from webapp.restful.customer import *
+from webapp.restful.captchaverify import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
 from webapp.restful.feature import *
@@ -119,3 +120,5 @@ def initialize(app):
                      endpoint = 'customeraccount')
     api.add_resource(CustomerProjectAPI, '/api/customerproject/<string:projectname>',
                      endpoint = 'customerproject')
+
+    api.add_resource(CaptchaAPI, '/api/captcha', endpoint = 'captcha')

@@ -26,7 +26,6 @@ class SessionAPI(Resource):
         if (user and user.checkpassword(password)):
             flask.ext.login.login_user(user, remember=True)
             token = flask.ext.login.current_user.get_auth_token()
-            flask.session[user.id] = dict()
             result = { 'code': 200, 'token': token, 'user': user.name,
                        'id': user.id, 'redirect_url': '/search' }
         else:

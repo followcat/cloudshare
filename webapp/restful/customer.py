@@ -1,5 +1,6 @@
 import flask
 import flask.ext.login
+import services.customer
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
@@ -31,6 +32,24 @@ class CustomerAPI(Resource):
     def delete(self):
         user = flask.ext.login.current_user
         result = user.awaycustomer(user.id, self.svc_customers)
+        return { 'code': 200, 'result': result }
+
+
+class IsCustomerAPI(CustomerAPI):
+
+    def get(self):
+        user = flask.ext.login.current_user
+        customer = user.getcustomer(self.svc_customers)
+        result = not isinstance(customer, services.customer.DefaultCustomer)
+        return { 'code': 200, 'result': result }
+
+
+class IsCustomerAdminAPI(CustomerAPI):
+
+    def get(self):
+        user = flask.ext.login.current_user
+        customer = user.getcustomer(self.svc_customers)
+        result = customer.check_admin(user.id)
         return { 'code': 200, 'result': result }
 
 

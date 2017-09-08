@@ -109,6 +109,8 @@ def initialize(app):
     api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
     api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')
 
+    api.add_resource(IsCustomerAPI, '/api/iscustomer', endpoint = 'iscustomer')
+    api.add_resource(IsCustomerAdminAPI, '/api/iscustomeradmin', endpoint = 'iscustomeradmin')
     api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
     api.add_resource(CustomerAdminAPI, '/api/customeradmin', endpoint = 'customeradmin')
     api.add_resource(ListCustomerAccountsAPI, '/api/listcustomeraccounts',

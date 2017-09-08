@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 import Header from 'components/layout-header';
 
-import { Modal, Menu } from 'antd';
+import { Modal, Menu, Badge  } from 'antd';
 
 import { URL } from 'URL';
 
@@ -100,14 +100,16 @@ class LayoutHeader extends Component {
   }
 
   render() {
-    const profileMenu = (
+    const profileMenu = ( 
       <Menu>
         <MenuItem>
           <a href={URL.getUserInfoURL()}>{language.PROFILE}</a>
         </MenuItem>
         <MenuDivider />
         <MenuItem>
+          <Badge dot>
           <a href={URL.getNotcieURL()}>{language.NOTICE}</a>
+          </Badge>
         </MenuItem>
         <MenuDivider />
         <MenuItem>

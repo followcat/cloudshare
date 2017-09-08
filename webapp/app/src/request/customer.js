@@ -47,17 +47,3 @@ export const sendInviteMessage = (params,callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const acceptInviteMessage = (params,callback) => {
-  return fetch(`${API.ACCEPT_INVITE_MESSAGE_API}/${params.name}`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Authorization': `Basic ${StorageUtil.get('token')}`,
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(params)
-  })
-  .then(response => response.json())
-  .then(json => callbackFunction(callback, json));
-};

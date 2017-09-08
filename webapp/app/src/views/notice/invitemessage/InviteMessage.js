@@ -6,8 +6,7 @@ import { Row, Col ,Popconfirm,message } from 'antd';
 import TablePlus from 'components/table-plus';
 import inviteMsg from 'components/invite-message';
 
-import { getListInvited } from 'request/message';
-import { acceptInviteMessage } from 'request/customer';
+import { getListInvited,readMessage,acceptInviteMessage } from 'request/message';
 
 import { URL } from 'URL';
 import websiteText from 'config/website-text';
@@ -28,16 +27,24 @@ class InviteMessage extends Component {
   getInviteMsg() {
     getListInvited ((json) => {
       if (json.code === 200) {
-        var jsontest = [];
-        var fin = [];
-    // json.data.map((item,index) => { return jsontest.push('{"key"'+':"'+index+'",'+'projectname'+':"'+item+'"}') });
-    // jsontest.map((item,index) => { return fin.push(eval('(' + item + ')')) });
         this.setState({
           listinvited: json.result,
         });
       }
     });
   }
+
+  onIgnore = (key) =>{
+    acceptInviteMessage ({
+        msgid : key,
+       reply : false,
+    }, (json) => {
+      if (json.code === 200) {
+          this.onDelete(key);
+      } 
+    });
+  }
+
 
   onDelete = (key) => {
     const listinvited = [...this.state.listinvited];
@@ -47,10 +54,9 @@ class InviteMessage extends Component {
   onAccept = (record) => {
     acceptInviteMessage ({
         msgid : record.id,
-       userid : record.relation,
-        name : record.content,
+       reply : true,
     }, (json) => {
-      if (json.code === 200) {
+      if (json.result === true) {
         this.onDelete(record.id);
         message.success(language.ACCEPT_INVITE_SUCCESS_MSG);
       } else {
@@ -82,7 +88,7 @@ class InviteMessage extends Component {
             <span>
             <a href="#" onClick={() => this.onAccept(record)}>accept</a>
             <span className="ant-divider" />
-            <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record.id)}>
+            <Popconfirm title="Sure to delete?" onConfirm={() => this.onIgnore(record.id)}>
               <a href="#">ignore</a>
             </Popconfirm>
             </span>

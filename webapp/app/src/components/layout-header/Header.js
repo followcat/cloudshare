@@ -4,7 +4,7 @@ import LayoutHeader from './LayoutHeader';
 import Navigation from './Navigation';
 import ProjectMessage from './ProjectMessage';
 import Profile from './Profile';
-import { Dropdown, Icon } from 'antd';
+import { Dropdown, Icon} from 'antd';
 
 class Header extends Component {
   render() {

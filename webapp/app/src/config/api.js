@@ -2,7 +2,15 @@
 const HOST = '';
 
 export const API = {
-  ACCEPT_INVITE_MESSAGE_API:`${HOST}/api/customeraccount`,
+  IS_CUSTOMER_ADMIN_API:`${HOST}/api/iscustomeradmin`,
+
+  IS_CUSTOMER_API:`${HOST}/api/iscustomer`,
+
+  MESSAGESNOTIFY_API:`${HOST}/api/messagenotify`,
+
+  MESSAGE_API:`${HOST}/api/message`,
+
+  ACCEPT_INVITE_MESSAGE_API:`${HOST}/api/invitedmessage`,
 
   LIST_INVITED_MESSAGES_API:`${HOST}/api/listinvitedmessages`,
 

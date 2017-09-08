@@ -70,5 +70,7 @@ export const URL = {
   getInviteMessageURL: () => {
     return `/notice/invitemessage`;
   },
-
+  getBecomeCustomer: () => {
+    return `/becomecustomer`;
+  },
 };

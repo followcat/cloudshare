@@ -81,7 +81,7 @@ class Customer(services.base.service.Service):
         result = False
         if 'administrator' not in self.config:
             self.config['administrator'] = set()
-        if creator is Ture or (self.check_admin(inviter_id) and
+        if creator is True or (self.check_admin(inviter_id) and
                                self.check_admin(invited_id) is False):
             self.config['administrator'].add(invited_id)
             self.save()

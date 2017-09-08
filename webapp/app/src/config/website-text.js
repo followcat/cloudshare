@@ -16,6 +16,7 @@ const websiteText = {
     MATCH: '匹配',
     RESUME_UPLOADER: '简历上传',
     PROJECT_MANAGEMENT: '项目管理',
+    BECOME_CUSTOMER: '成为顾客',
     BEST_EXCELLENT: '每日优秀',
 
     JOB_DESCRIPTION_MANAGEMENT: '职位管理',

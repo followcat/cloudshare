@@ -4,11 +4,30 @@ import { Link } from 'react-router';
 
 import { Menu } from 'antd';
 
+import { isCustomerAdmin } from 'request/customer';
+
 const MenuItem = Menu.Item;
 const MenuItemGroup = Menu.ItemGroup;
 const SubMenu = Menu.SubMenu;
 
 class SubheadNav extends Component {
+  constructor() {
+    super();
+    this.state = {
+      show :false,
+    };
+  }
+
+  componentWillMount() {
+      isCustomerAdmin((json) => {
+      if (json.result === true) {
+        this.setState({
+          show: true,
+        });
+      }
+      });
+  }
+
   render() {
     const {
       prefixCls,
@@ -26,12 +45,18 @@ class SubheadNav extends Component {
             mode="inline"
             onClick={this.props.onClick}
           >
+          { this.state.show ?
           <MenuItem key="invite" title="invite">
               <Link to='/pm/listcustomer'>Customer</Link>
           </MenuItem>
+          :null
+          }
+          { this.state.show ?
           <MenuItem key="project">
             <Link to='/pm/projectlist'>project</Link>
           </MenuItem>
+          : null
+          }
           <SubMenu key="service" title="service">
             {menus.map(item => {
               return (

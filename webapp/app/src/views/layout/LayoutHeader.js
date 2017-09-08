@@ -9,7 +9,7 @@ import { URL } from 'URL';
 
 import { getProject } from 'request/project';
 import { signOut } from 'request/sign';
-import { getListCustomer } from 'request/customer';
+import { isCustomer } from 'request/customer';
 
 import StorageUtil from 'utils/storage';
 
@@ -71,8 +71,8 @@ class LayoutHeader extends Component {
   }
 
   componentWillMount() {
-      getListCustomer((json) => {
-      if (json.result) {
+      isCustomer((json) => {
+      if (json.result === false) {
         this.setState({
           navMenus: navMenuUser,
         });

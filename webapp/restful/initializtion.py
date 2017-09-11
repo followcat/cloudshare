@@ -110,7 +110,7 @@ def initialize(app):
     api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
     api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')
 
-    api.add_resource(IsMemberAPI, '/api/ismember', endpoint = 'member')
+    api.add_resource(IsMemberAPI, '/api/ismember', endpoint = 'ismember')
     api.add_resource(IsMemberAdminAPI, '/api/ismemberadmin', endpoint = 'ismemberadmin')
     api.add_resource(MemberAPI, '/api/member', endpoint = 'member')
     api.add_resource(MemberAdminAPI, '/api/memberadmin', endpoint = 'memberadmin')

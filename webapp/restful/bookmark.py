@@ -20,10 +20,9 @@ class BookmarkAPI(Resource):
         user = flask.ext.login.current_user
         data = []
         customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject()
         bookmark_list = list(user.getbookmark())
         for bookmark_item in bookmark_list:
-            yaml_info = project.cv_getyaml(bookmark_item)
+            yaml_info = customer.curriculumvitaes.getyaml(bookmark_item)
             data.append(yaml_info)
         if name == user.name:
             result = { 'code': 200, 'data': data }

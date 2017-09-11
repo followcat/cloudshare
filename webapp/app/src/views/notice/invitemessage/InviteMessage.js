@@ -71,14 +71,14 @@ class InviteMessage extends Component {
 
   render() {
     const columns = [{
-      title: 'companyName',
+      title: '公司名称',
       dataIndex: 'content',
-      render: text => <a href="#">{text}</a>,
+      render: text => <span>{text}</span>,
     }, {
-      title: 'date',
+      title: '日期',
       dataIndex: 'date',
     }, {
-     title: 'action',
+     title: '操作',
       className: 'action',
       dataIndex: 'action',
       render: (text, record) => {
@@ -86,10 +86,10 @@ class InviteMessage extends Component {
           this.state.listinvited.length > 0 ?
           ( 
             <span>
-            <a href="#" onClick={() => this.onAccept(record)}>accept</a>
+            <a href="#" onClick={() => this.onAccept(record)}>{language.ACCEPT}</a>
             <span className="ant-divider" />
-            <Popconfirm title="Sure to delete?" onConfirm={() => this.onIgnore(record.id)}>
-              <a href="#">ignore</a>
+            <Popconfirm title="确认删除么?" onConfirm={() => this.onIgnore(record.id)}>
+              <a href="#">{language.IGNORE}</a>
             </Popconfirm>
             </span>
           ) : null
@@ -108,7 +108,6 @@ class InviteMessage extends Component {
       <div className="cs-InviteMessage">
       <TablePlus
           isToolbarShowed={true}
-          isSearched={true}
           columns={columns}
           rowKey={record => record.id}
           dataSource={this.state.listinvited}

@@ -132,11 +132,11 @@ class ListCustomer extends Component {
 
   render() {
   	const columns = [{
-      title: 'memberName',
+      title: '成员名称',
       dataIndex: 'name',
-  		render: text => <a href="#">{text}</a>,
+  		render: text => <span>{text}</span>,
 		}, {
-      title: 'action',
+      title: '操作',
   		className: 'action',
   		dataIndex: 'action',
       render: (text, record) => {
@@ -144,7 +144,7 @@ class ListCustomer extends Component {
           this.state.customers.length > 0 ?
           (
             <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record)}>
-              <a href="#">delete</a>
+              <a href="#">{language.DELETE}</a>
             </Popconfirm>
           ) : null
         );

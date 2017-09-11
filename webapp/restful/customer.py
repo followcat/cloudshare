@@ -7,12 +7,12 @@ from flask.ext.restful import Resource
 import utils.builtin
 
 
-class CustomerAPI(Resource):
+class MemberAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        super(CustomerAPI, self).__init__()
+        super(MemberAPI, self).__init__()
         self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('customername', type = str, location = 'json')
@@ -35,7 +35,7 @@ class CustomerAPI(Resource):
         return { 'code': 200, 'result': result }
 
 
-class IsCustomerAPI(CustomerAPI):
+class IsMemberAPI(MemberAPI):
 
     def get(self):
         user = flask.ext.login.current_user
@@ -44,7 +44,7 @@ class IsCustomerAPI(CustomerAPI):
         return { 'code': 200, 'result': result }
 
 
-class IsCustomerAdminAPI(CustomerAPI):
+class IsMemberAdminAPI(MemberAPI):
 
     def get(self):
         user = flask.ext.login.current_user
@@ -53,10 +53,10 @@ class IsCustomerAdminAPI(CustomerAPI):
         return { 'code': 200, 'result': result }
 
 
-class ListCustomerAccountsAPI(CustomerAPI):
+class ListMemberAccountsAPI(MemberAPI):
 
     def __init__(self):
-        super(ListCustomerAccountsAPI, self).__init__()
+        super(ListMemberAccountsAPI, self).__init__()
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
 
     def get(self):
@@ -73,16 +73,16 @@ class ListCustomerAccountsAPI(CustomerAPI):
         return { 'code': 200, 'result': result }
 
 
-class CustomerAccountAPI(CustomerAPI):
+class MemberAccountAPI(MemberAPI):
 
     def delete(self, userid):
         result = user.awaycustomer(userid, self.svc_customers)
         return { 'code': 200, 'result': result }
 
-class CustomerAdminAPI(CustomerAPI):
+class MemberAdminAPI(MemberAPI):
 
     def __init__(self):
-        super(CustomerAdminAPI, self).__init__()
+        super(MemberAdminAPI, self).__init__()
         self.reqparse.add_argument('userid', type = str, location = 'json')
 
     def get(self):
@@ -110,10 +110,10 @@ class CustomerAdminAPI(CustomerAPI):
         return { 'code': 200, 'result': result }
 
 
-class CustomerProjectAPI(CustomerAPI):
+class MemberProjectAPI(MemberAPI):
 
     def __init__(self):
-        super(CustomerProjectAPI, self).__init__()
+        super(MemberProjectAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('classify', type = list, location = 'json')
 

@@ -110,15 +110,15 @@ def initialize(app):
     api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
     api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')
 
-    api.add_resource(IsCustomerAPI, '/api/iscustomer', endpoint = 'iscustomer')
-    api.add_resource(IsCustomerAdminAPI, '/api/iscustomeradmin', endpoint = 'iscustomeradmin')
-    api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
-    api.add_resource(CustomerAdminAPI, '/api/customeradmin', endpoint = 'customeradmin')
-    api.add_resource(ListCustomerAccountsAPI, '/api/listcustomeraccounts',
-                     endpoint = 'listcustomeraccounts')
-    api.add_resource(CustomerAccountAPI, '/api/customeraccount/<string:userid>',
-                     endpoint = 'customeraccount')
-    api.add_resource(CustomerProjectAPI, '/api/customerproject/<string:projectname>',
-                     endpoint = 'customerproject')
+    api.add_resource(IsMemberAPI, '/api/ismember', endpoint = 'member')
+    api.add_resource(IsIsMemberAdminAPI, '/api/ismemberadmin', endpoint = 'ismemberadmin')
+    api.add_resource(IsMembeAPI, '/api/member', endpoint = 'member')
+    api.add_resource(IsMemberAdminAPI, '/api/memberadmin', endpoint = 'memberadmin')
+    api.add_resource(ListIsMemberAccountsAPI, '/api/listmemberaccounts',
+                     endpoint = 'listmemberaccounts')
+    api.add_resource(MemberAccountAPI, '/api/memberaccount/<string:userid>',
+                     endpoint = 'memberaccount')
+    api.add_resource(MemberProjectAPI, '/api/memberproject/<string:projectname>',
+                     endpoint = 'memberproject')
 
     api.add_resource(CaptchaAPI, '/api/captcha', endpoint = 'captcha')

@@ -111,10 +111,10 @@ def initialize(app):
     api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')
 
     api.add_resource(IsMemberAPI, '/api/ismember', endpoint = 'member')
-    api.add_resource(IsIsMemberAdminAPI, '/api/ismemberadmin', endpoint = 'ismemberadmin')
-    api.add_resource(IsMembeAPI, '/api/member', endpoint = 'member')
-    api.add_resource(IsMemberAdminAPI, '/api/memberadmin', endpoint = 'memberadmin')
-    api.add_resource(ListIsMemberAccountsAPI, '/api/listmemberaccounts',
+    api.add_resource(IsMemberAdminAPI, '/api/ismemberadmin', endpoint = 'ismemberadmin')
+    api.add_resource(MemberAPI, '/api/member', endpoint = 'member')
+    api.add_resource(MemberAdminAPI, '/api/memberadmin', endpoint = 'memberadmin')
+    api.add_resource(ListMemberAccountsAPI, '/api/listmemberaccounts',
                      endpoint = 'listmemberaccounts')
     api.add_resource(MemberAccountAPI, '/api/memberaccount/<string:userid>',
                      endpoint = 'memberaccount')

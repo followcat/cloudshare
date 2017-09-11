@@ -15,9 +15,13 @@ const websiteText = {
     SEARCH: '搜索',
     MATCH: '匹配',
     RESUME_UPLOADER: '简历上传',
-    PROJECT_MANAGEMENT: '项目管理',
+    VIP_MANAGEMENT: '会员服务',
     BECOME_CUSTOMER: '成为顾客',
     BEST_EXCELLENT: '每日优秀',
+
+    MENBER_MANAGEMENT: '成员管理',
+    PROJECT_MANAGEMENT: '项目管理',
+    CUSTOMER_MANAGEMENT: '客户管理',
 
     JOB_DESCRIPTION_MANAGEMENT: '职位管理',
     OPEN_JOB_DESCRIPTION: '已开放职位',
@@ -66,6 +70,8 @@ const websiteText = {
     ADD: '添加',
     MATCH_ACTION: '进行匹配',
     UPLOAD: '上传',
+    ACCEPT: '接受',
+    IGNORE: '忽略',
 
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',

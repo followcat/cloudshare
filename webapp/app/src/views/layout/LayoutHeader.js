@@ -35,7 +35,7 @@ const navMenusCustomer = [{
   text: language.RESUME_UPLOADER
 }, {
   url: URL.getProjectManagement(),
-  text: language.PROJECT_MANAGEMENT
+  text: language.VIP_MANAGEMENT
 }, {
   url: URL.getBestExcellent(),
   text: language.BEST_EXCELLENT
@@ -137,9 +137,7 @@ class LayoutHeader extends Component {
         </MenuItem>
         <MenuDivider />
         <MenuItem>
-          <Badge dot>
           <a href={URL.getNotcieURL()}>{language.NOTICE}</a>
-          </Badge>
         </MenuItem>
         <MenuDivider />
         <MenuItem>

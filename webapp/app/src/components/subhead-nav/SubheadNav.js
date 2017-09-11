@@ -5,10 +5,12 @@ import { Link } from 'react-router';
 import { Menu } from 'antd';
 
 import { isCustomerAdmin } from 'request/customer';
+import  websiteText  from 'config/website-text'
 
 const MenuItem = Menu.Item;
 const MenuItemGroup = Menu.ItemGroup;
 const SubMenu = Menu.SubMenu;
+const language = websiteText.zhCN;
 
 class SubheadNav extends Component {
   constructor() {
@@ -47,17 +49,17 @@ class SubheadNav extends Component {
           >
           { this.state.show ?
           <MenuItem key="invite" title="invite">
-              <Link to='/pm/listcustomer'>Customer</Link>
+              <Link to='/pm/listcustomer'>{language.MENBER_MANAGEMENT}</Link>
           </MenuItem>
           :null
           }
           { this.state.show ?
           <MenuItem key="project">
-            <Link to='/pm/projectlist'>project</Link>
+            <Link to='/pm/projectlist'>{language.PROJECT_MANAGEMENT}</Link>
           </MenuItem>
           : null
           }
-          <SubMenu key="service" title="service">
+          <SubMenu key="service" title={language.CUSTOMER_MANAGEMENT}>
             {menus.map(item => {
               return (
                 <MenuItem key={item.key}>

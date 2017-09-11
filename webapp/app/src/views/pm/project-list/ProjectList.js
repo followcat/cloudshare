@@ -127,11 +127,11 @@ class ProjectList extends Component {
 
   render() {
   	const columns = [{
-  		title: 'projectName',
+  		title: '项目名称',
   		dataIndex: 'projectname',
-  		render: text => <a href="#">{text}</a>,
+  		render: text => <span>{text}</span>,
 		}, {
- 		 title: 'action',
+ 		 title: '操作',
   		className: 'action',
   		dataIndex: 'action',
       render: (text, record) => {
@@ -139,7 +139,7 @@ class ProjectList extends Component {
           this.state.projects.length > 1 ?
           (
             <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record.key)}>
-              <a href="#">delete</a>
+              <a href="#">{language.DELETE}</a>
             </Popconfirm>
           ) : null
         );

@@ -8,8 +8,15 @@ module.exports = {
       callback(null, require('views/notice').default);
     });
   },
+  indexRoute: {
+    getComponent(nextState, callback) {
+      require.ensure([], (require) => {
+        callback(null, require('views/notice/invitemessage').default);
+      }, 'invitemessage');
+    }
+  },
   onEnter: checkStatus,
-    childRoutes: [
+  childRoutes: [
     require('./invitemessage'),
   ]
 };

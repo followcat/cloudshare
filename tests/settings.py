@@ -6,7 +6,7 @@ import services.mining
 import services.people
 import services.account
 import services.project
-import services.customers
+import services.members
 import services.multipeople
 import services.curriculumvitae
 import interface.gitinterface
@@ -23,7 +23,7 @@ class Config(object):
     PWD_DB_NAME = os.path.join(TESTDATA_PATH, 'password')
     ACCOUNT_DB_NAME = os.path.join(TESTDATA_PATH, 'account')
     LSI_PATH = os.path.join(TESTDATA_PATH, 'lsimodel')
-    CUSTOMERS_PATH = os.path.join(TESTDATA_PATH, 'customers')
+    MEMBERS_PATH = os.path.join(TESTDATA_PATH, 'members')
 
     def __init__(self):
         self.build()
@@ -46,15 +46,15 @@ class Config(object):
                                                    name='peorepo', iotype='base')
 
         self.SVC_MULT_PEO = services.multipeople.MultiPeople([self.SVC_PEO_REPO])
-        self.SVC_CUSTOMERS = services.customers.Customers(self.CUSTOMERS_PATH,
-                                                          [self.SVC_ACCOUNT],
-                                                          [self.SVC_CV_REPO], [self.SVC_MULT_PEO])
-        self.SVC_CUSTOMERS.create('test_customer')
-        self.SVC_CUSTOMER = self.SVC_CUSTOMERS.get('test_customer')
-        self.SVC_CUSTOMER._add_project('project_test', {})
-        self.SVC_PRJ_TEST = self.SVC_CUSTOMER.projects['project_test']
+        self.SVC_MEMBERS = services.members.Members(self.MEMBERS_PATH,
+                                                    [self.SVC_ACCOUNT],
+                                                    [self.SVC_CV_REPO], [self.SVC_MULT_PEO])
+        self.SVC_MEMBERS.create('test_member')
+        self.SVC_MEMBERS = self.SVC_MEMBERS.get('test_member')
+        self.SVC_MEMBERS._add_project('project_test', {})
+        self.SVC_PRJ_TEST = self.SVC_MEMBERS.projects['project_test']
 
-        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_CUSTOMERS.allprojects(),
+        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MEMBERS.allprojects(),
                                               {'repoclassify': self.SVC_CV_REPO})
         self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].no_above = 1
         self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].setup(['first.md'],
@@ -73,7 +73,7 @@ class Config(object):
                                            metadata=yamlinfo)
         peopmeta = extractor.information_explorer.catch_peopinfo(yamlinfo)
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-        project = self.SVC_CUSTOMER.getproject('project_test')
+        project = self.SVC_MEMBERS.getproject('project_test')
         self.SVC_CV_REPO.add(dataobj, 'tester', unique=True)
         project.cv_add(dataobj)
         self.SVC_PEO_REPO.add(peopobj)

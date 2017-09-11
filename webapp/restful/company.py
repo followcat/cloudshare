@@ -13,7 +13,7 @@ class CompanyAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -23,8 +23,8 @@ class CompanyAPI(Resource):
     def get(self, name):
         projectname = args['project']
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = project.company_get(name)
         return { 'result': result }
 
@@ -35,8 +35,8 @@ class CompanyAPI(Resource):
         if args['introduction'] is None:
             args['introduction'] = str()
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         metadata = extractor.information_explorer.catch_coinfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.company_add(coobj, user.name)
@@ -51,7 +51,7 @@ class CompanyAllAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(CompanyAllAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
@@ -62,8 +62,8 @@ class CompanyAllAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         return list(project.company.datas())
 
     def post(self):
@@ -72,8 +72,8 @@ class CompanyAllAPI(Resource):
         page_size = args['page_size']
         projectname = args['project']
         current_page = args['current_page']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         data = []
         ids = project.company.sorted_ids('modifytime')
         for id in ids[(current_page-1)*page_size : current_page*page_size]:
@@ -85,7 +85,7 @@ class AddedCompanyListAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(AddedCompanyListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('text', location = 'json')
@@ -96,8 +96,8 @@ class AddedCompanyListAPI(Resource):
         args = self.reqparse.parse_args()
         text = args['text']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         customer_ids = project.company_customers()
         search_results = project.company.search('name: '+text)
         company_ids = map(lambda x:x[0], search_results)
@@ -118,7 +118,7 @@ class CompanyCustomerListAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(CompanyCustomerListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
@@ -127,8 +127,8 @@ class CompanyCustomerListAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = project.company_customers()
         data = []
         for coname in result:
@@ -142,8 +142,8 @@ class CompanyCustomerAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
-        super(CustomerAPI, self).__init__()
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        super(CompanyCustomerAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', location = 'json')
@@ -153,8 +153,8 @@ class CompanyCustomerAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = project.company.addcustomer(id, user.name)
         if result:
             response = { 'code': 200, 'message': 'Add customer success.' }
@@ -167,8 +167,8 @@ class CompanyCustomerAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = project.company.deletecustomer(id, user.name)
         if result:
             response = { 'code': 200, 'message': 'Delete customer success.' }
@@ -182,7 +182,7 @@ class CompanyInfoUpdateAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', location = 'json')
@@ -195,8 +195,8 @@ class CompanyInfoUpdateAPI(Resource):
         id = args['id']
         projectname = args['project']
         update_info = args['update_info']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         origin_info = project.company_get(id)
         for each in update_info:
             key = each['key']
@@ -225,7 +225,7 @@ class SearchCObyTextAPI(Resource):
 
     def __init__(self):
         super(SearchCObyTextAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
@@ -239,8 +239,8 @@ class SearchCObyTextAPI(Resource):
         page_size = args['page_size']
         projectname = args['project']
         cur_page = args['current_page']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         search_results = project.company.search(text)
         search_yaml_results = project.company.search_yaml(text)
         search_results.update(search_yaml_results)
@@ -273,7 +273,7 @@ class SearchCObyKeyAPI(Resource):
 
     def __init__(self):
         super(SearchCObyKeyAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('current_page', type = int, location = 'json')
         self.reqparse.add_argument('page_size', type = int, location = 'json')
@@ -287,8 +287,8 @@ class SearchCObyKeyAPI(Resource):
         page_size = args['page_size']
         search_items = args['search_items']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         results = set(project.company.ids)
         for each in search_items:
             key = each[0]
@@ -324,7 +324,7 @@ class CompanyUploadExcelAPI(Resource):
     def __init__(self):
         super(CompanyUploadExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('files', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
@@ -332,8 +332,8 @@ class CompanyUploadExcelAPI(Resource):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
         projectname = flask.request.form['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         network_file = flask.request.files['files']
         compare_result = project.company_compare_excel(network_file.read(),
                                                        committer=user.name)
@@ -359,7 +359,7 @@ class CompanyConfirmExcelAPI(Resource):
     def __init__(self):
         super(CompanyConfirmExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('data', type = list, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
@@ -368,8 +368,8 @@ class CompanyConfirmExcelAPI(Resource):
         args = self.reqparse.parse_args()
         datas = args['data']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         results = project.company_add_excel(datas, user.name)
         return {
             'code': 200,

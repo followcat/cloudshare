@@ -43,7 +43,7 @@ class MessagesNotifyAPI(Resource):
         svc_msg = flask.current_app.config['SVC_MSG']
         msginfo = svc_msg.getinfo(user.id)
         return { 'code': 200, 'result': {'unread_chat': len(msginfo['unread_chat']),
-                                         'invited_customer': len(msginfo['invited_customer'])} }
+                                         'invited_member': len(msginfo['invited_member'])} }
 
 
 class MessageAPI(Resource):
@@ -86,7 +86,7 @@ class InvitedMessageAPI(MessageAPI):
 
     def __init__(self):
         super(InvitedMessageAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('reply', type = bool, location = 'json')
 
@@ -101,7 +101,7 @@ class InvitedMessageAPI(MessageAPI):
         message = self.svc_msg.process_invite(user.id, msgid, user.name)
         result = False
         if message is not None and reply is True:
-            result = user.joincustomer(message['relation'], message['content'], self.svc_customers)
+            result = user.joinmember(message['relation'], message['content'], self.svc_members)
         return { 'code': 200, 'result': result }
 
 
@@ -109,5 +109,5 @@ class SendInviteMessageAPI(MessageAPI):
         
     def post(self, desname):
         user = flask.ext.login.current_user
-        result = user.invitecustomer(desname, self.svc_msg)
+        result = user.invitemember(desname, self.svc_msg)
         return { 'code': 200, 'result': result }

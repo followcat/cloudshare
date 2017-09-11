@@ -9,7 +9,7 @@ class JobDescriptionAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_id', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -25,8 +25,8 @@ class JobDescriptionAPI(Resource):
         args = self.reqparse.parse_args()
         jd_id = args['jd_id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = project.jd_get(jd_id)
         co_id = result['company']
         co_name = project.company_get(co_id)['name']
@@ -42,8 +42,8 @@ class JobDescriptionAPI(Resource):
         description = args['description']
         commentary = args['commentary'] if args['commentary'] else ''
         followup = args['followup'] if args['followup'] else ''
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = project.jd_modify(jd_id, description, status,
                                    commentary, followup, user.name)
         if result: 
@@ -60,7 +60,7 @@ class JobDescriptionUploadAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_name', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -79,8 +79,8 @@ class JobDescriptionUploadAPI(Resource):
         description = args['jd_description']
         commentary = args['commentary'] if args['commentary'] else ''
         followup = args['followup'] if args['followup'] else ''
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = project.jd_add(co_id, jd_name, description,
                                 commentary, followup, user.name)
         return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
@@ -91,7 +91,7 @@ class JobDescriptionListAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(JobDescriptionListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
@@ -100,8 +100,8 @@ class JobDescriptionListAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = project.jd_lists()
         for jd in result:
             co_id = jd['company']

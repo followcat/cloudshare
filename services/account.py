@@ -97,32 +97,32 @@ class Message(services.base.storage.BaseStorage):
         True
         >>> info2['read_chat'][0] == receive
         True
-        >>> invitation = svc_message.send_invitation('id1', 'id2', 'mock_customer', 'name1')
+        >>> invitation = svc_message.send_invitation('id1', 'id2', 'mock_member', 'name1')
         >>> info1 = svc_message.getinfo('id1')
-        >>> info1['inviter_customer'][0]['relation'] == 'id2'
+        >>> info1['inviter_member'][0]['relation'] == 'id2'
         True
         >>> info2 = svc_message.getinfo('id2')
-        >>> info2['invited_customer'][0] == invitation
+        >>> info2['invited_member'][0] == invitation
         True
         >>> svc_message.process_invite('id2', invitation['id'], 'id2')
         True
         >>> svc_message.getcontent('id2', invitation['id'])['relation']
         'id1'
-        >>> len(svc_message.getinfo('id1')['inviter_customer'])
+        >>> len(svc_message.getinfo('id1')['inviter_member'])
         0
         >>> shutil.rmtree(repo_path)
     """
     YAML_TEMPLATE = (
         ("id",                  str),
-        ("invited_customer",    list),
-        ("inviter_customer",    list),
+        ("invited_member",    list),
+        ("inviter_member",    list),
         ("send_chat",           list),
         ("read_chat",           list),
         ("unread_chat",         list),
     )
 
     MUST_KEY = ['id']
-    list_item = {"invited_customer", "inviter_customer",
+    list_item = {"invited_member", "inviter_member",
                  "send_chat", "read_chat", "unread_chat"}
     fix_item  = {"id"}
 
@@ -231,7 +231,7 @@ class Message(services.base.storage.BaseStorage):
         result = None
         msginfo = self.getinfo(id)
         for each in msginfo:
-            if each in ['invited_customer']:
+            if each in ['invited_member']:
                 for msg in msginfo[each]:
                     if msg['id'] == msgid:
                         result = msg
@@ -241,7 +241,7 @@ class Message(services.base.storage.BaseStorage):
         result = None
         msginfo = self.getinfo(id)
         for each in msginfo:
-            if each in ['inviter_customer']:
+            if each in ['inviter_member']:
                 for msg in msginfo[each]:
                     if msg['id'] == msgid:
                         result = msg
@@ -252,14 +252,14 @@ class Message(services.base.storage.BaseStorage):
         send_info = None
         receive_info = self.getinvitedcontent(invited_id, msgid)
         inviter_id = receive_info['relation']
-        for each in self.getinfo(inviter_id)['inviter_customer']:
+        for each in self.getinfo(inviter_id)['inviter_member']:
             if receive_info['content'] == each['content'] and invited_id == each['relation']:
                 send_info = each
                 break
         if send_info and receive_info:
-            send_result = self._move(inviter_id, send_info['id'], 'inviter_customer',
+            send_result = self._move(inviter_id, send_info['id'], 'inviter_member',
                                      'read_chat', committer)
-            receive_result = self._move(invited_id, receive_info['id'], 'invited_customer',
+            receive_result = self._move(invited_id, receive_info['id'], 'invited_member',
                                      'read_chat', committer)
             if send_result and receive_result:
                 result = receive_info
@@ -273,9 +273,9 @@ class Message(services.base.storage.BaseStorage):
         receive = self.updateinfo(des_id, 'unread_chat', content, ori_id, committer)
         return send, receive
 
-    def send_invitation(self, ori_id, des_id, customer, committer):
-        send_result = self.updateinfo(ori_id, 'inviter_customer', customer, des_id, committer)
-        receive_result = self.updateinfo(des_id, 'invited_customer', customer, ori_id, committer)
+    def send_invitation(self, ori_id, des_id, member, committer):
+        send_result = self.updateinfo(ori_id, 'inviter_member', member, des_id, committer)
+        receive_result = self.updateinfo(des_id, 'invited_member', member, ori_id, committer)
         return send_result and receive_result
 
 
@@ -309,7 +309,7 @@ class Account(services.base.storage.BaseStorage):
         ("bookmark",            set),
         ("phone",               str),
         ("email",               str),
-        ("customer",            str),
+        ("member",            str),
     )
 
     def __init__(self, svc_password, path, name=None, searchengine=None, iotype='git'):
@@ -354,66 +354,66 @@ class Account(services.base.storage.BaseStorage):
             result = self.svc_password.updatepwd(id, oldpassword, newpassword)
         return result
 
-    def createcustomer(self, id, name, svc_customers):
+    def createmember(self, id, name, svc_members):
         """
             >>> from tests.settings import *
             >>> config = Config()
             >>> svc_account = config.SVC_ACCOUNT
-            >>> svc_customers = config.SVC_CUSTOMERS
+            >>> svc_members = config.SVC_MEMBERS
             >>> accobj = svc_account.baseobj({'name': u'user'})
             >>> svc_account.add(accobj, 'password')
             True
             >>> info = svc_account.getinfo_byname(u'user')
-            >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
+            >>> svc_account.createmember(info['id'], 'added_member', svc_members)
             True
-            >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
+            >>> svc_account.createmember(info['id'], 'added_member', svc_members)
             False
             >>> config.destory()
         """
         result = False
         info = self.getinfo(id)
-        if not info['customer']:
-            svc_customers.create(name)
-            customer = svc_customers.get(name)
-            customer.add_account(info['id'], info['id'], info['name'], creator=True)
-            self.updateinfo(id, 'customer', name, info['name'])
+        if not info['member']:
+            svc_members.create(name)
+            member = svc_members.get(name)
+            member.add_account(info['id'], info['id'], info['name'], creator=True)
+            self.updateinfo(id, 'member', name, info['name'])
             result = True
         return result
 
-    def awaycustomer(self, inviter_id, invited_id, svc_customers):
+    def awaymember(self, inviter_id, invited_id, svc_members):
         """
             >>> from tests.settings import *
             >>> config = Config()
             >>> svc_account = config.SVC_ACCOUNT
-            >>> svc_customers = config.SVC_CUSTOMERS
+            >>> svc_members = config.SVC_MEMBERS
             >>> accobj = svc_account.baseobj({'name': u'user'})
             >>> svc_account.add(accobj, 'password')
             True
             >>> info = svc_account.getinfo_byname(u'user')
-            >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
+            >>> svc_account.createmember(info['id'], 'added_member', svc_members)
             True
-            >>> svc_account.awaycustomer(info['id'], info['id'], svc_customers)
+            >>> svc_account.awaymember(info['id'], info['id'], svc_members)
             True
             >>> info = svc_account.getinfo_byname(u'user')
-            >>> info['customer']
+            >>> info['member']
             ''
             >>> config.destory()
         """
         result = False
         info = self.getinfo(inviter_id)
-        customer = svc_customers.use(info['customer'], inviter_id)
-        if customer:
-            result = customer.rm_account(inviter_id, invited_id, info['name'])
+        member = svc_members.use(info['member'], inviter_id)
+        if member:
+            result = member.rm_account(inviter_id, invited_id, info['name'])
             if result is True:
-                self.updateinfo(invited_id, 'customer', '', info['name'])
+                self.updateinfo(invited_id, 'member', '', info['name'])
         return result
 
-    def joincustomer(self, inviter_id, invited_id, name, svc_customers):
+    def joinmember(self, inviter_id, invited_id, name, svc_members):
         """
             >>> from tests.settings import *
             >>> config = Config()
             >>> svc_account = config.SVC_ACCOUNT
-            >>> svc_customers = config.SVC_CUSTOMERS
+            >>> svc_members = config.SVC_MEMBERS
             >>> accobj = svc_account.baseobj({'name': u'user'})
             >>> svc_account.add(accobj, 'password')
             True
@@ -422,28 +422,28 @@ class Account(services.base.storage.BaseStorage):
             True
             >>> info = svc_account.getinfo_byname(u'user')
             >>> invited_info = svc_account.getinfo_byname(u'invited')
-            >>> svc_account.createcustomer(info['id'], 'added_customer', svc_customers)
+            >>> svc_account.createmember(info['id'], 'added_member', svc_members)
             True
-            >>> svc_account.joincustomer(info['id'], invited_info['id'],
-            ...                          'added_customer', svc_customers)
+            >>> svc_account.joinmember(info['id'], invited_info['id'],
+            ...                          'added_member', svc_members)
             True
-            >>> customer = svc_customers.get('added_customer')
-            >>> customer.accounts.exists(invited_info['id'])
+            >>> member = svc_members.get('added_member')
+            >>> member.accounts.exists(invited_info['id'])
             True
-            >>> validateinfo = customer.accounts.getinfo(invited_info['id'])
+            >>> validateinfo = member.accounts.getinfo(invited_info['id'])
             >>> validateinfo['inviter'] == 'user'
             True
             >>> config.destory()
         """
-        assert svc_customers.exists(name)
+        assert svc_members.exists(name)
         result = False
         inviter_info = self.getinfo(inviter_id)
         invited_info = self.getinfo(invited_id)
-        if inviter_info['customer'] == name and not invited_info['customer']:
-            customer = svc_customers.use(name, inviter_id)
-            result = customer.add_account(inviter_id, invited_id, inviter_info['name'])
+        if inviter_info['member'] == name and not invited_info['member']:
+            member = svc_members.use(name, inviter_id)
+            result = member.add_account(inviter_id, invited_id, inviter_info['name'])
             if result is True:
-                self.updateinfo(invited_id, 'customer', name, invited_info['name'])
+                self.updateinfo(invited_id, 'member', name, invited_info['name'])
         return result
 
     @property

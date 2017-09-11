@@ -11,9 +11,9 @@ import services.simulationacc
 import sources.industry_id
 
 
-class Customer(services.base.service.Service):
+class Member(services.base.service.Service):
 
-    commitinfo = 'Customer'
+    commitinfo = 'Member'
     PRJ_PATH = 'projects'
     ACC_PATH = 'accounts'
     CV_PATH = 'curriculumvitaes'
@@ -22,7 +22,7 @@ class Customer(services.base.service.Service):
 
     def __init__(self, acc_repos, cv_repos,
                  mult_peo, path, name, iotype='git'):
-        super(Customer, self).__init__(path, name, iotype=iotype)
+        super(Member, self).__init__(path, name, iotype=iotype)
         self.name = name
         self.path = path
         self.cv_path = os.path.join(path, self.CV_PATH)
@@ -162,12 +162,12 @@ class Customer(services.base.service.Service):
         return result
 
     def backup(self, path):
-        customer_path = os.path.join(path, self.name)
-        projects_path = os.path.join(customer_path, 'projects')
-        accounts_path = os.path.join(customer_path, 'accounts')
-        companies_path = os.path.join(customer_path, 'companies')
-        curriculumvitaes_path = os.path.join(customer_path, 'curriculumvitaes')
-        utils.builtin.assure_path_exists(customer_path)
+        member_path = os.path.join(path, self.name)
+        projects_path = os.path.join(member_path, 'projects')
+        accounts_path = os.path.join(member_path, 'accounts')
+        companies_path = os.path.join(member_path, 'companies')
+        curriculumvitaes_path = os.path.join(member_path, 'curriculumvitaes')
+        utils.builtin.assure_path_exists(member_path)
         utils.builtin.assure_path_exists(projects_path)
         utils.builtin.assure_path_exists(accounts_path)
         utils.builtin.assure_path_exists(companies_path)
@@ -180,21 +180,21 @@ class Customer(services.base.service.Service):
         self.curriculumvitaes.backup(curriculumvitaes_path)
 
 
-class DefaultCustomer(Customer):
+class DefaultMember(Member):
 
     default_name = 'default'
     default_model = 'medical'
 
     def __init__(self, acc_repos, cv_repos, mult_peo, path,
                  name='default', iotype='git'):
-        super(DefaultCustomer, self).__init__(acc_repos, cv_repos,
-                                              mult_peo, path, name, iotype=iotype)
+        super(DefaultMember, self).__init__(acc_repos, cv_repos,
+                                            mult_peo, path, name, iotype=iotype)
 
     def load_projects(self):
-        super(DefaultCustomer, self).load_projects()
+        super(DefaultMember, self).load_projects()
         if self.default_name not in self.projects:
-            super(DefaultCustomer, self)._add_project(self.default_name,
-                                                      sources.industry_id.sources)
+            super(DefaultMember, self)._add_project(self.default_name,
+                                                    sources.industry_id.sources)
         self.projects[self.default_name]._modelname = self.default_model
 
     def use(self, id):

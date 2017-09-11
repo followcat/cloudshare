@@ -125,17 +125,17 @@ class AccountHistoryAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(AccountHistoryAPI, self).__init__()
 
     def get(self, project):
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
-        info_list = customer.getproject(project).cv_history(user.name, entries=10)
+        member = user.getmember(self.svc_members)
+        info_list = member.getproject(project).cv_history(user.name, entries=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:
-                    info['information'] = customer.getproject(project).cv_getyaml(id)
+                    info['information'] = member.getproject(project).cv_getyaml(id)
                 except IOError:
                     info['information'] = md5
                 info['name'] = md5

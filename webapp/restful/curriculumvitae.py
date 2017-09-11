@@ -14,7 +14,7 @@ class CurrivulumvitaeAPI(Resource):
 
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -24,8 +24,8 @@ class CurrivulumvitaeAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = user.getbookmark()
         yaml = project.cv_getyaml(id)
         if yaml['id'] in result:
@@ -45,7 +45,7 @@ class UpdateCurrivulumvitaeInformation(Resource):
 
     def __init__(self):
         super(UpdateCurrivulumvitaeInformation, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -56,8 +56,8 @@ class UpdateCurrivulumvitaeInformation(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         update_info = args['update_info']
 
         for key, value in update_info.iteritems():
@@ -77,7 +77,7 @@ class SearchCVbyTextAPI(Resource):
 
     def __init__(self):
         super(SearchCVbyTextAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.index = flask.current_app.config['SVC_INDEX']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -92,8 +92,8 @@ class SearchCVbyTextAPI(Resource):
         cur_page = args['page']
         filterdict = args['filterdict'] if args['filterdict'] else {}
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         searchs = dict(project.cv_search(text))
         yaml_searchs = dict(project.cv_search_yaml(text))
         for id in yaml_searchs:

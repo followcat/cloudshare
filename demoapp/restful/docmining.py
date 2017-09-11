@@ -21,7 +21,7 @@ class UploadCVAPI(Resource):
     def __init__(self):
         self.svc_min = flask.current_app.config['SVC_MIN']
         self.svc_cv_repo = flask.current_app.config['SVC_CV_REPO']
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -30,8 +30,8 @@ class UploadCVAPI(Resource):
     def post(self):
         results = []
         network_file = flask.request.files['files']
-        customer = self.svc_customers.get(self.svc_customers.default_customer_name)
-        project = customer.getproject()
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject()
         id = None
         code = 401
         added = False
@@ -79,7 +79,7 @@ class DocMiningAPI(Resource):
         super(DocMiningAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
@@ -99,8 +99,8 @@ class DocMiningAPI(Resource):
             cur_page = 1
         datas = []
         result = []
-        customer = self.svc_customers.get(self.svc_customers.default_customer_name)
-        project = customer.getproject()
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject()
         if cvlist:
             names = []
             documents = []
@@ -148,7 +148,7 @@ class DocValuableAPI(Resource):
         super(DocValuableAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
@@ -162,8 +162,8 @@ class DocValuableAPI(Resource):
 
     def _get(self, doc, projectname):
         args = self.reqparse.parse_args()
-        customer = self.svc_customers.get(self.svc_customers.default_customer_name)
-        project = customer.getproject(projectname)
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject(projectname)
         name_list = [demoapp.tools.caesarcipher.decrypt(self.caesar_cipher_num, name)
                      for name in args['name_list']]
         result = core.mining.valuable.rate(self.miner, project,
@@ -206,8 +206,8 @@ class DocCVValuableAPI(DocValuableAPI):
         if not tmpSha1_Digest in lsisim.names:
             lsisim.add(tmpSha1_Digest, cv)
             lsisim.set_index()
-        customer = self.svc_customers.get(self.svc_customers.default_customer_name)
-        project = customer.getproject(projectname)
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject(projectname)
         result = core.mining.valuable.rate(self.miner, project,
                                            doc, uses=[projectname],
                                            name_list=[tmpSha1_Digest],
@@ -254,15 +254,15 @@ class CurrivulumvitaeAPI(Resource):
 
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
-        customer = self.svc_customers.get(self.svc_customers.default_customer_name)
-        project = customer.getproject()
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject()
         id = args['id']
         realid = demoapp.tools.caesarcipher.decrypt(self.caesar_cipher_num, id)
         yaml = project.cv_getyaml(realid)

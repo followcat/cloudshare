@@ -1,6 +1,6 @@
 import flask
 import flask.ext.login
-import services.customer
+import services.member
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
@@ -13,25 +13,25 @@ class MemberAPI(Resource):
 
     def __init__(self):
         super(MemberAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('customername', type = str, location = 'json')
-# get customer's projectname
+        self.reqparse.add_argument('membername', type = str, location = 'json')
+# get member's projectname
     def get(self):
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
-        return { 'code': 200, 'result': customer.name }
-# user become customer
+        member = user.getmember(self.svc_members)
+        return { 'code': 200, 'result': member.name }
+# user become member
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        customername = args['customername']
-        result = user.createcustomer(customername, self.svc_customers)
+        membername = args['membername']
+        result = user.createmember(membername, self.svc_members)
         return { 'code': 200, 'result': result }
 
     def delete(self):
         user = flask.ext.login.current_user
-        result = user.awaycustomer(user.id, self.svc_customers)
+        result = user.awaymember(user.id, self.svc_members)
         return { 'code': 200, 'result': result }
 
 
@@ -39,8 +39,8 @@ class IsMemberAPI(MemberAPI):
 
     def get(self):
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
-        result = not isinstance(customer, services.customer.DefaultCustomer)
+        member = user.getmember(self.svc_members)
+        result = not isinstance(member, services.member.DefaultMember)
         return { 'code': 200, 'result': result }
 
 
@@ -48,8 +48,8 @@ class IsMemberAdminAPI(MemberAPI):
 
     def get(self):
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
-        result = customer.check_admin(user.id)
+        member = user.getmember(self.svc_members)
+        result = member.check_admin(user.id)
         return { 'code': 200, 'result': result }
 
 
@@ -61,22 +61,22 @@ class ListMemberAccountsAPI(MemberAPI):
 
     def get(self):
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
+        member = user.getmember(self.svc_members)
         result = list()
-        for id in customer.accounts.ids:
+        for id in member.accounts.ids:
             info = self.svc_account.getinfo(id)
-            customer_info = customer.accounts.getinfo(id)
-            customer_info['date'] = utils.builtin.strftime(customer_info['date'])
-            customer_info['name'] = info['name']
-            customer_info['id'] = id
-            result.append(customer_info)
+            member_info = member.accounts.getinfo(id)
+            member_info['date'] = utils.builtin.strftime(member_info['date'])
+            member_info['name'] = info['name']
+            member_info['id'] = id
+            result.append(member_info)
         return { 'code': 200, 'result': result }
 
 
 class MemberAccountAPI(MemberAPI):
 
     def delete(self, userid):
-        result = user.awaycustomer(userid, self.svc_customers)
+        result = user.awaymember(userid, self.svc_members)
         return { 'code': 200, 'result': result }
 
 class MemberAdminAPI(MemberAPI):
@@ -87,26 +87,26 @@ class MemberAdminAPI(MemberAPI):
 
     def get(self):
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
+        member = user.getmember(self.svc_members)
         result = set()
-        if customer.check_admin(user.id):
-            result = customer.get_admins()
+        if member.check_admin(user.id):
+            result = member.get_admins()
         return { 'code': 200, 'result': result }
 
     def post(self):
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
+        member = user.getmember(self.svc_members)
         args = self.reqparse.parse_args()
         userid = args['userid']
-        result = customer.add_admin(user.id, userid)
+        result = member.add_admin(user.id, userid)
         return { 'code': 200, 'result': result }
 
     def delete(self):
         user = flask.ext.login.current_user
-        customer = user.getcustomer(self.svc_customers)
+        member = user.getmember(self.svc_members)
         args = self.reqparse.parse_args()
         userid = args['userid']
-        result = customer.delete_admin(user.id, userid)
+        result = member.delete_admin(user.id, userid)
         return { 'code': 200, 'result': result }
 
 
@@ -121,6 +121,6 @@ class MemberProjectAPI(MemberAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         classify = args['classify']
-        customer = user.getcustomer(self.svc_customers)
-        result = customer.add_project(projectname, classify, user.id)
+        member = user.getmember(self.svc_members)
+        result = member.add_project(projectname, classify, user.id)
         return { 'code': 200, 'result': result }

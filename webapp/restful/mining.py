@@ -18,7 +18,7 @@ class BaseAPI(Resource):
 
     def __init__(self):
         super(BaseAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('md_ids', type = list, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -40,8 +40,8 @@ class PositionAPI(BaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         text = args['search_text']
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
@@ -78,8 +78,8 @@ class RegionAPI(BaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = []
         for id in args['md_ids'][:self.numbers]:
             stream = project.cv_getmd(id)
@@ -93,8 +93,8 @@ class CapacityAPI(BaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = []
         for id in args['md_ids'][:self.numbers]:
             stream = project.cv_getmd(id)
@@ -108,8 +108,8 @@ class AbilityAPI(BaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = []
         for id in args['md_ids']:
             month = 0
@@ -134,8 +134,8 @@ class ExperienceAPI(BaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = []
         for id in args['md_ids']:
             stream = project.cv_getmd(id)
@@ -157,7 +157,7 @@ class LSIbaseAPI(Resource):
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
         self.sim_names = self.miner.addition_names()
@@ -189,7 +189,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbyJDidAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('appendcomment', type = bool, location = 'json')
@@ -202,8 +202,8 @@ class LSIbyJDidAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
         append_comment = args['appendcomment'] if args['appendcomment'] else False
@@ -223,7 +223,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
     def __init__(self):
         super(LSIbyAllJDAPI, self).__init__()
         self.index = flask.current_app.config['SVC_INDEX']
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('fromcache', type=bool, location = 'json')
         self.reqparse.add_argument('project', type=str, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -292,8 +292,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         filterdict = args['filterdict']
         numbers = args['numbers']
         results = list()
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         alls = self.fromcache(project, filterdict, threshold, cache=fromcache)
         for jdid in alls:
             results.append({'ID': jdid, 'name': alls[jdid]['name'],
@@ -307,7 +307,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbyCVidAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('project', type = str, location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
@@ -319,8 +319,8 @@ class LSIbyCVidAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         doc = project.cv_getmd(id)
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
@@ -344,8 +344,8 @@ class LSIbydocAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         doc = args['doc']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
@@ -359,7 +359,7 @@ class SimilarAPI(Resource):
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
@@ -370,8 +370,8 @@ class SimilarAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         doc = project.cv_getmd(id)
         uses = [projectname]
         project_classify = project.getclassify()
@@ -431,7 +431,7 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
 
     def __init__(self):
         super(ValuablebyJDidAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
 
@@ -440,8 +440,8 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
         result = self._get(doc, project)
@@ -466,7 +466,7 @@ class ValuableAPI(ValuablebaseAPI):
 
     def __init__(self):
         super(ValuableAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -475,8 +475,8 @@ class ValuableAPI(ValuablebaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         doc = ''
         if args['id']:
             jd_yaml = project.jd_get(args['id'])

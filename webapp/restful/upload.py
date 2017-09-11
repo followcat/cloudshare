@@ -20,7 +20,7 @@ class UploadCVAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_min = flask.current_app.config['SVC_MIN']
         self.svc_index = flask.current_app.config['SVC_INDEX']
@@ -39,8 +39,8 @@ class UploadCVAPI(Resource):
         projectname = args['project']
         names = []
         documents = []
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         for item in updates:
             status = 'failed'
             cvobj = upload[user.name].pop(item['filename'])
@@ -55,8 +55,8 @@ class UploadCVAPI(Resource):
                         if result['repo_cv_result']:
                             self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
                         if result['project_cv_result']:
-                            result['customer_cv_result'] = customer.cv_add(cvobj, user.name,
-                                                                           unique=True)
+                            result['member_cv_result'] = member.cv_add(cvobj, user.name,
+                                                                       unique=True)
                             status = 'success'
                             message = 'Add to CV database and project.'
                             names.append(cvobj.name.md)
@@ -119,7 +119,7 @@ class UploadEnglishCVAPI(Resource):
 
     def __init__(self):
         super(UploadEnglishCVAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('file', type = str, location = 'json')
@@ -137,8 +137,8 @@ class UploadEnglishCVAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         dataobj = uploadeng[user.name]
         result = project.cv_add_eng(id, dataobj, user.name)
         uploadeng[user.name] = None

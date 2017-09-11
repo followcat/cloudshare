@@ -17,16 +17,16 @@ class User(flask.ext.login.UserMixin):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
 
-    def createcustomer(self, name, svc_customers):
-        result = self.svc_account.createcustomer(self.id, name, svc_customers)
+    def createmember(self, name, svc_members):
+        result = self.svc_account.createmember(self.id, name, svc_members)
         return result
 
-    def awaycustomer(self, awayid, svc_customers):
-        result = self.svc_account.awaycustomer(self.id, awayid, svc_customers)
+    def awaymember(self, awayid, svc_members):
+        result = self.svc_account.awaymember(self.id, awayid, svc_members)
         return result
 
-    def joincustomer(self, inviter_id, name, svc_customers):
-        result = self.svc_account.joincustomer(inviter_id, self.id, name, svc_customers)
+    def joinmember(self, inviter_id, name, svc_members):
+        result = self.svc_account.joinmember(inviter_id, self.id, name, svc_members)
         return result
 
     def updateinfo(self, info):
@@ -51,8 +51,8 @@ class User(flask.ext.login.UserMixin):
     def delbookmark(self, id):
         return self.svc_account.delbookmark(self.id, id)
 
-    def getcustomer(self, svc_customers):
-        return svc_customers.use(self.customer, self.id)
+    def getmember(self, svc_members):
+        return svc_members.use(self.member, self.id)
 
     def getmessage(self, msgid, svc_message):
         return svc_message.getcontent(self.id, msgid)
@@ -67,7 +67,7 @@ class User(flask.ext.login.UserMixin):
         return svc_message.getinfo(self.id)['unread_chat']
 
     def getinvitedmessages(self, svc_message):
-        return svc_message.getinfo(self.id)['invited_customer']
+        return svc_message.getinfo(self.id)['invited_member']
 
     def sentmessage(self, des_name, content, svc_message):
         des_info = self.svc_account.getinfo_byname(des_name)
@@ -79,25 +79,25 @@ class User(flask.ext.login.UserMixin):
         result = svc_message.read(self.id, msgid, self.name)
         return result
 
-    def invitecustomer(self, des_name, svc_message):
+    def invitemember(self, des_name, svc_message):
         result = False
-        if self.customer:
+        if self.member:
             des_info = self.svc_account.getinfo_byname(des_name)
             des_id = des_info['id']
             result = svc_message.send_invitation(self.id, des_id,
-                                                 self.customer, self.name)
+                                                 self.member, self.name)
         return result
 
     @property
-    def customer(self):
+    def member(self):
         result = ''
-        if 'customer' in self.info:
-            result = self.info['customer']
+        if 'member' in self.info:
+            result = self.info['member']
         return result
 
     @property
-    def defaultcustomer(self):
-        return not self.customer
+    def defaultmember(self):
+        return not self.member
 
     @property
     def info(self):

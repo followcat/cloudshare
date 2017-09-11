@@ -10,7 +10,7 @@ class PeopleAPI(Resource):
 
     def __init__(self):
         super(PeopleAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('date', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -22,8 +22,8 @@ class PeopleAPI(Resource):
         args = self.reqparse.parse_args()
         unique_id = args['unique_id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         peopleinfo = project.peo_getyaml(unique_id)
         return { 'code': 200, 'data': peopleinfo }
 
@@ -33,8 +33,8 @@ class PeopleAPI(Resource):
         unique_id = args['unique_id']
         projectname = args['project']
         update_info = args['update_info']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         for key, value in update_info.iteritems():
             data = project.peo_updateyaml(unique_id, key, value, user.name)
             if data is not None:
@@ -51,8 +51,8 @@ class PeopleAPI(Resource):
         date = args['date']
         projectname = args['project']
         update_info = args['update_info']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         for key, value in update_info.iteritems():
             data = project.peo_deleteyaml(unique_id, key, value, user.name, date)
             if data is not None:
@@ -69,7 +69,7 @@ class PeopleByCVAPI(Resource):
 
     def __init__(self):
         super(PeopleByCVAPI, self).__init__()
-        self.svc_customers = flask.current_app.config['SVC_CUSTOMERS']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('cv_id', type = str, location = 'json')
         self.reqparse.add_argument('project', type = str, location = 'json')
@@ -79,8 +79,8 @@ class PeopleByCVAPI(Resource):
         args = self.reqparse.parse_args()
         cv_id = args['cv_id']
         projectname = args['project']
-        customer = user.getcustomer(self.svc_customers)
-        project = customer.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         yamlinfo = project.cv_getyaml(cv_id)
         try:
             unique_id = yamlinfo['unique_id']

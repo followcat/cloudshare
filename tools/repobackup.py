@@ -5,7 +5,7 @@ import tarfile
 import utils.builtin
 import baseapp.backup
 import baseapp.datadbs
-import baseapp.customer
+import baseapp.member
 import webapp.settings
 
 
@@ -20,7 +20,7 @@ SVC_CV_REPO = baseapp.datadbs.SVC_CV_REPO
 SVC_PEO_REPO = baseapp.datadbs.SVC_PEO_REPO
 SVC_CV_INDIV = baseapp.datadbs.SVC_CV_INDIV
 SVC_PEO_INDIV = baseapp.datadbs.SVC_PEO_INDIV
-SVC_CUSTOMERS =  baseapp.customer.SVC_CUSTOMERS
+SVC_MEMBERS =  baseapp.member.SVC_MEMBERS
 
 
 def backup_upload_output():
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         peorepo_backup_path = os.path.join(folder, 'peorepo', backup_name)
         cvindiv_backup_path = os.path.join(folder, 'cvindiv', backup_name)
         peoindiv_backup_path = os.path.join(folder, 'peoindiv', backup_name)
-        customers_backup_path = os.path.join(folder, 'customers', backup_name)
+        members_backup_path = os.path.join(folder, 'members', backup_name)
         utils.builtin.assure_path_exists(account_backup_path)
         utils.builtin.assure_path_exists(message_backup_path)
         utils.builtin.assure_path_exists(password_backup_path)
@@ -51,7 +51,7 @@ if __name__ == '__main__':
         utils.builtin.assure_path_exists(peorepo_backup_path)
         utils.builtin.assure_path_exists(cvindiv_backup_path)
         utils.builtin.assure_path_exists(peoindiv_backup_path)
-        utils.builtin.assure_path_exists(customers_backup_path)
+        utils.builtin.assure_path_exists(members_backup_path)
         SVC_MSG.backup(message_backup_path, bare=True)
         SVC_PWD.backup(password_backup_path, bare=True)
         SVC_ACCOUNT.backup(account_backup_path, bare=True)
@@ -59,6 +59,6 @@ if __name__ == '__main__':
         SVC_PEO_REPO.backup(peorepo_backup_path, bare=True)
         SVC_CV_INDIV.backup(cvindiv_backup_path, bare=True)
         SVC_PEO_INDIV.backup(peoindiv_backup_path, bare=True)
-        for customer in SVC_CUSTOMERS.customers.values():
-            customer.backup(customers_backup_path)
+        for member in SVC_MEMBERS.members.values():
+            member.backup(members_backup_path)
     backup_upload_output()

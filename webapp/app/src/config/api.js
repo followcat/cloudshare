@@ -2,9 +2,9 @@
 const HOST = '';
 
 export const API = {
-  IS_CUSTOMER_ADMIN_API:`${HOST}/api/iscustomeradmin`,
+  IS_CUSTOMER_ADMIN_API:`${HOST}/api/ismenberadmin`,
 
-  IS_CUSTOMER_API:`${HOST}/api/iscustomer`,
+  IS_CUSTOMER_API:`${HOST}/api/ismenber`,
 
   MESSAGESNOTIFY_API:`${HOST}/api/messagenotify`,
 
@@ -16,9 +16,9 @@ export const API = {
 
   SEND_INVITE_MESSAGE_API:`${HOST}/api/sendinvitemessage`,
 
-  LIST_CUSTOMER_ACCOUNTS_API:`${HOST}/api/listcustomeraccounts`,
+  LIST_CUSTOMER_ACCOUNTS_API:`${HOST}/api/listmenberaccounts`,
 
-  CUSTOMER_PROJECT_API:`${HOST}/api/customerproject`,
+  CUSTOMER_PROJECT_API:`${HOST}/api/menberproject`,
 
   USER_API:`${HOST}/api/user`,
 

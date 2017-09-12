@@ -114,7 +114,9 @@ class BaseStorage(services.base.service.Service):
     def saveinfo(self, id, info, message, committer, do_commit=True):
         result = False
         baseinfo = self.getinfo(id)
-        saveinfo = dict(filter(lambda k: k[0] in baseinfo, info.items()))
+        saveinfo = dict(filter(lambda k: k[0] in baseinfo.keys()+
+                                                 self.generate_info_template().keys(),
+                                                 info.items()))
         if baseinfo != saveinfo:
             name = core.outputstorage.ConvertName(id).yaml
             saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())

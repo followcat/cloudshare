@@ -114,8 +114,8 @@ class Message(services.base.storage.BaseStorage):
     """
     YAML_TEMPLATE = (
         ("id",                  str),
-        ("invited_member",    list),
-        ("inviter_member",    list),
+        ("invited_member",      list),
+        ("inviter_member",      list),
         ("send_chat",           list),
         ("read_chat",           list),
         ("unread_chat",         list),
@@ -309,7 +309,7 @@ class Account(services.base.storage.BaseStorage):
         ("bookmark",            set),
         ("phone",               str),
         ("email",               str),
-        ("member",            str),
+        ("member",              str),
     )
 
     def __init__(self, svc_password, path, name=None, searchengine=None, iotype='git'):

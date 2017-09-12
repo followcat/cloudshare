@@ -7,7 +7,7 @@ from webapp.restful.upload import *
 from webapp.restful.account import *
 from webapp.restful.company import *
 from webapp.restful.message import *
-from webapp.restful.customer import *
+from webapp.restful.member import *
 from webapp.restful.captchaverify import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *

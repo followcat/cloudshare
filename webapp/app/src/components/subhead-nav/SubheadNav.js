@@ -44,11 +44,11 @@ class SubheadNav extends Component {
           <Menu
             selectedKeys={selectedKeys}
             defaultopenKeys={selectedKeys}
-            mode="inline"
+            mode="horizontal"
             onClick={this.props.onClick}
           >
           { this.state.show ?
-          <MenuItem key="invite" title="invite">
+          <MenuItem key="invite">
               <Link to='/pm/listcustomer'>{language.MENBER_MANAGEMENT}</Link>
           </MenuItem>
           :null
@@ -59,7 +59,6 @@ class SubheadNav extends Component {
           </MenuItem>
           : null
           }
-          <SubMenu key="service" title={language.CUSTOMER_MANAGEMENT}>
             {menus.map(item => {
               return (
                 <MenuItem key={item.key}>
@@ -67,7 +66,6 @@ class SubheadNav extends Component {
                 </MenuItem>
               );
             })}
-            </SubMenu>
           </Menu>
         </div>
       </div>

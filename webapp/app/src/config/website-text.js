@@ -74,6 +74,8 @@ const websiteText = {
     UPLOAD: '上传',
     ACCEPT: '接受',
     IGNORE: '忽略',
+    ELEVATE: '授予权限',
+    REVOKE: '撤销权限',
 
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',

@@ -2,6 +2,8 @@
 const HOST = '';
 
 export const API = {
+  MEMBER_ADMIN_API:`${HOST}/api/memberadmin`,
+
   MEMBER_API:`${HOST}/api/member`,
 
   IS_MEMBER_ADMIN_API:`${HOST}/api/ismemberadmin`,

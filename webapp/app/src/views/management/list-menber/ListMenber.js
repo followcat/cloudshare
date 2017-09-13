@@ -5,12 +5,12 @@ import TablePlus from 'components/table-plus';
 import ButtonWithModal from 'components/button-with-modal';
 import ListCustomerForm from 'components/project-list';
 
-import {   message,Form,Table, Input,Button, Popconfirm } from 'antd';
+import {   message, Form, Table, Input, Button, Popconfirm } from 'antd';
 
 import findIndex from 'lodash/findIndex';
 
-import { getListMenber,deleteMenber,sendInviteMessage } from 'request/member';
-
+import { getListMenber, deleteMenber, sendInviteMessage } from 'request/member';
+import { elevateAdmin,  } from 'request/memberadmin';
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
 
@@ -32,6 +32,7 @@ class ListMenber extends Component {
     this.handleOkClick = this.handleOkClick.bind(this);
     this.getListMenberData = this.getListMenberData.bind(this);
     this.getMenberName = this.getMenberName.bind(this);
+    this.handleElevate = this.handleElevate.bind(this);
   }
 
   getListMenberData() {
@@ -76,6 +77,18 @@ class ListMenber extends Component {
   handleCancelClick() {
     this.setState({
       visible: false
+    });
+  }
+
+  handleElevate(record) {
+    elevateAdmin({
+      userid: record.id,
+    },(json) => {
+      if (json.result === true) {
+      message.success(language.SENT_SUCCESS_MSG);
+      } else {
+        message.error(language.SENT_FAIL_MSG);
+      }
     });
   }
 
@@ -143,9 +156,15 @@ class ListMenber extends Component {
         return (
           this.state.customers.length > 0 ?
           (
+            <span>
+            <a href="#" onClick={() => this.handleElevate(record)}>{language.ELEVATE}</a>
+            <span className="ant-divider" />
+            <a href="#"onClick={() => this.handleRevoke(record)}>{language.REVOKE}</a>
+            <span className="ant-divider" />
             <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record)}>
               <a href="#">{language.DELETE}</a>
             </Popconfirm>
+            </span>
           ) : null
         );
       },

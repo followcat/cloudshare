@@ -1,11 +1,11 @@
 'use strict';
-// import { Customer } from 'views/ProjectManagement';
+// import { Member } from 'views/ProjectManagement';
 
 module.exports = {
-  path: 'customer',
+  path: 'member',
   getComponent(nextState, callback) {
     require.ensure([], (require) => {
-      callback(null, require('views/pm/customer').default);
-    }, 'customer');
+      callback(null, require('views/pm/member').default);
+    }, 'member');
   }
 };

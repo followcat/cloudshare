@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  path: 'listcustomer',
+  path: 'listmember',
   getComponent(nextState, callback) {
     require.ensure([], (require) => {
       callback(null, require('views/pm/list-member').default);

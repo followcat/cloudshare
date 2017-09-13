@@ -23,7 +23,7 @@ const MenuItem = Menu.Item,
       MenuDivider = Menu.Divider,
       confirm = Modal.confirm;
 
-//customer
+//member
 const navMenusMember = [{
   url: URL.getSearchURL(),
   text: language.SEARCH

@@ -98,9 +98,6 @@ const websiteText = {
     JOB_DESCRIPTION_NAME_VALIDATE_MSG: '请输入职位名称',
     JOB_DESCRIPTION_CONTENT_VALIDATE_MSG: '请输入职位描述内容',
 
-    ADD_CUSTOMER: '添加客户',
-    ADDED_CUSTOMER: '已添加客户',
-
     SENT_SUCCESS_MSG: '发送成功',
     SENT_FAIL_MSG: '发送失败',
 

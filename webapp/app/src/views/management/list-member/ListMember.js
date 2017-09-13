@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 import TablePlus from 'components/table-plus';
 import ButtonWithModal from 'components/button-with-modal';
-import ListCustomerForm from 'components/project-list';
+import ListMemberForm from 'components/project-list';
 
 import {   message,Form,Table, Input,Button, Popconfirm } from 'antd';
 
@@ -21,10 +21,10 @@ class ListMember extends Component {
     this.state = {
       selectedKeys: [],
       projects: [],
-      customers: [],
+      members: [],
       visible: false,
       value: '',
-      customerName: '',
+      memberName: '',
     };
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
@@ -38,14 +38,14 @@ class ListMember extends Component {
     getListMember((json) => {
       if (json.code === 200) {
 		    this.setState({
-          customers: json.result,
+          members: json.result,
         });
       }
     });
   }
 
   getMemberName(childname){
-    this.setState({ customerName: childname.name });
+    this.setState({ memberName: childname.name });
   }
 
   handleButtonClick() {
@@ -60,7 +60,7 @@ class ListMember extends Component {
 
   handleSubmit (feildValue) {
     sendInviteMessage({
-      customerName: this.state.customerName,
+      memberName: this.state.memberName,
     }, (json) => {
       if  (json.code === 200) {
         this.setState({
@@ -97,9 +97,9 @@ class ListMember extends Component {
           onModalOk={this.handleOkClick}
           onModalCancel={this.handleCancelClick}
         >
-        <ListCustomerForm
+        <ListMemberForm
               inputLabel="用户名称"
-              getInput={this.getCustomerName}
+              getInput={this.getMemberName}
               onChange={this.handleFormChange}
               onSubmit={this.handleSubmit}
         />
@@ -115,8 +115,8 @@ class ListMember extends Component {
       userid : record.id,
     }, (json) => {
       if  (json.code === 200) {
-      const customers = [...this.state.customers];
-      this.setState({ customers: customers.filter(item => item.id !== record.id) });
+      const members = [...this.state.members];
+      this.setState({ members: members.filter(item => item.id !== record.id) });
       message.success(language.DELETE_SUCCESS_MSG);
       } else {
         message.error(language.DELETE_FAIL_MSG);
@@ -140,7 +140,7 @@ class ListMember extends Component {
   		dataIndex: 'action',
       render: (text, record) => {
         return (
-          this.state.customers.length > 0 ?
+          this.state.members.length > 0 ?
           (
             <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record)}>
               <a href="#">{language.DELETE}</a>
@@ -159,7 +159,7 @@ class ListMember extends Component {
           isSearched={true}
           elements={this.getElements()}
           columns={columns}
-          dataSource={this.state.customers}
+          dataSource={this.state.members}
           loading={this.state.loading}
       />
     </div>

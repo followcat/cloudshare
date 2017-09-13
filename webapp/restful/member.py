@@ -76,6 +76,7 @@ class ListMemberAccountsAPI(MemberAPI):
 class MemberAccountAPI(MemberAPI):
 
     def delete(self, userid):
+        user = flask.ext.login.current_user
         result = user.awaymember(userid, self.svc_members)
         return { 'code': 200, 'result': result }
 

@@ -24,8 +24,9 @@ raw/
 tags/
 cutwords/
 projects/
-customers/
 classify/
+members/
+message/
 storage/
 webapp/app/dist
 webapp/static/node_modules/

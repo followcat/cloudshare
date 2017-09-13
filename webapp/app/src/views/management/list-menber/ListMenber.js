@@ -124,8 +124,7 @@ class ListMenber extends Component {
   }
 
   onDelete = (record) => {
-    deleteMenber({
-      customerName: record.name,
+    deleteMember({
       userid : record.id,
     }, (json) => {
       if  (json.code === 200) {

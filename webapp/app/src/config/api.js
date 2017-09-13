@@ -20,9 +20,9 @@ export const API = {
 
   MEMBER_ACCOUNT_API:`${HOST}/api/memberaccount`,
 
-  LIST_MENBER_ACCOUNTS_API:`${HOST}/api/listmemberaccounts`,
+  LIST_MEMBER_ACCOUNTS_API:`${HOST}/api/listmemberaccounts`,
 
-  MENBER_PROJECT_API:`${HOST}/api/menberproject`,
+  MEMBER_PROJECT_API:`${HOST}/api/memberproject`,
 
   USER_API:`${HOST}/api/user`,
 

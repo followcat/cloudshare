@@ -30,7 +30,7 @@ export const getProject = (callback) => {
  * @return {function} fetch    异步请求方法
  */
 export const addProject = (params,callback) => {
-  return fetch(`${API.MENBER_PROJECT_API}/${params.projectname}`, {
+  return fetch(`${API.MEMBER_PROJECT_API}/${params.projectname}`, {
     method: 'POST',
     credentials: 'include',
     headers: {

@@ -9,7 +9,7 @@ import { URL } from 'URL';
 
 import { getProject } from 'request/project';
 import { signOut } from 'request/sign';
-import { isMenber } from 'request/member';
+import { isMember } from 'request/member';
 
 import StorageUtil from 'utils/storage';
 
@@ -24,7 +24,7 @@ const MenuItem = Menu.Item,
       confirm = Modal.confirm;
 
 //customer
-const navMenusMenber = [{
+const navMenusMember = [{
   url: URL.getSearchURL(),
   text: language.SEARCH
 }, {
@@ -64,14 +64,14 @@ class LayoutHeader extends Component {
     this.state = {
       selectedKeys: [],
       projects: [],
-      navMenus: navMenusMenber,
+      navMenus: navMenusMember,
     };
     this.handleSignOutClick = this.handleSignOutClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
   componentWillMount() {
-      isMenber((json) => {
+      isMember((json) => {
       if (json.result === false) {
         this.setState({
           navMenus: navMenuUser,

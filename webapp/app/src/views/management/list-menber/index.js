@@ -1,6 +1,6 @@
 'use strict';
 import './style/index.less';
 
-import ListMenber from './ListMenber';
+import ListMember from './ListMember';
 
-export default ListMenber;
+export default ListMember;

@@ -11,14 +11,14 @@ module.exports = {
   indexRoute: {
     getComponent(nextState, callback) {
       require.ensure([], (require) => {
-        callback(null, require('views/management/list-menber').default);
+        callback(null, require('views/management/list-member').default);
       }, 'management');
     }
   },
   onEnter: checkStatus,
   childRoutes: [
     require('./project-list'),
-    require('./list-menber'),
+    require('./list-member'),
     require('./admin'),
   ]
 };

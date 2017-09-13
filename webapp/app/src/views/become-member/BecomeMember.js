@@ -8,7 +8,7 @@ import { becomeMember } from 'request/member';
 
 const FormItem = Form.Item;
 
-class BecomeMenber extends Component {
+class BecomeMember extends Component {
   constructor() {
     super();
     this.state = {
@@ -72,4 +72,4 @@ class BecomeMenber extends Component {
   }
 }
 
-export default BecomeMenber = Form.create({})(BecomeMenber);
+export default BecomeMember = Form.create({})(BecomeMember);

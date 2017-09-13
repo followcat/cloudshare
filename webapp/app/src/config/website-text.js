@@ -21,7 +21,7 @@ const websiteText = {
     BEST_EXCELLENT: '每日优秀',
 
     ADMIN_MANAGEMENT: '权限管理',
-    MENBER_MANAGEMENT: '成员管理',
+    MEMBER_MANAGEMENT: '成员管理',
     PROJECT_MANAGEMENT: '项目管理',
     CUSTOMER_MANAGEMENT: '客户管理',
 

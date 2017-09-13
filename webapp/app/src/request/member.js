@@ -4,8 +4,23 @@ import { API } from '../config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
-export const getListCustomer = (callback) => {
-  return fetch(API.LIST_CUSTOMER_ACCOUNTS_API, {
+export const becomeMember = (params,callback) => {
+  return fetch(API.MEMBER_API, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body:JSON.stringify(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+export const getListMenber = (callback) => {
+  return fetch(API.LIST_MENBER_ACCOUNTS_API, {
     method: 'GET',
     credentials: 'include',
     headers: {
@@ -18,7 +33,7 @@ export const getListCustomer = (callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const deleteCustomer = (params,callback) => {
+export const deleteMenber = (params,callback) => {
   return fetch(`${API.ACCEPT_INVITE_MESSAGE_API}/${params.customerName}`, {
     method: 'DELETE',
     credentials: 'include',
@@ -47,8 +62,8 @@ export const sendInviteMessage = (params,callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const isCustomer = (callback) => {
-  return fetch(API.IS_CUSTOMER_API, {
+export const isMenber = (callback) => {
+  return fetch(API.IS_MEMBER_API, {
     method: 'GET',
     credentials: 'include',
     headers: {
@@ -61,8 +76,8 @@ export const isCustomer = (callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const isCustomerAdmin = (callback) => {
-  return fetch(API.IS_CUSTOMER_ADMIN_API, {
+export const isMenberAdmin = (callback) => {
+  return fetch(API.IS_MEMBER_ADMIN_API, {
     method: 'GET',
     credentials: 'include',
     headers: {

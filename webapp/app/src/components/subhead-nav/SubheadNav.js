@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 
 import { Menu } from 'antd';
 
-import { isCustomerAdmin } from 'request/customer';
+import { isMenberAdmin } from 'request/member';
 import  websiteText  from 'config/website-text'
 
 const MenuItem = Menu.Item;
@@ -21,7 +21,7 @@ class SubheadNav extends Component {
   }
 
   componentWillMount() {
-      isCustomerAdmin((json) => {
+      isMenberAdmin((json) => {
       if (json.result === true) {
         this.setState({
           show: true,

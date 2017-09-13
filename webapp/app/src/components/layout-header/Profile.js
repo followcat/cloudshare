@@ -13,7 +13,7 @@ class Profile extends Component {
     messagesNotify ((json) => {
         if(json.code === 200) {
           this.setState({
-            count : json.result.invited_customer+json.result.unread_chat
+            count : json.result.invited_member+json.result.unread_chat
             })
           }
         })

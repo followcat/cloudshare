@@ -9,7 +9,7 @@ import { URL } from 'URL';
 
 import { getProject } from 'request/project';
 import { signOut } from 'request/sign';
-import { isCustomer } from 'request/customer';
+import { isMenber } from 'request/member';
 
 import StorageUtil from 'utils/storage';
 
@@ -24,7 +24,7 @@ const MenuItem = Menu.Item,
       confirm = Modal.confirm;
 
 //customer
-const navMenusCustomer = [{
+const navMenusMenber = [{
   url: URL.getSearchURL(),
   text: language.SEARCH
 }, {
@@ -51,8 +51,8 @@ const navMenuUser = [{
   url: URL.getUploaderURL(),
   text: language.RESUME_UPLOADER
 }, {
-  url: URL.getBecomeCustomer(),
-  text: language.BECOME_CUSTOMER
+  url: URL.getBecomeMember(),
+  text: language.BECOME_MEMBER
 }, {
   url: URL.getBestExcellent(),
   text: language.BEST_EXCELLENT
@@ -64,14 +64,14 @@ class LayoutHeader extends Component {
     this.state = {
       selectedKeys: [],
       projects: [],
-      navMenus: navMenusCustomer,
+      navMenus: navMenusMenber,
     };
     this.handleSignOutClick = this.handleSignOutClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
   componentWillMount() {
-      isCustomer((json) => {
+      isMenber((json) => {
       if (json.result === false) {
         this.setState({
           navMenus: navMenuUser,
@@ -134,6 +134,10 @@ class LayoutHeader extends Component {
       <Menu>
         <MenuItem>
           <a href={URL.getUserInfoURL()}>{language.PROFILE}</a>
+        </MenuItem>
+        <MenuDivider />
+        <MenuItem>
+          <a href={URL.getNotcieURL()}>{language.NOTICE}</a>
         </MenuItem>
         <MenuDivider />
         <MenuItem>

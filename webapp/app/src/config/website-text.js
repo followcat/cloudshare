@@ -16,7 +16,7 @@ const websiteText = {
     MATCH: '匹配',
     RESUME_UPLOADER: '简历上传',
     VIP_MANAGEMENT: '会员服务',
-    BECOME_CUSTOMER: '成为会员',
+    BECOME_MEMBER: '成为会员',
     BEST_EXCELLENT: '每日优秀',
 
     MENBER_MANAGEMENT: '成员管理',

@@ -9,13 +9,13 @@ import {   message,Form,Table, Input,Button, Popconfirm } from 'antd';
 
 import findIndex from 'lodash/findIndex';
 
-import { getListCustomer,deleteCustomer,sendInviteMessage } from 'request/customer';
+import { getListMenber,deleteMenber,sendInviteMessage } from 'request/member';
 
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
 
 
-class ListCustomer extends Component {
+class ListMenber extends Component {
 	constructor() {
     super();
     this.state = {
@@ -30,12 +30,12 @@ class ListCustomer extends Component {
     this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleSubmit   = this.handleSubmit.bind(this);
     this.handleOkClick = this.handleOkClick.bind(this);
-    this.getListCustomerData = this.getListCustomerData.bind(this);
-    this.getCustomerName = this.getCustomerName.bind(this);
+    this.getListMenberData = this.getListMenberData.bind(this);
+    this.getMenberName = this.getMenberName.bind(this);
   }
 
-  getListCustomerData() {
-    getListCustomer((json) => {
+  getListMenberData() {
+    getListMenber((json) => {
       if (json.code === 200) {
 		    this.setState({
           customers: json.result,
@@ -44,7 +44,7 @@ class ListCustomer extends Component {
     });
   }
 
-  getCustomerName(childname){
+  getMenberName(childname){
     this.setState({ customerName: childname.name });
   }
 
@@ -111,7 +111,7 @@ class ListCustomer extends Component {
   }
 
   onDelete = (record) => {
-    deleteCustomer({
+    deleteMenber({
       customerName: record.name,
       userid : record.id,
     }, (json) => {
@@ -127,7 +127,7 @@ class ListCustomer extends Component {
 
 
   componentDidMount() {
-    this.getListCustomerData();
+    this.getListMenberData();
     }
 
   render() {
@@ -167,4 +167,4 @@ class ListCustomer extends Component {
     );
   }
 }
-export default ListCustomer;
+export default ListMenber;

@@ -32,7 +32,7 @@ const rootRoute = {
   childRoutes: [
     require('../routes/search'),
     require('../routes/uploader'),
-    require('../routes/become-customer'),
+    require('../routes/become-member'),
     require('../routes/pm'),
     require('../routes/fast-matching'),
     require('../routes/doc-mining'),

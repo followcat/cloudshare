@@ -405,6 +405,8 @@ class Account(services.base.storage.BaseStorage):
         if member:
             result = member.rm_account(inviter_id, invited_id, info['name'])
             if result is True:
+                if member.check_admin(invited_id) is True:
+                    result = member.delete_admin(inviter_id, invited_id)
                 self.updateinfo(invited_id, 'member', '', info['name'])
         return result
 

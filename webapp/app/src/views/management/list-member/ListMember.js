@@ -10,6 +10,7 @@ import {   message,Form,Table, Input,Button, Popconfirm } from 'antd';
 import findIndex from 'lodash/findIndex';
 
 import { getListMember, deleteMember, sendInviteMessage } from 'request/member';
+import { elevateAdmin, revokeAdmin, } from 'request/memberadmin';
 
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
@@ -32,6 +33,8 @@ class ListMember extends Component {
     this.handleOkClick = this.handleOkClick.bind(this);
     this.getListMemberData = this.getListMemberData.bind(this);
     this.getMemberName = this.getMemberName.bind(this);
+    this.handleElevate = this.handleElevate.bind(this);
+    this.handleRevoke = this.handleRevoke.bind(this);
   }
 
   getListMemberData() {
@@ -58,7 +61,7 @@ class ListMember extends Component {
      this.handleSubmit();
   }
 
-  handleSubmit (feildValue) {
+  handleSubmit(feildValue) {
     sendInviteMessage({
       memberName: this.state.memberName,
     }, (json) => {
@@ -77,6 +80,30 @@ class ListMember extends Component {
     this.setState({
       visible: false
     });
+  }
+
+  handleElevate(record) {
+    elevateAdmin({
+      userid: record.id,
+    }, (json) => {
+      if  (json.result === true) {
+      message.success(language.ELEVATE_SUCCESS);
+      } else {
+        message.error(language.ELEVATE_FAIL);
+      }
+    })
+  }
+
+  handleRevoke(record) {
+    revokeAdmin({
+      userid: record.id,
+    }, (json) => {
+      if  (json.result === true) {
+      message.success(language.REVOKE_SUCCESS);
+      } else {
+        message.error(language.REVOKE_FAIL);
+      }
+    })
   }
 
   getElements() {
@@ -134,17 +161,46 @@ class ListMember extends Component {
       title: '成员名称',
       dataIndex: 'name',
   		render: text => <span>{text}</span>,
-		}, {
+		},{
+      title: '管理员',
+      dataIndex: 'admin',
+      render: (text, record) => {
+        return (
+        record.admin ?
+        <span>{language.YES}</span>
+        :
+        <span>{language.NO}</span>
+        )
+      },
+    },{
       title: '操作',
   		className: 'action',
   		dataIndex: 'action',
       render: (text, record) => {
         return (
           this.state.members.length > 0 ?
-          (
+          ( 
+            record.admin ? 
+            (
+            <span>
+              <a href="#" onClick={() => this.handleRevoke(record)}>
+              {language.REVOKE}
+              <span className="ant-divider" /></a>
             <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record)}>
               <a href="#">{language.DELETE}</a>
             </Popconfirm>
+            </span>
+            ):
+            (
+              <span>
+              <a href="#" onClick={() => this.handleElevate(record)}>
+              {language.ELEVATE}
+              <span className="ant-divider" /></a>
+            <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record)}>
+              <a href="#">{language.DELETE}</a>
+            </Popconfirm>
+            </span>
+              )
           ) : null
         );
       },

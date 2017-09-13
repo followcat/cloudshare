@@ -47,7 +47,7 @@ export const getListMember = (callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const deleteMember = (params,callback) => {
+export const deleteMember = (params, callback) => {
   return fetch(`${API.MEMBER_ACCOUNT_API}/${params.userid}`, {
     method: 'DELETE',
     credentials: 'include',
@@ -62,8 +62,8 @@ export const deleteMember = (params,callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const sendInviteMessage = (params,callback) => {
-  return fetch(`${API.SEND_INVITE_MESSAGE_API}/${params.customerName}`, {
+export const sendInviteMessage = (params, callback) => {
+  return fetch(`${API.SEND_INVITE_MESSAGE_API}/${params.memberName}`, {
     method: 'POST',
     credentials: 'include',
     headers: {

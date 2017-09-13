@@ -160,7 +160,7 @@ export default class Management extends Component {
     const menus = [{
       key: 'invite',
       text: language.MEMBER_MANAGEMENT,
-      url: '/management/listcustomer'
+      url: '/management/listmember'
     }, {
       key: 'project',
       text: language.PROJECT_MANAGEMENT,

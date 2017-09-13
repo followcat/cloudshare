@@ -49,7 +49,7 @@ class SubheadNav extends Component {
           >
           { this.state.show ?
           <MenuItem key="invite">
-              <Link to='/pm/listcustomer'>{language.MEMBER_MANAGEMENT}</Link>
+              <Link to='/pm/listmember'>{language.MEMBER_MANAGEMENT}</Link>
           </MenuItem>
           :null
           }

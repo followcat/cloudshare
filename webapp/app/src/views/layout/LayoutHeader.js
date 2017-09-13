@@ -9,7 +9,7 @@ import { URL } from 'URL';
 
 import { getProject } from 'request/project';
 import { signOut } from 'request/sign';
-import { isMember } from 'request/member';
+import { isMember, isMemberAdmin } from 'request/member';
 
 import StorageUtil from 'utils/storage';
 
@@ -23,7 +23,7 @@ const MenuItem = Menu.Item,
       MenuDivider = Menu.Divider,
       confirm = Modal.confirm;
 
-//customer
+//member
 const navMenusMember = [{
   url: URL.getSearchURL(),
   text: language.SEARCH
@@ -40,7 +40,7 @@ const navMenusMember = [{
   url: URL.getBestExcellent(),
   text: language.BEST_EXCELLENT
 }];
-//user
+//account
 const navMenuUser = [{
   url: URL.getSearchURL(),
   text: language.SEARCH
@@ -64,19 +64,72 @@ class LayoutHeader extends Component {
     this.state = {
       selectedKeys: [],
       projects: [],
-      navMenus: navMenusMember,
+      navMenus: navMenuUser,
+      profileMenus: [],
     };
     this.handleSignOutClick = this.handleSignOutClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
   componentWillMount() {
+
+    const profileMenuAdmin = ( 
+    <Menu>
+    <MenuItem>
+      <a href={URL.getUserInfoURL()}>{language.PROFILE}</a>
+    </MenuItem>
+    <MenuDivider />
+    <MenuItem>
+      <a href={URL.getNotcieURL()}>{language.NOTICE}</a>
+    </MenuItem>
+    <MenuDivider />
+    <MenuItem>
+      <a href={URL.getManagement()}>{language.MANGEMENT}</a>
+    </MenuItem>
+    <MenuDivider />
+    <MenuItem>
+      <a href="#" onClick={this.handleSignOutClick}>
+        {language.SIGN_OUT}
+      </a>
+    </MenuItem>
+    </Menu>
+    );
+
+    const profileMenu = ( 
+  <Menu>
+    <MenuItem>
+      <a href={URL.getUserInfoURL()}>{language.PROFILE}</a>
+    </MenuItem>
+    <MenuDivider />
+    <MenuItem>
+      <a href={URL.getNotcieURL()}>{language.NOTICE}</a>
+    </MenuItem>
+    <MenuDivider />
+    <MenuItem>
+      <a href="#" onClick={this.handleSignOutClick}>
+        {language.SIGN_OUT}
+      </a>
+    </MenuItem>
+  </Menu>
+    );
+
       isMember((json) => {
-      if (json.result === false) {
+      if (json.result === true) {
         this.setState({
-          navMenus: navMenuUser,
+          navMenus: navMenusMember,
         });
       }
+      });
+      isMemberAdmin((json) => {
+      if (json.result === true) {
+        this.setState({
+          profileMenus: profileMenuAdmin,
+        });
+      } else{
+          this.setState({
+          profileMenus: profileMenu,
+        });
+        }
       });
   }
 
@@ -130,30 +183,6 @@ class LayoutHeader extends Component {
   }
 
   render() {
-    const profileMenu = ( 
-      <Menu>
-        <MenuItem>
-          <a href={URL.getUserInfoURL()}>{language.PROFILE}</a>
-        </MenuItem>
-        <MenuDivider />
-        <MenuItem>
-          <a href={URL.getNotcieURL()}>{language.NOTICE}</a>
-        </MenuItem>
-        <MenuDivider />
-        <MenuItem>
-          <a href={URL.getManagement()}>{language.MANGEMENT}</a>
-        </MenuItem>
-        <MenuDivider />
-        <MenuItem>
-          <a
-            href="#"
-            onClick={this.handleSignOutClick}
-          >
-            {language.SIGN_OUT}
-          </a>
-        </MenuItem>
-      </Menu>
-    );
 
     const { selectedKeys, projects } = this.state;
 
@@ -161,7 +190,7 @@ class LayoutHeader extends Component {
       <Header
         logoImg={logo}
         navMenus={this.state.navMenus}
-        profileMenu={profileMenu}
+        profileMenu={this.state.profileMenus}
         projects={projects}
         project={StorageUtil.get('_pj')}
         profileText={StorageUtil.get('user')}

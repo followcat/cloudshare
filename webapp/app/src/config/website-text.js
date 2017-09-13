@@ -10,6 +10,9 @@ const websiteText = {
 
     NAME: '姓名',
 
+    YES: '是',
+    NO: '否',
+
     PROFILE: '个人中心',
     NOTICE: '消息',
     MANGEMENT: '管理',
@@ -76,6 +79,11 @@ const websiteText = {
     IGNORE: '忽略',
     ELEVATE: '授予权限',
     REVOKE: '撤销权限',
+
+    ELEVATE_SUCCESS: '授予权限成功！',
+    ELEVATE_FAIL: '授予权限失败！',
+    REVOKE_SUCCESS: '撤销权限成功！',
+    REVOKE_FAIL: '撤销权限成功！',
 
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',

@@ -21,6 +21,6 @@ module.exports = {
     require('./customer'),
     require('./company'),
     require('./project-list'),
-    require('./list-menber'),
+    require('./list-member'),
   ]
 };

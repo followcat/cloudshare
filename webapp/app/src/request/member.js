@@ -33,8 +33,8 @@ export const quitMember = (callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const getListMenber = (callback) => {
-  return fetch(API.LIST_MENBER_ACCOUNTS_API, {
+export const getListMember = (callback) => {
+  return fetch(API.LIST_MEMBER_ACCOUNTS_API, {
     method: 'GET',
     credentials: 'include',
     headers: {
@@ -76,7 +76,7 @@ export const sendInviteMessage = (params,callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const isMenber = (callback) => {
+export const isMember = (callback) => {
   return fetch(API.IS_MEMBER_API, {
     method: 'GET',
     credentials: 'include',
@@ -90,7 +90,7 @@ export const isMenber = (callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const isMenberAdmin = (callback) => {
+export const isMemberAdmin = (callback) => {
   return fetch(API.IS_MEMBER_ADMIN_API, {
     method: 'GET',
     credentials: 'include',

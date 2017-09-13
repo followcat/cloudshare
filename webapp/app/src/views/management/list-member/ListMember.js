@@ -9,13 +9,13 @@ import {   message,Form,Table, Input,Button, Popconfirm } from 'antd';
 
 import findIndex from 'lodash/findIndex';
 
-import { getListMenber, deleteMember, sendInviteMessage } from 'request/member';
+import { getListMember, deleteMember, sendInviteMessage } from 'request/member';
 
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
 
 
-class ListMenber extends Component {
+class ListMember extends Component {
 	constructor() {
     super();
     this.state = {
@@ -30,12 +30,12 @@ class ListMenber extends Component {
     this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleSubmit   = this.handleSubmit.bind(this);
     this.handleOkClick = this.handleOkClick.bind(this);
-    this.getListMenberData = this.getListMenberData.bind(this);
-    this.getMenberName = this.getMenberName.bind(this);
+    this.getListMemberData = this.getListMemberData.bind(this);
+    this.getMemberName = this.getMemberName.bind(this);
   }
 
-  getListMenberData() {
-    getListMenber((json) => {
+  getListMemberData() {
+    getListMember((json) => {
       if (json.code === 200) {
 		    this.setState({
           customers: json.result,
@@ -44,7 +44,7 @@ class ListMenber extends Component {
     });
   }
 
-  getMenberName(childname){
+  getMemberName(childname){
     this.setState({ customerName: childname.name });
   }
 
@@ -126,7 +126,7 @@ class ListMenber extends Component {
 
 
   componentDidMount() {
-    this.getListMenberData();
+    this.getListMemberData();
     }
 
   render() {
@@ -166,4 +166,4 @@ class ListMenber extends Component {
     );
   }
 }
-export default ListMenber;
+export default ListMember;

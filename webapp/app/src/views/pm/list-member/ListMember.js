@@ -11,11 +11,12 @@ import findIndex from 'lodash/findIndex';
 
 import { getListMenber, deleteMenber, sendInviteMessage } from 'request/member';
 import { elevateAdmin,  } from 'request/memberadmin';
+
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
 
 
-class ListMenber extends Component {
+class ListMember extends Component {
 	constructor() {
     super();
     this.state = {
@@ -35,8 +36,8 @@ class ListMenber extends Component {
     this.handleElevate = this.handleElevate.bind(this);
   }
 
-  getListMenberData() {
-    getListMenber((json) => {
+  getListMemberData() {
+    getListMember((json) => {
       if (json.code === 200) {
 		    this.setState({
           customers: json.result,
@@ -45,7 +46,7 @@ class ListMenber extends Component {
     });
   }
 
-  getMenberName(childname){
+  getMemberName(childname){
     this.setState({ customerName: childname.name });
   }
 
@@ -139,7 +140,7 @@ class ListMenber extends Component {
 
 
   componentDidMount() {
-    this.getListMenberData();
+    this.getListMemberData();
     }
 
   render() {
@@ -185,4 +186,4 @@ class ListMenber extends Component {
     );
   }
 }
-export default ListMenber;
+export default ListMember;

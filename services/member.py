@@ -72,18 +72,16 @@ class Member(services.base.service.Service):
         return result
 
     def get_admins(self):
-        return self.config['administrator']
+        return self.administrator
 
     def check_admin(self, id):
-        return id in self.config['administrator']
+        return id in self.administrator
 
     def add_admin(self, inviter_id, invited_id, creator=False):
         result = False
-        if 'administrator' not in self.config:
-            self.config['administrator'] = set()
         if creator is True or (self.check_admin(inviter_id) and
                                self.check_admin(invited_id) is False):
-            self.config['administrator'].add(invited_id)
+            self.administrator.add(invited_id)
             self.save()
             result = True
         return result
@@ -91,10 +89,17 @@ class Member(services.base.service.Service):
     def delete_admin(self, inviter_id, invited_id):
         result = False
         if self.check_admin(inviter_id) and self.check_admin(invited_id):
-            self.config['administrator'].remove(invited_id)
+            self.administrator.remove(invited_id)
             self.save()
             result = True
         return result
+
+    @property
+    def administrator(self):
+        if 'administrator' not in self.config:
+            self.config['administrator'] = set()
+            self.save()
+        return self.config['administrator']
 
     def load_projects(self):
         self.projects = dict()

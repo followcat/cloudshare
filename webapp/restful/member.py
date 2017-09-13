@@ -68,6 +68,7 @@ class ListMemberAccountsAPI(MemberAPI):
             member_info = member.accounts.getinfo(id)
             member_info['date'] = utils.builtin.strftime(member_info['date'])
             member_info['name'] = info['name']
+            member_info['admin'] = member.check_admin(id)
             member_info['id'] = id
             result.append(member_info)
         return { 'code': 200, 'result': result }

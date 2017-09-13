@@ -73,4 +73,7 @@ export const URL = {
   getBecomeMember: () => {
     return `/becomemember`;
   },
+  getManagement: () => {
+    return `/management`;
+  },
 };

@@ -47,8 +47,8 @@ export const getListMenber = (callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
-export const deleteMenber = (params,callback) => {
-  return fetch(`${API.MENBER_ACCOUNT_API}/${params.userid}`, {
+export const deleteMember = (params,callback) => {
+  return fetch(`${API.MEMBER_ACCOUNT_API}/${params.userid}`, {
     method: 'DELETE',
     credentials: 'include',
     headers: {

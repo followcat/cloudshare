@@ -9,7 +9,7 @@ import {   message,Form,Table, Input,Button, Popconfirm } from 'antd';
 
 import findIndex from 'lodash/findIndex';
 
-import { getListMenber,deleteMenber,sendInviteMessage } from 'request/member';
+import { getListMenber, deleteMember, sendInviteMessage } from 'request/member';
 
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
@@ -111,7 +111,7 @@ class ListMenber extends Component {
   }
 
   onDelete = (record) => {
-    deleteMenber({
+    deleteMember({
       userid : record.id,
     }, (json) => {
       if  (json.code === 200) {

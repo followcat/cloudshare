@@ -18,6 +18,8 @@ export const API = {
 
   SEND_INVITE_MESSAGE_API:`${HOST}/api/sendinvitemessage`,
 
+  MEMBER_ACCOUNT_API:`${HOST}/api/memberaccount`,
+
   LIST_MENBER_ACCOUNTS_API:`${HOST}/api/listmemberaccounts`,
 
   MENBER_PROJECT_API:`${HOST}/api/menberproject`,

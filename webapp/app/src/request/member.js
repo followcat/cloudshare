@@ -19,6 +19,20 @@ export const becomeMember = (params,callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
+export const quitMember = (callback) => {
+  return fetch(API.MEMBER_API, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    }
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
 export const getListMenber = (callback) => {
   return fetch(API.LIST_MENBER_ACCOUNTS_API, {
     method: 'GET',
@@ -34,7 +48,7 @@ export const getListMenber = (callback) => {
 };
 
 export const deleteMenber = (params,callback) => {
-  return fetch(`${API.ACCEPT_INVITE_MESSAGE_API}/${params.customerName}`, {
+  return fetch(`${API.MENBER_ACCOUNT_API}/${params.userid}`, {
     method: 'DELETE',
     credentials: 'include',
     headers: {

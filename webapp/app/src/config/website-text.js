@@ -12,6 +12,7 @@ const websiteText = {
 
     PROFILE: '个人中心',
     NOTICE: '消息',
+    MANGEMENT: '管理',
     SEARCH: '搜索',
     MATCH: '匹配',
     RESUME_UPLOADER: '简历上传',
@@ -19,6 +20,7 @@ const websiteText = {
     BECOME_MEMBER: '成为会员',
     BEST_EXCELLENT: '每日优秀',
 
+    ADMIN_MANAGEMENT: '权限管理',
     MENBER_MANAGEMENT: '成员管理',
     PROJECT_MANAGEMENT: '项目管理',
     CUSTOMER_MANAGEMENT: '客户管理',

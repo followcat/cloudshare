@@ -141,7 +141,7 @@ class LayoutHeader extends Component {
         </MenuItem>
         <MenuDivider />
         <MenuItem>
-          <a href={URL.getNotcieURL()}>{language.NOTICE}</a>
+          <a href={URL.getManagement()}>{language.MANGEMENT}</a>
         </MenuItem>
         <MenuDivider />
         <MenuItem>

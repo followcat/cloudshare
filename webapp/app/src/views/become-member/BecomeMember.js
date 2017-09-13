@@ -19,15 +19,21 @@ class BecomeMenber extends Component {
     this.handleBtnClick = this.handleBtnClick.bind(this);
   }
 
-  handleBtnClick() {
-    becomeMember({
-      membername: StorageUtil.get('user')
+  handleBtnClick(e) {
+    e.preventDefault();
+
+  this.props.form.validateFields((errors, values) => {
+      if (!errors) {
+        becomeMember({
+      membername: values.membername
     }, (json) => {
-      if (json.code === 200) {
-        message.success('注册成功',3,function(){
+      if (json.result === true) {
+        message.success('成功！',3,function(){
         });
       } else {
-        message.error('注册信息有误！');
+        message.error('失败！');
+      }
+    });
       }
     });
   }
@@ -54,8 +60,10 @@ class BecomeMenber extends Component {
             <Input placeholder="公司名称"/>
           )}
         </FormItem>
+        <FormItem>
+          <Button type="primary" onClick={this.handleBtnClick}>申请会员</Button>
+        </FormItem>
         </Form>
-            <Button type="primary" onClick={this.handleBtnClick}>申请会员</Button>
           </div>
           </Card>
         </div>

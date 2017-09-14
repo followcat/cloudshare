@@ -14,12 +14,13 @@ flask_session/
 celerybeat-schedule
 output/
 repo/
+indiv/
 Index/
 account/
 password/
 lsimodel/
-raw
 config/
+raw
 raw/
 tags/
 cutwords/

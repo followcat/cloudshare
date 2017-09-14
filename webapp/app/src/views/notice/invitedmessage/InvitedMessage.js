@@ -89,8 +89,8 @@ class InvitedMessage extends Component {
             <span>
             <a href="#" onClick={() => this.onAccept(record)}>{language.ACCEPT}</a>
             <span className="ant-divider" />
-            <Popconfirm title="确认删除么?" onConfirm={() => this.onIgnore(record.id)}>
-              <a href="#">{language.IGNORE}</a>
+            <Popconfirm title="拒绝邀请?" onConfirm={() => this.onIgnore(record.id)}>
+              <a href="#">{language.REJECT}</a>
             </Popconfirm>
             </span>
           ) : null

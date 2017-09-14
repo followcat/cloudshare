@@ -77,9 +77,9 @@ const websiteText = {
     MATCH_ACTION: '进行匹配',
     UPLOAD: '上传',
     ACCEPT: '接受',
-    IGNORE: '忽略',
-    ELEVATE: '授予权限',
-    REVOKE: '撤销权限',
+    REJECT: '拒绝',
+    ELEVATE: '授予管理员权限',
+    REVOKE: '撤销管理员权限',
 
     ELEVATE_SUCCESS: '授予权限成功！',
     ELEVATE_FAIL: '授予权限失败！',

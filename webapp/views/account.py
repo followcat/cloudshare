@@ -75,6 +75,9 @@ class User(flask.ext.login.UserMixin):
     def getinvitermessages(self, svc_message):
         return svc_message.getinfo(self.id)['inviter_member']
 
+    def getprocessedmessages(self, svc_message):
+        return svc_message.getinfo(self.id)['processed_member']
+
     def sentmessage(self, des_name, content, svc_message):
         des_info = self.svc_account.getinfo_byname(des_name)
         des_id = des_info['id']

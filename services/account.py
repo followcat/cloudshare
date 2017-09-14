@@ -73,63 +73,78 @@ class Message(services.base.storage.BaseStorage):
     """
         >>> import shutil
         >>> import services.account
-        >>> repo_path = 'services/test_msg'
-        >>> svc_message = services.account.Message(repo_path)
-        >>> svc_message.add(svc_message.baseobj({'id': 'id1'}))
+        >>> pwd_path = 'services/test_pwd'
+        >>> acc_path = 'services/test_acc'
+        >>> msg_path = 'services/test_msg'
+        >>> svc_password = services.account.Password(pwd_path)
+        >>> svc_account = services.account.Account(svc_password, acc_path)
+        >>> svc_message = services.account.Message(svc_account, msg_path)
+        >>> acc1_info = svc_account.baseobj({'name': 'name1'})
+        >>> acc2_info = svc_account.baseobj({'name': 'name2'})
+        >>> ID1, ID2 = acc1_info.ID.base, acc2_info.ID.base
+        >>> svc_account.add(acc1_info, 'pwd1')
         True
-        >>> svc_message.add(svc_message.baseobj({'id': 'id2'}))
+        >>> svc_account.add(acc2_info, 'pwd2')
         True
-        >>> sent, receive = svc_message.send_chat('id1', 'id2', 'hello world', 'name1')
-        >>> sent['relation'] == 'id2'
+        >>> svc_message.add(svc_message.baseobj({'id': ID1}))
         True
-        >>> receive['relation'] == 'id1'
+        >>> svc_message.add(svc_message.baseobj({'id': ID2}))
         True
-        >>> info1 = svc_message.getinfo('id1')
-        >>> info2 = svc_message.getinfo('id2')
+        >>> sent, receive = svc_message.send_chat(ID1, ID2, 'hello world', 'name1')
+        >>> sent['relation'] == ID2
+        True
+        >>> receive['relation'] == ID1
+        True
+        >>> info1 = svc_message.getinfo(ID1)
+        >>> info2 = svc_message.getinfo(ID2)
         >>> info1['sent_chat'][0] == sent
         True
         >>> info2['unread_chat'][0] == receive
         True
-        >>> svc_message.read('id2', receive['id'], 'name2')
+        >>> svc_message.read(ID2, receive['id'], 'name2')
         True
-        >>> info2 = svc_message.getinfo('id2')
+        >>> info2 = svc_message.getinfo(ID2)
         >>> len(info2['unread_chat']) == 0
         True
         >>> info2['read_chat'][0] == receive
         True
-        >>> invitation = svc_message.send_invitation('id1', 'id2', 'mock_member', 'name1')
-        >>> info1 = svc_message.getinfo('id1')
-        >>> info1['inviter_member'][0]['relation'] == 'id2'
+        >>> invitation = svc_message.send_invitation(ID1, ID2, 'mock_member', 'name1')
+        >>> info1 = svc_message.getinfo(ID1)
+        >>> info1['inviter_member'][0]['relation'] == ID2
         True
-        >>> info2 = svc_message.getinfo('id2')
+        >>> info2 = svc_message.getinfo(ID2)
         >>> info2['invited_member'][0] == invitation
         True
-        >>> result = svc_message.process_invite('id2', invitation['id'], 'id2')
-        >>> result['content'], result['relation']
-        ('mock_member', 'id1')
-        >>> svc_message.getcontent('id2', invitation['id'])['relation']
-        'id1'
-        >>> len(svc_message.getinfo('id1')['inviter_member'])
+        >>> result = svc_message.process_invite(ID2, invitation['id'], ID2)
+        >>> result['content'], result['relation'] == ID1
+        ('mock_member', True)
+        >>> svc_message.getcontent(ID2, invitation['id'])['relation'] == ID1
+        True
+        >>> len(svc_message.getinfo(ID1)['inviter_member'])
         0
-        >>> shutil.rmtree(repo_path)
+        >>> shutil.rmtree(pwd_path)
+        >>> shutil.rmtree(acc_path)
+        >>> shutil.rmtree(msg_path)
     """
     YAML_TEMPLATE = (
         ("id",                  str),
         ("invited_member",      list),
         ("inviter_member",      list),
+        ("processed_member",    list),
         ("sent_chat",           list),
         ("read_chat",           list),
         ("unread_chat",         list),
     )
 
     MUST_KEY = ['id']
-    list_item = {"invited_member", "inviter_member",
+    list_item = {"invited_member", "inviter_member", "processed_member",
                  "sent_chat", "read_chat", "unread_chat"}
     fix_item  = {"id"}
 
-    def __init__(self, path, name=None, searchengine=None, iotype='git'):
+    def __init__(self, svc_account, path, name=None, searchengine=None, iotype='git'):
         super(Message, self).__init__(path, name=name,
                                       searchengine=searchengine, iotype=iotype)
+        self.svc_account = svc_account
 
     def baseobj(self, info):
         metadata = self._metadata(info)
@@ -152,8 +167,11 @@ class Message(services.base.storage.BaseStorage):
     def _listframe(self, value, userid, date=None):
         if date is None:
             date = time.strftime('%Y-%m-%d %H:%M:%S')
-        data = {'id': utils.builtin.hash(' '.join([str(time.time()), value])),
+        relation_info = self.svc_account.getinfo(userid)
+        name = relation_info['name']
+        data = {'id': utils.builtin.hash(' '.join([str(time.time()), userid])),
                 'relation': userid,
+                'name': name,
                 'content': value,
                 'date': date}
         return data

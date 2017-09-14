@@ -54,6 +54,16 @@ class ListInviterMessagesAPI(Resource):
         return { 'code': 200, 'result': user.getinvitermessages(svc_msg) }
 
 
+class ListProcessedMessagesAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def get(self):
+        user = flask.ext.login.current_user
+        svc_msg = flask.current_app.config['SVC_MSG']
+        return { 'code': 200, 'result': user.getprocessedmessages(svc_msg) }
+
+
 class MessagesNotifyAPI(Resource):
 
     decorators = [flask.ext.login.login_required]

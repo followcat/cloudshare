@@ -111,6 +111,8 @@ def initialize(app):
     api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
     api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')
     api.add_resource(ListInviterMessagesAPI, '/api/listinvitermessages', endpoint = 'listinvitermessages')
+    api.add_resource(ListProcessedMessagesAPI, '/api/listprocessedmessages',
+                     endpoint = 'listprocessedmessages')
 
     api.add_resource(IsMemberAPI, '/api/ismember', endpoint = 'ismember')
     api.add_resource(IsMemberAdminAPI, '/api/ismemberadmin', endpoint = 'ismemberadmin')

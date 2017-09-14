@@ -1,8 +1,13 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
+
 import StorageUtil from '../../utils/storage';
+
 import { getAccount } from 'request/account';
-import { isMember,getMemberName } from 'request/member';
+import { isMember, getMemberName, quitMember } from 'request/member';
+
+import websiteText from 'config/website-text';
+const language = websiteText.zhCN;
 
 import {
   Form,
@@ -19,6 +24,7 @@ class ManageInfo extends Component {
     this.handleReset = this.handleReset.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.handleQuit = this.handleQuit.bind(this);
   }
 
   state = {
@@ -43,6 +49,19 @@ class ManageInfo extends Component {
         this.props.onSubmit(values);
       }
     });
+  }
+
+  handleQuit() {
+    quitMember((json) => {
+      if (json.result === true) {
+        message.success('退出成功',1,function(){
+        window.location.reload();
+        });
+      } else {
+        message.error('退出失败！');
+      }
+      
+      });
   }
 
   handleKeyPress(e) {
@@ -82,21 +101,6 @@ class ManageInfo extends Component {
     });
   }
 
-  componentDidMount() {
-    // getAccount({
-    //   name: this.state.name,
-    // },(json) => {
-    //   if (json.code === 200) {
-    //     this.setState({
-    //       email: json.result.email,
-    //       phone: json.result.phone,
-    //     })
-    //   } else {
-    //     message.error('系统繁忙，刷新重试！');
-    //   }
-    // });
-  }
-
   render() {
     const { wrapperCol, btnText,resetText } = this.props,
           { getFieldDecorator } = this.props.form;
@@ -110,11 +114,11 @@ class ManageInfo extends Component {
         </FormItem>
         { this.state.show ? (
         <FormItem
-          label="公司名称"
+          label={language.COMPANY_NAME}
         >
-        <Input class="membername" value={this.state.membername} disabled={true}/>
-          <Button type="primary" onClick={this.handleClick}>
-          {btnText}
+        <Input value={this.state.membername} disabled={true}/>
+          <Button type="primary" onClick={this.handleQuit}>
+          {language.QUIT_MEMBER}
           </Button>
         </FormItem>
         ): null }

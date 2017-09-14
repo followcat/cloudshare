@@ -76,6 +76,9 @@ export const URL = {
   getUnreadMessageURL: () => {
     return `/notice/unreadmessage`;
   },
+  getProcessedMessageURL: () => {
+    return `/notice/processedmessage`;
+  },
   getReadMessageURL: () => {
     return `/notice/readmessage`;
   },

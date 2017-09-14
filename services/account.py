@@ -235,9 +235,9 @@ class Message(services.base.storage.BaseStorage):
         return result
 
     def getinfo(self, id):
-        assert self.account.exists(id)
+        assert self.svc_account.exists(id)
         if not self.exists(id):
-            tmpobj = self.baseobj({'id': id})
+            tmpobj = self.baseobj({'id': str(id)})
             assert self.add(tmpobj)
         return super(Message, self).getinfo(id)
 
@@ -282,9 +282,9 @@ class Message(services.base.storage.BaseStorage):
                 break
         if sent_info and receive_info:
             sent_result = self._move(inviter_id, sent_info['id'], 'inviter_member',
-                                     'read_chat', committer)
+                                     'processed_member', committer)
             receive_result = self._move(invited_id, receive_info['id'], 'invited_member',
-                                     'read_chat', committer)
+                                     'processed_member', committer)
             if sent_result and receive_result:
                 result = receive_info
         return result

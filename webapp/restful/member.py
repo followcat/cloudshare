@@ -31,7 +31,7 @@ class MemberAPI(Resource):
 
     def delete(self):
         user = flask.ext.login.current_user
-        result = user.awaymember(user.id, self.svc_members)
+        result = user.quitmember(user.id, self.svc_members)
         return { 'code': 200, 'result': result }
 
 
@@ -78,7 +78,7 @@ class MemberAccountAPI(MemberAPI):
 
     def delete(self, userid):
         user = flask.ext.login.current_user
-        result = user.awaymember(userid, self.svc_members)
+        result = user.quitmember(userid, self.svc_members)
         return { 'code': 200, 'result': result }
 
 class MemberAdminAPI(MemberAPI):

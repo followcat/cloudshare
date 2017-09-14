@@ -380,7 +380,7 @@ class Account(services.base.storage.BaseStorage):
             result = True
         return result
 
-    def awaymember(self, inviter_id, invited_id, svc_members):
+    def quitmember(self, inviter_id, invited_id, svc_members):
         """
             >>> from tests.settings import *
             >>> config = Config()
@@ -392,7 +392,7 @@ class Account(services.base.storage.BaseStorage):
             >>> info = svc_account.getinfo_byname(u'user')
             >>> svc_account.createmember(info['id'], 'added_member', svc_members)
             True
-            >>> svc_account.awaymember(info['id'], info['id'], svc_members)
+            >>> svc_account.quitmember(info['id'], info['id'], svc_members)
             True
             >>> info = svc_account.getinfo_byname(u'user')
             >>> info['member']

@@ -21,8 +21,8 @@ class User(flask.ext.login.UserMixin):
         result = self.svc_account.createmember(self.id, name, svc_members)
         return result
 
-    def awaymember(self, awayid, svc_members):
-        result = self.svc_account.awaymember(self.id, awayid, svc_members)
+    def quitmember(self, awayid, svc_members):
+        result = self.svc_account.quitmember(self.id, awayid, svc_members)
         return result
 
     def joinmember(self, inviter_id, name, svc_members):

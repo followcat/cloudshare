@@ -15,8 +15,8 @@ import {
 } from 'antd';
 
 import {
-  getMemberList,
-  updateMember,
+  getCustomerList,
+  updateCustomer,
   getAddedCompanyList
 } from 'request/company';
 
@@ -37,7 +37,7 @@ const extractValueToString = (key, array) => {
   return '';
 };
 
-class Member extends Component {
+class Customer extends Component {
   constructor() {
     super();
     this.state = {
@@ -50,7 +50,7 @@ class Member extends Component {
       value: '',
       id: ''
     };
-    this.handleDeleteMemberConfirm = this.handleDeleteMemberConfirm.bind(this);
+    this.handleDeleteCustomerConfirm = this.handleDeleteCustomerConfirm.bind(this);
     this.handleViewDetailsClick = this.handleViewDetailsClick.bind(this);
     this.handleSiderPanelClose = this.handleSiderPanelClose.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
@@ -66,8 +66,8 @@ class Member extends Component {
     this.getDataSource();
   }
 
-  handleDeleteMemberConfirm(id) {
-    updateMember('DELETE', {
+  handleDeleteCustomerConfirm(id) {
+    updateCustomer('DELETE', {
       id: id
     }, (json) => {
       if (json.code === 200) {
@@ -101,7 +101,7 @@ class Member extends Component {
   handleOkClick() {
     const { id } = this.state;
 
-    updateMember('POST', {
+    updateCustomer('POST', {
       id: id
     }, (json) => {
       if (json.code === 200) {
@@ -144,7 +144,7 @@ class Member extends Component {
       loading: true
     });
 
-    getMemberList(json => {
+    getCustomerList(json => {
       if (json.code === 200) {
         this.setState({
           dataSource: json.data,
@@ -273,7 +273,7 @@ class Member extends Component {
             <li>
               <Popconfirm
                 title={language.DELETE_CONFIRM_MSG}
-                onConfirm={() => this.handleDeleteMemberConfirm(record.id)}
+                onConfirm={() => this.handleDeleteCustomerConfirm(record.id)}
               >
                 <a href="javascript: void(0);">
                   {language.DELETE}
@@ -329,7 +329,7 @@ class Member extends Component {
     }];
 
     return (
-      <div className="cs-member">
+      <div className="cs-Customer">
         <TablePlus
           rowKey={record => record.id}
           isToolbarShowed={true}
@@ -368,4 +368,4 @@ class Member extends Component {
   }
 }
 
-export default Member;
+export default Customer;

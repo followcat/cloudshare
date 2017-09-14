@@ -18,7 +18,7 @@ module.exports = {
   onEnter: checkStatus,
   childRoutes: [
     require('./job-description'),
-    require('./member'),
+    require('./customer'),
     require('./company'),
     require('./project-list'),
     require('./list-member'),

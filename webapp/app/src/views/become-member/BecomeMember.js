@@ -28,7 +28,8 @@ class BecomeMember extends Component {
       membername: values.membername
     }, (json) => {
       if (json.result === true) {
-        message.success('成功！',3,function(){
+        message.success('成功！',2,function(){
+          window.location.reload();
         });
       } else {
         message.error('失败！');

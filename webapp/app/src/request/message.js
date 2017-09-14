@@ -57,6 +57,22 @@ export const getListInviter = (callback) => {
   });
 };
 
+export const getListProcessed = (callback) => {
+  return fetch(API.LIST_PROCESSED_MESSAGES_API, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(json => {
+    callbackFunction(callback, json);
+  });
+};
+
 export const getListRead = (callback) => {
   return fetch(API.LIST_READ_MESSAGES_API, {
     method: 'GET',

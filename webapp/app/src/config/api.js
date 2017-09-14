@@ -26,6 +26,8 @@ export const API = {
 
   LIST_INVITER_MESSAGES_API:`${HOST}/api/listinvitermessages`,
 
+  LIST_PROCESSED_MESSAGES_API:`${HOST}/api/listprocessedmessages`,
+
   SEND_INVITE_MESSAGE_API:`${HOST}/api/sendinvitemessage`,
 
   MEMBER_ACCOUNT_API:`${HOST}/api/memberaccount`,

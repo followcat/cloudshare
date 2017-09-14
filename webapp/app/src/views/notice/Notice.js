@@ -181,6 +181,11 @@ export default class Notice extends Component {
       key: 'inviter',
       text: language.INVITER_MESSAGE,
       url: URL.getInviterMessageURL()
+    },
+    {
+      key: 'processed',
+      text: language.PROCESSED_MESSAGE,
+      url: URL.getProcessedMessageURL()
     }
     ];
 

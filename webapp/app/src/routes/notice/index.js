@@ -22,5 +22,6 @@ module.exports = {
     require('./unreadmessage'),
     require('./invitedmessage'),
     require('./invitermessage'),
+    require('./processedmessage'),
   ]
 };

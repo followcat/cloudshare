@@ -40,11 +40,11 @@ class UnreadMessage extends Component {
     const columns = [{
       title: '日期',
       dataIndex: 'date',
-    }{
+    }, {
       title: '内容',
       dataIndex: 'content',
       render: text => <span>{text}</span>,
-    },, {
+    }, {
      title: '操作',
       className: 'action',
       dataIndex: 'action',

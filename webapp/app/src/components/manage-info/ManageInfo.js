@@ -55,6 +55,7 @@ class ManageInfo extends Component {
     quitMember((json) => {
       if (json.result === true) {
         message.success('退出成功',1,function(){
+        StorageUtil.unset('_pj');
         window.location.reload();
         });
       } else {

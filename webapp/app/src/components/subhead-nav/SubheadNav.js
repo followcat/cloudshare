@@ -20,16 +20,6 @@ class SubheadNav extends Component {
     };
   }
 
-  componentWillMount() {
-      isMemberAdmin((json) => {
-      if (json.result === true) {
-        this.setState({
-          show: true,
-        });
-      }
-      });
-  }
-
   render() {
     const {
       prefixCls,
@@ -47,18 +37,6 @@ class SubheadNav extends Component {
             mode="horizontal"
             onClick={this.props.onClick}
           >
-          { this.state.show ?
-          <MenuItem key="invite">
-              <Link to='/pm/listmember'>{language.MEMBER_MANAGEMENT}</Link>
-          </MenuItem>
-          :null
-          }
-          { this.state.show ?
-          <MenuItem key="project">
-            <Link to='/pm/projectlist'>{language.PROJECT_MANAGEMENT}</Link>
-          </MenuItem>
-          : null
-          }
             {menus.map(item => {
               return (
                 <MenuItem key={item.key}>

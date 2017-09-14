@@ -214,7 +214,6 @@ class Message(services.base.storage.BaseStorage):
 
     def updateinfo(self, id, key, value, relation, committer, do_commit=True):
         assert key not in self.fix_item
-        assert self.exists(id)
         projectinfo = self.getinfo(id)
         result = None
         if key in [each[0] for each in self.YAML_TEMPLATE]:
@@ -228,13 +227,19 @@ class Message(services.base.storage.BaseStorage):
     def deleteinfo(self, id, key, msgid, committer, date, do_commit=True):
         assert key not in self.fix_item
         assert key in self.list_item
-        assert self.exists(id)
         projectinfo = self.getinfo(id)
         result = None
         if key not in projectinfo:
             return result
         result = self._deleteinfo(id, key, msgid, committer, do_commit=do_commit)
         return result
+
+    def getinfo(self, id):
+        assert self.account.exists(id)
+        if not self.exists(id):
+            tmpobj = self.baseobj({'id': id})
+            assert self.add(tmpobj)
+        return super(Message, self).getinfo(id)
 
     def getcontent(self, id, msgid):
         result = None

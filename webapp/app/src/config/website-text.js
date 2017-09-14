@@ -51,6 +51,7 @@ const websiteText = {
     RESPONSIBLE: '跟进人',
     PRIORITY: '优先级',
     REMINDER: '待联系',
+    QUIT_MEMBER: '退出公司',
 
     VISITING_SITUATION: '陌拜情况',
     VISITING_INFORMATION: '陌拜信息',

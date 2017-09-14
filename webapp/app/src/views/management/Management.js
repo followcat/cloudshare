@@ -165,10 +165,6 @@ export default class Management extends Component {
       key: 'project',
       text: language.PROJECT_MANAGEMENT,
       url: '/management/projectlist'
-    }, {
-      key: 'admin',
-      text: language.ADMIN_MANAGEMENT,
-      url: '/management/admin'
     }];
 
     return (

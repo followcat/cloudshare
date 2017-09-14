@@ -28,6 +28,7 @@ class BecomeMember extends Component {
       membername: values.membername
     }, (json) => {
       if (json.result === true) {
+        StorageUtil.unset('_pj');
         message.success('成功！',2,function(){
           window.location.reload();
         });

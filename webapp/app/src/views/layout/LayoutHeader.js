@@ -63,6 +63,7 @@ class LayoutHeader extends Component {
       projects: [],
       navMenus: navMenuUser,
       profileMenus: [],
+      ismember: '',
     };
     this.handleSignOutClick = this.handleSignOutClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -114,6 +115,7 @@ class LayoutHeader extends Component {
       if (json.result === true) {
         this.setState({
           navMenus: navMenusMember,
+          ismember: true,
         });
       }
       });
@@ -128,13 +130,18 @@ class LayoutHeader extends Component {
         });
         }
       });
+      getProject((json) => {
+      if (json.code === 200) {
+        this.setState({
+          projects: json.data,
+        });
+      }
+    });
   }
 
   componentDidMount() {
     const href = location.href;
     let selectedKeys = [];
-    
-    this.getProjectData();
 
     this.state.navMenus.forEach(v => {
       if (href.indexOf(v.url) > -1) {
@@ -169,16 +176,6 @@ class LayoutHeader extends Component {
     window.location.reload();
   }
 
-  getProjectData() {
-    getProject((json) => {
-      if (json.code === 200) {
-        this.setState({
-          projects: json.data,
-        });
-      }
-    });
-  }
-
   render() {
 
     const { selectedKeys, projects } = this.state;
@@ -188,6 +185,7 @@ class LayoutHeader extends Component {
         logoImg={logo}
         navMenus={this.state.navMenus}
         profileMenu={this.state.profileMenus}
+        isMember={this.state.ismember}
         projects={projects}
         project={StorageUtil.get('_pj')}
         profileText={StorageUtil.get('user')}

@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react';
 
 import { Row, Col ,Popconfirm,message } from 'antd';
 
+import StorageUtil from 'utils/storage';
+
 import TablePlus from 'components/table-plus';
 import inviteMsg from 'components/invite-message';
 

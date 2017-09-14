@@ -17,6 +17,7 @@ class Header extends Component {
           selectedKeys={props.selectedKeys}
         />
         <ProjectMessage
+          isMember={props.isMember}
           project={props.project}
           projects={props.projects}
           onChange={this.props.onChange}

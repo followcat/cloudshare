@@ -1,6 +1,10 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
+import StorageUtil from 'utils/storage';
+
+import ProjectListForm from 'components/project-list';
+
 import { Select, Modal } from 'antd';
 
 class ProjectMessage extends Component {
@@ -11,6 +15,7 @@ class ProjectMessage extends Component {
 
   getSelectRender() {
     const {
+      isMember,
       projects,
       project,
       title
@@ -30,7 +35,12 @@ class ProjectMessage extends Component {
       </Select>
     );
 
-    if (project === null) {
+    if (isMember === true ) {
+      if( project !== null ) {
+        return selectElement;
+      }
+
+      if( project === null && projects !==null ) {
       return (
         <Modal
           visible={true}
@@ -42,8 +52,29 @@ class ProjectMessage extends Component {
           {selectElement}
         </Modal>
       );
+      }
+
+      if( project === null && projects ===null ) {
+      return (
+        <Modal
+          visible={true}
+          title={title}
+          closable={false}
+          footer={<div style={{ padding: 4 }}></div>}
+        >
+        <ProjectListForm
+          inputLabel="项目名称"
+          getInput={this.getProjectName}
+          onChange={this.handleFormChange}
+          onSubmit={this.handleSubmit}
+        />
+        </Modal>
+      );
+      }
     } else {
+      StorageUtil.set('_pj','default');
       return selectElement;
+      window.location.reload();
     }
   }
 

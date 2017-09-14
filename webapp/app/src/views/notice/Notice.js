@@ -155,13 +155,32 @@ export default class Notice extends Component {
 
     return columns;
   }
-
   render() {
     const menus = [
     {
-      key: 'invitemessage',
-      text: language.INVITE_MESSAGE,
-      url: URL.getInviteMessageURL()
+      key: 'unread',
+      text: language.UNREAD_MESSAGE,
+      url: URL.getUnreadMessageURL()
+    },
+    {
+      key: 'read',
+      text: language.READ_MESSAGE,
+      url: URL.getReadMessageURL()
+    },
+    {
+      key: 'sent',
+      text: language.SENT_MESSAGE,
+      url: URL.getSentMessageURL()
+    },
+    {
+      key: 'invited',
+      text: language.INVITED_MESSAGE,
+      url: URL.getInvitedMessageURL()
+    },
+    {
+      key: 'inviter',
+      text: language.INVITER_MESSAGE,
+      url: URL.getInviterMessageURL()
     }
     ];
 

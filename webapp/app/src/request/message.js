@@ -41,6 +41,70 @@ export const getListInvited = (callback) => {
   });
 };
 
+export const getListInviter = (callback) => {
+  return fetch(API.LIST_INVITER_MESSAGES_API, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(json => {
+    callbackFunction(callback, json);
+  });
+};
+
+export const getListRead = (callback) => {
+  return fetch(API.LIST_READ_MESSAGES_API, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(json => {
+    callbackFunction(callback, json);
+  });
+};
+
+export const getListUnread = (callback) => {
+  return fetch(API.LIST_UNREAD_MESSAGES_API, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(json => {
+    callbackFunction(callback, json);
+  });
+};
+
+export const getListSent = (callback) => {
+  return fetch(API.LIST_SENT_MESSAGES_API, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(json => {
+    callbackFunction(callback, json);
+  });
+};
+
 export const acceptInviteMessage = (params,callback) => {
   return fetch(`${API.ACCEPT_INVITE_MESSAGE_API}/${params.msgid}`, {
     method: 'POST',

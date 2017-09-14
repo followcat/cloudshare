@@ -67,8 +67,20 @@ export const URL = {
   getNotcieURL: () => {
     return `/notice`;
   },
-  getInviteMessageURL: () => {
-    return `/notice/invitemessage`;
+  getInvitedMessageURL: () => {
+    return `/notice/invitedmessage`;
+  },
+  getInviterMessageURL: () => {
+    return `/notice/invitermessage`;
+  },
+  getUnreadMessageURL: () => {
+    return `/notice/unreadmessage`;
+  },
+  getReadMessageURL: () => {
+    return `/notice/readmessage`;
+  },
+  getSentMessageURL: () => {
+    return `/notice/sentmessage`;
   },
   getBecomeMember: () => {
     return `/becomemember`;

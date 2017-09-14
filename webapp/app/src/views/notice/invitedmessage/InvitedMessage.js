@@ -4,15 +4,13 @@ import React, { Component, PropTypes } from 'react';
 import { Row, Col ,Popconfirm,message } from 'antd';
 
 import TablePlus from 'components/table-plus';
-import inviteMsg from 'components/invite-message';
 
-import { getListInvited,readMessage,acceptInviteMessage } from 'request/message';
+import { getListInvited, readMessage, acceptInviteMessage } from 'request/message';
 
-import { URL } from 'URL';
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
 
-class InviteMessage extends Component {
+class InvitedMessage extends Component {
   constructor() {
     super();
     this.state = {
@@ -71,12 +69,12 @@ class InviteMessage extends Component {
 
   render() {
     const columns = [{
-      title: '公司名称',
-      dataIndex: 'content',
-      render: text => <span>{text}</span>,
-    }, {
       title: '日期',
       dataIndex: 'date',
+    }, {
+      title: '邀请公司',
+      dataIndex: 'content',
+      render: text => <span>{text}</span>,
     }, {
      title: '操作',
       className: 'action',
@@ -118,4 +116,4 @@ class InviteMessage extends Component {
   }
 }
 
-export default InviteMessage;
+export default InvitedMessage;

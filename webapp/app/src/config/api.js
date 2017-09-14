@@ -16,7 +16,15 @@ export const API = {
 
   ACCEPT_INVITE_MESSAGE_API:`${HOST}/api/invitedmessage`,
 
+  LIST_UNREAD_MESSAGES_API:`${HOST}/api/listunreadmessages`,
+
+  LIST_READ_MESSAGES_API:`${HOST}/api/listreadmessages`,
+
+  LIST_SENT_MESSAGES_API:`${HOST}/api/listsentmessages`,
+
   LIST_INVITED_MESSAGES_API:`${HOST}/api/listinvitedmessages`,
+
+  LIST_INVITER_MESSAGES_API:`${HOST}/api/listinvitermessages`,
 
   SEND_INVITE_MESSAGE_API:`${HOST}/api/sendinvitemessage`,
 

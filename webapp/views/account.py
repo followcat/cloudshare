@@ -57,6 +57,9 @@ class User(flask.ext.login.UserMixin):
     def getmessage(self, msgid, svc_message):
         return svc_message.getcontent(self.id, msgid)
 
+    def deletemessage(self, key, msgid, svc_message):
+        return svc_message.deleteinfo(self.id, key, msgid, committer=self.name)
+
     def getinvitedmessage(self, msgid, svc_message):
         return svc_message.getinvitedcontent(self.id, msgid)
 

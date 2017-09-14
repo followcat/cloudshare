@@ -202,11 +202,11 @@ class Message(services.base.storage.BaseStorage):
 
     def _deleteinfo(self, id, key, msgid, committer, do_commit=True):
         result = None
-        projectinfo = self.getinfo(id)
-        for msg in projectinfo[key]:
+        messageinfo = self.getinfo(id)
+        for msg in messageinfo[key]:
             if msg['id'] == msgid:
-                projectinfo[key].remove(msg)
-                self.saveinfo(id, projectinfo, 'Delete %s key %s %s.' % (id, key, msgid),
+                messageinfo[key].remove(msg)
+                self.saveinfo(id, messageinfo, 'Delete %s key %s %s.' % (id, key, msgid),
                               committer, do_commit=do_commit)
                 result = msg
                 break
@@ -214,7 +214,6 @@ class Message(services.base.storage.BaseStorage):
 
     def updateinfo(self, id, key, value, relation, committer, do_commit=True):
         assert key not in self.fix_item
-        projectinfo = self.getinfo(id)
         result = None
         if key in [each[0] for each in self.YAML_TEMPLATE]:
             if key in self.list_item:
@@ -224,14 +223,12 @@ class Message(services.base.storage.BaseStorage):
                 result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
-    def deleteinfo(self, id, key, msgid, committer, date, do_commit=True):
+    def deleteinfo(self, id, key, msgid, committer, do_commit=True):
         assert key not in self.fix_item
         assert key in self.list_item
-        projectinfo = self.getinfo(id)
         result = None
-        if key not in projectinfo:
-            return result
-        result = self._deleteinfo(id, key, msgid, committer, do_commit=do_commit)
+        if key in [each[0] for each in self.YAML_TEMPLATE]:
+             result = self._deleteinfo(id, key, msgid, committer, do_commit=do_commit)
         return result
 
     def getinfo(self, id):

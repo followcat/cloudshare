@@ -57,17 +57,29 @@ class User(flask.ext.login.UserMixin):
     def getmessage(self, msgid, svc_message):
         return svc_message.getcontent(self.id, msgid)
 
+    def deletemessage(self, key, msgid, svc_message):
+        return svc_message.deleteinfo(self.id, key, msgid, committer=self.name)
+
     def getinvitedmessage(self, msgid, svc_message):
         return svc_message.getinvitedcontent(self.id, msgid)
 
     def getreadmessages(self, svc_message):
         return svc_message.getinfo(self.id)['read_chat']
 
+    def getsentmessages(self, svc_message):
+        return svc_message.getinfo(self.id)['sent_chat']
+
     def getunreadmessages(self, svc_message):
         return svc_message.getinfo(self.id)['unread_chat']
 
     def getinvitedmessages(self, svc_message):
         return svc_message.getinfo(self.id)['invited_member']
+
+    def getinvitermessages(self, svc_message):
+        return svc_message.getinfo(self.id)['inviter_member']
+
+    def getprocessedmessages(self, svc_message):
+        return svc_message.getinfo(self.id)['processed_member']
 
     def sentmessage(self, des_name, content, svc_message):
         des_info = self.svc_account.getinfo_byname(des_name)

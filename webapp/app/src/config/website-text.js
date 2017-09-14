@@ -127,7 +127,12 @@ const websiteText = {
     FOLD_MSG: '收起所有信息',
     UNFOLD_MSG: '展开所有信息',
 
-    INVITE_MESSAGE: '邀请消息',
+    UNREAD_MESSAGE: '未读',
+    READ_MESSAGE: '已读',
+    SENT_MESSAGE: '已发',
+    INVITED_MESSAGE: '被邀请',
+    INVITER_MESSAGE: '已发邀请',
+    PROCESSED_MESSAGE: '已处理邀请',
     ACCEPT_INVITE_SUCCESS_MSG: '接受邀请成功！',
     ACCEPT_INVITE_FAIL_MSG: '接受邀请失败！',
 

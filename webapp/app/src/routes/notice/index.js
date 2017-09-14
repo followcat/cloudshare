@@ -11,12 +11,17 @@ module.exports = {
   indexRoute: {
     getComponent(nextState, callback) {
       require.ensure([], (require) => {
-        callback(null, require('views/notice/invitemessage').default);
-      }, 'invitemessage');
+        callback(null, require('views/notice/unreadmessage').default);
+      }, 'unreadmessage');
     }
   },
   onEnter: checkStatus,
   childRoutes: [
-    require('./invitemessage'),
+    require('./readmessage'),
+    require('./sentmessage'),
+    require('./unreadmessage'),
+    require('./invitedmessage'),
+    require('./invitermessage'),
+    require('./processedmessage'),
   ]
 };

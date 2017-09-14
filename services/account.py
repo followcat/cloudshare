@@ -79,14 +79,14 @@ class Message(services.base.storage.BaseStorage):
         True
         >>> svc_message.add(svc_message.baseobj({'id': 'id2'}))
         True
-        >>> send, receive = svc_message.send_chat('id1', 'id2', 'hello world', 'name1')
-        >>> send['relation'] == 'id2'
+        >>> sent, receive = svc_message.send_chat('id1', 'id2', 'hello world', 'name1')
+        >>> sent['relation'] == 'id2'
         True
         >>> receive['relation'] == 'id1'
         True
         >>> info1 = svc_message.getinfo('id1')
         >>> info2 = svc_message.getinfo('id2')
-        >>> info1['send_chat'][0] == send
+        >>> info1['sent_chat'][0] == sent
         True
         >>> info2['unread_chat'][0] == receive
         True
@@ -117,14 +117,14 @@ class Message(services.base.storage.BaseStorage):
         ("id",                  str),
         ("invited_member",      list),
         ("inviter_member",      list),
-        ("send_chat",           list),
+        ("sent_chat",           list),
         ("read_chat",           list),
         ("unread_chat",         list),
     )
 
     MUST_KEY = ['id']
     list_item = {"invited_member", "inviter_member",
-                 "send_chat", "read_chat", "unread_chat"}
+                 "sent_chat", "read_chat", "unread_chat"}
     fix_item  = {"id"}
 
     def __init__(self, path, name=None, searchengine=None, iotype='git'):
@@ -222,7 +222,7 @@ class Message(services.base.storage.BaseStorage):
         result = None
         msginfo = self.getinfo(id)
         for each in msginfo:
-            if each in ['unread_chat', 'read_chat', 'send_chat']:
+            if each in ['unread_chat', 'read_chat', 'sent_chat']:
                 for msg in msginfo[each]:
                     if msg['id'] == msgid:
                         result = msg
@@ -250,19 +250,19 @@ class Message(services.base.storage.BaseStorage):
 
     def process_invite(self, invited_id, msgid, committer):
         result = None
-        send_info = None
+        sent_info = None
         receive_info = self.getinvitedcontent(invited_id, msgid)
         inviter_id = receive_info['relation']
         for each in self.getinfo(inviter_id)['inviter_member']:
             if receive_info['content'] == each['content'] and invited_id == each['relation']:
-                send_info = each
+                sent_info = each
                 break
-        if send_info and receive_info:
-            send_result = self._move(inviter_id, send_info['id'], 'inviter_member',
+        if sent_info and receive_info:
+            sent_result = self._move(inviter_id, sent_info['id'], 'inviter_member',
                                      'read_chat', committer)
             receive_result = self._move(invited_id, receive_info['id'], 'invited_member',
                                      'read_chat', committer)
-            if send_result and receive_result:
+            if sent_result and receive_result:
                 result = receive_info
         return result
 
@@ -270,14 +270,14 @@ class Message(services.base.storage.BaseStorage):
         return self._move(id, msgid, 'unread_chat', 'read_chat', committer)
 
     def send_chat(self, ori_id, des_id, content, committer):
-        send = self.updateinfo(ori_id, 'send_chat', content, des_id, committer)
+        sent = self.updateinfo(ori_id, 'sent_chat', content, des_id, committer)
         receive = self.updateinfo(des_id, 'unread_chat', content, ori_id, committer)
-        return send, receive
+        return sent, receive
 
     def send_invitation(self, ori_id, des_id, member, committer):
-        send_result = self.updateinfo(ori_id, 'inviter_member', member, des_id, committer)
+        sent_result = self.updateinfo(ori_id, 'inviter_member', member, des_id, committer)
         receive_result = self.updateinfo(des_id, 'invited_member', member, ori_id, committer)
-        return send_result and receive_result
+        return sent_result and receive_result
 
 
 class Account(services.base.storage.BaseStorage):

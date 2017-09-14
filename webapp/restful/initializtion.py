@@ -107,8 +107,10 @@ def initialize(app):
     api.add_resource(SendInviteMessageAPI, '/api/sendinvitemessage/<string:desname>',
                      endpoint = 'sendinvitemessage')
     api.add_resource(ListReadMessagesAPI, '/api/listreadmessages', endpoint = 'listreadmessages')
+    api.add_resource(ListSentMessagesAPI, '/api/listsentmessages', endpoint = 'listsentmessages')
     api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
     api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')
+    api.add_resource(ListInviterMessagesAPI, '/api/listinvitermessages', endpoint = 'listinvitermessages')
 
     api.add_resource(IsMemberAPI, '/api/ismember', endpoint = 'ismember')
     api.add_resource(IsMemberAdminAPI, '/api/ismemberadmin', endpoint = 'ismemberadmin')

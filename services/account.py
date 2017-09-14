@@ -104,8 +104,9 @@ class Message(services.base.storage.BaseStorage):
         >>> info2 = svc_message.getinfo('id2')
         >>> info2['invited_member'][0] == invitation
         True
-        >>> svc_message.process_invite('id2', invitation['id'], 'id2')
-        True
+        >>> result = svc_message.process_invite('id2', invitation['id'], 'id2')
+        >>> result['content'], result['relation']
+        ('mock_member', 'id1')
         >>> svc_message.getcontent('id2', invitation['id'])['relation']
         'id1'
         >>> len(svc_message.getinfo('id1')['inviter_member'])
@@ -389,12 +390,20 @@ class Account(services.base.storage.BaseStorage):
             >>> accobj = svc_account.baseobj({'name': u'user'})
             >>> svc_account.add(accobj, 'password')
             True
-            >>> info = svc_account.getinfo_byname(u'user')
-            >>> svc_account.createmember(info['id'], 'added_member', svc_members)
+            >>> accobj2 = svc_account.baseobj({'name': u'user2'})
+            >>> svc_account.add(accobj2, 'password2')
             True
-            >>> svc_account.quitmember(info['id'], info['id'], svc_members)
+            >>> info1 = svc_account.getinfo_byname(u'user')
+            >>> info2 = svc_account.getinfo_byname(u'user2')
+            >>> svc_account.createmember(info1['id'], 'added_member', svc_members)
             True
-            >>> info = svc_account.getinfo_byname(u'user')
+            >>> svc_account.quitmember(info1['id'], info1['id'], svc_members)
+            False
+            >>> svc_account.joinmember(info1['id'], info2['id'], 'added_member', svc_members)
+            True
+            >>> svc_account.quitmember(info2['id'], info2['id'], svc_members)
+            True
+            >>> info = svc_account.getinfo_byname(u'user2')
             >>> info['member']
             ''
             >>> config.destory()

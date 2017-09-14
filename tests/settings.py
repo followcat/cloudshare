@@ -43,16 +43,16 @@ class Config(object):
                                                                     'cloudshare')
         self.SVC_PEO_REPO = services.people.People(self.SVC_CV_REPO,
                                                    os.path.join(self.REPO_DB_NAME, 'PEO'),
-                                                   name='peorepo', iotype='base')
+                                                   name='peostorage', iotype='base')
 
         self.SVC_MULT_PEO = services.multipeople.MultiPeople([self.SVC_PEO_REPO])
         self.SVC_MEMBERS = services.members.Members(self.MEMBERS_PATH,
                                                     [self.SVC_ACCOUNT],
                                                     [self.SVC_CV_REPO], [self.SVC_MULT_PEO])
         self.SVC_MEMBERS.create('test_member')
-        self.SVC_MEMBERS = self.SVC_MEMBERS.get('test_member')
-        self.SVC_MEMBERS._add_project('project_test', {})
-        self.SVC_PRJ_TEST = self.SVC_MEMBERS.projects['project_test']
+        self.SVC_MEMBER = self.SVC_MEMBERS.get('test_member')
+        self.SVC_MEMBER._add_project('project_test', {})
+        self.SVC_PRJ_TEST = self.SVC_MEMBER.projects['project_test']
 
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MEMBERS.allprojects(),
                                               {'repoclassify': self.SVC_CV_REPO})
@@ -73,7 +73,7 @@ class Config(object):
                                            metadata=yamlinfo)
         peopmeta = extractor.information_explorer.catch_peopinfo(yamlinfo)
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-        project = self.SVC_MEMBERS.getproject('project_test')
+        project = self.SVC_MEMBER.getproject('project_test')
         self.SVC_CV_REPO.add(dataobj, 'tester', unique=True)
         project.cv_add(dataobj)
         self.SVC_PEO_REPO.add(peopobj)

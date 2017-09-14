@@ -10,7 +10,6 @@ import TablePlus from 'components/table-plus';
 import { getListInvited, acceptInviteMessage } from 'request/message';
 
 import websiteText from 'config/website-text';
-import StorageUtil from '../../../utils/storage';
 
 const language = websiteText.zhCN;
 

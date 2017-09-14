@@ -10,6 +10,7 @@ import { Select, Modal } from 'antd';
 class ProjectMessage extends Component {
   constructor() {
     super();
+    this.state;
     this.getSelectRender = this.getSelectRender.bind(this);
   }
 
@@ -20,7 +21,7 @@ class ProjectMessage extends Component {
       project,
       title
     } = this.props;
-    
+    console.log(isMember );
     let selectElement = (
       <Select
         className="cs-header-project-selection"
@@ -34,7 +35,7 @@ class ProjectMessage extends Component {
         })}
       </Select>
     );
-
+    if(isMember !== undefined)  {
     if (isMember === true ) {
       if( project !== null ) {
         return selectElement;
@@ -72,13 +73,16 @@ class ProjectMessage extends Component {
       );
       }
     } else {
+      console.log(isMember);
       StorageUtil.set('_pj','default');
       return selectElement;
       window.location.reload();
+      }
     }
   }
 
   render() {
+    this.state =this.props;
     return (
       <div className="cs-header-project">
         {this.getSelectRender()}

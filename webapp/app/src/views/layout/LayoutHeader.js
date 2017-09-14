@@ -178,14 +178,13 @@ class LayoutHeader extends Component {
 
   render() {
 
-    const { selectedKeys, projects } = this.state;
-
+    const { selectedKeys, projects, ismember, navMenus ,profileMenus } = this.state;
     return (
       <Header
         logoImg={logo}
-        navMenus={this.state.navMenus}
-        profileMenu={this.state.profileMenus}
-        isMember={this.state.ismember}
+        navMenus={navMenus}
+        profileMenu={profileMenus}
+        isMember={ismember}
         projects={projects}
         project={StorageUtil.get('_pj')}
         profileText={StorageUtil.get('user')}

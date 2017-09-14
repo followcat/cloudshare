@@ -4,6 +4,20 @@ import { API } from '../config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
+export const getMemberName = (callback) => {
+  return fetch(API.MEMBER_API, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
 export const becomeMember = (params,callback) => {
   return fetch(API.MEMBER_API, {
     method: 'POST',

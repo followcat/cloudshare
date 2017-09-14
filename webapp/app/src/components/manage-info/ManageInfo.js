@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import StorageUtil from '../../utils/storage';
 import { getAccount } from 'request/account';
+import { isMember,getMemberName } from 'request/member';
 
 import {
   Form,
@@ -24,6 +25,8 @@ class ManageInfo extends Component {
     name: StorageUtil.get('user'),
     email: '',
     phone: '',
+    show :false,
+    membername: '',
   }
     //重置表单方法
   handleReset(e) {
@@ -48,7 +51,15 @@ class ManageInfo extends Component {
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
+    isMember((json) => {
+      if (json.result === true) {
+        this.setState({
+          show: true,
+        });
+      }
+      });
+
     getAccount({
       name: this.state.name,
     },(json) => {
@@ -61,7 +72,30 @@ class ManageInfo extends Component {
         message.error('系统繁忙，刷新重试！');
       }
     });
-}
+
+    getMemberName((json) => {
+      if (json.code === 200) {
+        this.setState({
+          membername: json.result,
+        });
+      }
+    });
+  }
+
+  componentDidMount() {
+    // getAccount({
+    //   name: this.state.name,
+    // },(json) => {
+    //   if (json.code === 200) {
+    //     this.setState({
+    //       email: json.result.email,
+    //       phone: json.result.phone,
+    //     })
+    //   } else {
+    //     message.error('系统繁忙，刷新重试！');
+    //   }
+    // });
+  }
 
   render() {
     const { wrapperCol, btnText,resetText } = this.props,
@@ -72,8 +106,18 @@ class ManageInfo extends Component {
         <FormItem
           label="用户名"
         >
-        <label>{this.state.name}</label>
+        <Input value={this.state.name} disabled={true}/>
         </FormItem>
+        { this.state.show ? (
+        <FormItem
+          label="公司名称"
+        >
+        <Input class="membername" value={this.state.membername} disabled={true}/>
+          <Button type="primary" onClick={this.handleClick}>
+          {btnText}
+          </Button>
+        </FormItem>
+        ): null }
         <FormItem label="电子邮箱">
           {getFieldDecorator('email', {
             initialValue: this.state.email,

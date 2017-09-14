@@ -4,7 +4,7 @@ import StorageUtil from '../utils/storage';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
-export const readMessage = (params,callback) => {
+export const readMessage = (params, callback) => {
   return fetch(`${API.MESSAGE_API}/${params.msgid}`, {
     method: 'PUT',
     credentials: 'include',
@@ -121,7 +121,21 @@ export const getListSent = (callback) => {
   });
 };
 
-export const acceptInviteMessage = (params,callback) => {
+export const deleteMessage = (params, callback) => {
+  return fetch(`${API.MESSAGE_API}/${params.msgid}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    }
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+export const acceptInviteMessage = (params, callback) => {
   return fetch(`${API.ACCEPT_INVITE_MESSAGE_API}/${params.msgid}`, {
     method: 'POST',
     credentials: 'include',

@@ -5,7 +5,7 @@ import { Row, Col ,Popconfirm,message } from 'antd';
 
 import TablePlus from 'components/table-plus';
 
-import { getListInvited, readMessage, acceptInviteMessage } from 'request/message';
+import { getListInvited, acceptInviteMessage } from 'request/message';
 
 import websiteText from 'config/website-text';
 import StorageUtil from '../../../utils/storage';
@@ -40,13 +40,12 @@ class InvitedMessage extends Component {
        reply : false,
     }, (json) => {
       if (json.code === 200) {
-          this.onDelete(key);
+          this.deleteListMessage(key);
       } 
     });
   }
 
-
-  onDelete = (key) => {
+  deleteListMessage = (key) => {
     const listinvited = [...this.state.listinvited];
     this.setState({ listinvited: listinvited.filter(item => item.id !== key) });
   }
@@ -58,7 +57,7 @@ class InvitedMessage extends Component {
     }, (json) => {
       if (json.result === true) {
         StorageUtil.unset('_pj');
-        this.onDelete(record.id);
+        this.deleteListMessage(record.id);
         message.success(language.ACCEPT_INVITE_SUCCESS_MSG,1,function(){
         window.location.reload();  
         });
@@ -70,7 +69,7 @@ class InvitedMessage extends Component {
 
   componentDidMount() {
     this.getInviteMsg();
-    }
+  }
 
   render() {
     const columns = [{

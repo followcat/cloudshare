@@ -34,7 +34,7 @@ class InviterMessage extends Component {
 
   componentDidMount() {
     this.getInviterMsg();
-    }
+  }
 
   render() {
     const columns = [{

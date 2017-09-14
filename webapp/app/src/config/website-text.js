@@ -135,6 +135,8 @@ const websiteText = {
     PROCESSED_MESSAGE: '已处理邀请',
     ACCEPT_INVITE_SUCCESS_MSG: '接受邀请成功！',
     ACCEPT_INVITE_FAIL_MSG: '接受邀请失败！',
+    SUCESS_MSG: '成功',
+    FAIL_MSG: '失败',
 
     BROWSING_HISTORY: '浏览历史',
     BOOKMARK: '书签',

@@ -64,16 +64,6 @@ class ListProcessedMessagesAPI(Resource):
         return { 'code': 200, 'result': user.getprocessedmessages(svc_msg) }
 
 
-class DeleteMessageAPI(Resource):
-
-    decorators = [flask.ext.login.login_required]
-
-    def post(self, key, msgid):
-        user = flask.ext.login.current_user
-        svc_msg = flask.current_app.config['SVC_MSG']
-        return { 'code': 200, 'result': user.deletemessage(key, msgid, svc_msg) }
-
-
 class MessagesNotifyAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
@@ -104,6 +94,12 @@ class MessageAPI(Resource):
         user = flask.ext.login.current_user
         result = user.readmessage(msgid, self.svc_msg)
         return { 'code': 200, 'result': result }
+
+    def delete(self, msgid):
+        user = flask.ext.login.current_user
+        svc_msg = flask.current_app.config['SVC_MSG']
+        deleted_msg = user.deletemessage(msgid, svc_msg)
+        return { 'code': 200, 'result': deleted_msg is not None }
 
 
 class SendMessageAPI(MessageAPI):

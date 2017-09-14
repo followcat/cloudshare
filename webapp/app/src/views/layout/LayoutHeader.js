@@ -53,9 +53,6 @@ const navMenuUser = [{
 }, {
   url: URL.getBecomeMember(),
   text: language.BECOME_MEMBER
-}, {
-  url: URL.getBestExcellent(),
-  text: language.BEST_EXCELLENT
 }];
 
 class LayoutHeader extends Component {

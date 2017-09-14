@@ -51,12 +51,15 @@ class InvitedMessage extends Component {
 
   onAccept = (record) => {
     acceptInviteMessage ({
-        msgid : record.id,
-       reply : true,
+      msgid : record.id,
+      reply : true,
     }, (json) => {
       if (json.result === true) {
+        StorageUtil.unset('_pj');
         this.onDelete(record.id);
-        message.success(language.ACCEPT_INVITE_SUCCESS_MSG);
+        message.success(language.ACCEPT_INVITE_SUCCESS_MSG,1,function(){
+        window.location.reload();  
+        });
       } else {
         message.error(language.ACCEPT_INVITE_FAIL_MSG);
       }

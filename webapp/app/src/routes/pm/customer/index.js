@@ -2,10 +2,10 @@
 // import { Member } from 'views/ProjectManagement';
 
 module.exports = {
-  path: 'member',
+  path: 'customer',
   getComponent(nextState, callback) {
     require.ensure([], (require) => {
-      callback(null, require('views/pm/member').default);
-    }, 'member');
+      callback(null, require('views/pm/customer').default);
+    }, 'customer');
   }
 };

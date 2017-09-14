@@ -38,6 +38,9 @@ class UnreadMessage extends Component {
 
   render() {
     const columns = [{
+      title: '发送人',
+      dataIndex: 'name',
+    }, {
       title: '日期',
       dataIndex: 'date',
     }, {

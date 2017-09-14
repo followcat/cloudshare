@@ -38,10 +38,13 @@ class ProcessedMessage extends Component {
 
   render() {
     const columns = [{
+      title: '相关人',
+      dataIndex: 'name',
+    }, {
       title: '日期',
       dataIndex: 'date',
-    },{
-      title: '邀请公司',
+    }, {
+      title: '相关公司',
       dataIndex: 'content',
       render: text => <span>{text}</span>,
     }, {

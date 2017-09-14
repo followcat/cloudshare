@@ -38,6 +38,9 @@ class SentMessage extends Component {
 
   render() {
     const columns = [{
+      title: '接收人',
+      dataIndex: 'name',
+    }, {
       title: '日期',
       dataIndex: 'date',
     },{

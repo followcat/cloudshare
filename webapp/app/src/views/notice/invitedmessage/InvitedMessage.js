@@ -8,6 +8,8 @@ import TablePlus from 'components/table-plus';
 import { getListInvited, readMessage, acceptInviteMessage } from 'request/message';
 
 import websiteText from 'config/website-text';
+import StorageUtil from '../../../utils/storage';
+
 const language = websiteText.zhCN;
 
 class InvitedMessage extends Component {
@@ -72,6 +74,9 @@ class InvitedMessage extends Component {
 
   render() {
     const columns = [{
+      title: '邀请人',
+      dataIndex: 'name',
+    }, {
       title: '日期',
       dataIndex: 'date',
     }, {

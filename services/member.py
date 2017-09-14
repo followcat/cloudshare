@@ -88,10 +88,12 @@ class Member(services.base.service.Service):
 
     def delete_admin(self, inviter_id, invited_id):
         result = False
-        if self.check_admin(inviter_id) and self.check_admin(invited_id):
-            self.administrator.remove(invited_id)
-            self.save()
-            result = True
+        if len(self.administrator) > 1:
+            if self.check_admin(inviter_id):
+                if self.check_admin(invited_id):
+                    self.administrator.remove(invited_id)
+                    self.save()
+                    result = True
         return result
 
     @property
@@ -143,9 +145,10 @@ class Member(services.base.service.Service):
 
     def rm_account(self, inviter_id, invited_id, committer):
         result = False
-        if self.accounts.exists(invited_id) and (self.check_admin(inviter_id) or
-                                                 inviter_id == invited_id):
-            result = self.accounts.remove(invited_id, committer=committer)
+        if self.accounts.exists(invited_id):
+            if self.check_admin(inviter_id) or inviter_id == invited_id:
+                if len(self.accounts.ids) > 1:
+                    result = self.accounts.remove(invited_id, committer=committer)
         return result
 
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):

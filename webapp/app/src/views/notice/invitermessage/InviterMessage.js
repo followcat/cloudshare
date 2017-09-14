@@ -34,29 +34,19 @@ class InviterMessage extends Component {
 
   componentDidMount() {
     this.getInviterMsg();
-    }
+  }
 
   render() {
     const columns = [{
+      title: '被邀请人',
+      dataIndex: 'name',
+    }, {
       title: '日期',
       dataIndex: 'date',
-    },{
+    }, {
       title: '邀请公司',
       dataIndex: 'content',
       render: text => <span>{text}</span>,
-    }, {
-     title: '操作',
-      className: 'action',
-      dataIndex: 'action',
-      render: (text, record) => {
-        return (
-          this.state.listinviter.length > 0 ?
-          ( 
-            <span>
-            </span>
-          ) : null
-        );
-      },
     }];
 
     const {

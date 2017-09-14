@@ -77,9 +77,9 @@ const websiteText = {
     MATCH_ACTION: '进行匹配',
     UPLOAD: '上传',
     ACCEPT: '接受',
-    IGNORE: '忽略',
-    ELEVATE: '授予权限',
-    REVOKE: '撤销权限',
+    REJECT: '拒绝',
+    ELEVATE: '授予管理员权限',
+    REVOKE: '撤销管理员权限',
 
     ELEVATE_SUCCESS: '授予权限成功！',
     ELEVATE_FAIL: '授予权限失败！',
@@ -135,6 +135,8 @@ const websiteText = {
     PROCESSED_MESSAGE: '已处理邀请',
     ACCEPT_INVITE_SUCCESS_MSG: '接受邀请成功！',
     ACCEPT_INVITE_FAIL_MSG: '接受邀请失败！',
+    SUCESS_MSG: '成功',
+    FAIL_MSG: '失败',
 
     BROWSING_HISTORY: '浏览历史',
     BOOKMARK: '书签',

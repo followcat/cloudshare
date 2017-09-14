@@ -49,9 +49,10 @@ class BecomeMember extends Component {
           <Card>
           <div className="cs-container-center">
               <h1><Icon type="rocket" />
-              <span>申请会员</span></h1>
-              <p>会员让您尊享更加流畅更加精彩的高端服务</p>
-              <p>从菜鸟到老司机，一个会员的距离。</p>
+              <span>成为免费会员</span></h1>
+              <p>创建组织，管理项目以及成员，上传云端职位以及简历。</p>
+              <p>获得强大的智能分析和推荐功能。</p>
+              <p>同时，我们将会保证数据的隐私安全。</p>
         <Form layout="horizontal" >
         <FormItem >
           {getFieldDecorator('membername',{

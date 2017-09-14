@@ -7,9 +7,11 @@ import StorageUtil from 'utils/storage';
 
 import TablePlus from 'components/table-plus';
 
-import { getListInvited, readMessage, acceptInviteMessage } from 'request/message';
+import { getListInvited, acceptInviteMessage } from 'request/message';
 
 import websiteText from 'config/website-text';
+import StorageUtil from '../../../utils/storage';
+
 const language = websiteText.zhCN;
 
 class InvitedMessage extends Component {
@@ -40,13 +42,12 @@ class InvitedMessage extends Component {
        reply : false,
     }, (json) => {
       if (json.code === 200) {
-          this.onDelete(key);
+          this.deleteListMessage(key);
       } 
     });
   }
 
-
-  onDelete = (key) => {
+  deleteListMessage = (key) => {
     const listinvited = [...this.state.listinvited];
     this.setState({ listinvited: listinvited.filter(item => item.id !== key) });
   }
@@ -58,7 +59,7 @@ class InvitedMessage extends Component {
     }, (json) => {
       if (json.result === true) {
         StorageUtil.unset('_pj');
-        this.onDelete(record.id);
+        this.deleteListMessage(record.id);
         message.success(language.ACCEPT_INVITE_SUCCESS_MSG,1,function(){
         window.location.reload();  
         });
@@ -70,10 +71,13 @@ class InvitedMessage extends Component {
 
   componentDidMount() {
     this.getInviteMsg();
-    }
+  }
 
   render() {
     const columns = [{
+      title: '邀请人',
+      dataIndex: 'name',
+    }, {
       title: '日期',
       dataIndex: 'date',
     }, {
@@ -91,8 +95,8 @@ class InvitedMessage extends Component {
             <span>
             <a href="#" onClick={() => this.onAccept(record)}>{language.ACCEPT}</a>
             <span className="ant-divider" />
-            <Popconfirm title="确认删除么?" onConfirm={() => this.onIgnore(record.id)}>
-              <a href="#">{language.IGNORE}</a>
+            <Popconfirm title="拒绝邀请?" onConfirm={() => this.onIgnore(record.id)}>
+              <a href="#">{language.REJECT}</a>
             </Popconfirm>
             </span>
           ) : null

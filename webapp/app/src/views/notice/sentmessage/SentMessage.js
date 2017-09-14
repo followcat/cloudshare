@@ -5,7 +5,7 @@ import { Row, Col ,Popconfirm,message } from 'antd';
 
 import TablePlus from 'components/table-plus';
 
-import { getListSent } from 'request/message';
+import { getListSent, deleteMessage } from 'request/message';
 
 import websiteText from 'config/website-text';
 const language = websiteText.zhCN;
@@ -34,10 +34,32 @@ class SentMessage extends Component {
 
   componentDidMount() {
     this.getSentMsg();
-    }
+  }
+
+  deleteListMessage = (key) => {
+    const listsent = [...this.state.listsent];
+    this.setState({ listsent: listsent.filter(item => item.id !== key) });
+  }
+
+  onDelete = (record) => {
+    deleteMessage ({
+      msgid : record.id
+    }, (json) => {
+      if (json.result === true) {
+        this.deleteListMessage(record.id);
+        message.success(language.SUCESS_MSG,1,function(){
+        });
+      } else {
+        message.error(language.FAIL_MSG);
+      }
+    });
+  }
 
   render() {
     const columns = [{
+      title: '接收人',
+      dataIndex: 'name',
+    }, {
       title: '日期',
       dataIndex: 'date',
     },{
@@ -53,6 +75,9 @@ class SentMessage extends Component {
           this.state.listsent.length > 0 ?
           ( 
             <span>
+            <Popconfirm title="删除信息?" onConfirm={() => this.onDelete(record)}>
+              <a href="#">{language.DELETE}</a>
+            </Popconfirm>
             </span>
           ) : null
         );

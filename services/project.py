@@ -32,7 +32,7 @@ class Project(services.base.service.Service):
 
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
                                                         cvpath, name, cvrepos)
-        self.curriculumvitae.privite = False
+        self.curriculumvitae.yaml_private_default = False
         self.company = services.simulationco.SimulationCO.autoservice(
                                                         copath, name, corepos)
         self.jobdescription = services.jobdescription.JobDescription(jdpath, name)

@@ -150,7 +150,9 @@ class BaseStorage(services.base.service.Service):
         return True
 
     def getinfo(self, id):
-        return self.getyaml(id)
+        info = self.generate_info_template()
+        info.update(self.getyaml(id))
+        return info
 
     def getyaml(self, id):
         """

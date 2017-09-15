@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import StorageUtil from '../../utils/storage';
+import StorageUtil from 'utils/storage';
 
 import { getAccount } from 'request/account';
 import { isMember, getMemberName, quitMember } from 'request/member';

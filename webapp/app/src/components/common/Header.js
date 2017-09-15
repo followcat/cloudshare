@@ -3,13 +3,13 @@ import React, { Component } from 'react';
 
 import { Icon, Input, Button } from 'antd';
 
-import HeaderPerson from './HeaderPerson';
-import SearchInput from './SearchInput';
+import HeaderPerson from 'HeaderPerson';
+import SearchInput from 'SearchInput';
 
-import LogoImg from '../../image/logo.png';
+import LogoImg from 'image/logo.png';
 
-import StorageUtil from '../../utils/storage';
-import './header.less';
+import StorageUtil from 'utils/storage';
+import 'header.less';
 
 export default class Header extends Component {
 

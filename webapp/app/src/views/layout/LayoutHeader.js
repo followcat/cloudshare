@@ -13,7 +13,7 @@ import { isMember, isMemberAdmin } from 'request/member';
 
 import StorageUtil from 'utils/storage';
 
-import logo from '../../image/logo.png';
+import logo from 'image/logo.png';
 
 import websiteText from 'config/website-text';
 

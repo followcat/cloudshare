@@ -30,7 +30,7 @@ class BecomeMember extends Component {
       if (json.result === true) {
         StorageUtil.unset('_pj');
         message.success('成功！',2,function(){
-          window.location.reload();
+          window.location.href = '/';
         });
       } else {
         message.error('失败！');

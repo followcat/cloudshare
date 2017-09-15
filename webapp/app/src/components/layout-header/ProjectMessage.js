@@ -9,6 +9,10 @@ import { addProject } from 'request/project';
 
 import { Select, Modal, Button, message } from 'antd';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 const defaultproje = null;
 
 class ProjectMessage extends Component {
@@ -46,7 +50,7 @@ class ProjectMessage extends Component {
     let selectElement = (
       <Select
         className="cs-header-project-selection"
-        defaultValue={ defaultproje || project || projects[0]}
+        defaultValue={ defaultproje || project }
         onChange={this.props.onChange}
       >
         {projects.map((item) => {

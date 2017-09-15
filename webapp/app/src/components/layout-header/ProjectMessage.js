@@ -19,6 +19,11 @@ class ProjectMessage extends Component {
     };
     this.getSelectRender = this.getSelectRender.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.getProjectName = this.getProjectName.bind(this);
+  }
+
+  getProjectName(childname){
+    this.setState({ projectName: childname.name });
   }
 
   handleSubmit () {

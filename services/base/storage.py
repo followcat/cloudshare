@@ -105,9 +105,8 @@ class BaseStorage(services.base.service.Service):
     @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer, do_commit=True):
         assert self.exists(id)
-        baseinfo = self.getyaml(id)
         result = None
-        if key in baseinfo:
+        if key in key in [each[0] for each in self.YAML_TEMPLATE]:
             result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         return result
 

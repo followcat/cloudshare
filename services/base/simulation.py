@@ -138,9 +138,8 @@ class Simulation(services.base.storage.BaseStorage):
     def updateinfo(self, id, key, value, committer, do_commit=True):
         assert key not in self.fix_item
         assert self.exists(id)
-        projectinfo = self.getinfo(id)
         result = None
-        if key in projectinfo:
+        if key in [each[0] for each in self.YAML_TEMPLATE]:
             if key in self.list_item:
                 result = self._addinfo(id, key, value, committer, do_commit=do_commit)
             else:

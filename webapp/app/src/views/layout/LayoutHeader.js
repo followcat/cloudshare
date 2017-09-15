@@ -111,15 +111,19 @@ class LayoutHeader extends Component {
   </Menu>
     );
 
-      isMember((json) => {
+    isMember((json) => {
       if (json.result === true) {
-        this.setState({
+             this.setState({
           navMenus: navMenusMember,
           ismember: true,
         });
+      }else{
+        this.setState({
+           ismember: false,
+        });
       }
       });
-      isMemberAdmin((json) => {
+    isMemberAdmin((json) => {
       if (json.result === true) {
         this.setState({
           profileMenus: profileMenuAdmin,
@@ -130,7 +134,7 @@ class LayoutHeader extends Component {
         });
         }
       });
-      getProject((json) => {
+    getProject((json) => {
       if (json.code === 200) {
         this.setState({
           projects: json.data,

@@ -5,13 +5,35 @@ import StorageUtil from 'utils/storage';
 
 import ProjectListForm from 'components/project-list';
 
-import { Select, Modal } from 'antd';
+import { addProject } from 'request/project';
+
+import { Select, Modal, Button, message } from 'antd';
+
+const defaultproje = null;
 
 class ProjectMessage extends Component {
   constructor() {
     super();
-    this.state;
+    this.state ={
+      projectName: '',
+    };
     this.getSelectRender = this.getSelectRender.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit () {
+    addProject({
+      projectname: this.state.projectName,
+    }, (json) => {
+      if  (json.result === true) {
+        this.setState({
+        visible: false,
+    });
+      message.success(language.ADD_SUCCESS_MSG);
+      } else {
+        message.error(language.ADD_FAIL_MSG);
+      }
+    })
   }
 
   getSelectRender() {
@@ -19,13 +41,12 @@ class ProjectMessage extends Component {
       isMember,
       projects,
       project,
-      title
+      title,
     } = this.props;
-    console.log(isMember );
     let selectElement = (
       <Select
         className="cs-header-project-selection"
-        defaultValue={project || projects[0]}
+        defaultValue={ defaultproje || project || projects[0]}
         onChange={this.props.onChange}
       >
         {projects.map((item) => {
@@ -35,13 +56,13 @@ class ProjectMessage extends Component {
         })}
       </Select>
     );
-    if(isMember !== undefined)  {
+    if(isMember !== '' )  {
     if (isMember === true ) {
       if( project !== null ) {
         return selectElement;
       }
 
-      if( project === null && projects !==null ) {
+      if( project === null && projects.length !== 0 ) {
       return (
         <Modal
           visible={true}
@@ -55,13 +76,17 @@ class ProjectMessage extends Component {
       );
       }
 
-      if( project === null && projects ===null ) {
+      if( project === null && projects.length === 0 ) {
       return (
         <Modal
           visible={true}
-          title={title}
+          title={'新建项目'}
           closable={false}
-          footer={<div style={{ padding: 4 }}></div>}
+          footer={[
+            <Button key="submit" type="primary" size="large" onClick={this.handleSubmit}>
+              确认
+            </Button>,
+          ]}
         >
         <ProjectListForm
           inputLabel="项目名称"
@@ -73,10 +98,10 @@ class ProjectMessage extends Component {
       );
       }
     } else {
-      console.log(isMember);
       StorageUtil.set('_pj','default');
+      this.defaultValue = 'default';
       return selectElement;
-      window.location.reload();
+       window.location.reload();
       }
     }
   }
@@ -92,7 +117,7 @@ class ProjectMessage extends Component {
 }
 
 ProjectMessage.defaultProps = {
-  title: '选择项目'
+  title: '选择项目',
 };
 
 ProjectMessage.propTypes = {

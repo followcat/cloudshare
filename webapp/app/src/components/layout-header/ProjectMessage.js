@@ -13,7 +13,6 @@ import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
-const defaultproject = null;
 const projectName = null;
 class ProjectMessage extends Component {
   constructor() {
@@ -41,7 +40,8 @@ class ProjectMessage extends Component {
         this.setState({
         visible: false,
     });
-      message.success(language.ADD_SUCCESS_MSG);
+      message.success(language.ADD_SUCCESS_MSG,1,
+        () => {window.location.reload();});
       } else {
         message.error(language.ADD_FAIL_MSG);
       }
@@ -58,7 +58,7 @@ class ProjectMessage extends Component {
     let selectElement = (
       <Select
         className="cs-header-project-selection"
-        defaultValue={ defaultproject || project }
+        defaultValue={ project }
         onChange={this.props.onChange}
       >
         {projects.map((item) => {
@@ -109,9 +109,6 @@ class ProjectMessage extends Component {
       }
     } else {
       StorageUtil.set('_pj','default');
-      this.defaultproject = 'default';
-      return selectElement;
-       window.location.reload();
       }
     }
   }

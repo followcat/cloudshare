@@ -77,7 +77,7 @@ class Interface(object):
 
     def subprocess_grep(self, command, path, shell):
         grep_list = []
-        greppath = os.path.join(self.repo.path, path)
+        greppath = os.path.join(self.path, path)
         if not os.path.exists(greppath):
             return grep_list
         p = subprocess.Popen(command,

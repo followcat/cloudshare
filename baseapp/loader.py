@@ -4,7 +4,6 @@ import functools
 
 import services.index
 import services.mining
-import services.multicv
 import services.multiclsify
 import services.analysis.cutword
 
@@ -28,13 +27,13 @@ CONFIG_PATH = 'config'
 CUTWORD_PATH = 'cutwords'
 
 
-def load_mult_classify(SVC_CV_STO):
-    SVC_MULT_CLSIFY = services.multiclsify.MultiClassify(SVC_CV_STO)
+def load_mult_classify(svc_storages):
+    SVC_MULT_CLSIFY = services.multiclsify.MultiClassify(svc_storages)
     SVC_CLS_CV = SVC_MULT_CLSIFY.classifies
     return SVC_MULT_CLSIFY, SVC_CLS_CV
 
 
-def load_mining(SVC_MULT_CV, silencer, lsipath=None, cutwordpath=None):
+def load_mining(SVC_MEMBERS, SVC_CLS_CV, silencer, lsipath=None, cutwordpath=None):
     global LSI_PATH, CUTWORD_PATH
     if lsipath is None:
         lsipath = LSI_PATH
@@ -42,14 +41,9 @@ def load_mining(SVC_MULT_CV, silencer, lsipath=None, cutwordpath=None):
         cutwordpath = CUTWORD_PATH
     SVC_CUTWORD = services.analysis.cutword.Cutword(cutwordpath)
     slicer = functools.partial(silencer, cutservice=SVC_CUTWORD)
-    SVC_MIN = services.mining.Mining(lsipath, SVC_MULT_CV, slicer=slicer)
+    SVC_MIN = services.mining.Mining(lsipath, SVC_MEMBERS.allprojects(), SVC_CLS_CV, slicer=slicer)
     SVC_MIN.setup()
     return SVC_CUTWORD, SVC_MIN
-
-
-def load_mult_cv(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV):
-    SVC_MULT_CV = services.multicv.MultiCV(PRJ_LIST, SVC_CV_REPO, SVC_CLS_CV)
-    return SVC_MULT_CV
 
 
 def load_doc_processor(name):
@@ -57,8 +51,12 @@ def load_doc_processor(name):
     return SUPPORT_DOCPROCESSOR[name]
 
 
-def load_index(svc_mult_cv):
-    SVC_INDEX = services.index.ReverseIndexing('Index', svc_mult_cv)
+def load_index(SVC_MEMBERS, SVC_CLS_CV):
+    svc_cvs = list()
+    for name, project in SVC_MEMBERS.allprojects().items():
+        svc_cvs.append(project.curriculumvitae)
+    svc_cvs.extend(SVC_CLS_CV.values())
+    SVC_INDEX = services.index.ReverseIndexing('Index', svc_cvs)
     SVC_INDEX.setup()
     return SVC_INDEX
 

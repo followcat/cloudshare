@@ -105,16 +105,17 @@ class BaseStorage(services.base.service.Service):
     @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer, do_commit=True):
         assert self.exists(id)
-        baseinfo = self.getyaml(id)
         result = None
-        if key in baseinfo:
+        if key in key in [each[0] for each in self.YAML_TEMPLATE]:
             result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
         result = False
         baseinfo = self.getinfo(id)
-        saveinfo = dict(filter(lambda k: k[0] in baseinfo, info.items()))
+        saveinfo = dict(filter(lambda k: k[0] in baseinfo.keys()+
+                                                 self.generate_info_template().keys(),
+                                                 info.items()))
         if baseinfo != saveinfo:
             name = core.outputstorage.ConvertName(id).yaml
             saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -148,7 +149,9 @@ class BaseStorage(services.base.service.Service):
         return True
 
     def getinfo(self, id):
-        return self.getyaml(id)
+        info = self.generate_info_template()
+        info.update(self.getyaml(id))
+        return info
 
     def getyaml(self, id):
         """

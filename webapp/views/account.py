@@ -10,11 +10,24 @@ class User(flask.ext.login.UserMixin):
         if not svc_account.exists(id):
             raise services.exception.UserNotFoundError()
         self.id = id
+        self._name = None
         self.svc_account = svc_account
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
+
+    def createmember(self, name, svc_members):
+        result = self.svc_account.createmember(self.id, name, svc_members)
+        return result
+
+    def quitmember(self, awayid, svc_members):
+        result = self.svc_account.quitmember(self.id, awayid, svc_members)
+        return result
+
+    def joinmember(self, inviter_id, name, svc_members):
+        result = self.svc_account.joinmember(inviter_id, self.id, name, svc_members)
+        return result
 
     def updateinfo(self, info):
         origininfo = self.svc_account.getinfo(self.id)
@@ -38,13 +51,75 @@ class User(flask.ext.login.UserMixin):
     def delbookmark(self, id):
         return self.svc_account.delbookmark(self.id, id)
 
+    def getmember(self, svc_members):
+        return svc_members.use(self.member, self.id)
+
+    def getmessage(self, msgid, svc_message):
+        return svc_message.getcontent(self.id, msgid)
+
+    def deletemessage(self, msgid, svc_message):
+        return svc_message.deleteinfo(self.id, msgid, committer=self.name)
+
+    def getinvitedmessage(self, msgid, svc_message):
+        return svc_message.getinvitedcontent(self.id, msgid)
+
+    def getreadmessages(self, svc_message):
+        return svc_message.getinfo(self.id)['read_chat']
+
+    def getsentmessages(self, svc_message):
+        return svc_message.getinfo(self.id)['sent_chat']
+
+    def getunreadmessages(self, svc_message):
+        return svc_message.getinfo(self.id)['unread_chat']
+
+    def getinvitedmessages(self, svc_message):
+        return svc_message.getinfo(self.id)['invited_member']
+
+    def getinvitermessages(self, svc_message):
+        return svc_message.getinfo(self.id)['inviter_member']
+
+    def getprocessedmessages(self, svc_message):
+        return svc_message.getinfo(self.id)['processed_member']
+
+    def sentmessage(self, des_name, content, svc_message):
+        des_info = self.svc_account.getinfo_byname(des_name)
+        des_id = des_info['id']
+        result = svc_message.send_chat(self.id, des_id, content, self.name)
+        return result
+
+    def readmessage(self, msgid, svc_message):
+        result = svc_message.read(self.id, msgid, self.name)
+        return result
+
+    def invitemember(self, des_name, svc_message):
+        result = False
+        if self.member:
+            des_info = self.svc_account.getinfo_byname(des_name)
+            des_id = des_info['id']
+            result = svc_message.send_invitation(self.id, des_id,
+                                                 self.member, self.name)
+        return result
+
+    @property
+    def member(self):
+        result = ''
+        if 'member' in self.info:
+            result = self.info['member']
+        return result
+
+    @property
+    def defaultmember(self):
+        return not self.member
+
     @property
     def info(self):
         return self.svc_account.getinfo(self.id)
 
     @property
     def name(self):
-        return self.info['name']
+        if self._name is None:
+            self._name = self.info['name']
+        return self._name
 
     @classmethod
     def get(self_class, id, svc_account):
@@ -76,7 +151,10 @@ class User(flask.ext.login.UserMixin):
             >>> shutil.rmtree(pwd_path)
             >>> shutil.rmtree(acc_path)
         """
-        info = svc_account.getinfo_byname(name)
+        try:
+            info = svc_account.getinfo_byname(name)
+        except KeyError:
+            return None
         return self_class.get(info['id'], svc_account)
 
     @classmethod

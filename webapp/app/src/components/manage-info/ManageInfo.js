@@ -1,7 +1,13 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import StorageUtil from '../../utils/storage';
+
+import StorageUtil from 'utils/storage';
+
 import { getAccount } from 'request/account';
+import { isMember, getMemberName, quitMember } from 'request/member';
+
+import websiteText from 'config/website-text';
+const language = websiteText.zhCN;
 
 import {
   Form,
@@ -18,12 +24,15 @@ class ManageInfo extends Component {
     this.handleReset = this.handleReset.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.handleQuit = this.handleQuit.bind(this);
   }
 
   state = {
     name: StorageUtil.get('user'),
     email: '',
     phone: '',
+    show :false,
+    membername: '',
   }
     //重置表单方法
   handleReset(e) {
@@ -42,13 +51,35 @@ class ManageInfo extends Component {
     });
   }
 
+  handleQuit() {
+    quitMember((json) => {
+      if (json.result === true) {
+        message.success('退出成功',1,function(){
+        StorageUtil.unset('_pj');
+        window.location.reload();
+        });
+      } else {
+        message.error('退出失败！');
+      }
+      
+      });
+  }
+
   handleKeyPress(e) {
     if (e.key === 'Enter') {
       this.handleClick();
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
+    isMember((json) => {
+      if (json.result === true) {
+        this.setState({
+          show: true,
+        });
+      }
+      });
+
     getAccount({
       name: this.state.name,
     },(json) => {
@@ -61,7 +92,15 @@ class ManageInfo extends Component {
         message.error('系统繁忙，刷新重试！');
       }
     });
-}
+
+    getMemberName((json) => {
+      if (json.code === 200) {
+        this.setState({
+          membername: json.result,
+        });
+      }
+    });
+  }
 
   render() {
     const { wrapperCol, btnText,resetText } = this.props,
@@ -72,8 +111,18 @@ class ManageInfo extends Component {
         <FormItem
           label="用户名"
         >
-        <label>{this.state.name}</label>
+        <Input value={this.state.name} disabled={true}/>
         </FormItem>
+        { this.state.show ? (
+        <FormItem
+          label={language.COMPANY_NAME}
+        >
+        <Input value={this.state.membername} disabled={true}/>
+          <Button type="primary" onClick={this.handleQuit}>
+          {language.QUIT_MEMBER}
+          </Button>
+        </FormItem>
+        ): null }
         <FormItem label="电子邮箱">
           {getFieldDecorator('email', {
             initialValue: this.state.email,

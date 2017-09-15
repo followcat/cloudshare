@@ -3,9 +3,9 @@ import React, { Component, PropTypes } from 'react';
 
 import { Checkbox } from 'antd';
 
-import { URL } from '../../../config/url';
+import { URL } from 'config/url';
 
-import websiteText from '../../../config/website-text';
+import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 

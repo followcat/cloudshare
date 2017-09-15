@@ -1,5 +1,3 @@
-import json
-
 import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
@@ -38,6 +36,7 @@ class UserAPI(Resource):
 class AccountAPI(Resource):
 
     def __init__(self):
+        self.svc_msg = flask.current_app.config['SVC_MSG']
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('password', type = str,
@@ -60,6 +59,8 @@ class AccountAPI(Resource):
         bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
         addresult = self.svc_account.add(bsobj, password)
         if addresult is True:
+            msgobj = self.svc_msg.baseobj({'id': bsobj.ID.base})
+            msgresult = self.svc_msg.add(msgobj, committer=name)
             result = { 'code': 200, 'message': 'Create user successed.','redirect_url': '/'}
         else:
             result = { 'code': 400, 'message': 'This username is existed.'}
@@ -124,16 +125,17 @@ class AccountHistoryAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(AccountHistoryAPI, self).__init__()
 
     def get(self, project):
         user = flask.ext.login.current_user
-        info_list = self.svc_mult_cv.getproject(project).cv_history(user.name, entries=10)
+        member = user.getmember(self.svc_members)
+        info_list = member.getproject(project).cv_history(user.name, entries=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:
-                    info['information'] = self.svc_mult_cv.getyaml(md5)
+                    info['information'] = member.getproject(project).cv_getyaml(id)
                 except IOError:
                     info['information'] = md5
                 info['name'] = md5

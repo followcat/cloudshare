@@ -19,9 +19,9 @@ class ReverseIndexing(object):
                  'business',
                  'date')
 
-    def __init__(self, path, cvsvc):
+    def __init__(self, path, cvs):
         self.path = path
-        self.cvs = cvsvc.svcls
+        self.cvs = cvs
         self.index = {}
 
     def setup(self):

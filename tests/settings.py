@@ -5,9 +5,9 @@ import core.basedata
 import services.mining
 import services.people
 import services.account
-import services.multicv
 import services.project
-import services.company
+import services.members
+import services.multipeople
 import services.curriculumvitae
 import interface.gitinterface
 import utils.docprocessor.libreoffice
@@ -20,9 +20,10 @@ class Config(object):
     TESTDATA_PATH = 'tests/testcase_data'
     UPLOAD_TEMP = os.path.join(TESTDATA_PATH, 'output')
     REPO_DB_NAME = os.path.join(TESTDATA_PATH, 'repo')
+    PWD_DB_NAME = os.path.join(TESTDATA_PATH, 'password')
     ACCOUNT_DB_NAME = os.path.join(TESTDATA_PATH, 'account')
     LSI_PATH = os.path.join(TESTDATA_PATH, 'lsimodel')
-    PRJ_PATH = os.path.join(TESTDATA_PATH, 'projects')
+    MEMBERS_PATH = os.path.join(TESTDATA_PATH, 'members')
 
     def __init__(self):
         self.build()
@@ -34,26 +35,27 @@ class Config(object):
             os.mkdir(self.TESTDATA_PATH)
         if not os.path.exists(self.UPLOAD_TEMP):
             os.mkdir(self.UPLOAD_TEMP)
-        if not os.path.exists(self.PRJ_PATH):
-            os.mkdir(self.PRJ_PATH)
 
-        self.SVC_ACCOUNT = services.account.Account(self.ACCOUNT_DB_NAME)
+        self.SVC_PWD = services.account.Password(self.PWD_DB_NAME, 'pwdrepo')
+        self.SVC_ACCOUNT = services.account.Account(self.SVC_PWD, self.ACCOUNT_DB_NAME,
+                                                    'accrepo')
         self.SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(self.REPO_DB_NAME,
                                                                     'cloudshare')
-        self.SVC_CO_REPO = services.company.Company(self.REPO_DB_NAME, 'corepo')
         self.SVC_PEO_REPO = services.people.People(self.SVC_CV_REPO,
                                                    os.path.join(self.REPO_DB_NAME, 'PEO'),
-                                                   name='peorepo', iotype='base')
-        self.SVC_PRJ_TEST = services.project.Project(os.path.join(self.PRJ_PATH,
-                                                                 'project_test'),
-                                                    self.SVC_CO_REPO, self.SVC_CV_REPO,
-                                                    self.SVC_PEO_REPO, 'project_test')
-        self.SVC_PRJ_TEST.setup([])
+                                                   name='peostorage', iotype='base')
 
-        self.SVC_MULT_CV = services.multicv.MultiCV([self.SVC_PRJ_TEST],
-                                                    self.SVC_CV_REPO)
+        self.SVC_MULT_PEO = services.multipeople.MultiPeople([self.SVC_PEO_REPO])
+        self.SVC_MEMBERS = services.members.Members(self.MEMBERS_PATH,
+                                                    [self.SVC_ACCOUNT],
+                                                    [self.SVC_CV_REPO], [self.SVC_MULT_PEO])
+        self.SVC_MEMBERS.create('test_member')
+        self.SVC_MEMBER = self.SVC_MEMBERS.get('test_member')
+        self.SVC_MEMBER._add_project('project_test', {})
+        self.SVC_PRJ_TEST = self.SVC_MEMBER.projects['project_test']
 
-        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MULT_CV)
+        self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MEMBERS.allprojects(),
+                                              {'repoclassify': self.SVC_CV_REPO})
         self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].no_above = 1
         self.SVC_MIN.lsi_model[self.SVC_PRJ_TEST.name].setup(['first.md'],
             ['here is a text for testing.'])
@@ -71,8 +73,8 @@ class Config(object):
                                            metadata=yamlinfo)
         peopmeta = extractor.information_explorer.catch_peopinfo(yamlinfo)
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-        project = self.SVC_MULT_CV.getproject('project_test')
-        self.SVC_MULT_CV.repodb.add(dataobj, 'tester', unique=True)
+        project = self.SVC_MEMBER.getproject('project_test')
+        self.SVC_CV_REPO.add(dataobj, 'tester', unique=True)
         project.cv_add(dataobj)
         self.SVC_PEO_REPO.add(peopobj)
         self.SVC_PRJ_TEST.peo_add(peopobj)

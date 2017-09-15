@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import 'whatwg-fetch';
 import { Menu, Dropdown, Icon, Modal, message } from 'antd';
 
-import StorageUtil from '../../utils/storage';
+import StorageUtil from 'utils/storage';
 
 export default class HeaderPerson extends Component {
   constructor() {

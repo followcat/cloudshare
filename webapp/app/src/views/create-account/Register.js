@@ -48,7 +48,7 @@ class Register extends Component {
       phone: feildValue.phone,
     }, (json) => {
       if (json.code === 200) {
-        message.success('注册成功',3,function(){
+        message.success('注册成功',2,function(){
           window.location.href = json.redirect_url;
         });
       } else {

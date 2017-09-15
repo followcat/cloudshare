@@ -2,6 +2,40 @@
 const HOST = '';
 
 export const API = {
+  MEMBER_ADMIN_API:`${HOST}/api/memberadmin`,
+
+  MEMBER_API:`${HOST}/api/member`,
+
+  IS_MEMBER_ADMIN_API:`${HOST}/api/ismemberadmin`,
+
+  IS_MEMBER_API:`${HOST}/api/ismember`,
+
+  MESSAGESNOTIFY_API:`${HOST}/api/messagenotify`,
+
+  MESSAGE_API:`${HOST}/api/message`,
+
+  ACCEPT_INVITE_MESSAGE_API:`${HOST}/api/invitedmessage`,
+
+  LIST_UNREAD_MESSAGES_API:`${HOST}/api/listunreadmessages`,
+
+  LIST_READ_MESSAGES_API:`${HOST}/api/listreadmessages`,
+
+  LIST_SENT_MESSAGES_API:`${HOST}/api/listsentmessages`,
+
+  LIST_INVITED_MESSAGES_API:`${HOST}/api/listinvitedmessages`,
+
+  LIST_INVITER_MESSAGES_API:`${HOST}/api/listinvitermessages`,
+
+  LIST_PROCESSED_MESSAGES_API:`${HOST}/api/listprocessedmessages`,
+
+  SEND_INVITE_MESSAGE_API:`${HOST}/api/sendinvitemessage`,
+
+  MEMBER_ACCOUNT_API:`${HOST}/api/memberaccount`,
+
+  LIST_MEMBER_ACCOUNTS_API:`${HOST}/api/listmemberaccounts`,
+
+  MEMBER_PROJECT_API:`${HOST}/api/memberproject`,
+
   USER_API:`${HOST}/api/user`,
 
   PASSWORD_API: `${HOST}/api/password`,
@@ -32,9 +66,9 @@ export const API = {
 
   UPDATE_COMPANY_INFO_API: `${HOST}/api/companyinfoupdate`,
 
-  CUSTOMER_LIST_API: `${HOST}/api/customerlist`,
+  COMPANY_CUSTOMER_LIST_API: `${HOST}/api/companycustomerlist`,
 
-  CUSTOMER_API: `${HOST}/api/customer`,
+  COMPANY_CUSTOMER_API: `${HOST}/api/companycustomer`,
 
   CREATE_JOBDESCRIPTION_API: `${HOST}/api/uploadjd`,
 

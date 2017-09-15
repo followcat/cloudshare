@@ -27,10 +27,14 @@ def hash(text):
     return m.hexdigest()
 
 
-def save_yaml(infodict, path, filename, default_flow_style=None):
+def dump_yaml(data, default_flow_style=None):
+    return yaml.dump(data, Dumper=utils._yaml.SafeDumper,
+                     allow_unicode=True, default_flow_style=default_flow_style)
+
+
+def save_yaml(infodict, path, filename):
     with open(os.path.join(path, filename), 'w') as f:
-        f.write(yaml.dump(infodict, Dumper=utils._yaml.SafeDumper,
-                          allow_unicode=True, default_flow_style=default_flow_style))
+        f.write(dump_yaml(infodict))
 
 
 def load_yaml(path, filename):

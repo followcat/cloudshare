@@ -4,9 +4,22 @@ import { Link } from 'react-router';
 
 import { Menu } from 'antd';
 
+import { isMemberAdmin } from 'request/member';
+import  websiteText  from 'config/website-text'
+
 const MenuItem = Menu.Item;
+const MenuItemGroup = Menu.ItemGroup;
+const SubMenu = Menu.SubMenu;
+const language = websiteText.zhCN;
 
 class SubheadNav extends Component {
+  constructor() {
+    super();
+    this.state = {
+      show :false,
+    };
+  }
+
   render() {
     const {
       prefixCls,
@@ -20,9 +33,9 @@ class SubheadNav extends Component {
         <div className={`${prefixCls}-wrap`}>
           <Menu
             selectedKeys={selectedKeys}
+            defaultopenKeys={selectedKeys}
             mode="horizontal"
             onClick={this.props.onClick}
-            style={style}
           >
             {menus.map(item => {
               return (

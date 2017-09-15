@@ -122,7 +122,7 @@ class Member(services.base.service.Service):
 
     def _add_project(self, name, classify, autosetup=False, autoupdate=False):
         result = False
-        if name not in self.projects:
+        if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
             tmp_project = services.project.Project(path, self.co_repos, [self.curriculumvitaes],
                                                    self.mult_peo, name)

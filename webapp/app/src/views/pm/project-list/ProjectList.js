@@ -136,7 +136,7 @@ class ProjectList extends Component {
   		dataIndex: 'action',
       render: (text, record) => {
         return (
-          this.state.projects.length > 1 ?
+          this.state.projects.length > 0 ?
           (
             <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record.key)}>
               <a href="#">{language.DELETE}</a>

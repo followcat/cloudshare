@@ -13,8 +13,8 @@ import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
 
-const defaultproje = null;
-
+const defaultproject = null;
+const projectName = null;
 class ProjectMessage extends Component {
   constructor() {
     super();
@@ -27,12 +27,15 @@ class ProjectMessage extends Component {
   }
 
   getProjectName(childname){
-    this.setState({ projectName: childname.name });
-  }
+     //  this.setState({ 
+     //  projectName : childname.name,
+     // });
+      this.projectName=childname.name;
+    }
 
   handleSubmit () {
     addProject({
-      projectname: this.state.projectName,
+      projectname: this.projectName,
     }, (json) => {
       if  (json.result === true) {
         this.setState({
@@ -55,7 +58,7 @@ class ProjectMessage extends Component {
     let selectElement = (
       <Select
         className="cs-header-project-selection"
-        defaultValue={ defaultproje || project }
+        defaultValue={ defaultproject || project }
         onChange={this.props.onChange}
       >
         {projects.map((item) => {
@@ -100,15 +103,13 @@ class ProjectMessage extends Component {
         <ProjectListForm
           inputLabel="项目名称"
           getInput={this.getProjectName}
-          onChange={this.handleFormChange}
-          onSubmit={this.handleSubmit}
         />
         </Modal>
       );
       }
     } else {
       StorageUtil.set('_pj','default');
-      this.defaultValue = 'default';
+      this.defaultproject = 'default';
       return selectElement;
        window.location.reload();
       }
@@ -116,7 +117,6 @@ class ProjectMessage extends Component {
   }
 
   render() {
-    this.state =this.props;
     return (
       <div className="cs-header-project">
         {this.getSelectRender()}

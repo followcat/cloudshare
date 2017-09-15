@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import CVProcess from '../../utils/cv-process';
+import CVProcess from 'utils/cv-process';
 
 class ResumeContent extends Component {
   constructor() {

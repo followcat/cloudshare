@@ -1,8 +1,8 @@
 'use strict';
-import { API } from '../config/api';
+import { API } from 'config/api';
 import { callbackFunction } from './callback';
-import Generator from '../utils/generator';
-import StorageUtil from '../utils/storage';
+import Generator from 'utils/generator';
+import StorageUtil from 'utils/storage';
 
 export const getClassify = (callback) => {
   return fetch(API.CLASSIFY_API, {

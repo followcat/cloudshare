@@ -18,11 +18,11 @@ class Project(services.base.service.Service):
     PEO_PATH = 'PEO'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepos, cvrepos, svcpeos, name, iotype='git'):
+    def __init__(self, path, corepo, cvrepos, svcpeos, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
         self._modelname = name
-        self.corepos = corepos
+        self.corepo = corepo
         self.cvrepos = cvrepos
         self.svcpeos = svcpeos
         cvpath = os.path.join(path, self.CV_PATH)
@@ -34,7 +34,7 @@ class Project(services.base.service.Service):
                                                         cvpath, name, cvrepos)
         self.curriculumvitae.yaml_private_default = False
         self.company = services.simulationco.SimulationCO.autoservice(
-                                                        copath, name, corepos)
+                                                        copath, name, [corepo])
         self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
         self.config = dict()
@@ -197,7 +197,7 @@ class Project(services.base.service.Service):
 
     def company_compare_excel(self, stream, committer):
         outputs = list()
-        outputs.extend(self.corepos.compare_excel(stream, committer))
+        outputs.extend(self.corepo.compare_excel(stream, committer))
         outputs.extend(self.company.compare_excel(stream, committer))
         return outputs
 
@@ -210,7 +210,7 @@ class Project(services.base.service.Service):
             if item[0] == 'companyadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 repo_result.add(yamlname)
-                result = self.corepos.add(baseobj, committer=item[2][-1], do_commit=False)
+                result = self.corepo.add(baseobj, committer=item[2][-1], do_commit=False)
             elif item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 project_result.add(self.company.ids_file)
@@ -220,12 +220,12 @@ class Project(services.base.service.Service):
                 project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
                 result = self.company.updateinfo(*item[2], do_commit=False)
             results[item[1]] = result
-        self.corepos.interface.do_commit(list(repo_result), committer=committer)
+        self.corepo.interface.do_commit(list(repo_result), committer=committer)
         self.company.interface.do_commit(list(project_result), committer=committer)
         return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
-        self.corepos.add(coobj, committer, unique, yamlfile, mdfile)
+        self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
         self.company.add(coobj, committer, unique, yamlfile, mdfile)
         return self.company.addcustomer(coobj.name, committer)
 

@@ -33,7 +33,6 @@ class Member(services.base.service.Service):
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.companies = services.company.Company(self.co_path, name)
-        self.co_repos = [self.companies]
         self.curriculumvitaes = services.simulationcv.SimulationCV.autoservice(
                                                             self.cv_path, name, cv_repos)
         self.config = dict()
@@ -108,7 +107,8 @@ class Member(services.base.service.Service):
         for path in glob.glob(os.path.join(self.projects_path, '*')):
             if os.path.isdir(path):
                 name = os.path.split(path)[1]
-                tmp_project = services.project.Project(path, self.co_repos, [self.curriculumvitaes],
+                tmp_project = services.project.Project(path, self.companies,
+                                                       [self.curriculumvitaes],
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'storageCV': self.config['storageCV'],
                                           'storagePEO': self.config['storagePEO']})
@@ -124,7 +124,7 @@ class Member(services.base.service.Service):
         result = False
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
-            tmp_project = services.project.Project(path, self.co_repos, [self.curriculumvitaes],
+            tmp_project = services.project.Project(path, self.companies, [self.curriculumvitaes],
                                                    self.mult_peo, name)
             tmp_project.setup(classify, config={'autosetup': autosetup,
                                                 'autoupdate': autoupdate,

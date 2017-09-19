@@ -141,7 +141,7 @@ class ListMember extends Component {
     deleteMember({
       userid : record.id,
     }, (json) => {
-      if  (json.code === 200) {
+      if  (json.result === true) {
       const members = [...this.state.members];
       this.setState({ members: members.filter(item => item.id !== record.id) });
       message.success(language.DELETE_SUCCESS_MSG);

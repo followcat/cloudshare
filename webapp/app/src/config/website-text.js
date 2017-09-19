@@ -84,7 +84,7 @@ const websiteText = {
     ELEVATE_SUCCESS: '授予权限成功！',
     ELEVATE_FAIL: '授予权限失败！',
     REVOKE_SUCCESS: '撤销权限成功！',
-    REVOKE_FAIL: '撤销权限成功！',
+    REVOKE_FAIL: '撤销权限失败！',
 
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',

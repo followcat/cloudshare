@@ -126,3 +126,4 @@ def initialize(app):
                      endpoint = 'memberproject')
 
     api.add_resource(CaptchaAPI, '/api/captcha', endpoint = 'captcha')
+    api.add_resource(SMSAPI, '/api/sms/<string:code>', endpoint = 'sms')

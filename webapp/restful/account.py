@@ -4,21 +4,19 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import services.exception
+import webapp.restful.captchaverify
 
 class UserAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        super(UserAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('email', type = str, required = True,
                                    help = 'No email provided', location = 'json')
         self.reqparse.add_argument('phone', type = str, required = True,
                                    help = 'No phone provided', location = 'json')
-
-
-        super(UserAPI, self).__init__()
-
 
     def get(self):
         user = flask.ext.login.current_user
@@ -33,9 +31,10 @@ class UserAPI(Resource):
         return { 'code': 200, 'result': result }
 
 
-class AccountAPI(Resource):
+class AccountAPI(webapp.restful.captchaverify.SMSAPI):
 
     def __init__(self):
+        super(AccountAPI, self).__init__()
         self.svc_msg = flask.current_app.config['SVC_MSG']
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         self.reqparse = reqparse.RequestParser()
@@ -45,7 +44,7 @@ class AccountAPI(Resource):
                                    help = 'No email provided', location = 'json')
         self.reqparse.add_argument('phone', type = str, required = True,
                                    help = 'No phone provided', location = 'json')
-        super(AccountAPI, self).__init__()
+        self.reqparse.add_argument('smscode', type = str, required = True, location = 'json')
 
     def get(self, name):
         result = name in self.svc_account.USERS
@@ -55,15 +54,20 @@ class AccountAPI(Resource):
         args = self.reqparse.parse_args()
         phone = args['phone']
         email = args['email']
+        smscode = args['smscode']
         password = args['password']
-        bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
-        addresult = self.svc_account.add(bsobj, password)
-        if addresult is True:
-            msgobj = self.svc_msg.baseobj({'id': bsobj.ID.base})
-            msgresult = self.svc_msg.add(msgobj, committer=name)
-            result = { 'code': 200, 'message': 'Create user successed.','redirect_url': '/'}
-        else:
+        cachecode = self.getcache(flask.session['_id'], self.prefix)
+        result = { 'code': 400, 'message': 'SMS code verify failed.'}
+        if cachecode is not None and smscode.lower() == cachecode.lower():
             result = { 'code': 400, 'message': 'This username is existed.'}
+            bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
+            addresult = self.svc_account.add(bsobj, password)
+            if addresult is True:
+                msgobj = self.svc_msg.baseobj({'id': bsobj.ID.base})
+                msgresult = self.svc_msg.add(msgobj, committer=name)
+                if msgresult:
+                    self.deletecache(flask.session['_id'], self.prefix)
+                result = { 'code': 200, 'message': 'Create user successed.','redirect_url': '/'}
         return result
 
 

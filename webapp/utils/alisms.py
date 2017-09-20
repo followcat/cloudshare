@@ -3,7 +3,7 @@ from aliyunsdkdysmsapi.request.v20170525 import QuerySendDetailsRequest
 from aliyunsdkcore.client import AcsClient
 
 
-def send_sms(ACCESS_KEY_ID, ACCESS_KEY_SECRET, REGION, business_id, phone_number,
+def send_alisms(ACCESS_KEY_ID, ACCESS_KEY_SECRET, REGION, business_id, phone_number,
              sign_name, template_code, template_param=None):
     if isinstance(sign_name, unicode):
         sign_name = sign_name.encode('utf-8')

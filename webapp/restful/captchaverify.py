@@ -7,8 +7,8 @@ import captcha.image
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
-import utils.alisms
 import utils.builtin
+from webapp.utils.alisms import send_alisms
 
 
 class CaptchaAPI(Resource):
@@ -83,11 +83,9 @@ class SMSAPI(CaptchaAPI):
                 smscode = self.updatecache(flask.session['_id'], self.prefix)
                 business_id = uuid.uuid1()
                 params = "{\"code\":\"%s\"}"%smscode
-                response = utils.alisms.send_sms(self.ACCESS_KEY_ID,
-                                                 self.ACCESS_KEY_SECRET,
-                                                 self.REGION, business_id, phone,
-                                                 self.sign_name,
-                                                 self.template_code, params)
+                response = send_alisms(self.ACCESS_KEY_ID, self.ACCESS_KEY_SECRET,
+                                    self.REGION, business_id, phone,
+                                    self.sign_name, self.template_code, params)
                 result = True
         self.deletecache(flask.session['_id'], CaptchaAPI.prefix)
         return { 'code': 200, 'result': result }

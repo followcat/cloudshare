@@ -1,6 +1,7 @@
 import uuid
 import string
 import random
+import logging
 
 import flask
 import captcha.image
@@ -63,12 +64,14 @@ class SMSAPI(CaptchaAPI):
     def __init__(self):
         super(SMSAPI, self).__init__()
         access_info = flask.current_app.config['ACCESS']
-        self.REGION = access_info['REGION']
-        self.ACCESS_KEY_ID = access_info['ACCESS_KEY_ID']
-        self.ACCESS_KEY_SECRET = access_info['ACCESS_KEY_SECRET']
+        self.enable = access_info['SMS_ENABLE']
+        self.region = access_info['SMS_REGION']
+        self.access_key_id = access_info['SMS_ACCESS_KEY_ID']
+        self.access_key_secret = access_info['SMS_ACCESS_KEY_SECRET']
         self.template_code = access_info['SMS_TEMPLATE_CODE']
         self.sign_name = access_info['SMS_SIGN_NAME']
 
+        self.smslogger = logging.getLogger('sms')
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('phone', type = str, location = 'json')
 
@@ -83,9 +86,12 @@ class SMSAPI(CaptchaAPI):
                 smscode = self.updatecache(flask.session['_id'], self.prefix)
                 business_id = uuid.uuid1()
                 params = "{\"code\":\"%s\"}"%smscode
-                response = send_alisms(self.ACCESS_KEY_ID, self.ACCESS_KEY_SECRET,
-                                    self.REGION, business_id, phone,
-                                    self.sign_name, self.template_code, params)
+                self.smslogger.debug(params)
+                if self.enable is True:
+                    response = send_alisms(self.access_key_id, self.access_key_secret,
+                                           self.region, business_id, phone,
+                                           self.sign_name, self.template_code, params)
+                    self.smslogger.info(' '.join([phone, response.__str__()]))
                 result = True
         self.deletecache(flask.session['_id'], CaptchaAPI.prefix)
         return { 'code': 200, 'result': result }

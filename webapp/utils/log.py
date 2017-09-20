@@ -33,3 +33,14 @@ def init_webapp_userlog(app):
         info = ' '.join([ipaddr, '- -', date, '"'+method, url,
                         protocol+'"', 'code', user, '-'])
         logger.info(info)
+
+
+def init_smslog(app):
+    LOG_PATH = 'log'
+    if not os.path.exists(LOG_PATH):
+        os.mkdir(LOG_PATH)
+    smslogger = logging.getLogger('sms')
+    handler = logging.handlers.RotatingFileHandler(os.path.join(LOG_PATH, 'sms.log'))
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s: \t%(message)s")
+    handler.setFormatter(formatter)
+    smslogger.addHandler(handler)

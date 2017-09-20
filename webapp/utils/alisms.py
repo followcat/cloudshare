@@ -1,7 +1,9 @@
-from aliyunsdkdysmsapi.request.v20170525 import SendSmsRequest
-from aliyunsdkdysmsapi.request.v20170525 import QuerySendDetailsRequest
-from aliyunsdkcore.client import AcsClient
-
+try:
+    from aliyunsdkdysmsapi.request.v20170525 import SendSmsRequest
+    from aliyunsdkdysmsapi.request.v20170525 import QuerySendDetailsRequest
+    from aliyunsdkcore.client import AcsClient
+except ImportError:
+    pass
 
 def send_alisms(ACCESS_KEY_ID, ACCESS_KEY_SECRET, REGION, business_id, phone_number,
              sign_name, template_code, template_param=None):

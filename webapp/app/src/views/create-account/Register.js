@@ -46,6 +46,7 @@ class Register extends Component {
       password: feildValue.password,
       email: feildValue.email,
       phone: feildValue.phone,
+      smscode: feildValue.smscode,
     }, (json) => {
       if (json.code === 200) {
         message.success('注册成功',2,function(){

@@ -1,12 +1,14 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 import { checkAccount } from 'request/account';
+import { getCaptcha, getSmscode } from 'request/captchaverify';
 
 import {
   Form,
   Input,
   Button,
   message,
+  Modal,
 } from 'antd';
 
 const FormItem = Form.Item;
@@ -15,17 +17,39 @@ class CreateAccountForm extends Component {
   constructor() {
     super();
     this.handleClick = this.handleClick.bind(this);
+    this.handlePhoneClick = this.handlePhoneClick.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.getCaptchaPng = this.getCaptchaPng.bind(this);
   }
 
   state = {
     confirmDirty: false,
     result: false,
+    image: null,
+    smscode: '',
+    visible:false,
   };
 
-  handleClick(e) {
-    // e.preventDefault();
+  handleCancel = (e) => {
+    this.setState({
+      visible: false,
+    });
+  }
 
+  handlePhoneClick(e) {
+     e.preventDefault();
+  this.props.form.validateFields(
+    ['phone'],(errors, values) => {
+      if (!errors) {
+        this.setState({
+          visible : true,
+        })
+      }
+    });
+  }
+
+  handleClick(e) {
+    e.preventDefault();
   this.props.form.validateFields((errors, values) => {
       if (!errors) {
         this.props.onSubmit(values);
@@ -72,6 +96,27 @@ class CreateAccountForm extends Component {
     }
   }
 
+  checkCaptcha = (rule, value, callback) => {
+    const form = this.props.form;
+    if(value && value.length === 4) {   
+      getSmscode({
+       captcha: value,
+       phone: form.getFieldValue('phone')
+      },(json) => {
+       if (json.result === true) {
+          callback();
+          this.setState({
+          visible : false,
+          });
+       } else {
+          this.getCaptchaPng();
+          callback('验证码错误，请重新输入!');
+       }
+     });
+    } else {callback('验证码长度必须4位')}
+  }
+
+
   checkPassword = (rule, value, callback) => {
     const form = this.props.form;
     if (value && value !== form.getFieldValue('password')) {
@@ -87,6 +132,20 @@ class CreateAccountForm extends Component {
       form.validateFields(['confirm'], { force: true });
     }
     callback();
+  }
+
+  getCaptchaPng (){
+    getCaptcha((blob) => {
+      if (blob){
+        this.setState({
+          image : URL.createObjectURL(blob),
+        });
+      }
+    });
+  }
+
+  componentWillMount() {
+    this.getCaptchaPng();
   }
 
   render() {
@@ -107,7 +166,7 @@ class CreateAccountForm extends Component {
             }]
           })(<Input onBlur={this.handleNameBlur}  onFocus={this.handleNameFocus} placeholder="请输入用户名" />)}
         </FormItem>
-                <FormItem
+        <FormItem
           label="密码"
           hasFeedback
         >
@@ -152,12 +211,45 @@ class CreateAccountForm extends Component {
         <FormItem label="联系电话"  hasFeedback>
           {getFieldDecorator('phone',{
             rules: [{
-              required: true, message: '手机号码是地址必填项',}
+              required: true, message: '手机号码是地址必填项',},
+              {len: 11,message: '手机长度为11位'}
             ],
           })(
             <Input />
           )}
         </FormItem>
+        <FormItem label="短信验证码">
+          {getFieldDecorator('smscode',{
+            rules: [{
+              required: true, message: '短信验证码是地址必填项',}
+            ],
+          })(
+            <Input />
+          )}
+          <Button type="primary" onClick={this.handlePhoneClick}>
+            {"获取验证码"}
+          </Button>
+        </FormItem>
+        <Modal
+          visible={this.state.visible}
+          onCancel={this.handleCancel}
+          title={'发送手机验证码'}
+          width={'350px'}
+          footer={null}
+        >
+        <FormItem label="验证码" hasFeedback>
+        {getFieldDecorator('captcha', {
+            rules: [{
+              required: true, message: '验证码是必填项'},{
+            },
+            {
+              validator: this.checkCaptcha,
+            }]
+          })(<Input />)}
+        <img src={this.state.image} onClick={this.getCaptchaPng}>
+        </img>
+        </FormItem>
+        </Modal>
         <FormItem>
           <Button type="primary" onClick={this.handleClick}>
             {btnText}

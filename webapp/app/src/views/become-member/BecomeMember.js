@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { message, Card, Button,Icon,Form,Input } from 'antd';
 
 import StorageUtil from 'utils/storage';
+
 import { becomeMember } from 'request/member';
 
 const FormItem = Form.Item;

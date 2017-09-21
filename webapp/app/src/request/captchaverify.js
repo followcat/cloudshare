@@ -18,11 +18,14 @@ export const getCaptcha = (callback) => {
 
 export const getSmscode = (params,callback) => {
   return fetch(`${API.SMS_API}/${params.captcha}`, {
-    method: 'GET',
+    method: 'POST',
     credentials: 'include',
     headers: {
+            'Accept': 'application/json',
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify(params)
   })
-  .then(response => response.blob())
-  .then(blob => callbackFunction(callback, blob));
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
 };

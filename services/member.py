@@ -158,6 +158,15 @@ class Member(services.base.service.Service):
                                           unique=unique, do_commit=do_commit)
         return result
 
+    def cv_search(self, keyword):
+        return self.curriculumvitaes.search(keyword, selected=self.config['storageCV'])
+
+    def cv_search_yaml(self, keyword):
+        return self.curriculumvitaes.search_yaml(keyword, selected=self.config['storageCV'])
+
+    def cv_projects(self, id):
+        return [p.name for p in self.projects.values() if id in p.cv_ids()]
+
     def getproject(self, projectname):
         return self.projects[projectname]
 

@@ -33,11 +33,13 @@ class CurrivulumvitaeAPI(Resource):
         else:
             yaml['collected'] = False
         yaml['date'] = utils.builtin.strftime(yaml['date'])
+        cv_projects = member.cv_projects(id)
         en_html = ''
         html = project.cv_gethtml(id)
         if 'enversion' in yaml:
             en_html = project.cv_getmd_en(id)
-        return { 'code': 200, 'data': { 'html': html, 'en_html': en_html, 'yaml_info': yaml } }
+        return { 'code': 200, 'data': { 'html': html, 'en_html': en_html,
+                                        'yaml_info': yaml, 'projects': cv_projects } }
 
 
 class UpdateCurrivulumvitaeInformation(Resource):
@@ -94,8 +96,8 @@ class SearchCVbyTextAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        searchs = dict(project.cv_search(text))
-        yaml_searchs = dict(project.cv_search_yaml(text))
+        searchs = dict(member.cv_search(text))
+        yaml_searchs = dict(member.cv_search_yaml(text))
         for id in yaml_searchs:
             if id in searchs:
                 searchs[id] += yaml_searchs[id]
@@ -103,7 +105,7 @@ class SearchCVbyTextAPI(Resource):
                 searchs[id] = yaml_searchs[id]
         results = sorted(searchs.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
         ids = set([cv[0] for cv in results])
-        results = self.index.filter_ids(results, filterdict, ids, uses=[projectname])
+        results = self.index.filter_ids(results, filterdict, ids)
         results = [result[0] for result in results]
         count = 20
         datas, pages = self.paginate(results, cur_page, count, project)

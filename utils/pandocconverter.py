@@ -10,5 +10,5 @@ def md_to_html(stream):
         new_list.reverse()
         new_str = "\n".join(new_list)
         new_stream = new_stream.replace(match, new_str)
-    md = pypandoc.convert(new_stream, 'html', format='markdown')
+    md = pypandoc.convert_text(new_stream, 'html', format='markdown')
     return md

@@ -237,7 +237,7 @@ class CreateAccountForm extends Component {
           width={'350px'}
           footer={null}
         >
-        <FormItem label="验证码" hasFeedback>
+        <FormItem label="验证码" >
         {getFieldDecorator('captcha', {
             rules: [{
               required: true, message: '验证码是必填项'},{

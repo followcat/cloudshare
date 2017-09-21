@@ -112,6 +112,7 @@ class Member(services.base.service.Service):
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'storageCV': self.config['storageCV'],
                                           'storagePEO': self.config['storagePEO']})
+                tmp_project.cv_private = False
                 self.projects[name] = tmp_project
 
     def add_project(self, name, classify, adminID, autosetup=False, autoupdate=False):
@@ -130,6 +131,7 @@ class Member(services.base.service.Service):
                                                 'autoupdate': autoupdate,
                                                 'storageCV': self.config['storageCV'],
                                                 'storagePEO': self.config['storagePEO']})
+            tmp_project.cv_private = False
             self.projects[name] = tmp_project
             result = True
         return result
@@ -203,6 +205,7 @@ class DefaultMember(Member):
         if self.default_name not in self.projects:
             super(DefaultMember, self)._add_project(self.default_name,
                                                     sources.industry_id.sources)
+        self.projects[self.default_name].cv_secrecy = True
         self.projects[self.default_name]._modelname = self.default_model
 
     def use(self, id):

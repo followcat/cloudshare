@@ -16,6 +16,8 @@ class SimulationCV(services.base.simulation.Simulation,
     }
 
     list_item = {}
+    secrecy_default = False
+    private_default = True
 
     def __init__(self, path, name, storages, iotype='git'):
         """
@@ -29,7 +31,6 @@ class SimulationCV(services.base.simulation.Simulation,
             >>> config.destory()
         """
         super(SimulationCV, self).__init__(path, name, storages, iotype=iotype)
-        self.yaml_private_default = True
 
     def getmd_en(self, id):
         yamlinfo = self.getyaml(id)
@@ -63,11 +64,12 @@ class SimulationCV(services.base.simulation.Simulation,
                 continue
         return result
 
-    def getyaml(self, id, private=None):
-        if private is None:
-             private = self.yaml_private_default
+    def getyaml(self, id, secrecy=None):
+        if secrecy is None:
+             secrecy = self.secrecy_default
         result = super(SimulationCV, self).getyaml(id)
-        if private is True and self.exists(id) is False:
+        if secrecy is True or (self.private_default is True and
+                               self.exists(id) is False):
             result.update(self.yaml_private_key)
         return result
 

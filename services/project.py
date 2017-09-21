@@ -32,7 +32,6 @@ class Project(services.base.service.Service):
 
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
                                                         cvpath, name, cvrepos)
-        self.curriculumvitae.yaml_private_default = False
         self.company = services.simulationco.SimulationCO.autoservice(
                                                         copath, name, [corepo])
         self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
@@ -103,6 +102,22 @@ class Project(services.base.service.Service):
     @property
     def id(self):
         return self.name
+
+    @property
+    def cv_secrecy(self):
+        return self.curriculumvitae.secrecy_default
+
+    @property
+    def cv_private(self):
+        return self.curriculumvitae.private_default
+
+    @cv_secrecy.setter
+    def cv_secrecy(self, value):
+        self.curriculumvitae.secrecy_default = value
+
+    @cv_private.setter
+    def cv_private(self, value):
+        self.curriculumvitae.private_default = value
 
     def getclassify(self):
         return self.config['classify']

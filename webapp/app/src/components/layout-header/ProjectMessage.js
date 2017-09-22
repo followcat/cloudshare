@@ -113,6 +113,7 @@ class ProjectMessage extends Component {
   render() {
     return (
       <div className="cs-header-project">
+        <span>项目：</span>
         {this.getSelectRender()}
       </div>
     );

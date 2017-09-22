@@ -18,7 +18,8 @@ class Members(object):
         self.members = dict()
         for member_path in glob.glob(os.path.join(self.path, '*')):
             if os.path.isdir(member_path):
-                name = os.path.split(member_path)[1]
+                str_name = os.path.split(member_path)[1]
+                name = unicode(str_name, 'utf-8')
                 member = services.member.Member(acc_repos, cv_repos, mult_peo,
                                                 member_path, name)
                 member.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage'})

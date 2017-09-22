@@ -106,7 +106,8 @@ class Member(services.base.service.Service):
         self.projects = dict()
         for path in glob.glob(os.path.join(self.projects_path, '*')):
             if os.path.isdir(path):
-                name = os.path.split(path)[1]
+                str_name = os.path.split(path)[1]
+                name = unicode(str_name, 'utf-8')
                 tmp_project = services.project.Project(path, self.companies,
                                                        [self.curriculumvitaes],
                                                        self.mult_peo, name)

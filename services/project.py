@@ -119,12 +119,19 @@ class Project(services.base.service.Service):
     def cv_private(self, value):
         self.curriculumvitae.private_default = value
 
+    @property
+    def classify(self):
+        result = dict()
+        if 'classify' in self.config
+            result = self.config['classify']
+        return result
+
     def getclassify(self):
-        return self.config['classify']
+        return self.classify
 
     def getindustry(self):
         result = dict()
-        for each in self.config['classify']:
+        for each in self.classify:
             result.update({each: sources.industry_id.sources[each]})
         return result
 

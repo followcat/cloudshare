@@ -10,9 +10,9 @@ class SimulationCV(services.base.simulation.Simulation,
     )
 
     yaml_private_key = {
-        "phone": str(),
-        "email": str(),
-        "name":  str()
+        "phone":                '[*****]',
+        "email":                '[*****]',
+        "name":                 '[*****]'
     }
 
     list_item = {}
@@ -44,7 +44,7 @@ class SimulationCV(services.base.simulation.Simulation,
                 continue
         return html
 
-    def gethtml(self, id):
+    def gethtml(self, id, secrecy=True):
         html = None
         for storage in self.storages:
             try:
@@ -52,6 +52,11 @@ class SimulationCV(services.base.simulation.Simulation,
                 break
             except IOError:
                 continue
+        if secrecy is True and self.ishideprivate(id):
+            info = self.getyaml(id, secrecy=False)
+            for key in self.yaml_private_key:
+                if info[key]:
+                    html = html.replace(info[key], '[*****]')
         return html
 
     def getuniqueid(self, id):
@@ -64,14 +69,24 @@ class SimulationCV(services.base.simulation.Simulation,
                 continue
         return result
 
-    def getyaml(self, id, secrecy=None):
-        if secrecy is None:
-             secrecy = self.secrecy_default
+    def getmd(self, id, secrecy=True):
+        result = super(SimulationCV, self).getmd(id)
+        if secrecy is True and self.ishideprivate(id):
+            info = self.getyaml(id, secrecy=False)
+            for key in self.yaml_private_key:
+                if info[key]:
+                    result = result.replace(info[key], '[***]')
+        return result
+
+    def getyaml(self, id, secrecy=True):
         result = super(SimulationCV, self).getyaml(id)
-        if secrecy is True or (self.private_default is True and
-                               self.exists(id) is False):
+        if secrecy is True and self.ishideprivate(id):
             result.update(self.yaml_private_key)
         return result
 
     def getprivatekeys(self):
         return self.yaml_private_key.keys()
+
+    def ishideprivate(self, id):
+        return self.secrecy_default is True or (self.private_default is True and
+                                                self.exists(id) is False)

@@ -122,7 +122,7 @@ class Project(services.base.service.Service):
     @property
     def classify(self):
         result = dict()
-        if 'classify' in self.config
+        if 'classify' in self.config:
             result = self.config['classify']
         return result
 

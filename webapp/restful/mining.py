@@ -21,7 +21,7 @@ class BaseAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('md_ids', type = list, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def calculate_work_month(self, begin_y, begin_m, end_y, end_m):
         year = int(end_y) - int(begin_y)
@@ -190,7 +190,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
     def __init__(self):
         super(LSIbyJDidAPI, self).__init__()
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('appendcomment', type = bool, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
@@ -225,7 +225,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         self.index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('fromcache', type=bool, location = 'json')
-        self.reqparse.add_argument('project', type=str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
@@ -308,7 +308,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
     def __init__(self):
         super(LSIbyCVidAPI, self).__init__()
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
@@ -333,7 +333,7 @@ class LSIbydocAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbydocAPI, self).__init__()
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
@@ -363,7 +363,7 @@ class SimilarAPI(Resource):
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
@@ -433,7 +433,7 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
         super(ValuablebyJDidAPI, self).__init__()
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
@@ -452,7 +452,7 @@ class ValuablebydocAPI(ValuablebaseAPI):
     def __init__(self):
         super(ValuablebydocAPI, self).__init__()
         self.reqparse.add_argument('doc', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -469,7 +469,7 @@ class ValuableAPI(ValuablebaseAPI):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('doc', location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user

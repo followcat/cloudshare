@@ -56,7 +56,7 @@ class AllSIMSAPI(flask.views.MethodView):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(AllSIMSAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -75,7 +75,7 @@ class ClassifyAPI(flask.views.MethodView):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(ClassifyAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -93,7 +93,7 @@ class IndustryAPI(flask.views.MethodView):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(IndustryAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()

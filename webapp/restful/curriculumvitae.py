@@ -17,7 +17,7 @@ class CurrivulumvitaeAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
@@ -50,7 +50,7 @@ class UpdateCurrivulumvitaeInformation(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('update_info', type = dict, location = 'json')
 
     def put(self):
@@ -82,7 +82,7 @@ class SearchCVbyTextAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.index = flask.current_app.config['SVC_INDEX']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')

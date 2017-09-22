@@ -227,7 +227,7 @@ class SearchCObyTextAPI(Resource):
         super(SearchCObyTextAPI, self).__init__()
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
         self.reqparse.add_argument('current_page', type = int, location = 'json')
         self.reqparse.add_argument('page_size', type = int, location = 'json')
@@ -278,7 +278,7 @@ class SearchCObyKeyAPI(Resource):
         self.reqparse.add_argument('current_page', type = int, location = 'json')
         self.reqparse.add_argument('page_size', type = int, location = 'json')
         self.reqparse.add_argument('search_items', type = list, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
@@ -326,7 +326,7 @@ class CompanyUploadExcelAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('files', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -361,7 +361,7 @@ class CompanyConfirmExcelAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('data', type = list, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user

@@ -29,7 +29,7 @@ class UploadCVAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type = str, location = 'json')
         self.reqparse.add_argument('updates', type = list, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def put(self):
         results = []
@@ -124,7 +124,7 @@ class UploadEnglishCVAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('file', type = str, location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def get(self):
         user = flask.ext.login.current_user

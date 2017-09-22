@@ -13,7 +13,7 @@ class PeopleAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('date', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('unique_id', type = str, location = 'json')
         self.reqparse.add_argument('update_info', type = dict, location = 'json')
 
@@ -72,7 +72,7 @@ class PeopleByCVAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('cv_id', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user

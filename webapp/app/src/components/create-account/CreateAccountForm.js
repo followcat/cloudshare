@@ -164,7 +164,7 @@ class CreateAccountForm extends Component {
             {
               validator: this.checkName,
             }]
-          })(<Input onBlur={this.handleNameBlur}  onFocus={this.handleNameFocus} placeholder="请输入用户名" />)}
+          })(<Input onBlur={this.handleNameBlur}  onFocus={this.handleNameFocus}  />)}
         </FormItem>
         <FormItem
           label="密码"
@@ -245,7 +245,7 @@ class CreateAccountForm extends Component {
             {
               validator: this.checkCaptcha,
             }]
-          })(<Input />)}
+          })(<Input placeholder="请输入右侧验证码"/>)}
         <img src={this.state.image} onClick={this.getCaptchaPng}>
         </img>
         </FormItem>

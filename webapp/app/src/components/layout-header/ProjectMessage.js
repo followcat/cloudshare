@@ -26,9 +26,6 @@ class ProjectMessage extends Component {
   }
 
   getProjectName(childname){
-     //  this.setState({ 
-     //  projectName : childname.name,
-     // });
       this.projectName=childname.name;
     }
 

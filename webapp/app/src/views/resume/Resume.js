@@ -301,7 +301,6 @@ class Resume extends Component {
           panelLoading: false,
           project: json.data.projects
         });
-        console.log(json.data.projects);
         History.write({
           id: id,
           name: yaml_info.name

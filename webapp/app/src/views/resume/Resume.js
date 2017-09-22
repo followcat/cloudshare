@@ -15,7 +15,8 @@ import ResumeSimilar from './ResumeSimilar';
 import {
   Tabs,
   Spin,
-  message
+  message,
+  Card
 } from 'antd';
 
 import {
@@ -46,6 +47,7 @@ class Resume extends Component {
       dataSource: {},
       html: '',
       enHTML: '',
+      project: '',
       collected: false,
       panelLoading: false,
       confirmLoading: false,
@@ -296,9 +298,10 @@ class Resume extends Component {
           enHTML: en_html,
           dataSource: yaml_info,
           collected: yaml_info.collected,
-          panelLoading: false
+          panelLoading: false,
+          project: json.data.projects
         });
-
+        console.log(json.data.projects);
         History.write({
           id: id,
           name: yaml_info.name
@@ -364,7 +367,8 @@ class Resume extends Component {
       tag,
       tracking,
       comment,
-      similar
+      similar,
+      project
     } = this.state;
 
     const uploadProps = {
@@ -425,6 +429,9 @@ class Resume extends Component {
             </Tabs>
           </div>
           <div className="resume-side">
+            <Card title="所属项目">
+            <span>{project}</span>
+            </Card>
             <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
             <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />

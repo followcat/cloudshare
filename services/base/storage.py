@@ -31,7 +31,7 @@ class BaseStorage(services.base.service.Service):
         """
         return id in self.ids
 
-    def unique(self, id):
+    def unique(self, bsobj):
         """
             >>> import shutil
             >>> import core.basedata
@@ -59,6 +59,7 @@ class BaseStorage(services.base.service.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
+        id = bsobj.ID
         return not self.exists(id)
 
     def generate_info_template(self):
@@ -131,7 +132,7 @@ class BaseStorage(services.base.service.Service):
         return True
 
     def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=True, do_commit=True):
-        if unique is True and self.unique(bsobj.name) is False:
+        if unique is True and self.unique(bsobj) is False:
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(bsobj.name)

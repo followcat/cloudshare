@@ -339,6 +339,12 @@ class Account(services.base.storage.BaseStorage):
         super(Account, self).__init__(path, name=name,
                                       searchengine=searchengine, iotype=iotype)
 
+    def unique(self, bsobj):
+        id = bsobj.ID
+        email = bsobj.metadata['email']
+        phone = bsobj.metadata['phone']
+        return id not in self.ids and email not in self.EMAILS and phone not in self.PHONES
+
     def getinfo_byname(self, name):
         return self.USERS[name]
 
@@ -484,6 +490,22 @@ class Account(services.base.storage.BaseStorage):
         for id in self.ids:
             info = self.getinfo(id)
             result[info['name']] = info
+        return result
+
+    @property
+    def PHONES(self):
+        result = dict()
+        for id in self.ids:
+            info = self.getinfo(id)
+            result[info['phone']] = info
+        return result
+
+    @property
+    def EMAILS(self):
+        result = dict()
+        for id in self.ids:
+            info = self.getinfo(id)
+            result[info['email']] = info
         return result
 
     def get_user_list(self):

@@ -22,6 +22,8 @@ def initialize(app):
     api.add_resource(SessionAPI, '/api/session')
     api.add_resource(PasswordAPI, '/api/password')
     api.add_resource(UserAPI, '/api/user', endpoint = 'user')
+    api.add_resource(ExistsEmailAPI, '/api/existsemail/<string:email>', endpoint = 'existsemail')
+    api.add_resource(ExistsPhoneAPI, '/api/existsphone/<string:phone>', endpoint = 'existsphone')
     api.add_resource(AccountAPI, '/api/account/<string:name>', endpoint = 'account')
     api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')
     api.add_resource(AccountHistoryAPI, '/api/accounthistory', endpoint = 'accounthistory')

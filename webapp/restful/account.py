@@ -31,6 +31,28 @@ class UserAPI(Resource):
         return { 'code': 200, 'result': result }
 
 
+class ExistsEmailAPI(Resource):
+
+    def __init__(self):
+        super(ExistsEmailAPI, self).__init__()
+        self.svc_account = flask.current_app.config['SVC_ACCOUNT']
+
+    def get(self, email):
+        result = email in self.svc_account.EMAILS
+        return { 'code': 200, 'result': result}
+
+
+class ExistsPhoneAPI(Resource):
+
+    def __init__(self):
+        super(ExistsPhoneAPI, self).__init__()
+        self.svc_account = flask.current_app.config['SVC_ACCOUNT']
+
+    def get(self, phone):
+        result = phone in self.svc_account.PHONES
+        return { 'code': 200, 'result': result}
+
+
 class AccountAPI(webapp.restful.captchaverify.SMSAPI):
 
     def __init__(self):

@@ -3,7 +3,8 @@ class MultiPeople(object):
     def __init__(self, svc_peos):
         self.peoples = svc_peos
 
-    def unique(self, id):
+    def unique(self, peoobj):
+        id = peoobj.ID
         return not self.exists(id)
 
     def exists(self, id):

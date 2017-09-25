@@ -104,7 +104,7 @@ class UploadCVAPI(Resource):
         if not dataobj.metadata['name']:
             dataobj.metadata['name'] = utils.chsname.name_from_filename(filename)
         unique_peo = ('unique_id' not in yamlinfo or
-                      self.svc_mult_peo.unique(dataobj.metadata['unique_id']))
+                      self.svc_mult_peo.unique(dataobj))
         upload[user.name][filename] = dataobj
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,

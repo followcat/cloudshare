@@ -48,6 +48,10 @@ class Simulation(services.base.storage.BaseStorage):
     def saveids(self):
         self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))
 
+    def unique(self, bsobj):
+        id = bsobj.ID
+        return id not in self.ids
+
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base
         return id in self.ids
@@ -79,8 +83,8 @@ class Simulation(services.base.storage.BaseStorage):
     def add(self, bsobj, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
         result = False
-        id = bsobj.ID
-        if (unique and not self.exists(id)) or not unique:
+        if (unique and self.unique(bsobj)) or not unique:
+            id = bsobj.ID
             self._add(id)
             filenames = []
             filedatas = []

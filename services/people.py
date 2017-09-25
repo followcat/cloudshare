@@ -32,7 +32,7 @@ class People(services.base.storage.BaseStorage):
 
     def add(self, peopobj, committer=None, unique=True, yamlfile=True, do_commit=True):
         name = core.outputstorage.ConvertName(peopobj.name)
-        if unique is True and self.unique(peopobj.name) is not True:
+        if unique is True and self.unique(peopobj) is False:
             savedobj = self.getyaml(name)
             if peopobj.metadata['cv'][0] in savedobj['cv']:
                 return False

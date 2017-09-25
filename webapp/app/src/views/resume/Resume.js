@@ -14,6 +14,7 @@ import ResumeSimilar from './ResumeSimilar';
 
 import {
   Tabs,
+  Tag,
   Spin,
   message,
   Card
@@ -429,7 +430,7 @@ class Resume extends Component {
           </div>
           <div className="resume-side">
             <Card title="所属项目">
-            <span>{project}</span>
+            <Tag color="blue">{project}</Tag>
             </Card>
             <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />

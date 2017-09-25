@@ -21,6 +21,7 @@ class Member(services.base.service.Service):
     config_file = 'config.yaml'
 
     default_model = 'default'
+    max_project_nums = 3
 
     def __init__(self, acc_repos, cv_repos,
                  mult_peo, path, name, iotype='git'):
@@ -122,7 +123,7 @@ class Member(services.base.service.Service):
 
     def add_project(self, name, classify, adminID, autosetup=False, autoupdate=False):
         result = False
-        if self.check_admin(adminID):
+        if self.check_admin(adminID) and len(self.projects) < self.max_project_nums:
             result = self._add_project(name, classify, autosetup=autosetup, autoupdate=autoupdate)
         return result
 

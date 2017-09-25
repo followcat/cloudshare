@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { checkAccount } from 'request/account';
 import { getCaptcha, getSmscode } from 'request/captchaverify';
+import { checkEmail, checkPhone } from 'request/checkregister';
 
 import {
   Form,
@@ -131,6 +132,40 @@ class CreateAccountForm extends Component {
     }
   }
 
+  checkEmail= (rule, value, callback) => {
+    const form = this.props.form;
+    if (value) {
+      checkEmail({
+       email: form.getFieldValue('email')
+      },(json) => {
+       if (json.result === true) {
+          callback('邮箱已被注册');
+       } else {
+          callback();
+       }
+     });
+    } else {
+      callback();
+    }
+  }
+
+  checkPhone= (rule, value, callback) => {
+    const form = this.props.form;
+    if (value) {
+      checkPhone({
+       phone: form.getFieldValue('phone')
+      },(json) => {
+       if (json.result === true) {
+          callback('手机已被注册');
+       } else {
+          callback();
+       }
+     });
+    } else {
+      callback();
+    }
+  }
+
   checkConfirm = (rule, value, callback) => {
     const form = this.props.form;
     if (value && this.state.confirmDirty) {
@@ -228,8 +263,10 @@ class CreateAccountForm extends Component {
             rules: [{
               type: 'email', message: '请输入正确邮箱地址'
             },{
-              required: true, message: '邮箱地址是必填项'}
-            ],
+              required: true, message: '邮箱地址是必填项'
+            },{
+              validator: this.checkEmail,
+            }],
           })(
             <Input />
           )}
@@ -237,8 +274,13 @@ class CreateAccountForm extends Component {
         <FormItem label="联系电话"  hasFeedback>
           {getFieldDecorator('phone',{
             rules: [{
-              required: true, message: '手机号码是地址必填项',},
-              {len: 11,message: '手机长度为11位'}
+              required: true, message: '手机号码是必填项'
+            },
+              {
+              len: 11,message: '手机长度为11位'
+            },{
+              validator: this.checkPhone,
+            }
             ],
           })(
             <Input />

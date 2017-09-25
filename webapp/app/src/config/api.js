@@ -2,6 +2,10 @@
 const HOST = '';
 
 export const API = {
+  EXISTS_EMAIL_API : `${HOST}/api/existsemail`,
+
+  EXISTS_PHONE_API :`${HOST}/api/existsphone`,
+
   SMS_API :`${HOST}/api/sms`,
 
   CAPTCHA_API :`${HOST}/api/captcha`,

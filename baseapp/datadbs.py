@@ -18,7 +18,9 @@ SVC_PEO_REPO = services.people.People(SVC_CV_REPO, 'repo/PEO', 'peorepo', iotype
 
 SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')
 SVC_PEO_STO = services.people.People(SVC_CV_STO, 'storage/PEO', 'peostorage', iotype='base')
-SVC_CV_INDIV = services.curriculumvitae.CurriculumVitae('indiv/CV', 'cvindividual', iotype='base')
+SVC_CV_INDIV = services.curriculumvitae.CurriculumVitae('indiv/CV', 'cvindividual',
+                                                        searchengine=baseapp.searchengine.ES,
+                                                        iotype='base')
 SVC_PEO_INDIV = services.people.People(SVC_CV_INDIV, 'indiv/PEO', 'peoindividual', iotype='base')
 SVC_MULT_PEO = services.multipeople.MultiPeople([SVC_PEO_REPO, SVC_PEO_STO, SVC_PEO_INDIV])
 

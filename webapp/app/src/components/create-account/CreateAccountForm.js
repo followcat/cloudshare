@@ -28,6 +28,8 @@ class CreateAccountForm extends Component {
     image: null,
     smscode: '',
     visible:false,
+    time: 60,
+    smsok: false,
   };
 
   handleCancel = (e) => {
@@ -107,12 +109,15 @@ class CreateAccountForm extends Component {
           callback();
           this.setState({
           visible : false,
+          smsok: true,
+          time: 60,
           });
        } else {
-          this.getCaptchaPng();
           callback('验证码错误，请重新输入!');
        }
      });
+      form.resetFields(['captcha']);
+      this.getCaptchaPng();
     } else {callback('验证码长度必须4位')}
   }
 
@@ -142,6 +147,27 @@ class CreateAccountForm extends Component {
         });
       }
     });
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(
+      () => {
+        var num = this.state.time;
+        num -= 1;
+        if (this.state.time <= 0)
+        this.setState({
+          smsok: false
+        });
+        this.setState({
+          time: num
+        });
+      }, 1000);
+  }
+
+  componentWillUnmount() {
+    // 如果存在this.timer，则使用clearTimeout清空。
+    // 如果你使用多个timer，那么用多个变量，或者用个数组来保存引用，然后逐个clear
+    this.timer && clearInterval(this.timer);
   }
 
   componentWillMount() {
@@ -226,9 +252,15 @@ class CreateAccountForm extends Component {
           })(
             <Input />
           )}
+          { !this.state.smsok?
           <Button type="primary" onClick={this.handlePhoneClick}>
             {"获取验证码"}
           </Button>
+          :
+           <Button type="primary" onClick={this.handlePhoneClick} disabled>
+            {this.state.time}
+          </Button>
+          }
         </FormItem>
         <Modal
           visible={this.state.visible}

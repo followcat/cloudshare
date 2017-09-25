@@ -82,7 +82,6 @@ class ProjectMessage extends Component {
           closable={false}
           footer={<div style={{ padding: 4 }}></div>}
         >
-          <label>项目列表: </label>
           {selectElement}
         </Modal>
       );

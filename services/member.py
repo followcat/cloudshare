@@ -18,7 +18,9 @@ class Member(services.base.service.Service):
     ACC_PATH = 'accounts'
     CV_PATH = 'curriculumvitaes'
     CO_PATH = 'companies'
-    config_file = 'config.yaml' 
+    config_file = 'config.yaml'
+
+    default_model = 'default'
 
     def __init__(self, acc_repos, cv_repos,
                  mult_peo, path, name, iotype='git'):
@@ -114,6 +116,8 @@ class Member(services.base.service.Service):
                 tmp_project.setup(config={'storageCV': self.config['storageCV'],
                                           'storagePEO': self.config['storagePEO']})
                 tmp_project.cv_private = False
+                if not tmp_project.config['autosetup'] and not tmp_project.config['autoupdate']:
+                    tmp_project._modelname = self.default_model
                 self.projects[name] = tmp_project
 
     def add_project(self, name, classify, adminID, autosetup=False, autoupdate=False):
@@ -133,6 +137,7 @@ class Member(services.base.service.Service):
                                                 'storageCV': self.config['storageCV'],
                                                 'storagePEO': self.config['storagePEO']})
             tmp_project.cv_private = False
+            tmp_project._modelname = self.default_model
             self.projects[name] = tmp_project
             result = True
         return result
@@ -203,7 +208,6 @@ class Member(services.base.service.Service):
 class DefaultMember(Member):
 
     default_name = 'default'
-    default_model = 'medical'
 
     def __init__(self, acc_repos, cv_repos, mult_peo, path,
                  name='default', iotype='git'):

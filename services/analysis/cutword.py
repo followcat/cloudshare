@@ -9,7 +9,7 @@ class Cutword(services.base.storage.BaseStorage):
 
     commitinfo = 'Cutword'
 
-    def unique(docobj):
+    def unique(self, docobj):
         return not self.exists(docobj.name)
 
     def datas(self):

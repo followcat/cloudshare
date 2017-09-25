@@ -109,10 +109,11 @@ class CreateAccountForm extends Component {
           visible : false,
           });
        } else {
-          this.getCaptchaPng();
           callback('验证码错误，请重新输入!');
        }
      });
+      form.resetFields(['captcha']);
+      this.getCaptchaPng();
     } else {callback('验证码长度必须4位')}
   }
 
@@ -142,6 +143,10 @@ class CreateAccountForm extends Component {
         });
       }
     });
+  }
+
+  componentDidMount() {
+
   }
 
   componentWillMount() {

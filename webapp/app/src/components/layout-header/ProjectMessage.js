@@ -53,6 +53,8 @@ class ProjectMessage extends Component {
       title,
     } = this.props;
     let selectElement = (
+      <span>
+      项目:
       <Select
         className="cs-header-project-selection"
         defaultValue={ project }
@@ -64,6 +66,7 @@ class ProjectMessage extends Component {
           );
         })}
       </Select>
+      </span>
     );
     if(isMember !== '' )  {
     if (isMember === true ) {
@@ -113,7 +116,6 @@ class ProjectMessage extends Component {
   render() {
     return (
       <div className="cs-header-project">
-        <span>项目：</span>
         {this.getSelectRender()}
       </div>
     );

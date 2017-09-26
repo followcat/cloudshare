@@ -1,6 +1,9 @@
 import services.base.simulation
 import services.curriculumvitae
 
+import utils.pandocconverter
+import extractor.information_explorer
+
 
 class SimulationCV(services.base.simulation.Simulation,
                    services.curriculumvitae.CurriculumVitae):
@@ -44,19 +47,21 @@ class SimulationCV(services.base.simulation.Simulation,
                 continue
         return html
 
+    def cleanprivate(self, id, source):
+        result = source
+        hidden = '[****]'
+        info = self.getyaml(id, secrecy=False)
+        for key in self.yaml_private_key:
+            if info[key]:
+                result = result.replace(info[key], hidden+' '*(len(info[key])-len(hidden)))
+            elif key == 'phone':
+                value = extractor.information_explorer.get_phone(result)
+                result = result.replace(value, hidden+' '*(len(value)-len(hidden)))
+        return result
+
     def gethtml(self, id, secrecy=True):
-        html = None
-        for storage in self.storages:
-            try:
-                html = storage.gethtml(id)
-                break
-            except IOError:
-                continue
-        if secrecy is True and self.ishideprivate(id):
-            info = self.getyaml(id, secrecy=False)
-            for key in self.yaml_private_key:
-                if info[key]:
-                    html = html.replace(info[key], '[*****]')
+        md = self.getmd(id, secrecy=secrecy)
+        html = utils.pandocconverter.md_to_html(md)
         return html
 
     def getuniqueid(self, id):
@@ -72,10 +77,7 @@ class SimulationCV(services.base.simulation.Simulation,
     def getmd(self, id, secrecy=True):
         result = super(SimulationCV, self).getmd(id)
         if secrecy is True and self.ishideprivate(id):
-            info = self.getyaml(id, secrecy=False)
-            for key in self.yaml_private_key:
-                if info[key]:
-                    result = result.replace(info[key], '[***]')
+            result = self.cleanprivate(id, result)
         return result
 
     def getyaml(self, id, secrecy=True):

@@ -21,7 +21,7 @@ demoapp.restful.initializtion.initialize(app)
 
 
 if __name__ == '__main__':
-    app.debug = True
+    app.debug = False
     if not app.debug:
         import logging
         logger = logging.getLogger()

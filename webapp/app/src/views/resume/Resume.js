@@ -50,7 +50,7 @@ class Resume extends Component {
       dataSource: {},
       html: '',
       enHTML: '',
-      project: '',
+      project: [],
       collected: false,
       panelLoading: false,
       confirmLoading: false,
@@ -73,7 +73,7 @@ class Resume extends Component {
     this.handSelectProject = this.handSelectProject.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const id = this.props.params.resumeId;
 
     this.setState({
@@ -301,7 +301,7 @@ class Resume extends Component {
       id: id
     }, json => {
       if (json.code === 200) {
-        const { html, en_html, yaml_info } = json.data;
+        const { html, en_html, yaml_info, projects } = json.data;
         
         this.setState({
           html: html,
@@ -309,7 +309,7 @@ class Resume extends Component {
           dataSource: yaml_info,
           collected: yaml_info.collected,
           panelLoading: false,
-          project: json.data.projects
+          project: projects
         });
         History.write({
           id: id,
@@ -439,7 +439,12 @@ class Resume extends Component {
           </div>
           <div className="resume-side">
             <Card title="所属项目">
-            <Tag color="blue" onClick={this.handSelectProject}>{project}</Tag>
+            { project.map(item => {
+                return (
+                  <Tag color="blue" onClick={this.handSelectProject}>{item}</Tag>
+                  );
+              })
+            }
             </Card>
             <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />

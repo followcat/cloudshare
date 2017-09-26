@@ -272,8 +272,8 @@ class CreateAccountForm extends Component {
           )}
         </FormItem>
         <FormItem label="联系电话"  hasFeedback>
-          {getFieldDecorator('phone',{
-            rules: [{
+          {getFieldDecorator('phone',
+          {rules: [{
               required: true, message: '手机号码是必填项'
             },
               {

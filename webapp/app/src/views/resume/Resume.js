@@ -3,8 +3,10 @@ import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
 import { Layout } from 'views/layout';
+
 import ResumeContent from 'components/resume-content';
 import Summary from 'components/summary';
+
 import ResumeHeader from './ResumeHeader';
 import ResumeToolMenu from './ResumeToolMenu';
 import ResumeTag from './ResumeTag';
@@ -68,6 +70,7 @@ class Resume extends Component {
     this.getResumeDataSource = this.getResumeDataSource.bind(this);
     this.getResumeIDList = this.getResumeIDList.bind(this);
     this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
+    this.handSelectProject = this.handSelectProject.bind(this);
   }
 
   componentDidMount() {
@@ -80,6 +83,12 @@ class Resume extends Component {
     this.getResumeDataSource(id);
     this.getResumeIDList(id);
     this.getSimilarDataSource(id);
+  }
+
+  handSelectProject(e){
+    const { project } = this.state;
+    StorageUtil.set('_pj',e.target.innerText);
+    window.location.reload();
   }
 
   /**
@@ -430,7 +439,7 @@ class Resume extends Component {
           </div>
           <div className="resume-side">
             <Card title="所属项目">
-            <Tag color="blue">{project}</Tag>
+            <Tag color="blue" onClick={this.handSelectProject}>{project}</Tag>
             </Card>
             <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />

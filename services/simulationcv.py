@@ -49,13 +49,14 @@ class SimulationCV(services.base.simulation.Simulation,
 
     def cleanprivate(self, id, source):
         result = source
+        hidden = '[****]'
         info = self.getyaml(id, secrecy=False)
         for key in self.yaml_private_key:
             if info[key]:
-                result = result.replace(info[key], '[****]'+' '*(len(info[key])-len('[****]')))
+                result = result.replace(info[key], hidden+' '*(len(info[key])-len(hidden)))
             elif key == 'phone':
                 value = extractor.information_explorer.get_phone(result)
-                result = result.replace(value, '[****]'+' '*(len(value)-len('[****]')))
+                result = result.replace(value, hidden+' '*(len(value)-len(hidden)))
         return result
 
     def gethtml(self, id, secrecy=True):

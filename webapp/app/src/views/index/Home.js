@@ -12,6 +12,7 @@ import { getFeature } from 'request/feature';
 import StorageUtil from 'utils/storage';
 import { signIn } from 'request/sign';
 
+import bg  from 'image/bg.jpg';
 
 class Home extends Component {
   constructor() {
@@ -67,6 +68,7 @@ class Home extends Component {
     });
   }
 
+
   render() {
     return (
       <div className="viewport">
@@ -85,6 +87,10 @@ class Home extends Component {
         </Header>
         <div className="cs-container">
           <div className="cs-container-center">
+            <div className="cs-container-center-info">
+              <h1>最好的智能速配简历平台</h1>
+              <p>智能深度分析职位，可视化对比数据，云招聘管理共享平台。</p>
+            </div>
             <SignIn
               title="登入"
               btnText="登入"

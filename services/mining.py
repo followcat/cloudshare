@@ -243,7 +243,7 @@ class Mining(object):
         self.lsi_model = dict()
         for project in self.projects.values():
             service = project.curriculumvitae
-            lsi_path = os.path.join(self.path, project.name, 'model')
+            lsi_path = os.path.join(self.path, project.modelname, 'model')
             lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer,
                                                 no_above=1./3, config=project.config)
             try:

@@ -89,7 +89,7 @@ class Home extends Component {
           <div className="cs-container-center">
             <div className="cs-container-center-info">
               <h1>最好的智能速配简历平台</h1>
-              <p>智能深度分析职位，可视化对比数据，云招聘管理共享平台。</p>
+              <p>可视化对比数据<br />智能深度分析职位<br />云招聘管理共享平台</p>
             </div>
             <SignIn
               title="登入"

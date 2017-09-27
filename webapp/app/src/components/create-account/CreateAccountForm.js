@@ -216,7 +216,6 @@ class CreateAccountForm extends Component {
     return (
       <Form layout="horizontal" onKeyPress={this.handleKeyPress}>
         <FormItem
-          label="用户名"
           id="account"
           hasFeedback
         >
@@ -225,10 +224,9 @@ class CreateAccountForm extends Component {
             {
               validator: this.checkName,
             }]
-          })(<Input onBlur={this.handleNameBlur}  onFocus={this.handleNameFocus}  />)}
+          })(<Input onBlur={this.handleNameBlur}  onFocus={this.handleNameFocus}  placeholder="用户名" />)}
         </FormItem>
         <FormItem
-          label="密码"
           hasFeedback
         >
           {getFieldDecorator('password', {
@@ -238,11 +236,10 @@ class CreateAccountForm extends Component {
               validator: this.checkConfirm,
             }],
           })(
-            <Input type="password" />
+            <Input type="password" placeholder="密码"/>
           )}
         </FormItem>
         <FormItem
-          label="确认密码"
           hasFeedback
         >
           {getFieldDecorator('confirm', {
@@ -252,11 +249,10 @@ class CreateAccountForm extends Component {
               validator: this.checkPassword,
             }],
           })(
-            <Input type="password" onBlur={this.handleConfirmBlur} />
+            <Input type="password" onBlur={this.handleConfirmBlur} placeholder="确认密码" />
           )}
         </FormItem>
         <FormItem
-          label="电子邮箱"
           hasFeedback
         >
           {getFieldDecorator('email', {
@@ -268,10 +264,10 @@ class CreateAccountForm extends Component {
               validator: this.checkEmail,
             }],
           })(
-            <Input />
+            <Input placeholder="电子邮箱"/>
           )}
         </FormItem>
-        <FormItem label="联系电话"  hasFeedback>
+        <FormItem  hasFeedback>
           {getFieldDecorator('phone',
           {rules: [{
               required: true, message: '手机号码是必填项'
@@ -283,16 +279,16 @@ class CreateAccountForm extends Component {
             }
             ],
           })(
-            <Input />
+            <Input placeholder="手机号码" />
           )}
         </FormItem>
-        <FormItem label="短信验证码">
+        <FormItem >
           {getFieldDecorator('smscode',{
             rules: [{
               required: true, message: '短信验证码是地址必填项',}
             ],
           })(
-            <Input />
+            <Input placeholder="短信验证码" />
           )}
           { !this.state.smsok?
           <Button type="primary" onClick={this.handlePhoneClick}>

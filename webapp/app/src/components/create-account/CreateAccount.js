@@ -18,7 +18,7 @@ class CreateAccount extends Component {
         title={props.title}
         bordered={props.bordered}
         className={classes}
-        style={{border: '1px solid #9e9797'}}
+        style={{border: '5px solid #e9e9e9', 'border-radius': '10px'}}
       >
         <CreateAccountForm {...props} />
       </Card>

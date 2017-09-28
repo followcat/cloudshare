@@ -205,10 +205,6 @@ class CreateAccountForm extends Component {
     this.timer && clearInterval(this.timer);
   }
 
-  componentWillMount() {
-    this.getCaptchaPng();
-  }
-
   render() {
     const { wrapperCol, btnText } = this.props,
           { getFieldDecorator } = this.props.form;

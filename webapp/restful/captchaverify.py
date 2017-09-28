@@ -29,23 +29,22 @@ class CaptchaAPI(Resource):
     def updatecache(self, id, prefix):
         code = ''.join([random.SystemRandom().choice(self.code_type)
                         for _ in range(self.code_numbers)])
-        cachename = self.hashname(flask.session['_id'], prefix)
+        cachename = self.hashname(flask.session.sid, prefix)
         self.cache.set(cachename, code, timeout=self.cache_timeout)
         return code
 
     def getcache(self, id, prefix):
-        cachename = self.hashname(flask.session['_id'], prefix)
+        cachename = self.hashname(flask.session.sid, prefix)
         code = self.cache.get(cachename)
         return code
 
     def deletecache(self, id, prefix):
-        cachename = self.hashname(flask.session['_id'], prefix)
+        cachename = self.hashname(flask.session.sid, prefix)
         self.cache.delete(cachename)
 
     def get(self):
-        assert '_id' in flask.session
         self.imagecaptcha = captcha.image.ImageCaptcha()
-        code = self.updatecache(flask.session['_id'], self.prefix)
+        code = self.updatecache(flask.session.sid, self.prefix)
         imagecsIO = self.imagecaptcha.generate(code)
         send = flask.send_file(imagecsIO, attachment_filename="captcha.png",
                                add_etags=False, as_attachment=True,
@@ -81,11 +80,11 @@ class SMSAPI(CaptchaAPI):
         result = False
         args = self.reqparse.parse_args()
         phone = args['phone']
-        cachecode = self.getcache(flask.session['_id'], CaptchaAPI.prefix)
+        cachecode = self.getcache(flask.session.sid, CaptchaAPI.prefix)
         if code.lower() == cachecode.lower():
             result = True
             if cachecode is not None:
-                smscode = self.updatecache(flask.session['_id'], self.prefix)
+                smscode = self.updatecache(flask.session.sid, self.prefix)
                 business_id = uuid.uuid1()
                 params = "{\"code\":\"%s\"}"%smscode
                 self.smslogger.debug(params)
@@ -95,5 +94,5 @@ class SMSAPI(CaptchaAPI):
                                            self.sign_name, self.template_code, params)
                     self.smslogger.info(' '.join([phone, response.__str__()]))
                 result = True
-        self.deletecache(flask.session['_id'], CaptchaAPI.prefix)
+        self.deletecache(flask.session.sid, CaptchaAPI.prefix)
         return { 'code': 200, 'result': result }

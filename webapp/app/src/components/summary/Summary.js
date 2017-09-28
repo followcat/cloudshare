@@ -2,6 +2,10 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Card } from 'antd';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 const TOTAL_COLUMN = 24;  // 栅栏格一行总格子数
 
 const groupArray = (data, number) => {
@@ -27,11 +31,31 @@ const groupArray = (data, number) => {
   return list;
 };
 
+  const replaceName = (name) => {
+    switch (name){
+      case 'name' :  return language.NAME; break;
+      case 'email' :  return language.EMAIL; break;
+      case 'gender' :  return language.GENDER; break;
+      case 'phone' :  return language.PHONE; break;
+      case 'age' :  return language.AGE; break;
+      case 'education' :  return language.EDUCATION; break;
+      case 'marital_status' :  return language.MARITAL_STATUS; break;
+      case 'school' :  return language.SCHOOL; break;
+      case 'position' :  return language.POSITION; break;
+      case 'company' :  return language.COMPANY; break;
+      case 'experience' :  return language.EXPERIENCE; break;
+      case 'experience' :  return language.EXPERIENCE; break;
+      case 'education_history' :  return language.EDUCATION_HISTORY; break;
+      case 'classify' :  return language.CLASSIFY; break;
+    }
+  }
+
 class Summary extends Component {
   render() {
     const props = this.props,
           data = groupArray(props.dataSource, props.number),
           colValue = TOTAL_COLUMN / props.number;
+          console.log(data);
 
     return (
       <Card className={props.prefixCls}>
@@ -49,7 +73,7 @@ class Summary extends Component {
                         span={10}
                         className={`${props.prefixCls}-label`}
                       >
-                        {`${v.name}: `}
+                        {`${replaceName(v.name)}: `}
                       </Col>  
                       <Col span={14}>
                         {v.value}
@@ -66,7 +90,7 @@ class Summary extends Component {
                   span={5}
                   className={`${props.prefixCls}-label`}
                 >
-                  {`${dataItem.name}: `}
+                  {`${replaceName(dataItem.name)}: `}
                 </Col>
                 <Col span={19}>
                   {dataItem.value.reverse().map((valueItem, index) => {

@@ -176,7 +176,8 @@ class FilterForm extends Component {
                 wrapperCol={{ span: 19 }}
               >
                 {getFieldDecorator('uses', {
-                  initialValue: textarea ? [] : projects.concat(classify),
+                  // textarea ? [] : 默认数据库
+                  initialValue: projects.concat(classify),
                   rules: [{ type: 'array' }]
                 })(<Select multiple={true}>
                     <OptGroup key='projects' label="项目数据库">

@@ -42,7 +42,7 @@ class CreateAccountForm extends Component {
   handlePhoneClick(e) {
      e.preventDefault();
   this.props.form.validateFields(
-    ['phone'],(errors, values) => {
+    ['name','password','confirm','email','phone',],(errors, values) => {
       if (!errors) {
         this.setState({
           visible : true,

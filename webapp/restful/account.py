@@ -78,7 +78,7 @@ class AccountAPI(webapp.restful.captchaverify.SMSAPI):
         email = args['email']
         smscode = args['smscode']
         password = args['password']
-        cachecode = self.getcache(flask.session['_id'], self.prefix)
+        cachecode = self.getcache(flask.session.sid, self.prefix)
         result = { 'code': 400, 'message': 'SMS code verify failed.'}
         if cachecode is not None and smscode.lower() == cachecode.lower():
             result = { 'code': 400, 'message': 'This username is existed.'}
@@ -88,7 +88,7 @@ class AccountAPI(webapp.restful.captchaverify.SMSAPI):
                 msgobj = self.svc_msg.baseobj({'id': bsobj.ID.base})
                 msgresult = self.svc_msg.add(msgobj, committer=name)
                 if msgresult:
-                    self.deletecache(flask.session['_id'], self.prefix)
+                    self.deletecache(flask.session.sid, self.prefix)
                 result = { 'code': 200, 'message': 'Create user successed.','redirect_url': '/'}
         return result
 

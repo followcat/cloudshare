@@ -82,8 +82,8 @@ class SimulationCV(services.base.simulation.Simulation,
         return result
 
     def getyaml(self, id, secrecy=True):
-        result = super(SimulationCV, self).getyaml(id)
-        result['secrecy'] = False
+        result = {'secrecy': False}
+        result.update(super(SimulationCV, self).getyaml(id))
         if secrecy is True and self.ishideprivate(id):
             result.update(self.yaml_private_key)
             result['secrecy'] = True

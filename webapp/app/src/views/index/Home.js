@@ -13,7 +13,6 @@ import { getFeature } from 'request/feature';
 import StorageUtil from 'utils/storage';
 import { signIn } from 'request/sign';
 
-import bg  from 'image/bg.jpg';
 
 const TabPane = Tabs.TabPane;
 
@@ -110,8 +109,8 @@ class Home extends Component {
         <div className="cs-container">
           <div className="cs-container-center">
             <div className="cs-container-center-info">
-              <h1>最好的智能速配简历平台</h1>
-              <p>可视化对比数据<br />智能深度分析职位<br />云招聘管理共享平台</p>
+              <h1>最智能速配简历平台</h1>
+              <p>职位智能深度分析<br />可视化数据对比<br />云招聘共享管理</p>
             </div>
             <div className="cs-container-center-flow">
               <Tabs defaultActiveKey="1" animated={false} tabBarStyle={{borderBottom: '0px solid',marginBottom: '10px'}}>

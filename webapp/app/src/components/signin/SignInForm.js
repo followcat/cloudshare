@@ -15,12 +15,8 @@ class SignInForm extends Component {
     super();
     this.handleClick = this.handleClick.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
-    this.handleRegisterClick = this.handleRegisterClick.bind(this);
   }
 
-  handleRegisterClick(){
-    window.location.href = '/createaccount';
-  }
   handleClick(e) {
     // e.preventDefault();
 
@@ -63,7 +59,6 @@ class SignInForm extends Component {
           {btnText}
           </Button>
           </FormItem>
-          Or <a href="/createaccount">创建用户!</a>
       </Form>
     );
   }

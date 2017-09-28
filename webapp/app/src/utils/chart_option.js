@@ -130,7 +130,7 @@ const getRadarOption = (max, data, anonymized = false, cutNumber = 20) => {
       }),
     }],
   };
-
+  console.log(option)
   return option;
 };
 

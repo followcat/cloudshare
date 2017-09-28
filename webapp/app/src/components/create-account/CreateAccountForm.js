@@ -41,6 +41,7 @@ class CreateAccountForm extends Component {
 
   handlePhoneClick(e) {
      e.preventDefault();
+     this.getCaptchaPng();
   this.props.form.validateFields(
     ['name','password','confirm','email','phone',],(errors, values) => {
       if (!errors) {

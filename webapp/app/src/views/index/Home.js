@@ -136,6 +136,9 @@ class Home extends Component {
               </div>
           </div>
         </div>
+        <div className="copyright">
+            <p>Copyright©2015 广州汇人达计算机科技有限公司 粤ICP15006654号-1 </p>  
+        </div>
       </div>
     );
   }

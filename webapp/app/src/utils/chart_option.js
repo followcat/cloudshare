@@ -23,6 +23,7 @@ const processString = (beginIndex, cutNumber, string) => {
  */
 const getLegend = (data) => {
   return data.map(item => {
+    item.name = item.secrecy ? item.id : item.name;
     return item.name || item.id;
   });
 };
@@ -46,7 +47,8 @@ const getIndicatorAndSeries = (data, max) => {
     object.indicator.push({ name: current.description, max: max });
 
     for (let j = 0,  cLen = current.value.length; j < cLen; j++) {
-      let name = current.value[j].name || current.value[j].id;
+      let name = current.value[j].secrecy ? current.value[j].id :
+                  current.value[j].name || current.value[j].id;
       let value = object.series[name] || [];
       value.push(current.value[j].match);
       object.series[name] = value;
@@ -68,7 +70,6 @@ const getRadarOption = (max, data, anonymized = false, cutNumber = 20) => {
         indicator = indicatorAndSeries.indicator,
         series = indicatorAndSeries.series,
         anonymizedLegend = anonymized ? anonymize(legend) : null;
-
   const option = {
     title: {
       text: '匹配度雷达图',
@@ -130,7 +131,6 @@ const getRadarOption = (max, data, anonymized = false, cutNumber = 20) => {
       }),
     }],
   };
-
   return option;
 };
 

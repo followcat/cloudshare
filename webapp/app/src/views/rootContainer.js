@@ -47,7 +47,6 @@ const rootRoute = {
     require('routes/go-to-signin'),
     // require('routes/manage'),
     require('routes/best-excellent'),
-    require('routes/create-account'),
   ]
 };
 

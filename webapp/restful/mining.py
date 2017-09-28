@@ -419,7 +419,8 @@ class ValuablebaseAPI(Resource):
                 yaml_data['match'] = match_item[1]
                 values.append({ 'match': match_item[1],
                                 'id': yaml_data['id'],
-                                'name': yaml_data['name'] })
+                                'name': yaml_data['name'],
+                                'secrecy': yaml_data['secrecy'] })
             item['value'] = values
             datas.append(item)
         response['result'] = datas

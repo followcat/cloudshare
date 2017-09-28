@@ -12,7 +12,7 @@ class ResumeSimilar extends Component {
   render() {
     return (
       <Card
-        title="Similar"
+        title="相似简历"
         className="mg-t-8"
       >
         <div className="similar">

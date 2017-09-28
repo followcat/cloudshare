@@ -55,7 +55,6 @@ class Summary extends Component {
     const props = this.props,
           data = groupArray(props.dataSource, props.number),
           colValue = TOTAL_COLUMN / props.number;
-          console.log(data);
 
     return (
       <Card className={props.prefixCls}>

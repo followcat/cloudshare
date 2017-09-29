@@ -9,10 +9,10 @@ import CreateAccount from 'components/create-account';
 import { message, Tabs } from 'antd';
 
 import { getFeature } from 'request/feature';
-
-import StorageUtil from 'utils/storage';
+import { createAccount } from 'request/account';
 import { signIn } from 'request/sign';
 
+import StorageUtil from 'utils/storage';
 
 const TabPane = Tabs.TabPane;
 
@@ -70,7 +70,7 @@ class Home extends Component {
       smscode: feildValue.smscode,
     }, (json) => {
       if (json.code === 200) {
-        message.success('注册成功',2,function(){
+        message.success('注册成功',1,function(){
           window.location.href = json.redirect_url;
         });
       } else {

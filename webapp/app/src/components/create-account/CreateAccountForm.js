@@ -41,9 +41,11 @@ class CreateAccountForm extends Component {
   }
 
   handlePhoneClick(e) {
-     e.preventDefault();
-     this.getCaptchaPng();
-  this.props.form.validateFields(
+    const form = this.props.form;
+    e.preventDefault();
+    form.resetFields(['captcha']);
+    this.getCaptchaPng();
+    this.props.form.validateFields(
     ['name','password','confirm','email','phone',],(errors, values) => {
       if (!errors) {
         this.setState({
@@ -54,7 +56,7 @@ class CreateAccountForm extends Component {
   }
 
   handleClick(e) {
-    e.preventDefault();
+    // e.preventDefault();
   this.props.form.validateFields((errors, values) => {
       if (!errors) {
         this.props.onSubmit(values);
@@ -108,7 +110,7 @@ class CreateAccountForm extends Component {
        captcha: value,
        phone: form.getFieldValue('phone')
       },(json) => {
-       if (json.result === true) {
+       if (json.code === 200 && json.result === true) {
           callback();
           this.setState({
           visible : false,
@@ -116,11 +118,11 @@ class CreateAccountForm extends Component {
           time: 60,
           });
        } else {
+          this.getCaptchaPng();
+          form.setFieldsValue({captcha : null});
           callback('验证码错误，请重新输入!');
        }
      });
-      form.resetFields(['captcha']);
-      this.getCaptchaPng();
     } else {callback('验证码长度必须4位')}
   }
 
@@ -187,7 +189,7 @@ class CreateAccountForm extends Component {
     callback();
   }
 
-  getCaptchaPng (){
+  getCaptchaPng() {
     getCaptcha((blob) => {
       if (blob){
         this.setState({

@@ -71,7 +71,7 @@ module.exports = {
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       hash: false,
-      title: 'Cloudshare - Willendare',
+      title: 'RUJU - 简单招聘',
       template: path.join(config.SRC_PATH, '/template.html'),
       inject: true
     })

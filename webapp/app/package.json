@@ -4,10 +4,11 @@
   "description": "Cloudshare front-end refactor with react.",
   "main": "index.js",
   "scripts": {
-    "clean": "rm ../static/* -rf && rm ../templates_dist/* -rf",
+    "clean": "rm ../static.bak ../templates_dist.bak -rf && rm ../static.prod ../templates_dist.prod -rf",
+    "release": "mkdir -p ../static ../templates_dist && mv ../static ../static.bak && mv ../static.prod ../static && mv ../templates_dist ../templates_dist.bak && mv ../templates_dist.prod ../templates_dist",
     "dev": "./node_modules/.bin/webpack-dev-server",
     "build": "./node_modules/.bin/webpack --progress --display-error-details",
-    "build:production": "npm run clean && npm run build",
+    "build:production": "npm run clean && npm run build && npm run release",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

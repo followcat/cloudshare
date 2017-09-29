@@ -95,7 +95,9 @@ def rankvalue(rank, total):
     topstandard = total*0.15
     midstandard = total*0.4
     botstandard = total*0.4
-    if rank < beststandard:
+    if total == 0:
+        rankvalue = 0.6
+    elif rank < beststandard:
         rankvalue = 0.8 + float(total*0.05 - rank)/beststandard*0.2
     elif rank > beststandard and rank < total*0.2:
         rankvalue = 0.6 + float(total*0.2 - rank)/topstandard*0.2

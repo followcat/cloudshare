@@ -31,6 +31,7 @@ class CreateAccountForm extends Component {
     visible:false,
     time: 60,
     smsok: false,
+    emailresult:false,
   };
 
   handleCancel = (e) => {
@@ -133,18 +134,29 @@ class CreateAccountForm extends Component {
     }
   }
 
-  checkEmail= (rule, value, callback) => {
+  handleEmailFocus = (e) => {
+    this.setState({emailresult: false})
+  }
+
+  handleEmailBlur = (e) => {
     const form = this.props.form;
-    if (value) {
-      checkEmail({
-       email: form.getFieldValue('email')
-      },(json) => {
-       if (json.result === true) {
-          callback('邮箱已被注册');
-       } else {
-          callback();
-       }
-     });
+    const value = e.target.value;
+    if (value){
+    checkEmail({
+      email: value
+    },(json) => {
+      if (json.result === true) {
+          this.setState({emailresult: true})
+          form.validateFields(['email'], { force: true });
+      } 
+    });
+    }
+  }
+
+  checkemail = (rule, value, callback) => {
+    const form = this.props.form;
+    if (value && this.state.emailresult) {
+      callback('邮箱已被注册!');
     } else {
       callback();
     }
@@ -152,7 +164,7 @@ class CreateAccountForm extends Component {
 
   checkPhone= (rule, value, callback) => {
     const form = this.props.form;
-    if (value) {
+    if (value && value.length === 11) {
       checkPhone({
        phone: form.getFieldValue('phone')
       },(json) => {
@@ -258,10 +270,10 @@ class CreateAccountForm extends Component {
             },{
               required: true, message: '邮箱地址是必填项'
             },{
-              validator: this.checkEmail,
+              validator: this.checkemail,
             }],
           })(
-            <Input placeholder="电子邮箱"/>
+            <Input placeholder="电子邮箱" onBlur={this.handleEmailBlur} onFocus={this.handleEmailFocus}/>
           )}
         </FormItem>
         <FormItem  hasFeedback>

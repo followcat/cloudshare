@@ -275,6 +275,17 @@ class Mining(object):
                 if newmodel or updated:
                     self.sim[modelname][simname].save()
 
+    def update_project_sims(self, newmodel=False):
+        for modelname in self.sim:
+            for projectname in self.projects:
+                if (projectname in self.sim[modelname] and
+                    len(self.projects[projectname].curriculumvitae.ids) !=
+                    len(self.sim[modelname][projectname].names)):
+                    svc = self.services['all'][projectname]
+                    updated = self.sim[modelname][projectname].update([svc], newmodel)
+                    if newmodel or updated:
+                        self.sim[modelname][projectname].save()
+
     def probability(self, basemodel, doc, uses=None, top=None, minimum=None):
         result = []
         sims = self.getsims(basemodel, uses=uses)

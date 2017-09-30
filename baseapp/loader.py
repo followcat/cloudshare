@@ -43,6 +43,7 @@ def load_mining(SVC_MEMBERS, SVC_CLS_CV, silencer, lsipath=None, cutwordpath=Non
     slicer = functools.partial(silencer, cutservice=SVC_CUTWORD)
     SVC_MIN = services.mining.Mining(lsipath, SVC_MEMBERS.allprojects(), SVC_CLS_CV, slicer=slicer)
     SVC_MIN.setup()
+    SVC_MIN.update_project_sims()
     return SVC_CUTWORD, SVC_MIN
 
 

@@ -118,6 +118,5 @@ class SimulationCO(services.base.simulation.Simulation,
             except IOError:
                 self._customers = set()
                 self.interface.add(self.customers_file,
-                                   ujson.dumps(ujson.dumps(sorted(self._customers),
-                                                           indent=4)))
+                                   ujson.dumps(sorted(self._customers), indent=4))
         return self._customers

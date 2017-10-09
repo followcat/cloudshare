@@ -155,8 +155,8 @@ def get_expectation(stream):
 def get_project(stream, name=None, as_date=None):
     fix_func = {
         'default': extractor.project.fix,
-        'jingying': extractor.project.fix_jingying,
-        'liepin': extractor.project.fix_liepin,
+        # 'jingying': extractor.project.fix_jingying,
+        # 'liepin': extractor.project.fix_liepin,
         'yingcai': extractor.project.fix_yingcai,
         'zhilian': extractor.project.fix_zhilian,
     }

@@ -20,7 +20,7 @@ def experience_upto_date(date_to, to):
     """
     if to == u'至今':
         return date_to
-    (period_month, period_year) = extractor.utils_parsing.compute_period(to, date_to, today=to)
+    (period_month, period_year) = extractor.utils_parsing.compute_period(to, date_to, as_date=to)
     if period_year < 0 or (period_year == 0 and period_month <= 0):
         return date_to
     else:
@@ -37,7 +37,7 @@ def predate(xp, to):
         >>> assert not u'至今' == predate(ed, u'至今')['date_to']
     """
     output = xp.copy()
-    if extractor.utils_parsing.compute_period(output['date_to'], to, today=to)[-1] < 0:
+    if extractor.utils_parsing.compute_period(output['date_to'], to, as_date=to)[-1] < 0:
         output['date_to'] = u'至今'
     return output
 
@@ -58,7 +58,7 @@ def acceptable_education(ed, to_date=u'至今', low_level=u'中专'):
     """
     assert is_education(ed)
     try:
-        (period_month, period_year) = extractor.utils_parsing.compute_period(ed['date_from'], to_date, today=to_date)
+        (period_month, period_year) = extractor.utils_parsing.compute_period(ed['date_from'], to_date, as_date=to_date)
     except ValueError:
         return False
     if period_year < 0:
@@ -85,7 +85,7 @@ def acceptable_experience(xp, to_date=u'至今'):
     """
     assert is_experience(xp)
     try:
-        (period_month, period_year) = extractor.utils_parsing.compute_period(xp['date_from'], experience_upto_date(xp['date_to'], to_date), today=to_date)
+        (period_month, period_year) = extractor.utils_parsing.compute_period(xp['date_from'], experience_upto_date(xp['date_to'], to_date), as_date=to_date)
     except ValueError:
         return False
     return period_year > 0 or (period_year == 0 and period_month > 3)

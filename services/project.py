@@ -121,7 +121,7 @@ class Project(services.base.service.Service):
 
     @property
     def classify(self):
-        result = dict()
+        result = [c for c in sources.industry_id.industryID]
         if 'classify' in self.config:
             result = self.config['classify']
         return result

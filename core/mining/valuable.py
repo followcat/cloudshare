@@ -68,7 +68,7 @@ def next(miner, project, doc, top, basemodel, uses=None,
                           for each in extract_data_full])
     uses = miner.idsims(basemodel, name_list)
     rating.append((doc, extract_data_full))
-    total = miner.lenght(basemodel, uses=[basemodel])
+    total = miner.lenght(basemodel, uses=[project.name])
     for text in doc.split('\n'):
         if not text.strip():
             continue
@@ -78,7 +78,7 @@ def next(miner, project, doc, top, basemodel, uses=None,
                 education_requirement.group('education'), name_list)
         else:
             value_res = miner.minelist(text, name_list, basemodel, uses=uses)
-            rank_res = miner.minelistrank(text, value_res, basemodel, uses=[basemodel])
+            rank_res = miner.minelistrank(text, value_res, basemodel, uses=[project.name])
             value_point = map(lambda x: (x[0], float(x[1])/2), value_res)
             rank_point = map(lambda x: (x[0], rankvalue(x[1], total)), rank_res)
             total_point = map(lambda x: (x[0][0], x[0][1]*0.5+x[1][1]*0.5),

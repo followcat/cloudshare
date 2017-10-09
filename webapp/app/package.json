@@ -4,10 +4,11 @@
   "description": "Cloudshare front-end refactor with react.",
   "main": "index.js",
   "scripts": {
-    "clean": "rm ../static/* -rf && rm ../templates_dist/* -rf",
+    "clean": "rm ../static.bak ../templates_dist.bak -rf && rm ../static.prod ../templates_dist.prod -rf",
+    "release": "mkdir -p ../static ../templates_dist && mv ../static ../static.bak && mv ../static.prod ../static && mv ../templates_dist ../templates_dist.bak && mv ../templates_dist.prod ../templates_dist",
     "dev": "./node_modules/.bin/webpack-dev-server",
     "build": "./node_modules/.bin/webpack --progress --display-error-details",
-    "build:production": "npm run clean && npm run build",
+    "build:production": "npm run clean && npm run build && npm run release",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -17,17 +18,17 @@
   "author": "kabessC",
   "license": "MIT",
   "dependencies": {
-    "antd": "^2.8.1",
-    "babel-plugin-transform-object-assign": "^6.8.0",
-    "babel-polyfill": "^6.16.0",
-    "classnames": "^2.2.5",
-    "echarts": "^3.2.3",
-    "marked": "^0.3.6",
-    "moment": "^2.17.1",
-    "react": "^15.5.0",
-    "react-addons-css-transition-group": "^15.5.0",
-    "react-dom": "^15.5.0",
-    "react-router": "^3.0.2"
+    "antd": "2.8.1",
+    "babel-plugin-transform-object-assign": "6.8.0",
+    "babel-polyfill": "6.16.0",
+    "classnames": "2.2.5",
+    "echarts": "3.2.3",
+    "marked": "0.3.6",
+    "moment": "2.17.1",
+    "react": "15.5.0",
+    "react-addons-css-transition-group": "15.5.0",
+    "react-dom": "15.5.0",
+    "react-router": "3.0.2"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",

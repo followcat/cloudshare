@@ -73,8 +73,7 @@ class UploadCVAPI(Resource):
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
-        if projectname in self.svc_min.sim:
-            self.svc_min.sim[projectname][projectname].add_documents(names, documents)
+        self.svc_min.sim[project.modelname][projectname].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):

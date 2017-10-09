@@ -33,11 +33,11 @@
     padding: 0 50px;
   }
 }
-    
+
 .cs-layout-logo {
   width: 180px;
-  height: 32px;
-  margin: 16px 28px 16px 0;
+  height: 54px;
+  margin-top: 8px;
   float: left;
 }
 
@@ -89,6 +89,9 @@
 
   .cs-layout-profile-content {
     line-height: @headerHeight;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     .cs-dropdown-link {
       color: @textColor;

@@ -56,7 +56,8 @@ class SimulationCV(services.base.simulation.Simulation,
                 result = result.replace(info[key], hidden+' '*(len(info[key])-len(hidden)))
             elif key == 'phone':
                 value = extractor.information_explorer.get_phone(result)
-                result = result.replace(value, hidden+' '*(len(value)-len(hidden)))
+                if len(value) > 6:
+                    result = result.replace(value, hidden+' '*(len(value)-len(hidden)))
         return result
 
     def gethtml(self, id, secrecy=True):
@@ -81,9 +82,11 @@ class SimulationCV(services.base.simulation.Simulation,
         return result
 
     def getyaml(self, id, secrecy=True):
-        result = super(SimulationCV, self).getyaml(id)
+        result = {'secrecy': False}
+        result.update(super(SimulationCV, self).getyaml(id))
         if secrecy is True and self.ishideprivate(id):
             result.update(self.yaml_private_key)
+            result['secrecy'] = True
         return result
 
     def getprivatekeys(self):

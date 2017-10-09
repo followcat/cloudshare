@@ -15,7 +15,7 @@ export const getAbilityData = (params, callback) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(params)
+    body: Generator.getPostData(params)
   })
   .then(response => response.json())
   .then(json => {
@@ -32,7 +32,7 @@ export const getExperienceData = (params, callback) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(params)
+    body: Generator.getPostData(params)
   })
   .then(response => response.json())
   .then(json => {
@@ -49,7 +49,7 @@ export const getPositionData = (params, callback) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(params)
+    body: Generator.getPostData(params)
   })
   .then(response => response.json())
   .then(json => {

@@ -4,12 +4,12 @@ import LayoutHeader from './LayoutHeader';
 import Navigation from './Navigation';
 import ProjectMessage from './ProjectMessage';
 import Profile from './Profile';
-import { Dropdown, Icon } from 'antd';
+import { Dropdown, Icon} from 'antd';
 
 class Header extends Component {
+
   render() {
     const props = this.props;
-
     return (
       <LayoutHeader logoImg={props.logoImg}>
         <Navigation
@@ -17,6 +17,7 @@ class Header extends Component {
           selectedKeys={props.selectedKeys}
         />
         <ProjectMessage
+          isMember={props.isMember}
           project={props.project}
           projects={props.projects}
           onChange={this.props.onChange}

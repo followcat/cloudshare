@@ -8,7 +8,7 @@ import services.simulationcv
 import services.simulationco
 import services.simulationpeo
 import services.jobdescription
-
+import extractor.information_explorer
 
 class Project(services.base.service.Service):
 
@@ -18,22 +18,24 @@ class Project(services.base.service.Service):
     PEO_PATH = 'PEO'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepo, cvrepo, svcpeo, name, iotype='git'):
-        super(Project, self).__init__(path, name, iotype)
+    def __init__(self, path, corepo, cvrepos, svcpeos, name, iotype='git'):
+        super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
+        self._modelname = name
         self.corepo = corepo
-        self.cvrepo = cvrepo
+        self.cvrepos = cvrepos
+        self.svcpeos = svcpeos
         cvpath = os.path.join(path, self.CV_PATH)
         copath = os.path.join(path, self.CO_PATH)
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
 
         self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
-                                                        cvpath, name, cvrepo)
+                                                        cvpath, name, cvrepos)
         self.company = services.simulationco.SimulationCO.autoservice(
-                                                        copath, name, corepo)
-        self.jobdescription = services.jobdescription.JobDescription(jdpath)
-        self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeo)
+                                                        copath, name, [corepo])
+        self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
+        self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
         self.config = dict()
         try:
             self.load()
@@ -44,32 +46,119 @@ class Project(services.base.service.Service):
         self.config = utils.builtin.load_yaml(self.path, self.config_file)
 
     def save(self):
-        utils.builtin.save_yaml(self.config, self.path, self.config_file,
-                                default_flow_style=False)
+        dumpconfig = utils.builtin.dump_yaml(self.config)
+        self.interface.add(self.config_file, dumpconfig, message="Update config file.")
 
-    def setup(self, classify, committer=None, config=None):
+    def setup(self, classify=None, committer=None, config=None):
+        self.setconfig(config)
+        self.setclassify(classify, committer=committer)
+
+    def setconfig(self, config=None):
         if config is None:
             config = {}
-        if not os.path.exists(os.path.join(self.path, self.config_file)):
-            self.update(classify, committer)
-        self.config.update(config)
-        self.save()
+        modified = False
+        for key in config:
+            if key not in self.config or self.config[key] != config[key]:
+                self.config[key] = config[key]
+                modified = True
+        if modified:
+            self.save()
 
-    def update(self, classify, committer=None):
-        self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
-        self.save()
+    def setclassify(self, classify=None, committer=None):
+        if not os.path.exists(os.path.join(self.path, self.config_file)) or classify is not None:
+            self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
+            self.save()
+
+    @property
+    def storageCV(self):
+        result = None
+        servicename = self.config['storageCV']
+        for cvrepo in self.cvrepos:
+            if isinstance(cvrepo, services.simulationcv.SimulationCV):
+                for each in cvrepo.storages:
+                    if each.name == servicename:
+                        result = each
+                        break
+            elif cvrepo.name == servicename:
+                result = each
+            if result is not None:
+                break
+        return result
+
+    @property
+    def storagePEO(self):
+        result = None
+        servicename = self.config['storagePEO']
+        for each in self.svcpeos[0].peoples:
+            if each.name == servicename:
+                result = each
+                break
+        return result
+
+    @property
+    def modelname(self):
+        return self._modelname
+
+    @property
+    def id(self):
+        return self.name
+
+    @property
+    def cv_secrecy(self):
+        return self.curriculumvitae.secrecy_default
+
+    @property
+    def cv_private(self):
+        return self.curriculumvitae.private_default
+
+    @cv_secrecy.setter
+    def cv_secrecy(self, value):
+        self.curriculumvitae.secrecy_default = value
+
+    @cv_private.setter
+    def cv_private(self, value):
+        self.curriculumvitae.private_default = value
+
+    @property
+    def classify(self):
+        result = dict()
+        if 'classify' in self.config:
+            result = self.config['classify']
+        return result
 
     def getclassify(self):
-        return self.config['classify']
+        return self.classify
 
     def getindustry(self):
         result = dict()
-        for each in self.config['classify']:
+        for each in self.classify:
             result.update({each: sources.industry_id.sources[each]})
         return result
 
-    def cv_add(self, cvobj, committer=None, unique=True):
-        return self.curriculumvitae.add(cvobj, committer, unique)
+    def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
+        result = {
+            'repo_cv_result' : False,
+            'repo_peo_result' : False,
+            'project_cv_result' : False,
+            'project_peo_result' : False
+        }
+        peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
+        peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
+        result['repo_cv_result'] = self.storageCV.add(cvobj, committer, unique=unique,
+                                                      do_commit=do_commit)
+        result['project_cv_result'] = self.curriculumvitae.add(cvobj, committer, unique=unique,
+                                                               do_commit=do_commit)
+        if result['repo_cv_result']:
+            peoresult = self.peo_add(peopobj, committer, unique=unique, do_commit=do_commit)
+            result.update(peoresult)
+        return result
+
+    def cv_add_eng(self, id, cvobj, committer):
+        yaml_data = self.storageCV.getyaml(id)
+        result = self.storageCV.add_md(cvobj, committer)
+        yaml_data['enversion'] = cvobj.ID.md
+        self.storageCV.modify(id+'.yaml', utils.builtin.dump_yaml(yaml_data), committer=committer)
+        return result
 
     def cv_yamls(self):
         return self.curriculumvitae.yamls()
@@ -80,11 +169,15 @@ class Project(services.base.service.Service):
     def cv_datas(self):
         return self.curriculumvitae.datas()
 
-    def cv_search(self, keyword):
-        return self.curriculumvitae.search(keyword)
+    def cv_search(self, keyword, selected=None):
+        if selected is None:
+            selected = [self.storageCV.name]
+        return self.curriculumvitae.search(keyword, selected=selected)
 
-    def cv_search_yaml(self, keyword):
-        return self.curriculumvitae.search_yaml(keyword)
+    def cv_search_yaml(self, keyword, selected=None):
+        if selected is None:
+            selected = [self.storageCV.name]
+        return self.curriculumvitae.search_yaml(keyword, selected=selected)
 
     def cv_gethtml(self, id):
         return self.curriculumvitae.gethtml(id)
@@ -104,16 +197,13 @@ class Project(services.base.service.Service):
     def cv_history(self, author=None, entries=10, skip=0):
         return self.curriculumvitae.history(author, entries, skip)
 
-    def cv_updateyaml(self, id, key, value, userid):
+    def cv_updateyaml(self, id, key, value, username):
         result = None
         if key in dict(self.curriculumvitae.YAML_TEMPLATE):
-            cv_service = self.curriculumvitae
-        else:
-            cv_service = self.cvrepo
-        try:
-            result = cv_service.updateinfo(id, key, value, userid)
-        except AssertionError:
-            pass
+            try:
+                result = self.curriculumvitae.updateinfo(id, key, value, username)
+            except AssertionError:
+                pass
         return result
 
     def cv_ids(self):
@@ -124,18 +214,8 @@ class Project(services.base.service.Service):
                                               end_y, end_m, end_d)
 
     def company_update_info(self, id, info, committer):
-        baseinfo = dict()
-        projectinfo = dict()
-        for item in info:
-            if item in dict(self.company.YAML_TEMPLATE):
-                projectinfo[item] = info[item]
-            else:
-                baseinfo[item] = info[item]
-        prj_res = self.company.saveinfo(id, projectinfo,
-                                        "Update %s information."%id, committer)
-        bas_res = self.company.storage.saveinfo(id, baseinfo,
-                                        "Update %s information."%id, committer)
-        return prj_res or bas_res
+        result = self.company.update_info(id, info, committer)
+        return result
 
     def company_compare_excel(self, stream, committer):
         outputs = list()
@@ -196,35 +276,44 @@ class Project(services.base.service.Service):
         return self.jobdescription.modify(hex_id, description, status,
                                             commentary, followup, committer)
 
-    def jd_search(self, keyword):
-        return self.jobdescription.search(keyword)
+    def jd_search(self, keyword, selected=None):
+        return self.jobdescription.search(keyword, selected=selected)
 
     def jd_lists(self):
         return self.jobdescription.lists()
 
-    def peo_add(self, peopobj, committer=None, unique=True):
-        return self.people.add(peopobj, committer, unique)
+    def peo_add(self, peopobj, committer=None, unique=True, do_commit=True):
+        result = {
+            'repo_peo_result' : False,
+            'project_peo_result' :False,
+        }
+        result['repo_peo_result'] = self.storagePEO.add(peopobj, committer,
+                                                        unique=unique, do_commit=do_commit)
+        result['project_peo_result'] = self.people.add(peopobj, committer,
+                                                       unique=unique, do_commit=do_commit)
+        return result
 
     def peo_getyaml(self, id):
         return self.people.getyaml(id)
 
-    def peo_updateyaml(self, id, key, value, userid):
+    def peo_updateyaml(self, id, key, value, username):
         result = None
         try:
-            result = self.people.updateinfo(id, key, value, userid)
+            result = self.people.updateinfo(id, key, value, username)
         except AssertionError:
             pass
         return result
 
-    def peo_deleteyaml(self, id, key, value, userid, date):
-        return self.people.deleteinfo(id, key, value, userid, date)
+    def peo_deleteyaml(self, id, key, value, username, date):
+        return self.people.deleteinfo(id, key, value, username, date)
 
     def backup(self, path, bare=True):
-        project_path = os.path.join(path, 'project')
-        cv_path = os.path.join(path, 'curriculumvitae')
-        jd_path = os.path.join(path, 'jobdescription')
-        co_path = os.path.join(path, 'company')
-        peo_path = os.path.join(path, 'people')
+        backup_path = os.path.join(path, self.name)
+        project_path = os.path.join(backup_path, 'project')
+        cv_path = os.path.join(backup_path, 'curriculumvitae')
+        jd_path = os.path.join(backup_path, 'jobdescription')
+        co_path = os.path.join(backup_path, 'company')
+        peo_path = os.path.join(backup_path, 'people')
         utils.builtin.assure_path_exists(project_path)
         utils.builtin.assure_path_exists(cv_path)
         utils.builtin.assure_path_exists(jd_path)

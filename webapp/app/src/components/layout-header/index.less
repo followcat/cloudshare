@@ -50,17 +50,19 @@
 .cs-header-project {
   position: absolute;
   top: 0;
-  width: 140px;
   height: @headerHeight;
   line-height: @headerHeight;
   overflow: hidden;
   color: #fff;
   right: 236px;
   text-align: center;
+    .ant-select {
+      left: 5px;
+    }
 }
 
 .cs-header-project-selection {
-  width: 140px;
+  width: 120px;
 }
 
 .cs-layout-profile {
@@ -95,6 +97,12 @@
       &:hover {
         color: #fff;
       }
+    }
+
+    .ant-badge-count {
+      height: 18px;
+      min-width: 18px;
+      top: -20px;
     }
   }
 }

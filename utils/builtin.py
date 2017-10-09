@@ -21,16 +21,20 @@ def industrytopath(industry):
     return industry.replace('/', '-')
 
 
-def md5(text):
+def hash(text):
     m = hashlib.md5()
     m.update(text)
-    return unicode(m.hexdigest())
+    return m.hexdigest()
+
+
+def dump_yaml(data, default_flow_style=None):
+    return yaml.dump(data, Dumper=utils._yaml.SafeDumper,
+                     allow_unicode=True, default_flow_style=default_flow_style)
 
 
 def save_yaml(infodict, path, filename, default_flow_style=None):
     with open(os.path.join(path, filename), 'w') as f:
-        f.write(yaml.dump(infodict, Dumper=utils._yaml.SafeDumper,
-                          allow_unicode=True, default_flow_style=default_flow_style))
+        f.write(dump_yaml(infodict, default_flow_style=default_flow_style))
 
 
 def load_yaml(path, filename):
@@ -63,7 +67,7 @@ def strftime(t, format='%Y-%m-%d %H:%M:%S'):
     return time.strftime(format, time.localtime(t))
 
 
-def nemudate(dates):
+def nemudate(dates, outformat='%Y%m%d'):
     str_result = []
     datetimes_result = []
     datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
@@ -73,7 +77,7 @@ def nemudate(dates):
         datetimes_result.append(tstart)
         tstart += datetime.timedelta(days = 1)
     for each in datetimes_result:
-        str_result.append(each.strftime('%Y%m%d'))
+        str_result.append(each.strftime(outformat))
     return str_result
 
 

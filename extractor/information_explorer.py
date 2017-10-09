@@ -256,7 +256,8 @@ def get_originid(stream):
 def get_phone(stream):
     phone_restr = u'1\d{10}'
     phone = info_by_re_iter(stream, phone_restr)
-    result = get_tagfromstring(u'电话', stream, ur'\d\-－()') or phone
+    result = get_tagfromstring(u'电话', stream, ur'\d\-－()') or \
+            get_tagfromstring(u'手机号码', stream, ur'\d\-－()') or phone
     return result
 
 

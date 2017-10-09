@@ -177,18 +177,20 @@ class Mining(object):
 
     SIMS_PATH = 'all'
 
-    def __init__(self, path, cvsvc, slicer=None):
+    def __init__(self, path, projects, classifycvs, slicer=None):
         self.sim = {}
         self.path = path
         self.lsi_model = dict()
-        self.projects = cvsvc.projects
-        self.additionals = cvsvc.additionals
-        self.services = {'default': cvsvc.projectscv,
+        self.projects = projects
+        self.projectscv = dict([(project.id, project.curriculumvitae)
+                                for project in projects.values()])
+        self.additionals = classifycvs
+        self.services = {'default': self.projectscv,
                          'classify': dict(),
                          'all': dict()}
-        self.services['all'].update(cvsvc.projectscv)
-        self.services['all'].update(cvsvc.additionals)
-        self.services['classify'].update(cvsvc.additionals)
+        self.services['all'].update(self.projectscv)
+        self.services['all'].update(self.additionals)
+        self.services['classify'].update(classifycvs)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
@@ -208,7 +210,7 @@ class Mining(object):
             model = self.lsi_model[modelname]
             save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
             self.sim[modelname] = dict()
-            service_names = [modelname] + self.projects[modelname].getclassify()
+            service_names = self.projects.keys() + self.projects[modelname].getclassify()
             for svc_name in service_names:
                 svc = self.services['all'][svc_name]
                 industrypath = industrytopath(svc_name)

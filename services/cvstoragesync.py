@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import time
 import yaml
@@ -7,8 +8,6 @@ import pypandoc
 
 import utils._yaml
 import core.basedata
-import interface.predator
-import services.curriculumvitae
 import extractor.information_explorer
 
 
@@ -24,6 +23,23 @@ logger.setLevel(log_level)
 
 def update_bydate(yamlinfo, lastdate):
     return lastdate < yamlinfo['date']
+
+def generate_md(raw_html):
+    return pypandoc.convert(raw_html, 'markdown', format='docbook')
+
+def generate_yaml(md, yamlobj, selected=None, name=None):
+    if selected is None:
+        catchinfo = extractor.information_explorer.catch(md, name=name)
+    else:
+        catchinfo = extractor.information_explorer.catch_selected(md, selected, name=name)
+    for key in catchinfo:
+        if catchinfo[key] or (selected is not None and key in selected):
+            yamlobj[key] = catchinfo[key]
+        elif key not in yamlobj:
+            yamlobj[key] = catchinfo[key]
+        elif not yamlobj[key] and type(yamlobj[key]) != type(catchinfo[key]):
+            yamlobj[key] = catchinfo[key]
+    return yamlobj
 
 
 class CVStorageSync(object):
@@ -46,18 +62,29 @@ class CVStorageSync(object):
             filterfunc = filter
         for dbname in interfaces:
             raw_db = interfaces[dbname]
+            for id in raw_db.lsid_raw():
+                filepath = os.path.join(raw_db.rawpath, id+raw_db.yamlextention)
+                try:
+                    date = os.path.getmtime(filepath)
+                except OSError:
+                    self.logger.info((' ').join(["Error RAWYAML not exists", id]))
+                    continue
+                yamlinfo = {'date': date, 'id': id}
+                if filterfunc(yamlinfo):
+                    yield dbname, raw_db, yamlinfo
+        """
             for yamlinfo in raw_db.lscly_yaml():
                 yield dbname, raw_db, yamlinfo
+        """
 
     def update(self, raws=None, filterfunc=None):
         for dbname, raw_db, yamlinfo in self.yamls_gen(raws, filterfunc):
             id = yamlinfo['id']
-            if filterfunc(yamlinfo):
-                if raw_db.exists(id+'.html'):
-                    if not self.cv_storage.exists(id):
-                        result = self.add_new(raw_db, id, dbname)
-                    else:
-                        result = self.update_exists(raw_db, id)
+            if raw_db.exists(id+'.html'):
+                if not self.cv_storage.exists(id):
+                    result = self.add_new(raw_db, id, dbname)
+                else:
+                    result = self.update_exists(raw_db, id)
 
     def update_exists(self, rawdb, id):
         result = False
@@ -76,14 +103,15 @@ class CVStorageSync(object):
         result = False
         raw_html = rawdb.getraw(id+'.html')
         raw_yaml = rawdb.getraw(id+'.yaml')
-        md = self.generate_md(raw_html)
+        raw_yaml_obj = yaml.load(raw_yaml, Loader=utils._yaml.Loader)
+        md = generate_md(raw_html)
         logidname = os.path.join(rawdb.path, id)
         if len(md) < 100:
             self.logger.info((' ').join(["Skip", logidname]))
             return result
         t1 = time.time()
         try:
-            info = self.generate_yaml(md, raw_yaml, name=dbname)
+            info = generate_yaml(md, raw_yaml_obj, name=dbname)
         except KeyboardInterrupt:
             usetime = time.time() - t1
             self.logger.info((' ').join(["KeyboardInterrupt", logidname,
@@ -99,26 +127,8 @@ class CVStorageSync(object):
                                            metadata=info)
         peoinfo = extractor.information_explorer.catch_peopinfo(info)
         peoobj = core.basedata.DataObject(data=peoinfo,
-                                           metadata=peoinfo)
+                                          metadata=peoinfo)
         self.cv_storage.addcv(dataobj, raw_html.encode('utf-8'))
         self.peo_storage.add(peoobj)
         result = True
         return result
-
-    def generate_md(self, raw_html):
-        return pypandoc.convert(raw_html, 'markdown', format='docbook')
-
-    def generate_yaml(self, md, raw_yaml, selected=None, name=None):
-        obj = yaml.load(raw_yaml, Loader=utils._yaml.Loader)
-        if selected is None:
-            catchinfo = extractor.information_explorer.catch(md, name=name)
-        else:
-            catchinfo = extractor.information_explorer.catch_selected(md, selected, name=name)
-        for key in catchinfo:
-            if catchinfo[key] or (selected is not None and key in selected):
-                obj[key] = catchinfo[key]
-            elif key not in obj:
-                obj[key] = catchinfo[key]
-            elif not obj[key] and type(obj[key]) != type(catchinfo[key]):
-                obj[key] = catchinfo[key]
-        return obj

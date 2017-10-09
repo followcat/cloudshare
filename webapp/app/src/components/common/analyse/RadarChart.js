@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 
 import { Button, Modal, Checkbox } from 'antd';
 
-import Charts from '../Charts';
+import Charts from 'Charts';
 
-import Storage from '../../../utils/storage';
-import Generator from '../../../utils/generator';
-import { getRadarOption } from '../../../utils/chart_option';
+import Storage from 'utils/storage';
+import Generator from 'utils/generator';
+import { getRadarOption } from 'utils/chart_option';
 
 import 'whatwg-fetch';
 

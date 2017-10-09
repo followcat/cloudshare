@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 import { Button, Modal, Table } from 'antd';
 
-import History from '../../../utils/history';
+import History from 'utils/history';
 
 export default class HistorySelection extends Component {
   

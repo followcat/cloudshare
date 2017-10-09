@@ -13,10 +13,10 @@ from extractor.utils_parsing import *
 EDUCATION_REQUIREMENT = re.compile(ur'[\d .]*(?P<education>.{2})(?=[及或以上]{0,3}学历)')
 
 
-def rate(miner, svc_cv, doc, basemodel, top=10, selected=5,
+def rate(miner, project, doc, top=10, selected=5,
          uses=None, name_list=None, education_req=True):
     result = []
-    rating = next(miner, svc_cv, doc, top, basemodel,
+    rating = next(miner, project, doc, top, project.modelname,
                   uses=uses, name_list=name_list, education_req=education_req)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]
@@ -53,7 +53,7 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(miner, svc_cv, doc, top, basemodel, uses=None,
+def next(miner, project, doc, top, basemodel, uses=None,
          name_list=None, education_req=True):
     rating = []
     extract_data_full = []
@@ -74,7 +74,7 @@ def next(miner, svc_cv, doc, top, basemodel, uses=None,
             continue
         education_requirement = EDUCATION_REQUIREMENT.match(text)
         if education_req and education_requirement:
-            total_point = mine_education(svc_cv,
+            total_point = mine_education(project,
                 education_requirement.group('education'), name_list)
         else:
             value_res = miner.minelist(text, name_list, basemodel, uses=uses)
@@ -105,12 +105,12 @@ def rankvalue(rank, total):
         rankvalue = float(total - rank)/botstandard*0.2
     return rankvalue
 
-def mine_education(svc_cv, text, name_list):
+def mine_education(projcet, text, name_list):
     assert text
     assert name_list
     datas = []
     for name in name_list:
-        education = education_rate(svc_cv.getyaml(name)['education'])
+        education = education_rate(projcet.cv_getyaml(name)['education'])
         req = education_rate(text)
         if education and req:
             datas.append((name, str((5 + education - req)*0.1)))

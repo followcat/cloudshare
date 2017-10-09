@@ -68,10 +68,9 @@ class Layout extends Component {
         <SubheadNav
           menus={menus}
           selectedKeys={[this.state.selectedKey]}
-          style={{ marginLeft: 338 }}
           onClick={this.handleSubheadNavClick}
         />
-        <LayoutContainer style={{ paddingLeft: 50, paddingRight: 50 }}>
+        <LayoutContainer>
           <CardContainer>
             <CardContent title={cardContentTitle}>
               {this.props.children}

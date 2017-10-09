@@ -3,7 +3,6 @@ import os
 import core.basedata
 import utils.builtin
 from baseapp.datadbs import *
-from baseapp.projects import *
 
 
 def init_prjpeo(SVC_PRJ):

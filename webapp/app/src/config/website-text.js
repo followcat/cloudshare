@@ -10,12 +10,23 @@ const websiteText = {
 
     NAME: '姓名',
 
+    YES: '是',
+    NO: '否',
+
     PROFILE: '个人中心',
+    NOTICE: '消息',
+    MANGEMENT: '管理',
     SEARCH: '搜索',
     MATCH: '匹配',
     RESUME_UPLOADER: '简历上传',
-    PROJECT_MANAGEMENT: '项目管理',
+    VIP_MANAGEMENT: '会员服务',
+    BECOME_MEMBER: '成为会员',
     BEST_EXCELLENT: '每日优秀',
+
+    ADMIN_MANAGEMENT: '权限管理',
+    MEMBER_MANAGEMENT: '成员管理',
+    PROJECT_MANAGEMENT: '项目管理',
+    CUSTOMER_MANAGEMENT: '客户管理',
 
     JOB_DESCRIPTION_MANAGEMENT: '职位管理',
     OPEN_JOB_DESCRIPTION: '已开放职位',
@@ -40,6 +51,7 @@ const websiteText = {
     RESPONSIBLE: '跟进人',
     PRIORITY: '优先级',
     REMINDER: '待联系',
+    QUIT_MEMBER: '退出公司',
 
     VISITING_SITUATION: '陌拜情况',
     VISITING_INFORMATION: '陌拜信息',
@@ -64,6 +76,15 @@ const websiteText = {
     ADD: '添加',
     MATCH_ACTION: '进行匹配',
     UPLOAD: '上传',
+    ACCEPT: '接受',
+    REJECT: '拒绝',
+    ELEVATE: '授予管理员权限',
+    REVOKE: '撤销管理员权限',
+
+    ELEVATE_SUCCESS: '授予权限成功！',
+    ELEVATE_FAIL: '授予权限失败！',
+    REVOKE_SUCCESS: '撤销权限成功！',
+    REVOKE_FAIL: '撤销权限失败！',
 
     JOB_DESCRIPTION_ID: 'ID',
     JOB_DESCRIPTION_NAME: '职位名称',
@@ -85,9 +106,9 @@ const websiteText = {
     COMPANY_NAME_VALIDATE_MSG: '请输入公司名称',
     JOB_DESCRIPTION_NAME_VALIDATE_MSG: '请输入职位名称',
     JOB_DESCRIPTION_CONTENT_VALIDATE_MSG: '请输入职位描述内容',
-    
-    ADD_CUSTOMER: '添加客户',
-    ADDED_CUSTOMER: '已添加客户',
+
+    SENT_SUCCESS_MSG: '发送成功',
+    SENT_FAIL_MSG: '发送失败',
 
     SAVE_SUCCESS_MSG: '已保存!',
     SAVE_FAIL_MSG: '保存失败!',
@@ -106,9 +127,21 @@ const websiteText = {
     FOLD_MSG: '收起所有信息',
     UNFOLD_MSG: '展开所有信息',
 
+    UNREAD_MESSAGE: '未读',
+    READ_MESSAGE: '已读',
+    SENT_MESSAGE: '已发',
+    INVITED_MESSAGE: '被邀请',
+    INVITER_MESSAGE: '已发邀请',
+    PROCESSED_MESSAGE: '已处理邀请',
+    ACCEPT_INVITE_SUCCESS_MSG: '接受邀请成功！',
+    ACCEPT_INVITE_FAIL_MSG: '接受邀请失败！',
+    SUCESS_MSG: '成功',
+    FAIL_MSG: '失败',
+
     BROWSING_HISTORY: '浏览历史',
     BOOKMARK: '书签',
     SETTING: '设置',
+    MANAGE_INFO: '信息管理',
 
     RESET_PWD_SUCCESS_MSG: '重置密码成功',
     RESET_PWD_FAIL_MSG: '重置密码失败'

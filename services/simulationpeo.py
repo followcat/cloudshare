@@ -2,8 +2,7 @@ import services.people
 import services.base.simulation
 
 
-class SimulationPEO(services.base.simulation.Simulation,
-                    services.people.People):
+class SimulationPEO(services.base.simulation.Simulation):
 
     YAML_TEMPLATE = (
         ("committer",           str),
@@ -14,7 +13,7 @@ class SimulationPEO(services.base.simulation.Simulation,
 
     list_item = {"tag", "comment", "tracking"}
 
-    def __init__(self, path, name, peostorage, iotype='git'):
+    def __init__(self, path, name, storages, iotype='git'):
         """
             >>> from tests.settings import *
             >>> config = Config()
@@ -37,7 +36,7 @@ class SimulationPEO(services.base.simulation.Simulation,
             True
             >>> config.destory()
         """
-        super(SimulationPEO, self).__init__(path, name, peostorage, iotype)
+        super(SimulationPEO, self).__init__(path, name, storages, iotype=iotype)
 
     def getyaml(self, id):
         try:

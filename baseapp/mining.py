@@ -1,6 +1,7 @@
 import baseapp.loader
 import services.mining
-from baseapp.multicv import SVC_MULT_CV
+from baseapp.datadbs import SVC_CLS_CV
+from baseapp.member import SVC_MEMBERS
 
 
-SVC_CUTWORD, SVC_MIN = baseapp.loader.load_mining(SVC_MULT_CV, services.mining.silencer)
+SVC_CUTWORD, SVC_MIN = baseapp.loader.load_mining(SVC_MEMBERS, SVC_CLS_CV, services.mining.silencer)

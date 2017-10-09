@@ -10,7 +10,7 @@ from tests.jd_additional_words import added_words
 
 
 test_cv_svc = services.simulationcv.SimulationCV('tests/cv_svc', 'lsisim_test', 
-                SVC_CV_REPO, iotype='base')
+                                                 [SVC_CV_REPO], iotype='base')
 
 FIRST_PAGE = range(len(test_cv_svc.ids)/90)
 

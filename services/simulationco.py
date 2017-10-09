@@ -26,14 +26,33 @@ class SimulationCO(services.base.simulation.Simulation,
     fix_item  = {"id", "name"}
     customers_file = 'customers.json'
 
-    def __init__(self, path, name, costorage, iotype='git'):
-        super(SimulationCO, self).__init__(path, name, costorage, iotype)
+    def __init__(self, path, name, storages, iotype='git'):
+        super(SimulationCO, self).__init__(path, name, storages, iotype=iotype)
         self._customers = None
 
     def _templateinfo(self, committer):
         info = super(SimulationCO, self)._templateinfo(committer)
         info['responsible'] = committer
         return info
+
+    def update_info(self, id, info, committer):
+        bas_res = False
+        prj_res = False
+        baseinfo = dict()
+        projectinfo = dict()
+        for item in info:
+            if item in dict(self.YAML_TEMPLATE):
+                projectinfo[item] = info[item]
+            else:
+                baseinfo[item] = info[item]
+        prj_res = self.saveinfo(id, projectinfo,
+                                "Update %s information."%id, committer)
+        for storage in self.storages:
+            if storage.exists(id):
+                bas_res = self.storage.saveinfo(id, baseinfo,
+                                                "Update %s information."%id, committer)
+                break
+        return prj_res or bas_res
 
     def compare_excel(self, stream, committer):
         output = list()

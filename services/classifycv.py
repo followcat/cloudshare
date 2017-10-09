@@ -10,12 +10,12 @@ class ClassifyCV(object):
     config_file = 'config.yaml'
     SAVE_DIR = 'CV'
 
-    def __init__(self, name, path, storage, iotype='base'):
+    def __init__(self, name, path, storages, iotype='base'):
         self.name = name
         self.path = os.path.join(path, utils.builtin.industrytopath(name))
         self.curriculumvitae = services.simulationcv.SimulationCV(os.path.join(self.path,
                                                                   self.SAVE_DIR),
-                                                                  name, storage, iotype)
+                                                                  name, storages, iotype)
         self.config = dict()
         try:
             self.load()
@@ -37,13 +37,14 @@ class ClassifyCV(object):
                 self.update()
 
     def update(self):
-        for id in self.curriculumvitae.storage.ids:
-            if not self.curriculumvitae.exists(id):
-                data = self.curriculumvitae.storage.getmd(id)
-                metadata = self.curriculumvitae.storage.getyaml(id)
-                if self.name in metadata['classify']:
-                    dataobj = core.basedata.DataObject(metadata, data)
-                    self.add(dataobj, yamlfile=False)
+        for storage in self.curriculumvitae.storages:
+            for id in storage.ids:
+                if not self.curriculumvitae.exists(id):
+                    data = storage.getmd(id)
+                    metadata = storage.getyaml(id)
+                    if self.name in metadata['classify']:
+                        dataobj = core.basedata.DataObject(metadata, data)
+                        self.add(dataobj, yamlfile=False)
 
     def add(self, dataobj, committer=None, unique=True, yamlfile=False):
         return self.curriculumvitae.add(dataobj, committer, unique, yamlfile)

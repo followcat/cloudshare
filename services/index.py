@@ -5,6 +5,7 @@ import cPickle
 import collections
 
 import utils.builtin
+import core.outputstorage
 
 
 class ReverseIndexing(object):
@@ -18,9 +19,9 @@ class ReverseIndexing(object):
                  'business',
                  'date')
 
-    def __init__(self, path, cvsvc):
+    def __init__(self, path, cvs):
         self.path = path
-        self.cvs = cvsvc.svcls
+        self.cvs = cvs
         self.index = {}
 
     def setup(self):
@@ -94,12 +95,15 @@ class ReverseIndexing(object):
         svc_name = svc.name
         if svc_name in self.index:
             cv_index = self.index[svc_name]
-        for name in svc.names():
-            if (ids is None and name in cv_index['names']) or\
-                (ids is not None and name in ids):
-                yamlinfo = svc.getyaml(name)
-                index = self.genindex(name, yamlinfo, selected)
-                self.merge(cv_index, index)
+        if ids is not None:
+            ids = set([core.outputstorage.ConvertName(id).md for id in ids])
+            names = set(svc.names()) & ids
+        else:
+            names = svc.names()
+        for name in names:
+            yamlinfo = svc.getyaml(name)
+            index = self.genindex(name, yamlinfo, selected)
+            self.merge(cv_index, index)
         self.index[svc_name] = cv_index
         self.save()
 
@@ -190,7 +194,7 @@ class ReverseIndexing(object):
                 results.update(result)
         return results
 
-    def filter_ids(self, ids, filterdict, uses=None):
+    def filter(self, filterdict, ids, uses=None):
         indexdict = {}
         filterdict = copy.deepcopy(filterdict)
         if 'date' in filterdict:
@@ -205,6 +209,18 @@ class ReverseIndexing(object):
         if indexdict:
             ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
         return ids
+
+    def filter_ids(self, source, filterdict, ids, uses=None):
+        result = source
+        if filterdict:
+            if not isinstance(ids, set):
+                ids = set(ids)
+            filterset = self.filter(filterdict, ids=ids)
+            result = filter(lambda x: x in filterset or x[0] in filterset, source)
+        return result
+
+    def lastday(self):
+        return max([max(i['date'].keys()) for i in self.index.values() if i['date']])
 
     def _cur_places(self, yamlinfo):
         result = dict()

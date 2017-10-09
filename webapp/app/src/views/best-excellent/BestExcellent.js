@@ -3,34 +3,52 @@ import moment from 'moment';
 import React, { Component } from 'react';
 
 import { API } from 'API';
-import { Table } from 'antd';
+import { Row, Col, Table, Radio, DatePicker } from 'antd';
 import ColorGrad from 'utils/color-grad';
 import { getFastMatching } from 'request/fastmatching';
 
 class BestExcellent extends Component {
   constructor() {
     super();
+    const date = new Date();
     this.state = {
       dataSource: [],
+      daterange: [moment(date).add(-1, 'days'), moment(date).add(0, 'days')],
+      numbers: "3",
+      dateFormat: 'YYYY-MM-DD',
       pagesize: '20',
       loading: true,
       fromcache: true,
       allJDAPI: API.LSI_BY_ALL_JD_API,
     };
+    this.disabledDate = this.disabledDate.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleNumbersChange = this.handleNumbersChange.bind(this);
+    this.getAllJDDataSource = this.getAllJDDataSource.bind(this);
+    this.getExpandedRowRender = this.getExpandedRowRender.bind(this);
   }
 
   componentDidMount() {
-    const { fromcache, allJDAPI } = this.state;
-    const date = new Date();
+    this.getAllJDDataSource();
+  }
+
+  getAllJDDataSource() {
+    const { fromcache, allJDAPI, dateFormat, daterange, numbers } = this.state;
     const colorGrad = new ColorGrad();
     const gradient = colorGrad.gradient();
-    const defFilterData = { date: [moment(date).add(-1, 'days').format('YYYY-MM-DD'),
-                                   moment(date).add(0, 'days').format('YYYY-MM-DD')] };
-    var postData = { filterdict: defFilterData, threshold: 0.78, fromcache: fromcache };
+    const defFilterData = { date: [daterange[0].format(dateFormat),
+                                   daterange[1].format(dateFormat)] };
+    var postData = { filterdict: defFilterData, threshold: 0.78,
+                     fromcache: fromcache, numbers: parseInt(numbers) };
+    this.setState({
+      loading: true,
+    });
     getFastMatching(allJDAPI, postData, json => {
       if (json.code === 200) {
-        json.data.forEach((value) => {
-          value.color = gradient[parseInt(value.CVvalue*100)];
+        json.data.forEach((JDid) => {
+          JDid.CV.forEach((item) => {
+            item.color = gradient[parseInt(item.CVvalue*100)];
+          });
         });
         this.setState({
           dataSource: json.data,
@@ -40,43 +58,109 @@ class BestExcellent extends Component {
     });
   }
 
+  handleDateChange(dates) {
+    this.setState({ daterange: dates }, this.getAllJDDataSource);
+  }
+
+  handleNumbersChange(e) {
+    this.setState({ numbers: e.target.value }, this.getAllJDDataSource);
+  }
+
+  disabledDate(current) {
+    return current.valueOf() > Date.now() || current.valueOf() < Date.now()-14*24*60*60*1000;
+  }
+
+  getExpandedRowRender(record) {
+    return (
+      <div>
+      {record.description.split('\n').map((item, index) => { return (<p key={index}>{item}</p>); })}
+      </div>
+    );
+  };
+
   render() {
     const {
       dataSource,
       loading,
       pagesize,
+      daterange,
+      dateFormat,
+      numbers
     } = this.state;
-    const columns = [{
-      title: '公司',
-      key: 'JDcompany',
-      render: (text, record) => (
-        <a href={ `/fastmatching?jd_id=${record.JDid}&init_append_commentary=true` }
-           target="_blank">
-          { record.JDcompany } 
-        </a>
-      )
-    }, {
-      title: '职位',
-      dataIndex: 'JDname',
-      key: 'JDname',
-    },{
-      title: '候选人资料',
-      key: 'CVid',
-      render: (text, record) => (
-        <a href={`/resume/${record.id}`} target="_blank"
-           style={ { color: record.color } }>
-          { record.id } | { record.name } | { record.company } | { record.position } 
-        </a>
-      ),
-    },{
-      title: '来源',
-      dataIndex: 'origin',
-      key: 'CVorigin',
-    } ];
+
+    const columns = [
+      {
+        title: '公司职位',
+        key: 'name',
+        width: 400,
+        render: (text, record) => (
+          <a href={ `/fastmatching?jd_id=${record.ID}&init_append_commentary=true` }
+             target="_blank">
+            { record.company } | { record.name }
+          </a>
+        )
+      }, {
+        title: '人选',
+        key: 'CV',
+        render: (text, record) => (
+          <div>
+          {
+            record.CV.map((item) => {
+              return (
+                <Row gutter={16} key={item.id}>
+                  <Col span={16}>
+                    <a href={`/resume/${item.id}`} target="_blank"
+                     style={ { color: item.color } }>
+                    { item.id } | { item.name } | { item.company } | { item.position } | { item.school }
+                    </a>
+                  </Col>
+                  <Col span={8}>
+                    <span>{ item.origin }</span>
+                  </Col>
+                </Row>
+              );
+            })
+          }
+          </div>
+        )
+      }
+    ];
+
     return (
       <div>
+        <Row gutter={16}>
+          <Col span={5} />
+          <Col span={2}>
+            <span>
+              选择日期
+            </span>
+          </Col>
+          <Col span={5}>
+              <DatePicker.RangePicker
+               defaultValue={daterange}
+               disabledDate={this.disabledDate}
+               onChange={this.handleDateChange}/>
+          </Col>
+          <Col span={2}>
+            <span>
+              选择显示人数
+            </span>
+          </Col>
+          <Col span={5}>
+            <Radio.Group defaultValue={numbers} onChange={this.handleNumbersChange}>
+              <Radio.Button value="1">1</Radio.Button>
+              <Radio.Button value="3">3</Radio.Button>
+              <Radio.Button value="5">5</Radio.Button>
+              <Radio.Button value="10">10</Radio.Button>
+            </Radio.Group>
+          </Col>
+          <Col span={5} />
+        </Row>
         <Table columns={columns}
                dataSource={dataSource}
+               defaultExpandAllRows={false}
+               rowKey={record => record.ID}
+               expandedRowRender={record => this.getExpandedRowRender(record)}
                size={pagesize}
                loading={loading} />
       </div>

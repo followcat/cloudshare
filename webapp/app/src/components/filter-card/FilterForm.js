@@ -10,6 +10,7 @@ import {
   Checkbox,
   Select,
   DatePicker,
+  InputNumber,
   Icon
 } from 'antd';
 
@@ -68,13 +69,19 @@ class FilterForm extends Component {
 
       const formValues = Object.assign({}, {
         ...values,
-        'date': dateValue && dateValue[0] ? [dateValue[0].format('YYYY-MM-DD'), dateValue[1].format('YYYY-MM-DD')] : ['', '']
+        'date': dateValue && dateValue[0] ? [dateValue[0].format('YYYY-MM-DD'), dateValue[1].format('YYYY-MM-DD')] : null
       }, {
+
         gender: this.state.gender,
         education: this.state.education,
         marital_status: this.state.maritalStatus
       });
-
+      for(let key in formValues)
+      {
+        if (formValues[key] === null || formValues[key] === undefined 
+          || formValues[key].toString().replace(/,/g, "").length === 0)
+          delete formValues[key];
+      }
       this.props.onSearch(formValues);
     });
   }
@@ -82,7 +89,6 @@ class FilterForm extends Component {
   handleReset(e) {
     e.preventDefault();
     this.props.form.resetFields();
-
     this.setState({
       gender: [],
       education: [],
@@ -108,6 +114,7 @@ class FilterForm extends Component {
     for (let key in industry) {
       optGroup.push(
         <OptGroup key={key} label={key}>
+          <Option key={key} value={key}>{key}</Option>
           {industry[key].map(item => <Option key={item} value={item}>{item}</Option>)}
         </OptGroup>
       );
@@ -116,7 +123,7 @@ class FilterForm extends Component {
   }
 
   render() {
-    const { textarea, databaseDisplay, classify, postData } = this.props;
+    const { textarea, databaseDisplay, classify, projects, postData } = this.props;
     const { getFieldDecorator } = this.props.form;
     const { expand } = this.state;
 
@@ -143,6 +150,7 @@ class FilterForm extends Component {
     };
 
     const dateFormat = 'YYYY-MM-DD';
+
     return (
       <Form layout="horizontal">
         {textarea ?
@@ -168,18 +176,25 @@ class FilterForm extends Component {
                 wrapperCol={{ span: 19 }}
               >
                 {getFieldDecorator('uses', {
-                  initialValue: textarea ? [] : classify,
+                  initialValue: textarea ? [] : projects.concat(classify),
                   rules: [{ type: 'array' }]
-                })(<Select multiple>
-                    {classify.map((item, index) => {
-                      return <Option key={index} value={item} >{item}</Option>
-                    })}
+                })(<Select multiple={true}>
+                    <OptGroup key='projects' label="项目数据库">
+                      {projects.map((item, index) => {
+                        return <Option key={index} value={item} >{item}</Option>
+                      })}
+                    </OptGroup>
+                    <OptGroup key='classify' label="分类数据库">
+                      {classify.map((item, index) => {
+                        return <Option key={index} value={item} >{item}</Option>
+                      })}
+                    </OptGroup>
                   </Select>)}
               </Form.Item>
             </Col>
           </Row> : null}
-        <Row gutter={8}>
-          <Col span={8}>
+        <Row gutter={16}>
+          <Col span={5} offset={2}>
             <FormItem
               label="性别"
               {...formItemLayout}
@@ -190,7 +205,7 @@ class FilterForm extends Component {
               />
             </FormItem>
           </Col>
-          <Col span={8}>
+          <Col span={9}>
             <FormItem
               label="学历"
               {...formItemLayout}
@@ -214,7 +229,7 @@ class FilterForm extends Component {
           </Col>
           {expand ?
             <div>
-              <Col span={8}>
+              <Col span={5} offset={2}>
                 <FormItem
                   label="时间"
                   {...formItemLayout}
@@ -228,7 +243,43 @@ class FilterForm extends Component {
                   )}
                 </FormItem>
               </Col>
-              <Col span={8}>
+              <Col span={5} offset={1}>
+                <FormItem
+                label="年龄"
+                  {...formItemLayout}
+                >
+                {getFieldDecorator('age[0]')(
+                 <InputNumber  min={18} max={60}  step={1} 
+                  />
+                  )}
+                </FormItem>
+              </Col>
+              <Col span={3} pull={2}>
+                <FormItem
+                label="至" colon={false}
+                  {...formItemLayout}
+                >
+                {getFieldDecorator('age[1]')(
+                 <InputNumber  min={18} max={60}  step={1} 
+                  />
+                  )}
+                </FormItem>
+              </Col>
+              <Col span={6}>
+                <FormItem
+                  label="行业"
+                  {...formItemLayout}
+                >
+                  {getFieldDecorator('business')(
+                    <Select 
+                      multiple={true}
+                      showSearch={true}
+                    >
+                      {this.renderIndustry()}
+                    </Select>)}
+                </FormItem>
+              </Col>
+              <Col span={10} offset={1}>
                 <FormItem
                   label="当前地点"
                   {...formItemLayout}
@@ -237,27 +288,13 @@ class FilterForm extends Component {
                     <Input />)}
                 </FormItem>
               </Col>
-              <Col span={8}>
+              <Col span={10} offset={1}>
                 <FormItem
                   label="期望地点"
                   {...formItemLayout}
                 >
                   {getFieldDecorator('expectation_places')(
                     <Input />)}
-                </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem
-                  label="行业"
-                  {...formItemLayout}
-                >
-                  {getFieldDecorator('business')(
-                    <Select
-                      showSearch={true}
-                      multiple={true}
-                    >
-                      {this.renderIndustry()}
-                    </Select>)}
                 </FormItem>
               </Col>
             </div> :
@@ -285,6 +322,7 @@ FilterForm.propTypes = {
   textarea: PropTypes.bool,
   industry: PropTypes.objectOf(PropTypes.array),
   classify: PropTypes.array,
+  projects: PropTypes.array,
   postData: PropTypes.object,
   form: PropTypes.object,
   onSearch: PropTypes.func

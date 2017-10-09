@@ -1,7 +1,7 @@
 'use strict';
-import StorageUtil from '../utils/storage';
-import Generator from '../utils/generator';
-import { API } from '../config/api';
+import StorageUtil from 'utils/storage';
+import Generator from 'utils/generator';
+import { API } from 'config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
@@ -135,7 +135,7 @@ export const updateCompanyInfo = (params, callback) => {
  * @param {function} callback  回调函数
  */
 export const getCustomerList = (callback) => {
-  return fetch(API.CUSTOMER_LIST_API, {
+  return fetch(API.COMPANY_CUSTOMER_LIST_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -156,7 +156,7 @@ export const getCustomerList = (callback) => {
  * @param {function} callback 回调函数
  */
 export const updateCustomer = (method, params, callback) => {
-  return fetch(API.CUSTOMER_API, {
+  return fetch(API.COMPANY_CUSTOMER_API, {
     method: method,
     credentials: 'include',
     headers: {

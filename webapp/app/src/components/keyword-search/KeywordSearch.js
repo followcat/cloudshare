@@ -55,6 +55,7 @@ class KeywordSearch extends Component {
             <Input
               value={value}
               size="large"
+              placeholder="在关键字前后添加双引号&quot; &quot;可进行精确搜索"
               onChange={this.handleChange}
               onKeyPress={this.handleKeyPress}
             />
@@ -84,6 +85,7 @@ class KeywordSearch extends Component {
         <Col span={19}>
           <Input
             value={value}
+            placeholder="在关键字前后添加双引号&quot; &quot;可进行精确搜索"
             size="large"
             onChange={this.handleChange}
             onKeyPress={this.handleKeyPress}

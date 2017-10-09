@@ -3,7 +3,8 @@ class MultiPeople(object):
     def __init__(self, svc_peos):
         self.peoples = svc_peos
 
-    def unique(self, id):
+    def unique(self, peoobj):
+        id = peoobj.ID
         return not self.exists(id)
 
     def exists(self, id):
@@ -17,15 +18,19 @@ class MultiPeople(object):
     def getmd(self, id):
         results = list()
         for people in self.peoples:
+            if not people.exists(id):
+                continue
             for md in people.getmd(id):
                 if md not in results:
-                    result.append(md)
+                    results.append(md)
         for result in results:
             yield result
 
     def getinfo(self, id):
         results = list()
         for people in self.peoples:
+            if not people.exists(id):
+                continue
             for info in people.getinfo(id):
                 if info not in results:
                     results.append(info)

@@ -9,7 +9,7 @@ class JobDescriptionAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_id', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -21,12 +21,15 @@ class JobDescriptionAPI(Resource):
         super(JobDescriptionAPI, self).__init__()
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         jd_id = args['jd_id']
-        project = args['project']
-        result = self.svc_mult_cv.getproject(project).jd_get(jd_id)
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        result = project.jd_get(jd_id)
         co_id = result['company']
-        co_name = self.svc_mult_cv.getproject(project).company_get(co_id)['name']
+        co_name = project.company_get(co_id)['name']
         result['company_name'] = co_name
         return { 'code': 200, 'data': result }
 
@@ -34,13 +37,15 @@ class JobDescriptionAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         jd_id = args['jd_id']
-        project = args['project']
         status = args['status']
+        projectname = args['project']
         description = args['description']
         commentary = args['commentary'] if args['commentary'] else ''
         followup = args['followup'] if args['followup'] else ''
-        result = self.svc_mult_cv.getproject(project).jd_modify(jd_id, description,
-                    status, commentary, followup, user.id)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        result = project.jd_modify(jd_id, description, status,
+                                   commentary, followup, user.name)
         if result: 
             response = { 'code': 200, 'data': result,
                          'message': 'Update job description successed.' }
@@ -55,7 +60,7 @@ class JobDescriptionUploadAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_name', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -68,14 +73,16 @@ class JobDescriptionUploadAPI(Resource):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        project = args['project']
         co_id = args['co_id']
         jd_name = args['jd_name']
+        projectname = args['project']
         description = args['jd_description']
         commentary = args['commentary'] if args['commentary'] else ''
         followup = args['followup'] if args['followup'] else ''
-        result = self.svc_mult_cv.getproject(project).jd_add(co_id, jd_name, description,
-                                                             commentary, followup, user.id)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        result = project.jd_add(co_id, jd_name, description,
+                                commentary, followup, user.name)
         return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 
@@ -84,18 +91,21 @@ class JobDescriptionListAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(JobDescriptionListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        project = args['project']
-        result = self.svc_mult_cv.getproject(project).jd_lists()
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        result = project.jd_lists()
         for jd in result:
             co_id = jd['company']
-            co_name = self.svc_mult_cv.getproject(project).company_get(co_id)['name']
+            co_name = project.company_get(co_id)['name']
             jd['company_name'] = co_name
         return { 'code': 200, 'data': result }
 

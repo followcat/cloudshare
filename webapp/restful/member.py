@@ -15,12 +15,14 @@ class MemberAPI(Resource):
         super(MemberAPI, self).__init__()
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('membername', type = str, location = 'json')
+        self.reqparse.add_argument('membername', location = 'json')
+
 # get member's projectname
     def get(self):
         user = flask.ext.login.current_user
         member = user.getmember(self.svc_members)
         return { 'code': 200, 'result': member.name }
+
 # user become member
     def post(self):
         user = flask.ext.login.current_user

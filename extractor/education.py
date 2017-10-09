@@ -4,47 +4,43 @@ import re
 from extractor.utils_parsing import *
 
 
-with_prefix = lambda x: u'^'+ASP+u'*'+PREFIX+u'+'+ASP+u'*'+ x.pattern[1:]
-
 ED_PERIOD = u'(('+PERIOD+u')|(?P<ato>'+DATE+u'))'
 # We check for braket to avoid catching title 教育/培训/学术/科研/院校
-ED = re.compile(ur'^'+ASP+u'*(?P<br>'+UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*?)^'+ASP+u'*(?='+ UNIBRALEFT +u'?((((项'+ASP+u'*目)|((工'+ASP+u'*作'+ASP+u'*)|(实习)|(工作(与)?实践)))'+ASP+u'*经'+ASP+u'*[历验])|(实习与实践)|(背景)|(培训)|(语言((能力)|(技能)))|(所获奖项)|(校内职务)|(学生实践经验)|(技能证书)|(接受培训)|(社会经验))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
-AED = re.compile(ur'^'+ASP+u'*(?P<br>'+ UNIBRALEFT +u')?教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*)', re.DOTALL+re.M)
-PFXED = re.compile(with_prefix(ED), re.DOTALL+re.M)
-PFXAED = re.compile(with_prefix(AED), re.DOTALL+re.M)
-EED = re.compile(ur'^'+PREFIX+'*'+ASP+u'*(?P<br>'+ UNIBRALEFT +u')?Education'+ UNIBRARIGHT +u'?\n(?P<edu>.*)', re.DOTALL+re.M)
+ED = re.compile(ur'^'+PREFIX+u'*(?P<br>'+UNIBRALEFT +u')?\**教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*?)^'+PREFIX+u'*(?='+ UNIBRALEFT +u'?\**((((项'+ASP+u'*目)|((工'+ASP+u'*作'+ASP+u'*)|(实习)|(工作(与)?实践))){1,}'+ASP+u'*经'+ASP+u'*[历验])|(实习与实践)|(背景)|(培训)|(语言((能力)|(技能)))|(所获奖项)|(校内职务)|(学生实践经验)|(技能证书)|(接受培训)|(社会经验)|素质技能)'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+AED = re.compile(ur'^'+PREFIX+u'*(?P<br>'+ UNIBRALEFT +u')?\**教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|((?(br)/?)[及与]?培训))[:：]?'+ UNIBRARIGHT +u'?(?P<edu>.*)', re.DOTALL+re.M)
+EED = re.compile(ur'^'+PREFIX+'*'+ASP+u'*(?P<br>'+ UNIBRALEFT +u')?\**Education\**'+ UNIBRARIGHT +u'?\n(?P<edu>.*)', re.DOTALL+re.M)
 
 
-SENSEMA = re.compile(u'^'+CONTEXT+u'?'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+SCHOOL+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P=sep)'+ASP+u'*'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
+PELASTMA = re.compile(u'^'+POESP+u'*'+CONTEXT+u'?'+POESP+u'*'+SCHOOL+POESP+u'+'+MAJOR+POESP+u'+'+EDUCATION+POESP+u'+'+PERIOD, re.M)
+PIPELASTMA = re.compile(u'^'+POESP+u'*'+CONTEXT+u'?'+POESP+u'*'+SCHOOL+POESP+u'+\|'+POESP+u'+'+EDUCATION+POESP+u'+\|'+POESP+u'+'+MAJOR+POESP+u'+'+PERIOD, re.M)
+PIPEEDMA = re.compile(u'^'+POESP+u'*'+CONTEXT+u'?'+POESP+u'*'+PERIOD+POESP+u'*'+SCHOOL+u'\n+'+POESP+u'*'+EDUCATION+POESP+u'*\|'+POESP+u'*'+MAJOR+u'$', re.M)
+PIPEEDLASTMA = re.compile(u'^'+POESP+u'*'+CONTEXT+u'?'+POESP+u'*'+PERIOD+POESP+u'*'+SCHOOL+u'\n+'+POESP+u'*'+MAJOR+POESP+u'+\|'+POESP+u'+'+EDUCATION, re.M)
+
+SENSEMA = re.compile(CONTEXT+u'?'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+SCHOOL+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*'+MAJOR+ASP+u'*(?P=sep)'+ASP+u'*'+EDUCATION+ASP+u'*'+exclude_with_parenthesis('')+u'?'+ASP+u'*$', re.M)
 SENSEDROP = u'((\S+)[\n'+SP+EDUFIELDSEP+u']*)?'
-RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+u'(?P<major>[^'+EDUFIELDSEP+u'\n]+)'+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*(?P=sep)'+ASP+u'*'+SENSEDROP+u'$', re.M)
-MAJFSTMA = re.compile(u'^'+ASP+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
+RVSENSEMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+SCHOOL+ASP+u'*'+PERIOD+u'[\n'+SP+EDUFIELDSEP+u']*'+MAJOR+ASP+u'*(?P<sep>['+EDUFIELDSEP+u'])'+ASP+u'*'+SENSEDROP+u''+EDUCATION+ASP+u'*(?P=sep)'+ASP+u'*'+SENSEDROP+u'$', re.M)
+MAJFSTMA = re.compile(PREFIX+u'*'+PERIOD+ur'[:：]?[\n'+SP+u']+'+UNIBRALEFT+u'(?P<major>\S+)'+UNIBRARIGHT+'\([^\(]*\)[\n'+SP+u']+'+SCHOOL+ASP+u'+'+EDUCATION+ASP+u'*$', re.M)
 # Major is optional
 SPSOLHDR = ASP+u'*(?P<col1>-{5,}) (?:-{5,}) (?:-{5,}) (?:-{5,})\n'
 SEPLIST = ur'[:：]?'+ASP+u'*'
 CTL = (u'(?P<period>'+PERIOD+u')', SCHOOL)
-SPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+ASP+u'*'+SEPLIST.join(CTL)+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
-RVSPSOLMA = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+ASP+u'*'+SEPLIST.join(reversed(CTL))+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
-UCSOLMA = re.compile(u'^'+CONTEXT+u'?'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
-SPSOLMAEDFST = re.compile(u'^'+ASP+u'*'+CONTEXT+u'?'+PERIOD+ur'[:：]?'+ASP+u'*'+EDUCATION+u'[\n'+SP+u']+'+SCHOOL+u'[\n'+SP+u']+(?P<major>[^'+SP+u']+)[\n'+SP+u']+', re.M)
-
-PFXSENSEMA = re.compile(with_prefix(SENSEMA), re.M)
-PFXSPSOLMA = re.compile(with_prefix(SPSOLMA), re.M)
-PFXUCSOLMA = re.compile(with_prefix(UCSOLMA), re.M)
+SPSOLMA = re.compile(CONTEXT+u'?'+PREFIX+u'*'+SEPLIST.join(CTL)+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
+RVSPSOLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+SEPLIST.join(reversed(CTL))+u'[\n'+SP+u']+(([^'+SP+u']+[\n'+SP+u']+)?((?P<major>[^'+SP+u']+(\s'+exclude_with_parenthesis('')+u')?)[\n'+SP+u']+))?'+EDUCATION+ASP+u'*', re.M)
+UCSOLMA = re.compile(CONTEXT+u'?'+PREFIX+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'( ?[\xa0\ufffd])'+ASP+u'*((?P<major>[^\ufffd\xa0'+u'\n]+?)( ?[\xa0\ufffd])'+ASP+u'*)?'+EDUCATION, re.M)
+SPSOLMAEDFST = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+EDUCATION+u'[\n'+SP+u']+'+SCHOOL+u'[\n'+SP+u']+(?P<major>[^'+SP+u']+)[\n'+SP+u']+', re.M)
 
 SEPLIST = u'[\n'+SP+u']*)|(?:(\d\.)?'+ASP+u'*'
 VRT = (u'(毕业)?[院学]校(名称)?[:：]'+ASP+u'*'+SCHOOL, u'((就读)|(入学))?时间[:：]'+ASP+u'*'+PERIOD, u'专业(名称)?[:：]'+ASP+u'*(?P<major>.+?)', u'学[位历][:：]'+ASP+u'*'+EDUCATION+ASP)
-HDVRTMA = re.compile(u'^'+ASP+u'*(?:(?:(\d\.)?'+ASP+u'*'+ SEPLIST.join(VRT) +u')){4}'+ASP+u'*$', re.M)
+HDVRTMA = re.compile(u'^'+PREFIX+u'*(?:(?:(\d\.)?'+ASP+u'*'+ SEPLIST.join(VRT) +u')){4}'+ASP+u'*$', re.M)
 
 SEPLIST = u''
-CTL = (u'(?P<school>.+?)', u'(?P<br>'+UNIBRALEFT+')?'+ASP+u'*'+PERIOD+ASP+u'*(?(br)'+UNIBRARIGHT+')')
-HDCTLMA = re.compile(u'^'+CONTEXT+u'?'+ SEPLIST.join(CTL)+ASP+u'*\n+('+ASP+u'*专业(名称)?[:：])?'+ASP+u'*(?P<major>.+?)\n*(学院名称[:：]\n*\S+'+ASP+u'+\n*)?学(历/学)?[历位][:：]'+ASP+u'*'+EDUCATION+u'('+ASP+u'+((是否)|(全日制))统招[:：]?'+ASP+u'*[是否])?', re.M)
-RVHDCTLMA = re.compile(u'^'+CONTEXT+u'?'+ SEPLIST.join(reversed(CTL))+ASP+u'*\n+('+ASP+u'*专业(名称)?[:：])?'+ASP+u'*(?P<major>.+?)\n*(学院名称[:：]\n*\S+'+ASP+u'+\n*)?学(历/学)?[历位][:：]'+ASP+u'*'+EDUCATION+u'('+ASP+u'+((是否)|(全日制))统招[:：]?'+ASP+u'*[是否])?', re.M)
+CTL = (u'\**(?P<school>.+?)\**', u'(?P<br>'+UNIBRALEFT+')?'+ASP+u'*\**'+PERIOD+u'\**'+ASP+u'*(?(br)'+UNIBRARIGHT+')')
+MANDCTLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ SEPLIST.join(CTL)+ASP+u'+专业(名称)?[:：]'+ASP+u'*(?P<major>.+?)'+ASP+u'*学(历/学)?[历位][:：]'+ASP+u'*'+EDUCATION, re.M)
+RVMANDCTLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ SEPLIST.join(reversed(CTL))+ASP+u'+专业(名称)?[:：]'+ASP+u'*(?P<major>.+?)'+ASP+u'*学(历/学)?[历位][:：]'+ASP+u'*'+EDUCATION, re.M)
+HDCTLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ SEPLIST.join(CTL)+ASP+u'*\n+('+ASP+u'*专业(名称)?[:：])?'+ASP+u'*(?P<major>.+?)'+ASP+u'*(学院名称[:：]'+ASP+u'*\S+'+ASP+u'+'+ASP+u'*)?学(历/学)?[历位][:：]'+ASP+u'*'+EDUCATION+u'('+ASP+u'+((是否)|(全日制))统招[:：]?'+ASP+u'*[是否])?', re.M)
+RVHDCTLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ SEPLIST.join(reversed(CTL))+ASP+u'*\n+('+ASP+u'*专业(名称)?[:：])?'+ASP+u'*(?P<major>.+?)'+ASP+u'*(学院名称[:：]'+ASP+u'*\S+'+ASP+u'+'+ASP+u'*)?学(历/学)?[历位][:：]'+ASP+u'*'+EDUCATION+u'('+ASP+u'+((是否)|(全日制))统招[:：]?'+ASP+u'*[是否])?', re.M)
 
-PFXHDCTLMA = re.compile(with_prefix(HDCTLMA), re.M)
-PFXRVHDCTLMA = re.compile(with_prefix(RVHDCTLMA), re.M)
-
-NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+ASP+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
+NLSMLMA = re.compile(u'^'+CONTEXT+u'?'+PREFIX+u'*'+PERIOD+ur'[:：]?'+ASP+u'*'+SCHOOL+u'\n{2}'+ASP+u'*'+EDUCATION+u'\n{2}'+ASP+u'*(?P<major>\S+)'+ASP+u'*$', re.M)
 
 TABHDRMAJ = u'^'+ASP+u'*时'+ASP+u'*间段?'+ASP+u'+[院学]'+ASP+u'*校('+ASP+u'*名'+ASP+u'*称)?'+ASP+u'+专'+ASP+u'*业'+ASP+u'+(获得证书/)?学'+ASP+u'*历(/学位)?('+ASP+u'+证'+ASP+u'*书)?('+ASP+u'+是否统招)?(?P<edu>.+)'
 
@@ -58,7 +54,7 @@ SUMMARYEDU = re.compile(u'学'+ASP+u'*[历位][:：]'+ASP+u'*(?P<education>\S+)'
 SUMMARYMAJOR = re.compile(u'专'+ASP+u'*业[:：]'+ASP+u'*(?P<major>\S+)', re.M)
 SUMMARYSCHOOL = re.compile(u'((毕业院)|(学))'+ASP+u'*校[:：]'+ASP+u'*'+SCHOOL, re.M)
 
-EMA = re.compile('^'+PREFIX+'*'+ASP+'*(?P<school>\S[\S ]*)\n+'+PREFIX+'*'+ASP+'*'+EDUCATION+','+ASP+'*(?P<major>\S[\S ]+)\n+(?P<from>\d{4})'+DATESEP+'(?P<to>\d{4})', re.M)
+EMA = re.compile('^'+PREFIX+'*'+ASP+'*\**'+SCHOOL+u'\**\n+'+PREFIX+'*'+ASP+'*'+EDUCATION+','+ASP+'*'+MAJOR+u'\n+(?P<from>\d{4}|'+ENPDATE+u')'+DATESEP+'(?P<to>\d{4}|'+ENPDATE+u')', re.M)
 
 def format_output(output, groupdict, summary=None):
     result = {
@@ -73,16 +69,16 @@ def format_output(output, groupdict, summary=None):
         result['date_from'] = fix_date(groupdict['afrom'])
         result['date_to'] = fix_date(groupdict['ato'])
     try:
-        result['education'] = groupdict['education'].strip()
+        result['education'] = fix_education(groupdict['education'])
         if groupdict['shorted4']:
-            result['education'] = groupdict['shorted4']
+            result['education'] = fix_education(groupdict['shorted4'])
         elif groupdict['shorted6']:
-            result['education'] = groupdict['shorted6']
+            result['education'] = fix_education(groupdict['shorted6'])
         elif groupdict['shorted7']:
-            result['education'] = groupdict['shorted7']
+            result['education'] = fix_education(groupdict['shorted7'])
     except KeyError:
         if summary:
-            result['education'] = summary['education'].strip()
+            result['education'] = fix_education(summary['education'])
             
     try:
         result['major'] = fix_name(groupdict['major'].replace('\n', ' '))
@@ -97,10 +93,12 @@ schools = lambda output: output[1]
 school_1 = lambda output: output[1][0]
 name = lambda school: school['school']
 major = lambda school: school['major']
+education = lambda school: school['education']
 
 def education_xp(text, summary=None):
     u"""
         >>> assert education_xp(u'1999年9月至2001年7月  北京科技经营管理学院  计算机应用技术           大专')[0]
+        >>> assert '|' not in major(school_1(education_xp(u'2007年9月至2010年7月        山东理工大学\\n\\n农业电气化及自动化 | 硕士学位')))
         >>> assert education_xp(u'  2000.09 - 2003.07  清华大学  工程物理系  硕士')[0]
         >>> assert education_xp(u'2002/09 - 2005/03   沈阳工业大学 �电力电子与电力传动 �硕士')[0]
         >>> assert u'法' not in name(school_1(education_xp(u'2007/09-2011/06   福建漳州师范学院��法学 �本科')))
@@ -108,11 +106,14 @@ def education_xp(text, summary=None):
         >>> assert education_xp(u'（海外） 2015 /9 --至今  南京大学 人力资源管理 MBA')[0]
         >>> assert education_xp(u'1995 /9--1998 /7  衡阳医学院（现名“南华大学”）   临床医学与医学技术   大专')[0]
         >>> assert education_xp(u'2009.01 - 2010.06  印度大学(India University)  软件工程  硕士')[0]
+        >>> assert education_xp(u'2012.09-2015.06        重庆大学             机械电子工程      硕   士')[0]
+        >>> assert 2 == len(education(school_1(education_xp(u'2012.09-2015.06        重庆大学             机械电子工程      硕   士'))))
         >>> assert education_xp(u'2001.03 - 2002.11  悉尼科技大学 (University of Technology, Sydney)  其他  本科')[0]
         >>> assert education_xp(u'1999.02 - 2000.11  商业学院，悉尼大学  商业全科学 (Business Studies)  大专')[0]
         >>> assert education_xp(u'教育背景及培训：\\n\\n   1996.09-2000.07  西南学院 (西南科技大学)\\n 自动化  本科。')[0] == 1
         >>> assert education_xp(u'（海外） 2015/9-至今 南京大学 管理 MBA\\n双证班；\\n2007/1-2010/1 南京大学 资源管理 本科\\n管理')[0] == 2
-        >>> assert education_xp(u'2010.09-至今  科学研究院  原子核物理\\n 硕士2006.09 - 2010.07  理工大学  飞行器设计  本科')[0] == 2
+        >>> assert 2 == education_xp(u'2010.09 - 2013.07  能科学研究院  原子核物理\\n 硕士2006.09 - 2010.07  理工大学  飞行器设计  本科')[0]
+        >>> assert 2 == education_xp(u'2010.09-至今  科学研究院  原子核物理\\n 硕士2006.09 - 2010.07  理工大学  飞行器设计  本科')[0]
         >>> assert education_xp(u'2000/9―2003/3：同济大学 | 生物医学工程 | 硕士')[0]
         >>> assert education_xp(u'2006/09 --2010/06广东商学院 | 法学 | 学士')[0]
         >>> assert '|' not in name(school_1(education_xp(u'2009/09 --2012/07 \\n\\n电力职业技术学院 | 其自动化 | 大专')))
@@ -131,6 +132,9 @@ def education_xp(text, summary=None):
         >>> assert education_xp(u'2001/08 --2005/07  大连理工大学  机械设计制造及其自动化专业  学士')[0]
         >>>     #TODO replace 学士 by corresponding 学历
         >>> assert education_xp(u'学历：本科  毕业学校：湖南大学\\n\\n专业：汉语言文学  时间：2004.01 至2008.01\\n')[0]
+        >>> assert 2 == len((schools(education_xp(u'中科院近代物理研究所       加速器物理         硕士   2010/09\~2013/07  兰州\\n\\n'
+        ...         u'陕西师范大学           物理学 (排名：4/169)    学士      2006/09\~2010/07  西安'))))
+        >>> assert education_xp(u'清华大学 | 博士 | 工程物理-加速器   2010年9月 - 2014年9月')
         >>> assert education_xp(u'2003/9 - 2007/5 湖南科技大学\\n\\n专业：生物科学，技术\\n\\n学历： 本科')[0]
         >>> assert education_xp(u'''2010年8月  --  2014年1月东北大学\\n\\n专业名称：其自动化\\n\\n学历/学位：博士 全日制统招：是''')[0]
         >>> assert education_xp(u'2011-9 至 2014-7   计算机软件与理论中山大学\\n\\n硕士研究生')[1]
@@ -146,24 +150,49 @@ def education_xp(text, summary=None):
         >>>     #TODO 本科 学士 makes one for education and the other for major
         >>> assert not education_xp(u'2003年9月---2008年6月：华北煤炭医学院')[1]  #FIXME
         >>> assert not education_xp(u'最高学位：硕士 2009年11月\\n\\n毕业院校：巴斯大学（英国）中英口笔译')[0]  #FIXME
-        >>> assert 2 == education_xp(u'2010.09 - 2013.07  能科学研究院  原子核物理\\n 硕士2006.09 - 2010.07  理工大学  飞行器设计  本科')[0]
+        >>> assert not education_xp(u'2004/9-2008/7         浙江大学\\n本科|生物科学，技术')[0] #FIXME
+
+        MANDCTLMA related
+        >>> assert 6 == len(name(school_1(education_xp(u'合肥工业大学 2006/09–2010/06   专业：材料成型及控制工程专业   学历：本科'))))
+
+        RVHDCTLMA test:
+        >>> assert u'本科' in school_1(education_xp(u'   1.  ##### 2007年6月  --  2011年4月北京人文大学\\n\\n> 专业名称：\\n>\\n'
+        ...     u'> 机械设计制造及其自动化\\n>\\n> 学历/学位：\\n>\\n> 本科 全日制统招：是'))['education']
+        >>> assert u'硕士' in school_1(education_xp(u'##### **2003年10月  --  2006年2月天津大学**\\n\\n> 专业名称：\\n>\\n'
+        ...     u'> 制药工程\\n>\\n> 学历/学位：\\n>\\n> 硕士 全日制统招：是'))['education']
     """
     maj = 0
     out = []
-    if HDCTLMA.search(text):
-        for r in HDCTLMA.finditer(text):
+    if PIPEEDMA.search(text):
+        for r in PIPEEDMA.finditer(text):
             maj +=1
             format_output(out, r.groupdict())
-    elif PFXHDCTLMA.search(text):
-        for r in PFXHDCTLMA.finditer(text):
+    elif PIPEEDLASTMA.search(text):
+        for r in PIPEEDLASTMA.finditer(text):
             maj +=1
             format_output(out, r.groupdict())
-    elif RVHDCTLMA.search(text):
-        for r in RVHDCTLMA.finditer(text):
+    elif PELASTMA.search(text):
+        for r in PELASTMA.finditer(text):
             maj +=1
             format_output(out, r.groupdict())
-    elif PFXRVHDCTLMA.search(text):
-        for r in PFXRVHDCTLMA.finditer(text):
+    elif PIPELASTMA.search(text):
+        for r in PIPELASTMA.finditer(text):
+            maj +=1
+            format_output(out, r.groupdict())
+    elif MANDCTLMA.search(SHORTEN_BLANK(text)):
+        for r in MANDCTLMA.finditer(SHORTEN_BLANK(text)):
+            maj +=1
+            format_output(out, r.groupdict())
+    elif RVMANDCTLMA.search(SHORTEN_BLANK(text)):
+        for r in RVMANDCTLMA.finditer(SHORTEN_BLANK(text)):
+            maj +=1
+            format_output(out, r.groupdict())
+    elif HDCTLMA.search(SHORTEN_BLANK(text)):
+        for r in HDCTLMA.finditer(SHORTEN_BLANK(text)):
+            maj +=1
+            format_output(out, r.groupdict())
+    elif RVHDCTLMA.search(SHORTEN_BLANK(text)):
+        for r in RVHDCTLMA.finditer(SHORTEN_BLANK(text)):
             maj +=1
             format_output(out, r.groupdict())
     elif HDVRTMA.search(text):
@@ -178,37 +207,10 @@ def education_xp(text, summary=None):
         for r in NLSMLMA.finditer(text):
             maj +=1
             format_output(out, r.groupdict())
-    if not maj and UCSOLMA.search(text):
-        out = []
-        for r in UCSOLMA.finditer(text):
-            if r.group('major'):
-                maj +=1
-                format_output(out, r.groupdict())
-            elif summary:
-                maj +=1
-                format_output(out, r.groupdict(), summary)
-            else:
-                format_output(out, r.groupdict(), summary={'major': ''})
-    if not maj and PFXUCSOLMA.search(text):
-        out = []
-        for r in PFXUCSOLMA.finditer(text):
-            if r.group('major'):
-                maj +=1
-                format_output(out, r.groupdict())
-            elif summary:
-                maj +=1
-                format_output(out, r.groupdict(), summary)
-            else:
-                format_output(out, r.groupdict(), summary={'major': ''})
     if not maj:
         if SENSEMA.search(text):
             out = []
             for r in SENSEMA.finditer(text):
-                maj +=1
-                format_output(out, r.groupdict())
-        elif PFXSENSEMA.search(text):
-            out = []
-            for r in PFXSENSEMA.finditer(text):
                 maj +=1
                 format_output(out, r.groupdict())
         elif RVSENSEMA.search(text):
@@ -216,23 +218,9 @@ def education_xp(text, summary=None):
             for r in RVSENSEMA.finditer(text):
                 maj +=1
                 format_output(out, r.groupdict())
-    if not maj and (PFXSPSOLMA.search(text) or SPSOLMA.search(text)):
+    if not maj and SPSOLMA.search(text):
         out = []
-        for r in PFXSPSOLMA.finditer(text):
-            if r.group('major'):
-                maj +=1
-                format_output(out, r.groupdict())
-            elif summary:
-                maj +=1
-                format_output(out, r.groupdict(), summary)
-            else:
-                format_output(out, r.groupdict(), summary={'major': ''})
-        if not maj:
-            # Support inline definition would duplicate PFXSPSOLMA
-            RE = re.compile(SPSOLMA.pattern[1:], re.M)
-        else:
-            RE = SPSOLMA
-        for r in RE.finditer(text):
+        for r in SPSOLMA.finditer(text):
             if r.group('major'):
                 maj +=1
                 format_output(out, r.groupdict())
@@ -253,9 +241,20 @@ def education_xp(text, summary=None):
                 format_output(out, r.groupdict(), summary)
             else:
                 format_output(out, r.groupdict(), summary={'major': ''})
+    if not maj and UCSOLMA.search(text):
+        out = []
+        for r in UCSOLMA.finditer(text):
+            if r.group('major'):
+                maj +=1
+                format_output(out, r.groupdict())
+            elif summary:
+                maj +=1
+                format_output(out, r.groupdict(), summary)
+            else:
+                format_output(out, r.groupdict(), summary={'major': ''})
     if not maj and summary:
         RE = re.compile(u'^'+PREFIX+u'*'+ASP+u'*'+PERIOD+ASP+u'+(?P<school>%s)' %
-                summary['school'].replace('(', '\(').replace(')', '\)').strip()+ASP+u'+(?P<major>%s)' % summary['major'].strip(), re.M)
+                aspstrip(summary['school'].replace('(', '\(').replace(')', '\)'))+ASP+u'+(?P<major>%s)' % aspstrip(summary['major']), re.M)
         if RE.search(text):
             out = []
         for r in RE.finditer(text):
@@ -288,7 +287,6 @@ def fix_liepin(d):
     maj = 0
     processed = []
     summary = {}
-    MA = re.compile(SPSOLMA.pattern[1:], re.M)
     for RE in [ED, AED]:
         res = RE.search(d)
         if res:
@@ -297,8 +295,9 @@ def fix_liepin(d):
                 summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
                 summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
             for r in SPSOLMA.finditer(res.group('edu')):
-                maj +=1
-                format_output(processed, r.groupdict(), summary)
+                if r.group('major'):
+                    maj +=1
+                    format_output(processed, r.groupdict(), summary)
             else:
                 if maj:
                     return fix_output(processed)
@@ -309,12 +308,6 @@ def fix_liepin(d):
                 if maj:
                     return fix_output(processed)
             for r in HDCTLMA.finditer(res.group('edu')):
-                maj +=1
-                format_output(processed, r.groupdict(), summary)
-            else:
-                if maj:
-                    return fix_output(processed)
-            for r in MA.finditer(res.group('edu')):
                 maj +=1
                 format_output(processed, r.groupdict(), summary)
             else:
@@ -367,7 +360,7 @@ def fix_jingying(d):
     maj = 0
     processed = []
     summary = {}
-    MA = re.compile(u'^('+SPSOLHDR+u')?'+SPSOLMA.pattern[1:]+'$', re.M)
+    MA = re.compile(u'^('+SPSOLHDR+u')?'+SPSOLMA.pattern+'$', re.M)
     for RE in [ED, AED]:
         res = RE.search(d)
         if res:
@@ -395,10 +388,8 @@ def fix_yingcai(d):
         >>> assert fix_yingcai(u'教育经历\\n燕山大学\\n2000.09 - 2004.07\\n本科\\n计算机科学与技术')['education_history']
         >>> assert fix_yingcai(u'教育经历\\n武汉生物工程学院\\n2016.07\\n本科\\n土木工程') # Incomplete period
         >>> assert fix_yingcai(u'本科\\n教育经历\\n 郑州科技学院\\n 1900.01 - 2016.07\\n 计算机科学与技术')
-        >>> assert u'本科' == fix_yingcai(u'男\\n 22岁\\n 未婚\\n 本科')['education_history'][0]['education']
         >>> assert not fix_yingcai(u'教育经历\\n第一中学\\n1980.09 - 1983.07\\n高中\\n在校经历：我在')['education_history'][0]['major']
-        >>> assert u'技术' in fix_yingcai(u'教育经历\\n郑州工业 应用技术学院\\n2006.09 - 2009.07\\n'
-        ...     u'大专\\n计算机科学与技术')['education_history'][0]['school']
+        >>> #assert u'技术' in fix_yingcai(u'教育经历\\n郑州工业 应用技术学院\\n2006.09 - 2009.07\\n大专\\n计算机科学与技术')['education_history'][0]['school']
     """
     maj = 0
     processed = []
@@ -413,20 +404,23 @@ def fix_yingcai(d):
     if not maj:
         r = SINGLEYIED.search(d)
         edu = re.compile(u'^'+ASP+u'*'+EDUCATION+u'$', re.M).search(d)
+        try:
+            education = edu.group('education')
+        except AttributeError:
+            education = ''
         if r:
             res = r.groupdict()
-            try:
-                res['education'] = edu.group('education')
-            except AttributeError:
-                res['education'] = ''
+            res['education'] = education
             maj +=1
             format_output(processed, res)
         else:
-            summary['education'] = edu.group('education')
+            summary['education'] = education
     return fix_output(processed)
 
 def fix(d):
     u"""
+        >>> assert ED.search(u'教育背景              Education\\n\\n素质技能')
+        >>> assert ED.search(u'教育背景              Education\\n\\n工作项目经历')
         >>> assert u'大' in name(fix(u'''【教育/培训】1991-09\~1995-07  师范大学 汉语言文学 本科\\n【工作经验】''')['education_history'][0])
         >>> assert fix(u'教育经历\\n2011/09 - 2013/12   广东科技学院 电子信息科学与技术 大专\\n语言能力')
         >>> assert fix(u'教育经历\\n\\n2008.09 - 2012.07  中南民族大学  网络工程  本科')
@@ -460,6 +454,15 @@ def fix(d):
         >>> assert not fix(u'教育:\\n\\n1982-1986        哈尔滨工业大学计算机科学，本科') #FIXME
         >>> assert not fix(u'学习培训经历：\\n\\n2003年9月-2007年7月　    湖南城市学院　　\\n电子信息工程专业　　 本科')  #FIXME
         >>> assert not fix(u'----\\n1995.9—1999.7   长春光学精密机械学院       检测技术及仪器仪表   本科\\n----')   #FIXME
+        >>> assert fix(u'**教育经历 **\\n\\n2004.09 - 2007.03  北京航空航天大学  测试计量技术及仪器  硕士')
+        >>> assert fix(u'Education\\n\\n西安交通大学\\n\\n硕士, 临床医学\\n\\n2005 – 2012')
+        >>> assert 4 == len(fix(u'Education\\n\\n西安交通大学\\n\\n硕士, [临床医学](http://www.linkedin.com/vsearch/p?trk=prof-edu-field_of_study)'
+        ...         u'\\n\\n2005 – 2012')['education_history'][0]['major'])
+        >>> assert 'Business' in name(fix(u'Education\\n\\n[Indiana University - Kelley School of\\nBusiness]\\n\\n'
+        ...         u'MBA, [MBA]\\n\\n2005 – 2007')['education_history'][0])
+        >>> assert 2 == len(fix(u'### **教育经历**\\n\\n2013.09 - 2016.06  中国科学院武汉物理与数学研究所  MRI仪器技术  硕士\\\\\\n'
+        ...         u'2009.09 - 2013.06  华中科技大学  生物医学工程  本科\\n### **语言能力**')['education_history'])
+
     """
     maj = 0
     if is_jycv(d):
@@ -497,16 +500,6 @@ def fix(d):
             if maj:
                 processed = out
                 break
-    if not maj:
-        for match in PFXED.finditer(d):
-            remainer = d.replace(match.group('edu'), '')
-            if SUMMARYMAJOR.search(remainer) and SUMMARYSCHOOL.search(remainer):
-                summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
-                summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
-            maj, out = education_xp(match.group('edu'), summary)
-            if maj:
-                processed = out
-                break
     if maj:
         return fix_output(processed)
     if AED.search(d):
@@ -515,15 +508,6 @@ def fix(d):
             summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
             summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
         res = AED.search(d)
-        maj, out = education_xp(res.group('edu'), summary)
-        if maj or len(out):
-            processed = out
-    elif PFXAED.search(d):
-        remainer = PFXAED.sub('', d)
-        if SUMMARYMAJOR.search(remainer) and SUMMARYSCHOOL.search(remainer):
-            summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
-            summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
-        res = PFXAED.search(d)
         maj, out = education_xp(res.group('edu'), summary)
         if maj or len(out):
             processed = out
@@ -540,10 +524,6 @@ def fix(d):
         for r in UCSOLMA.finditer(THED.search(d).group('edu')):
             maj +=1
             format_output(out, r.groupdict())
-        if not maj:
-            for r in PFXUCSOLMA.finditer(THED.search(d).group('edu')):
-                maj +=1
-                format_output(out, r.groupdict())
         processed = out
     elif HDVRTMA.search(d):
         maj = 0

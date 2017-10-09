@@ -10,5 +10,7 @@ module.exports = {
 
   STATIC_PATH: path.join(__dirname, '../static'),
 
+  PROD_STATIC_PATH: path.join(__dirname, '../static.prod'),
+
   ROOT_PATH: path.join(__dirname, '../')
 };

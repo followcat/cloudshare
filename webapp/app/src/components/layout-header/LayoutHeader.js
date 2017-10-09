@@ -7,7 +7,7 @@ class LayoutHeader extends Component {
       <div className="cs-layout-header">
         <div className="cs-layout-header-wrapper">
           <div className="cs-layout-logo">
-            <img src={this.props.logoImg} alt="Logo" />
+            <img src={this.props.logoImg} alt="Logo" style={{ height: "92%" }}/>
           </div>
           {this.props.children}
         </div>

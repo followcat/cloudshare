@@ -1,8 +1,6 @@
 #ignore node_modules
 .hg/
-webapp/static/
-webapp/static/js/node_modules/
-webapp/static/js/PhantomJS*/
+webapp/static*/
 flask_session/
 *.swp
 *.orig
@@ -14,15 +12,21 @@ flask_session/
 celerybeat-schedule
 output/
 repo/
+indiv/
 Index/
 account/
+password/
 lsimodel/
+config/
+webapp/config/
 raw
 raw/
 tags/
 cutwords/
 projects/
 classify/
+members/
+message/
 storage/
 webapp/app/dist
 webapp/static/node_modules/
@@ -32,3 +36,5 @@ webapp/app/node_modules/
 webapp/templates_dist/
 tests/lsisim
 tests/lsimodel_words
+demostorage/
+demorepo/

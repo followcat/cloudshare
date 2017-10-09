@@ -2,9 +2,9 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 
-import CVProcess from '../../utils/cv-process';
+import CVProcess from 'utils/cv-process';
 
-import './cvcontent.less';
+import 'cvcontent.less';
 
 export default class ResumeContent extends Component {
 

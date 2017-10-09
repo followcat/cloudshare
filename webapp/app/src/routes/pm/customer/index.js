@@ -1,5 +1,5 @@
 'use strict';
-// import { Customer } from 'views/ProjectManagement';
+// import { Member } from 'views/ProjectManagement';
 
 module.exports = {
   path: 'customer',

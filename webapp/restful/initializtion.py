@@ -6,6 +6,9 @@ from webapp.restful.reload import *
 from webapp.restful.upload import *
 from webapp.restful.account import *
 from webapp.restful.company import *
+from webapp.restful.message import *
+from webapp.restful.member import *
+from webapp.restful.captchaverify import *
 from webapp.restful.jobdescription import *
 from webapp.restful.curriculumvitae import *
 from webapp.restful.feature import *
@@ -17,11 +20,15 @@ def initialize(app):
     api = flask.ext.restful.Api(app)
     api.add_resource(SyncReloadAPI, '/api/syncreload', endpoint = 'syncreload')
     api.add_resource(SessionAPI, '/api/session')
-    api.add_resource(AccountAPI, '/api/accounts/<string:id>')
+    api.add_resource(PasswordAPI, '/api/password')
+    api.add_resource(UserAPI, '/api/user', endpoint = 'user')
+    api.add_resource(ExistsEmailAPI, '/api/existsemail/<string:email>', endpoint = 'existsemail')
+    api.add_resource(ExistsPhoneAPI, '/api/existsphone/<string:phone>', endpoint = 'existsphone')
+    api.add_resource(AccountAPI, '/api/account/<string:name>', endpoint = 'account')
     api.add_resource(AccountListAPI, '/api/accounts', endpoint = 'accounts')
     api.add_resource(AccountHistoryAPI, '/api/accounthistory', endpoint = 'accounthistory')
 
-    api.add_resource(BookmarkAPI, '/api/accounts/<string:id>/bookmark')
+    api.add_resource(BookmarkAPI, '/api/accounts/<string:name>/bookmark')
 
     api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyAllAPI, '/api/companyall', endpoint = 'companyall')
@@ -30,10 +37,11 @@ def initialize(app):
                      endpoint = 'couploadexcel')
     api.add_resource(CompanyConfirmExcelAPI, '/api/coconfirmexcel',
                      endpoint = 'coconfirmexcel')
-    api.add_resource(CustomerListAPI, '/api/customerlist', endpoint = 'customerlist')
+    api.add_resource(CompanyCustomerListAPI, '/api/companycustomerlist',
+                     endpoint = 'companycustomerlist')
     api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
     api.add_resource(SearchCObyKeyAPI, '/api/searchcobykey', endpoint = 'searchcobykey')
-    api.add_resource(CustomerAPI, '/api/customer', endpoint = 'customer')
+    api.add_resource(CompanyCustomerAPI, '/api/companycustomer', endpoint = 'companycustomer')
     api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate',
                      endpoint = 'companyinfoupdate')
 
@@ -85,7 +93,39 @@ def initialize(app):
 
     api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')
     api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')
-    api.add_resource(DBNumberAPI, '/api/dbnumber/<string:name>', endpoint = 'dbnumber')
     api.add_resource(DBNumbersAPI, '/api/dbnumbers', endpoint = 'dbnumbers')
     api.add_resource(ClassifyAPI, '/api/classify', endpoint = 'classify')
+    api.add_resource(AllSIMSAPI, '/api/lsiallsims', endpoint = 'lsiallsims')
     api.add_resource(IndustryAPI, '/api/industry', endpoint = 'industry')
+
+    api.add_resource(MessageAPI, '/api/message/<string:msgid>',
+                     endpoint = 'message')
+    api.add_resource(MessagesNotifyAPI, '/api/messagenotify',
+                     endpoint = 'messagenotify')
+    api.add_resource(SendMessageAPI, '/api/sendmessage/<string:desname>',
+                     endpoint = 'sendmessage')
+    api.add_resource(InvitedMessageAPI, '/api/invitedmessage/<string:msgid>',
+                     endpoint = 'invitedmessage')
+    api.add_resource(SendInviteMessageAPI, '/api/sendinvitemessage/<string:desname>',
+                     endpoint = 'sendinvitemessage')
+    api.add_resource(ListReadMessagesAPI, '/api/listreadmessages', endpoint = 'listreadmessages')
+    api.add_resource(ListSentMessagesAPI, '/api/listsentmessages', endpoint = 'listsentmessages')
+    api.add_resource(ListUnreadMessagesAPI, '/api/listunreadmessages', endpoint = 'listunreadmessages')
+    api.add_resource(ListInvitedMessagesAPI, '/api/listinvitedmessages', endpoint = 'listinvitedmessages')
+    api.add_resource(ListInviterMessagesAPI, '/api/listinvitermessages', endpoint = 'listinvitermessages')
+    api.add_resource(ListProcessedMessagesAPI, '/api/listprocessedmessages',
+                     endpoint = 'listprocessedmessages')
+
+    api.add_resource(IsMemberAPI, '/api/ismember', endpoint = 'ismember')
+    api.add_resource(IsMemberAdminAPI, '/api/ismemberadmin', endpoint = 'ismemberadmin')
+    api.add_resource(MemberAPI, '/api/member', endpoint = 'member')
+    api.add_resource(MemberAdminAPI, '/api/memberadmin', endpoint = 'memberadmin')
+    api.add_resource(ListMemberAccountsAPI, '/api/listmemberaccounts',
+                     endpoint = 'listmemberaccounts')
+    api.add_resource(MemberAccountAPI, '/api/memberaccount/<string:userid>',
+                     endpoint = 'memberaccount')
+    api.add_resource(MemberProjectAPI, '/api/memberproject/<string:projectname>',
+                     endpoint = 'memberproject')
+
+    api.add_resource(CaptchaAPI, '/api/captcha', endpoint = 'captcha')
+    api.add_resource(SMSAPI, '/api/sms/<string:code>', endpoint = 'sms')

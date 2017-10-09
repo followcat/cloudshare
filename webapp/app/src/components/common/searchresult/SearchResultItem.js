@@ -6,7 +6,7 @@ import { Row, Col, Card, Checkbox, Button } from 'antd';
 import WorkExperience from './WorkExperience';
 import EducationExperience from './EducationExperience';
 
-import { generateWorkExperience } from '../../../utils/summary-generator';
+import { generateWorkExperience } from 'utils/summary-generator';
 
 export default class SearchResultItem extends Component {
 

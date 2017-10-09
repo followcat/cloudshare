@@ -1,0 +1,41 @@
+@import '../default';
+@createaccountPrefixCls: cs-createaccount;
+
+.@{createaccountPrefixCls} {
+  width: 360px;
+ 
+
+  .ant-card-body {
+    padding: 10px 24px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 5px;
+  }
+
+  .ant-form-item:nth-last-child(2) {
+    input{
+      width: 67%;
+    }
+    button{
+      width: 33%;
+    }
+  }
+
+  .ant-form-item:last-child button {
+	margin-top : 15px; 
+	width : 100%;
+  }
+}
+
+.ant-modal {
+  .ant-form-item-control  {
+    input {
+      width: 70%;
+    }
+    img {
+      height: 32px;
+      vertical-align:middle;
+    }
+  }
+}

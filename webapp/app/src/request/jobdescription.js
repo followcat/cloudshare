@@ -1,7 +1,7 @@
 'use strict';
-import StorageUtil from '../utils/storage';
-import Generator from '../utils/generator';
-import { API } from '../config/api';
+import StorageUtil from 'utils/storage';
+import Generator from 'utils/generator';
+import { API } from 'config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 

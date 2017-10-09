@@ -11,11 +11,13 @@ import services.base.service
 class BaseStorage(services.base.service.Service):
 
     commitinfo = 'BaseData'
+    YAML_TEMPLATE = ()
 
-    def __init__(self, path, name=None, iotype=None):
+    def __init__(self, path, name=None, searchengine=None, iotype=None):
         self.path = path
         self.yamlpath = ''
-        super(BaseStorage, self).__init__(self.path, name, iotype)
+        super(BaseStorage, self).__init__(path, name=name,
+                                          searchengine=searchengine, iotype=iotype)
         self.unique_checker = None
         self.info = ""
         self._nums = 0
@@ -29,7 +31,7 @@ class BaseStorage(services.base.service.Service):
         """
         return id in self.ids
 
-    def unique(self, id):
+    def unique(self, bsobj):
         """
             >>> import shutil
             >>> import core.basedata
@@ -57,7 +59,14 @@ class BaseStorage(services.base.service.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
+        id = bsobj.ID
         return not self.exists(id)
+
+    def generate_info_template(self):
+        info = {}
+        for each in self.YAML_TEMPLATE:
+            info[each[0]] = each[1]()
+        return info
 
     def _listframe(self, value, username, date=None):
         if date is None:
@@ -97,16 +106,17 @@ class BaseStorage(services.base.service.Service):
     @utils.issue.fix_issue('issues/update_name.rst')
     def updateinfo(self, id, key, value, committer, do_commit=True):
         assert self.exists(id)
-        baseinfo = self.getyaml(id)
         result = None
-        if key in baseinfo:
+        if key in key in [each[0] for each in self.YAML_TEMPLATE]:
             result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
         return result
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
         result = False
         baseinfo = self.getinfo(id)
-        saveinfo = dict(filter(lambda k: k[0] in baseinfo, info.items()))
+        saveinfo = dict(filter(lambda k: k[0] in baseinfo.keys()+
+                                                 self.generate_info_template().keys(),
+                                                 info.items()))
         if baseinfo != saveinfo:
             name = core.outputstorage.ConvertName(id).yaml
             saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -122,7 +132,7 @@ class BaseStorage(services.base.service.Service):
         return True
 
     def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=True, do_commit=True):
-        if unique is True and self.unique(bsobj.name) is False:
+        if unique is True and self.unique(bsobj) is False:
             self.info = "Exists File"
             return False
         name = core.outputstorage.ConvertName(bsobj.name)
@@ -140,7 +150,9 @@ class BaseStorage(services.base.service.Service):
         return True
 
     def getinfo(self, id):
-        return self.getyaml(id)
+        info = self.generate_info_template()
+        info.update(self.getyaml(id))
+        return info
 
     def getyaml(self, id):
         """
@@ -177,18 +189,18 @@ class BaseStorage(services.base.service.Service):
 
     def search(self, keyword):
         results = set()
-        allfile = self.interface.grep(keyword)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            results.add(id)
+        allfile = self.interface.search(keyword)
+        for result in allfile:
+            id = core.outputstorage.ConvertName(result[0]).base
+            results.add((id, result[1]))
         return results
 
     def search_yaml(self, keyword):
         results = set()
-        allfile = self.interface.grep_yaml(keyword)
-        for filename in allfile:
-            id = core.outputstorage.ConvertName(filename).base
-            results.add(id)
+        allfile = self.interface.search_yaml(keyword)
+        for result in allfile:
+            id = core.outputstorage.ConvertName(result[0]).base
+            results.add((id, result[1]))
         return results
 
     def names(self):

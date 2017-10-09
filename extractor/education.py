@@ -54,7 +54,7 @@ SUMMARYEDU = re.compile(u'学'+ASP+u'*[历位][:：]'+ASP+u'*(?P<education>\S+)'
 SUMMARYMAJOR = re.compile(u'专'+ASP+u'*业[:：]'+ASP+u'*(?P<major>\S+)', re.M)
 SUMMARYSCHOOL = re.compile(u'((毕业院)|(学))'+ASP+u'*校[:：]'+ASP+u'*'+SCHOOL, re.M)
 
-EMA = re.compile('^'+PREFIX+'*'+ASP+'*'+SCHOOL+u'\n+'+PREFIX+'*'+ASP+'*'+EDUCATION+','+ASP+'*'+MAJOR+u'\n+(?P<from>\d{4}|'+ENPDATE+u')'+DATESEP+'(?P<to>\d{4}|'+ENPDATE+u')', re.M)
+EMA = re.compile('^'+PREFIX+'*'+ASP+'*\**'+SCHOOL+u'\**\n+'+PREFIX+'*'+ASP+'*'+EDUCATION+','+ASP+'*'+MAJOR+u'\n+(?P<from>\d{4}|'+ENPDATE+u')'+DATESEP+'(?P<to>\d{4}|'+ENPDATE+u')', re.M)
 
 def format_output(output, groupdict, summary=None):
     result = {
@@ -179,20 +179,20 @@ def education_xp(text, summary=None):
         for r in PIPELASTMA.finditer(text):
             maj +=1
             format_output(out, r.groupdict())
-    elif MANDCTLMA.search(text):
-        for r in MANDCTLMA.finditer(text):
+    elif MANDCTLMA.search(SHORTEN_BLANK(text)):
+        for r in MANDCTLMA.finditer(SHORTEN_BLANK(text)):
             maj +=1
             format_output(out, r.groupdict())
-    elif RVMANDCTLMA.search(text):
-        for r in RVMANDCTLMA.finditer(text):
+    elif RVMANDCTLMA.search(SHORTEN_BLANK(text)):
+        for r in RVMANDCTLMA.finditer(SHORTEN_BLANK(text)):
             maj +=1
             format_output(out, r.groupdict())
-    elif HDCTLMA.search(text):
-        for r in HDCTLMA.finditer(text):
+    elif HDCTLMA.search(SHORTEN_BLANK(text)):
+        for r in HDCTLMA.finditer(SHORTEN_BLANK(text)):
             maj +=1
             format_output(out, r.groupdict())
-    elif RVHDCTLMA.search(text):
-        for r in RVHDCTLMA.finditer(text):
+    elif RVHDCTLMA.search(SHORTEN_BLANK(text)):
+        for r in RVHDCTLMA.finditer(SHORTEN_BLANK(text)):
             maj +=1
             format_output(out, r.groupdict())
     elif HDVRTMA.search(text):
@@ -287,7 +287,6 @@ def fix_liepin(d):
     maj = 0
     processed = []
     summary = {}
-    MA = SPSOLMA
     for RE in [ED, AED]:
         res = RE.search(d)
         if res:
@@ -296,8 +295,9 @@ def fix_liepin(d):
                 summary['major'] = SUMMARYMAJOR.search(remainer).group('major')
                 summary['school'] = SUMMARYSCHOOL.search(remainer).group('school')
             for r in SPSOLMA.finditer(res.group('edu')):
-                maj +=1
-                format_output(processed, r.groupdict(), summary)
+                if r.group('major'):
+                    maj +=1
+                    format_output(processed, r.groupdict(), summary)
             else:
                 if maj:
                     return fix_output(processed)
@@ -308,12 +308,6 @@ def fix_liepin(d):
                 if maj:
                     return fix_output(processed)
             for r in HDCTLMA.finditer(res.group('edu')):
-                maj +=1
-                format_output(processed, r.groupdict(), summary)
-            else:
-                if maj:
-                    return fix_output(processed)
-            for r in MA.finditer(res.group('edu')):
                 maj +=1
                 format_output(processed, r.groupdict(), summary)
             else:
@@ -410,16 +404,17 @@ def fix_yingcai(d):
     if not maj:
         r = SINGLEYIED.search(d)
         edu = re.compile(u'^'+ASP+u'*'+EDUCATION+u'$', re.M).search(d)
+        try:
+            education = edu.group('education')
+        except AttributeError:
+            education = ''
         if r:
             res = r.groupdict()
-            try:
-                res['education'] = edu.group('education')
-            except AttributeError:
-                res['education'] = ''
+            res['education'] = education
             maj +=1
             format_output(processed, res)
         else:
-            summary['education'] = edu.group('education')
+            summary['education'] = education
     return fix_output(processed)
 
 def fix(d):

@@ -3,8 +3,10 @@ import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
 import { Layout } from 'views/layout';
+
 import ResumeContent from 'components/resume-content';
 import Summary from 'components/summary';
+
 import ResumeHeader from './ResumeHeader';
 import ResumeToolMenu from './ResumeToolMenu';
 import ResumeTag from './ResumeTag';
@@ -14,8 +16,10 @@ import ResumeSimilar from './ResumeSimilar';
 
 import {
   Tabs,
+  Tag,
   Spin,
-  message
+  message,
+  Card
 } from 'antd';
 
 import {
@@ -46,6 +50,7 @@ class Resume extends Component {
       dataSource: {},
       html: '',
       enHTML: '',
+      project: [],
       collected: false,
       panelLoading: false,
       confirmLoading: false,
@@ -65,9 +70,10 @@ class Resume extends Component {
     this.getResumeDataSource = this.getResumeDataSource.bind(this);
     this.getResumeIDList = this.getResumeIDList.bind(this);
     this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
+    this.handSelectProject = this.handSelectProject.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const id = this.props.params.resumeId;
 
     this.setState({
@@ -77,6 +83,12 @@ class Resume extends Component {
     this.getResumeDataSource(id);
     this.getResumeIDList(id);
     this.getSimilarDataSource(id);
+  }
+
+  handSelectProject(e){
+    const { project } = this.state;
+    StorageUtil.set('_pj',e.target.innerText);
+    window.location.reload();
   }
 
   /**
@@ -289,16 +301,16 @@ class Resume extends Component {
       id: id
     }, json => {
       if (json.code === 200) {
-        const { html, en_html, yaml_info } = json.data;
+        const { html, en_html, yaml_info, projects } = json.data;
         
         this.setState({
           html: html,
           enHTML: en_html,
           dataSource: yaml_info,
           collected: yaml_info.collected,
-          panelLoading: false
+          panelLoading: false,
+          project: projects
         });
-
         History.write({
           id: id,
           name: yaml_info.name
@@ -364,7 +376,8 @@ class Resume extends Component {
       tag,
       tracking,
       comment,
-      similar
+      similar,
+      project
     } = this.state;
 
     const uploadProps = {
@@ -425,6 +438,14 @@ class Resume extends Component {
             </Tabs>
           </div>
           <div className="resume-side">
+            <Card title="所属项目">
+            { project.map(item => {
+                return (
+                  <Tag color="blue" onClick={this.handSelectProject}>{item}</Tag>
+                  );
+              })
+            }
+            </Card>
             <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
             <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />

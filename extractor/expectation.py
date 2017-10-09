@@ -32,6 +32,12 @@ PLACECURRENT = re.compile(u'(?: ?\*{1,2})?((目前)|(所在))(工作)?地点?[:�
 LABELGEND = re.compile(u'(?: ?\*{1,2})?性'+ASP+u'*别[:：]?(?: ?\*{1,2})?'+ASP+u'*'+GENDER, re.M)
 LABELMARITAL = re.compile(u'(?: ?\*{1,2})?婚姻状况[:：]?(?: ?\*{1,2})?'+ASP+u'*'+MARITALSTATUS, re.M)
 
+SATITLE = BRACKETTOP('xpparens') +u'?\**(?:(?:自我|个人)评价)[:：]?'+ POASP +'*\**'+ BRACKETBOTTOM('xpparens')
+SA = re.compile(u'^'+PREFIX+u'*'+ SATITLE +u'(?P<self>.*?)'+ASP+u'*(?=^(?:'+PREFIX+u'*'+POASP+u'*'+ BRACKETTOP('satrailparens') +u'?\**(求职意向|(((工'+POASP+u'?作'+POASP+u'?|实习|(工作与?)?实践)经'+POASP+u'?[历验])|实习与实践)|((项'+POASP+u'?目|教'+POASP+u'?育|培'+POASP+u'?训)'+POASP+u'?(经'+POASP+u'?[历验]|背景|(?P<slash>/)?培训(?(slash)背景)))|(?:工作内容（医疗器械经验）)|Resume)'+ POASP +'*\**' + BRACKETBOTTOM('satrailparens') +u'[:：]?'+POASP+u'*$' +u')|Copyright)', re.DOTALL+re.M)
+SABO = re.compile(u'(?:(?<=^)'+BORDERTOP('saborder')+u')'+ASP+u'*'+PREFIX+u'*'+ SATITLE +u'(?P<self>.*?)\n+'+BORDERBOTTOM('saborder')+ASP+u'*(?=(?:^'+BORDERTOP('trailborder')+u'|'+PREFIX+u'*'+POASP+u'*'+ BRACKETTOP('satrailparens') +u'?\**(求职意向|(((工'+POASP+u'?作'+POASP+u'?|实习|(工作与?)?实践)经'+POASP+u'?[历验])|实习与实践)|((项'+POASP+u'?目|教'+POASP+u'?育|培'+POASP+u'?训)'+POASP+u'?(经'+POASP+u'?[历验]|背景|(?P<slash>/)?培训(?(slash)背景)))|(?:工作内容（医疗器械经验）)|Resume)'+ POASP +'*\**' + BRACKETBOTTOM('satrailparens') +u'[:：]?'+POASP+u'*$' +u')|Copyright)', re.DOTALL+re.M)
+SABI = re.compile(u'(?<=^)'+PREFIX+u'*'+ SATITLE +POASP+u'*\n+'+BORDERTOP('saborder')+u'(?P<self>.*?)\n+'+BORDERBOTTOM('saborder')+ASP+u'*(?=(?:^'+BORDERTOP('trailborder')+u'|'+PREFIX+u'*'+POASP+u'*'+ BRACKETTOP('satrailparens') +u'?\**(附加消息|求职意向|(((工'+POASP+u'?作'+POASP+u'?|实习|(工作与?)?实践)经'+POASP+u'?[历验])|实习与实践)|((项'+POASP+u'?目|教'+POASP+u'?育|培'+POASP+u'?训)'+POASP+u'?(经'+POASP+u'?[历验]|背景|(?P<slash>/)?培训(?(slash)背景)))|(?:工作内容（医疗器械经验）)|Resume)'+ POASP +'*\**' + BRACKETBOTTOM('satrailparens') +u'[:：]?'+POASP+u'*$' +u')|Copyright)', re.DOTALL+re.M)
+SAE = re.compile(PREFIX+u'*'+ SATITLE +POASP+u'*\n+'+BORDERTOP('saborder')+u'?(?P<self>.*?)\n+'+BORDERBOTTOM('saborder')+ASP+u'*$', re.DOTALL)
+
 
 def format_salary(result, groupdict):
     if 'salary_months' in groupdict and groupdict['salary_months']:
@@ -224,4 +230,9 @@ def fix(d):
         processed.update(extract_general(PIPEGEN.search(d).groupdict()))
     elif SPACEGEN.search(d):
         processed.update(extract_general(SPACEGEN.search(d).groupdict()))
+    if re.compile(SATITLE, re.M).search(d):
+        for RE in [SABO, SABI, SA, SAE]:
+            if RE.search(d):
+                processed['self_assessment'] = fix_name(RE.search(d).group('self'))
+                break
     return fix_output(processed)

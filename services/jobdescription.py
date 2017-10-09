@@ -4,13 +4,13 @@ import os.path
 
 import yaml
 
+import core.outputstorage
 import services.base.service
 
 
 class JobDescription(services.base.service.Service):
     """
         >>> import shutil
-        >>> import services.company
         >>> import services.jobdescription
         >>> import interface.gitinterface
 
@@ -21,12 +21,12 @@ class JobDescription(services.base.service.Service):
         >>> svc_jd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
         >>> results = svc_jd.search('JD-A')
-        >>> data = svc_jd.get(results[0])
+        >>> data = svc_jd.get(results[0][0])
         >>> data['description']
         'JD-A description'
         >>> svc_jd.modify(data['id'], 'JD-B description', 'Closed', '', '', 'Dever')
         True
-        >>> data = svc_jd.get(results[0])
+        >>> data = svc_jd.get(results[0][0])
         >>> data['description']
         'JD-B description'
         >>> lists = svc_jd.lists()
@@ -36,13 +36,13 @@ class JobDescription(services.base.service.Service):
         ...     commentary='this is JD-C commentary', followup='JD-C followup')
         True
         >>> results = svc_jd.search('JD-C')
-        >>> data = svc_jd.get(results[0])
+        >>> data = svc_jd.get(results[0][0])
         >>> data['description'], data['commentary']
         ('JD-C description', 'this is JD-C commentary')
         >>> svc_jd.modify(data['id'], 'JD-C description', 'Opening',
         ...     'this is UPDATED JD-C commentary', 'UPDATED JD-C followup', 'Dever')
         True
-        >>> data = svc_jd.get(results[0])
+        >>> data = svc_jd.get(results[0][0])
         >>> data['description'], data['commentary'], data['followup']
         ('JD-C description', 'this is UPDATED JD-C commentary', 'UPDATED JD-C followup')
         >>> shutil.rmtree(repo_name)
@@ -96,12 +96,11 @@ class JobDescription(services.base.service.Service):
         return True
 
     def filename(self, hex_id):
-        return hex_id + '.yaml'
+        output = core.outputstorage.ConvertName(hex_id)
+        return output.yaml
 
     def search(self, keyword):
-        results = list()
-        for name in self.interface.grep_yaml(keyword):
-            results.append(os.path.splitext(name)[0])
+        results = self.interface.search_yaml(keyword)
         return results
 
     def lists(self):

@@ -19,8 +19,9 @@ class UploadCVAPI(Resource):
     projectname = 'temporary'
 
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.svc_min = flask.current_app.config['SVC_MIN']
+        self.svc_cv_repo = flask.current_app.config['SVC_CV_REPO']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -29,7 +30,8 @@ class UploadCVAPI(Resource):
     def post(self):
         results = []
         network_file = flask.request.files['files']
-        project = self.svc_mult_cv.getproject(self.projectname)
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject()
         id = None
         code = 401
         added = False
@@ -57,9 +59,9 @@ class UploadCVAPI(Resource):
                     yamlinfo = dataobj.metadata
                     if not yamlinfo['name']:
                         yamlinfo['name'] = utils.chsname.name_from_filename(filename)
-                    repo_cv_result = self.svc_mult_cv.repodb.add(dataobj, 'temporary',
-                                                                 unique=True,
-                                                                 contacts=False)
+                    repo_cv_result = self.svc_cv_repo.add(dataobj, 'temporary',
+                                                          unique=True,
+                                                          contacts=False)
                     project_cv_result = project.cv_add(dataobj, 'temporary')
                     result = project_cv_result and repo_cv_result
                 code = 200
@@ -77,7 +79,7 @@ class DocMiningAPI(Resource):
         super(DocMiningAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
@@ -97,7 +99,8 @@ class DocMiningAPI(Resource):
             cur_page = 1
         datas = []
         result = []
-        project = self.svc_mult_cv.getproject(self.projectname)
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject()
         if cvlist:
             names = []
             documents = []
@@ -123,7 +126,7 @@ class DocMiningAPI(Resource):
         else:
             pages = totals/eve_count
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = self.svc_mult_cv.getyaml(name, projectname=model)
+            yaml_info = project.cv_getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
@@ -145,7 +148,7 @@ class DocValuableAPI(Resource):
         super(DocValuableAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
@@ -159,11 +162,12 @@ class DocValuableAPI(Resource):
 
     def _get(self, doc, projectname):
         args = self.reqparse.parse_args()
-        uses = [projectname]
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject(projectname)
         name_list = [demoapp.tools.caesarcipher.decrypt(self.caesar_cipher_num, name)
                      for name in args['name_list']]
-        result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
-                                           doc, projectname, uses=uses, name_list=name_list)
+        result = core.mining.valuable.rate(self.miner, project,
+                                           doc, uses=[projectname], name_list=name_list)
         response = dict()
         datas = []
         for index in result:
@@ -172,7 +176,7 @@ class DocValuableAPI(Resource):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = self.svc_mult_cv.getyaml(name+'.yaml', projectname=projectname)
+                yaml_data = project.getyaml(name+'.yaml', projectname=projectname)
                 yaml_data['match'] = match_item[1]
                 values.append({ 'match': match_item[1],
                                 'id': demoapp.tools.caesarcipher.encrypt(
@@ -202,8 +206,10 @@ class DocCVValuableAPI(DocValuableAPI):
         if not tmpSha1_Digest in lsisim.names:
             lsisim.add(tmpSha1_Digest, cv)
             lsisim.set_index()
-        result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
-                                           doc, projectname, uses=[projectname],
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject(projectname)
+        result = core.mining.valuable.rate(self.miner, project,
+                                           doc, uses=[projectname],
                                            name_list=[tmpSha1_Digest],
                                            education_req=False)
         ranklist = self.miner.probability(projectname, doc, top=0.05, minimum=1000)
@@ -248,14 +254,16 @@ class CurrivulumvitaeAPI(Resource):
 
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.caesar_cipher_num = flask.current_app.config['CAESAR_CIPHER_NUM']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
+        member = self.svc_members.get(self.svc_members.default_member_name)
+        project = member.getproject()
         id = args['id']
         realid = demoapp.tools.caesarcipher.decrypt(self.caesar_cipher_num, id)
-        yaml = self.svc_mult_cv.getyaml(realid, projectname='temporary')
+        yaml = project.cv_getyaml(realid)
         return { 'code': 200, 'data': { 'yaml_info': yaml } }

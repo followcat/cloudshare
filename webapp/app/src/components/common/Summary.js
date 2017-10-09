@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 
 import { Row, Col, Card } from 'antd';
 
-import './summary.less';
+import 'summary.less';
 
 export default class Summary extends Component {
 

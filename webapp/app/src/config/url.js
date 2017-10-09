@@ -61,5 +61,34 @@ export const URL = {
   getBestExcellent: () => {
     return `/excellent`;
   },
-
+  getProjectList: () => {
+    return `/pm/projectlist`;
+  },
+  getNotcieURL: () => {
+    return `/notice`;
+  },
+  getInvitedMessageURL: () => {
+    return `/notice/invitedmessage`;
+  },
+  getInviterMessageURL: () => {
+    return `/notice/invitermessage`;
+  },
+  getUnreadMessageURL: () => {
+    return `/notice/unreadmessage`;
+  },
+  getProcessedMessageURL: () => {
+    return `/notice/processedmessage`;
+  },
+  getReadMessageURL: () => {
+    return `/notice/readmessage`;
+  },
+  getSentMessageURL: () => {
+    return `/notice/sentmessage`;
+  },
+  getBecomeMember: () => {
+    return `/becomemember`;
+  },
+  getManagement: () => {
+    return `/management`;
+  },
 };

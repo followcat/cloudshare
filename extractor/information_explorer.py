@@ -6,6 +6,7 @@ import os.path
 import functools
 
 import utils.chsname
+import extractor.project
 import extractor.unique_id
 import extractor.education
 import extractor.expectation
@@ -151,7 +152,23 @@ def get_expectation(stream):
     return result
 
 
-def get_experience(stream, name=None):
+def get_project(stream, name=None, as_date=None):
+    fix_func = {
+        'default': extractor.project.fix,
+        'jingying': extractor.project.fix_jingying,
+        'liepin': extractor.project.fix_liepin,
+        'yingcai': extractor.project.fix_yingcai,
+        'zhilian': extractor.project.fix_zhilian,
+    }
+    try:
+        assert name in fix_func
+    except AssertionError:
+        name = 'default'
+    result = fix_func[name](stream, as_date)
+    return result
+
+
+def get_experience(stream, name=None, as_date=None):
     u"""
         >>> xp = get_experience(u"工作经历\\n2010.03 - 2015.05 公司")['experience']['company'][0]
         >>> xp['date_from'], xp['date_to']
@@ -166,12 +183,12 @@ def get_experience(stream, name=None):
     """
 
     fix_func = {
-        'default': functools.partial(extractor.extract_experience.fix, stream, True),
-        'cloudshare': functools.partial(extractor.extract_experience.fix, stream, True),
-        'liepin': functools.partial(extractor.extract_experience.fix_liepin, stream),
-        'jingying': functools.partial(extractor.extract_experience.fix_jingying, stream),
-        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream),
-        'yingcai': functools.partial(extractor.extract_experience.fix_yingcai, stream),
+        'default': functools.partial(extractor.extract_experience.fix, stream, True, as_date),
+        'cloudshare': functools.partial(extractor.extract_experience.fix, stream, True, as_date),
+        'liepin': functools.partial(extractor.extract_experience.fix_liepin, stream, as_date),
+        'jingying': functools.partial(extractor.extract_experience.fix_jingying, stream, as_date),
+        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream, as_date),
+        'yingcai': functools.partial(extractor.extract_experience.fix_yingcai, stream, as_date),
     }
     experiences = []
     current_company = None
@@ -253,9 +270,9 @@ def get_age(stream):
 
 all_selected = ('name', 'originid', 'age', 'phone', 'email',
                 'education', 'experience', 'expectation',
-                'classify', 'unique_id')
+                'classify', 'unique_id', 'project')
 
-def catch_selected(stream, selected, name=None):
+def catch_selected(stream, selected, name=None, as_date=None):
     assert set(selected).issubset(set(all_selected))
     info_dict = dict()
     if 'name' in selected:
@@ -271,14 +288,22 @@ def catch_selected(stream, selected, name=None):
     if 'education' in selected:
         info_dict.update(get_education(stream, name))     # education_history, education, school
     if 'experience' in selected:
-        info_dict.update(get_experience(stream, name))    # experience, company, position
+        info_dict.update(get_experience(stream, name, as_date))    # experience, company, position
+    if 'project' in selected:
+        project = get_project(stream, name, as_date)    # project
+        if 'experience' in project:
+            try:
+                info_dict['experience'].update(project['experience'])
+            except KeyError:
+                info_dict['experience'] = {}
+                info_dict['experience'].update(project['experience'])
     if 'expectation' in selected:
         info_dict.update(get_expectation(stream))   # expectation, current, gender,
                                                     # marital_status, age
     if 'unique_id' in selected:
         extractor.unique_id.unique_id(info_dict)
     if 'classify' in selected and 'classify' not in info_dict:
-        experience = get_experience(stream, name)
+        experience = get_experience(stream, name, as_date)
         info_dict["classify"] = get_classify(experience['experience'])
     return info_dict
 

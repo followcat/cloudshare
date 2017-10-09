@@ -116,13 +116,21 @@ def get_explorer_name(svc_cv, yamlname):
         pass
     return explorer_name
 
-def update_selected(svc_cv, yamlname, selected):
+def update_selected(svc_cv, yamlname, selected, as_date=None):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.path, core.outputstorage.ConvertName(yamlname).yaml)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
-                                                         selected, explorer_name)
+                                                         selected, explorer_name, as_date)
+    try:
+        experience = info.pop('experience')
+        try:
+            obj['experience'].update(experience)
+        except AttributeError:
+            obj['experience'] = experience
+    except KeyError:
+            pass
     try:
         obj.update(info)
     except AttributeError:
@@ -139,12 +147,12 @@ def update_uniqueid(svc_cv, yamlname):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
-def update_xp(svc_cv, yamlname):
+def update_xp(svc_cv, yamlname, as_date=None):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.path, yamlname)
     explorer_name = get_explorer_name(svc_cv, yamlname)
     extracted_data = extractor.information_explorer.get_experience(svc_cv.getmd(yamlname),
-                                                                   explorer_name)
+                                                                   explorer_name, as_date)
     obj.update(extracted_data)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:

@@ -237,7 +237,7 @@ SPO = re.compile(u'(项目)?职务[:：]'+ASP+u'*(?P<position>[^= \n:：\*]+)$',
 RESPPO = regex.compile(company_details_pipeonly(re.compile(u'^职责：(?P<position>'+POSITION+u')')), re.M)
 
 def append_po(header, footer):
-    return header+POASP+u'*(?:(?:\\\\)?\n)+'+POASP+u'*'+footer
+    return header+POASP+u'*(?:(?:\\\\)?\n)+'+BORDERTOP('appendpo')+u'?'+POASP+u'*'+footer+BORDERBOTTOM('appendpo')
 
 NOBRPOS = POSITION.replace(u'：', u'（）：；;'+ENDLINESEP)
 YIPOSITION = NOBRPOS+u'(?P<lbr>[\(（])?(?(lbr)'+NOBRPOS+u'[\)）]('+NOBRPOS+u')?)'
@@ -657,6 +657,27 @@ def work_xp_liepin(text):
                             if not out['company']:
                                 continue
                             position_output(out, r.groupdict())
+            if len(out['position']):
+                break
+            out = {'company': [], 'position': []}
+            pattern = company_details(RE)
+            if re.compile(SALARY).search(text):
+                popattern = lp_position_details(NLIEPONOPER)
+            else:
+                # Speed up non-matching
+                popattern = lp_position_details(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
+            MA = regex.compile(append_po(pattern, NLIEPONOPER.pattern), re.M)
+            res = MA.search(text)
+            if res:
+                if (res.group('typelabel') or res.group('businesslabel') or
+                        res.group('employlabel') or res.group('desclabel')):
+                    pattern = empty_company_details(RE)
+                else:
+                    pattern = empty_company_details_pipeonly(RE)
+                MA = regex.compile(append_po(pattern, popattern), re.M)
+                for r in MA.finditer(text):
+                    company_output(out, r.groupdict())
+                    position_output(out, r.groupdict())
             if not len(out['position']):
                 out = {'company': [], 'position': []}
                 pattern = company_details(RE)

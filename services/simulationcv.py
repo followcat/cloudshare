@@ -15,7 +15,9 @@ class SimulationCV(services.base.simulation.Simulation,
     yaml_private_key = {
         "phone":                '[*****]',
         "email":                '[*****]',
-        "name":                 '[*****]'
+        "name":                 '[*****]',
+        "committer":            '[*****]',
+        "origin":               '[*****]'
     }
 
     list_item = {}

@@ -98,7 +98,7 @@ BORDERBOTTOM = lambda label : u'(?('+label+u')(?P='+label+u')\n*)'
 
 JYCVSRC = re.compile(PREFIXBORDER('^')(u'(英文简历\n)?')+INBORDER(' {4}')+INBORDER(' {6}')+'?'+INBORDER(' {8}')+u'(?: {8,}精英网用户.*\n)?')
 NLPCVSRC = re.compile(FLBORDER+u'\n*(?:(?:简历编号|最新登录|更新(?:时间|日期))：'+POASP+u'*\S+'+POASP+u'*)+\n+'+BORDER)
-LPCVSRC = re.compile(u'^(:?(个人信息\n(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n(On job, open for new job|Dimission, seeking for new job) ,)) ， ', re.M)
+LPCVSRC = re.compile(u'^(:?(个人信息\n+(?:离职，正在找工作 ，|在职(，急寻新工作 ，|，看看新机会 ，|，暂无跳槽打算。)))|(Personal Information\n+(On job, open for new job|Dimission, seeking for new job) ,))', re.M)
 ZLCVSRC = re.compile(u'^\t*(简历ID：RCC|Resume ID：REC)00\d{8}\n'+ASP+u'*[^\n\uf0b7]')
 YCCVSRC = re.compile(u'^更新时间：(\d{4}-\d{2}-\d{2}|今天|昨天)\n(简历编号：)?')
 

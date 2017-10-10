@@ -1,8 +1,6 @@
 #ignore node_modules
 .hg/
-webapp/static/
-webapp/static/js/node_modules/
-webapp/static/js/PhantomJS*/
+webapp/static*/
 flask_session/
 *.swp
 *.orig

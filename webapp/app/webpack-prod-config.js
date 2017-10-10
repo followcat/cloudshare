@@ -14,7 +14,7 @@ module.exports = {
   ],
 
   output: {
-    path: config.STATIC_PATH,
+    path: config.PROD_STATIC_PATH,
     publicPath: '/static/',
     filename: 'js/[name].[hash].js',
   },
@@ -51,7 +51,7 @@ module.exports = {
       title: 'RUJU - 简单招聘',
       template: path.join(config.SRC_PATH, '/template.html'),
       inject: true,
-      filename: path.join(config.ROOT_PATH, '/templates_dist/index.html'),
+      filename: path.join(config.ROOT_PATH, '/templates_dist.prod/index.html'),
       minify: {    // 压缩HTML文件
         removeComments: true,    // 移除HTML中的注释
         collapseWhitespace: false,   // 删除空白符与换行符

@@ -32,9 +32,9 @@ def dump_yaml(data, default_flow_style=None):
                      allow_unicode=True, default_flow_style=default_flow_style)
 
 
-def save_yaml(infodict, path, filename):
+def save_yaml(infodict, path, filename, default_flow_style=None):
     with open(os.path.join(path, filename), 'w') as f:
-        f.write(dump_yaml(infodict))
+        f.write(dump_yaml(infodict, default_flow_style=default_flow_style))
 
 
 def load_yaml(path, filename):

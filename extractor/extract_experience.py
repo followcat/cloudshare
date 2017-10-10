@@ -376,8 +376,10 @@ def position_output(output, groupdict, begin='', end=''):
                 result['name'] = fix_position(groupdict['second'])
             elif 'name' in groupdict and groupdict['name']:
                 result['name'] = fix_position(groupdict['name'])
-            else:
+            elif groupdict['position']:
                 result['name'] = fix_position(groupdict['position'])
+            else:
+                result['name'] = None
         if 'aduration' in groupdict and groupdict['aduration']:
             result['duration'] = fix_duration(groupdict['aduration'])
         else:

@@ -268,7 +268,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         if threshold is None:
             threshold = 0.8
         results = {}
-        for jd in project.jobdescription.lists():
+        for jd_id, jd in project.jobdescription.datas():
             try:
                 if jd['status'] == 'Closed':
                     continue

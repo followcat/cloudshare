@@ -260,11 +260,11 @@ class Project(services.base.service.Service):
     def company_names(self):
         return self.company.ids
 
-    def jd_get(self, hex_id):
-        return self.jobdescription.get(hex_id)
+    def jd_get(self, id):
+        return self.jobdescription.getyaml(id)
 
     def jd_add(self, company, name, description, commentary, followup, committer,
-                status=None):
+               status=None):
         try:
             self.company_get(company)
         except IOError:
@@ -272,15 +272,15 @@ class Project(services.base.service.Service):
         return self.jobdescription.add(company, name, description, committer,
                                         status, commentary, followup)
 
-    def jd_modify(self, hex_id, description, status, commentary, followup, committer):
-        return self.jobdescription.modify(hex_id, description, status,
-                                            commentary, followup, committer)
+    def jd_modify(self, id, description, status, commentary, followup, committer):
+        return self.jobdescription.modify(id, description, status,
+                                          commentary, followup, committer)
 
     def jd_search(self, keyword, selected=None):
         return self.jobdescription.search(keyword, selected=selected)
 
-    def jd_lists(self):
-        return self.jobdescription.lists()
+    def jd_datas(self):
+        return self.jobdescription.datas()
 
     def peo_add(self, peopobj, committer=None, unique=True, do_commit=True):
         result = {

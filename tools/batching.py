@@ -350,8 +350,7 @@ def update_jd_co_id(SVC_JD, SVC_CO):
         co_info = SVC_CO.getyaml(id)
         co_dict[co_info['name']] = co_info
 
-    for jd in SVC_JD.lists():
-        jd_id = jd['id']
+    for jd_id, jd in SVC_JD.datas():
         jd_company = jd['company']
         if jd_company in co_dict:
             jd['company'] = co_dict[jd_company]['id']
@@ -363,10 +362,9 @@ def update_jd_co_id(SVC_JD, SVC_CO):
 
 def update_jd_commentary(SVC_JD, comments_dict):
     import yaml
-    for jd in SVC_JD.lists():
+    for jd_id, jd in SVC_JD.datas():
         if 'commentary' in jd:
             continue
-        jd_id = jd['id']
         if jd_id in comments_dict:
             jd['commentary'] = comments_dict[jd_id]
         else:
@@ -380,10 +378,9 @@ def update_jd_commentary(SVC_JD, comments_dict):
 def add_jd_followup(SVC_PRJ):
     import yaml
     SVC_JD = SVC_PRJ.jobdescription
-    for jd in SVC_JD.lists():
+    for jd_id, jd in SVC_JD.datas():
         if 'followup' in jd:
-            continue
-        jd_id = jd['id']
+            continue]
         jd['followup'] = ''
         if '\n' in jd['commentary']:
             jd['followup'] = jd['commentary']

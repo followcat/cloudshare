@@ -23,23 +23,8 @@ class ResumeHeader extends Component {
           <span>{dataSource.id}</span>
         </div>
         <div className="cs-resume-header-info">
-          <label>来源: </label>
-          <span>{dataSource.origin}</span>
-        </div>
-        <div className="cs-resume-header-info">
           <label>上传人: </label>
           <span>{`${dataSource.committer}, ${dataSource.date && dataSource.date.split(' ')[0]}`}</span>
-        </div>
-        <div className="cs-resume-header-info">
-          {dataSource.committer === 'SCRAPPY' ?
-              <a
-                href={getSourceURL(dataSource.origin, dataSource.filename)}
-                target="_blank"
-              >
-                简历源地址
-              </a> :
-              null
-          }
         </div>
       </div>
     );

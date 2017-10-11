@@ -61,21 +61,25 @@ class ProjectList extends Component {
      this.handleSubmit();
   }
 
-  handleSubmit (feildValue) {
-    addProject({
-      projectname: this.state.projectName,
-    }, (json) => {
-      if  (json.result === true) {
-        this.setState({
-        visible: false,
-        projects: [...this.state.projects],
-    });
+  handleSubmit () {
+    if(this.state.projectName === null) {
+      addProject({
+        projectname: this.state.projectName,
+      }, (json) => {
+        if  (json.result === true) {
+          this.setState({
+          visible: false,
+          projects: [...this.state.projects],
+        });
 
-      message.success(language.ADD_SUCCESS_MSG);
-      } else {
-        message.error(language.ADD_FAIL_MSG);
-      }
-    })
+        message.success(language.ADD_SUCCESS_MSG);
+        } else {
+            message.error(language.ADD_FAIL_MSG);
+        }
+      })
+    } else {
+            message.error(language.ADD_NULL_MSG);
+          }
   }
 
   handleCancelClick() {

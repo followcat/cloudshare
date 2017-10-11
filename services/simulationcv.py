@@ -63,9 +63,16 @@ class SimulationCV(services.base.simulation.Simulation,
         return result
 
     def gethtml(self, id, secrecy=True):
-        md = self.getmd(id, secrecy=secrecy)
-        html = utils.pandocconverter.md_to_html(md)
-        return html
+        result = None
+        for storage in self.storages:
+            try:
+                result = storage.gethtml(id)
+                if secrecy is True and self.ishideprivate(id):
+                    result = self.cleanprivate(id, result)
+                break
+            except IOError:
+                continue
+        return result
 
     def getuniqueid(self, id):
         result = None

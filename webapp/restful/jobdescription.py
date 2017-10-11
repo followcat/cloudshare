@@ -102,7 +102,7 @@ class JobDescriptionListAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = project.jd_datas()
+        result = [jd for jd_id, jd in project.jd_datas()]
         for jd in result:
             co_id = jd['company']
             co_name = project.company_get(co_id)['name']

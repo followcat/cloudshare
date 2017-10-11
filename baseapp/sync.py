@@ -6,13 +6,13 @@ import services.cvstoragesync
 
 from baseapp.index import *
 from baseapp.datadbs import *
+from baseapp.loader import config
 
 
-RAW_DIR = 'raw'
 RAW_DB = dict()
-if os.path.exists(RAW_DIR):
-    for name in os.listdir(RAW_DIR):
-        namepath = os.path.join(RAW_DIR, name)
+if os.path.exists(config.storage_config['RAW']):
+    for name in os.listdir(config.storage_config['RAW']):
+        namepath = os.path.join(config.storage_config['RAW'], name)
         RAW_DB[name] = interface.predator.PredatorInterface(namepath, name=name)
 
 SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_PEO_STO, SVC_CV_STO, RAW_DB)

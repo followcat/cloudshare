@@ -6,13 +6,12 @@ import sources.industry_id
 
 class MultiClassify(object):
 
-    CLASSIFY_DIR = 'classify'
-
-    def __init__(self, storages):
+    def __init__(self, path, storages):
+        self.path = path
         self.classifies = dict()
         self.storages = storages
         for name in sources.industry_id.industryID.keys():
-            cls_cv = services.classifycv.ClassifyCV(name, self.CLASSIFY_DIR, storages)
+            cls_cv = services.classifycv.ClassifyCV(name, self.path, storages)
             cls_cv.setup()
             self.classifies[name] = cls_cv
 

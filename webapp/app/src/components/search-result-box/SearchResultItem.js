@@ -33,7 +33,7 @@ class SearchResultItem extends Component {
 
     const name = yaml_info.name ? yaml_info.name : yaml_info.id,
           origin = yaml_info.origin ? ' - ' + yaml_info.origin : '';
-    return name + origin;
+    return name ;
   }
 
   render() {

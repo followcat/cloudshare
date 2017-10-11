@@ -127,6 +127,7 @@ const websiteText = {
     ADD_CONFIRM_MSG: '确定要添加这个条目吗?',
     ADD_SUCCESS_MSG: '添加成功!',
     ADD_FAIL_MSG: '添加失败!',
+    ADD_NULL_MSG: '项目名不能为空!',
     DELETE_CONFIRM_MSG: '确定要删除这个条目吗?',
     DELETE_SUCCESS_MSG: '删除成功!',
     DELETE_FAIL_MSG: '删除失败!',

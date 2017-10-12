@@ -1,5 +1,6 @@
 #ignore node_modules
 .hg/
+datas/
 webapp/static*/
 flask_session/
 *.swp
@@ -10,24 +11,9 @@ flask_session/
 *.pyc
 *.bak
 celerybeat-schedule
-output/
-repo/
-indiv/
-Index/
-account/
-password/
-lsimodel/
 config/
 webapp/config/
-raw
-raw/
 tags/
-cutwords/
-projects/
-classify/
-members/
-message/
-storage/
 webapp/app/dist
 webapp/static/node_modules/
 webapp/static/dist/

@@ -24,14 +24,21 @@ class RadarChart extends Component {
   }
 
   handleClick() {
-    const { postData, selection } = this.props;
-
+    const { postData, selection, dataSource } = this.props;
     this.setState({
       visible: true,
       data: [],
     });
 
     let param = postData.id ? { id: postData.id } : { doc: postData.doc };
+    if (dataSource.length > 0 && selection.length <= 0) {
+       for (var i = 0; i < 5; i++) {
+        selection.push({
+          id: dataSource[i].yaml_info.id,
+          name: dataSource[i].yaml_info.name
+        })
+       };
+    }
 
     getValuableData(Object.assign(param, {
         name_list: selection.map(item => `${item.id}.md`),

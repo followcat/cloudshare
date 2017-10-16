@@ -177,13 +177,14 @@ class Mining(object):
 
     SIMS_PATH = 'all'
 
-    def __init__(self, path, projects, classifycvs, slicer=None):
+    def __init__(self, path, members, classifycvs, slicer=None):
         self.sim = {}
         self.path = path
         self.lsi_model = dict()
-        self.projects = projects
+        self.members = members
+        self.projects = members.allprojects()
         self.projectscv = dict([(project.id, project.curriculumvitae)
-                                for project in projects.values()])
+                                for project in self.projects.values()])
         self.additionals = classifycvs
         self.services = {'default': self.projectscv,
                          'classify': dict(),
@@ -199,33 +200,34 @@ class Mining(object):
             self.slicer = slicer
         self.make_lsi()
 
-    def setup(self, projects=None):
+    def setup(self, members=None):
         assert self.lsi_model
-        if projects is None:
-            projects = self.projects.values()
-        for project in projects:
-            modelname = project.modelname
-            model = self.lsi_model[modelname]
-            if not model.names:
-                continue
-            save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
-            svccv_names = [project.curriculumvitae.name] + \
-                            self.projects[modelname].getclassify()
-            self.sim[modelname] = dict()
-            for svc_name in svccv_names:
-                if svc_name in self.sim[modelname]:
+        if members is None:
+            members = self.members.members.values()
+        for member in members:
+            member_projects = member.projects.keys()
+            for project in member.projects.values():
+                modelname = project.modelname
+                model = self.lsi_model[modelname]
+                if not model.names:
                     continue
-                svc = self.services['all'][svc_name]
-                industrypath = industrytopath(svc_name)
-                index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
-                                                                os.path.join(save_path,
-                                                                industrypath), model)
-                try:
-                    index.load()
-                except IOError:
-                    index.build([svc])
-                    index.save()
-                self.sim[modelname][svc_name] = index
+                save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
+                svccv_names = member_projects + self.projects[modelname].getclassify()
+                self.sim[modelname] = dict()
+                for svc_name in svccv_names:
+                    if svc_name in self.sim[modelname]:
+                        continue
+                    svc = self.services['all'][svc_name]
+                    industrypath = industrytopath(svc_name)
+                    index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
+                                                                    os.path.join(save_path,
+                                                                    industrypath), model)
+                    try:
+                        index.load()
+                    except IOError:
+                        index.build([svc])
+                        index.save()
+                    self.sim[modelname][svc_name] = index
 
     def getsims(self, basemodel, uses=None):
         sims = []

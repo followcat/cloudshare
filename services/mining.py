@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import math
 
 import core.basedata
 import core.mining.lsimodel
@@ -306,17 +307,19 @@ class Mining(object):
                 break
         return result
 
-    def lenght(self, basemodel, uses=None, top=None):
+    def lenght(self, basemodel, namelist, uses=None, top=None):
         result = 0
         sims = self.getsims(basemodel, uses=uses)
-        for sim in sims:
-            nums = len(sim.names)
-            if top is not None:
-                if top < 1:
-                    nums = nums*top
-                elif nums > top:
-                    nums = top
-            result += nums
+        for name in namelist:
+            for sim in sims:
+                if sim.exists(name):
+                    nums = len(sim.names)
+                    if top is not None:
+                        if top < 1:
+                            nums = math.ceil(nums*top)
+                        elif nums > top:
+                            nums = top
+                    result += nums
         return result
 
     def idsims(self, modelname, ids):
@@ -329,15 +332,27 @@ class Mining(object):
         return results
 
     def minetop(self, doc, basemodel, top=None, uses=None):
-        results = self.probability(basemodel, doc, uses=uses)
-        if top is None:
-            top = len(results)
-        return results[:top]
+        results = self.probability(basemodel, doc, top=top, uses=uses)
+        return results
 
     def minelist(self, doc, lists, basemodel, uses=None):
-        return map(lambda x: self.probability_by_id(basemodel, doc, x, uses=uses), lists)
+        result = list()
+        for name in lists:
+            uses = list()
+            for sim in self.sim[basemodel].values():
+                if sim.exists(name):
+                    uses.append(sim.name)
+                    break
+            result.append(self.probability_by_id(basemodel, doc, name, uses=uses))
+        return result
 
     def minelistrank(self, doc, lists, basemodel, uses=None, top=None, minimum=None):
+        if uses is None:
+            uses = list()
+            for name, value in lists:
+                for sim in self.sim[basemodel].values():
+                    if sim.exists(name):
+                        uses.append(sim.name)
         probalist = set(self.probability(basemodel, doc, uses=uses,
                                          top=top, minimum=minimum))
         probalist.update(set(lists))

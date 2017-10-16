@@ -68,7 +68,7 @@ class ProjectMessage extends Component {
       </Select>
       </span>
     );
-    if(isMember !== '' )  {
+
     if (isMember === true ) {
       if( project !== null ) {
         return selectElement;
@@ -105,9 +105,6 @@ class ProjectMessage extends Component {
         />
         </Modal>
       );
-      }
-    } else {
-      StorageUtil.set('_pj','default');
       }
     }
   }

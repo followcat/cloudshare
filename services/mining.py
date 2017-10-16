@@ -307,19 +307,24 @@ class Mining(object):
                 break
         return result
 
-    def lenght(self, basemodel, namelist, uses=None, top=None):
+    def lenght(self, basemodel, namelist, uses=None, top=1):
         result = 0
         sims = self.getsims(basemodel, uses=uses)
-        for name in namelist:
+        for sim in sims:
+            if basemodel == sim.name:
+                result = len(sim.names)
+                break
+        else:
             for sim in sims:
-                if sim.exists(name):
-                    nums = len(sim.names)
-                    if top is not None:
-                        if top < 1:
+                for name in namelist:
+                    if sim.exists(name):
+                        nums = len(sim.names)
+                        if top <= 1:
                             nums = math.ceil(nums*top)
                         elif nums > top:
                             nums = top
-                    result += nums
+                        result += nums
+                        break
         return result
 
     def idsims(self, modelname, ids):

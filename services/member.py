@@ -121,6 +121,9 @@ class Member(services.base.service.Service):
                     tmp_project._modelname = self.default_model
                 self.projects[name] = tmp_project
 
+    def exists_project(self, name):
+        return name in self.projects
+
     def add_project(self, name, classify, adminID, autosetup=False, autoupdate=False):
         result = False
         if self.check_admin(adminID) and len(self.projects) < self.max_project_nums:

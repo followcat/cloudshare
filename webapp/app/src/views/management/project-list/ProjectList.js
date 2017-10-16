@@ -62,16 +62,16 @@ class ProjectList extends Component {
   }
 
   handleSubmit () {
-    if(this.state.projectName === null) {
+    if(this.state.projectName !== null) {
       addProject({
         projectname: this.state.projectName,
+        classify: []
       }, (json) => {
         if  (json.result === true) {
           this.setState({
           visible: false,
           projects: [...this.state.projects],
         });
-
         message.success(language.ADD_SUCCESS_MSG);
         } else {
             message.error(language.ADD_FAIL_MSG);

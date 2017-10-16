@@ -61,15 +61,15 @@ class LayoutHeader extends Component {
     this.state = {
       selectedKeys: [],
       projects: [],
-      navMenus: navMenuUser,
+      navMenus: [],
       profileMenus: [],
-      ismember: '',
+      ismember: null,
     };
     this.handleSignOutClick = this.handleSignOutClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
-  componentWillMount() {
+  async componentWillMount() {
 
     const profileMenuAdmin = ( 
     <Menu>
@@ -111,18 +111,20 @@ class LayoutHeader extends Component {
   </Menu>
     );
 
-    isMember((json) => {
+    await isMember((json) => {
       if (json.result === true) {
-             this.setState({
+        this.setState({
           navMenus: navMenusMember,
           ismember: true,
         });
       }else{
         this.setState({
-           ismember: false,
+          navMenus: navMenuUser,
+          ismember: false,
         });
       }
       });
+
     isMemberAdmin((json) => {
       if (json.result === true) {
         this.setState({
@@ -134,7 +136,8 @@ class LayoutHeader extends Component {
         });
         }
       });
-    getProject((json) => {
+
+    await getProject((json) => {
       if (json.code === 200) {
         this.setState({
           projects: json.data,
@@ -152,6 +155,20 @@ class LayoutHeader extends Component {
         selectedKeys.push(v.url);
       }
     });
+
+
+    isMember((json) => {
+      if (json.result === true) {
+             this.setState({
+          navMenus: navMenusMember,
+          ismember: true,
+        });
+      }else{
+        this.setState({
+           ismember: false,
+        });
+      }
+      });
 
     this.setState({
       selectedKeys: selectedKeys

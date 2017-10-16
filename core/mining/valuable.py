@@ -47,7 +47,7 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(name_list, miner, project, doc, top, basemodel,
+def next(name_list, miner, project, doc, top, basemodel, minimum=10000,
          uses=None, education_req=True):
     rating = []
     extract_data_full = []
@@ -63,7 +63,8 @@ def next(name_list, miner, project, doc, top, basemodel,
                 education_requirement.group('education'), name_list)
         else:
             value_res = miner.minelist(text, name_list, basemodel)
-            total, rank_res = miner.minelistrank(text, value_res, basemodel, top=top)
+            total, rank_res = miner.minelistrank(text, value_res, basemodel,
+                                                 top=top, minimum=minimum)
             value_point = map(lambda x: (x[0], float(x[1])/2), value_res)
             rank_point = map(lambda x: (x[0], rankvalue(x[1], total)), rank_res)
             total_point = map(lambda x: (x[0][0], x[0][1]*0.5+x[1][1]*0.5),

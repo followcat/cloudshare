@@ -126,17 +126,17 @@ class Simulation(services.base.storage.BaseStorage):
 
     def getyaml(self, id):
         baseinfo = dict()
+        prjinfo = self.getinfo(id)
         for storage in self.storages:
             try:
                 baseinfo = storage.getyaml(id)
+                basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
+                prjtime = prjinfo['modifytime'] if 'modifytime' in prjinfo else 0
+                prjinfo.update(baseinfo)
+                prjinfo['modifytime'] = max(basetime, prjtime)
                 break
             except IOError:
                 continue
-        prjinfo = self.getinfo(id)
-        basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
-        prjtime = prjinfo['modifytime'] if 'modifytime' in prjinfo else 0
-        prjinfo.update(baseinfo)
-        prjinfo['modifytime'] = max(basetime, prjtime)
         return prjinfo
 
     def updateinfo(self, id, key, value, committer, do_commit=True):

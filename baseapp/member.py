@@ -11,4 +11,4 @@ AI_needed = sources.industry_id.needed_ai
 
 SVC_MEMBERS = services.members.Members(config.storage_config['MEMBERS'], [SVC_ACCOUNT],
                                        [SVC_CV_REPO, SVC_CV_STO, SVC_CV_INDIV],
-                                       [SVC_MULT_PEO])
+                                       [SVC_JD_REPO], [SVC_MULT_PEO])

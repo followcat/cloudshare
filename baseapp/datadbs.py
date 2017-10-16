@@ -4,8 +4,9 @@ import baseapp.loader
 import services.account
 import services.people
 import services.multipeople
-import baseapp.searchengine
+import services.jobdescription
 import services.curriculumvitae
+import baseapp.searchengine
 
 from baseapp.loader import config
 
@@ -15,6 +16,8 @@ PATHS = config.storage_config
 SVC_PWD = services.account.Password(PATHS['PASSWORD'], 'pwdrepo')
 SVC_ACCOUNT = services.account.Account(SVC_PWD, PATHS['ACCOUNT'], 'accrepo')
 SVC_MSG = services.account.Message(SVC_ACCOUNT, PATHS['MESSAGE'], 'msgrepo')
+
+SVC_JD_REPO = services.jobdescription.JobDescription(PATHS['JD_REPO'], 'jdrepo')
 
 SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(PATHS['CV_REPO'], 'cloudshare',
                                                        searchengine=baseapp.searchengine.ES)

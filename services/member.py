@@ -6,6 +6,7 @@ import utils.builtin
 import services.company
 import services.project
 import services.base.service
+import services.simulationjd
 import services.simulationacc
 
 import sources.industry_id
@@ -16,26 +17,31 @@ class Member(services.base.service.Service):
     commitinfo = 'Member'
     PRJ_PATH = 'projects'
     ACC_PATH = 'accounts'
-    CV_PATH = 'curriculumvitaes'
     CO_PATH = 'companies'
+    JD_PATH = 'jobdescriptions'
+    CV_PATH = 'curriculumvitaes'
     config_file = 'config.yaml'
 
     default_model = 'default'
     max_project_nums = 3
 
-    def __init__(self, acc_repos, cv_repos,
+    def __init__(self, acc_repos, cv_repos, jd_repos,
                  mult_peo, path, name, iotype='git'):
         super(Member, self).__init__(path, name, iotype=iotype)
         self.name = name
         self.path = path
         self.cv_path = os.path.join(path, self.CV_PATH)
+        self.jd_path = os.path.join(path, self.JD_PATH)
         self.co_path = os.path.join(path, self.CO_PATH)
         self.cv_repos = cv_repos
+        self.jd_repos = jd_repos
         self.mult_peo = mult_peo
         self.acc_repos = acc_repos
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.companies = services.company.Company(self.co_path, name)
+        self.jobdescriptions = services.simulationjd.SimulationJD.autoservice(
+                                                            self.jd_path, name, jd_repos)
         self.curriculumvitaes = services.simulationcv.SimulationCV.autoservice(
                                                             self.cv_path, name, cv_repos)
         self.config = dict()
@@ -113,6 +119,7 @@ class Member(services.base.service.Service):
                 name = unicode(str_name, 'utf-8')
                 tmp_project = services.project.Project(path, self.companies,
                                                        [self.curriculumvitaes],
+                                                       [self.jobdescriptions],
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'storageCV': self.config['storageCV'],
                                           'storagePEO': self.config['storagePEO']})
@@ -136,7 +143,9 @@ class Member(services.base.service.Service):
         result = False
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
-            tmp_project = services.project.Project(path, self.companies, [self.curriculumvitaes],
+            tmp_project = services.project.Project(path, self.companies,
+                                                   [self.curriculumvitaes],
+                                                   [self.jobdescriptions],
                                                    self.mult_peo, name)
             tmp_project.setup(classify, config={'autosetup': autosetup,
                                                 'autoupdate': autoupdate,
@@ -197,17 +206,20 @@ class Member(services.base.service.Service):
         projects_path = os.path.join(member_path, 'projects')
         accounts_path = os.path.join(member_path, 'accounts')
         companies_path = os.path.join(member_path, 'companies')
+        jobdescriptions_path = os.path.join(member_path, 'jobdescriptions')
         curriculumvitaes_path = os.path.join(member_path, 'curriculumvitaes')
         utils.builtin.assure_path_exists(member_path)
         utils.builtin.assure_path_exists(projects_path)
         utils.builtin.assure_path_exists(accounts_path)
         utils.builtin.assure_path_exists(companies_path)
+        utils.builtin.assure_path_exists(jobdescriptions_path)
         utils.builtin.assure_path_exists(curriculumvitaes_path)
         for name in self.projects:
             project = self.projects[name]
             project.backup(projects_path)
         self.accounts.backup(accounts_path)
         self.companies.backup(companies_path)
+        self.jobdescriptions.backup(jobdescriptions_path)
         self.curriculumvitaes.backup(curriculumvitaes_path)
 
 
@@ -215,9 +227,9 @@ class DefaultMember(Member):
 
     default_name = 'default'
 
-    def __init__(self, acc_repos, cv_repos, mult_peo, path,
+    def __init__(self, acc_repos, cv_repos, jd_repos, mult_peo, path,
                  name='default', iotype='git'):
-        super(DefaultMember, self).__init__(acc_repos, cv_repos,
+        super(DefaultMember, self).__init__(acc_repos, cv_repos, jd_repos,
                                             mult_peo, path, name, iotype=iotype)
 
     def load_projects(self):

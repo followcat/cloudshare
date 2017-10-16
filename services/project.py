@@ -18,11 +18,12 @@ class Project(services.base.service.Service):
     PEO_PATH = 'PEO'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepo, cvrepos, svcpeos, name, iotype='git'):
+    def __init__(self, path, corepo, cvrepos, jdrepos, svcpeos, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
         self._modelname = name
         self.corepo = corepo
+        self.jdrepos = jdrepos
         self.cvrepos = cvrepos
         self.svcpeos = svcpeos
         cvpath = os.path.join(path, self.CV_PATH)

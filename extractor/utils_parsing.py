@@ -89,12 +89,23 @@ POSITION = u'(?:(?=(?!\\\\\s))[^=\n：:。\|–―])+'
 PROJECT = ASP+u'*'+u'(?=(?!(?:'+POASP+u'*'+ANONPERIOD+u'|(?:\\\\)\n)))'+POASP+u'*'+POSITION.replace(u'\\n', '\s')+POSITION.replace(u'：:。', '').replace(u'+', '*')
 
 # Use of BORDER do not require re.M
-PREFIXBORDER = lambda PREFIX : lambda INDENT : u'(?:(?<='+PREFIX+u')'+INDENT+POASP+u'*\-{2,}(?: \-+)* *\n)'
+PREFIXNEXTCOL = lambda NEXTCOL : lambda PREFIX : lambda INDENT : u'(?:(?<='+PREFIX+u')'+INDENT+POASP+u'*\-{2,}'+NEXTCOL+u' *\n)'
+PREFIXBORDER = PREFIXNEXTCOL(u'(?: \-+)*')
 FLBORDER = PREFIXBORDER('^')('')
 INBORDER = PREFIXBORDER('\n')
 BORDER = INBORDER('')
 BORDERTOP = lambda label : u'(?P<'+label+u'>'+BORDER+u')'
 BORDERBOTTOM = lambda label : u'(?('+label+u')(?P='+label+u')\n*)'
+CHECKCOLTOP = lambda label : u'(?P<'+label+u'>'+PREFIXNEXTCOL(u'(?P<checknextcol>(?: \-+))*')('\n')('')+u')'
+CHECKCOLBOTTOM = BORDERBOTTOM
+
+BRACKETTOP = lambda gr: u'(?P<'+gr+u'>'+UNIBRALEFT+u')'
+BRACKETBOTTOM = lambda gr: u'(?('+gr+u')'+UNIBRARIGHT+u')'
+SHORTEN_BLANK = lambda x: re.compile(POASP+'{10,}').sub(3*' ', x)
+ANONYMOUS = lambda x: re.compile('\?P<\w+>').sub('?:', x).replace('?P=fromsep', '['+SEP+u'\.．年]')
+MATCH_SPACE_OR = lambda x: u'(?:'+x+u'|'+POASP+u'*)'
+PRJ_ITEM_KEYS = lambda p: [POASP+u'*'+_[0][0] for _ in p.values()]+[POASP+u'*'+'__NORECURSIVE__', BORDER]
+EXCLUDE_ITEM_KEYS = lambda x: u'(?=(?!'+RE_ANY(PRJ_ITEM_KEYS(x))+u'))'
 
 JYCVSRC = re.compile(PREFIXBORDER('^')(u'(英文简历\n)?')+INBORDER(' {4}')+INBORDER(' {6}')+'?'+INBORDER(' {8}')+u'(?: {8,}精英网用户.*\n)?')
 NLPCVSRC = re.compile(FLBORDER+u'\n*(?:(?:简历编号|最新登录|更新(?:时间|日期))：'+POASP+u'*\S+'+POASP+u'*)+\n+'+BORDER)
@@ -107,6 +118,31 @@ is_lpcv = lambda cv:LPCVSRC.search(cv)
 is_nlpcv = lambda cv:NLPCVSRC.search(cv)
 is_zlcv = lambda cv:ZLCVSRC.search(cv)
 is_yccv = lambda cv:YCCVSRC.search(cv)
+
+sections = {
+    'general': u'(?:个人信息|基本资料|\S*个人简历)' ,
+    'self_assessment': u'(?:(?:自我|个人)评价)',
+    'expectations': u'(?:求职意向)',
+    'experience': u'(?:(((工'+POASP+u'?作'+POASP+u'?)|实习|(工作与?)?实践)经'+POASP+u'?[历验])|实习与实践)',
+    'project': u'(?:项'+ASP+u'?目'+ASP+u'?经'+ASP+u'?[历验])',
+    'education': u'(?:教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|/?[及与]?培训)|Education)',
+    'languages': u'(?:语言(能力|技能))',
+    'computer_skills': u'(?:IT'+POASP+u'?技能)',
+    'personal_skills': u'(?:素质技能)',
+    'internship': u'(?:(实习|工作(与)?实践|学生实践){1,}'+ASP+u'*经'+ASP+u'*[历验])',
+    'training': u'(?:接受培训|(?P<slash>/)?培训(?(slash)背景))',
+    'certifications': u'(?:(?:技能'+POASP+u'?)?证'+POASP+u'?书)',
+    'publications': u'(?:发表论文)',
+    'associations': u'(?:社会经验)',
+    'school_honors': u'(?:所获奖项|校内职务)',
+    'various': u'(?:其他信息)', 
+    'english_section': u'(?:Resume)',
+    'copyright': u'(?:Copyright)'
+    }
+
+TITLE = lambda X: u'^'+PREFIX+u'*'+ BRACKETTOP(X+'parens') +u'?\**' + sections[X] + u'[:：]?' + POASP +'*\**'+ BRACKETBOTTOM(X+'parens')
+SECTION = lambda X: BORDERTOP(X+'title')+u'?'+ TITLE(X) +POASP+u'*\n+'+BORDERTOP(X+'border')+u'?(?P<' +X[:4]+ u'>.*?)'+BORDERBOTTOM(X+'border')+u'^'+BORDERBOTTOM(X+'title')
+REMAINING_SECTIONS = lambda X: ASP + u'*(?=' + RE_ANY([sections[_] for _ in sections if _ != X]) + u')'
 
 education_list = {
     0: (u'初中', u'初中及以下'),
@@ -149,7 +185,7 @@ BIRTHDATE = FULLDATE+ u'|'+DATE.replace(u'|'+TODAY, '')
 AGEANDBIRTH = u'('+AGE+ u'|((?P<abbr>'+UNIBRALEFT+u')?(?P<birthdate>' +BIRTHDATE+u')生?(?(abbr)' +UNIBRARIGHT + u')))+'
 
 CURRENCY = u'(?:(?:(?:元|Yuan)|'+ASP+u'*/'+ASP+u'*(?:月|Month)){1,2})'
-SALARY = u'(?:(?P<salarylabel>(?:(?<=月薪：)|月薪(?:（税前）)?)[:：]?)?'+ASP+u'*(?:(?P<salary>\d[\-到 \d\|]*(?:\+)?(?:月/月)?(?(salarylabel)'+CURRENCY+u'?|'+CURRENCY+u')(?:以[上下])?)'+ASP+u'*(?:\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?|保密)|(?:(?:年薪(?:（税前）)?[:：]?)?'+ASP+u'*(?P<salary_yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
+SALARY = u'(?:(?P<salarylabel>(?:(?<=月薪：)|月薪(?:[\(（]税前[\)）])?)[:：]?)?'+ASP+u'*(?:(?P<salary>\d[\-到 \d\|]*(?:\+)?(?:月/月)?(?(salarylabel)'+CURRENCY+u'?|'+CURRENCY+u')(?:以[上下])?)'+ASP+u'*(?:\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?|(?(salarylabel)保密))|(?:(?:年薪(?:[\(（]税前[\)）])?[:：]?)?'+ASP+u'*(?P<salary_yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
 
 EMPLOYEES = u'(?:(?P<employees>(?:少于)?\d+([ '+SEP+u']+(?:(?<= )-0 )?\d+)?'+ASP+u'*(?:人(?:以[上下])?|people))|未填写)'
 BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + POASP+ u'*(['+FIELDSEP+u']'+POASP+u'*(?P<type>'+COMPANY_TYPE+u'))?' +ASP+u'*' + UNIBRARIGHT +u')'
@@ -158,19 +194,12 @@ BDURATION = u'(((?P<br>(?P<dit>\*)?\\\\?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']
 
 PLACES = u'(?:(\S+)['+SENTENCESEP+SEP+']?)+'
 
-BRACKETTOP = lambda gr: u'(?P<'+gr+u'>'+UNIBRALEFT+u')'
-BRACKETBOTTOM = lambda gr: u'(?('+gr+u')'+UNIBRARIGHT+u')'
-SHORTEN_BLANK = lambda x: re.compile(POASP+'{10,}').sub(3*' ', x)
-ANONYMOUS = lambda x: re.compile('\?P<\w+>').sub('?:', x).replace('?P=fromsep', '['+SEP+u'\.．年]')
-MATCH_SPACE_OR = lambda x: u'(?:'+x+u'|'+POASP+u'*)'
-PRJ_ITEM_KEYS = lambda p: [POASP+u'*'+_[0][0] for _ in p.values()]+[POASP+u'*'+'__NORECURSIVE__', BORDER]
-EXCLUDE_ITEM_KEYS = lambda x: u'(?=(?!'+RE_ANY(PRJ_ITEM_KEYS(x))+u'))'
-
 SEPRTED = lambda l:u'(?:(?:'+u')|(?:'.join([_+POASP+u'*?(?:(?:__SEP__)|$)' for _ in l])+u'))'
 # Can't have newline followed by (ASP*) as it breaks (^...)
 PIPESEPRTED = lambda l:SEPRTED([POASP+'*'+_ for _ in l]).replace('__SEP__', u'[\n\|；]+')
 PIPEONLYSEPRTED = lambda l:SEPRTED([POASP+'*'+_ for _ in l]).replace('__SEP__', u'\|')
 SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '[ \n]+')
+NOTSEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '[ \n]*')
 
 def any_separated(item, ANY, label=''):
     output = u'(?:(?<=^)(?:'+PREFIX+u')+)?'
@@ -197,6 +226,7 @@ DEFAULT_ITEM = '__DEFAULT_ITEM__'
 SET_ALL_DEFAULT = lambda LC: lambda COND: lambda TRAIL: lambda KEYS: lambda STR: STR.replace(DEFAULT_ITEM, u'(?:(?:'+LC+u'(?!(?:\n|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(KEYS)).replace(u'[:：]?', u'[:：]')+u')|'+PREFIX+u'*\-{3,}))|(?<=[:：])\n{2}|.)*'+COND+u')'+TRAIL)
 SET_ALL_ITEMS = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(PIPESEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
 SET_ALL_ITEMS_SPACE = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(SPACESEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
+SET_ALL_ITEMS_NOSPACE = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(NOTSEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
 SET_ALL_ITEMS_PIPEONLY = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(PIPEONLYSEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
 
 

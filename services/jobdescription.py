@@ -64,26 +64,25 @@ class JobDescription(services.base.storage.BaseStorage):
                                              searchengine=searchengine, iotype=iotype)
         self.path = path
 
-    def add(self, company, name, description, committer, status=None,
-            commentary='', followup=''):
-        if status is None:
-            status = 'Opening'
+    def _metadata(self, info):
+        origin = self.generate_info_template()
+        for key, datatype in self.YAML_TEMPLATE:
+            if key in info and isinstance(info[key], datatype):
+                origin[key] = info[key]
+        origin['id'] = uuid.uuid1().get_hex()
+        origin['status'] = 'Opening' if not origin['status'] else origin['status']
+        return origin
 
-        id = uuid.uuid1().get_hex()
-        data = {
-            'name': name,
-            'id': id,
-            'company': company,
-            'description': description,
-            'committer': committer,
-            'commentary': commentary,
-            'followup': followup,
-            'status': status
-        }
-        name = core.outputstorage.ConvertName(id)
-        self.interface.add(name.yaml, yaml.safe_dump(data, allow_unicode=True),
-                           "Add job description file: " + name)
-        return True
+    def baseobj(self, info):
+        metadata = self._metadata(info)
+        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+        return bsobj
+
+    def add(self, bsobj, committer=None, unique=True, yamlfile=True,
+            mdfile=False, do_commit=True):
+        return super(JobDescription, self).add(bsobj, committer=committer, unique=unique,
+                                               yamlfile=yaml, mdfile=mdfile,
+                                               do_commit=do_commit)
 
     def modify(self, id, description, status, commentary, followup, committer):
         data = self.getyaml(id)

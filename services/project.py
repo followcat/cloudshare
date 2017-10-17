@@ -6,8 +6,8 @@ import sources.industry_id
 import services.base.service
 import services.simulationcv
 import services.simulationco
+import services.simulationjd
 import services.simulationpeo
-import services.jobdescription
 import extractor.information_explorer
 
 class Project(services.base.service.Service):
@@ -31,11 +31,9 @@ class Project(services.base.service.Service):
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
 
-        self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
-                                                        cvpath, name, cvrepos)
-        self.company = services.simulationco.SimulationCO.autoservice(
-                                                        copath, name, [corepo])
-        self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
+        self.curriculumvitae = services.simulationcv.SimulationCV( cvpath, name, cvrepos)
+        self.company = services.simulationco.SimulationCO(copath, name, [corepo])
+        self.jobdescription = services.simulationjd.SimulationJD(jdpath, name, jdrepos)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
         self.config = dict()
         try:
@@ -81,6 +79,22 @@ class Project(services.base.service.Service):
                         result = each
                         break
             elif cvrepo.name == servicename:
+                result = each
+            if result is not None:
+                break
+        return result
+
+    @property
+    def storageJD(self):
+        result = None
+        servicename = self.config['storageJD']
+        for jdrepo in self.jdrepos:
+            if isinstance(jdrepo, services.simulationjd.SimulationJD):
+                for each in jdrepo.storages:
+                    if each.name == servicename:
+                        result = each
+                        break
+            elif jdrepo.name == servicename:
                 result = each
             if result is not None:
                 break
@@ -264,18 +278,21 @@ class Project(services.base.service.Service):
     def jd_get(self, id):
         return self.jobdescription.getyaml(id)
 
-    def jd_add(self, company, name, description, commentary, followup, committer,
-               status=None):
-        try:
-            self.company_get(company)
-        except IOError:
-            return False
-        return self.jobdescription.add(company, name, description, committer,
-                                        status, commentary, followup)
+    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True):
+        result = False
+        if self.company.exists(company):
+            result = self.storageJD.add(jdobj, committer, unique=unique, do_commit=do_commit)
+            if result:
+                result = self.jobdescription.add(jdobj, committer,
+                                                 unique=unique, do_commit=do_commit)
+        return result
 
     def jd_modify(self, id, description, status, commentary, followup, committer):
-        return self.jobdescription.modify(id, description, status,
-                                          commentary, followup, committer)
+        result = False
+        if self.jobdescription.exists(id):
+            result = self.storageJD.modify(id, description, status,
+                                           commentary, followup, committer)
+        return result
 
     def jd_search(self, keyword, selected=None):
         return self.jobdescription.search(keyword, selected=selected)

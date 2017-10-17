@@ -73,16 +73,19 @@ class JobDescriptionUploadAPI(Resource):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        co_id = args['co_id']
-        jd_name = args['jd_name']
         projectname = args['project']
-        description = args['jd_description']
-        commentary = args['commentary'] if args['commentary'] else ''
-        followup = args['followup'] if args['followup'] else ''
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = project.jd_add(co_id, jd_name, description,
-                                commentary, followup, user.name)
+        info = {
+            'name': args['jd_name'],
+            'company': args['co_id'],
+            'description': args['jd_description'],
+            'committer': user.name,
+            'commentary': args['commentary'] if args['commentary'] else '',
+            'followup': args['followup'] if args['followup'] else '',
+        }
+        jdobj = project.storageJD.baseobj(info)
+        result = project.jd_add(jdobj, committer=user.name)
         return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 

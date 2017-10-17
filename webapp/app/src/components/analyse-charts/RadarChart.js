@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 
 import Charts from './Charts';
 
-import { Button, Modal, Checkbox } from 'antd';
+import { Button, Modal, Checkbox, Spin } from 'antd';
 
 import { getValuableData } from 'request/analyse';
 
@@ -17,16 +17,19 @@ class RadarChart extends Component {
       data: [],
       option: {},
       anonymized: false,
+      loading: true
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleLoading = this.handleLoading.bind(this);
   }
 
   handleClick() {
     const { postData, selection, dataSource } = this.props;
     this.setState({
       visible: true,
+      loading: true,
       data: [],
     });
 
@@ -65,6 +68,12 @@ class RadarChart extends Component {
     });
   }
 
+  handleLoading(val) {
+    this.setState({
+      loading: val
+    });
+  }
+
   render() {
     const { visible, option, data } = this.state;
 
@@ -82,9 +91,13 @@ class RadarChart extends Component {
           style={{ top: 20 }}
           width={980}
         >
+          <Spin size="large" spinning={this.state.loading}>
           {data.length > 0 ?
-            <Charts option={option} style={{ width: 900, height: 460, margin: '0 auto' }} /> :
-            ''}
+            <Charts option={option} getLoading={this.handleLoading} 
+            style={{ width: 900, height: 460, margin: '0 auto' }} />
+            : <div style={{ width: 900, height: 460, margin: '0 auto' }} />
+          }
+          </Spin>
         </Modal>
       </div>
     );

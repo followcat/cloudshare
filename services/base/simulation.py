@@ -6,6 +6,7 @@ import ujson
 
 import utils._yaml
 import utils.builtin
+import core.basedata
 import core.outputstorage
 import services.memdatas
 import services.base.storage
@@ -56,12 +57,6 @@ class Simulation(services.base.storage.BaseStorage):
         id = core.outputstorage.ConvertName(name).base
         return id in self.ids
 
-    def generate_info_template(self):
-        info = {}
-        for each in self.YAML_TEMPLATE:
-            info[each[0]] = each[1]()
-        return info
-
     def _add(self, name):
         id = core.outputstorage.ConvertName(name).base
         self.ids.add(id)
@@ -79,6 +74,10 @@ class Simulation(services.base.storage.BaseStorage):
         if 'date' not in info or not info['date']:
             info['date'] = time.time()
         return info
+
+    def baseobj(self, info):
+        bsobj = core.basedata.DataObject(metadata=info, data=None)
+        return bsobj
 
     def add(self, bsobj, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):

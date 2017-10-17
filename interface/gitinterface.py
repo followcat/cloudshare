@@ -28,7 +28,10 @@ class GitInterface(interface.base.Interface):
         if not os.path.exists(path):
             self.repo = dulwich.repo.Repo.init(path, mkdir=True)
         else:
-            self.repo = dulwich.repo.Repo(path)
+            try:
+                self.repo = dulwich.repo.Repo(path)
+            except dulwich.repo.NotGitRepository:
+                self.repo = dulwich.repo.Repo.init(path)
 
     def exists(self, filename):
         result = True

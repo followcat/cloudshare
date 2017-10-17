@@ -55,7 +55,7 @@ class SimulationCV(services.base.simulation.Simulation,
         hidden = '[****]'
         info = self.getyaml(id, secrecy=False)
         for key in self.yaml_private_key:
-            if info[key]:
+            if key in info and info[key]:
                 result = result.replace(info[key], hidden+' '*(len(info[key])-len(hidden)))
             elif key == 'phone':
                 value = extractor.information_explorer.get_phone(result)

@@ -16,6 +16,7 @@ class RadarChart extends Component {
       visible: false,
       data: [],
       option: {},
+      defaultSelection: [],
       anonymized: false,
       loading: true
     };
@@ -26,7 +27,8 @@ class RadarChart extends Component {
   }
 
   handleClick() {
-    const { postData, selection, dataSource } = this.props;
+    const { postData, selection, dataSource, } = this.props;
+    let defaultSelection = selection ? selection : [];
     this.setState({
       visible: true,
       loading: true,
@@ -35,16 +37,17 @@ class RadarChart extends Component {
 
     let param = postData.id ? { id: postData.id } : { doc: postData.doc };
     if (dataSource.length > 0 && selection.length <= 0) {
+       defaultSelection = [];
        for (var i = 0; i < 5; i++) {
-        selection.push({
+        defaultSelection.push({
           id: dataSource[i].yaml_info.id,
           name: dataSource[i].yaml_info.name
         })
-       };
+       }
     }
 
     getValuableData(Object.assign(param, {
-        name_list: selection.map(item => `${item.id}.md`),
+        name_list: defaultSelection.map(item => `${item.id}.md`),
         uses: postData.uses,
       }), json => {
         if (json.code === 200) {

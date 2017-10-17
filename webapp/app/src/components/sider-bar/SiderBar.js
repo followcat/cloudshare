@@ -135,6 +135,7 @@ class SiderBar extends Component {
               <RadarChart 
                 selection={selection}
                 postData={postData}
+                dataSource={dataSource}
               />
               <div className="selection-box">
                 <div className="selection-title">

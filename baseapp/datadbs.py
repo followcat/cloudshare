@@ -17,6 +17,7 @@ SVC_PWD = services.account.Password(PATHS['PASSWORD'], 'pwdrepo')
 SVC_ACCOUNT = services.account.Account(SVC_PWD, PATHS['ACCOUNT'], 'accrepo')
 SVC_MSG = services.account.Message(SVC_ACCOUNT, PATHS['MESSAGE'], 'msgrepo')
 
+SVC_CO_REPO = services.company.Company(PATHS['CO_REPO'], 'corepo')
 SVC_JD_REPO = services.jobdescription.JobDescription(PATHS['JD_REPO'], 'jdrepo')
 
 SVC_CV_REPO = services.curriculumvitae.CurriculumVitae(PATHS['CV_REPO'], 'cloudshare',

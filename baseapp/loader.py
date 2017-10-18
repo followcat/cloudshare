@@ -36,6 +36,7 @@ class Config(object):
         ("PASSWORD",        "account/password"),
         ("MESSAGE",         "account/message"),
         ("JD_REPO",         "JD/repo"),
+        ("CO_REPO",         "CO/repo"),
         ("CV_REPO",         "CV/repo"),
         ("CV_INDIV",        "CV/indiv"),
         ("CV_STO",          "CV/storage"),

@@ -18,11 +18,11 @@ class Project(services.base.service.Service):
     PEO_PATH = 'PEO'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepo, cvrepos, jdrepos, svcpeos, name, iotype='git'):
+    def __init__(self, path, corepos, cvrepos, jdrepos, svcpeos, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
         self._modelname = name
-        self.corepo = corepo
+        self.corepos = corepos
         self.jdrepos = jdrepos
         self.cvrepos = cvrepos
         self.svcpeos = svcpeos
@@ -31,8 +31,8 @@ class Project(services.base.service.Service):
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
 
-        self.curriculumvitae = services.simulationcv.SimulationCV( cvpath, name, cvrepos)
-        self.company = services.simulationco.SimulationCO(copath, name, [corepo])
+        self.company = services.simulationco.SimulationCO(copath, name, corepos)
+        self.curriculumvitae = services.simulationcv.SimulationCV(cvpath, name, cvrepos)
         self.jobdescription = services.simulationjd.SimulationJD(jdpath, name, jdrepos)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
         self.config = dict()
@@ -67,6 +67,22 @@ class Project(services.base.service.Service):
         if not os.path.exists(os.path.join(self.path, self.config_file)) or classify is not None:
             self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
             self.save()
+
+    @property
+    def storageCO(self):
+        result = None
+        servicename = self.config['storageCO']
+        for corepo in self.corepos:
+            if isinstance(corepo, services.simulationco.SimulationCO):
+                for each in corepo.storages:
+                    if each.name == servicename:
+                        result = each
+                        break
+            elif corepo.name == servicename:
+                result = each
+            if result is not None:
+                break
+        return result
 
     @property
     def storageCV(self):
@@ -234,7 +250,7 @@ class Project(services.base.service.Service):
 
     def company_compare_excel(self, stream, committer):
         outputs = list()
-        outputs.extend(self.corepo.compare_excel(stream, committer))
+        outputs.extend(self.storageCO.compare_excel(stream, committer))
         outputs.extend(self.company.compare_excel(stream, committer))
         return outputs
 
@@ -247,7 +263,7 @@ class Project(services.base.service.Service):
             if item[0] == 'companyadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 repo_result.add(yamlname)
-                result = self.corepo.add(baseobj, committer=item[2][-1], do_commit=False)
+                result = self.storageCO.add(baseobj, committer=item[2][-1], do_commit=False)
             elif item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 project_result.add(self.company.ids_file)
@@ -257,14 +273,20 @@ class Project(services.base.service.Service):
                 project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
                 result = self.company.updateinfo(*item[2], do_commit=False)
             results[item[1]] = result
-        self.corepo.interface.do_commit(list(repo_result), committer=committer)
+        self.storageCO.interface.do_commit(list(repo_result), committer=committer)
         self.company.interface.do_commit(list(project_result), committer=committer)
         return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
-        self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
-        self.company.add(coobj, committer, unique, yamlfile, mdfile)
-        return self.company.addcustomer(coobj.name, committer)
+        result = {
+            'repo_result' : False,
+            'project_result' : False
+        }
+        result['repo_result'] = self.storageCO.add(coobj, committer, unique, yamlfile, mdfile)
+        if result['repo_result']:
+            result['project_result'] = self.company.add(coobj, committer, unique,
+                                                        yamlfile, mdfile)
+        return result
 
     def company_get(self, name):
         return self.company.getyaml(name)
@@ -279,12 +301,17 @@ class Project(services.base.service.Service):
         return self.jobdescription.getyaml(id)
 
     def jd_add(self, jdobj, committer=None, unique=True, do_commit=True):
-        result = False
+        result = {
+            'repo_result' : False,
+            'project_result' : False
+        }
         if self.company.exists(company):
-            result = self.storageJD.add(jdobj, committer, unique=unique, do_commit=do_commit)
-            if result:
-                result = self.jobdescription.add(jdobj, committer,
-                                                 unique=unique, do_commit=do_commit)
+            result['repo_result'] = self.storageJD.add(jdobj, committer,
+                                                       unique=unique, do_commit=do_commit)
+            if result['repo_result']:
+                result['project_result'] = self.jobdescription.add(jdobj, committer,
+                                                                unique=unique,
+                                                                do_commit=do_commit)
         return result
 
     def jd_modify(self, id, description, status, commentary, followup, committer):

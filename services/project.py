@@ -247,9 +247,9 @@ class Project(services.base.service.Service):
         return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
-        self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
-        self.company.add(coobj, committer, unique, yamlfile, mdfile)
-        return self.company.addcustomer(coobj.name, committer)
+        result = self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
+        result = self.company.add(coobj, committer, unique, yamlfile, mdfile)
+        return result
 
     def company_get(self, name):
         return self.company.getyaml(name)

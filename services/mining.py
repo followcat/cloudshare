@@ -214,22 +214,26 @@ class Mining(object):
                     continue
                 if modelname not in self.sim:
                     self.sim[modelname] = dict()
-                save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
                 svccv_names = member_projects + self.projects[modelname].getclassify()
                 for svc_name in svccv_names:
                     if svc_name in self.sim[modelname]:
                         continue
-                    svc = self.services['all'][svc_name]
-                    industrypath = industrytopath(svc_name)
-                    index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
-                                                                    os.path.join(save_path,
-                                                                    industrypath), model)
-                    try:
-                        index.load()
-                    except IOError:
-                        index.build([svc])
-                        index.save()
-                    self.sim[modelname][svc_name] = index
+                    self.make_sim(modelname, svc_name)
+
+    def make_sim(self, modelname, svc_name):
+        model = self.lsi_model[modelname]
+        save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
+        svc = self.services['all'][svc_name]
+        industrypath = industrytopath(svc_name)
+        index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
+                                                        os.path.join(save_path,
+                                                        industrypath), model)
+        try:
+            index.load()
+        except IOError:
+            index.build([svc])
+            index.save()
+        self.sim[modelname][svc_name] = index
 
     def getsims(self, basemodel, uses=None):
         sims = []

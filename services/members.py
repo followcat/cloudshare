@@ -72,7 +72,8 @@ class Members(object):
         result = dict()
         for each in self.members:
             member = self.members[each]
-            result.update(member.projects)
+            for name, project in member.projects.items():
+                result[project.id] = project
         return result
 
     def backup(self, path):

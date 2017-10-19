@@ -43,6 +43,9 @@ class Project(services.base.service.Service):
 
     def load(self):
         self.config = utils.builtin.load_yaml(self.path, self.config_file)
+        self.config['name'] = self.name
+        if 'id' not in self.config:
+            self.config['id'] = utils.builtin.genuuid()
 
     def save(self):
         dumpconfig = utils.builtin.dump_yaml(self.config)
@@ -132,7 +135,7 @@ class Project(services.base.service.Service):
 
     @property
     def id(self):
-        return self.name
+        return self.config['id']
 
     @property
     def cv_secrecy(self):

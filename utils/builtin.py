@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
+import uuid
 import socket
 import hashlib
 import datetime
@@ -25,6 +26,10 @@ def hash(text):
     m = hashlib.md5()
     m.update(text)
     return m.hexdigest()
+
+
+def genuuid():
+    return uuid.uuid1().get_hex()
 
 
 def dump_yaml(data, default_flow_style=None):

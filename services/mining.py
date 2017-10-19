@@ -206,7 +206,7 @@ class Mining(object):
         if members is None:
             members = self.members.members.values()
         for member in members:
-            member_projects = member.projects.keys()
+            member_projects = [project.id for project in member.projects.values()]
             for project in member.projects.values():
                 modelname = project.modelname
                 model = self.lsi_model[modelname]
@@ -214,7 +214,7 @@ class Mining(object):
                     continue
                 if modelname not in self.sim:
                     self.sim[modelname] = dict()
-                svccv_names = member_projects + self.projects[modelname].getclassify()
+                svccv_names = member_projects + self.projects[project.id].getclassify()
                 for svc_name in svccv_names:
                     if svc_name in self.sim[modelname]:
                         continue
@@ -257,13 +257,13 @@ class Mining(object):
                 continue
             service = project.curriculumvitae
             lsi_path = os.path.join(self.path, project.modelname, 'model')
-            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer,
+            lsi = core.mining.lsimodel.LSImodel(project.modelname, lsi_path, slicer=self.slicer,
                                                 no_above=1./3, config=project.config)
             try:
                 lsi.load()
             except IOError:
                 if lsi.getconfig('autosetup') is True:
-                    if lsi.build([service]):
+                    if lsi.build({project.id: service}):
                         lsi.save()
             self.lsi_model[project.modelname] = lsi
 
@@ -271,8 +271,8 @@ class Mining(object):
         for modelname in self.lsi_model:
             lsimodel = self.lsi_model[modelname]
             if lsimodel.getconfig('autoupdate') is True:
-                updated = self.lsi_model[modelname].update(
-                    [self.services['default'][modelname]])
+                svc_cvs = [self.services['default'][cv] for cv in lsimodel.getconfig('origin')]
+                updated = self.lsi_model[modelname].update(svc_cvs)
                 self.update_sims(newmodel=updated)
 
     def update_sims(self, newmodel=False):

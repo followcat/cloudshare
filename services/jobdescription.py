@@ -1,9 +1,9 @@
 import glob
-import uuid
 import os.path
 
 import yaml
 
+import utils.builtin
 import core.outputstorage
 import services.base.storage
 
@@ -69,7 +69,7 @@ class JobDescription(services.base.storage.BaseStorage):
         for key, datatype in self.YAML_TEMPLATE:
             if key in info and isinstance(info[key], datatype):
                 origin[key] = info[key]
-        origin['id'] = uuid.uuid1().get_hex()
+        origin['id'] = utils.builtin.genuuid()
         origin['status'] = 'Opening' if not origin['status'] else origin['status']
         return origin
 

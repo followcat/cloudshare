@@ -1,8 +1,9 @@
 import os
 
 import baseapp.loader
-import services.account
 import services.people
+import services.account
+import services.company
 import services.multipeople
 import services.jobdescription
 import services.curriculumvitae

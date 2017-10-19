@@ -6,6 +6,8 @@ import ujson
 
 from gensim import corpora, models
 
+import utils.builtin
+
 
 class LSImodel(object):
 
@@ -15,12 +17,14 @@ class LSImodel(object):
     corpus_save_name = 'lsi.corpus'
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
+    config_file = 'config.yaml'
 
 
-    def __init__(self, savepath, no_above=1./1, topics=100, extra_samples=300,
+    def __init__(self, name, savepath, no_above=1./1, topics=100, extra_samples=300,
                  power_iters=6, tfidf_local=None, slicer=None, config=None):
         if config is None:
             config = {}
+        self.name = name
         self.path = savepath
         self.topics = topics
         self.power_iters = power_iters
@@ -46,6 +50,20 @@ class LSImodel(object):
         self.tfidf = None
         self.dictionary = None
         self.corpus_tfidf = None
+        self.load_config()
+
+    def load_config(self):
+        try:
+            config = utils.builtin.load_yaml(self.path, self.config_file)
+        except IOError:
+            config = dict()
+        self.config.update(config)
+        self.config['name'] = self.name
+        if 'id' not in self.config:
+            self.config['id'] = utils.builtin.genuuid()
+        if self.config != config:
+            with open(os.path.join(self.path, self.config_file), 'w') as f:
+                f.write(utils.builtin.dump_yaml(self.config))
 
     def update(self, svccv_list):
         added = False
@@ -59,25 +77,27 @@ class LSImodel(object):
             self.save()
         return added
 
-    def build(self, svccv_list):
+    def build(self, svccv):
         names = []
         texts = []
-        for svc_cv in svccv_list:
+        for svc_id, svc_cv in svccv:
             for data in svc_cv.datas():
                 name, doc = data
                 names.append(name)
                 texts.append(doc)
         if len(names) > 5:
             self.setup(names, texts)
+            self.config['origin'] = svccv.keys()
+            self.load_config()
             return True
         return False
 
-    def build_from_names(self, svccv_list, names):
+    def build_from_names(self, svccv, names):
         texts = []
         if len(names) < 6:
             return False
         for name in names:
-            for svc_cv in svccv_list:
+            for prj_id, svc_cv in svccv:
                 if svc_cv.exists(name):
                     doc = svc_cv.getmd(name)
                     texts.append(doc)
@@ -87,10 +107,10 @@ class LSImodel(object):
         self.setup(names, texts)
         return True
 
-    def build_from_words(self, svccv_list, words):
+    def build_from_words(self, svccv, words):
         names = []
         texts = []
-        for svc_cv in svccv_list:
+        for prj_id, svc_cv in svccv:
             for data in svc_cv.datas():
                 name, doc = data
                 for word in words:

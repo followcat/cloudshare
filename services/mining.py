@@ -183,16 +183,7 @@ class Mining(object):
         self.path = path
         self.lsi_model = dict()
         self.members = members
-        self.projects = members.allprojects()
-        self.projectscv = dict([(project.id, project.curriculumvitae)
-                                for project in self.projects.values()])
         self.additionals = classifycvs
-        self.services = {'default': self.projectscv,
-                         'classify': dict(),
-                         'all': dict()}
-        self.services['all'].update(self.projectscv)
-        self.services['all'].update(self.additionals)
-        self.services['classify'].update(classifycvs)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
@@ -200,6 +191,33 @@ class Mining(object):
         else:
             self.slicer = slicer
         self.make_lsi()
+
+    @property
+    def projects(self):
+        return self.members.allprojects()
+
+    @property
+    def projectscv(self):
+        return dict([(project.id, project.curriculumvitae)
+                     for project in self.projects.values()])
+    
+    @property
+    def services(self):
+        result = {'default': self.projectscv,
+                  'classify': dict(),
+                  'all': dict()}
+        result['all'].update(self.projectscv)
+        result['all'].update(self.additionals)
+        result['classify'].update(self.additionals)
+        return result
+
+    @property
+    def SIMS(self):
+        results = list()
+        for modelname in self.lsi_model:
+            for simname in self.sim[modelname]:
+                results.append(self.sim[modelname][simname])
+        return results
 
     def setup(self, members=None):
         assert self.lsi_model
@@ -354,11 +372,3 @@ class Mining(object):
 
     def addition_names(self):
         return [name for name in self.additionals]
-
-    @property
-    def SIMS(self):
-        results = list()
-        for modelname in self.lsi_model:
-            for simname in self.sim[modelname]:
-                results.append(self.sim[modelname][simname])
-        return results

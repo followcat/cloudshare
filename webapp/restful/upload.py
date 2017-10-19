@@ -73,6 +73,8 @@ class UploadCVAPI(Resource):
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
+        if projectname not in self.svc_min.sim[project.modelname]:
+            self.svc_min.make_sim(project.modelname, projectname)
         self.svc_min.sim[project.modelname][projectname].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 

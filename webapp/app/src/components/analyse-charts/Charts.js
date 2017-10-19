@@ -14,7 +14,7 @@ class Charts extends Component {
   }
 
   componentDidUpdate() {
-    // this.setOption();
+     this.setOption();
   }
 
   componentUnMount() {
@@ -33,7 +33,7 @@ class Charts extends Component {
     if(option) {
       this.charts.setOption(option);
       this.charts.hideLoading();
-      this.props.getLoading(false);
+      // this.props.getLoading(false);
     }
   }
 

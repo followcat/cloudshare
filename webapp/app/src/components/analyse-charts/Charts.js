@@ -33,7 +33,6 @@ class Charts extends Component {
     if(option) {
       this.charts.setOption(option);
       this.charts.hideLoading();
-      // this.props.getLoading(false);
     }
   }
 

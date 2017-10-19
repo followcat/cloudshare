@@ -212,9 +212,10 @@ class Mining(object):
                 model = self.lsi_model[modelname]
                 if not model.names:
                     continue
+                if modelname not in self.sim:
+                    self.sim[modelname] = dict()
                 save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
                 svccv_names = member_projects + self.projects[modelname].getclassify()
-                self.sim[modelname] = dict()
                 for svc_name in svccv_names:
                     if svc_name in self.sim[modelname]:
                         continue
@@ -307,26 +308,6 @@ class Mining(object):
                 break
         return result
 
-    def lenght(self, basemodel, namelist, uses=None, top=1):
-        result = 0
-        sims = self.getsims(basemodel, uses=uses)
-        for sim in sims:
-            if basemodel == sim.name:
-                result = len(sim.names)
-                break
-        else:
-            for sim in sims:
-                for name in namelist:
-                    if sim.exists(name):
-                        nums = len(sim.names)
-                        if top <= 1:
-                            nums = math.ceil(nums*top)
-                        elif nums > top:
-                            nums = top
-                        result += nums
-                        break
-        return result
-
     def idsims(self, modelname, ids):
         results = list()
         for id in ids:
@@ -362,7 +343,7 @@ class Mining(object):
                                          top=top, minimum=minimum))
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
-        return map(lambda x: (x[0], ranklist.index(x)), lists)
+        return len(ranklist), map(lambda x: (x[0], ranklist.index(x)), lists)
 
     def default_names(self):
         return [name for name in self.services['default']]

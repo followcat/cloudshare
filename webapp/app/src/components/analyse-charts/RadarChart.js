@@ -38,7 +38,7 @@ class RadarChart extends Component {
     let param = postData.id ? { id: postData.id } : { doc: postData.doc };
     if (dataSource.length > 0 && selection.length <= 0) {
        defaultSelection = [];
-       for (var i = 0; i < 5; i++) {
+       for (var i = 0; i < 3; i++) {
         defaultSelection.push({
           id: dataSource[i].yaml_info.id,
           name: dataSource[i].yaml_info.name

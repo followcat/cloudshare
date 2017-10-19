@@ -212,9 +212,10 @@ class Mining(object):
                 model = self.lsi_model[modelname]
                 if not model.names:
                     continue
+                if modelname not in self.sim:
+                    self.sim[modelname] = dict()
                 save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
                 svccv_names = member_projects + self.projects[modelname].getclassify()
-                self.sim[modelname] = dict()
                 for svc_name in svccv_names:
                     if svc_name in self.sim[modelname]:
                         continue

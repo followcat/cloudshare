@@ -137,11 +137,11 @@ def load_index(SVC_MEMBERS, SVC_CLS_CV):
     return SVC_INDEX
 
 
-def load_esindex(es_conn, cv_storages):
+def load_esindex(es_conn):
     import services.esindex
     from elasticsearch import Elasticsearch
     global config
-    SVC_INDEX = services.esindex.ElasticsearchIndexing(cv_storages)
+    SVC_INDEX = services.esindex.ElasticsearchIndexing()
     SVC_INDEX.setup(es_conn, config.es_config['CV_INDEXNAME'])
     return SVC_INDEX
 

@@ -29,25 +29,21 @@ class ElasticsearchIndexing(object):
         }
     }
 
-    def __init__(self, cvsvcs):
-        self.cvs = cvsvcs
-
     def setup(self, esconn, indexname):
         self.es = esconn
         self.es.indices.create(index=indexname, body=self.index_config_body, ignore=400)
 
-    def update(self):
-        for svc in self.cvs:
-            self.updatecv(svc.indexname, svc)
+    def update(self, svcs, indexname):
+        for svc in svcs:
+            self.updatecv(indexname, svc)
 
     def updatecv(self, indexname, svc, numbers=5000):
         assert svc.name
         update_ids = self.ESids(indexname, {})
-        cv_ids = svc.ids
         ACTIONS = list()
         times = 0
         count = 0
-        for id in cv_ids-update_ids:
+        for id in svc.ids-update_ids:
             info = svc.getyaml(id)
             geninfo = self.genindex(info)
             action = {
@@ -84,11 +80,11 @@ class ElasticsearchIndexing(object):
         elasticsearch.helpers.bulk(self.es, ACTIONS,
                 raise_on_error=False, raise_on_exception=False, stats_only=True)
 
-    def upgrade(self, selected, ids=None):
-        for svc in self.cvs:
-            self.upgradecv(svc, selected, ids=ids)
+    def upgrade(self, indexname, svcs, selected, ids=None):
+        for svc in svcs:
+            self.upgradesvc(indexname, svc, selected, ids=ids)
 
-    def upgradecv(self, svc, selected, ids=None, numbers=5000):
+    def upgradesvc(self, indexname, svc, selected, ids=None, numbers=5000):
         assert svc.name
         if ids is None:
             ids = svc.ids
@@ -97,7 +93,6 @@ class ElasticsearchIndexing(object):
         times = 0
         count = 0
         ACTIONS = list()
-        indexname = svc.indexname
         for id in ids:
             yamlinfo = self.genindex(svc.getyaml(id))
             action = {

@@ -388,7 +388,7 @@ class SimilarAPI(Resource):
                                                   uses=uses, top=100):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
-            if score < 0.8 or top==5:
+            if float(score) < 0.8 or top==5:
                 break
             yaml_info = project.cv_getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })

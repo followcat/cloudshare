@@ -159,9 +159,10 @@ class LSIbaseAPI(Resource):
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.sim_names = self.miner.addition_names()
 
     def process(self, project, doc, uses, filterdict, cur_page, eve_count=20):
@@ -171,7 +172,8 @@ class LSIbaseAPI(Resource):
         result = self.miner.probability(project.modelname, doc, uses=uses,
                                         top=self.top, minimum=1000)
         ids = set([cv[0] for cv in result])
-        result = self.index.filter_ids(result, filterdict, ids, uses=uses)
+        result = self.index.filter_ids(self.cv_indexname, result,
+                                       filterdict, ids, uses=uses)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1
@@ -227,6 +229,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         super(LSIbyAllJDAPI, self).__init__()
         self.index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.reqparse.add_argument('fromcache', type=bool, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -252,7 +255,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             output = {}
             output['CV'] = list()
             bestids = set([cv[0] for cv in bestjds[jdid]])
-            filterids = self.index.filter_ids(bestjds[jdid], filterdict, bestids)
+            filterids = self.index.filter_ids(self.cv_indexname, bestjds[jdid],
+                                              filterdict, bestids)
             for cv in filterids:
                 cvinfo = project.cv_getyaml(cv[0])
                 cvinfo['CVvalue'] = cv[1]

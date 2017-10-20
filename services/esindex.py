@@ -10,7 +10,6 @@ import utils.esquery
 
 class ElasticsearchIndexing(object):
 
-    indexname = 'cloudshare.index'
     doctype = 'index'
     index_config_body = {
         "template": doctype,
@@ -33,17 +32,17 @@ class ElasticsearchIndexing(object):
     def __init__(self, cvsvcs):
         self.cvs = cvsvcs
 
-    def setup(self, esconn):
+    def setup(self, esconn, indexname):
         self.es = esconn
-        self.es.indices.create(index=self.indexname, body=self.index_config_body, ignore=400)
+        self.es.indices.create(index=indexname, body=self.index_config_body, ignore=400)
 
     def update(self):
         for svc in self.cvs:
-            self.updatecv(svc)
+            self.updatecv(svc.indexname, svc)
 
-    def updatecv(self, svc, numbers=5000):
+    def updatecv(self, indexname, svc, numbers=5000):
         assert svc.name
-        update_ids = self.ESids({})
+        update_ids = self.ESids(indexname, {})
         cv_ids = svc.ids
         ACTIONS = list()
         times = 0
@@ -53,7 +52,7 @@ class ElasticsearchIndexing(object):
             geninfo = self.genindex(info)
             action = {
                 "_op_type": "index",
-                "_index": self.indexname,
+                "_index": indexname,
                 "_type": 'index',
                 "_source": geninfo,
                 '_id': id
@@ -71,12 +70,12 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Add numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def add(self, id, info):
+    def add(self, indexname, id, info):
         ACTIONS = list()
         geninfo = self.genindex(info)
         action = {
             "_op_type": "index",
-            "_index": self.indexname,
+            "_index": indexname,
             "_type": 'index',
             "_source": geninfo,
             '_id': id
@@ -98,11 +97,12 @@ class ElasticsearchIndexing(object):
         times = 0
         count = 0
         ACTIONS = list()
+        indexname = svc.indexname
         for id in ids:
             yamlinfo = self.genindex(svc.getyaml(id))
             action = {
                 "_op_type": "update",
-                "_index": self.indexname,
+                "_index": indexname,
                 "_type": 'index',
                 "_source": yamlinfo,
                 '_id': id
@@ -120,38 +120,38 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Update numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def get(self, querydict):
+    def get(self, indexname, querydict):
         kwargs={'body': querydict}
-        results = self.ESids(kwargs)
+        results = self.ESids(indexname, kwargs)
         return results
 
-    def ESids(self, kwargs, size=10000):
+    def ESids(self, indexname, kwargs, size=10000):
         kwargs['doc_type'] = 'index'
         kwargs['sort'] = '_doc'
         kwargs['_source'] = 'false'
-        result = utils.esquery.scroll_ids(self.es, self.indexname, kwargs)
+        result = utils.esquery.scroll_ids(self.es, indexname, kwargs)
         ids = set([item['_id'] for item in result])
         return ids
 
-    def filter(self, filterdict, ids=None):
+    def filter(self, indexname, filterdict, ids=None):
         results = set()
         querydict = utils.esquery.request_gen(filterdict=filterdict, ids=ids)
         if querydict['query']['bool']['filter']:
-            results = self.get(querydict)
+            results = self.get(indexname, querydict)
         return results
 
-    def filter_ids(self, source, filterdict, ids, uses=None):
+    def filter_ids(self, indexname, source, filterdict, ids, uses=None):
         result = source
         if filterdict:
             if not isinstance(ids, set):
                 ids = set(ids)
-            filterset = self.filter(filterdict, ids=ids)
+            filterset = self.filter(indexname, filterdict, ids=ids)
             result = filter(lambda x: x in filterset or x[0] in filterset, source)
         return result
 
-    def lastday(self):
+    def lastday(self, indexname):
         lastday = '19800101'
-        search_result = self.es.search(index=self.indexname, doc_type=self.doctype,
+        search_result = self.es.search(index=indexname, doc_type=self.doctype,
                                        sort='_score,date:desc', size = 1)
         try:
             lastday = search_result['hits']['hits'][0]['_source']['date']

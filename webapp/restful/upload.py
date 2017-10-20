@@ -20,11 +20,12 @@ class UploadCVAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_min = flask.current_app.config['SVC_MIN']
         self.svc_index = flask.current_app.config['SVC_INDEX']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
+        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type = str, location = 'json')
@@ -53,7 +54,9 @@ class UploadCVAPI(Resource):
                     try:
                         result = project.cv_add(cvobj, user.name, unique=True)
                         if result['repo_cv_result']:
-                            self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
+                            self.svc_index.add(self.cv_indexname,
+                                               cvobj.metadata['id'],
+                                               cvobj.metadata)
                         if result['project_cv_result']:
                             result['member_cv_result'] = member.cv_add(cvobj, user.name,
                                                                        unique=True)

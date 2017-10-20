@@ -49,14 +49,26 @@ class Config(object):
         ("RAW",             "raw")
     )
 
+    es_template = (
+        ("CV_INDEXNAME",    "cloudshare.index"),
+        ("JD_INDEXNAME",    "jobdescription.index"),
+        ("CO_INDEXNAME",    "company.index"),
+    )
+
     def __init__(self, path):
         self.path = path
 
-    def generate_info_template(self, base_dir):
+    def generate_storage_template(self, base_dir):
         storage_config = {}
         for each in self.storage_template:
             storage_config[each[0]] = os.path.join(base_dir, each[1])
         return storage_config
+
+    def generate_es_template(self):
+        es_config = {}
+        for each in self.es_template:
+            es_config[each[0]] = each[1]
+        return es_config
 
     @property
     def storage_config(self):
@@ -69,20 +81,21 @@ class Config(object):
             pass
         if 'path' in config:
             base_dir = config['path']
-        storage_config = self.generate_info_template(base_dir)
+        storage_config = self.generate_storage_template(base_dir)
         storage_config.update(config)
         return storage_config
 
     @property
     def es_config(self):
-        es_config = dict()
+        config = dict()
         try:
             stream = open(os.path.join(self.path, self.es_config_file)).read()
             config = yaml.load(stream)
-            es_config.update(config)
         except IOError:
             pass
-        return config
+        es_config = self.generate_es_template()
+        es_config.update(config)
+        return es_config
 
 CONFIG_PATH = 'config'
 config = Config(CONFIG_PATH)
@@ -127,8 +140,9 @@ def load_index(SVC_MEMBERS, SVC_CLS_CV):
 def load_esindex(es_conn, cv_storages):
     import services.esindex
     from elasticsearch import Elasticsearch
+    global config
     SVC_INDEX = services.esindex.ElasticsearchIndexing(cv_storages)
-    SVC_INDEX.setup(es_conn)
+    SVC_INDEX.setup(es_conn, config.es_config['CV_INDEXNAME'])
     return SVC_INDEX
 
 

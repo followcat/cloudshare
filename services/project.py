@@ -248,7 +248,12 @@ class Project(services.base.service.Service):
                                               end_y, end_m, end_d)
 
     def company_update_info(self, id, info, committer):
-        result = self.company.update_info(id, info, committer)
+        result = False
+        if self.company.exists(id):
+            repo_result = self.storageCO.saveinfo(id, info, "Update %s information."%id,
+                                                  committer)
+            project_result = self.company.update_info(id, info, committer)
+            result = repo_result or project_result
         return result
 
     def company_compare_excel(self, stream, committer):

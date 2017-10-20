@@ -9,6 +9,7 @@ from flask.ext.restful import Resource
 import utils.builtin
 import core.mining.info
 import core.mining.valuable
+import core.outputstorage
 
 
 class BaseAPI(Resource):
@@ -381,11 +382,17 @@ class SimilarAPI(Resource):
         for classify in project.cv_getyaml(id)['classify']:
             if classify in project_classify:
                 uses.append(classify)
+        top = 0
         datas = []
         for name, score in self.miner.probability(project.modelname, doc,
-                                                  uses=uses, top=6)[1:6]:
+                                                  uses=uses, top=100):
+            if id == core.outputstorage.ConvertName(name).base:
+                continue
+            if score < 0.8 or top==5:
+                break
             yaml_info = project.cv_getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
+            top += 1
         return { 'code': 200, 'data': datas }
 
 

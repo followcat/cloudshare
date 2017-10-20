@@ -94,13 +94,11 @@ class RadarChart extends Component {
           style={{ top: 20 }}
           width={980}
         >
-          <Spin size="large" spinning={this.state.loading}>
           {data.length > 0 ?
             <Charts option={option} getLoading={this.handleLoading} 
             style={{ width: 900, height: 460, margin: '0 auto' }} />
             : <div style={{ width: 900, height: 460, margin: '0 auto' }} />
           }
-          </Spin>
         </Modal>
       </div>
     );

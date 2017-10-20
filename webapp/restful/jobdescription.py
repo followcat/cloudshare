@@ -9,7 +9,9 @@ class JobDescriptionAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.jd_indexname = flask.current_app.config['ES_CONFIG']['JD_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_id', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -46,6 +48,9 @@ class JobDescriptionAPI(Resource):
         project = member.getproject(projectname)
         result = project.jd_modify(jd_id, description, status,
                                    commentary, followup, user.name)
+        if result is True:
+            jd_info = project.jd_get(jd_id)
+            self.svc_index.add(self.jd_indexname, jd_id, jd_info)
         if result: 
             response = { 'code': 200, 'data': result,
                          'message': 'Update job description successed.' }
@@ -60,7 +65,9 @@ class JobDescriptionUploadAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.jd_indexname = flask.current_app.config['ES_CONFIG']['JD_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_name', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -86,6 +93,8 @@ class JobDescriptionUploadAPI(Resource):
         }
         jdobj = project.storageJD.baseobj(info)
         result = project.jd_add(jdobj, committer=user.name)
+        if result is True:
+            self.svc_index.add(self.jd_indexname, jdobj.metadata['id'], jdobj.metadata)
         return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 

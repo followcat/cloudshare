@@ -160,7 +160,7 @@ class LSIbaseAPI(Resource):
         super(LSIbaseAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
-        self.index = flask.current_app.config['SVC_INDEX']
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.sim_names = self.miner.addition_names()
@@ -172,7 +172,7 @@ class LSIbaseAPI(Resource):
         result = self.miner.probability(project.modelname, doc, uses=uses,
                                         top=self.top, minimum=1000)
         ids = set([cv[0] for cv in result])
-        result = self.index.filter_ids(self.cv_indexname, result,
+        result = self.svc_index.filter_ids(self.cv_indexname, result,
                                        filterdict, ids, uses=uses)
         totals = len(result)
         if totals%eve_count != 0:
@@ -227,7 +227,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbyAllJDAPI, self).__init__()
-        self.index = flask.current_app.config['SVC_INDEX']
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.reqparse.add_argument('fromcache', type=bool, location = 'json')
@@ -255,8 +255,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             output = {}
             output['CV'] = list()
             bestids = set([cv[0] for cv in bestjds[jdid]])
-            filterids = self.index.filter_ids(self.cv_indexname, bestjds[jdid],
-                                              filterdict, bestids)
+            filterids = self.svc_index.filter_ids(self.cv_indexname, bestjds[jdid],
+                                                  filterdict, bestids)
             for cv in filterids:
                 cvinfo = project.cv_getyaml(cv[0])
                 cvinfo['CVvalue'] = cv[1]

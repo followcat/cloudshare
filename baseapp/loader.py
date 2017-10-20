@@ -143,6 +143,8 @@ def load_esindex(es_conn):
     global config
     SVC_INDEX = services.esindex.ElasticsearchIndexing()
     SVC_INDEX.setup(es_conn, config.es_config['CV_INDEXNAME'])
+    SVC_INDEX.setup(es_conn, config.es_config['JD_INDEXNAME'])
+    SVC_INDEX.setup(es_conn, config.es_config['CO_INDEXNAME'])
     return SVC_INDEX
 
 

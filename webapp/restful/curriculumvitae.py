@@ -79,7 +79,7 @@ class SearchCVbyTextAPI(Resource):
 
     def __init__(self):
         super(SearchCVbyTextAPI, self).__init__()
-        self.index = flask.current_app.config['SVC_INDEX']
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
@@ -106,7 +106,7 @@ class SearchCVbyTextAPI(Resource):
                 searchs[id] = yaml_searchs[id]
         results = sorted(searchs.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
         ids = set([cv[0] for cv in results])
-        results = self.index.filter_ids(self.cv_indexname, results, filterdict, ids)
+        results = self.svc_index.filter_ids(self.cv_indexname, results, filterdict, ids)
         results = [result[0] for result in results]
         count = 20
         datas, pages = self.paginate(results, cur_page, count, project)

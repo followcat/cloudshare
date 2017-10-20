@@ -33,11 +33,11 @@ class ElasticsearchIndexing(object):
         self.es = esconn
         self.es.indices.create(index=indexname, body=self.index_config_body, ignore=400)
 
-    def update(self, svcs, indexname):
+    def update(self, indexname, svcs):
         for svc in svcs:
-            self.updatecv(indexname, svc)
+            self.updatesvc(indexname, svc)
 
-    def updatecv(self, indexname, svc, numbers=5000):
+    def updatesvc(self, indexname, svc, numbers=5000):
         assert svc.name
         update_ids = self.ESids(indexname, {})
         ACTIONS = list()

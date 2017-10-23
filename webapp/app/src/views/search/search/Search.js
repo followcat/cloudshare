@@ -4,7 +4,13 @@ import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
 import KeywordSearch from 'components/keyword-search';
+import Guide from 'components/guide';
 import DatabaseInfo from './DatabaseInfo';
+
+import { introJs } from 'intro.js';
+
+import { Steps, Icon } from 'antd';
+const Step = Steps.Step;
 
 class Search extends Component {
   constructor() {
@@ -19,9 +25,17 @@ class Search extends Component {
     });
   }
 
+  UploadClick(){
+    browserHistory.push({
+      pathname: 'uploader?guide=true',
+      query: { search_text: true }
+    });
+  }
+
   render() {
     return (
       <div className="cs-layout-search">
+        <Guide />
         <div className="cs-search">
           <KeywordSearch
             btnText="搜索"

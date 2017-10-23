@@ -39,7 +39,7 @@ class SubheadNav extends Component {
           >
             {menus.map(item => {
               return (
-                <MenuItem key={item.key}>
+                <MenuItem key={item.key} className={`${prefixCls}-${item.key}`}>
                   <Link to={item.url}>{item.title}</Link>
                 </MenuItem>
               );

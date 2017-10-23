@@ -21,26 +21,23 @@ class LSIsimilarity(object):
         self.lsi_model = lsi_model
         self.index = None
 
-    def update(self, svccv_list, newmodel=False):
+    def update(self, gen, newmodel=False):
         added = False
-        for svc_cv in svccv_list:
-            for name in set(svc_cv.names()).difference(set(self.names)):
-                doc = svc_cv.getmd(name)
-                self.add(name, doc)
-                added = True
+        for name, doc in gen:
+            self.add(name, doc)
+            added = True
         if added or newmodel:
             self.set_index()
+            self.save()
         return added
 
-    def build(self, svccv_list):
+    def build(self, gen):
         names = []
         corpus = []
-        for svc_cv in svccv_list:
-            for data in svc_cv.datas():
-                name, doc = data
-                names.append(name)
-                words = self.lsi_model.slicer(doc, id=name)
-                corpus.append(self.lsi_model.dictionary.doc2bow(words))
+        for name, doc in gen:
+            names.append(name)
+            words = self.lsi_model.slicer(doc, id=name)
+            corpus.append(self.lsi_model.dictionary.doc2bow(words))
         self.setup(names, corpus)
 
     def setup(self, names, corpus):

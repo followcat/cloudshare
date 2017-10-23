@@ -249,7 +249,7 @@ class Mining(object):
         try:
             index.load()
         except IOError:
-            index.build([svc])
+            index.build(svc.datas())
             index.save()
         self.sim[modelname][svc_name] = index
 
@@ -281,7 +281,10 @@ class Mining(object):
                 lsi.load()
             except IOError:
                 if lsi.getconfig('autosetup') is True:
-                    if lsi.build({project.id: service}):
+                    result = lsi.build(service.datas())
+                    if result is True:
+                        lsi.config['origin'] = svccv.keys()
+                        lsi.load_config()
                         lsi.save()
             self.lsi_model[project.modelname] = lsi
 
@@ -289,28 +292,30 @@ class Mining(object):
         for modelname in self.lsi_model:
             lsimodel = self.lsi_model[modelname]
             if lsimodel.getconfig('autoupdate') is True:
-                svc_cvs = [self.services['default'][cv] for cv in lsimodel.getconfig('origin')]
-                updated = self.lsi_model[modelname].update(svc_cvs)
+                trains = list()
+                for cv in lsimodel.getconfig('origin'):
+                    svc = self.services['default'][cv]
+                    trains.extend([(name, svc.getmd(name)) for name in svc.names()])
+                updated = self.lsi_model[modelname].update(trains)
                 self.update_sims(newmodel=updated)
 
     def update_sims(self, newmodel=False):
         for modelname in self.sim:
             for simname in self.sim[modelname]:
                 svc = self.services['all'][simname]
-                updated = self.sim[modelname][simname].update([svc], newmodel)
-                if newmodel or updated:
-                    self.sim[modelname][simname].save()
+                trains = [(name, svc.getmd(name)) for name in
+                          set(svc.names()).difference(set(self.sim[modelname][simname].names))]
+                self.sim[modelname][simname].update(trains, newmodel)
 
     def update_project_sims(self, newmodel=False):
         for modelname in self.sim:
             for projectname in self.projects:
+                svc = self.projects[projectname].curriculumvitae
                 if (projectname in self.sim[modelname] and
-                    len(self.projects[projectname].curriculumvitae.ids) !=
-                    len(self.sim[modelname][projectname].names)):
-                    svc = self.services['all'][projectname]
-                    updated = self.sim[modelname][projectname].update([svc], newmodel)
-                    if newmodel or updated:
-                        self.sim[modelname][projectname].save()
+                    len(self.sim[modelname][projectname].names) != len(svc.ids)):
+                    trains = [(name, svc.getmd(name)) for name in
+                              set(svc.names()).difference(set(self.sim[modelname][projectname].names))]
+                    self.sim[modelname][projectname].update(trains, newmodel)
 
     def probability(self, basemodel, doc, uses=None, top=None, minimum=None):
         result = []

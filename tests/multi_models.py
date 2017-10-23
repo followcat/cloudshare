@@ -82,6 +82,9 @@ def build_sim(path, model, svcs):
     try:
         sim.load()
     except IOError:
-        sim.build({'testid': svcs})
+        trains = list()
+        for svc in svcs:
+            trains.extend(svc.datas())
+        sim.build(trains)
         sim.save()
     return sim

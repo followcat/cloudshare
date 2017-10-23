@@ -65,30 +65,24 @@ class LSImodel(object):
             with open(os.path.join(self.path, self.config_file), 'w') as f:
                 f.write(utils.builtin.dump_yaml(self.config))
 
-    def update(self, svccv_list):
+    def update(self, gen):
         added = False
-        for svc_cv in svccv_list:
-            for name in svc_cv.names():
-                if name not in self.names:
-                    doc = svc_cv.getmd(name)
-                    self.add(name, doc)
-                    added = True
+        for name, doc in gen:
+            if name not in self.names:
+                self.add(name, doc)
+                added = True
         if added:
             self.save()
         return added
 
-    def build(self, svccv):
+    def build(self, gen):
         names = []
         texts = []
-        for svc_id, svc_cv in svccv:
-            for data in svc_cv.datas():
-                name, doc = data
-                names.append(name)
-                texts.append(doc)
+        for name, doc in gen:
+            names.append(name)
+            texts.append(doc)
         if len(names) > 5:
             self.setup(names, texts)
-            self.config['origin'] = svccv.keys()
-            self.load_config()
             return True
         return False
 

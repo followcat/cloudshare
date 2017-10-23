@@ -52,7 +52,9 @@ class Member(services.base.service.Service):
             os.makedirs(self.projects_path)
 
     def load(self):
-        self.config = utils.builtin.load_yaml(self.path, self.config_file)
+        config = utils.builtin.load_yaml(self.path, self.config_file)
+        if config:
+            self.config.update(config)
 
     def save(self):
         dumpconfig = utils.builtin.dump_yaml(self.config)

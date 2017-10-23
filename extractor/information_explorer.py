@@ -272,6 +272,9 @@ def get_age(stream):
 all_selected = ('name', 'originid', 'age', 'phone', 'email',
                 'education', 'experience', 'expectation',
                 'classify', 'unique_id', 'project')
+upload_selected = ('name', 'originid', 'age', 'phone', 'email',
+                'education', 'experience', 'expectation',
+                'classify', 'unique_id')
 
 def catch_selected(stream, selected, name=None, as_date=None):
     assert set(selected).issubset(set(all_selected))
@@ -310,17 +313,19 @@ def catch_selected(stream, selected, name=None, as_date=None):
 
 catch = functools.partial(catch_selected, selected=all_selected)
 
-
-def catch_cvinfo(stream, filename, catch_info=True):
+def catch_cvinfo(stream, filename, selected=None, catch_info=True):
     """
         >>> import core.outputstorage
         >>> st = 'curriculum vitea'
         >>> name = core.outputstorage.ConvertName('name.docx')
         >>> assert catch_cvinfo(stream=st, filename=name.base)['filename'] == name.base
     """
+    if selected is None:
+        global upload_selected
+        selected = upload_selected
     info = generate_info_template(cv_template)
     if catch_info is True:
-        catchinfo = catch(stream)
+        catchinfo = catch_selected(stream, selected=selected)
         info.update(catchinfo)
         if not info['name']:
             info['name'] = utils.chsname.name_from_filename(filename)

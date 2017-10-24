@@ -207,9 +207,12 @@ class Customer extends Component {
                 filterOption={false}
                 onChange={this.handleChange}
               >
-                {companyDataSource.map(item => {
+                { companyDataSource.length > 0 ?
+                  companyDataSource.map(item => {
                   return <Select.Option key={item.company_name}>{item.company_name}</Select.Option>;
-                })}
+                })
+                  : null
+                }
               </Select>
             </Form.Item>
           </Form>

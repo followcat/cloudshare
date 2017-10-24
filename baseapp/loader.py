@@ -115,8 +115,12 @@ def load_mining(SVC_MEMBERS, SVC_CLS_CV, silencer):
     CUTWORD_PATH = config.storage_config['CUTWORD']
     SVC_CUTWORD = services.analysis.cutword.Cutword(CUTWORD_PATH)
     slicer = functools.partial(silencer, cutservice=SVC_CUTWORD)
-    SVC_MIN = services.mining.Mining(LSI_PATH, SVC_MEMBERS, SVC_CLS_CV, slicer=slicer)
-    SVC_MIN.setup()
+    SVC_MIN = services.mining.Mining(LSI_PATH, SVC_CLS_CV, slicer=slicer)
+    for member in SVC_MEMBERS.members.values():
+        for project in member.projects.values():
+            modelname = project.modelname
+            simnames = [prj.id for prj in member.projects.values()] + project.getclassify()
+            SVC_MIN.setup(modelname, simnames)
     tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS)
     return SVC_CUTWORD, SVC_MIN
 

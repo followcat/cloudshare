@@ -27,7 +27,8 @@ def update_bydate(yamlinfo, lastdate):
 def generate_md(raw_html):
     return pypandoc.convert(raw_html, 'markdown', format='docbook')
 
-def generate_yaml(md, yamlobj, selected=None, name=None):
+def generate_yaml(md, yamlobj, selected=extractor.information_explorer.upload_selected,
+                  name=None):
     catchinfo = extractor.information_explorer.catch_selected(md, selected, name=name)
     for key in catchinfo:
         if catchinfo[key] or (selected is not None and key in selected):

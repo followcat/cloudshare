@@ -213,9 +213,10 @@ class Mining(object):
         try:
             index.load()
         except IOError:
-            if gen is not None:
-                index.build(gen)
-                index.save()
+            if gen is None:
+                gen = list()
+            index.build(gen)
+            index.save()
         self.sim[modelname][svc_name] = index
 
     def getsims(self, basemodel, uses=None):

@@ -168,10 +168,13 @@ class LSIbaseAPI(Resource):
     def process(self, member, project, doc, uses, filterdict, cur_page, eve_count=20):
         if not cur_page:
             cur_page = 1
-        datas = []
-        iduses = []
+        datas = list()
+        iduses = list()
         for use in uses:
-            iduses.append(member.projects[use].id)
+            if use in member.projects:
+                iduses.append(member.projects[use].id)
+            else:
+                iduses.append(use)
         result = self.miner.probability(project.modelname, doc, uses=iduses,
                                         top=self.top, minimum=1000)
         ids = set([cv[0] for cv in result])

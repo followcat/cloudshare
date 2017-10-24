@@ -165,15 +165,18 @@ class LSIbaseAPI(Resource):
         self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.sim_names = self.miner.addition_names()
 
-    def process(self, project, doc, uses, filterdict, cur_page, eve_count=20):
+    def process(self, member, project, doc, uses, filterdict, cur_page, eve_count=20):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(project.modelname, doc, uses=uses,
+        iduses = []
+        for use in uses:
+            iduses.append(member.projects[use].id)
+        result = self.miner.probability(project.modelname, doc, uses=iduses,
                                         top=self.top, minimum=1000)
         ids = set([cv[0] for cv in result])
         result = self.svc_index.filter_ids(self.cv_indexname, result,
-                                       filterdict, ids, uses=uses)
+                                       filterdict, ids, uses=iduses)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1
@@ -217,7 +220,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self.process(project, doc, uses, filterdict, cur_page)
+        result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -333,7 +336,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self.process(project, doc, uses, filterdict, cur_page)
+        result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -357,7 +360,7 @@ class LSIbydocAPI(LSIbaseAPI):
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self.process(project, doc, uses, filterdict, cur_page)
+        result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -381,7 +384,7 @@ class SimilarAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         doc = project.cv_getmd(id)
-        uses = [projectname]
+        uses = [project.id]
         project_classify = project.getclassify()
         for classify in project.cv_getyaml(id)['classify']:
             if classify in project_classify:

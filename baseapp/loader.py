@@ -2,6 +2,7 @@ import os
 import yaml
 import functools
 
+import tools.updater
 import services.index
 import services.mining
 import services.multiclsify
@@ -116,7 +117,7 @@ def load_mining(SVC_MEMBERS, SVC_CLS_CV, silencer):
     slicer = functools.partial(silencer, cutservice=SVC_CUTWORD)
     SVC_MIN = services.mining.Mining(LSI_PATH, SVC_MEMBERS, SVC_CLS_CV, slicer=slicer)
     SVC_MIN.setup()
-    SVC_MIN.update_project_sims()
+    tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS)
     return SVC_CUTWORD, SVC_MIN
 
 

@@ -288,35 +288,6 @@ class Mining(object):
                         lsi.save()
             self.lsi_model[project.modelname] = lsi
 
-    def update_model(self):
-        for modelname in self.lsi_model:
-            lsimodel = self.lsi_model[modelname]
-            if lsimodel.getconfig('autoupdate') is True:
-                trains = list()
-                for cv in lsimodel.getconfig('origin'):
-                    svc = self.services['default'][cv]
-                    trains.extend([(name, svc.getmd(name)) for name in svc.names()])
-                updated = self.lsi_model[modelname].update(trains)
-                self.update_sims(newmodel=updated)
-
-    def update_sims(self, newmodel=False):
-        for modelname in self.sim:
-            for simname in self.sim[modelname]:
-                svc = self.services['all'][simname]
-                trains = [(name, svc.getmd(name)) for name in
-                          set(svc.names()).difference(set(self.sim[modelname][simname].names))]
-                self.sim[modelname][simname].update(trains, newmodel)
-
-    def update_project_sims(self, newmodel=False):
-        for modelname in self.sim:
-            for projectname in self.projects:
-                svc = self.projects[projectname].curriculumvitae
-                if (projectname in self.sim[modelname] and
-                    len(self.sim[modelname][projectname].names) != len(svc.ids)):
-                    trains = [(name, svc.getmd(name)) for name in
-                              set(svc.names()).difference(set(self.sim[modelname][projectname].names))]
-                    self.sim[modelname][projectname].update(trains, newmodel)
-
     def probability(self, basemodel, doc, uses=None, top=None, minimum=None):
         result = []
         sims = self.getsims(basemodel, uses=uses)
@@ -371,9 +342,6 @@ class Mining(object):
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return len(ranklist), map(lambda x: (x[0], ranklist.index(x)), lists)
-
-    def default_names(self):
-        return [name for name in self.services['default']]
 
     def addition_names(self):
         return [name for name in self.additionals]

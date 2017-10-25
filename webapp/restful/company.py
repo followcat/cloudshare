@@ -99,7 +99,7 @@ class AddedCompanyListAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         customer_ids = project.company_customers()
-        search_results = project.company.search('name: '+text)
+        search_results = project.company.search_key('name', text)
         company_ids = map(lambda x:x[0], search_results)
         data = []
         for company_id in company_ids:

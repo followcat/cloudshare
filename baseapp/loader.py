@@ -129,6 +129,11 @@ def load_cv_mining(SVC_MIN, SVC_MEMBERS):
     tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS)
 
 
+def load_jd_mining(SVC_MIN, SVC_JD_REPO):
+    SVC_MIN.setup('jdmatch', [SVC_JD_REPO.name])
+    tools.updater.update_jd_sims('jdmatch', SVC_MIN, [SVC_JD_REPO])
+
+
 def load_doc_processor(name):
     global SUPPORT_DOCPROCESSOR
     return SUPPORT_DOCPROCESSOR[name]

@@ -16,6 +16,7 @@ PJ = re.compile(ur'^'+PREFIX+u'*'+ PRTITLE +POASP+u'*\n+'+BORDERTOP('pjborder') 
 APJ = re.compile(ur'^'+PREFIX+u'*'+ UNIBRALEFT +u'?\**((项'+ASP+u'?目)'+ASP+u'?经'+ASP+u'?[历验])'+ UNIBRARIGHT +u'?[:：]?'+ASP+u'*'+DURATION+'?'+ASP+u'*?\**\n(?P<proj>.*)', re.DOTALL+re.M)
 
 PPJ = re.compile(ur'^'+PREFIX+u'*'+ PRTITLE +POASP+u'*\n+'+BORDERTOP('pjborder') +u'?(?P<proj>.*?)^'+BORDERBOTTOM('pjborder')+u'^'+PREFIX+u'*(?='+ UNIBRALEFT +u'?(教'+ASP+u'?育'+ASP+u'?((经'+ASP+u'?[历验])|背景|培训))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
+YPJ = re.compile(ur'^'+PREFIX+u'*工作职责和业绩[:：]'+ POASP+u'*\\\\\n(?P<proj>.*?)\n(?:\n|$)', re.DOTALL+re.M)
 
 
 no_project_detail = lambda STR: u'(?<!(?:(?:职责|工作)(?:描述|内容)|项目成就)：\n{2})' + STR + u'(?!\n{2}['+SP+u']{2,}主要成就：)'
@@ -23,7 +24,7 @@ no_project_detail = lambda STR: u'(?<!(?:(?:职责|工作)(?:描述|内容)|项�
 PR = re.compile(heading(PREFIX+u'*'+PERIOD+u'\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))\**(?P<project>'+PROJECT+u')\**'+POASP+u'*$'), re.DOTALL+re.M)
 # Use POESP to avoid matching LPR in DEFAULT_ITEM's __NORECURSIVE__
 LPR = re.compile(heading(PREFIX+u'*'+PERIOD+u'\**'+POASP+u'+\**(?P<project>'+PROJECT+u')\**'+POESP+u'*$'), re.DOTALL+re.M)
-JPR = re.compile(heading(PREFIX+u'*'+PERIOD+u'((?P<empty_project>'+POASP+u'*[:：])|\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))\**(?P<project>'+PROJECT+u')\**'+POASP+u'*)$'), re.DOTALL+re.M)
+JPR = re.compile(heading(PREFIX+u'*'+PERIOD+u'((?P<empty_project>'+POASP+u'*[:：])|\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))\**(?P<project>'+PROJECT+u')\**'+POASP+u'*)(?:\\\\)?$'), re.DOTALL+re.M)
 IPR = re.compile(heading(PREFIX+u'*\**(?P<project>'+PROJECT+u')\**'+ASP+u'*'+PERIOD+u'(?:\\\\)?$'), re.DOTALL+re.M)
 
 # Avoid conflict in group names when combining *CO and *PO

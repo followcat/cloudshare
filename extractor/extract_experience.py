@@ -10,14 +10,15 @@ except ImportError:
 import sources.industry_id
 
 from extractor.utils_parsing import *
+import extractor.project
 import extractor.unique_id
 
 
 BTXPSEP = ASP+u'*'
 BTXP = re.compile(u'^(?:'+BTXPSEP.join((u'工作经历', u'工作时间', u'单位名称', u'职位名称', u'所属部门'))+u')'+ASP+u'*(?P<expe>.*?)(?:培训经历|教育情况)', re.M+re.DOTALL)
-XPTITLE = BRACKETTOP('xpparens') +u'?\**((((工'+POASP+u'?作'+POASP+u'?)|(实习)|((工作与?)?实践))经'+POASP+u'?[历验])|(实习与实践))'+ POASP +'*\**'+ BRACKETBOTTOM('xpparens')
-XP = re.compile(ur'^'+PREFIX+u'*'+ XPTITLE +POASP+u'*\n+'+BORDERTOP('xpborder')+u'?(?P<expe>.*?)'+BORDERBOTTOM('xpborder')+u'^'+PREFIX+u'*(?='+POASP+u'*'+ BRACKETTOP('xptrailparens') +u'?\**((((项'+POASP+u'?目)|(教'+POASP+u'?育)|(培'+POASP+u'?训))'+POASP+u'?((经'+POASP+u'?[历验])|(背景)|((?P<slash>/)?培训(?(slash)背景))))|(?:工作内容（医疗器械经验）)|Resume)'+ POASP +'*\**' + BRACKETBOTTOM('xptrailparens') +u'[:：]?'+POASP+u'*$' +u')', re.DOTALL+re.M)
-AXP = re.compile(ur'^'+PREFIX+u'*'+ XPTITLE +u'[:：]?'+POASP+u'*'+DURATION+'?'+POASP+u'*?\**\n(?P<expe>.*)', re.DOTALL+re.M)
+XPTITLE = TITLE('experience')
+XP = re.compile(SECTION('experience')+u'(?=^'+PREFIX+u'*'+REMAINING_SECTIONS('experience') +u')', re.DOTALL+re.M)
+AXP = re.compile(ur'^'+SECTION('experience'), re.DOTALL+re.M)
 TXP = re.compile(ur'-{9}[\-'+SP+u']*(?P<expe>'+PERIOD+ur'.*?)(?=-{9}[\-'+SP+u']*)', re.DOTALL)
 PRXP = re.compile(ur'^'+PREFIX+u'*'+ XPTITLE +POASP+u'*\n+'+BORDERTOP('xpborder')+u'?(?P<expe>.*?)'+BORDERBOTTOM('xpborder')+u'^'+PREFIX+u'*(?='+POASP+u'*'+ BRACKETTOP('xptrailparens') +u'?\**((项'+POASP+u'?目经[验历]'+POASP+u'*'+ASP+u'+'+ANONPERIOD+u')|(((教'+POASP+u'?育)|(培'+POASP+u'?训))'+POASP+u'?((经'+POASP+u'?[历验])|(背景)|((?P<slash>/)?培训(?(slash)背景))))|Resume)'+ POASP +'*\**' + BRACKETBOTTOM('xptrailparens') +u'[:：]?'+POASP+u'*$' +u')', re.DOTALL+re.M)
 
@@ -31,9 +32,9 @@ no_project_detail = lambda STR: u'(?<!(?:(?:职责|工作)(?:描述|内容)|项�
 # As company has at least one char, need to handle break just as company tail
 # Catching all employees is too expensive on parenthesis repetition, some will be post processed
 ECO = re.compile(u'^'+heading(PREFIX+u'*(?P<position>(\S[\S ]+\n)*)\n+')+heading(PREFIX+u'*(?P<company>(\S[\S ]+\n)*)\n+') + PERIOD +ASP+u'*' + BDURATION, re.M+re.DOTALL)
-CO = re.compile(heading(PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u'])|([:：]?))(?:'+ASP+u'*'+BROKENOLELINK+u')?'+ASP+u'*\**(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)\**'+POASP+u'*'+BEMPLOYEES+'?\**'+ASP+u'*\**'+BDURATION+POASP+u'*\**'+POASP+u'*(?:\\\\)?$'), re.DOTALL+re.M)
-CCO = re.compile(heading(PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u'])|([:：]?))(?:'+ASP+u'*'+BROKENOLELINK+u')?'+ASP+u'*\**(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)\**'+POASP+u'*'+BEMPLOYEES+'?\**'+ASP+u'*\**'+BDURATION+POASP+u'*\**'+POASP+u'*(?:\\\\)?$'), re.DOTALL+re.M)
-TCO = re.compile(no_project_detail(u'^'+heading(PREFIX+u'*'+CONTEXT+u'?'+POASP+u'*\**'+PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u'])|([:：]?))(?:'+ASP+u'*'+BROKENOLELINK+u')?'+ASP+u'*\**(?P<company>'+COMPANY+u')\**'+POASP+u'*'+BEMPLOYEES+'?\**('+ASP+u'*\**'+BDURATION+'\**)?'+POASP+u'*(?:\\\\)?$')), re.DOTALL+re.M)
+CO = re.compile(heading(PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u'])|([:：]?))(?:'+ASP+u'*'+BROKENOLELINK+u')?'+ASP+u'*\**(?P<company>'+COMPANY+u'(\n'+COMPANYTAIL+u')?)\**'+POASP+u'*'+BEMPLOYEES+'?\**'+ASP+u'*\**'+BDURATION+POASP+u'*\**'+POASP+u'*$(?=(?<!\\\\)\n)'), re.DOTALL+re.M)
+CCO = re.compile(heading(PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u'])|([:：]?))(?:'+ASP+u'*'+BROKENOLELINK+u')?'+ASP+u'*\**(?P<company>'+COMPANY+u'(\n'+COMPANY+u')?)\**'+POASP+u'*'+BEMPLOYEES+'?\**'+ASP+u'*\**'+BDURATION+POASP+u'*\**'+POASP+u'*$(?=(?<!\\\\)\n)'), re.DOTALL+re.M)
+TCO = re.compile(no_project_detail(u'^'+heading(PREFIX+u'*'+CONTEXT+u'?'+POASP+u'*\**'+PERIOD+ur'\**(('+ASP+u'?[:：'+SP+u'])|([:：]?))(?:'+ASP+u'*'+BROKENOLELINK+u')?'+ASP+u'*\**(?P<company>'+COMPANY+u')\**'+POASP+u'*'+BEMPLOYEES+'?\**('+ASP+u'*\**'+BDURATION+'\**)?'+POASP+u'*$(?=(?<!\\\\)\n)')), re.DOTALL+re.M)
 PCO = re.compile(heading(PERIOD+ur'(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*\**))(?P<company>'+COMPANY+u'(\n(('+COMPANY+u')|('+COMPANYTAIL+u')))?)\**'+ASP+u'*\|('+ASP+u'*(?P<dpt>\S+)'+ASP+u'*\|)?'+ASP+u'*(?P<position>'+POSITION+u'?)'+ASP+u'*'+BDURATION+u'(?:\\\\)?$'), re.DOTALL+re.M)
 
 PJCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+ASP+u'*(?P<project>'+PROJECT+u')\n('+ASP+u'*项目职务[:：]?'+ASP+u'*(?P<position>'+POSITION+u'))?'+ASP+u'*所在公司[:：]?'+ASP+u'*(?P<company>'+COMPANY+u')(?:\\\\)?$', re.M)
@@ -49,12 +50,12 @@ AAEMPLOYEES = EMPLOYEES.replace('employees', 'aaemployees')
 AASALARY = SALARY.replace('salary', 'aasalary')
 
 __PROJECT__ = u'\**(?:项目经验)[:：]\**'
-__ACHIEVEMENT__ = u'\**(?:(?:主要)?工作|重点)业绩(?:[及和]成果|Performance)?[:：]?\**'
+__ACHIEVEMENT__ = u'\**(?:(?:主要)?工作|重点)业绩(?:[及和]成果|Performance|Main Achievements)?[:：]?\**'
 __DEPARTMENT__ = u'\**(?:所[属在]部'+POASP+u'*门|科室|Department)[:：]?\**'
 __CODESCRIPTION__ = u'(?P<desclabel>(?:公司|企业)(?:描述|介绍|简介|背景)[:：]?)'
 __CODEPARTMENT__ = u'(?P<codptlbl>'+__DEPARTMENT__+u')'
 __COEMPLOYEES__ = u'(?P<employlabel>(公司)?规模[:：]?)'
-__POSALARY__ = u'\**(?:薪酬[情状]况|(?:职位)?月薪(?:（税前）)?)[:：]?\**'
+__POSALARY__ = u'\**(?:薪酬[情状]况|(?:职位)?月薪(?:[\(（]税前[\)）])?)[:：]?\**'
 __PODESCRIPTION__ = u'\**(?:'+ITEM_PREFIX+u')?(?:工作(?:描述|简介|内容)|Job Description)[:：]?\**'
 __PORESPONSIBILITY__ = u'\**(?:(?:目前)?(?:主要|工作)*职'+POASP+u'*责(?:(?:[及和与](?:业绩|技能)|及其成果)|业绩|描述)?|Responsibilities)[:：]?\**'
 
@@ -73,22 +74,6 @@ company_items = {
                      u'[^:：\n\|(?:\\\\\n)]*(?:(?:\\\\\n>?)+[^:：\n\|(?:\\\\\n)]+)*(?=[\n\|^])'), )
     }
 key_company_items = company_items.copy()
-company_items['company_department'] =  ((__CODEPARTMENT__+'?', u'(?(codptlbl)\S*|\S+?[部处室册科](?='+POASP+u'*$))'), )
-company_items['company_employees'] = ((__COEMPLOYEES__+'?', AEMPLOYEES), )
-company_items['company_description'] = ((__CODESCRIPTION__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_company_items)+DEFAULT_ITEM)), )
-
-SET_COMPANY_DEFAULT = lambda STR: STR.replace(DEFAULT_ITEM, u'[^:：\n\|(?:\\\\\n)]*(?:(?:\\\\\n>?)*.+)*(?=(?:\\\\)?[\n\|^]|$)')
-
-# If pipe separated, the position is inside the table
-# but sometimes it is inside the company business table
-# (position details are then outside all tables.
-COMPANY_DETAILS = lambda DETAILS: lambda RE:RE.pattern+u'\n*'+BORDERTOP('codetborder')+u'?'+ASP+u'*\**'+DETAILS.replace('__NORECURSIVE__', RE.pattern)+u'\**(?(codetborder)\n*(?P<company_description>[^-]{3}.*\n)?)\n*'+BORDERBOTTOM('codetborder').replace('__NORECURSIVE__', RE.pattern)
-
-company_details = COMPANY_DETAILS(SET_ALL_ITEMS(SET_COMPANY_DEFAULT)(company_items)(newline_separated)+'{1,13}')
-empty_company_details = COMPANY_DETAILS(SET_ALL_ITEMS(SET_COMPANY_DEFAULT)(company_items)(newline_separated)+'{,13}')
-
-company_details_pipeonly = COMPANY_DETAILS(SET_ALL_ITEMS_PIPEONLY(SET_COMPANY_DEFAULT)(company_items)(space_separated)+'{1,13}')
-empty_company_details_pipeonly = COMPANY_DETAILS(SET_ALL_ITEMS_PIPEONLY(SET_COMPANY_DEFAULT)(company_items)(space_separated)+'{,13}')
 
 # Special handling for 部门 and 职位 with no [:：]: following space and value are enforced
 position_items = {
@@ -97,17 +82,40 @@ position_items = {
     'place': ((u'\**(?:所在地区|工作地点|Area)[:：]?\**', DEFAULT_ITEM), ),
     'department': ((__DEPARTMENT__, DEFAULT_ITEM), ),
     'department_short': ((u'\**部'+POASP+u'*门[:： \xa0]\**', DEFAULT_ITEM), ),
-    'report_to': ((u'\**(?:汇报(?:对象|人职位)|直接上司职位|Reporting To)[:：]?\**', DEFAULT_ITEM), ),
+    'report_to': ((u'\**(?:汇报(?:对象|人职位)|直接上司职位|Report(?:ing)? To)[:：]?\**', DEFAULT_ITEM), ),
     'people_under': ((u'\**(?:下属(?:人数|员工)|Subordinates Num)[:：]?\**', u'(?:(?:\d+)?(?:'+POASP+u'*人)?|'+ANONYMOUS(EMPLOYEES)+u')'), ),
-    'reason_leave': ((u'\**(?:本人)?离职原因[:：]?\**', DEFAULT_ITEM), ),
-    'contact': ((u'\**证 ?明 ?人[:：]?\**', DEFAULT_ITEM), ),
-    'name': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0])\**', u'(?P<aposition>'+POSITION+u'?)'+POASP+u'*(?:(?=[\n\|])|$)'), ),
-    'type': ((u'\**职[位务]类别[:：]?\**', DEFAULT_ITEM), ),
+    'reason_leave': ((u'\**(?:本人)?离职(?:转岗)?原因[:：]?\**', DEFAULT_ITEM), ),
+    'contact': ((u'\**(?:工作)?证 ?明 ?人[:：]?\**', DEFAULT_ITEM), ),
+    'name': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0]|Job Title[:：])\**', u'(?P<aposition>'+POSITION+u'?)'+POASP+u'*(?:(?=[\n\|])|$)'), ),
+    'type': ((u'\**(?:职[位务]类别|工作性质)[:：]?\**', DEFAULT_ITEM), ),
     'achievement': ((__ACHIEVEMENT__, DEFAULT_ITEM), ),
     'posalary': ((__POSALARY__, ASALARY), ),
     'project': ((__PROJECT__, DEFAULT_ITEM), ),
     }
-key_items = position_items.copy()
+key_position_items = position_items.copy()
+
+key_items = key_company_items.copy()
+key_items.update(key_position_items)
+
+# Company default lambdas
+company_items['company_department'] =  ((__CODEPARTMENT__+'?', u'(?(codptlbl)\S*|\S+?[部处室册科](?='+POASP+u'*$))'), )
+company_items['company_employees'] = ((__COEMPLOYEES__+'?', AEMPLOYEES), )
+company_items['company_description'] = ((__CODESCRIPTION__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
+
+SET_COMPANY_DEFAULT = lambda STR: STR.replace(DEFAULT_ITEM, u'[^:：\n\|(?:\\\\\n)]*(?:(?:\\\\\n>?)*.+)*(?=(?:\\\\)?[\n\|^]|$)')
+
+# If pipe separated, the position is inside the table
+# but sometimes it is inside the company business table
+# (position details are then outside all tables.
+COMPANY_DETAILS = lambda DETAILS: lambda RE:RE.pattern+u'\n*'+CHECKCOLTOP('codetborder')+u'?'+ASP+u'*\**'+DETAILS.replace('__NORECURSIVE__', RE.pattern)+u'\**\n+(?(codetborder)(?(checknextcol)|(?P<company_description>(?=(?!'+BORDER+u')).*\n)?))\n*'+CHECKCOLBOTTOM('codetborder').replace('__NORECURSIVE__', RE.pattern)
+
+company_details = COMPANY_DETAILS(SET_ALL_ITEMS(SET_COMPANY_DEFAULT)(company_items)(newline_separated)+'{1,13}')
+empty_company_details = COMPANY_DETAILS(SET_ALL_ITEMS(SET_COMPANY_DEFAULT)(company_items)(newline_separated)+'{,13}')
+
+company_details_pipeonly = COMPANY_DETAILS(SET_ALL_ITEMS_PIPEONLY(SET_COMPANY_DEFAULT)(company_items)(space_separated)+'{1,13}')
+empty_company_details_pipeonly = COMPANY_DETAILS(SET_ALL_ITEMS_PIPEONLY(SET_COMPANY_DEFAULT)(company_items)(space_separated)+'{,13}')
+
+# Position default lambdas
 position_items['project'] = ((__PROJECT__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 position_items['achievement'] = ((__ACHIEVEMENT__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 position_items['description'] = ((__PODESCRIPTION__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
@@ -122,7 +130,7 @@ SET_DEFAULT_LP = SET_ALL_DEFAULT(u'\n')(u'?')(u'(?=$|\|[^\\\\])')(key_items)
 # If pipe separated, the position is inside the table
 # but sometimes it is inside the company business table
 # (position details are then outside all tables.
-POSITION_DETAILS = lambda DETAILS: lambda RE:BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+RE.pattern+u'\n*(?:'+BORDERTOP('cobutab')+u'\n*(?=(?!'+ANONPERIOD+u')))?'+DETAILS.replace('__NORECURSIVE__', RE.pattern)+u'\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
+POSITION_DETAILS = lambda DETAILS: lambda RE:BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+RE.pattern+u'\n*(?:'+BORDERTOP('cobutab')+u'?\n*(?=(?!'+ANONPERIOD+u')))?'+DETAILS.replace('__NORECURSIVE__', RE.pattern)+u'\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
 
 position_details = lambda RE:BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+RE.pattern+u'\n*(?P<cobutab>\-{3,}(?: \-+)* *\n+)?'+SET_DEFAULT(PIPESEPRTED(map(label_separated(newline_separated), position_items.items())))+u'{3,17}\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
 empty_position_details = lambda RE:RE.pattern+position_details(re.compile('')).replace('{3,17}', '{,17}')
@@ -150,6 +158,7 @@ empty_zl_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_ZL)(zl_de
 position_items_yingcai = position_items.copy()
 position_items_yingcai['posalary'] = ((__POSALARY__, ASALARY), )
 position_items_yingcai['department'] = (((u'(?P<dptlbl>'+__DEPARTMENT__+u')?', u'(?:(?(dptlbl)|^)\S+?[部处室册科](?='+POASP+u'*(?:$|\|[^\\\\])))')), )
+position_items_yingcai['description'] = ((u'(?:'+__PODESCRIPTION__+u')?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 
 yc_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_YC)(position_items_yingcai)(newline_separated)+u'{1,17}')
 empty_yc_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_YC)(position_items_yingcai)(newline_separated)+u'{,17}')
@@ -158,7 +167,7 @@ empty_yc_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_YC)(posit
 position_items_nospace = position_items.copy()
 position_items_nospace.update({
     'department_short': ((u'\**部'+POASP+u'*门[:： \xa0]\**', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), ),
-    'name': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0])\**', u'(?P<aposition>'+MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)+u')'), ),
+    'name': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0]|Job Title[:：])\**', u'(?P<aposition>'+MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)+u')'), ),
     })
 
 
@@ -173,12 +182,14 @@ responsibility_item = {
     'resp_or_desc': ((__PORESPONSIBILITY__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), ),
     }
 
-DEFAULT_ITEM_NS = u'(?:(?:(?:[;；]|\\\\)\n+(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\s+(?=(?!(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\S)*?)(?=$|\s+(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\|[^\\\\])'
+DEFAULT_ITEM_SP = u'(?:(?:(?:[;；]|\\\\)\n+(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\s+(?=(?!(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\S)*?)(?=$|\s+(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\|[^\\\\])'
+SET_DEFAULT_SP = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_SP)
+DEFAULT_ITEM_NS = u'(?:(?:(?:[;；]|\\\\)\n+(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\s+(?=(?!(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\S)+?)(?=$|\s*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\|[^\\\\])'
 SET_DEFAULT_NS = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_NS)
 # If space only, the position is outside the table
-position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_DEFAULT_NS(SPACESEPRTED(map(label_separated(space_separated), position_items_nospace.items())))+u'{1,17}\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
+position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_DEFAULT_SP(SPACESEPRTED(map(label_separated(space_separated), position_items_nospace.items())))+u'{1,17}\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
 lp_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(lp_position_items)(newline_separated)+u'{1,17}')
-lp_position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_NS)(lp_position_items_nospace)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'{1,17}\n*'+SET_ALL_ITEMS(SET_DEFAULT)(responsibility_item)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'?\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
+lp_position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(lp_position_items_nospace)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'{1,17}\n*'+SET_ALL_ITEMS(SET_DEFAULT)(responsibility_item)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'?\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
 
 # Do not allow | after space
 YIDPT = u'(?:[^-\n:：'+SP+u']|-(?=['+SP+u']{3,}))(?:(?:[^\n:：'+SP+u']|(?:'+POASP+u'\|'+POASP+u')|('+POASP+u'[^\|\n'+SP+u']))+|(?=['+SP+u']{3,}))'
@@ -189,9 +200,11 @@ POPOSITION = u'(?='+ANONYMOUS(EXCLUDE_ITEM_KEYS(key_items).replace(u'[:：]?', u
 POFINISH = POASP+u'*(?:'+PODEPARTMENT+u'(?(ponl)\n+|'+POASP+u'+)'+u'(?: ?\*+)?(?:主管：)?)?(?:\**'+POPOSITION+POASP+u'*\**'+POASP+u'*(?:（?汇报对象：.*?)?'+POASP+u'*$)'
 
 position_decription_items = {}
-#position_decription_items['description'] = position_items_nospace.pop('description')
-position_decription_items['description'] = ((u'(?:'+__PODESCRIPTION__+u')?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_company_items))+MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
-empty_position_description_details_spaceonly = lambda RE:ASP+u'*'+SET_ALL_ITEMS(SET_DEFAULT)(position_decription_items)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*'+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_NS)(position_items_nospace)(newline_separated).replace('__NORECURSIVE__', RE.pattern)+u'*\n*'+BORDERBOTTOM('posdettab')
+# Only used in JY: anything not preceded by item label until the next blank line (accept escaped newlines)
+position_decription_items['description'] = ((u'(?:'+__PODESCRIPTION__+u')?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_company_items))+u'(?=(?!__NORECURSIVE__))(?:'+POASP+u'+(?=(?!__NORECURSIVE__))|\S)+'), )
+
+empty_position_details_spaceonly = lambda RE: ASP+u'*(?:'+POASP+u'*\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(position_items_nospace)(newline_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*)*'
+empty_position_description_details_spaceonly = lambda RE:ASP+u'*(?:'+SET_ALL_ITEMS(SET_DEFAULT)(position_decription_items)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*)?'+BORDERTOP('posdettab')+u'?'+empty_position_details_spaceonly(RE)+BORDERBOTTOM('posdettab')
 
 # Cannot use append_po as the first part is optional (\n might be missing)
 PO = re.compile(u'(?:'+POASP+u'*\**'+POFIELDLBL+u'(?:'+POASP+u'*'+POFIELD+POASP+u'*\**)?(?: ?\*+)?'+POASP+u'*$\n*)?'+u'(?:'+POASP+u'*' + POFINISH +u')?', re.M)
@@ -214,13 +227,13 @@ DRPATTERN = u'(?<!(?:职责|工作)描述：\n{2})^'+PERIOD+ur'[:：]?(?!\n{2}�
 DRTACO = re.compile(DRPATTERN.replace('__COMPANY__', u'('+COMPANY+u'\n)?'+COMPANY.replace(u'、', '')+u'?'+ASP+u'*').replace('__SEP__', '\|').replace('__ITEM__', u'([^\|（\(\[【]+'+COMPANYTAIL+u')*([^\|（\(\[【]*)'), re.DOTALL+re.M)
 
 # Exclude more invalid position as WYJCO at entrance of jingying
-WYJCO_POS = ur'(?:[^=\w\n\*：:\|\u2013\u2015\u3002（\(\[【]+('+exclude_with_parenthesis(u'人年月')+u')?|\w+(?:'+POASP+u'\w+)*)'
-WYJCO_DPT = u'(\S+?[部处室册科]|研发|QA|R&D|XP|\S*[\w\s]+)'
+WYJCO_POS = ur'(?:[^=\w\n\*：:\|\u2013\u2015\u3002（\(\[【]+('+exclude_with_parenthesis(u'人年月')+u')?|\w+(?:'+POASP+u'\w+)*|（兼\S）)+'
+WYJCO_DPT = u'(\S+?[部处室册科]|研发|QA|R&D|XP|\S*[&\w\s]+\S*)'
 # Company using (?P<company>[^\|\n]+?) is too slow to fail on long empty lines
 WYJCOBASE = u'(?P<position>'+WYJCO_POS+u')'+POASP+u'*(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+'+POASP+u'*\**(?P<company>[^\|'+SP+u']+(?: [^\|'+SP+u']+)*)'
-WYJCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+POASP+u'{3,}'+WYJCOBASE+POASP+u'*'+BDURATION+'\**(?=(?!\n+(?:.+?'+POASP+u'*(?=\|))?'+position_details(re.compile('')).replace('{1,17}', '{2,17}')+u'))$', re.M)
-DUFRTWYJCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+BDURATION+POASP+u'{2,}'+WYJCOBASE+'\**'+POASP+u'*'+position_details(re.compile('')).replace('{1,17}', '{2,17}')+u'$', re.M)
-DUFRTDPTWYJCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+BDURATION+POASP+u'+'+WYJCOBASE.replace(u'(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+', u'(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))')+'\**'+POASP+u'*'+position_details(re.compile('')).replace('{1,17}', '{2,17}')+u'$', re.M)
+WYJCO = regex.compile(u'^'+PREFIX+u'*'+PERIOD+POASP+u'{3,}'+WYJCOBASE+POASP+u'*'+BDURATION+'\**$', re.M+regex.ASCII)
+DUFRTWYJCO = regex.compile(u'^'+PREFIX+u'*'+PERIOD+BDURATION+POASP+u'{2,}'+WYJCOBASE+'\**'+POASP+u'*'+position_details(re.compile('')).replace('{1,17}', '{2,17}')+u'$', re.M+regex.ASCII)
+DUFRTDPTWYJCO = regex.compile(u'^'+PREFIX+u'*'+PERIOD+BDURATION+POASP+u'+'+WYJCOBASE.replace(u'(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+', u'(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))')+'\**'+POASP+u'*'+position_details(re.compile('')).replace('{1,17}', '{2,17}')+u'$', re.M+regex.ASCII)
 BTCO = re.compile(u'^'+PREFIX+u'*'+PERIOD+ASP+u'+(?P<company>[^'+SP+u']+)'+ASP+u'+'+u'(?P<position>'+POSITION+u'?)'+ASP+u'+(?P<dpt>'+WYJCO_DPT+u')$', re.M)
 
 # Combine presence of duration and bracket around period for safer searching
@@ -410,6 +423,8 @@ def position_output(output, groupdict, begin='', end=''):
                     continue
                 if key == 'people_under':
                     result[key] = fix_people(groupdict[key])
+                elif key == 'department_short':
+                        result['department'] = fix_name(groupdict[key])
                 elif key == 'resp_or_desc':
                     if 'description' in result:
                         result['responsibility'] = fix_name(groupdict[key])
@@ -738,9 +753,19 @@ def work_xp_yingcai(text):
         >>> assert u'部' not in name(company_1(work_xp_yingcai(u'见习\\n2010.08 - 2010.09\\n中国一汽\\n全部\\n月薪：保密\\n下属人数：0')))
         >>> assert not positions(work_xp_yingcai(u'瑞华会计师事务所总部 审计助理 2012.12-2013.2\\n?执行具体的实质性测试'))
     """
-    out = {'company': [], 'position': []}
+    co_items = company_items.copy()
+    co_items.pop('company_department')
+    empty_yc_company_details = COMPANY_DETAILS(SET_ALL_ITEMS(SET_COMPANY_DEFAULT)(co_items)(newline_separated)+'{,13}')
+
     popattern = u'(?:^(?='+EXCLUDE_ITEM_KEYS(key_items)+u')'+YIPOSITION.replace('lbr', 'albr')+u'(?<=(?!部处室册科))$)'
-    MA = regex.compile(empty_yc_position_details(regex.compile(append_po(empty_company_details(YICO), u'(?(position)'+popattern+u'|(?P<aposition>'+popattern+u'))?'))), re.M)
+    MAPO = regex.compile(append_po(empty_yc_company_details(YICO), u'(?(position)'+popattern+u'|(?P<aposition>'+popattern+u'))?'), re.M)
+    text = re.compile(BORDER, re.M).sub('', text)
+    if MAPO.search(text):
+        MA = regex.compile(empty_yc_position_details(MAPO), re.M)
+    else:
+        MA = regex.compile(empty_yc_position_details(regex.compile(empty_company_details(YICO))), re.M)
+
+    out = {'company': [], 'position': []}
     for r in MA.finditer(text):
         company_output(out, r.groupdict())
         if r.group('position') or r.group('aposition'):
@@ -810,6 +835,7 @@ def work_xp_zhilian(text):
         ...     u'**自动化软件工程师**\\n\\n职业优势：本人具有15年专业质量管理经历')))
     """
     out = {'company': [], 'position': []}
+    text = re.compile(BORDER, re.M).sub('', text)
     if DRTACO.search(text):
         MA = regex.compile(empty_zl_position_details(regex.compile(u'(?P<pip>'+DRTACO.pattern+u')')), re.M)
         for r in MA.finditer(text):
@@ -866,7 +892,7 @@ def work_xp_modified_wyjco(text):
     out = {'company': [], 'position': []}
     # Speed up non-matching
     if re.compile(BDURATION, re.M).search(text):
-        RE = re.compile(WYJCO.pattern.replace(u'{3,}', '+'), re.M)
+        RE = regex.compile(WYJCO.pattern.replace(u'{3,}', '+'), re.M+regex.ASCII)
         res = RE.search(text)
         if res:
             # regex's \w matches re's \w only is regex.ASCII is set
@@ -887,6 +913,48 @@ def work_xp_modified_wyjco(text):
                 company_output(out, r.groupdict())
                 position_output(out, r.groupdict())
     return len(out['position']), out
+
+def position_description_output(out, groupdict):
+    d = groupdict.copy()
+    if d['description']:
+        description = d.pop('description')
+
+        co_items = {}
+        co_items['company_description'] = company_items['company_description']
+        po_items = position_items_nospace.copy()
+        po_items.pop('name')
+        po_items.pop('description')
+        po_items.pop('resp_or_desc')
+        for key in po_items.copy():
+            resp_items = {}
+            resp_items[key] = po_items[key]
+            MARESP = regex.compile(SET_ALL_ITEMS_NOSPACE(SET_DEFAULT_NS)(resp_items)(space_separated).replace(u'[:：]?', u'[:：]'), re.M)
+            if len(MARESP.findall(description)) > 1:
+                po_items.pop(key)
+
+        MACO = regex.compile(SET_ALL_ITEMS(SET_DEFAULT)(co_items)(newline_separated).replace(u'[:：]?', u'[:：]'), re.M)
+        MAPO = regex.compile(SET_ALL_ITEMS_NOSPACE(SET_DEFAULT_NS)(po_items)(space_separated).replace(u'[:：]?', u'[:：]'), re.M)
+
+        res = MACO.search(description)
+        if res:
+            r = res.groupdict()
+            if r['company_description']:
+                d['company_description'] = r['company_description']
+            description = description.replace(res.group(), '')
+        desc = description
+        for res in MAPO.finditer(description):
+            r = {}
+            for key in res.groupdict():
+                if res.groupdict()[key]:
+                    r[key] = res.groupdict()[key]
+            d.update(r)
+            # Must avoid replacing all ASP/POASP is spurious match
+            if set(r).intersection(position_items):
+                desc = desc.replace(res.group(), '')
+        d['description'] = desc
+    company_output(out, d)
+    if d['position']:
+        position_output(out, d)
 
 def work_xp_jingying(text):
     u"""
@@ -964,15 +1032,27 @@ def work_xp_jingying(text):
         ...     u'武汉格瑞拓机械有限公司--研究生期间科研项目合作 \[8个月 \]\\n\\n机械/设备/重工|150-500人|外资(非欧美)')) # data: nhodm7tm
     """
     out = {'company': [], 'position': []}
+
     # Speed up non-matching
     if re.compile(BDURATION, re.M).search(text) and WYJCO.search(text):
+        fst_items = {}
+        fst_items['description'] = position_items['description']
+        fst_items['company_description'] = company_items['company_description']
+        SET_DEFAULT_WYJCO = lambda X: X.replace(DEFAULT_ITEM, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_company_items))+u'(?:'+POASP+u'+|\n(?!\n)|\S)+')
+        wyjco_position_details = BORDERTOP('posdettab')+u'?\n*'+SET_ALL_ITEMS(SET_DEFAULT_WYJCO)(fst_items)(newline_separated)+u'*\n*'+BORDERBOTTOM('posdettab')
         # regex's \w matches re's \w only is regex.ASCII is set
-        MA = regex.compile(company_details(WYJCO), re.M+regex.ASCII)
+        MA = regex.compile(append_po(empty_company_details_pipeonly(WYJCO), wyjco_position_details), re.M+regex.ASCII)
         for r in MA.finditer(text):
-            company_output(out, r.groupdict())
-            position_output(out, r.groupdict())
+            position_description_output(out, r.groupdict())
         if len(out['position']):
             return len(out['position']), out
+
+    t = text
+    MAPROJ = regex.compile(RE_ANY(PRJ_ITEM_KEYS(extractor.project.key_items)).replace(u'[:：]?', u'[:：]'), re.M)
+    for r in extractor.project.YPJ.finditer(text):
+        if MAPROJ.search(r.group('proj')):
+            t = t.replace(r.group(), '')
+    text = t
 
     for RE in [CCO, CO, TCO]:
         if (RE == TCO or re.compile(BDURATION).search(text)) and RE.search(text):
@@ -980,8 +1060,10 @@ def work_xp_jingying(text):
             if MA.search(text):
                 MA = regex.compile(append_po(RE.pattern, PO.pattern+empty_position_description_details_spaceonly(RE)), re.M)
                 for r in MA.finditer(text):
-                    company_output(out, r.groupdict())
-                    position_output(out, r.groupdict())
+                    d = r.groupdict()
+                    if (d['position'] and not d['position'].strip()) and d['dpt']:
+                        d['position'] = d['dpt']
+                    position_description_output(out, d)
                 if len(out['position']):
                     break
                 out = {'company': [], 'position': []}
@@ -990,11 +1072,11 @@ def work_xp_jingying(text):
                         u'(?P<po>'+POASP+u'*'+u'(?:'+PO.pattern+u')?'+empty_position_description_details_spaceonly(RE)+u')', re.M)
                 indent = None
                 for r in MA.finditer(text):
-                    company_output(out, r.groupdict())
                     if r.group('po'):
                         if r.group('position'):
-                            position_output(out, r.groupdict())
+                            position_description_output(out, r.groupdict())
                         elif r.group('description'):
+                            company_output(out, r.groupdict())
                             # If description is indented as field, that is a position
                             if not indent:
                                 indent = re.compile('^( *(?P<label>[^\w ]*)\w* +)(?=('+
@@ -1611,8 +1693,7 @@ def fix_zhilian(d, as_date=None):
     for RE in [PRXP, AXP]:
         res = RE.search(d)
         if res:
-            text = re.compile(BORDER, re.M).sub('', res.group('expe'))
-            pos, out = work_xp_zhilian(text)
+            pos, out = work_xp_zhilian(res.group('expe'))
             if not pos and len(out['company']) == 0:
                 pass
             else:

@@ -163,7 +163,6 @@ class LSIbaseAPI(Resource):
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
-        self.sim_names = self.miner.addition_names()
 
     def process(self, member, project, doc, uses, filterdict, cur_page, eve_count=20):
         if not cur_page:

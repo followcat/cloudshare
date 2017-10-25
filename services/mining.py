@@ -178,11 +178,10 @@ class Mining(object):
 
     SIMS_PATH = 'all'
 
-    def __init__(self, path, classifycvs, slicer=None):
+    def __init__(self, path, slicer=None):
         self.sim = dict()
         self.path = path
         self.lsi_model = dict()
-        self.additionals = classifycvs
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
@@ -306,6 +305,3 @@ class Mining(object):
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return len(ranklist), map(lambda x: (x[0], ranklist.index(x)), lists)
-
-    def addition_names(self):
-        return [name for name in self.additionals]

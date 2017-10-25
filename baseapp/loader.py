@@ -44,6 +44,7 @@ class Config(object):
         ("PEO_REPO",        "PEO/repo"),
         ("PEO_INDIV",       "PEO/indiv"),
         ("PEO_STO",         "PEO/storage"),
+        ("PEO_LIMIT",       "PEO/limit"),
         ("MULT_CLSIFY",     "CV/classify"),
         ("MEMBERS",         "members"),
         ("UPLOAD_TEMP",     "output"),

@@ -4,9 +4,12 @@ import { browserHistory } from 'react-router';
 
 import ShowCard from 'components/show-card';
 import DraggerUpload from 'components/dragger-upload';
+import Guide from 'components/guide';
 import Preview from './Preview';
 
 import { message } from 'antd';
+
+import { introJs } from 'intro.js';
 
 import { getClassify } from 'request/classify';
 import { uploadPreview, confirmUpload } from 'request/upload';
@@ -61,6 +64,7 @@ class Uploader extends Component {
       confirmResult: [],
       currentPreview: 0,
       total: 0,
+      guide:false,
       confirmLoading: false
     };
     this.handleChange = this.handleChange.bind(this);
@@ -72,8 +76,25 @@ class Uploader extends Component {
     this.getPreviewRender = this.getPreviewRender.bind(this);
   }
 
+  componentWillMount() {
+    if(this.props.location.query.guide) {
+      this.setState({
+      guide: this.props.location.query.guide
+      })
+    }
+  }
+
   componentDidMount() {
     this.getClassifyData();
+    if(this.state.guide) {
+      introJs().setOptions({
+        'skipLabel': '退出', 
+        'prevLabel':'上一步', 
+        'nextLabel':'下一步',
+        'doneLabel': '完成'
+      }).start();
+      // introJs().start();
+    }
   }
 
   handleChange(info) {
@@ -241,7 +262,8 @@ class Uploader extends Component {
       fileList,
       completedList,
       failedList,
-      confirmResult
+      confirmResult,
+      guide
     } = this.state;
 
     const uploadProps = {
@@ -258,12 +280,20 @@ class Uploader extends Component {
     };
 
     return (
-      <div className="cs-uploader">
+      <div className="cs-uploader" >
+        <Guide />
         <ShowCard>
+        <div data-step='1'data-intro='单击或拖曳上传!'>
           <DraggerUpload
             {...uploadProps}
             fileList={fileList}
           />
+          </div>
+          {guide ?
+          <div className="cs-uploader-steptwo" data-step='2' data-intro='上传后在这里预览文件!'>
+          </div>
+          : null
+          }
           {this.getPreviewRender()}
           {this.props.children && React.cloneElement(this.props.children, {
             completedList: completedList,

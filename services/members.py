@@ -26,6 +26,7 @@ class Members(object):
                                                 mult_peo, member_path, name)
                 member.setup({'storageCV':  'cloudshare',
                               'storagePEO': 'peostorage',
+                              'limitPEO':   'peolimit',
                               'storageCO':  'corepo',
                               'storageJD':  'jdrepo'})
                 self.members[name] = member
@@ -38,6 +39,7 @@ class Members(object):
                                                self.mult_peo, path, self.default_member_name)
         member.setup({'storageCV':  'cvindividual',
                       'storagePEO': 'peoindividual',
+                      'limitPEO':   'peolimit',
                       'storageCO':  'corepo',
                       'storageJD':  'jdrepo'})
         self.members[self.default_member_name] = member
@@ -52,6 +54,7 @@ class Members(object):
                                         self.jd_repos, self.mult_peo, path, name)
         member.setup({'storageCV':  'cloudshare',
                       'storagePEO': 'peostorage',
+                      'limitPEO':   'peolimit',
                       'storageCO':  'corepo',
                       'storageJD':  'jdrepo'})
         self.members[name] = member

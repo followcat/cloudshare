@@ -48,7 +48,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       hash: false,
-      title: '如炬 - 简单招聘',
+      title: '如炬 - 轻松选才',
       template: path.join(config.SRC_PATH, '/template.html'),
       inject: true,
       filename: path.join(config.ROOT_PATH, '/templates_dist.prod/index.html'),

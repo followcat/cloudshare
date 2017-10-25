@@ -130,6 +130,16 @@ class Project(services.base.service.Service):
         return result
 
     @property
+    def limitPEO(self):
+        result = None
+        servicename = self.config['limitPEO']
+        for each in self.svcpeos[0].peoples:
+            if each.name == servicename:
+                result = each
+                break
+        return result
+
+    @property
     def modelname(self):
         return self._modelname
 
@@ -340,8 +350,11 @@ class Project(services.base.service.Service):
             'repo_peo_result' : False,
             'project_peo_result' :False,
         }
-        result['repo_peo_result'] = self.storagePEO.add(peopobj, committer,
-                                                        unique=unique, do_commit=do_commit)
+        storage = self.storagePEO
+        if peopobj.ID == peopobj.metadata['cv'][0]:
+            storage = self.limitPEO
+        result['repo_peo_result'] = storage.add(peopobj, committer,
+                                                unique=unique, do_commit=do_commit)
         result['project_peo_result'] = self.people.add(peopobj, committer,
                                                        unique=unique, do_commit=do_commit)
         return result

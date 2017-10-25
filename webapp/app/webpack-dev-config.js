@@ -71,7 +71,7 @@ module.exports = {
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       hash: false,
-      title: '如炬 - 简单招聘',
+      title: '如炬 - 轻松选才',
       template: path.join(config.SRC_PATH, '/template.html'),
       inject: true
     })

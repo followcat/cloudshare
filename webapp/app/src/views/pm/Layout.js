@@ -10,6 +10,7 @@ import {
   CardContainer,
   CardContent
 } from 'components/card-container';
+import Guide from 'components/guide';
 
 import { getCurrentActive } from 'utils/sider-menu-list';
 
@@ -70,9 +71,10 @@ class Layout extends Component {
           selectedKeys={[this.state.selectedKey]}
           onClick={this.handleSubheadNavClick}
         />
+        <Guide />
         <LayoutContainer>
           <CardContainer>
-            <CardContent title={cardContentTitle}>
+            <CardContent>
               {this.props.children}
             </CardContent>
           </CardContainer>

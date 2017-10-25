@@ -56,14 +56,14 @@ class CreateNewJobDescription extends Component {
           </Form.Item>
           <Form.Item label={language.JOB_DESCRIPTION_NAME}>
             {getFieldDecorator('jd_name', {
-              rules: [{ required: true, message: language.JOB_DESCRIPTION_NAME_VALIDATE_MSG }]
+              rules: [{ required: true, message: language.JOB_DESCRIPTION_NAME_VALIDATE_MSG, whitespace:true}]
             })(
               <Input />
             )}
           </Form.Item>
           <Form.Item label={language.JOB_DESCRIPTION_CONTENT}>
             {getFieldDecorator('jd_description', {
-              rules: [{ required: true, message: language.JOB_DESCRIPTION_CONTENT_VALIDATE_MSG }]
+              rules: [{ required: true, message: language.JOB_DESCRIPTION_CONTENT_VALIDATE_MSG, whitespace:true }]
             })(
               <Input type="textarea" rows="4" />
             )}

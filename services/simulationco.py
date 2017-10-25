@@ -49,8 +49,8 @@ class SimulationCO(services.base.simulation.Simulation,
                                 "Update %s information."%id, committer)
         for storage in self.storages:
             if storage.exists(id):
-                bas_res = self.storage.saveinfo(id, baseinfo,
-                                                "Update %s information."%id, committer)
+                bas_res = storage.saveinfo(id, baseinfo,
+                                           "Update %s information."%id, committer)
                 break
         return prj_res or bas_res
 

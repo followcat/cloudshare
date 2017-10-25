@@ -42,8 +42,9 @@ def generate_yaml(md, yamlobj, selected=extractor.information_explorer.upload_se
 
 class CVStorageSync(object):
 
-    def __init__(self, svc_peo_sto, svc_cv_sto, rawdb):
+    def __init__(self, svc_peo_sto, svc_peo_limit, svc_cv_sto, rawdb):
         self.cv_storage = svc_cv_sto
+        self.peo_limit = svc_peo_limit
         self.peo_storage = svc_peo_sto
         self.rawdb = rawdb
         self.logger = logging.getLogger("CVStorageSyncLogger.UPDATE")
@@ -127,6 +128,9 @@ class CVStorageSync(object):
         peoobj = core.basedata.DataObject(data=peoinfo,
                                           metadata=peoinfo)
         self.cv_storage.addcv(dataobj, raw_html.encode('utf-8'))
-        self.peo_storage.add(peoobj)
+        if peoobj.ID == peoobj.metadata['cv'][0]:
+            self.peo_limit.add(peoobj)
+        else:
+            self.peo_storage.add(peoobj)
         result = True
         return result

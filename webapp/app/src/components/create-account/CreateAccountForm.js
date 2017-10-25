@@ -10,6 +10,7 @@ import {
   Button,
   message,
   Modal,
+  Checkbox
 } from 'antd';
 
 const FormItem = Form.Item;
@@ -57,7 +58,7 @@ class CreateAccountForm extends Component {
 
   handleClick(e) {
     // e.preventDefault();
-  this.props.form.validateFields((errors, values) => {
+    this.props.form.validateFields((errors, values) => {
       if (!errors) {
         this.props.onSubmit(values);
       }
@@ -131,6 +132,16 @@ class CreateAccountForm extends Component {
     const form = this.props.form;
     if (value && value !== form.getFieldValue('password')) {
       callback('您输入的两个密码不一致!');
+    } else {
+      callback();
+    }
+  }
+
+  checkAgreement = (rule, value, callback) => {
+    const form = this.props.form;
+    console.log(value);
+    if (!value) {
+      callback('请勾选此项!');
     } else {
       callback();
     }
@@ -293,7 +304,7 @@ class CreateAccountForm extends Component {
             <Input placeholder="手机号码" />
           )}
         </FormItem>
-        <FormItem >
+        <FormItem className='smscode'>
           {getFieldDecorator('smscode',{
             rules: [{
               required: true, message: '短信验证码是地址必填项',}
@@ -331,6 +342,19 @@ class CreateAccountForm extends Component {
         </img>
         </FormItem>
         </Modal>
+        <FormItem className='agreement'>
+          {getFieldDecorator('agreement', {
+            valuePropName: 'checked',
+            initialValue: true,
+            rules: [{
+              required: true
+            },{
+              validator: this.checkAgreement,
+            }]
+          })(
+        <Checkbox>我已阅读并同意<a target="_blank" href="/agreement">《用户服务协议》</a></Checkbox>
+          )}
+        </FormItem>
         <FormItem>
           <Button type="primary" onClick={this.handleClick}>
             {btnText}

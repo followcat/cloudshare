@@ -40,13 +40,12 @@ class MemeryDatas(object):
             ids = self.service.ids
         if key not in self.memdict:
             self.memdict[key] = {}
-        for id in ids:
-            if id not in self.memdict[key]:
-                info = self.service.getyaml(id)
-                if key not in info:
-                    self.memdict[key][id] = 0
-                else:
-                   self.memdict[key][id] = info[key]
+        for id in set(self.service.ids)-set(self.memdict[key].keys()):
+            info = self.service.getyaml(id)
+            if key not in info:
+                self.memdict[key][id] = 0
+            else:
+               self.memdict[key][id] = info[key]
 
     def update(self, key, id):
         if key not in self.memdict:

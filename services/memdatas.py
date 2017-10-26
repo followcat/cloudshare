@@ -12,8 +12,18 @@ class MemeryDatas(object):
         for id in ids:
             formatted_value = value.__repr__().replace('u', '', 1).replace('\'', '')
             searched = self.memdict[key][id]
-            if value in searched:
-                result.append(id)
+            if searched:
+                if isinstance(searched, str) or isinstance(searched, unicode):
+                    if value in searched:
+                        result.append(id)
+                elif isinstance(searched, list):
+                    for i in searched:
+                        if 'content' in i and value in i['content']:
+                            result.append(id)
+                            break
+                else:
+                    if value in unicode(searched):
+                        result.append(id)
         return result
 
     def sorted_ids(self, key, ids=None, reverse=True):

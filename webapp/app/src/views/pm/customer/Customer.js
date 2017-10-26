@@ -14,7 +14,8 @@ import {
   Popconfirm,
   message,
   Select,
-  Form
+  Form,
+  Spin
 } from 'antd';
 
 import {
@@ -45,6 +46,7 @@ class Customer extends Component {
     super();
     this.state = {
       dataSource: [],
+      fetching: false,
       loading: false,
       visible: false,
       siderPanelVisible: false,
@@ -123,7 +125,10 @@ class Customer extends Component {
   handleChange(value) {
     const { companyDataSource } = this.state;
 
-    this.setState({ value });
+    this.setState({ 
+      value: value,
+      fetching: true
+    });
 
     let object = find(companyDataSource, (item) => item.company_name === value);
     if (object) {
@@ -135,8 +140,13 @@ class Customer extends Component {
         id: ''
       });
     }
-
-    this.getCompanyDataSource(value);
+    if(value){
+      this.getCompanyDataSource(value);
+    } else {
+      this.setState({
+            companyDataSource: []
+          });
+    }
   }
 
   getDataSource() {
@@ -159,23 +169,23 @@ class Customer extends Component {
       clearTimeout(timer);
       timer = null;
     }
-
-    
     timer = setTimeout(() => {
       getAddedCompanyList({
         text: text
       }, json => {
         if (json.code === 200) {
           this.setState({
-            companyDataSource: json.data
+            companyDataSource: json.data,
+            fetching: false
           });
         }
       });
-    }, 500);
+    }, 300);
   }
 
   getElements() {
     const {
+      fetching,
       companyDataSource,
       visible,
     } = this.state;
@@ -209,9 +219,9 @@ class Customer extends Component {
               >
                 { companyDataSource.length > 0 ?
                   companyDataSource.map(item => {
-                  return <Select.Option key={item.company_name}>{item.company_name}</Select.Option>;
+                  return <Select.Option key={item.company_name}>{item.company_name}</Select.Option>
                 })
-                  : null
+                  : <Select.Option key='default'>没有相应公司</Select.Option>
                 }
               </Select>
             </Form.Item>

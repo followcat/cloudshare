@@ -12,8 +12,18 @@ class MemeryDatas(object):
         for id in ids:
             formatted_value = value.__repr__().replace('u', '', 1).replace('\'', '')
             searched = self.memdict[key][id]
-            if formatted_value in searched.__repr__():
-                result.append(id)
+            if searched:
+                if isinstance(searched, str) or isinstance(searched, unicode):
+                    if value in searched:
+                        result.append(id)
+                elif isinstance(searched, list):
+                    for i in searched:
+                        if 'content' in i and value in i['content']:
+                            result.append(id)
+                            break
+                else:
+                    if value in unicode(searched):
+                        result.append(id)
         return result
 
     def sorted_ids(self, key, ids=None, reverse=True):
@@ -30,13 +40,12 @@ class MemeryDatas(object):
             ids = self.service.ids
         if key not in self.memdict:
             self.memdict[key] = {}
-        for id in ids:
-            if id not in self.memdict[key]:
-                info = self.service.getyaml(id)
-                if key not in info:
-                    self.memdict[key][id] = 0
-                else:
-                   self.memdict[key][id] = info[key]
+        for id in set(self.service.ids)-set(self.memdict[key].keys()):
+            info = self.service.getyaml(id)
+            if key not in info:
+                self.memdict[key][id] = 0
+            else:
+               self.memdict[key][id] = info[key]
 
     def update(self, key, id):
         if key not in self.memdict:

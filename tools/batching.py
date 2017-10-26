@@ -4,6 +4,7 @@ import os
 import time
 import shutil
 
+import utils.builtin
 import utils.chsname
 import core.exception
 import core.outputstorage
@@ -123,18 +124,7 @@ def update_selected(svc_cv, yamlname, selected, as_date=None):
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
                                                          selected, explorer_name, as_date)
-    try:
-        experience = info.pop('experience')
-        try:
-            obj['experience'].update(experience)
-        except AttributeError:
-            obj['experience'] = experience
-    except KeyError:
-            pass
-    try:
-        obj.update(info)
-    except AttributeError:
-        obj = info
+    obj = utils.builtin.merge(obj, info)
     yamlstream = yaml.safe_dump(obj, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
@@ -380,7 +370,7 @@ def add_jd_followup(SVC_PRJ):
     SVC_JD = SVC_PRJ.jobdescription
     for jd_id, jd in SVC_JD.datas():
         if 'followup' in jd:
-            continue]
+            continue
         jd['followup'] = ''
         if '\n' in jd['commentary']:
             jd['followup'] = jd['commentary']

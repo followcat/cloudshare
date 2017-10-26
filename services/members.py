@@ -22,7 +22,8 @@ class Members(object):
                 name = unicode(str_name, 'utf-8')
                 member = services.member.Member(acc_repos, cv_repos, mult_peo,
                                                 member_path, name)
-                member.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage'})
+                member.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage',
+                              'limitPEO': 'peolimit'})
                 self.members[name] = member
         self.load_default_member()
 
@@ -30,7 +31,8 @@ class Members(object):
         path = os.path.join(self.path, self.default_member_name)
         member = services.member.DefaultMember(self.acc_repos, self.cv_repos, self.mult_peo,
                                                path, self.default_member_name)
-        member.setup({'storageCV': 'cvindividual', 'storagePEO': 'peoindividual'})
+        member.setup({'storageCV': 'cvindividual', 'storagePEO': 'peoindividual',
+                      'limitPEO': 'peolimit'})
         self.members[self.default_member_name] = member
 
     def exists(self, name):
@@ -41,7 +43,8 @@ class Members(object):
         path = os.path.join(self.path, name)
         member = services.member.Member(self.acc_repos, self.cv_repos, self.mult_peo,
                                         path, name)
-        member.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage'})
+        member.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage',
+                      'limitPEO': 'peolimit'})
         self.members[name] = member
 
     def get(self, name):

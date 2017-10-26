@@ -18,7 +18,7 @@ class RadarChart extends Component {
       option: {},
       defaultSelection: [],
       anonymized: false,
-      loading: true
+      spinning: true
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
@@ -31,7 +31,7 @@ class RadarChart extends Component {
     let defaultSelection = selection ? selection : [];
     this.setState({
       visible: true,
-      loading: true,
+      spinning: true,
       data: [],
     });
 
@@ -54,6 +54,7 @@ class RadarChart extends Component {
           this.setState({
             data: json.data.result,
             option: getRadarOption(json.data.max, json.data.result, this.state.anonymized),
+            spinning: false
           });
         }
       });
@@ -78,7 +79,7 @@ class RadarChart extends Component {
   }
 
   render() {
-    const { visible, option, data } = this.state;
+    const { visible, option, data, spinning } = this.state;
 
     return (
       <div>
@@ -94,11 +95,13 @@ class RadarChart extends Component {
           style={{ top: 20 }}
           width={980}
         >
+        <Spin spinning={spinning}>
           {data.length > 0 ?
             <Charts option={option} getLoading={this.handleLoading} 
             style={{ width: 900, height: 460, margin: '0 auto' }} />
             : <div style={{ width: 900, height: 460, margin: '0 auto' }} />
           }
+          </Spin>
         </Modal>
       </div>
     );

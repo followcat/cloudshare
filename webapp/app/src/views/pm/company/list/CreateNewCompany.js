@@ -27,14 +27,14 @@ class CreateNewCompany extends Component {
   }
 
   handleModalOk() {
-    this.setState({
-      visible: false
-    });
     this.props.form.validateFields((errors, values) => {
-      if (!!errors) {
+      if (!errors) {
+        this.setState({
+          visible: false
+        });
+        this.props.onSubmit(values);
         return;
       }
-      this.props.onSubmit(values);
     });
   }
 
@@ -74,7 +74,7 @@ class CreateNewCompany extends Component {
             {...formItemLayout}
           >
             {getFieldDecorator('name', {
-              rules: [{ required: true }]
+              rules: [{ required: true, message: '公司名称是必填项', whitespace:true}]
             })(
               <Input placeholder={`${language.INPUT_PLACEHOLDER}${language.COMPANY_NAME}`} />
             )}

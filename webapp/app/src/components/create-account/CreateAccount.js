@@ -15,7 +15,6 @@ class CreateAccount extends Component {
 
     return (
       <Card
-        title={props.title}
         bordered={props.bordered}
         className={classes}
         style={{border: '5px solid #e9e9e9', 'border-radius': '10px'}}

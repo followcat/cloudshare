@@ -115,7 +115,8 @@ class Member(services.base.service.Service):
                                                        [self.curriculumvitaes],
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'storageCV': self.config['storageCV'],
-                                          'storagePEO': self.config['storagePEO']})
+                                          'storagePEO': self.config['storagePEO'],
+                                          'limitPEO': self.config['limitPEO']})
                 tmp_project.cv_private = False
                 if not tmp_project.config['autosetup'] and not tmp_project.config['autoupdate']:
                     tmp_project._modelname = self.default_model
@@ -141,7 +142,8 @@ class Member(services.base.service.Service):
             tmp_project.setup(classify, config={'autosetup': autosetup,
                                                 'autoupdate': autoupdate,
                                                 'storageCV': self.config['storageCV'],
-                                                'storagePEO': self.config['storagePEO']})
+                                                'storagePEO': self.config['storagePEO'],
+                                                'limitPEO': self.config['limitPEO']})
             tmp_project.cv_private = False
             tmp_project._modelname = self.default_model
             self.projects[name] = tmp_project

@@ -49,26 +49,23 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
-                if 'unique_id' in cvobj.metadata:
-                    try:
-                        result = project.cv_add(cvobj, user.name, unique=True)
-                        if result['repo_cv_result']:
-                            self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
-                        if result['project_cv_result']:
-                            result['member_cv_result'] = member.cv_add(cvobj, user.name,
-                                                                       unique=True)
-                            status = 'success'
-                            message = 'Add to CV database and project.'
-                            names.append(cvobj.name.md)
-                            documents.append(cvobj.data)
-                            if not result['repo_cv_result']:
-                                message = 'Existed in other project.'
-                        else:
-                            message = 'Resume existed in database and project.'
-                    except core.exception.NotExistsContactException:
-                        message = 'The contact information is empty.'
-                else:
-                    message = 'Unable to extract personal information, please modify and try again'
+                try:
+                    result = project.cv_add(cvobj, user.name, unique=True)
+                    if result['repo_cv_result']:
+                        self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
+                    if result['project_cv_result']:
+                        result['member_cv_result'] = member.cv_add(cvobj, user.name,
+                                                                   unique=True)
+                        status = 'success'
+                        message = 'Add to CV database and project.'
+                        names.append(cvobj.name.md)
+                        documents.append(cvobj.data)
+                        if not result['repo_cv_result']:
+                            message = 'Existed in other project.'
+                    else:
+                        message = 'Resume existed in database and project.'
+                except core.exception.NotExistsContactException:
+                    message = 'The contact information is empty.'
                 results.append({ 'id': id,
                                  'status': status,
                                  'message': message,

@@ -12,7 +12,7 @@ class MemeryDatas(object):
         for id in ids:
             formatted_value = value.__repr__().replace('u', '', 1).replace('\'', '')
             searched = self.memdict[key][id]
-            if formatted_value in searched.__repr__():
+            if value in searched:
                 result.append(id)
         return result
 

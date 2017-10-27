@@ -124,19 +124,20 @@ class FastMatching extends Component {
                     {
                         //第一步引导
                         element: '.ant-card-body',
-                        intro: '职位描述越清晰，匹配越精准，可以选择多种筛选条件。推荐使用会员服务-开放职位的匹配.',
+                        intro: '职位描述较关键词匹配更精确，可以选择多种筛选条件。'+
+                        '<a href="/pm/jobdescription" target="_blank">推荐使用会员服务-已开放职位的匹配!</a>',
                         position: 'right'
                     },
                     {
                         element: '.cs-search-result',
-                        intro: '匹配结果展示，可以勾选后在多个结果中对比',
+                        intro: '匹配结果展示，可以勾选多个结果后对比',
                         position: 'bottom'
                     },
                     {
                         //这个属性类似于jquery的选择器， 可以通过jquery选择器的方式来选择你需要选中的对象进行指引
                         element: '.anticon-caret-left',
                         //这里是每个引导框具体的文字内容，中间可以编写HTML代码
-                        intro: '勾选后点击侧边栏，选择雷达图或者分析，可视化分析数据。',
+                        intro: '勾选后点击侧边栏，选择雷达图或者分析，进行可视化分析数据。',
                         //这里可以规定引导框相对于选中对象出现的位置 top,bottom,left,right
                         position: 'top'
                     },

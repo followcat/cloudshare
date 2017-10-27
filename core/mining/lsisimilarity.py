@@ -57,8 +57,8 @@ class LSIsimilarity(object):
         self.clear()
 
     def exists(self, name):
-        mdname = core.outputstorage.ConvertName(name).md
-        return mdname in self.names
+        id = core.outputstorage.ConvertName(name).base
+        return id in self.ids
 
     def clear(self):
         self.corpus = None
@@ -228,3 +228,7 @@ class LSIsimilarity(object):
     @corpus.setter
     def corpus(self, value):
         self._corpus = value
+
+    @property
+    def ids(self):
+        return set([os.path.splitext(name)[0] for name in self.names])

@@ -7,6 +7,7 @@ import ujson
 from gensim import corpora, models
 
 import utils.builtin
+import core.outputstorage
 
 
 class LSImodel(object):
@@ -158,6 +159,10 @@ class LSImodel(object):
         self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
                                                              self.corpu_dict_save_name))
+
+    def exists(self, name):
+        id = core.outputstorage.ConvertName(name).base
+        return id in self.ids
 
     def add(self, name, document):
         text = self.slicer(document, id=name)
@@ -431,6 +436,10 @@ class LSImodel(object):
     @texts.setter
     def texts(self, value):
         self._texts = value
+
+    @property
+    def ids(self):
+        return set([os.path.splitext(name)[0] for name in self.names])
 
 
 def tf_cal(term_freq):

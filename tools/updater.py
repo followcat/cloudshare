@@ -52,9 +52,12 @@ def update_co_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
             try:
                 datas = info['experience']['company']
             except KeyError, TypeError:
+                trains.append(('.'.join([id, '']), ''))
                 continue
             for data in datas:
                 if 'description' not in data:
+                    trains.append(('.'.join([id, data['name']]).encode('utf-8'),
+                                   ''))
                     continue
                 trains.append(('.'.join([id, data['name']]).encode('utf-8'), data['description']))
         SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)
@@ -69,9 +72,14 @@ def update_pos_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
             try:
                 datas = info['experience']['position']
             except KeyError, TypeError:
+                trains.append(('.'.join([id, '']), ''))
                 continue
             for data in datas:
                 if 'description' not in data:
+                    trains.append(('.'.join([id,
+                                         info['experience']['company'][data['at_company']]['name'],
+                                         data['name']]).encode('utf-8'),
+                                   ''))
                     continue
                 trains.append(('.'.join([id,
                                          info['experience']['company'][data['at_company']]['name'],
@@ -89,9 +97,12 @@ def update_prj_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
             try:
                 datas = info['experience']['project']
             except KeyError, TypeError:
+                trains.append(('.'.join([id, '']), ''))
                 continue
             for data in datas:
                 if 'description' not in data:
+                    trains.append(('.'.join([id, company, name]).encode('utf-8'),
+                                   ''))
                     continue
                 name = data['name'] if 'name' in data else '-'
                 company = data['company'] if 'company' in data else '-'

@@ -439,7 +439,7 @@ class LSImodel(object):
 
     @property
     def ids(self):
-        return set([os.path.splitext(name)[0] for name in self.names])
+        return set([name.split('.', 1)[0] for name in self.names])
 
 
 def tf_cal(term_freq):

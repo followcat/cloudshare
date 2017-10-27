@@ -61,7 +61,7 @@ class LSIsimilarity(object):
         return id in self.ids
 
     def clear(self):
-        self.corpus = None
+        self.corpus = list()
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
@@ -185,17 +185,9 @@ class LSIsimilarity(object):
             >>> count_in[0] - origin
             60
         """
-        if top is None:
-            top = len(self.index)
-        elif top < 1:
-            top = int(len(self.index)*top)
-        top = top if top > minimum else minimum
-        results = []
-        self.num_best = top
-        vec_lsi = self.lsi_model.probability(doc)
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])),
-                                self.index[vec_lsi])
         self.num_best = None
+        p = self.base_probability(doc, top=top, minimum=minimum)
+        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), p)
         return results
 
     def probability_by_id(self, doc, id):
@@ -205,6 +197,19 @@ class LSIsimilarity(object):
         vec_lsi = self.lsi_model.probability(doc)
         result = abs(self.index[vec_lsi][index])
         return (os.path.splitext(id)[0], str(result))
+
+    def base_probability(self, doc, top=None, minimum=0):
+        if top is None:
+            top = len(self.index)
+        elif top < 1:
+            top = int(len(self.index)*top)
+        top = top if top > minimum else minimum
+        results = []
+        self.num_best = top
+        vec_lsi = self.lsi_model.probability(doc)
+        result = self.index[vec_lsi]
+        self.num_best = None
+        return result
 
     @property
     def num_best(self):
@@ -222,7 +227,7 @@ class LSIsimilarity(object):
                 try:
                     self._corpus = ujson.load(f)
                 except ValueError:
-                    self._corpus = []
+                    self._corpus = list()
         return self._corpus
 
     @corpus.setter
@@ -231,4 +236,4 @@ class LSIsimilarity(object):
 
     @property
     def ids(self):
-        return set([os.path.splitext(name)[0] for name in self.names])
+        return set([name.split('.', 1)[0] for name in self.names])

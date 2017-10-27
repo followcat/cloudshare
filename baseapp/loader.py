@@ -129,9 +129,18 @@ def load_cv_mining(SVC_MIN, SVC_MEMBERS):
     tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS)
 
 
-def load_jd_mining(SVC_MIN, SVC_JD_REPO):
-    SVC_MIN.setup('jdmatch', [SVC_JD_REPO.name])
-    tools.updater.update_jd_sims('jdmatch', SVC_MIN, [SVC_JD_REPO])
+def load_jd_mining(SVC_MIN, SVC_JDS):
+    SVC_MIN.setup('jdmatch', [JD.name for JD in SVC_JDS])
+    tools.updater.update_jd_sims('jdmatch', SVC_MIN, SVC_JDS)
+
+
+def load_co_mining(SVC_MIN, SVC_CVS):
+    SVC_MIN.setup('comatch', [CV.name for CV in SVC_CVS])
+    SVC_MIN.setup('prjmatch', [CV.name for CV in SVC_CVS])
+    SVC_MIN.setup('posmatch', [CV.name for CV in SVC_CVS])
+    tools.updater.update_co_sims('comatch', SVC_MIN, SVC_CVS)
+    tools.updater.update_pos_sims('posmatch', SVC_MIN, SVC_CVS)
+    tools.updater.update_prj_sims('prjmatch', SVC_MIN, SVC_CVS)
 
 
 def load_doc_processor(name):

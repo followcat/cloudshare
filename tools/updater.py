@@ -37,7 +37,66 @@ def update_cv_models(SVC_MIN, SVC_MEMBERS, additionals=None):
 def update_jd_sims(modelname, SVC_MIN, SVC_JDS, newmodel=False):
     for svc in SVC_JDS:
         trains = list()
-        names = SVC_MIN.sim[modelname][svc.name].names
+        simids = SVC_MIN.sim[modelname][svc.name].ids
         trains.extend([(id, svc.getyaml(id)['description']) for id in
-                        svc.ids.difference(set(names))])
+                        svc.ids.difference(simids)])
+        SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)
+
+
+def update_co_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
+    for svc in SVC_CVS:
+        trains = list()
+        simids = SVC_MIN.sim[modelname][svc.name].ids
+        for id in svc.ids.difference(simids):
+            info = svc.getyaml(id)
+            try:
+                datas = info['experience']['company']
+            except KeyError, TypeError:
+                continue
+            for data in datas:
+                if 'description' not in data:
+                    continue
+                trains.append(('.'.join([id, data['name']]).encode('utf-8'), data['description']))
+        SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)
+
+
+def update_pos_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
+    for svc in SVC_CVS:
+        trains = list()
+        simids = SVC_MIN.sim[modelname][svc.name].ids
+        for id in svc.ids.difference(simids):
+            info = svc.getyaml(id)
+            try:
+                datas = info['experience']['position']
+            except KeyError, TypeError:
+                continue
+            for data in datas:
+                if 'description' not in data:
+                    continue
+                trains.append(('.'.join([id,
+                                         info['experience']['company'][data['at_company']]['name'],
+                                         data['name']]).encode('utf-8'),
+                               data['description']))
+        SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)
+
+
+def update_prj_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
+    for svc in SVC_CVS:
+        trains = list()
+        simids = SVC_MIN.sim[modelname][svc.name].ids
+        for id in svc.ids.difference(simids):
+            info = svc.getyaml(id)
+            try:
+                datas = info['experience']['project']
+            except KeyError, TypeError:
+                continue
+            for data in datas:
+                if 'description' not in data:
+                    continue
+                name = data['name'] if 'name' in data else '-'
+                company = data['company'] if 'company' in data else '-'
+                description = data['description'] if 'description' in data else ''
+                responsibility = data['responsibility'] if 'responsibility' in data else ''
+                trains.append(('.'.join([id, company, name]).encode('utf-8'),
+                               '\n'.join([description, responsibility])))
         SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)

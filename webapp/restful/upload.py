@@ -7,8 +7,7 @@ from flask.ext.restful import Resource
 
 import core.basedata
 import core.exception
-import utils.timeout.process
-import utils.timeout.exception
+import utils.timeout.thread
 import extractor.information_explorer
 
 
@@ -88,11 +87,12 @@ class UploadCVAPI(Resource):
                                             'resultid': filepro.resultcode,
                                             'name': '', 'filename': filename } }
         try:
-            yamlinfo = utils.timeout.process.process_timeout_call(
-                                 extractor.information_explorer.catch_cvinfo, 120,
+            yamlinfo = utils.timeout.thread.thread_timeout_call(
+                                 extractor.information_explorer.catch_cvinfo, 20,
                                  kwargs={'stream': filepro.markdown_stream.decode('utf8'),
                                          'filename': filename})
-        except utils.timeout.process.KilledExecTimeout as e:
+        except (utils.timeout.thread.KilledExecTimeout,
+                utils.timeout.thread.FailedKillExecTimeout) as e:
             return { 'code': 401, 'data': { 'result': False,
                                             'resultid': '',
                                             'name': '', 'filename': filename } }

@@ -166,7 +166,7 @@ def originid(svc_cv, yamlname):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
-def timeout_yamlaction(svc_cv, action, timeout, *args, **kwargs):
+def timeout_process_action(svc_cv, action, timeout, *args, **kwargs):
     import utils.timeout.process
     i = 0
     t1 = time.time()
@@ -177,6 +177,26 @@ def timeout_yamlaction(svc_cv, action, timeout, *args, **kwargs):
                                     args=tuple([svc_cv, yamlname]+list(args)),
                                     kwargs=kwargs)
         except utils.timeout.process.KilledExecTimeout as e:
+            print(yamlname, action, e)
+        if i % 100 == 0:
+            usetime = time.time() - t1
+            t1 = time.time()
+            print("100 Action use %s."%(str(usetime)))
+            print i
+
+def timeout_thread_action(svc_cv, action, timeout, *args, **kwargs):
+    import utils.timeout.thread
+    i = 0
+    t1 = time.time()
+    for yamlname in svc_cv.yamls():
+        i += 1
+        try:
+            utils.timeout.thread.thread_timeout_call(action, timeout,
+                                    args=tuple([svc_cv, yamlname]+list(args)),
+                                    kwargs=kwargs)
+        except utils.timeout.thread.KilledExecTimeout as e:
+            print(yamlname, action, e)
+        except utils.timeout.thread.FailedKillExecTimeout as e:
             print(yamlname, action, e)
         if i % 100 == 0:
             usetime = time.time() - t1

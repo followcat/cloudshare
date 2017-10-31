@@ -214,7 +214,7 @@ def timeout_action(svc_cv, action, timeout, *args, **kwargs):
                                     args=tuple([svc_cv, yamlname]+list(args)),
                                     kwargs=kwargs)
         except utils.timeout.inprocess.KilledExecTimeout as e:
-            print(yamlname)
+            print(yamlname, action, e)
         if i % 100 == 0:
             usetime = time.time() - t1
             t1 = time.time()

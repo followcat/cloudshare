@@ -96,17 +96,22 @@ from utils.timeout.exception import *
 
 
 def _kill_thread(thread):
-    # heavily based on http://stackoverflow.com/a/15274929/2281274
-    # by Johan Dahlin
-    # rewrited to avoid licence uncertainty
+    """Terminates a python thread from another thread.
 
-    # due to the strangeness in python 2.x, thread killing happens
-    # within 32 python operations regardless of duration
-    # (f.e. 32 x sleep(1), or 32 x sleep (0.01))
-    # python3 works fine
-    SE = ctypes.py_object(SystemExit)
-    tr = ctypes.c_long(thread.ident)
-    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tr, SE)
+    :param thread: a threading.Thread instance
+    """
+    if not thread.isAlive():
+        return
+    exc = ctypes.py_object(SystemExit)
+    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+        ctypes.c_long(thread.ident), exc)
+    if res == 0:
+        raise ValueError("nonexistent thread id")
+    elif res > 1:
+        # """if it returns a number greater than one, you're in trouble,
+        # and you should call it again with exc=NULL to revert the effect"""
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, None)
+        raise SystemError("PyThreadState_SetAsyncExc failed")
 
 
 def thread_exec(func, delay, kill=True, kill_wait=0.04):
@@ -118,8 +123,10 @@ def thread_exec(func, delay, kill=True, kill_wait=0.04):
         if not kill:
             raise NotKillExecTimeout(
                 "Timeout and no kill attempt")
-        _kill_thread(thread)
-        time.sleep(kill_wait)
+        while(thread.isAlive()):
+            _kill_thread(thread)
+            time.sleep(kill_wait)
+            break
         # FIXME isAlive is giving fals positive results
         if thread.isAlive():
             raise FailedKillExecTimeout(

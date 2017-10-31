@@ -89,7 +89,7 @@ POSITION = u'(?:(?=(?!\\\\\s))[^=\n：:。\|–―])+'
 PROJECT = ASP+u'*'+u'(?=(?!(?:'+POASP+u'*'+ANONPERIOD+u'|(?:\\\\)\n)))'+POASP+u'*'+POSITION.replace(u'\\n', '\s')+POSITION.replace(u'：:。', '').replace(u'+', '*')
 
 # Use of BORDER do not require re.M
-PREFIXNEXTCOL = lambda NEXTCOL : lambda PREFIX : lambda INDENT : u'(?:(?<='+PREFIX+u')'+INDENT+POASP+u'*\-{2,}'+NEXTCOL+u' *\n)'
+PREFIXNEXTCOL = lambda NEXTCOL : lambda PREFIX : lambda INDENT : u'(?:(?<='+PREFIX+u')'+INDENT+u' *\-{2,}'+NEXTCOL+u' *\n)'
 PREFIXBORDER = PREFIXNEXTCOL(u'(?: \-+)*')
 FLBORDER = PREFIXBORDER('^')('')
 INBORDER = PREFIXBORDER('\n')
@@ -124,13 +124,13 @@ sections = {
     'self_assessment': u'(?:(?:自我|个人)评价)',
     'expectations': u'(?:求职意向)',
     'experience': u'(?:(((工'+POASP+u'?作'+POASP+u'?)|实习|(工作与?)?实践)经'+POASP+u'?[历验])|实习与实践)',
-    'project': u'(?:项'+ASP+u'?目'+ASP+u'?经'+ASP+u'?[历验])',
-    'education': u'(?:教'+ASP+u'*育'+ASP+u'*((经'+ASP+u'*[历验])|(背景)|/?[及与]?培训)|Education)',
+    'project': u'(?:项'+POASP+u'?目'+POASP+u'?经'+POASP+u'?[历验])',
+    'education': u'(?:教'+POASP+u'*育'+POASP+u'*((经'+POASP+u'*[历验])|(背景)|/?[及与]?培训)|Education)',
     'languages': u'(?:语言(能力|技能))',
     'computer_skills': u'(?:IT'+POASP+u'?技能)',
     'personal_skills': u'(?:素质技能)',
-    'internship': u'(?:(实习|工作(与)?实践|学生实践){1,}'+ASP+u'*经'+ASP+u'*[历验])',
-    'training': u'(?:接受培训|(?P<slash>/)?培训(?(slash)背景))',
+    'internship': u'(?:(实习|工作(与)?实践|学生实践){1,}'+POASP+u'*经'+POASP+u'*[历验])',
+    'training': u'(?:接受培训|培训背景)',
     'certifications': u'(?:(?:技能'+POASP+u'?)?证'+POASP+u'?书)',
     'publications': u'(?:发表论文)',
     'associations': u'(?:社会经验)',
@@ -140,9 +140,9 @@ sections = {
     'copyright': u'(?:Copyright)'
     }
 
-TITLE = lambda X: u'^'+PREFIX+u'*'+ BRACKETTOP(X+'parens') +u'?\**' + sections[X] + u'[:：]?' + POASP +'*\**'+ BRACKETBOTTOM(X+'parens')
+TITLE = lambda X: u'^'+PREFIX+u'*'+ BRACKETTOP(X+'parens') +u'?\**' + sections[X] + u'[:：]?' + POASP +'*\**'+ BRACKETBOTTOM(X+'parens')+u'$'
 SECTION = lambda X: BORDERTOP(X+'title')+u'?'+ TITLE(X) +POASP+u'*\n+'+BORDERTOP(X+'border')+u'?(?P<' +X[:4]+ u'>.*?)'+BORDERBOTTOM(X+'border')+u'^'+BORDERBOTTOM(X+'title')
-REMAINING_SECTIONS = lambda X: ASP + u'*(?=' + RE_ANY([sections[_] for _ in sections if _ != X]) + u')'
+REMAINING_SECTIONS = lambda X: ASP + u'*(?=' + RE_ANY([TITLE(_) for _ in sections if _ != X]) + u')'
 
 education_list = {
     0: (u'初中', u'初中及以下'),
@@ -213,7 +213,7 @@ def any_separated(item, ANY, label=''):
         output =  u'('+output+u'|'+u'('+ label +item[1]+u'))'
     except IndexError:
         pass
-    return BORDERTOP(borderlabel)+u'?'+output+u'\n*'+BORDERBOTTOM(borderlabel)
+    return BORDERTOP(borderlabel)+u'?\n*'+output+u'\n*'+BORDERBOTTOM(borderlabel)
 
 
 space_separated = functools.partial(any_separated, ANY=POASP)
@@ -223,7 +223,7 @@ label_separated = lambda x: lambda y: x(y[1], label=y[0])
 DEFAULT_ITEM = '__DEFAULT_ITEM__'
 
 # Cannot use "'\\\\)\n'+POASP+u'*'" as it would conflict with "'(?!(?:'+RE_ANY"
-SET_ALL_DEFAULT = lambda LC: lambda COND: lambda TRAIL: lambda KEYS: lambda STR: STR.replace(DEFAULT_ITEM, u'(?:(?:'+LC+u'(?!(?:\n|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(KEYS)).replace(u'[:：]?', u'[:：]')+u')|'+PREFIX+u'*\-{3,}))|(?<=[:：])\n{2}|.)*'+COND+u')'+TRAIL)
+SET_ALL_DEFAULT = lambda LC: lambda COND: lambda TRAIL: lambda KEYS: lambda STR: STR.replace(DEFAULT_ITEM, u'(?=(?!'+BORDER+u'))(?:(?:'+LC+u'(?!(?:\n|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(KEYS)).replace(u'[:：]?', u'[:：]')+u')|'+PREFIX+u'*\-{3,}))|(?<=[:：])\n{2}|.)*'+COND+u')'+TRAIL)
 SET_ALL_ITEMS = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(PIPESEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
 SET_ALL_ITEMS_SPACE = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(SPACESEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
 SET_ALL_ITEMS_NOSPACE = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(NOTSEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))

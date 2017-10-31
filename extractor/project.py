@@ -10,81 +10,101 @@ except ImportError:
 from extractor.utils_parsing import *
 
 
-PRTITLE = BRACKETTOP('prparens') +u'?\**(项'+ASP+u'?目)'+ASP+u'?经'+ASP+u'?[历验]'+ BRACKETBOTTOM('prparens')
-
-PJ = re.compile(ur'^'+PREFIX+u'*'+ PRTITLE +POASP+u'*\n+'+BORDERTOP('pjborder') +u'?(?P<proj>.*?)'+BORDERBOTTOM('pjborder')+u'^'+PREFIX+u'*(?='+ UNIBRALEFT +u'?\**(((教'+ASP+u'?育|培'+ASP+u'?训)'+ASP+u'?(经'+ASP+u'?[历验]|背景|(?P<slash>/)?培训(?(slash)背景)))|(?:工作内容（医疗器械经验）)|专业技能|Resume)'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
-APJ = re.compile(ur'^'+PREFIX+u'*'+ UNIBRALEFT +u'?\**((项'+ASP+u'?目)'+ASP+u'?经'+ASP+u'?[历验])'+ UNIBRARIGHT +u'?[:：]?'+ASP+u'*'+DURATION+'?'+ASP+u'*?\**\n(?P<proj>.*)', re.DOTALL+re.M)
+PRTITLE = TITLE('project')
+PJ = re.compile(SECTION('project')+u'(?=^'+PREFIX+u'*'+REMAINING_SECTIONS('project') +u')', re.DOTALL+re.M)
+APJ = re.compile(ur'^'+SECTION('project'), re.DOTALL+re.M)
 
 PPJ = re.compile(ur'^'+PREFIX+u'*'+ PRTITLE +POASP+u'*\n+'+BORDERTOP('pjborder') +u'?(?P<proj>.*?)^'+BORDERBOTTOM('pjborder')+u'^'+PREFIX+u'*(?='+ UNIBRALEFT +u'?(教'+ASP+u'?育'+ASP+u'?((经'+ASP+u'?[历验])|背景|培训))'+ UNIBRARIGHT +u'?)', re.DOTALL+re.M)
 YPJ = re.compile(ur'^'+PREFIX+u'*工作职责和业绩[:：]'+ POASP+u'*\\\\\n(?P<proj>.*?)\n(?:\n|$)', re.DOTALL+re.M)
 
-
-no_project_detail = lambda STR: u'(?<!(?:(?:职责|工作)(?:描述|内容)|项目成就)：\n{2})' + STR + u'(?!\n{2}['+SP+u']{2,}主要成就：)'
-
-PR = re.compile(heading(PREFIX+u'*'+PERIOD+u'\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))\**(?P<project>'+PROJECT+u')\**'+POASP+u'*$'), re.DOTALL+re.M)
+PR = re.compile(heading(PREFIX+u'*'+PERIOD+u'\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))\**(?P<project>'+PROJECT+u')\**'+POASP+u'*$'), re.M)
 # Use POESP to avoid matching LPR in DEFAULT_ITEM's __NORECURSIVE__
-LPR = re.compile(heading(PREFIX+u'*'+PERIOD+u'\**'+POASP+u'+\**(?P<project>'+PROJECT+u')\**'+POESP+u'*$'), re.DOTALL+re.M)
-JPR = re.compile(heading(PREFIX+u'*'+PERIOD+u'((?P<empty_project>'+POASP+u'*[:：])|\**(('+ASP+u'?[:：'+SP+u']'+ASP+u'*)|([:：]?'+ASP+u'*))\**(?P<project>'+PROJECT+u')\**'+POASP+u'*)(?:\\\\)?$'), re.DOTALL+re.M)
-IPR = re.compile(heading(PREFIX+u'*\**(?P<project>'+PROJECT+u')\**'+ASP+u'*'+PERIOD+u'(?:\\\\)?$'), re.DOTALL+re.M)
+LPR = re.compile(heading(PREFIX+u'*'+PERIOD+u'\**'+POASP+u'+\**(?P<project>'+PROJECT+u')\**'+POESP+u'*$'), re.M)
+JPR = re.compile(heading(PREFIX+u'*'+PERIOD+u'((?P<empty_project>'+POASP+u'*[:：])|\**(('+POASP+u'?[:：'+SP+u']'+POASP+u'*)|([:：]?'+POASP+u'*))\**(?P<project>'+PROJECT+u')\**'+POASP+u'*)$'), re.M)
+IPR = re.compile(heading(PREFIX+u'*\**(?P<project>'+PROJECT+u')\**'+ASP+u'*'+PERIOD+u'(?:\\\\)?$'), re.M)
 
 # Avoid conflict in group names when combining *CO and *PO
 APERIOD = PERIOD.replace('from', 'afrom').replace('to', 'ato')
 ADURATION = DURATION.replace('duration', 'aduration')
 
 CHAR = u'[^:：\n]'
-DEFAULT_ITEM = '__DEFAULT_ITEM__'
 
-LP_EMBEDDED_TITLE = u'(?:(?:项目|责任)(?:职责|简介|描述)：'+POASP+u'*)*'
+__PJDESCRIPTION__ = u'项目(?:描述|简介|内容)[:：]'
+
+LP_EMBEDDED_TITLE = lambda STR: u'(?:(?:项目|责任)(?:职责|简介|描述)：'+POASP+u'*)*'+ STR
 project_items = {
-    'duration' : ((LP_EMBEDDED_TITLE+u'项目周期[:：]', ADURATION+u'(?:[。;；]|\\\\)?$'), ),
-    'customer' : ((LP_EMBEDDED_TITLE+u'客户情况[:：]', DEFAULT_ITEM), ),
-    'position': ((LP_EMBEDDED_TITLE+u'(?:项目职[务位]|担任角色)[:：]', DEFAULT_ITEM), ),
-    'company': ((LP_EMBEDDED_TITLE+u'(?:所[在属]公司)[:：]', DEFAULT_ITEM), ),
+    'duration' : ((LP_EMBEDDED_TITLE(u'项目周期[:：]'), ADURATION+u'(?:[。;；]|\\\\)?$'), ),
+    'customer' : ((LP_EMBEDDED_TITLE(u'客户情况[:：]'), DEFAULT_ITEM), ),
+    'position': ((LP_EMBEDDED_TITLE(u'(?:项目职[务位]|担任角色)[:：]'), DEFAULT_ITEM), ),
+    'company': ((LP_EMBEDDED_TITLE(u'(?:所[在属]公司)[:：]'), DEFAULT_ITEM), ),
     #'?????': ((u'(?:项目名称[:：]', DEFAULT_ITEM), ),
     #'?????': ((u'(?:项目贡献[:：]', DEFAULT_ITEM), ),
     #'howto': ((u'(?:项目执行[:：]', DEFAULT_ITEM), ),
     #'objective': ((u'(?:项目目标)[:：]', DEFAULT_ITEM), ),
-    'achievement': ((LP_EMBEDDED_TITLE+u'(?:研究业绩|项目业绩|项目成果|咨询服务)[:：]', DEFAULT_ITEM), ),
-    'software': ((LP_EMBEDDED_TITLE+u'(?:软件环境)[:：]', DEFAULT_ITEM), ),
-    'hardware': ((LP_EMBEDDED_TITLE+u'(?:硬件环境)[:：]', DEFAULT_ITEM), ),
-    'language': ((LP_EMBEDDED_TITLE+u'(?:开发语言)[:：]', DEFAULT_ITEM), ),
-    'tools': ((LP_EMBEDDED_TITLE+u'(?:开发工具)[:：]', DEFAULT_ITEM), ),
-    'team': ((LP_EMBEDDED_TITLE+u'(?:项目团队)[:：]', DEFAULT_ITEM), ),
-    'budget' : ((LP_EMBEDDED_TITLE+u'项目投资[:：]', DEFAULT_ITEM), ),
-    'background': ((LP_EMBEDDED_TITLE+u'(?:(?:项目背景|背景描述|项目范围))[:：]', DEFAULT_ITEM), ),
-    'responsibility' : ((LP_EMBEDDED_TITLE+u'(?:责任描述|主要承担工作有)[:：]', DEFAULT_ITEM), ),
-    'resp_or_pos' : ((LP_EMBEDDED_TITLE+u'项目职责[:：]', DEFAULT_ITEM), ),
-    'description' : ((LP_EMBEDDED_TITLE+u'项目(?:描述|简介|内容)[:：]', DEFAULT_ITEM), ),
+    'achievement': ((LP_EMBEDDED_TITLE(u'(?:研究业绩|项目业绩|项目成果|咨询服务)[:：]'), DEFAULT_ITEM), ),
+    'software': ((LP_EMBEDDED_TITLE(u'(?:软件环境)[:：]'), DEFAULT_ITEM), ),
+    'hardware': ((LP_EMBEDDED_TITLE(u'(?:硬件环境)[:：]'), DEFAULT_ITEM), ),
+    'language': ((LP_EMBEDDED_TITLE(u'(?:开发语言)[:：]'), DEFAULT_ITEM), ),
+    'tools': ((LP_EMBEDDED_TITLE(u'(?:开发工具)[:：]'), DEFAULT_ITEM), ),
+    'team': ((LP_EMBEDDED_TITLE(u'(?:项目团队)[:：]'), DEFAULT_ITEM), ),
+    'budget' : ((LP_EMBEDDED_TITLE(u'项目投资[:：]'), DEFAULT_ITEM), ),
+    'background': ((LP_EMBEDDED_TITLE(u'(?:(?:项目背景|背景描述|项目范围))[:：]'), DEFAULT_ITEM), ),
+    'responsibility' : ((LP_EMBEDDED_TITLE(u'(?:责任描述|主要承担工作有)[:：]'), DEFAULT_ITEM), ),
+    'resp_or_pos' : ((LP_EMBEDDED_TITLE(u'项目职责[:：]'), DEFAULT_ITEM), ),
+    'description' : ((LP_EMBEDDED_TITLE(__PJDESCRIPTION__), DEFAULT_ITEM), ),
     }
 #'description': ((u'(?P<desclabel>项目(?:描述|简介|内容))[:：]?', DEFAULT_ITEM), ),
 key_items = project_items.copy()
-project_items['achievement'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE+u'(?:研究业绩|项目业绩|项目成果|咨询服务)[:：]', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
-project_items['responsibility'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE+u'(?:责任描述|主要承担工作有)[:：]', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
-project_items['resp_or_pos'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE+u'项目职责[:：](?:\n参与[:：])?', EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM), )
-project_items['description'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE+u'(?P<desclabel>项目(?:描述|简介|内容))[:：]', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
+project_items['achievement'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'(?:研究业绩|项目业绩|项目成果|咨询服务)[:：]'), MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
+project_items['responsibility'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'(?:责任描述|主要承担工作有)[:：]'), MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
+project_items['resp_or_pos'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'项目职责[:：](?:\n参与[:：])?'), EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM), )
+project_items['description'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'(?P<desclabel>项目(?:描述|简介|内容))[:：]'), MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 
-SET_DEFAULT = lambda x: x.replace(DEFAULT_ITEM, u'(?:(?:(?:(?:[;；]|\\\\)\n|(?<!\\\\)\n+(?=(?!'+POASP+u'*'+ANONPERIOD+u')))(?!(?:'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|'+PREFIX+u'*\-{3,}))|.)*)')
+SET_DEFAULT_ZL = SET_ALL_DEFAULT(u'(?:[;；。]?)\n+')(u'')(u'(?=$|\|[^\\\\])')(key_items)
+# TODO: replacement candidate for SET_DEFAULT_NS?
+SET_ALL_ITEMS_YC = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(SPACESEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
+SET_DEFAULT_YC = SET_ALL_DEFAULT(ASP+u'+')(u'?')(u'(?=\s+(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\|[^\\\\]|$)')(key_items)
+# YC project description do not have prefix as position description
+SET_DEFAULT_YC_DESC = SET_ALL_DEFAULT(u'(?:[;；。]?)\n+')(u'')(u'(?=$|\|[^\\\\])')(key_items)
+SET_DEFAULT = SET_ALL_DEFAULT(u'(?:[;；]|\\\\)\n')(u'')(u'(?=(?:\\\\)?$|\|)')(key_items)
+#SET_DEFAULT = SET_ALL_DEFAULT(u'(?:(?:[;；]|\\\\)\n|(?<!\\\\)\n+(?=(?!'+POASP+u'*'+ANONPERIOD+u')))')(u'')(u'(?=(?:\\\\)?$|\|)')(key_items)
+SET_DEFAULT_LP = SET_ALL_DEFAULT(u'\n')(u'')(u'')(key_items)
 
-PROJECT_DETAILS = lambda DETAILS: lambda RE:RE.pattern+BORDERTOP('detborder')+u'?(?:'+POASP+u'*\n)*\**'+DETAILS.replace('__NORECURSIVE__', RE.pattern)+u'\**(?(detborder)\n*(?P<intro>[^-]{3}.*\n)?'+BORDERBOTTOM('detborder')+u')'.replace('__NORECURSIVE__', RE.pattern)
-project_details = lambda RE:RE.pattern+BORDERTOP('detborder')+u'?(?:\n*)'+POASP+u'*\**'+SET_DEFAULT(PIPESEPRTED(map(label_separated(newline_separated), project_items.items())))+u'{1,}\**(?(detborder)\n*(?P<intro>[^-]{3}.*\n)?'+BORDERBOTTOM('detborder')+u')'
-empty_project_details = lambda RE:RE.pattern+project_details(re.compile('')).replace('{1,}', '*')
+PROJECT_DETAILS = lambda DETAILS: lambda RE:BORDERTOP('dettab')+u'?\n*'+POASP+u'*\**'+RE.pattern+u'\n*'+DETAILS.replace('__NORECURSIVE__', RE.pattern)+u'\n*'+BORDERBOTTOM('dettab').replace('__NORECURSIVE__', RE.pattern)
 
-project_details_pipeonly = lambda RE:RE.pattern+BORDERTOP('detborder')+u'?\n*'+POASP+u'*\**'+SET_DEFAULT(PIPEONLYSEPRTED(map(label_separated(space_separated), project_items.items())))+u'{1,}(?(detborder)\n*(?P<intro>[^-]{3}.*\n)?'+BORDERBOTTOM('detborder')+u')'
-empty_project_details_pipeonly = lambda RE:RE.pattern+project_details_pipeonly(re.compile('')).replace('{1,}', '*')
+project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated)+u'+')
+empty_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated)+u'*')
 
-SET_DEFAULT_ZL = lambda x: x.replace(DEFAULT_ITEM, u'(?:(?:(?:[;；。]?)\n+(?=(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|'+PREFIX+u'*\-{3,})))|.)*)')
+jy_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated).replace('__NORECURSIVE__', '__NO_DELETE__')+u'+')
+empty_jy_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated).replace('__NORECURSIVE__', '__NO_DELETE__')+u'*')
 
-zl_project_details = lambda RE:RE.pattern+BORDERTOP('detborder')+u'?(?:\n*)'+POASP+u'*\**'+SET_DEFAULT_ZL(PIPESEPRTED(map(label_separated(newline_separated), project_items.items())))+u'{1,}\**(?(detborder)\n*(?P<intro>[^-]{3}.*\n)?'+BORDERBOTTOM('detborder')+u')'
-empty_zl_project_details = lambda RE:RE.pattern+zl_project_details(re.compile('')).replace('{1,}', '*')
+project_decription_items = {}
+# Only used in JY: anything not preceded by item label until the next blank line (accept escaped newlines)
+project_decription_items['description'] = ((u'(?:'+__PJDESCRIPTION__+u')', u'(?=(?!'+BORDER+u'))(?=(?!__NORECURSIVE__))(?:(?:\\\\\n)(?P<followindent> {10,})\n(?(followindent))(?=(?!__NORECURSIVE__))|'+POASP+u'+(?=(?!__NORECURSIVE__))(?=\S)|\S)+'), )
 
+DEFAULT_ITEM_SP = u'(?:(?:(?:[;；]|\\\\)\n+(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\s+(?=(?!(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\S)*?)(?=$|\|[^\\\\])'
+SET_DEFAULT_SP = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_SP)
+DEFAULT_ITEM_NS = u'(?:(?:(?:[;；]|\\\\)\n+(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\s+(?=(?!(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\S)+?)(?=$|\s*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\|[^\\\\])'
+SET_DEFAULT_NS = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_NS)
+
+empty_project_details_spaceonly = lambda RE: u'\n*(?:\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(project_items)(newline_separated)+u'\n*)*'
+empty_project_description_details_spaceonly = lambda RE:u'\n*(?:'+SET_ALL_ITEMS(lambda x:x)(project_decription_items)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*)?'+empty_project_details_spaceonly(RE)
+
+lp_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(project_items)(newline_separated)+u'+')
+empty_lp_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(project_items)(newline_separated)+u'*')
+
+zl_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_ZL)(project_items)(newline_separated)+u'+')
+empty_zl_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_ZL)(project_items)(newline_separated)+u'*')
+
+yingcai_project_items = project_items.copy()
+yingcai_project_items['responsibility'] = ((u'(?<=[:：\s^])(?:(?:责任描述|主要承担工作有)[:：])', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')')), )
+yingcai_project_items['achievement'] = ((LP_EMBEDDED_TITLE(u'(?:研究业绩|项目业绩|项目成果|咨询服务)[:：]'), EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')'), )
+yingcai_project_items['resp_or_pos'] = ((u'(?<=[:：\s^])项目职责[:：](?:\n参与[:：])?', EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')'), )
+yingcai_project_items['description'] = ((u'(?<=[:：\s^])(?P<desclabel>项目(?:描述|简介|内容))[:：]', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')')), )
 yingcai_project_description = {}
 yingcai_project_description['description'] = ((u'(?<=[:：\s^])(?:(?P<desclabel>项目(?:描述|简介|内容))[:：])?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 
-SET_DEFAULT_YC = lambda x: x.replace(DEFAULT_ITEM, u'(?:(?:(?:[;；。]?)\n+(?=(?!(?:'+POASP+u'*'+PROJECT+ASP+u'+'+ANONPERIOD+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|'+PREFIX+u'*\-{3,})))|.)*)$')
-
-yc_project_details = lambda RE:RE.pattern+BORDERTOP('detborder')+u'?(?:\n*)'+POASP+u'*'+SET_DEFAULT_YC(PIPESEPRTED(map(label_separated(newline_separated), yingcai_project_description.items()))).replace('__NORECURSIVE__', RE.pattern)+u'\**'+SET_DEFAULT_YC(PIPESEPRTED(map(label_separated(space_separated), project_items.items())))+u'{1,}\**(?(detborder)\n*(?P<intro>[^-]{3}.*\n)?'+BORDERBOTTOM('detborder')+u')'
-empty_yc_project_details = lambda RE:RE.pattern+yc_project_details(re.compile('')).replace('{1,}', '*')
-
+yc_project_details = lambda RE:RE.pattern+BORDERTOP('detborder')+u'?(?:\n*)'+POASP+u'*'+SET_ALL_ITEMS(SET_DEFAULT_YC_DESC)(yingcai_project_description)(newline_separated).replace('__NORECURSIVE__', RE.pattern)+u'?\**'+SET_ALL_ITEMS_YC(SET_DEFAULT_YC)(yingcai_project_items)(newline_separated).replace('__NORECURSIVE__', RE.pattern)+u'*\**(?(detborder)\n*(?P<intro>[^-]{3}.*\n)?'+BORDERBOTTOM('detborder')+u')'
 
 
 def output_cleanup(groupdict):
@@ -200,6 +220,76 @@ def project_xp_zhilian(RE, text):
                     project_output(out, r.groupdict())
     return len(out['project']), out
 
+def project_description_output(out, groupdict):
+    d = groupdict.copy()
+    if d['description']:
+        description = d.pop('description')
+
+        pj_items = project_items.copy()
+        pj_items.pop('resp_or_pos')
+        pj_items.pop('description')
+        for key in pj_items.copy():
+            resp_items = {}
+            resp_items[key] = pj_items[key]
+            MARESP = regex.compile(SET_ALL_ITEMS_NOSPACE(SET_DEFAULT_NS)(resp_items)(space_separated).replace(u'[:：]?', u'[:：]'), re.M)
+            if len(MARESP.findall(description)) > 1:
+                pj_items.pop(key)
+
+        MAPJ = regex.compile(SET_ALL_ITEMS_NOSPACE(SET_DEFAULT_NS)(pj_items)(space_separated).replace(u'[:：]?', u'[:：]'), re.M)
+
+        desc = description
+        for res in MAPJ.finditer(description):
+            r = {}
+            for key in res.groupdict():
+                if res.groupdict()[key]:
+                    r[key] = res.groupdict()[key]
+            d.update(r)
+            # Must avoid replacing all ASP/POASP is spurious match
+            if set(r).intersection(project_items):
+                desc = desc.replace(res.group(), '')
+        d['description'] = desc
+    project_output(out, d)
+
+def project_xp_jingying(RE, text):
+    u"""
+    """
+    out = {'project': []}
+    if not len(out['project']):
+        if RE.search(text):
+            out = {'project': []}
+            if not len(out['project']):
+                MA = regex.compile(RE.pattern+empty_project_description_details_spaceonly(RE), re.M)
+                for r in MA.finditer(text):
+                    d = r.groupdict()
+                    if d['empty_project']:
+                        d['project'] = '\*\*\*'
+                    project_description_output(out, d)
+            if not len(out['project']):
+                MA = regex.compile(jy_project_details(RE), re.M)
+                if not MA.search(text):
+                    MA = regex.compile(empty_jy_project_details(RE), re.M)
+                for r in MA.finditer(text):
+                    d = r.groupdict().copy()
+                    if d['empty_project']:
+                        d['project'] = '\*\*\*'
+                    project_output(out, d)
+    return len(out['project']), out
+
+def project_xp_liepin(RE, text):
+    u"""
+    """
+    out = {'project': []}
+    if not len(out['project']):
+        if RE.search(text):
+            out = {'project': []}
+            if not len(out['project']):
+                MA = regex.compile(lp_project_details(RE), re.M)
+                if not MA.search(text):
+                    MA = regex.compile(empty_lp_project_details(RE), re.M)
+                for r in MA.finditer(text):
+                    project_output(out, r.groupdict())
+    return len(out['project']), out
+
 def project_xp_yingcai(RE, text):
     u"""
     """
@@ -238,6 +328,36 @@ def fix_zhilian(d, as_date=None):
             break
     return fix_output(processed, as_date)
 
+def fix_liepin(d, as_date=None):
+    u"""
+    """
+    processed = {'project': []}
+    for RE in [PJ, APJ]:
+        res = RE.search(d)
+        if res:
+            pos, out = project_xp_liepin(LPR, res.group('proj'))
+            if not pos and len(out['project']) == 0:
+                pass
+            else:
+                processed = out
+            break
+    return fix_output(processed, as_date)
+
+def fix_jingying(d, as_date=None):
+    u"""
+    """
+    processed = {'project': []}
+    for RE in [PJ, APJ]:
+        res = RE.search(d)
+        if res:
+            pos, out = project_xp_jingying(JPR, res.group('proj'))
+            if not pos and len(out['project']) == 0:
+                pass
+            else:
+                processed = out
+            break
+    return fix_output(processed, as_date)
+
 def fix_yingcai(d, as_date=None):
     u"""
     """
@@ -257,15 +377,15 @@ def fix(d, as_date=None):
     u"""
     """
     if is_jycv(d):
-        pass
+        return fix_jingying(d, as_date)
     elif is_lpcv(d):
-        pass
+        return fix_liepin(d, as_date)
     elif is_zlcv(d):
         return fix_zhilian(d, as_date)
     elif is_yccv(d):
         return fix_yingcai(d, as_date)
     elif is_nlpcv(d):
-        pass
+        return fix_liepin(d, as_date)
 
     reject = 0
     processed = {'project': []}

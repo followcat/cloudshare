@@ -217,11 +217,10 @@ class Customer extends Component {
                 filterOption={false}
                 onChange={this.handleChange}
               >
-                { companyDataSource.length > 0 ?
+                { 
                   companyDataSource.map(item => {
                   return <Select.Option key={item.company_name}>{item.company_name}</Select.Option>
                 })
-                  : <Select.Option key='default'>没有相应公司</Select.Option>
                 }
               </Select>
             </Form.Item>

@@ -115,7 +115,8 @@ class Uploader extends Component {
               file.response.data = Object.assign({}, file.response.data, json.data);
               file.filename = json.data.filename;
 
-              completedList.push(Object.assign({}, file.response.data, { uid: file.uid }));
+              completedList.push(Object.assign({}, file.response.data,
+                { uid: file.uid }));
               
               this.setState({
                 completedList: completedList,
@@ -273,7 +274,7 @@ class Uploader extends Component {
         'Authorization': `Basic ${StorageUtil.get('token')}`
       },
       multiple: true,
-      text: '点击或拖曳到此区域',
+      text: '点击上传或拖放文件到此区域',
       hint: '支持单文件或多文件上传',
       onChange: this.handleChange,
       onRemove: this.handleRemove,
@@ -283,14 +284,14 @@ class Uploader extends Component {
       <div className="cs-uploader" >
         <Guide />
         <ShowCard>
-        <div data-step='1'data-intro='单击或拖曳上传!'>
+        <div data-step='1'data-intro='单击或拖放文件上传!'>
           <DraggerUpload
             {...uploadProps}
             fileList={fileList}
           />
           </div>
           {guide ?
-          <div className="cs-uploader-steptwo" data-step='2' data-intro='上传后在这里预览文件!'>
+          <div className="cs-uploader-steptwo" data-step='2' data-intro='上传成功后在这里预览文件!'>
           </div>
           : null
           }

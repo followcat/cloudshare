@@ -73,7 +73,7 @@ class Guide extends Component {
       <div className={classSet}>
         <Steps  direction="vertical" current={guideStatus} >
           <Step title="简历上传" ref="step1" description="可以批量上传简历" onClick={this.UploadClick}/>
-          <Step title="新建客户" description="完美跟踪一条龙服务" onClick={this.CustomerClick}/>
+          <Step title="客户管理" description="跟踪管理客户状态" onClick={this.CustomerClick}/>
           <Step title="匹配" description="新建职位后进行匹配， 精确查找候选人" onClick={this.MathingClick}/>
         </Steps>
         <div className={`${prefixCls}-nohint`}>

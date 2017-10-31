@@ -86,6 +86,24 @@ def merge(a, b, path=None):
             a[key] = b[key]
     return a
 
+def merge(a, b, path=None, update=False):
+    "merges b into a"
+    if path is None: path = []
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                merge(a[key], b[key], path + [str(key)], update=update)
+            elif a[key] == b[key]:
+                pass # same leaf value
+            elif update is True:
+                a[key] = b[key]
+            else:
+                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        else:
+            a[key] = b[key]
+    return a
+
+
 def nemudate(dates, outformat='%Y%m%d'):
     str_result = []
     datetimes_result = []

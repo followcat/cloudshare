@@ -43,7 +43,7 @@ const websiteText = {
     JOB_DESCRIPTION_MANAGEMENT: '职位管理',
     OPEN_JOB_DESCRIPTION: '已开放职位',
     CUSTOMER_MANAGEMENT: '客户管理',
-    OWN_CUSTOMER_MANAGEMENT: '已拥有客户',
+    OWN_CUSTOMER_MANAGEMENT: '已签约客户',
     DEVELOPMENT_CUSTOMER_MANAGEMENT: '待开发客户',
     
     COMPANY_NAME: '公司名称',

@@ -71,7 +71,6 @@ class Cell extends Component {
         text += `${item.content}, `;
       }
     });
-
     return (
       <div
         className={openable && !editStatus ? '' : 'ommit'}
@@ -147,7 +146,7 @@ class Cell extends Component {
       type = itemInfo.type;
     }
 
-    if (editable) {   // 允许编辑
+  // 允许编辑
       return (
         <div className={cellCls}>
           {!editStatus ?
@@ -165,11 +164,6 @@ class Cell extends Component {
           }
         </div>
       );
-    } else {    // 不允许编辑
-      return (
-        <div className={cellCls}>{dataSource[dataIndex] || '无'}</div>
-      );
-    }
   }
 
   render() {

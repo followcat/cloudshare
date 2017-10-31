@@ -6,7 +6,7 @@ import os.path
 import functools
 
 import utils.chsname
-import utils.timeout.thread
+import utils.timeout.inprocess
 import extractor.project
 import extractor.unique_id
 import extractor.education
@@ -279,47 +279,47 @@ upload_selected = ('name', 'originid', 'age', 'phone', 'email',
 
 
 def catch_selected(stream, selected, name=None, as_date=None, timing=False):
-    def catch_one(method, kwargs, timing=False, timeout=0):
+    def catch_one(method, args, kwargs, timing=False, timeout=0):
         result = dict()
         if timing is False:
-            result = method(**kwargs)
+            result = method(*args, **kwargs)
         else:
             try:
-                result = utils.timeout.thread.thread_timeout_call(method, timeout, kwargs=kwargs)
-            except (utils.timeout.thread.KilledExecTimeout,
-                    utils.timeout.thread.FailedKillExecTimeout) as e:
+                result = utils.timeout.inprocess.timeout_call(method, timeout,
+                                                              args=args, kwargs=kwargs)
+            except utils.timeout.inprocess.KilledExecTimeout as e:
                 pass
         return result
 
     assert set(selected).issubset(set(all_selected))
     info_dict = dict()
     if 'name' in selected:
-        name = catch_one(get_name, {'stream': stream}, timing=False)
+        name = catch_one(get_name, ([stream]), {}, timing=False)
         info_dict["name"] = name if not name else ''
     if 'originid' in selected:
-        originid = catch_one(get_originid, {'stream': stream}, timing=False)
+        originid = catch_one(get_originid, ([stream]), {}, timing=False)
         info_dict["originid"] = originid if not originid else ''
     if 'age' in selected:
-        age = catch_one(get_age, {'stream': stream}, timing=False)
+        age = catch_one(get_age, ([stream]), {}, timing=False)
         info_dict["age"] = age if not age else ''
     if 'phone' in selected:
-        phone = catch_one(get_phone, {'stream': stream}, timing=False)
+        phone = catch_one(get_phone, ([stream]), {}, timing=False)
         info_dict["phone"] = phone if not phone else ''
     if 'email' in selected:
-        email = catch_one(get_email, {'stream': stream}, timing=False)
+        email = catch_one(get_email, ([stream]), {}, timing=False)
         info_dict['email'] = email if not email else ''
     if 'education' in selected:
-        education = catch_one(get_education, {'stream': stream, 'name': name},
+        education = catch_one(get_education, ([stream]), {'name': name},
                               timing=timing, timeout=5)
         info_dict.update(education)     # education_history, education, school
     if 'experience' in selected:
-        experience = catch_one(get_experience, {'stream': stream, 'name': name,
-                                               'as_date': as_date},
+        experience = catch_one(get_experience, ([stream]),
+                               {'name': name, 'as_date': as_date},
                                timing=timing, timeout=10)
         info_dict.update(experience)    # experience, company, position
     if 'project' in selected:
-        project = catch_one(get_project, {'stream': stream, 'name': name,
-                                          'as_date': as_date},
+        project = catch_one(get_project, ([stream]), {
+                            'name': name, 'as_date': as_date},
                             timing=timing, timeout=5)
         if 'experience' in project:
             try:
@@ -328,7 +328,7 @@ def catch_selected(stream, selected, name=None, as_date=None, timing=False):
                 info_dict['experience'] = {}
                 info_dict['experience'].update(project['experience'])
     if 'expectation' in selected:
-        expectation = catch_one(get_expectation, {'stream': stream}, timing=timing, timeout=5)
+        expectation = catch_one(get_expectation, ([stream]), {}, timing=timing, timeout=5)
         info_dict.update(expectation)   # expectation, current, gender,
                                         # marital_status, age
     if 'unique_id' in selected:
@@ -337,9 +337,9 @@ def catch_selected(stream, selected, name=None, as_date=None, timing=False):
         try:
             experience = info_dict['experience']
         except KeyError:
-            result = catch_one(get_experience, {'stream': stream, 'name': name,
-                                                    'as_date': as_date},
-                                   timing=timing, timeout=10)
+            result = catch_one(get_experience, ([stream]),
+                               {'name': name, 'as_date': as_date},
+                               timing=timing, timeout=10)
             experience = result['experience'] if 'experience' in result else dict()
         info_dict['classify'] = get_classify(experience)
     return info_dict

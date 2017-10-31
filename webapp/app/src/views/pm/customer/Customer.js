@@ -198,9 +198,9 @@ class Customer extends Component {
         <ButtonWithModal
           buttonStyle={{ marginLeft: 8 }}
           buttonType="primary"
-          buttonText="创建新的客户"
+          buttonText="新建已签约客户"
           visible={visible}
-          modalTitle="创建新的客户"
+          modalTitle="新建已签约客户"
           modalOkText="提交"
           modalCancelText="取消"
           onButtonClick={this.handleButtonClick}
@@ -217,11 +217,10 @@ class Customer extends Component {
                 filterOption={false}
                 onChange={this.handleChange}
               >
-                { companyDataSource.length > 0 ?
+                { 
                   companyDataSource.map(item => {
                   return <Select.Option key={item.company_name}>{item.company_name}</Select.Option>
                 })
-                  : <Select.Option key='default'>没有相应公司</Select.Option>
                 }
               </Select>
             </Form.Item>
@@ -254,19 +253,19 @@ class Customer extends Component {
                     {
                         //第一步引导
                         element: '.cs-layout-subhead-customer',
-                        intro: '已拥有客户',
+                        intro: '已签约客户',
                         position: 'right'
                     },
                     {
                         element: '.ant-btn-primary',
-                        intro: '确定待开发客户已有该客户，且已拥有发客户未创建！',
+                        intro: '确定新建客户存在于待开发客户中，不可重复创建！',
                         position: 'bottom'
                     }, 
                     {
                         //这个属性类似于jquery的选择器， 可以通过jquery选择器的方式来选择你需要选中的对象进行指引
                         element: '.ant-table-body',
                         //这里是每个引导框具体的文字内容，中间可以编写HTML代码
-                        intro: '新建客户展示',
+                        intro: '已签约客户展示',
                         //这里可以规定引导框相对于选中对象出现的位置 top,bottom,left,right
                         position: 'top'
                     },

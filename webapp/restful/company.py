@@ -349,7 +349,7 @@ class CompanyUploadExcelAPI(Resource):
         for item in compare_result:
             coid = item[1]
             if coid not in infos:
-                if project.corepo.exists(coid):
+                if project.company.exists(coid):
                     infos[coid] = project.company_get(coid)
                 else:
                     infos[coid] = item[2][0]

@@ -89,7 +89,7 @@ position_items = {
     'name': ((u'\**(?:[所担]任职[位务][:：]?|职'+POASP+u'*[位务][:： \xa0]|Job Title[:：])\**', u'(?P<aposition>'+POSITION+u'?)'+POASP+u'*(?:(?=[\n\|])|$)'), ),
     'type': ((u'\**(?:职[位务]类别|工作性质)[:：]?\**', DEFAULT_ITEM), ),
     'achievement': ((__ACHIEVEMENT__, DEFAULT_ITEM), ),
-    'posalary': ((__POSALARY__, ASALARY), ),
+    'posalary': ((__POSALARY__, u'(?:'+ASALARY+u'|保密)'), ),
     'project': ((__PROJECT__, DEFAULT_ITEM), ),
     }
 key_position_items = position_items.copy()
@@ -121,7 +121,7 @@ position_items['achievement'] = ((__ACHIEVEMENT__, MATCH_SPACE_OR(EXCLUDE_ITEM_K
 position_items['description'] = ((__PODESCRIPTION__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 position_items['resp_or_desc'] = ((__PORESPONSIBILITY__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 position_items['department'] = (((u'(?P<dptlbl>'+__DEPARTMENT__+u')', u'(?(dptlbl)'+DEFAULT_ITEM+u'?(?=(?:[\s\|$]|\\\\\n))|\S+?[部处室册科](?='+POASP+u'*$))')), )
-position_items['posalary'] = ((u'\**(?P<salbl>'+__POSALARY__+u')?', u'(?(salbl)'+ASALARY+u'?(?=(?:[\s\|$]|\\\\\n))|'+AASALARY+u')'), )
+position_items['posalary'] = ((u'\**(?P<salbl>'+__POSALARY__+u')?', u'(?(salbl)(?:'+ASALARY+u'|保密)?(?=(?:[\s\|$]|\\\\\n))|(?:'+AASALARY+u'|保密))'), )
 
 SET_DEFAULT_YC = SET_ALL_DEFAULT(u'(?:。?\n+)?(?:'+ITEM_PREFIX+u'(?:'+POASP+u'*'+ASP+u'+)?)|(?:[;；]|\\\\)\n+')(u'')(u'(?=$|\|[^\\\\])')(key_items)
 SET_DEFAULT = SET_ALL_DEFAULT(u'(?:[;；]|\\\\)\n')(u'')(u'(?=(?:\\\\)?$|\|)')(key_items)
@@ -156,7 +156,7 @@ empty_zl_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_ZL)(zl_de
 
 # Yingcai specific
 position_items_yingcai = position_items.copy()
-position_items_yingcai['posalary'] = ((__POSALARY__, ASALARY), )
+position_items_yingcai['posalary'] = ((__POSALARY__, u'(?:'+ASALARY+u'|保密)'), )
 position_items_yingcai['department'] = (((u'(?P<dptlbl>'+__DEPARTMENT__+u')?', u'(?:(?(dptlbl)|^)\S+?[部处室册科](?='+POASP+u'*(?:$|\|[^\\\\])))')), )
 position_items_yingcai['description'] = ((u'(?:'+__PODESCRIPTION__+u')?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 
@@ -189,6 +189,7 @@ SET_DEFAULT_NS = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_NS)
 # If space only, the position is outside the table
 position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_DEFAULT_SP(SPACESEPRTED(map(label_separated(space_separated), position_items_nospace.items())))+u'{1,17}\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
 lp_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(lp_position_items)(newline_separated)+u'{1,17}')
+lp_empty_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(lp_position_items)(newline_separated)+u'*')
 lp_position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(lp_position_items_nospace)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'{1,17}\n*'+SET_ALL_ITEMS(SET_DEFAULT)(responsibility_item)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'?\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
 
 # Do not allow | after space
@@ -201,7 +202,7 @@ POFINISH = POASP+u'*(?:'+PODEPARTMENT+u'(?(ponl)\n+|'+POASP+u'+)'+u'(?: ?\*+)?(?
 
 position_decription_items = {}
 # Only used in JY: anything not preceded by item label until the next blank line (accept escaped newlines)
-position_decription_items['description'] = ((u'(?:'+__PODESCRIPTION__+u')?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_company_items))+u'(?=(?!__NORECURSIVE__))(?:'+POASP+u'+(?=(?!__NORECURSIVE__))|\S)+'), )
+position_decription_items['description'] = ((u'(?:'+__PODESCRIPTION__+u')?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_company_items))+u'(?=(?!__NORECURSIVE__))(?:(?:\\\\\n)(?P<followindent> {10,})\n(?(followindent))(?=(?!__NORECURSIVE__))|'+POASP+u'+(?=(?!__NORECURSIVE__))|\S)+'), )
 
 empty_position_details_spaceonly = lambda RE: ASP+u'*(?:'+POASP+u'*\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(position_items_nospace)(newline_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*)*'
 empty_position_description_details_spaceonly = lambda RE:ASP+u'*(?:'+SET_ALL_ITEMS(SET_DEFAULT)(position_decription_items)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*)?'+BORDERTOP('posdettab')+u'?'+empty_position_details_spaceonly(RE)+BORDERBOTTOM('posdettab')
@@ -230,7 +231,7 @@ DRTACO = re.compile(DRPATTERN.replace('__COMPANY__', u'('+COMPANY+u'\n)?'+COMPAN
 WYJCO_POS = ur'(?:[^=\w\n\*：:\|\u2013\u2015\u3002（\(\[【]+('+exclude_with_parenthesis(u'人年月')+u')?|\w+(?:'+POASP+u'\w+)*|（兼\S）)+'
 WYJCO_DPT = u'(\S+?[部处室册科]|研发|QA|R&D|XP|\S*[&\w\s]+\S*)'
 # Company using (?P<company>[^\|\n]+?) is too slow to fail on long empty lines
-WYJCOBASE = u'(?P<position>'+WYJCO_POS+u')'+POASP+u'*(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+'+POASP+u'*\**(?P<company>[^\|'+SP+u']+(?: [^\|'+SP+u']+)*)'
+WYJCOBASE = u'(?P<position>'+WYJCO_POS+u')'+POASP+u'*(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u')'+POASP+u'*(\|'+POASP+u'*(?:[^\n]+))?)?\n+'+POASP+u'*\**(?P<company>[^\|'+SP+u']+(?: [^\|'+SP+u']+)*)'
 WYJCO = regex.compile(u'^'+PREFIX+u'*'+PERIOD+POASP+u'{3,}'+WYJCOBASE+POASP+u'*'+BDURATION+'\**$', re.M+regex.ASCII)
 DUFRTWYJCO = regex.compile(u'^'+PREFIX+u'*'+PERIOD+BDURATION+POASP+u'{2,}'+WYJCOBASE+'\**'+POASP+u'*'+position_details(re.compile('')).replace('{1,17}', '{2,17}')+u'$', re.M+regex.ASCII)
 DUFRTDPTWYJCO = regex.compile(u'^'+PREFIX+u'*'+PERIOD+BDURATION+POASP+u'+'+WYJCOBASE.replace(u'(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))?\n+', u'(\|'+POASP+u'*(?P<dpt>'+WYJCO_DPT+u'))')+'\**'+POASP+u'*'+position_details(re.compile('')).replace('{1,17}', '{2,17}')+u'$', re.M+regex.ASCII)
@@ -262,8 +263,8 @@ TAPO = re.compile(u'^([所担]任)?职'+ASP+u'*[位务](类别)?[:：]?'+ASP+u'*
 BPO = re.compile(u'^'+PREFIX+u'*\**(?P<position>(?!所属行业)'+POSITION+ASP+u'*)(\|'+ASP+u'*(?P<second>[^元/月'+SP+u']+)'+ASP+u'*)?(\|'+ASP+u'*'+SALARY+u''+ASP+u'*)\**'+ASP+u'*$', re.M)
 BPONOSAL = re.compile(BPO.pattern.replace(u'*)\**'+ASP+u'*$', u'*)?\**'+ASP+u'*$'), re.M)
 
-LIEPPO = re.compile(u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+PREFIX+u'*(?: ?\*{1,2})?'+APERIOD+ASP+ur'*(?: ?\*{1,2})?(?P<position>'+POSITION+u'?)(?: ?\*{1,2})?'+SALARY+u'?'+POASP+u'*$', re.M)
-NLIEPOBASE = u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+PREFIX+u'*(?:工作岗位：'+ASP+u'*)?(?: ?\*{1,2})?(?P<position>'+POSITION+u'?)(?: ?\*{1,2})?'+POASP+u'*('+SALARY+POASP+u'*)?'
+LIEPPO = re.compile(u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^'+PREFIX+u'*(?: ?\*{1,2})?'+APERIOD+POASP+ur'*(?: ?\*{1,2})?(?P<position>'+POSITION+u'?)(?: ?\*{1,2})?'+SALARY+u'?'+POASP+u'*$', re.M)
+NLIEPOBASE = u'(?<!(?:(?:职责|工作)描述|项目成就)：\n{2})^(?=(?!\n*'+BORDER+u'))'+PREFIX+u'*(?:工作岗位：'+ASP+u'*)?(?: ?\*{1,2})?(?P<position>'+POSITION+u'?)(?: ?\*{1,2})?'+POASP+u'*('+SALARY+POASP+u'*)?'
 NLIEPO = re.compile(NLIEPOBASE+APERIOD, re.M)
 NLIEPONOPER = re.compile(NLIEPOBASE+u'(?:'+APERIOD+u'|'+POASP+u'*$)', re.M)
 
@@ -543,7 +544,7 @@ def work_xp_new_liepin(text):
             else:
                 # Speed up non-matching
                 popattern = lp_position_details_spaceonly(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
-            MA = regex.compile(append_po(pattern, NLIEPONOPER.pattern), re.M)
+            MA = regex.compile(append_po(pattern, popattern), re.M)
             res = MA.search(text)
             if res:
                 if (res.group('typelabel') or res.group('businesslabel') or
@@ -562,8 +563,8 @@ def work_xp_new_liepin(text):
                     popattern = position_details(NLIEPONOPER)
                 else:
                     # Speed up non-matching
-                    popattern = position_details(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
-                MA = regex.compile(append_po(pattern, NLIEPONOPER.pattern), re.M)
+                    popattern = empty_position_details(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
+                MA = regex.compile(append_po(pattern, empty_position_details(NLIEPONOPER)), re.M)
                 res = MA.search(text)
                 if res:
                     if (res.group('typelabel') or res.group('businesslabel') or
@@ -681,7 +682,7 @@ def work_xp_liepin(text):
             else:
                 # Speed up non-matching
                 popattern = lp_position_details(NLIEPONOPER).replace(u'('+SALARY+POASP+u'*)?', '')
-            MA = regex.compile(append_po(pattern, NLIEPONOPER.pattern), re.M)
+            MA = regex.compile(append_po(pattern, lp_empty_position_details(NLIEPONOPER)), re.M)
             res = MA.search(text)
             if res:
                 if (res.group('typelabel') or res.group('businesslabel') or

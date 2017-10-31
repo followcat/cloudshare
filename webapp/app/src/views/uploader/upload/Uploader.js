@@ -115,7 +115,8 @@ class Uploader extends Component {
               file.response.data = Object.assign({}, file.response.data, json.data);
               file.filename = json.data.filename;
 
-              completedList.push(Object.assign({}, file.response.data, { uid: file.uid }));
+              completedList.push(Object.assign({}, file.response.data,
+                { uid: file.uid }));
               
               this.setState({
                 completedList: completedList,

@@ -86,16 +86,8 @@ class UploadCVAPI(Resource):
             return { 'code': 401, 'data': { 'result': False,
                                             'resultid': filepro.resultcode,
                                             'name': '', 'filename': filename } }
-        try:
-            yamlinfo = utils.timeout.thread.thread_timeout_call(
-                                 extractor.information_explorer.catch_cvinfo, 20,
-                                 kwargs={'stream': filepro.markdown_stream.decode('utf8'),
-                                         'filename': filename})
-        except (utils.timeout.thread.KilledExecTimeout,
-                utils.timeout.thread.FailedKillExecTimeout) as e:
-            return { 'code': 401, 'data': { 'result': False,
-                                            'resultid': '',
-                                            'name': '', 'filename': filename } }
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                        filepro.markdown_stream.decode('utf8'), filename, timing=True)
         filepro.renameconvert(yamlinfo['id'])
         dataobj = core.basedata.DataObject(metadata=yamlinfo,
                                            data=filepro.markdown_stream,)

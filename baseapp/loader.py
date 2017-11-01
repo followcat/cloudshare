@@ -26,6 +26,7 @@ except ImportError:
 class Config(object):
 
     es_config_file = 'es.yaml'
+    min_config_file = 'min.yaml'
     storage_config_file = 'storage.yaml'
 
     default_storage_path = 'datas'
@@ -57,6 +58,13 @@ class Config(object):
         ("CO_INDEXNAME",    "company.index"),
     )
 
+    min_template = (
+        ("JD_MIN",        "jdmatch"),
+        ("CO_MIN",        "comatch"),
+        ("PRJ_MIN",       "prjmatch"),
+        ("POS_MIN",       "posmatch"),
+    )
+
     def __init__(self, path):
         self.path = path
 
@@ -69,6 +77,12 @@ class Config(object):
     def generate_es_template(self):
         es_config = {}
         for each in self.es_template:
+            es_config[each[0]] = each[1]
+        return es_config
+
+    def generate_min_template(self):
+        es_config = {}
+        for each in self.min_template:
             es_config[each[0]] = each[1]
         return es_config
 
@@ -98,6 +112,19 @@ class Config(object):
         es_config = self.generate_es_template()
         es_config.update(config)
         return es_config
+
+    @property
+    def min_config(self):
+        config = dict()
+        try:
+            stream = open(os.path.join(self.path, self.min_config_file)).read()
+            config = yaml.load(stream)
+        except IOError:
+            pass
+        min_config = self.generate_min_template()
+        min_config.update(config)
+        return min_config
+
 
 CONFIG_PATH = 'config'
 config = Config(CONFIG_PATH)

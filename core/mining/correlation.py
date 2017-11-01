@@ -1,21 +1,25 @@
-def jobdescription_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0):
+def jobdescription_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0, page=0, numbers=0):
+    begin = page*numbers
+    end = (page+1)*numbers
     results = list()
     simdict = SVC_MIN.sim['jdmatch']
     for svc in SVCS:
         sim = simdict[svc.name]
-        result = sim.base_probability(doc, top=top, minimum=minimum)
+        result = sim.base_probability(doc, top=top, minimum=minimum)[begin:end]
         for index, value in result:
             id = sim.names[index]
-            results.append((id, value, svc.getyaml(id)['description']))
+            results.append((id, value, svc.getyaml(id)))
     return results
 
 
-def company_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0):
+def company_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0, page=0, numbers=0):
+    begin = page*numbers
+    end = (page+1)*numbers
     results = list()
     simdict = SVC_MIN.sim['comatch']
     for svc in SVCS:
         sim = simdict[svc.name]
-        result = sim.base_probability(doc, top=top, minimum=minimum)
+        result = sim.base_probability(doc, top=top, minimum=minimum)[begin:end]
         for index, value in result:
             longname = sim.names[index]
             id, name = longname.split('.', 1)
@@ -29,12 +33,14 @@ def company_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0):
     return results
 
 
-def position_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0):
+def position_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0, page=0, numbers=0):
+    begin = page*numbers
+    end = (page+1)*numbers
     results = list()
     simdict = SVC_MIN.sim['posmatch']
     for svc in SVCS:
         sim = simdict[svc.name]
-        result = sim.base_probability(doc, top=top, minimum=minimum)
+        result = sim.base_probability(doc, top=top, minimum=minimum)[begin:end]
         for index, value in result:
             longname = sim.names[index]
             try:
@@ -54,12 +60,14 @@ def position_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0):
     return results
 
 
-def project_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0):
+def project_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0, page=0, numbers=0):
+    begin = page*numbers
+    end = (page+1)*numbers
     results = list()
     simdict = SVC_MIN.sim['prjmatch']
     for svc in SVCS:
         sim = simdict[svc.name]
-        result = sim.base_probability(doc, top=top, minimum=minimum)
+        result = sim.base_probability(doc, top=top, minimum=minimum)[begin:end]
         for index, value in result:
             longname = sim.names[index]
             try:

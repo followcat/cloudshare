@@ -1,5 +1,6 @@
 import flask.ext.restful
 
+from webapp.restful.match import *
 from webapp.restful.people import *
 from webapp.restful.mining import *
 from webapp.restful.reload import *
@@ -84,6 +85,11 @@ def initialize(app):
                                         endpoint = 'valuablebyjdid')
     api.add_resource(ValuablebydocAPI, '/api/mining/valuablebydoc',
                                         endpoint = 'valuablebydoc')
+
+    api.add_resource(JDmathAPI, '/api/mining/jdmatch', endpoint = 'jdmatch')
+    api.add_resource(COmathAPI, '/api/mining/comatch', endpoint = 'comatch')
+    api.add_resource(POSmathAPI, '/api/mining/posmatch', endpoint = 'posmatch')
+    api.add_resource(PRJmathAPI, '/api/mining/prjmatch', endpoint = 'prjmatch')
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
 

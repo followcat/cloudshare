@@ -6,7 +6,8 @@ import os.path
 import functools
 
 import utils.chsname
-import utils.timeout.inprocess
+import utils.timeout.process
+import utils.timeout.exception
 import extractor.project
 import extractor.unique_id
 import extractor.education
@@ -285,9 +286,9 @@ def catch_selected(stream, selected, name=None, as_date=None, timing=False):
             result = method(*args, **kwargs)
         else:
             try:
-                result = utils.timeout.inprocess.timeout_call(method, timeout,
+                result = utils.timeout.process.timeout_call(method, timeout,
                                                               args=args, kwargs=kwargs)
-            except utils.timeout.inprocess.KilledExecTimeout as e:
+            except utils.timeout.exception.ExecTimeout as e:
                 pass
         return result
 
@@ -295,19 +296,19 @@ def catch_selected(stream, selected, name=None, as_date=None, timing=False):
     info_dict = dict()
     if 'name' in selected:
         name = catch_one(get_name, ([stream]), {}, timing=False)
-        info_dict["name"] = name if not name else ''
+        info_dict["name"] = name if name else ''
     if 'originid' in selected:
         originid = catch_one(get_originid, ([stream]), {}, timing=False)
         info_dict["originid"] = originid if not originid else ''
     if 'age' in selected:
         age = catch_one(get_age, ([stream]), {}, timing=False)
-        info_dict["age"] = age if not age else ''
+        info_dict["age"] = age if age else ''
     if 'phone' in selected:
         phone = catch_one(get_phone, ([stream]), {}, timing=False)
-        info_dict["phone"] = phone if not phone else ''
+        info_dict["phone"] = phone if phone else ''
     if 'email' in selected:
         email = catch_one(get_email, ([stream]), {}, timing=False)
-        info_dict['email'] = email if not email else ''
+        info_dict['email'] = email if email else ''
     if 'education' in selected:
         education = catch_one(get_education, ([stream]), {'name': name},
                               timing=timing, timeout=5)

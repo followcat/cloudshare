@@ -93,6 +93,8 @@ class LSIsimilarity(object):
         assert(self.lsi_model.dictionary)
         assert len(names) == len(documents)
         for name, document in zip(names, documents):
+            if name in self.names:
+                 continue
             text = self.lsi_model.slicer(document, id=name)
             self.names.append(name)
             corpu = self.lsi_model.dictionary.doc2bow(text)

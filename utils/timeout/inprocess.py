@@ -7,7 +7,7 @@ from utils.timeout.exception import *
 
 
 def _handle_timeout(signum, frame):
-    raise KilledExecTimeout("Timeout and func was killed")
+    raise ExecTimeout("Exec Timeout.")
 
 
 signal.signal(signal.SIGALRM, _handle_timeout)

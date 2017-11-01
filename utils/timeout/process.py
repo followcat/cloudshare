@@ -38,11 +38,9 @@ def process_exec(func, delay, queue, kill=True):
         res = queue.get(timeout=delay)
     except Queue.Empty:
         if not kill:
-            raise NotKillExecTimeout(
-                "Timeout and no kill attempt")
+            raise NotKillExecTimeout("Timeout and no kill attempt")
         _kill_process(process)
-        raise KilledExecTimeout(
-                "Timeout and process was killed")
+        raise ExecTimeout("Timeout and process was killed")
     return res
 
 def parse_return(res):
@@ -52,7 +50,7 @@ def parse_return(res):
         raise res[1][1]
 
 
-def process_timeout_call(func, delay, kill=True, args=None, kwargs=None):
+def timeout_call(func, delay, kill=True, args=None, kwargs=None):
     queue = multiprocessing.Queue()
 
     def inner_func(*args, **kwargs):

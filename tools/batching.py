@@ -123,8 +123,10 @@ def update_selected(svc_cv, yamlname, selected, as_date=None):
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
                                                          selected, explorer_name, as_date)
-    obj = utils.builtin.merge(obj, info, update=True)
-    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    if obj is None:
+        obj = dict()
+    result = utils.builtin.merge(obj, info, update=True)
+    yamlstream = yaml.safe_dump(result, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 

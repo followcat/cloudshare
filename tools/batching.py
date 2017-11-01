@@ -167,15 +167,16 @@ def originid(svc_cv, yamlname):
 
 def timeout_process_action(svc_cv, action, timeout, *args, **kwargs):
     import utils.timeout.process
+    import utils.timeout.exception
     i = 0
     t1 = time.time()
     for yamlname in svc_cv.yamls():
         i += 1
         try:
-            utils.timeout.process.process_timeout_call(action, timeout,
+            utils.timeout.process.timeout_call(action, timeout,
                                     args=tuple([svc_cv, yamlname]+list(args)),
                                     kwargs=kwargs)
-        except utils.timeout.process.KilledExecTimeout as e:
+        except utils.timeout.exception.ExecTimeout as e:
             print(yamlname, action, e)
         if i % 100 == 0:
             usetime = time.time() - t1
@@ -185,17 +186,18 @@ def timeout_process_action(svc_cv, action, timeout, *args, **kwargs):
 
 def timeout_thread_action(svc_cv, action, timeout, *args, **kwargs):
     import utils.timeout.thread
+    import utils.timeout.exception
     i = 0
     t1 = time.time()
     for yamlname in svc_cv.yamls():
         i += 1
         try:
-            utils.timeout.thread.thread_timeout_call(action, timeout,
+            utils.timeout.thread.timeout_call(action, timeout,
                                     args=tuple([svc_cv, yamlname]+list(args)),
                                     kwargs=kwargs)
-        except utils.timeout.thread.KilledExecTimeout as e:
+        except utils.timeout.exception.ExecTimeout as e:
             print(yamlname, action, e)
-        except utils.timeout.thread.FailedKillExecTimeout as e:
+        except utils.timeout.exception.FailedKillExecTimeout as e:
             print(yamlname, action, e)
         if i % 100 == 0:
             usetime = time.time() - t1
@@ -205,6 +207,7 @@ def timeout_thread_action(svc_cv, action, timeout, *args, **kwargs):
 
 def timeout_action(svc_cv, action, timeout, *args, **kwargs):
     import utils.timeout.inprocess
+    import utils.timeout.exception
     i = 0
     t1 = time.time()
     for yamlname in svc_cv.yamls():
@@ -213,7 +216,7 @@ def timeout_action(svc_cv, action, timeout, *args, **kwargs):
             utils.timeout.inprocess.timeout_call(action, timeout,
                                     args=tuple([svc_cv, yamlname]+list(args)),
                                     kwargs=kwargs)
-        except utils.timeout.inprocess.KilledExecTimeout as e:
+        except utils.timeout.exception.ExecTimeout as e:
             print(yamlname, action, e)
         if i % 100 == 0:
             usetime = time.time() - t1

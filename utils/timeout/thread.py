@@ -53,15 +53,15 @@ from utils.timeout.exception import *
             file(path, 'r').read()
 
         try:
-            result = thread_timeout_call(NFS_read, 10, kill=False,
-                                         args=('/broken_nfs/file',))
+            result = timeout_call(NFS_read, 10, kill=False,
+                                  args=('/broken_nfs/file',))
             print("Result: %s" % result)
         except ExecTimeout:
             print ("NFS seems to be hung")
 
 
 
-    thread_timeout/thread_timeout_call works by running specified
+    thread_timeout/timeout_call works by running specified
     function in separate thread and waiting for timeout (or finalization)
     of the thread to return value or raise exception.
     If thread is not finished before timeout, thread_timeout will
@@ -69,8 +69,8 @@ from utils.timeout.exception import *
 
     thread_timeout(timeout, kill=True, kill_wait=0.1)
 
-    thread_timeout_call(func, timeout, kill=True, kill_wait=0.1,
-                        args=tuple(), kwargs=dict())
+    timeout_call(func, timeout, kill=True, kill_wait=0.1,
+                 args=tuple(), kwargs=dict())
 
     timeout - seconds, floating, how long to wait thread.
     kill - if True (default) attempt to terminate thread with function
@@ -130,11 +130,9 @@ def thread_exec(func, delay, kill=True, kill_wait=0.04):
         # FIXME isAlive is giving fals positive results
         if thread.isAlive():
             raise FailedKillExecTimeout(
-                "Timeout, thread refuses to die in %s seconds" %
-                kill_wait)
+                "Timeout, thread refuses to die in %s seconds" % kill_wait)
         else:
-            raise KilledExecTimeout(
-                "Timeout and thread was killed")
+            raise ExecTimeout("Timeout and thread was killed")
 
 
 def parse_return(queue):
@@ -145,7 +143,7 @@ def parse_return(queue):
         raise res[1][1]
 
 
-def thread_timeout_call(func, delay, kill=True, kill_wait=0.04, args=None, kwargs=None):
+def timeout_call(func, delay, kill=True, kill_wait=0.04, args=None, kwargs=None):
     queue = Queue()
 
     def inner_func(*args, **kwargs):

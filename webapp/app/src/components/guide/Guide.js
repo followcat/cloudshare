@@ -15,22 +15,31 @@ class Guide extends Component {
     super();
     this.state ={
       guideStatus: 0,
+      visible: true,
     };
     this.UploadClick = this.UploadClick.bind(this);
     this.CustomerClick = this.CustomerClick.bind(this);
     this.MathingClick = this.MathingClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.CloseClick = this.CloseClick.bind(this);
   }
 
   handleChange(e) {
     if(e.target.checked){
       StorageUtil.set('guideStatus',false);
       this.setState({
-        guideStatus : false
+        guideStatus : true
       })
     } else {
       StorageUtil.set('guideStatus',0);
     }
+  }
+
+  CloseClick() {
+    this.setState({
+      visible : false
+    });
+    console.log(this.state.visible);
   }
 
   UploadClick() {
@@ -62,15 +71,18 @@ class Guide extends Component {
   }
 
   render() {
-    const { props, prefixCls } = this.props;
-    const {guideStatus} = this.state;
+    const { props, prefixCls, } = this.props;
+    const {guideStatus, visible} = this.state;
     const classSet = classNames({
       [`${prefixCls}`]: true,
-      'hidden': guideStatus == 'false',
-      'show' : guideStatus == true
+      'hidden': !visible || guideStatus == 'false',
+      'show' :  visible || guideStatus == true
     });
     return (
       <div className={classSet}>
+        <div className={`${prefixCls}-close`}  onClick={this.CloseClick}>
+        <Icon type="close" />
+        </div>
         <Steps  direction="vertical" current={guideStatus} >
           <Step title="简历上传" ref="step1" description="可以批量上传简历" onClick={this.UploadClick}/>
           <Step title="客户管理" description="跟踪管理客户状态" onClick={this.CustomerClick}/>

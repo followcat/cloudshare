@@ -77,3 +77,28 @@ class PRJmathAPI(MatchbaseAPI):
         result = core.mining.correlation.project_correlation(self.miner, [self.cv_repo],
                     doc=self.doc, page=self.page, numbers=self.numbers)
         return { 'code': 200, 'data': result }
+
+
+class CompanyProjectAPI(MatchbaseAPI):
+
+    def __init__(self):
+        super(CompanyProjectAPI, self).__init__()
+        self.cv_repo = flask.current_app.config['SVC_CV_REPO']
+        self.svc_index = flask.current_app.config['SVC_INDEX']
+        self.es_config = flask.current_app.config['ES_CONFIG']
+
+    def post(self):
+        super(CompanyProjectAPI, self).post()
+        result = list()
+        cv_indexname = self.es_config['CV_INDEXNAME']
+        search = self.svc_index.filter(cv_indexname,
+                                       {'experience.project.company': self.doc},
+                                       pagesize=self.numbers,
+                                       start=self.page*self.numbers,
+                                       size=self.numbers, source=True)
+        for each in search:
+            for project in each['_source']['experience']['project']:
+                if project['company'] == self.doc:
+                    result.append(project)
+                    break
+        return { 'code': 200, 'data': result }

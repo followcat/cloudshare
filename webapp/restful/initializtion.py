@@ -90,9 +90,9 @@ def initialize(app):
     api.add_resource(COmathAPI, '/api/mining/comatch', endpoint = 'comatch')
     api.add_resource(POSmathAPI, '/api/mining/posmatch', endpoint = 'posmatch')
     api.add_resource(PRJmathAPI, '/api/mining/prjmatch', endpoint = 'prjmatch')
+    api.add_resource(CompanyProjectAPI, '/api/mining/coprjsearch', endpoint = 'coprjsearch')
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
-
 
     api.add_resource(PeopleAPI, '/api/people', endpoint = 'people')
     api.add_resource(PeopleByCVAPI, '/api/peoplebycv', endpoint = 'peoplebycv')

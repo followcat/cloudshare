@@ -2,9 +2,11 @@ import os
 import yaml
 import functools
 
+from elasticsearch import Elasticsearch
+
 import tools.updater
-import services.index
 import services.mining
+import services.esindex
 import services.multiclsify
 import services.analysis.cutword
 
@@ -175,21 +177,7 @@ def load_doc_processor(name):
     return SUPPORT_DOCPROCESSOR[name]
 
 
-def load_index(SVC_MEMBERS, SVC_CLS_CV):
-    global config
-    REINDEX_PATH = config.storage_config['REINDEX']
-    svc_cvs = list()
-    for name, project in SVC_MEMBERS.allprojects().items():
-        svc_cvs.append(project.curriculumvitae)
-    svc_cvs.extend(SVC_CLS_CV.values())
-    SVC_INDEX = services.index.ReverseIndexing('Index', svc_cvs)
-    SVC_INDEX.setup()
-    return SVC_INDEX
-
-
 def load_esindex(es_conn):
-    import services.esindex
-    from elasticsearch import Elasticsearch
     global config
     SVC_INDEX = services.esindex.ElasticsearchIndexing()
     SVC_INDEX.setup(es_conn, config.es_config['CV_INDEXNAME'])
@@ -200,6 +188,5 @@ def load_esindex(es_conn):
 
 def load_es_searchengine():
     global config
-    from elasticsearch import Elasticsearch
     ES = Elasticsearch(**config.es_config)
     return ES

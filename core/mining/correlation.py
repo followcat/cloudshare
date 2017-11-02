@@ -26,7 +26,7 @@ def company_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0, page=0, numbers
             info = svc.getyaml(id)
             for company in info['experience']['company']:
                 if company['name'] == name:
-                    results.append((name, value, company))
+                    results.append((id, value, company))
                     break
             else:
                 raise Exception('Not found description')
@@ -53,7 +53,7 @@ def position_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0, page=0, number
                 at_company = position['at_company']
                 pos_company = info['experience']['company'][at_company]['name']
                 if pos_company == company and position['name'] == name:
-                    results.append((name, value, position))
+                    results.append((id, value, position))
                     break
             else:
                 continue
@@ -78,9 +78,7 @@ def project_correlation(SVC_MIN, SVCS, doc, top=None, minimum=0, page=0, numbers
             info = svc.getyaml(id)
             for project in info['experience']['project']:
                 if project['name'] == name:
-                    description = project['description'] if 'description' in project else ''
-                    responsibility = project['responsibility'] if 'responsibility' in project else ''
-                    results.append((name, value, '\n'.join([description, responsibility])))
+                    results.append((id, value, project))
                     break
             else:
                 raise Exception('Not found description')

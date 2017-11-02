@@ -36,6 +36,7 @@ class JDmathAPI(MatchbaseAPI):
         result = core.mining.correlation.jobdescription_correlation(self.miner, [self.jd_repo],
                     doc=self.doc, page=self.page, numbers=self.numbers)
         for each in result:
+            each[2]['companyID'] = each[2]['company']
             each[2]['company'] = self.co_repo.getyaml(each[2]['company'])['name']
         return { 'code': 200, 'data': result }
 

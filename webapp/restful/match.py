@@ -33,12 +33,13 @@ class JDmathAPI(MatchbaseAPI):
 
     def post(self):
         super(JDmathAPI, self).post()
-        result = core.mining.correlation.jobdescription_correlation(self.miner, [self.jd_repo],
-                    doc=self.doc, page=self.page, numbers=self.numbers)
+        total, result = core.mining.correlation.jobdescription_correlation(self.miner,
+                    [self.jd_repo], doc=self.doc, page=self.page, numbers=self.numbers)
         for each in result:
-            each[2]['companyID'] = each[2]['company']
-            each[2]['company'] = self.co_repo.getyaml(each[2]['company'])['name']
-        return { 'code': 200, 'data': result }
+            jdinfo = each['data']
+            jdinfo['companyID'] = jdinfo['company']
+            jdinfo['company'] = self.co_repo.getyaml(jdinfo['company'])['name']
+        return { 'code': 200, 'data': result, 'lenght': total }
 
 
 class COmathAPI(MatchbaseAPI):
@@ -49,9 +50,9 @@ class COmathAPI(MatchbaseAPI):
 
     def post(self):
         super(COmathAPI, self).post()
-        result = core.mining.correlation.company_correlation(self.miner, [self.cv_repo],
-                    doc=self.doc, page=self.page, numbers=self.numbers)
-        return { 'code': 200, 'data': result }
+        total, result = core.mining.correlation.company_correlation(self.miner,
+                    [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
+        return { 'code': 200, 'data': result, 'lenght': total }
 
 
 class POSmathAPI(MatchbaseAPI):
@@ -62,9 +63,9 @@ class POSmathAPI(MatchbaseAPI):
 
     def post(self):
         super(POSmathAPI, self).post()
-        result = core.mining.correlation.position_correlation(self.miner, [self.cv_repo],
-                    doc=self.doc, page=self.page, numbers=self.numbers)
-        return { 'code': 200, 'data': result }
+        total, result = core.mining.correlation.position_correlation(self.miner,
+                    [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
+        return { 'code': 200, 'data': result, 'lenght': total }
 
 
 class PRJmathAPI(MatchbaseAPI):
@@ -75,9 +76,9 @@ class PRJmathAPI(MatchbaseAPI):
 
     def post(self):
         super(PRJmathAPI, self).post()
-        result = core.mining.correlation.project_correlation(self.miner, [self.cv_repo],
-                    doc=self.doc, page=self.page, numbers=self.numbers)
-        return { 'code': 200, 'data': result }
+        total, result = core.mining.correlation.project_correlation(self.miner,
+                    [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
+        return { 'code': 200, 'data': result, 'lenght': total }
 
 
 class CompanyProjectAPI(MatchbaseAPI):
@@ -100,6 +101,8 @@ class CompanyProjectAPI(MatchbaseAPI):
         for each in search:
             for project in each['_source']['experience']['project']:
                 if project['company'] == self.doc:
-                    result.append(project)
+                    result.append( {'id': each['_source']['id'],
+                                    'value': 1,
+                                    'data': project} )
                     break
         return { 'code': 200, 'data': result }

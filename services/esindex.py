@@ -115,32 +115,36 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Update numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def get(self, indexname, querydict):
+    def get(self, indexname, querydict, pagesize=10000, start=0, size=None):
         kwargs={'body': querydict}
-        results = self.ESids(indexname, kwargs)
+        results = self.ESids(indexname, kwargs, pagesize=pagesize, start=start, size=None)
         return results
 
-    def ESids(self, indexname, kwargs, size=10000):
+    def ESids(self, indexname, kwargs, pagesize=10000, start=0, size=None):
         kwargs['doc_type'] = 'index'
         kwargs['sort'] = '_doc'
         kwargs['_source'] = 'false'
-        result = utils.esquery.scroll_ids(self.es, indexname, kwargs)
+        result = utils.esquery.scroll_ids(self.es, indexname, kwargs,
+                                          pagesize=pagesize, start=start, size=size)
         ids = set([item['_id'] for item in result])
         return ids
 
-    def filter(self, indexname, filterdict, ids=None):
+    def filter(self, indexname, filterdict, ids=None, pagesize=10000, start=0, size=None):
         results = set()
         querydict = utils.esquery.request_gen(filterdict=filterdict, ids=ids)
         if querydict['query']['bool']['filter']:
-            results = self.get(indexname, querydict)
+            results = self.get(indexname, querydict,
+                               pagesize=pagesize, start=start, size=size)
         return results
 
-    def filter_ids(self, indexname, source, filterdict, ids, uses=None):
+    def filter_ids(self, indexname, source, filterdict, ids, uses=None,
+                   pagesize=10000, start=0, size=None):
         result = source
         if filterdict:
             if not isinstance(ids, set):
                 ids = set(ids)
-            filterset = self.filter(indexname, filterdict, ids=ids)
+            filterset = self.filter(indexname, filterdict, ids=ids,
+                                    pagesize=pagesize, start=start, size=size)
             result = filter(lambda x: x in filterset or x[0] in filterset, source)
         return result
 

@@ -35,18 +35,18 @@ class Interface(object):
     def lsfiles(self):
         raise NotImplementedInterface
 
-    def search(self, keywords, path='', files=None):
+    def search(self, keywords, path='', files=None, pagesize=10000, start=0, size=None):
         if self.searchengine is None:
             result = self.grep(keywords, path=path, files=files)
         else:
-            result = self.SEsearch(keywords)
+            result = self.SEsearch(keywords, pagesize=pagesize, start=start, size=size)
         return result
 
-    def search_yaml(self, keywords, path='', files=None):
+    def search_yaml(self, keywords, path='', files=None, pagesize=10000, start=0, size=None):
         if self.searchengine is None:
             result = self.grep_yaml(keywords, path=path, files=files)
         else:
-            result = self.SEsearch_yaml(keywords)
+            result = self.SEsearch_yaml(keywords, pagesize=pagesize, start=start, size=size)
         return result
 
     def grep(self):
@@ -55,24 +55,25 @@ class Interface(object):
     def grep_yaml(self):
         raise NotImplementedInterface
 
-    def SEquery(self, indexname, keywords):
+    def SEquery(self, indexname, keywords, pagesize=10000, start=0, size=None):
         query_dict = utils.esquery.request_gen(keywords=keywords)
         kwargs = {
             '_source_include': 'file',
             'body': query_dict
         }
-        result = utils.esquery.scroll_ids(self.searchengine, indexname, kwargs)
+        result = utils.esquery.scroll_ids(self.searchengine, indexname, kwargs,
+                                          pagesize=pagesize, start=start, size=size)
         return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
                                   x['_score']), result))
 
-    def SEsearch(self, keywords):
+    def SEsearch(self, keywords, pagesize=10000, start=0, size=None):
         indexname = '.'.join([self.name])
-        result = self.SEquery(indexname, keywords)
+        result = self.SEquery(indexname, keywords, pagesize=pagesize, start=start, size=size)
         return result
 
-    def SEsearch_yaml(self, keywords):
+    def SEsearch_yaml(self, keywords, pagesize=10000, start=0, size=None):
         indexname = '.'.join([self.name, 'yaml'])
-        result = self.SEquery(indexname, keywords)
+        result = self.SEquery(indexname, keywords, pagesize=pagesize, start=start, size=size)
         return result
 
     def subprocess_grep(self, command, path, shell):

@@ -39,7 +39,7 @@ class ElasticsearchIndexing(object):
 
     def updatesvc(self, indexname, svc, numbers=5000):
         assert svc.name
-        update_ids = self.ESids(indexname, {})
+        update_ids = set([item['_id'] for item in self.ES(indexname, {})])
         ACTIONS = list()
         times = 0
         count = 0
@@ -115,37 +115,36 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Update numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def get(self, indexname, querydict, pagesize=10000, start=0, size=None):
+    def get(self, indexname, querydict, source=False, pagesize=10000, start=0, size=None):
         kwargs={'body': querydict}
-        results = self.ESids(indexname, kwargs, pagesize=pagesize, start=start, size=None)
+        results = self.ES(indexname, kwargs, source=source,
+                          pagesize=pagesize, start=start, size=None)
         return results
 
-    def ESids(self, indexname, kwargs, pagesize=10000, start=0, size=None):
+    def ES(self, indexname, kwargs, source=False, pagesize=10000, start=0, size=None):
         kwargs['doc_type'] = 'index'
         kwargs['sort'] = '_doc'
-        kwargs['_source'] = 'false'
-        result = utils.esquery.scroll_ids(self.es, indexname, kwargs,
-                                          pagesize=pagesize, start=start, size=size)
-        ids = set([item['_id'] for item in result])
-        return ids
+        kwargs['_source'] = 'false' if source is False else 'true'
+        result = utils.esquery.scroll(self.es, indexname, kwargs,
+                                      pagesize=pagesize, start=start, size=size)
+        return result
 
-    def filter(self, indexname, filterdict, ids=None, pagesize=10000, start=0, size=None):
+    def filter(self, indexname, filterdict, ids=None, source=False,
+               pagesize=10000, start=0, size=None):
         results = set()
         querydict = utils.esquery.request_gen(filterdict=filterdict, ids=ids)
         if querydict['query']['bool']['filter']:
-            results = self.get(indexname, querydict,
+            results = self.get(indexname, querydict, source=source,
                                pagesize=pagesize, start=start, size=size)
         return results
 
-    def filter_ids(self, indexname, source, filterdict, ids, uses=None,
+    def filter_ids(self, indexname, ids, filterdict, source=False,
                    pagesize=10000, start=0, size=None):
-        result = source
+        result = ids
         if filterdict:
-            if not isinstance(ids, set):
-                ids = set(ids)
-            filterset = self.filter(indexname, filterdict, ids=ids,
+            filterset = self.filter(indexname, filterdict, ids=ids, source=source,
                                     pagesize=pagesize, start=start, size=size)
-            result = filter(lambda x: x in filterset or x[0] in filterset, source)
+            result = set([item['_id'] for item in filterset])
         return result
 
     def lastday(self, indexname):

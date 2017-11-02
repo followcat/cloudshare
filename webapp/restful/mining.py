@@ -177,8 +177,8 @@ class LSIbaseAPI(Resource):
         result = self.miner.probability(project.modelname, doc, uses=iduses,
                                         top=self.top, minimum=1000)
         ids = set([cv[0] for cv in result])
-        result = self.svc_index.filter_ids(self.cv_indexname, result,
-                                       filterdict, ids, uses=iduses)
+        ids = self.svc_index.filter_ids(self.cv_indexname, ids, filterdict)
+        result = filter(lambda x: x[0] in ids, result)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1
@@ -260,8 +260,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             output = {}
             output['CV'] = list()
             bestids = set([cv[0] for cv in bestjds[jdid]])
-            filterids = self.svc_index.filter_ids(self.cv_indexname, bestjds[jdid],
-                                                  filterdict, bestids)
+            filterids = self.svc_index.filter_ids(self.cv_indexname, bestids,
+                                                  filterdict)
             for cv in filterids:
                 cvinfo = project.cv_getyaml(cv[0])
                 cvinfo['CVvalue'] = cv[1]

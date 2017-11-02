@@ -106,8 +106,7 @@ class SearchCVbyTextAPI(Resource):
                 searchs[id] = yaml_searchs[id]
         results = sorted(searchs.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
         ids = set([cv[0] for cv in results])
-        results = self.svc_index.filter_ids(self.cv_indexname, results, filterdict, ids)
-        results = [result[0] for result in results]
+        results = list(self.svc_index.filter_ids(self.cv_indexname, ids, filterdict))
         count = 20
         datas, pages = self.paginate(results, cur_page, count, project)
         return {

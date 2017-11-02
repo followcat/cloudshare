@@ -61,8 +61,8 @@ class Interface(object):
             '_source_include': 'file',
             'body': query_dict
         }
-        result = utils.esquery.scroll_ids(self.searchengine, indexname, kwargs,
-                                          pagesize=pagesize, start=start, size=size)
+        result = utils.esquery.scroll(self.searchengine, indexname, kwargs,
+                                      pagesize=pagesize, start=start, size=size)
         return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
                                   x['_score']), result))
 

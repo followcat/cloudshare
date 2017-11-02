@@ -76,7 +76,7 @@ def request_gen(keywords=None, filterdict=None, ids=None):
     return querydict
 
 
-def scroll_ids(esconn, indexname, kwargs, pagesize=10000, start=0, size=None):
+def scroll(esconn, indexname, kwargs, pagesize=10000, start=0, size=None):
     count = 0
     result = list()
     page = esconn.search(

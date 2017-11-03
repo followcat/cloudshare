@@ -197,10 +197,10 @@ class Mining(object):
         if model.names:
             if modelname not in self.sim:
                 self.sim[modelname] = dict()
-                for simname in simnames:
-                    if simname in self.sim[modelname]:
-                        continue
-                    self.init_sim(modelname, simname)
+            for simname in simnames:
+                if simname in self.sim[modelname]:
+                    continue
+                self.init_sim(modelname, simname)
 
     def init_sim(self, modelname, svc_name, gen=None):
         model = self.lsi_model[modelname]

@@ -17,17 +17,19 @@ class CompanyAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.co_indexname = flask.current_app.config['ES_CONFIG']['CO_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('id', location = 'json')
         self.reqparse.add_argument('name', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('introduction', location = 'json')
         super(CompanyAPI, self).__init__()
 
-    def get(self, name):
+    def get(self):
+        id = args['id']
         projectname = args['project']
         user = flask.ext.login.current_user
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = project.company_get(name)
+        result = project.company_get(id)
         return { 'result': result }
 
     def post(self):

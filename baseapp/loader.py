@@ -167,9 +167,9 @@ def load_co_mining(SVC_MIN, SVC_CVS):
     SVC_MIN.setup('comatch', [CV.name for CV in SVC_CVS])
     SVC_MIN.setup('prjmatch', [CV.name for CV in SVC_CVS])
     SVC_MIN.setup('posmatch', [CV.name for CV in SVC_CVS])
-    tools.updater.update_co_sims('comatch', SVC_MIN, SVC_CVS)
-    tools.updater.update_pos_sims('posmatch', SVC_MIN, SVC_CVS)
-    tools.updater.update_prj_sims('prjmatch', SVC_MIN, SVC_CVS)
+    #tools.updater.update_co_sims('comatch', SVC_MIN, SVC_CVS)
+    #tools.updater.update_pos_sims('posmatch', SVC_MIN, SVC_CVS)
+    #tools.updater.update_prj_sims('prjmatch', SVC_MIN, SVC_CVS)
 
 
 def load_doc_processor(name):

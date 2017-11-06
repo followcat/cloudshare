@@ -23,6 +23,7 @@ def initialize(app):
     api.add_resource(SessionAPI, '/api/session')
     api.add_resource(PasswordAPI, '/api/password')
     api.add_resource(UserAPI, '/api/user', endpoint = 'user')
+    api.add_resource(UserPeopleIDAPI, '/api/userpeopleid', endpoint = 'userpeopleid')
     api.add_resource(ExistsEmailAPI, '/api/existsemail/<string:email>', endpoint = 'existsemail')
     api.add_resource(ExistsPhoneAPI, '/api/existsphone/<string:phone>', endpoint = 'existsphone')
     api.add_resource(AccountAPI, '/api/account/<string:name>', endpoint = 'account')
@@ -58,7 +59,9 @@ def initialize(app):
     api.add_resource(UpdateCurrivulumvitaeInformation, '/api/cv/updateinfo',
                      endpoint = 'updatecurrivulumvitaeinformation')
 
-    api.add_resource(UploadCVAPI, '/api/uploadcv', endpoint = 'uploadcv')
+    api.add_resource(UploadOriginsAPI, '/api/uploadorigins', endpoint = 'uploadorigins')
+    api.add_resource(UserUploadCVAPI, '/api/userupcv', endpoint = 'userupcv')
+    api.add_resource(MemberUploadCVAPI, '/api/memberupcv', endpoint = 'memberupcv')
     api.add_resource(UploadEnglishCVAPI, '/api/uploadengcv', endpoint = 'uploadengcv')
     api.add_resource(UploadCVPreviewAPI, '/api/uploadcv/preview')
 

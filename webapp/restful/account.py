@@ -31,6 +31,19 @@ class UserAPI(Resource):
         return { 'code': 200, 'result': result }
 
 
+class UserPeopleIDAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(UserAPI, self).__init__()
+
+    def get(self):
+        user = flask.ext.login.current_user
+        user.peopleID
+        return { 'code': 200, 'result': user.peopleID }
+
+
 class ExistsEmailAPI(Resource):
 
     def __init__(self):

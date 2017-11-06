@@ -101,6 +101,17 @@ class User(flask.ext.login.UserMixin):
         return result
 
     @property
+    def peopleID(self):
+        result = ''
+        if 'people' in self.info:
+            result = self.info['people']
+        return result
+
+    @peopleID.setter
+    def peopleID(self, peoID):
+        self.svc_account.setpeople(self.id, peoID, self.name)
+
+    @property
     def member(self):
         result = ''
         if 'member' in self.info:

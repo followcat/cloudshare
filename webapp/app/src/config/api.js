@@ -138,6 +138,8 @@ export const API = {
 
   MINING_VALUABLE_API: `${HOST}/api/mining/valuable`,
 
-  MINING_CV_API: `${HOST}/api/mining/cv`
+  MINING_CV_API: `${HOST}/api/mining/cv`,
+
+  MINING_JD_MATCING_API: `${HOST}/api/mining/jdmatch`,
 };
 

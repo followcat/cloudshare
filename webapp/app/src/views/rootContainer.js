@@ -46,8 +46,10 @@ const rootRoute = {
     require('routes/upload-preview'),
     require('routes/go-to-signin'),
     require('routes/agreement'),
-    // require('routes/manage'),
+    require('routes/job-search'),
     require('routes/best-excellent'),
+    require('routes/company'),
+    require('routes/job-description'),
   ]
 };
 

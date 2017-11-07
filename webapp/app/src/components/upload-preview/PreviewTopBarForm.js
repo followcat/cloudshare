@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 
 import { Form, Input, Select, Button } from 'antd';
 
-import { resumeSource } from 'config/source';
+import { getUploadOrigin } from 'request/classify';
 
 const FormItem = Form.Item,
       Option = Select.Option;
@@ -11,7 +11,20 @@ const FormItem = Form.Item,
 class PreviewTopBarForm extends Component {
   constructor() {
     super();
+    this.state = {
+      origins: []
+    }
     this.handleClick = this.handleClick.bind(this);
+  }
+
+  componentWillMount() {
+    getUploadOrigin((json) => {
+      if (json.code === 200) {
+        this.setState({
+          origins: json.data,
+        });
+      }
+    });
   }
 
   handleClick(e) {
@@ -38,7 +51,8 @@ class PreviewTopBarForm extends Component {
       confirmLoading,
       btnText
     } = this.props,
-      { getFieldDecorator } = form;
+    { getFieldDecorator } = form;
+    const { origins } = this.state;
 
     return (
       <Form layout="inline" className={`${prefixCls}-form`}>
@@ -75,7 +89,7 @@ class PreviewTopBarForm extends Component {
               style={{ width: 120 }}
               size="small"
             >
-              {resumeSource.map(item => {
+              {origins.map(item => {
                 return (
                   <Option key={item.id} value={item.name}>{item.name}</Option>
                 );

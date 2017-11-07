@@ -60,6 +60,8 @@ export const API = {
 
   INDUSTRY_API: `${HOST}/api/industry`,
 
+  UPLOAD_ORIGIN_API: `${HOST}/api/uploadorigins`,
+
   COMPANYLIST_API: `${HOST}/api/companylist`,
 
   COMPANY_API: `${HOST}/api/company`,
@@ -92,7 +94,7 @@ export const API = {
 
   SESSION_API: `${HOST}/api/session`,
 
-  UPLOAD_RESUME_API: `${HOST}/api/uploadcv`,
+  UPLOAD_RESUME_API: `${HOST}/api/userupcv`,
 
   UPLOAD_RESUME_PREVIEW_API: `${HOST}/api/uploadcv/preview`,
 

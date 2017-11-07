@@ -157,8 +157,8 @@ def get_expectation(stream):
 def get_project(stream, name=None, as_date=None):
     fix_func = {
         'default': extractor.project.fix,
-        # 'jingying': extractor.project.fix_jingying,
-        # 'liepin': extractor.project.fix_liepin,
+        'jingying': extractor.project.fix_jingying,
+        'liepin': extractor.project.fix_liepin,
         'yingcai': extractor.project.fix_yingcai,
         'zhilian': extractor.project.fix_zhilian,
     }
@@ -274,12 +274,9 @@ def get_age(stream):
 all_selected = ('name', 'originid', 'age', 'phone', 'email',
                 'education', 'experience', 'expectation',
                 'classify', 'unique_id', 'project')
-upload_selected = ('name', 'originid', 'age', 'phone', 'email',
-                'education', 'experience', 'expectation',
-                'classify', 'unique_id')
 
 
-def catch_selected(stream, selected, name=None, as_date=None, timing=False):
+def catch_selected(stream, selected, fix_func=None, as_date=None, timing=False):
     def catch_one(method, args, kwargs, timing=False, timeout=0):
         result = dict()
         if timing is False:
@@ -310,17 +307,17 @@ def catch_selected(stream, selected, name=None, as_date=None, timing=False):
         email = catch_one(get_email, ([stream]), {}, timing=False)
         info_dict['email'] = email if email else ''
     if 'education' in selected:
-        education = catch_one(get_education, ([stream]), {'name': name},
+        education = catch_one(get_education, ([stream]), {'name': fix_func},
                               timing=timing, timeout=5)
         info_dict.update(education)     # education_history, education, school
     if 'experience' in selected:
         experience = catch_one(get_experience, ([stream]),
-                               {'name': name, 'as_date': as_date},
+                               {'name': fix_func, 'as_date': as_date},
                                timing=timing, timeout=10)
         info_dict.update(experience)    # experience, company, position
     if 'project' in selected:
         project = catch_one(get_project, ([stream]), {
-                            'name': name, 'as_date': as_date},
+                            'name': fix_func, 'as_date': as_date},
                             timing=timing, timeout=5)
         if 'experience' in project:
             try:
@@ -339,7 +336,7 @@ def catch_selected(stream, selected, name=None, as_date=None, timing=False):
             experience = info_dict['experience']
         except KeyError:
             result = catch_one(get_experience, ([stream]),
-                               {'name': name, 'as_date': as_date},
+                               {'name': fix_func, 'as_date': as_date},
                                timing=timing, timeout=10)
             experience = result['experience'] if 'experience' in result else dict()
         info_dict['classify'] = get_classify(experience)
@@ -347,7 +344,7 @@ def catch_selected(stream, selected, name=None, as_date=None, timing=False):
 
 catch = functools.partial(catch_selected, selected=all_selected)
 
-def catch_cvinfo(stream, filename, selected=None, catch_info=True, timing=False):
+def catch_cvinfo(stream, filename, selected=None, fix_func=None, catch_info=True, timing=False):
     """
         >>> import core.outputstorage
         >>> st = 'curriculum vitea'
@@ -355,11 +352,11 @@ def catch_cvinfo(stream, filename, selected=None, catch_info=True, timing=False)
         >>> assert catch_cvinfo(stream=st, filename=name.base)['filename'] == name.base
     """
     if selected is None:
-        global upload_selected
-        selected = upload_selected
+        global all_selected
+        selected = all_selected
     info = generate_info_template(cv_template)
     if catch_info is True:
-        catchinfo = catch_selected(stream, selected=selected, timing=timing)
+        catchinfo = catch_selected(stream, selected=selected, fix_func=fix_func, timing=timing)
         info.update(catchinfo)
         if not info['name']:
             info['name'] = utils.chsname.name_from_filename(filename)

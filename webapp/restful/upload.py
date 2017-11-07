@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import yaml
 
 import flask
@@ -14,50 +15,74 @@ import extractor.information_explorer
 upload = dict()
 uploadeng = dict()
 
+
+class UploadOriginsAPI(Resource):
+
+    def get(self):
+        results = [
+                  { "id" : 1, "name" : u"前程无忧", "origin": "default"},
+                  { "id" : 2, "name" : u"无忧精英", "origin": "jingying"},
+                  { "id" : 3, "name" : u"智联招聘", "origin": "default"},
+                  { "id" : 4, "name" : u"智联卓聘", "origin": "zhilian"},
+                  { "id" : 5, "name" : u"猎聘", "origin": "liepin"},
+                  { "id" : 6, "name" : u"领英", "origin": "default"},
+                  { "id" : 7, "name" : u"大街网", "origin": "default"},
+                  { "id" : 6, "name" : u"中华英才", "origin": "yingcai"},
+                  { "id" : 8, "name" : u"Cold Call", "origin": "default"},
+                  { "id" : 9, "name" : u"其他", "origin": "default"}
+                ]
+        return { 'code': 200, 'data': results }
+
+
 class UploadCVAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        super(UploadCVAPI, self).__init__()
         self.svc_min = flask.current_app.config['SVC_MIN']
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
-        super(UploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('files', type = str, location = 'json')
-        self.reqparse.add_argument('updates', type = list, location = 'json')
-        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('files', type=str, location='json')
+        self.reqparse.add_argument('updates', type=list, location='json')
+        self.reqparse.add_argument('origin', type=str, location='json')
+
+    def putparam(self):
+        self.user = flask.ext.login.current_user
+        self.args = self.reqparse.parse_args()
+        self.updates = self.args['updates']
+        self.member = self.svc_members.defaultmember
+        self.project = self.member.getproject()
+        self.projectid = self.project.id
+        self.modelname = self.project.modelname
 
     def put(self):
-        results = []
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        updates = args['updates']
-        projectname = args['project']
+        self.putparam()
         names = []
+        results = []
         documents = []
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
-        for item in updates:
+        for item in self.updates:
             status = 'failed'
-            cvobj = upload[user.name].pop(item['filename'])
+            self.cvobj = cvobj
+            cvobj = upload[self.user.name].pop(item['filename'])
             if cvobj is not None:
                 id = cvobj.metadata['id']
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
                 try:
-                    result = project.cv_add(cvobj, user.name, unique=True)
+                    result = self.project.cv_add(cvobj, self.user.name, unique=True)
                     if result['repo_cv_result']:
                         self.svc_index.add(self.cv_indexname,
                                            cvobj.metadata['id'],
                                            cvobj.metadata)
                     if result['project_cv_result']:
-                        result['member_cv_result'] = member.cv_add(cvobj, user.name,
-                                                                   unique=True)
+                        result['member_cv_result'] = self.member.cv_add(cvobj, user.name,
+                                                                        unique=True)
                         status = 'success'
                         message = 'Add to CV database and project.'
                         names.append(cvobj.name.md)
@@ -65,6 +90,7 @@ class UploadCVAPI(Resource):
                         if not result['repo_cv_result']:
                             message = 'Existed in other project.'
                     else:
+                        status = 'success'
                         message = 'Resume existed in database and project.'
                 except core.exception.NotExistsContactException:
                     message = 'The contact information is empty.'
@@ -72,14 +98,16 @@ class UploadCVAPI(Resource):
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
-        if projectname not in self.svc_min.sim[project.modelname]:
-            self.svc_min.init_sim(project.modelname, projectname)
+        if self.projectid not in self.svc_min.sim[self.modelname]:
+            self.svc_min.init_sim(self.modelname, self.projectid)
         else:
-            self.svc_min.sim[project.modelname][projectname].add_documents(names, documents)
+            self.svc_min.sim[self.modelname][self.projectid].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):
         user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        origin = args['origin']
         if user.name not in upload:
             upload[user.name] = dict()
         network_file = flask.request.files['files']
@@ -91,7 +119,8 @@ class UploadCVAPI(Resource):
                                             'resultid': filepro.resultcode,
                                             'name': '', 'filename': filename } }
         yamlinfo = extractor.information_explorer.catch_cvinfo(
-                        filepro.markdown_stream.decode('utf8'), filename, timing=True)
+                                            filepro.markdown_stream.decode('utf8'),
+                                            filename, fix_func=origin, timing=True)
         filepro.renameconvert(yamlinfo['id'])
         dataobj = core.basedata.DataObject(metadata=yamlinfo,
                                            data=filepro.markdown_stream,)
@@ -103,8 +132,47 @@ class UploadCVAPI(Resource):
         return { 'code': 200, 'data': { 'result': filepro.result,
                                         'resultid': filepro.resultcode,
                                         'unique_peo': unique_peo,
+                                        'unique_id': yamlinfo['unique_id'],
                                         'name': dataobj.metadata['name'],
                                         'filename': filename } }
+
+
+class UserUploadCVAPI(UploadCVAPI):
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('setpeople', type=bool, location='json')
+
+    def put(self):
+        args = self.reqparse.parse_args()
+        setpeople = args['setpeople']
+        result = super(UserUploadCVAPI, self).put()
+        if result['data']['status'] == 'success' and setpeople:
+            self.user.peopleID = cvobj.metadata['unique_id']
+        return result
+
+    def post(self):
+        result = super(UserUploadCVAPI, self).post()
+        result['data']['user_peo'] = False
+        user = flask.ext.login.current_user
+        if user.peopleID == result['data']['unique_id']:
+            result['data']['user_peo'] = True
+        return result
+
+
+class MemberUploadCVAPI(UploadCVAPI):
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('project', location = 'json')
+
+    def putparam(self):
+        super(MemberUploadCVAPI, self).putparam()
+        projectname = self.args['project']
+        self.member = user.getmember(self.svc_members)
+        self.project = member.getproject(projectname)
+        self.projectid = self.project.id
+        self.modelname = self.project.modelname
 
 
 class UploadEnglishCVAPI(Resource):

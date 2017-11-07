@@ -332,6 +332,7 @@ class Account(services.base.storage.BaseStorage):
         ("phone",               str),
         ("email",               str),
         ("member",              str),
+        ("people",              str),
     )
 
     def __init__(self, svc_password, path, name=None, searchengine=None, iotype='git'):
@@ -381,6 +382,9 @@ class Account(services.base.storage.BaseStorage):
         if self.exists(id):
             result = self.svc_password.updatepwd(id, oldpassword, newpassword)
         return result
+
+    def setpeople(self, id, people, committer):
+        return self.updateinfo(id, 'people', committer)
 
     def createmember(self, id, name, svc_members):
         """

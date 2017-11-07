@@ -31,6 +31,7 @@ class Members(object):
                               'storageJD':  'jdrepo'})
                 self.members[name] = member
         self.load_default_member()
+        self._defaultmember = self.members[self.default_member_name]
 
     def load_default_member(self):
         path = os.path.join(self.path, self.default_member_name)
@@ -85,3 +86,7 @@ class Members(object):
         for each in self.members:
             member = self.members[each]
             member.backup(members_path)
+
+    @property
+    def defaultmember(self):
+        return self._defaultmember

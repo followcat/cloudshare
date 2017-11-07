@@ -61,17 +61,18 @@ __PORESPONSIBILITY__ = u'\**(?:(?:目前)?(?:主要|工作)*职'+POASP+u'*责(?:
 
 # Don't use (?(label) ...|...) as they are defined through all repetitions
 company_items = {
-    'place': ((u'(?:所在地区|工作地点)[:：]?', u'\S*?(?=[\n\|])'), ),
+    'place': ((u'(?:所在地区|工作地点)[:：]?', u'\S*?(?=[__SEP__])'), ),
     'position': ((u'职位(?:名称)?[:：]', POSITION),),
-    'company_type': ((u'(?P<typelabel>(单位|企业|公司)性质[:：]?)', u'('+COMPANY_TYPE+u'|[^\|\n'+SP+u']*?(?=[\|\n'+SP+u']))'),
+    'company_type': ((u'(?P<typelabel>(单位|企业|公司)性质[:：]?)', u'('+COMPANY_TYPE+u'|[^__SEP__]*?(?=[__SEP__]))'),
         COMPANY_TYPE),
-    'company_business': ((u'(?P<businesslabel>(?:单位|所属|公司)行业[:：]?)', u'(?P<nl>['+ANL+u']+'+POASP+u'*)?('+ACOMPANY_BUSINESS+u'|\S*?(?='+POASP+u'*[\|\n'+SP+u']))', POASP+u'*'),
-        u'(?:'+COMPANY_BUSINESS+u'|(?<=[^\|])'+POASP+u'*(?=(?!'+COMPANY_TYPE+u'))'+BUSINESSTRAIL+u'(?='+POASP+u'*\|))'),
+    'company_business': ((u'(?P<businesslabel>(?:单位|所属|公司)行业[:：]?)', u'(?P<nl>['+ANL+u']+'+POASP+u'*)?('+ACOMPANY_BUSINESS+u'|\S*?(?='+POASP+u'*[__SEP__]))', POASP+u'*'),
+        u'(?:'+COMPANY_BUSINESS+u'|(?<=[^__SEP__])'+POASP+u'*(?=(?!'+COMPANY_TYPE+u'))'+BUSINESSTRAIL+u'(?='+POASP+u'*[__SEP__]))'),
     'company_department': ((__CODEPARTMENT__, u'(?(codptlbl)\S*|\S+?[部处室册科](?='+POASP+u'*$))'), ),
-    'branch': ((u'行业类别[:：]?', u'.*?(?=[\n\|])'), ),
+    'branch': ((u'行业类别[:：]?', u'.*?(?=[__SEP__])'), ),
     'company_employees': ((__COEMPLOYEES__, AEMPLOYEES), ),
+    'recommendations': ((u'同事认证[:：]?', u'\d+'), ),
     'company_description': ((__CODESCRIPTION__,
-                     u'[^:：\n\|(?:\\\\\n)]*(?:(?:\\\\\n>?)+[^:：\n\|(?:\\\\\n)]+)*(?=[\n\|^])'), )
+                     u'[^:：__SEP__(?:\\\\\n)]*(?:(?:\\\\\n>?)+[^:：__SEP__(?:\\\\\n)]+)*(?=[__SEP__^])'), )
     }
 key_company_items = company_items.copy()
 
@@ -102,12 +103,12 @@ company_items['company_department'] =  ((__CODEPARTMENT__+'?', u'(?(codptlbl)\S*
 company_items['company_employees'] = ((__COEMPLOYEES__+'?', AEMPLOYEES), )
 company_items['company_description'] = ((__CODESCRIPTION__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 
-SET_COMPANY_DEFAULT = lambda STR: STR.replace(DEFAULT_ITEM, u'[^:：\n\|(?:\\\\\n)]*(?:(?:\\\\\n>?)*.+)*(?=(?:\\\\)?[\n\|^]|$)')
+SET_COMPANY_DEFAULT = lambda STR: STR.replace(DEFAULT_ITEM, u'[^:：__SEP__(?:\\\\\n)]*(?:(?:\\\\\n>?)*.+)*(?=(?:\\\\)?[__SEP__^]|$)')
 
 # If pipe separated, the position is inside the table
 # but sometimes it is inside the company business table
 # (position details are then outside all tables.
-COMPANY_DETAILS = lambda DETAILS: lambda RE:RE.pattern+u'\n*'+CHECKCOLTOP('codetborder')+u'?'+ASP+u'*\**'+DETAILS.replace('__NORECURSIVE__', RE.pattern)+u'\**\n+(?(codetborder)(?(checknextcol)|(?P<company_description>(?=(?!'+BORDER+u')).*\n)?))\n*'+CHECKCOLBOTTOM('codetborder').replace('__NORECURSIVE__', RE.pattern)
+COMPANY_DETAILS = lambda DETAILS: lambda RE:RE.pattern+u'\n*'+CHECKCOLTOP('codetborder')+u'?'+ASP+u'*\**'+NO_RECURSIVE(RE)(DETAILS)+u'\**\n+(?(codetborder)(?(checknextcol)|(?P<company_description>(?=(?!'+BORDER+u')).*\n)?))\n*'+CHECKCOLBOTTOM('codetborder')
 
 company_details = COMPANY_DETAILS(SET_ALL_ITEMS(SET_COMPANY_DEFAULT)(company_items)(newline_separated)+'{1,13}')
 empty_company_details = COMPANY_DETAILS(SET_ALL_ITEMS(SET_COMPANY_DEFAULT)(company_items)(newline_separated)+'{,13}')
@@ -121,7 +122,7 @@ position_items['achievement'] = ((__ACHIEVEMENT__, MATCH_SPACE_OR(EXCLUDE_ITEM_K
 position_items['description'] = ((__PODESCRIPTION__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 position_items['resp_or_desc'] = ((__PORESPONSIBILITY__, MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 position_items['department'] = (((u'(?P<dptlbl>'+__DEPARTMENT__+u')', u'(?(dptlbl)'+DEFAULT_ITEM+u'?(?=(?:[\s\|$]|\\\\\n))|\S+?[部处室册科](?='+POASP+u'*$))')), )
-position_items['posalary'] = ((u'\**(?P<salbl>'+__POSALARY__+u')?', u'(?(salbl)(?:'+ASALARY+u'|保密)?(?=(?:[\s\|$]|\\\\\n))|(?:'+AASALARY+u'|保密))'), )
+position_items['posalary'] = ((u'\**(?P<salbl>'+__POSALARY__+u')?', u'(?(salbl)(?:'+ASALARY+u'|保密)?(?=(?:[\s\|$]|\\\\\n))|'+AASALARY+u')'), )
 
 SET_DEFAULT_YC = SET_ALL_DEFAULT(u'(?:。?\n+)?(?:'+ITEM_PREFIX+u'(?:'+POASP+u'*'+ASP+u'+)?)|(?:[;；]|\\\\)\n+')(u'')(u'(?=$|\|[^\\\\])')(key_items)
 SET_DEFAULT = SET_ALL_DEFAULT(u'(?:[;；]|\\\\)\n')(u'')(u'(?=(?:\\\\)?$|\|)')(key_items)
@@ -186,11 +187,13 @@ DEFAULT_ITEM_SP = u'(?:(?:(?:[;；]|\\\\)\n+(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+P
 SET_DEFAULT_SP = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_SP)
 DEFAULT_ITEM_NS = u'(?:(?:(?:[;；]|\\\\)\n+(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+POASP+u'*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\s+(?=(?!(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\-{3,}))|\S)+?)(?=$|\s*(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\|[^\\\\])'
 SET_DEFAULT_NS = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_NS)
-# If space only, the position is outside the table
-position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_DEFAULT_SP(SPACESEPRTED(map(label_separated(space_separated), position_items_nospace.items())))+u'{1,17}\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
+
+company_details_spaceonly = COMPANY_DETAILS(SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(company_items)(space_separated)+'{1,13}')
+empty_company_details_spaceonly = COMPANY_DETAILS(SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(company_items)(space_separated)+'{,13}')
+
 lp_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(lp_position_items)(newline_separated)+u'{1,17}')
 lp_empty_position_details = POSITION_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(lp_position_items)(newline_separated)+u'*')
-lp_position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(lp_position_items_nospace)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'{1,17}\n*'+SET_ALL_ITEMS(SET_DEFAULT)(responsibility_item)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'?\n*'+BORDERBOTTOM('posdettab').replace('__NORECURSIVE__', RE.pattern)
+lp_position_details_spaceonly = lambda RE:RE.pattern+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+NO_RECURSIVE(RE)(SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(lp_position_items_nospace)(space_separated))+u'{1,17}\n*'+NO_RECURSIVE(RE)(SET_ALL_ITEMS(SET_DEFAULT)(responsibility_item)(space_separated))+u'?\n*'+BORDERBOTTOM('posdettab')
 
 # Do not allow | after space
 YIDPT = u'(?:[^-\n:：'+SP+u']|-(?=['+SP+u']{3,}))(?:(?:[^\n:：'+SP+u']|(?:'+POASP+u'\|'+POASP+u')|('+POASP+u'[^\|\n'+SP+u']))+|(?=['+SP+u']{3,}))'
@@ -204,8 +207,10 @@ position_decription_items = {}
 # Only used in JY: anything not preceded by item label until the next blank line (accept escaped newlines)
 position_decription_items['description'] = ((u'(?:'+__PODESCRIPTION__+u')?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_company_items))+u'(?=(?!__NORECURSIVE__))(?:(?:\\\\\n)(?P<followindent> {10,})\n(?(followindent))(?=(?!__NORECURSIVE__))|'+POASP+u'+(?=(?!__NORECURSIVE__))|\S)+'), )
 
-empty_position_details_spaceonly = lambda RE: ASP+u'*(?:'+POASP+u'*\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(position_items_nospace)(newline_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*)*'
-empty_position_description_details_spaceonly = lambda RE:ASP+u'*(?:'+SET_ALL_ITEMS(SET_DEFAULT)(position_decription_items)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*)?'+BORDERTOP('posdettab')+u'?'+empty_position_details_spaceonly(RE)+BORDERBOTTOM('posdettab')
+# If space only, the position is outside the table
+position_details_spaceonly = lambda RE:RE.pattern+u'\n*'+BORDERTOP('posdettab')+u'?\n*'+POASP+u'*\**'+NO_RECURSIVE(RE)(SET_DEFAULT_SP(SPACESEPRTED(map(label_separated(space_separated), position_items_nospace.items()))))+u'{1,17}\n*'+BORDERBOTTOM('posdettab')
+empty_position_details_spaceonly = lambda RE: u'\n*'+BORDERTOP('posdettab')+u'?\n*(?:'+POASP+u'*\**'+NO_RECURSIVE(RE)(SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(position_items_nospace)(newline_separated))+u'\n*)*'+BORDERBOTTOM('posdettab')
+empty_position_description_details_spaceonly = lambda RE:ASP+u'*(?:'+NO_RECURSIVE(RE)(SET_ALL_ITEMS(SET_DEFAULT)(position_decription_items)(space_separated))+u'\n*)?'+empty_position_details_spaceonly(RE)
 
 # Cannot use append_po as the first part is optional (\n might be missing)
 PO = re.compile(u'(?:'+POASP+u'*\**'+POFIELDLBL+u'(?:'+POASP+u'*'+POFIELD+POASP+u'*\**)?(?: ?\*+)?'+POASP+u'*$\n*)?'+u'(?:'+POASP+u'*' + POFINISH +u')?', re.M)

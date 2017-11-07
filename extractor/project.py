@@ -29,7 +29,8 @@ ADURATION = DURATION.replace('duration', 'aduration')
 
 CHAR = u'[^:：\n]'
 
-__PJDESCRIPTION__ = u'项目(?:描述|简介|内容)[:：]'
+__PJDESCRIPTION__ = u'项目(?:描述|简介)[:：]'
+__PJACHIEVEMENT__ = u'(?:研究业绩|项目业绩|(?:项目)?成果|咨询服务)[:：]'
 
 LP_EMBEDDED_TITLE = lambda STR: u'(?:(?:项目|责任)(?:职责|简介|描述)：'+POASP+u'*)*'+ STR
 project_items = {
@@ -37,46 +38,48 @@ project_items = {
     'customer' : ((LP_EMBEDDED_TITLE(u'客户情况[:：]'), DEFAULT_ITEM), ),
     'position': ((LP_EMBEDDED_TITLE(u'(?:项目职[务位]|担任角色)[:：]'), DEFAULT_ITEM), ),
     'company': ((LP_EMBEDDED_TITLE(u'(?:所[在属]公司)[:：]'), DEFAULT_ITEM), ),
-    #'?????': ((u'(?:项目名称[:：]', DEFAULT_ITEM), ),
+    'name': ((LP_EMBEDDED_TITLE(u'项目（?名称）?[:：]'), DEFAULT_ITEM), ),
     #'?????': ((u'(?:项目贡献[:：]', DEFAULT_ITEM), ),
     #'howto': ((u'(?:项目执行[:：]', DEFAULT_ITEM), ),
     #'objective': ((u'(?:项目目标)[:：]', DEFAULT_ITEM), ),
-    'achievement': ((LP_EMBEDDED_TITLE(u'(?:研究业绩|项目业绩|项目成果|咨询服务)[:：]'), DEFAULT_ITEM), ),
-    'software': ((LP_EMBEDDED_TITLE(u'(?:软件环境)[:：]'), DEFAULT_ITEM), ),
+    'achievement': ((LP_EMBEDDED_TITLE(__PJACHIEVEMENT__), DEFAULT_ITEM), ),
+    'software': ((LP_EMBEDDED_TITLE(u'(?:软件环境|工程软件)[:：]'), DEFAULT_ITEM), ),
     'hardware': ((LP_EMBEDDED_TITLE(u'(?:硬件环境)[:：]'), DEFAULT_ITEM), ),
     'language': ((LP_EMBEDDED_TITLE(u'(?:开发语言)[:：]'), DEFAULT_ITEM), ),
-    'tools': ((LP_EMBEDDED_TITLE(u'(?:开发工具)[:：]'), DEFAULT_ITEM), ),
+    'tools': ((LP_EMBEDDED_TITLE(u'(?:开发工具|开发环境)[:：]'), DEFAULT_ITEM), ),
     'team': ((LP_EMBEDDED_TITLE(u'(?:项目团队)[:：]'), DEFAULT_ITEM), ),
     'budget' : ((LP_EMBEDDED_TITLE(u'项目投资[:：]'), DEFAULT_ITEM), ),
     'background': ((LP_EMBEDDED_TITLE(u'(?:(?:项目背景|背景描述|项目范围))[:：]'), DEFAULT_ITEM), ),
     'responsibility' : ((LP_EMBEDDED_TITLE(u'(?:责任描述|主要承担工作有)[:：]'), DEFAULT_ITEM), ),
     'resp_or_pos' : ((LP_EMBEDDED_TITLE(u'项目职责[:：]'), DEFAULT_ITEM), ),
+    'desc_or_backgr': ((LP_EMBEDDED_TITLE(u'项目内容[:：]'), DEFAULT_ITEM), ),
     'description' : ((LP_EMBEDDED_TITLE(__PJDESCRIPTION__), DEFAULT_ITEM), ),
     }
-#'description': ((u'(?P<desclabel>项目(?:描述|简介|内容))[:：]?', DEFAULT_ITEM), ),
+
 key_items = project_items.copy()
-project_items['achievement'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'(?:研究业绩|项目业绩|项目成果|咨询服务)[:：]'), MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
+project_items['achievement'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(__PJACHIEVEMENT__), MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 project_items['responsibility'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'(?:责任描述|主要承担工作有)[:：]'), MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 project_items['resp_or_pos'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'项目职责[:：](?:\n参与[:：])?'), EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM), )
-project_items['description'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'(?P<desclabel>项目(?:描述|简介|内容))[:：]'), MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
+project_items['description'] = ((u'(?<=[:：\s^])'+LP_EMBEDDED_TITLE(u'(?P<desclabel>项目(?:描述|简介))[:：]'), MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 
-SET_DEFAULT_ZL = SET_ALL_DEFAULT(u'(?:[;；。]?)\n+')(u'')(u'(?=$|\|[^\\\\])')(key_items)
+SET_DEFAULT_ZL = SET_ALL_DEFAULT(u'(?:[;；。]?)\n+')(u'')(u'(?=(?:\\\\)?[__SEP__^]|$)')(key_items)
 # TODO: replacement candidate for SET_DEFAULT_NS?
 SET_ALL_ITEMS_YC = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(SPACESEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
-SET_DEFAULT_YC = SET_ALL_DEFAULT(ASP+u'+')(u'?')(u'(?=\s+(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|\|[^\\\\]|$)')(key_items)
+SET_DEFAULT_YC = SET_ALL_DEFAULT(ASP+u'+')(u'?')(u'(?=\s+(?:'+RE_ANY(PRJ_ITEM_KEYS(key_items)).replace(u'[:：]?', u'[:：]')+u')|(?:\\\\)?[__SEP__^]|$)')(key_items)
 # YC project description do not have prefix as position description
-SET_DEFAULT_YC_DESC = SET_ALL_DEFAULT(u'(?:[;；。]?)\n+')(u'')(u'(?=$|\|[^\\\\])')(key_items)
-SET_DEFAULT = SET_ALL_DEFAULT(u'(?:[;；]|\\\\)\n')(u'')(u'(?=(?:\\\\)?$|\|)')(key_items)
+SET_DEFAULT_YC_DESC = SET_ALL_DEFAULT(u'(?:[;；。]?)\n+')(u'')(u'(?=(?:\\\\)?[__SEP__^]|$)')(key_items)
+SET_DEFAULT = SET_ALL_DEFAULT(u'(?:[;；]|\\\\)\n')(u'')(u'(?=(?:\\\\)?[__SEP__^]|$)')(key_items)
 #SET_DEFAULT = SET_ALL_DEFAULT(u'(?:(?:[;；]|\\\\)\n|(?<!\\\\)\n+(?=(?!'+POASP+u'*'+ANONPERIOD+u')))')(u'')(u'(?=(?:\\\\)?$|\|)')(key_items)
 SET_DEFAULT_LP = SET_ALL_DEFAULT(u'\n')(u'')(u'')(key_items)
 
-PROJECT_DETAILS = lambda DETAILS: lambda RE:BORDERTOP('dettab')+u'?\n*'+POASP+u'*\**'+RE.pattern+u'\n*'+DETAILS.replace('__NORECURSIVE__', RE.pattern)+u'\n*'+BORDERBOTTOM('dettab').replace('__NORECURSIVE__', RE.pattern)
+PROJECT_DETAILS = lambda DETAILS: lambda RE:BORDERTOP('dettab')+u'?\n*'+POASP+u'*\**'+RE.pattern+u'\n*'+NO_RECURSIVE(RE)(DETAILS)+u'\n*'+BORDERBOTTOM('dettab')
 
 project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated)+u'+')
 empty_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated)+u'*')
 
-jy_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated).replace('__NORECURSIVE__', '__NO_DELETE__')+u'+')
-empty_jy_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated).replace('__NORECURSIVE__', '__NO_DELETE__')+u'*')
+# Do not use NO_RECURSIVE(RE)
+jy_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated)+u'+')
+empty_jy_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT)(project_items)(newline_separated)+u'*')
 
 project_decription_items = {}
 # Only used in JY: anything not preceded by item label until the next blank line (accept escaped newlines)
@@ -88,7 +91,7 @@ DEFAULT_ITEM_NS = u'(?:(?:(?:[;；]|\\\\)\n+(?!(?:'+POASP+u'*'+ANONPERIOD+u'|'+P
 SET_DEFAULT_NS = lambda x: x.replace(DEFAULT_ITEM, DEFAULT_ITEM_NS)
 
 empty_project_details_spaceonly = lambda RE: u'\n*(?:\**'+SET_ALL_ITEMS_SPACE(SET_DEFAULT_SP)(project_items)(newline_separated)+u'\n*)*'
-empty_project_description_details_spaceonly = lambda RE:u'\n*(?:'+SET_ALL_ITEMS(lambda x:x)(project_decription_items)(space_separated).replace('__NORECURSIVE__', RE.pattern)+u'\n*)?'+empty_project_details_spaceonly(RE)
+empty_project_description_details_spaceonly = lambda RE:u'\n*(?:'+NO_RECURSIVE(RE)(SET_ALL_ITEMS(lambda x:x)(project_decription_items)(space_separated))+u'\n*)?'+empty_project_details_spaceonly(RE)
 
 lp_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(project_items)(newline_separated)+u'+')
 empty_lp_project_details = PROJECT_DETAILS(SET_ALL_ITEMS(SET_DEFAULT_LP)(project_items)(newline_separated)+u'*')
@@ -100,11 +103,11 @@ yingcai_project_items = project_items.copy()
 yingcai_project_items['responsibility'] = ((u'(?<=[:：\s^])(?:(?:责任描述|主要承担工作有)[:：])', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')')), )
 yingcai_project_items['achievement'] = ((LP_EMBEDDED_TITLE(u'(?:研究业绩|项目业绩|项目成果|咨询服务)[:：]'), EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')'), )
 yingcai_project_items['resp_or_pos'] = ((u'(?<=[:：\s^])项目职责[:：](?:\n参与[:：])?', EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')'), )
-yingcai_project_items['description'] = ((u'(?<=[:：\s^])(?P<desclabel>项目(?:描述|简介|内容))[:：]', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')')), )
+yingcai_project_items['description'] = ((u'(?<=[:：\s^])(?P<desclabel>项目(?:描述|简介))[:：]', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+u'(?:'+SET_DEFAULT_YC_DESC(DEFAULT_ITEM)+u'|'+DEFAULT_ITEM+u')')), )
 yingcai_project_description = {}
-yingcai_project_description['description'] = ((u'(?<=[:：\s^])(?:(?P<desclabel>项目(?:描述|简介|内容))[:：])?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
+yingcai_project_description['description'] = ((u'(?<=[:：\s^])(?:(?P<desclabel>项目(?:描述|简介))[:：])?', MATCH_SPACE_OR(EXCLUDE_ITEM_KEYS(key_items)+DEFAULT_ITEM)), )
 
-yc_project_details = lambda RE:RE.pattern+BORDERTOP('detborder')+u'?(?:\n*)'+POASP+u'*'+SET_ALL_ITEMS(SET_DEFAULT_YC_DESC)(yingcai_project_description)(newline_separated).replace('__NORECURSIVE__', RE.pattern)+u'?\**'+SET_ALL_ITEMS_YC(SET_DEFAULT_YC)(yingcai_project_items)(newline_separated).replace('__NORECURSIVE__', RE.pattern)+u'*\**(?(detborder)\n*(?P<intro>[^-]{3}.*\n)?'+BORDERBOTTOM('detborder')+u')'
+yc_project_details = lambda RE:RE.pattern+BORDERTOP('detborder')+u'?(?:\n*)'+POASP+u'*'+NO_RECURSIVE(RE)(SET_ALL_ITEMS(SET_DEFAULT_YC_DESC)(yingcai_project_description)(newline_separated))+u'?\**'+NO_RECURSIVE(RE)(SET_ALL_ITEMS_YC(SET_DEFAULT_YC)(yingcai_project_items)(newline_separated))+u'*\**(?(detborder)\n*(?P<intro>[^-]{3}.*\n)?'+BORDERBOTTOM('detborder')+u')'
 
 
 def output_cleanup(groupdict):
@@ -130,7 +133,7 @@ def project_output(output, groupdict, begin='', end='', company=''):
             result['date_to'] = fix_date(groupdict['ato'])
         result['name'] = fix_name(groupdict['project'])
         for key in project_items:
-            if key == 'resp_or_pos':
+            if key in ('resp_or_pos', 'desc_or_backgr'):
                 continue
             if key == 'duration':
                 if 'aduration' in groupdict and groupdict['aduration']:
@@ -144,6 +147,11 @@ def project_output(output, groupdict, begin='', end='', company=''):
                 result['responsibility'] = fix_name(groupdict['resp_or_pos'])
             elif not 'position' in result:
                 result['position'] = fix_name(groupdict['resp_or_pos'])
+        if 'desc_or_backgr' in groupdict and groupdict['desc_or_backgr']:
+            if not 'description' in result:
+                result['description'] = fix_name(groupdict['desc_or_backgr'])
+            elif not 'background' in result:
+                result['background'] = fix_name(groupdict['desc_or_backgr'])
         if 'duration' not in result or not result['duration']:
             result['duration'] = compute_duration(result['date_from'], result['date_to'])
         output['project'].append(result)
@@ -241,7 +249,9 @@ def project_description_output(out, groupdict):
         for res in MAPJ.finditer(description):
             r = {}
             for key in res.groupdict():
-                if res.groupdict()[key]:
+                if key == 'responsibility' and res.groupdict()[key] and key in d:
+                    r['resp_or_pos'] = res.groupdict()[key]
+                elif res.groupdict()[key]:
                     r[key] = res.groupdict()[key]
             d.update(r)
             # Must avoid replacing all ASP/POASP is spurious match

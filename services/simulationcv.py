@@ -13,7 +13,7 @@ class SimulationCV(services.base.simulation.Simulation,
     )
 
     yaml_private_key = {
-        "secrecy":              True,
+        # "secrecy":              True,
         "phone":                '[*****]',
         "email":                '[*****]',
         "name":                 '[*****]',

@@ -89,60 +89,42 @@ class SearchCVbyTextAPI(Resource):
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
+        count = 20
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         text = args['search_text']
-        cur_page = args['page']
+        cur_page = args['page'] if args['page'] else 1
         filterdict = args['filterdict'] if args['filterdict'] else {}
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        searchs = dict(member.cv_search(text))
-        yaml_searchs = dict(member.cv_search_yaml(text))
-        for id in yaml_searchs:
-            if id in searchs:
-                searchs[id] += yaml_searchs[id]
-            else:
-                searchs[id] = yaml_searchs[id]
-        result = sorted(searchs.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
-        ids = set([cv[0] for cv in result])
-        ids = self.svc_index.filter_ids(self.cv_indexname, ids, filterdict)
-        result = filter(lambda x: x[0] in ids, result)
-        count = 20
-        datas, pages = self.paginate([cv[0] for cv in result], cur_page, count, project)
+        searchs = member.cv_search(keywords=text, filterdict=filterdict,
+                                   start=(cur_page-1)*count, size=count)
+        total = member.cv_count(keywords=text, filterdict=filterdict)
+        pages = total/count
+        datas = self.paginate([each[0] for each in searchs], project)
         return {
             'code': 200,
             'data': {
                 'keyword': text,
                 'datas': datas,
                 'pages': pages,
-                'totals': len(result),
+                'totals': total,
             }
         }
 
-    def paginate(self, results, cur_page, eve_count, project):
-        if not cur_page:
-            cur_page = 1
-        sum = len(results)
-        if sum%eve_count != 0:
-            pages = sum/eve_count + 1
-        else:
-            pages = sum/eve_count
-        datas = []
-        ids = []
-        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            if id not in ids:
-                ids.append(id)
-            else:
-                continue
+    def paginate(self, results, project):
+        datas = list()
+        for id in results:
+            yaml_info = project.cv_getyaml(id)
             try:
-                yaml_info = project.cv_getyaml(id)
-            except IOError:
-                ids.remove(id)
+                info = {
+                    'author': yaml_info['committer'],
+                    'time': utils.builtin.strftime(yaml_info['date']),
+                }
+            except Exception:
                 continue
-            info = {
-                'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
-            }
-            datas.append({ 'cv_id': id, 'yaml_info': yaml_info, 'info': info})
-        return datas, pages
+            datas.append({ 'cv_id': yaml_info['id'],
+                           'yaml_info': yaml_info,
+                           'info': info})
+        return datas

@@ -106,6 +106,22 @@ class Member(services.base.service.Service):
         return result
 
     @property
+    def storageCV(self):
+        result = None
+        servicename = self.config['storageCV']
+        for cvrepo in self.cvrepos:
+            if isinstance(cvrepo, services.simulationcv.SimulationCV):
+                for each in cvrepo.storages:
+                    if each.name == servicename:
+                        result = each
+                        break
+            elif cvrepo.name == servicename:
+                result = each
+            if result is not None:
+                break
+        return result
+
+    @property
     def administrator(self):
         if 'administrator' not in self.config:
             self.config['administrator'] = set()
@@ -186,11 +202,35 @@ class Member(services.base.service.Service):
                                           unique=unique, do_commit=do_commit)
         return result
 
-    def cv_search(self, keyword):
-        return self.curriculumvitaes.search(keyword, selected=self.config['storageCV'])
+    def cv_count(self, keywords=None, filterdict=None, ids=None):
+        if ids is None:
+            ids = self.curriculumvitaes.names()
+        return self.curriculumvitaes.count(keywords=keywords, filterdict=filterdict,
+                                           ids=ids, selected=self.config['storageCV'])
 
-    def cv_search_yaml(self, keyword):
-        return self.curriculumvitaes.search_yaml(keyword, selected=self.config['storageCV'])
+    def cv_count_yaml(self, keywords=None, filterdict=None, ids=None):
+        if ids is None:
+            ids = self.curriculumvitaes.yamls()
+        return self.curriculumvitaes.count_yaml(keywords=keywords, filterdict=filterdict,
+                                                ids=ids, selected=self.config['storageCV'])
+
+    def cv_search(self, keywords=None, filterdict=None, ids=None,
+                  source=False, start=0, size=10):
+        if ids is None:
+            ids = self.curriculumvitaes.names()
+        return self.curriculumvitaes.search(keywords=keywords, filterdict=filterdict,
+                                            ids=ids, source=source,
+                                            start=start, size=size,
+                                            selected=self.config['storageCV'])
+
+    def cv_search_yaml(self, keywords=None, filterdict=None, ids=None,
+                       source=False, start=0, size=10):
+        if ids is None:
+            ids = self.curriculumvitaes.yamls()
+        return self.curriculumvitaes.search_yaml(keywords=keywords, filterdict=filterdict,
+                                                 ids=ids, source=source,
+                                                 start=start, size=size,
+                                                 selected=self.config['storageCV'])
 
     def cv_projects(self, id):
         return [p.name for p in self.projects.values() if id in p.cv_ids()]

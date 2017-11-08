@@ -187,20 +187,28 @@ class BaseStorage(services.base.service.Service):
             result = unicode(str(markdown), 'utf-8')
         return result
 
-    def search(self, keyword):
-        results = set()
-        allfile = self.interface.search(keyword)
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            results.add((id, result[1]))
+    def count(self, keywords=None, filterdict=None, ids=None):
+        results = self.interface.SEcount(keywords=keywords,
+                                         filterdict=filterdict, ids=ids)
         return results
 
-    def search_yaml(self, keyword):
-        results = set()
-        allfile = self.interface.search_yaml(keyword)
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            results.add((id, result[1]))
+    def count_yaml(self, keywords=None, filterdict=None, ids=None):
+        results = self.interface.SEcount_yaml(keywords=keywords,
+                                              filterdict=filterdict, ids=ids)
+        return results
+
+    def search(self, keywords=None, filterdict=None, ids=None,
+               source=False, start=0, size=10):
+        results = self.interface.search(keywords=keywords, filterdict=filterdict,
+                                        ids=ids, source=source,
+                                        start=start, size=size)
+        return results
+
+    def search_yaml(self, keywords=None, filterdict=None, ids=None,
+                    source=False, start=0, size=10):
+        results = self.interface.search_yaml(keywords=keywords, filterdict=filterdict,
+                                            ids=ids, source=source,
+                                            start=start, size=size)
         return results
 
     def names(self):

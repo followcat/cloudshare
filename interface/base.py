@@ -35,18 +35,22 @@ class Interface(object):
     def lsfiles(self):
         raise NotImplementedInterface
 
-    def search(self, keywords, path='', files=None, pagesize=10000, start=0, size=None):
+    def search(self, keywords=None, filterdict=None, ids=None, source=False,
+               start=0, size=None, path='', files=None):
         if self.searchengine is None:
             result = self.grep(keywords, path=path, files=files)
         else:
-            result = self.SEsearch(keywords, pagesize=pagesize, start=start, size=size)
+            result = self.SEsearch(keywords=keywords, filterdict=filterdict, ids=ids,
+                                   source=source, start=start, size=size)
         return result
 
-    def search_yaml(self, keywords, path='', files=None, pagesize=10000, start=0, size=None):
+    def search_yaml(self, keywords=None, filterdict=None, ids=None, source=False,
+                    start=0, size=None, path='', files=None):
         if self.searchengine is None:
             result = self.grep_yaml(keywords, path=path, files=files)
         else:
-            result = self.SEsearch_yaml(keywords, pagesize=pagesize, start=start, size=size)
+            result = self.SEsearch_yaml(keywords=keywords, filterdict=filterdict, ids=ids,
+                                        source=source, start=start, size=size)
         return result
 
     def grep(self):
@@ -55,25 +59,60 @@ class Interface(object):
     def grep_yaml(self):
         raise NotImplementedInterface
 
-    def SEquery(self, indexname, keywords, pagesize=10000, start=0, size=None):
-        query_dict = utils.esquery.request_gen(keywords=keywords)
+    def SEquery(self, indexname, keywords=None, filterdict=None, ids=None,
+                source=False, start=0, size=None):
+        query_dict = utils.esquery.request_gen(keywords=keywords,
+                                               filterdict=filterdict, ids=ids)
         kwargs = {
             '_source_include': 'file',
-            'body': query_dict
+            'body': query_dict,
+            '_source': 'false' if source is False else 'true'
         }
         result = utils.esquery.scroll(self.searchengine, indexname, kwargs,
-                                      pagesize=pagesize, start=start, size=size)
-        return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
-                                  x['_score']), result))
-
-    def SEsearch(self, keywords, pagesize=10000, start=0, size=None):
-        indexname = '.'.join([self.name])
-        result = self.SEquery(indexname, keywords, pagesize=pagesize, start=start, size=size)
+                                      start=start, size=size)
+        if source is False:
+            result = map(lambda x: (x['_id'], x['_score']), result)
         return result
 
-    def SEsearch_yaml(self, keywords, pagesize=10000, start=0, size=None):
-        indexname = '.'.join([self.name, 'yaml'])
-        result = self.SEquery(indexname, keywords, pagesize=pagesize, start=start, size=size)
+    def SEcount(self, keywords=None, filterdict=None, ids=None):
+        kwargs = dict()
+        indexname = ['.'.join([self.name])]
+        if filterdict is not None:
+            indexname.extend(["cloudshare.index"])
+        querydict = utils.esquery.request_gen(keywords=keywords,
+                                              filterdict=filterdict, ids=ids)
+        kwargs.update({'body': querydict})
+        result = utils.esquery.count(self.searchengine, indexname, kwargs)
+        return result
+
+    def SEcount_yaml(self, keywords=None, filterdict=None, ids=None):
+        kwargs = dict()
+        indexname = ['.'.join([self.name, 'yaml'])]
+        if filterdict is not None:
+            indexname.extend(["cloudshare.index"])
+        querydict = utils.esquery.request_gen(keywords=keywords,
+                                              filterdict=filterdict, ids=ids)
+        kwargs.update({'body': querydict})
+        result = utils.esquery.count(self.searchengine, indexname, kwargs)
+        return result
+
+
+    def SEsearch(self, keywords=None, filterdict=None, ids=None, source=False,
+                 start=0, size=10):
+        indexname = ['.'.join([self.name])]
+        if filterdict is not None:
+            indexname.extend(["cloudshare.index"])
+        result = self.SEquery(indexname, keywords=keywords, filterdict=filterdict, ids=ids,
+                              source=source, start=start, size=size)
+        return result
+
+    def SEsearch_yaml(self, keywords=None, filterdict=None, ids=None, source=False,
+                      start=0, size=10):
+        indexname = ['.'.join([self.name, 'yaml'])]
+        if filterdict is not None:
+            indexname.extend(["cloudshare.index"])
+        result = self.SEquery(indexname, keywords=keywords, filterdict=filterdict, ids=ids,
+                              source=source, start=start, size=size)
         return result
 
     def subprocess_grep(self, command, path, shell):

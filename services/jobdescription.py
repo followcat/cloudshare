@@ -33,7 +33,7 @@ class JobDescription(services.base.storage.BaseStorage):
             >>> svc_jd = services.jobdescription.JobDescription(path, 'testjd')
             >>> svc_jd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
             True
-            >>> results = list(svc_jd.search('JD-A'))
+            >>> results = list(svc_jd.search(keywords='JD-A'))
             >>> data = svc_jd.getyaml(results[0][0])
             >>> data['description']
             'JD-A description'
@@ -48,7 +48,7 @@ class JobDescription(services.base.storage.BaseStorage):
             >>> svc_jd.add('CompanyC', 'JD-C', 'JD-C description', 'Dever',
             ...     commentary='this is JD-C commentary', followup='JD-C followup')
             True
-            >>> results = list(svc_jd.search('JD-C'))
+            >>> results = list(svc_jd.search(keywords='JD-C'))
             >>> data = svc_jd.getyaml(results[0][0])
             >>> data['description'], data['commentary']
             ('JD-C description', 'this is JD-C commentary')

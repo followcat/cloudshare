@@ -47,7 +47,7 @@ class PositionAPI(BaseAPI):
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            searches = project.cv_search(text)
+            searches = project.cv_search(keywords=text)
         result = []
         for search in list(searches)[:self.numbers]:
             name = search[0]
@@ -177,7 +177,7 @@ class LSIbaseAPI(Resource):
         result = self.miner.probability(project.modelname, doc, uses=iduses,
                                         top=self.top, minimum=1000)
         ids = set([cv[0] for cv in result])
-        ids = self.svc_index.filter_ids(self.cv_indexname, ids, filterdict)
+        ids = self.svc_index.filter_ids(self.cv_indexname, filterdict=filterdict, ids=ids)
         result = filter(lambda x: x[0] in ids, result)
         totals = len(result)
         if totals%eve_count != 0:
@@ -260,8 +260,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             output = {}
             output['CV'] = list()
             bestids = set([cv[0] for cv in bestjds[jdid]])
-            filterids = self.svc_index.filter_ids(self.cv_indexname, bestids,
-                                                  filterdict)
+            filterids = self.svc_index.filter_ids(self.cv_indexname,
+                                                  filterdict=filterdict, ids=bestids)
             for cv in filterids:
                 cvinfo = project.cv_getyaml(cv[0])
                 cvinfo['CVvalue'] = cv[1]

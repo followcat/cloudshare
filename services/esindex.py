@@ -115,35 +115,47 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Update numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def get(self, indexname, querydict, source=False, pagesize=10000, start=0, size=None):
-        kwargs={'body': querydict}
-        results = self.ES(indexname, kwargs, source=source,
-                          pagesize=pagesize, start=start, size=None)
-        return results
-
-    def ES(self, indexname, kwargs, source=False, pagesize=10000, start=0, size=None):
-        kwargs['doc_type'] = 'index'
-        kwargs['sort'] = '_doc'
+    def ESsearch(self, indexname, querydict=None, kwargs=None, source=False,
+                 start=0, size=None):
+        if kwargs is None:
+            kwargs = dict()
+        kwargs.update({'body': querydict})
+        kwargs['sort'] = '_doc' if 'sort' not in kwargs else kwargs['sort']
         kwargs['_source'] = 'false' if source is False else 'true'
-        result = utils.esquery.scroll(self.es, indexname, kwargs,
-                                      pagesize=pagesize, start=start, size=size)
+        result = utils.esquery.scroll(self.es, indexname, kwargs, start=start, size=size)
         return result
 
-    def filter(self, indexname, filterdict, ids=None, source=False,
-               pagesize=10000, start=0, size=None):
+    def count(self, indexname, keywords=None, filterdict=None, ids=None, kwargs=None):
+        result = 0
+        querydict = utils.esquery.request_gen(keywords=keywords,
+                                              filterdict=filterdict, ids=ids)
+        if kwargs is None:
+            kwargs = dict()
+        kwargs.update({'body': querydict})
+        if ('filter' in querydict['query']['bool'] and querydict['query']['bool']['filter']) or\
+            ('must' in querydict['query']['bool'] and querydict['query']['bool']['must']):
+            result = utils.esquery.count(self.es, indexname, kwargs=kwargs)
+        return result
+
+    def filter(self, indexname, keywords=None, filterdict=None, ids=None,
+               source=False, start=0, size=None, kwargs=None):
         results = set()
-        querydict = utils.esquery.request_gen(filterdict=filterdict, ids=ids)
-        if querydict['query']['bool']['filter']:
-            results = self.get(indexname, querydict, source=source,
-                               pagesize=pagesize, start=start, size=size)
+        querydict = utils.esquery.request_gen(keywords=keywords,
+                                              filterdict=filterdict, ids=ids)
+        if ('filter' in querydict['query']['bool'] and querydict['query']['bool']['filter']) or\
+            ('must' in querydict['query']['bool'] and querydict['query']['bool']['must']):
+            results = self.ESsearch(indexname, querydict=querydict, kwargs=kwargs,
+                                    source=source,
+                                    start=start, size=size)
         return results
 
-    def filter_ids(self, indexname, ids, filterdict, source=False,
-                   pagesize=10000, start=0, size=None):
+    def filter_ids(self, indexname, keywords=None, filterdict=None, ids=None,
+                   source=False, start=0, size=None, kwargs=None):
         result = ids
         if filterdict:
-            filterset = self.filter(indexname, filterdict, ids=ids, source=source,
-                                    pagesize=pagesize, start=start, size=size)
+            filterset = self.filter(indexname, keywords=keywords, filterdict=filterdict,
+                                    ids=ids, source=source,
+                                    start=start, size=size, kwargs=kwargs)
             result = set([item['_id'] for item in filterset])
         return result
 

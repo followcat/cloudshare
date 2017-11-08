@@ -165,36 +165,69 @@ class Simulation(services.base.storage.BaseStorage):
         self.memdatas.update('modifytime', id)
         return result
 
-    def search(self, keyword, selected=None):
+    def count(self, keywords=None, filterdict=None, ids=None, selected=None):
         if selected is None:
             selected = [storage.name for storage in self.storages]
-        results = set()
-        allfile = set()
+        if ids is None:
+            ids = self.ids
+        results = 0
         for storage in self.storages:
             if isinstance(storage, Simulation):
-                allfile.update(storage.search(keyword, selected=selected))
+                results += storage.count(keywords=keywords, filterdict=filterdict,
+                                         ids=ids, selected=selected)
             elif storage.name in selected:
-                allfile.update(storage.search(keyword))
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            if id in self.ids:
-                results.add((id, result[1]))
+                results += storage.count(keywords=keywords, filterdict=filterdict, ids=ids)
         return results
 
-    def search_yaml(self, keyword, selected=None):
+    def count_yaml(self, keywords=None, filterdict=None, ids=None, selected=None):
         if selected is None:
             selected = [storage.name for storage in self.storages]
-        results = set()
-        allfile = set()
+        if ids is None:
+            ids = self.ids
+        results = 0
         for storage in self.storages:
             if isinstance(storage, Simulation):
-                allfile.update(storage.search_yaml(keyword, selected=selected))
+                results += storage.count_yaml(keywords=keywords, filterdict=filterdict,
+                                              ids=ids, selected=selected)
             elif storage.name in selected:
-                allfile.update(storage.search_yaml(keyword))
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            if id in self.ids:
-                results.add((id, result[1]))
+                results += storage.count_yaml(keywords=keywords, filterdict=filterdict,
+                                              ids=ids)
+        return results
+
+    def search(self, keywords=None, filterdict=None, ids=None,
+               source=False, start=0, size=10, selected=None):
+        if selected is None:
+            selected = [storage.name for storage in self.storages]
+        if ids is None:
+            ids = self.ids
+        results = list()
+        for storage in self.storages:
+            if isinstance(storage, Simulation):
+                results.extend(storage.search(keywords=keywords, filterdict=filterdict,
+                                              ids=ids, source=source,
+                                              start=start, size=size, selected=selected))
+            elif storage.name in selected:
+                results.extend(storage.search(keywords=keywords, filterdict=filterdict,
+                                              ids=ids, source=source,
+                                              start=start, size=size))
+        return results
+
+    def search_yaml(self, keywords=None, filterdict=None, ids=None,
+                    source=False, start=0, size=10, selected=None):
+        if selected is None:
+            selected = [storage.name for storage in self.storages]
+        if ids is None:
+            ids = self.ids
+        results = list()
+        for storage in self.storages:
+            if isinstance(storage, Simulation):
+                results.extend(storage.search_yaml(keywords=keywords, filterdict=filterdict,
+                                                   ids=ids, source=source,
+                                                   start=start, size=size, selected=selected))
+            elif storage.name in selected:
+                results.extend(storage.search_yaml(keywords=keywords, filterdict=filterdict,
+                                                   ids=ids, source=source,
+                                                   start=start, size=size))
         return results
 
     def search_key(self, key, value, ids=None):

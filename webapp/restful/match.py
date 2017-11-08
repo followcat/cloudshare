@@ -94,9 +94,8 @@ class CompanyProjectAPI(MatchbaseAPI):
         result = list()
         cv_indexname = self.es_config['CV_INDEXNAME']
         search = self.svc_index.filter(cv_indexname,
-                                       {'experience.project.company': self.doc},
-                                       pagesize=self.numbers,
-                                       start=self.page*self.numbers,
+                                       filterdict={'experience.project.company': self.doc},
+                                       start=(self.page-1)*self.numbers,
                                        size=self.numbers, source=True)
         for each in search:
             for project in each['_source']['experience']['project']:

@@ -251,8 +251,8 @@ class SearchCObyTextAPI(Resource):
         cur_page = args['current_page']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        search_results = project.company.search(text)
-        search_yaml_results = project.company.search_yaml(text)
+        search_results = project.company.search(keywords=text)
+        search_yaml_results = project.company.search_yaml(keywords=text)
         search_results.update(search_yaml_results)
         results = map(lambda x:x[0], search_results)
         sorted_results = project.company.sorted_ids('modifytime', ids=results)

@@ -55,9 +55,10 @@ class Config(object):
     )
 
     es_template = (
-        ("CV_INDEXNAME",    "cloudshare.index"),
-        ("JD_INDEXNAME",    "jobdescription.index"),
-        ("CO_INDEXNAME",    "company.index"),
+        ("cvstorage",          "cvstorage"),    # SVC_CV_STO
+        ("cvmembers",          "cvmembers"),    # SVC_CO_MEMBERS
+        ("jdmembers",          "jdmembers"),    # SVC_JD_MEMBERS
+        ("comembers",          "cormembers"),   # SVC_CO_MEMBERS
     )
 
     min_template = (
@@ -180,9 +181,8 @@ def load_doc_processor(name):
 def load_esindex(es_conn):
     global config
     SVC_INDEX = services.esindex.ElasticsearchIndexing()
-    SVC_INDEX.setup(es_conn, config.es_config['CV_INDEXNAME'])
-    SVC_INDEX.setup(es_conn, config.es_config['JD_INDEXNAME'])
-    SVC_INDEX.setup(es_conn, config.es_config['CO_INDEXNAME'])
+    for each in config.es_config:
+        SVC_INDEX.setup(es_conn, config.es_config[each])
     return SVC_INDEX
 
 

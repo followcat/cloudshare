@@ -76,15 +76,18 @@ def request_gen(keywords=None, filterdict=None, ids=None):
     return querydict
 
 
-def scroll(esconn, indexname, kwargs, start=0, size=None):
+def scroll(esconn, kwargs, index=None, doctype=None, start=0, size=None):
     count = 0
     result = list()
+    if size is None:
+        size = 10000
     scroll = True if start + size > 10000 else False
     if scroll:
         start = 0
         kwargs['scroll'] = '1m'
     page = esconn.search(
-            index=indexname,
+            index=index,
+            doc_type=doctype,
             from_=start,
             size=size,
             request_timeout=30,
@@ -101,6 +104,6 @@ def scroll(esconn, indexname, kwargs, start=0, size=None):
     return result
 
 
-def count(esconn, indexname, kwargs):
-    page = esconn.count(index=indexname, **kwargs)
+def count(esconn, kwargs, index=None, doctype=None):
+    page = esconn.count(index=index, doc_type=doctype, **kwargs)
     return page['count']

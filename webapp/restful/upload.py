@@ -49,7 +49,6 @@ class UploadCVAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type=str, location='json')
         self.reqparse.add_argument('updates', type=list, location='json')
-        self.reqparse.add_argument('origin', type=str, location='json')
 
     def putparam(self):
         self.user = flask.ext.login.current_user
@@ -107,9 +106,9 @@ class UploadCVAPI(Resource):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        origin = args['origin']
         if user.name not in upload:
             upload[user.name] = dict()
+        origin = flask.request.form['origin']
         network_file = flask.request.files['files']
         filename = network_file.filename
         filepro = self.svc_docpro(network_file, filename.encode('utf-8'),
@@ -140,6 +139,7 @@ class UploadCVAPI(Resource):
 class UserUploadCVAPI(UploadCVAPI):
 
     def __init__(self):
+        super(UserUploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('setpeople', type=bool, location='json')
 
@@ -163,6 +163,7 @@ class UserUploadCVAPI(UploadCVAPI):
 class MemberUploadCVAPI(UploadCVAPI):
 
     def __init__(self):
+        super(MemberUploadCVAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
 

@@ -17,16 +17,6 @@ class PreviewTopBarForm extends Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  componentWillMount() {
-    getUploadOrigin((json) => {
-      if (json.code === 200) {
-        this.setState({
-          origins: json.data,
-        });
-      }
-    });
-  }
-
   handleClick(e) {
     e.preventDefault();
 
@@ -44,6 +34,7 @@ class PreviewTopBarForm extends Component {
       name,
       prefixCls,
       resumeID,
+      origins,
       classifyValue,
       classifyList,
       currentPreview,
@@ -52,8 +43,7 @@ class PreviewTopBarForm extends Component {
       btnText
     } = this.props,
     { getFieldDecorator } = form;
-    const { origins } = this.state;
-
+    console.log(origins);
     return (
       <Form layout="inline" className={`${prefixCls}-form`}>
         <FormItem label="简历ID">

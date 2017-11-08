@@ -13,6 +13,7 @@ import { introJs } from 'intro.js';
 
 import { getClassify } from 'request/classify';
 import { uploadPreview, confirmUpload } from 'request/upload';
+import { getUploadOrigin } from 'request/classify';
 
 import { API } from 'API';
 
@@ -62,6 +63,7 @@ class Uploader extends Component {
       failedList: [],
       classifyList: [],
       confirmResult: [],
+      origins: [],
       currentPreview: 0,
       total: 0,
       guide:false,
@@ -77,6 +79,14 @@ class Uploader extends Component {
   }
 
   componentWillMount() {
+    getUploadOrigin((json) => {
+      if (json.code === 200) {
+        this.setState({
+          origins: json.data,
+        });
+      }
+    });
+
     if(this.props.location.query.guide) {
       this.setState({
       guide: this.props.location.query.guide
@@ -237,6 +247,7 @@ class Uploader extends Component {
       classifyList,
       currentPreview,
       total,
+      origins,
       confirmLoading
     } = this.state;
 
@@ -246,6 +257,7 @@ class Uploader extends Component {
           completedList={completedList}
           classifyList={classifyList}
           currentPreview={currentPreview}
+          origins={origins}
           total={total}
           confirmLoading={confirmLoading}
           onPrevClick={this.handlePrevClick}
@@ -264,7 +276,8 @@ class Uploader extends Component {
       completedList,
       failedList,
       confirmResult,
-      guide
+      guide,
+      origins
     } = this.state;
 
     const uploadProps = {
@@ -273,6 +286,7 @@ class Uploader extends Component {
       headers: {
         'Authorization': `Basic ${StorageUtil.get('token')}`
       },
+      origins: origins,
       multiple: true,
       text: '点击上传或拖放文件到此区域',
       hint: '支持单文件或多文件上传',

@@ -67,7 +67,7 @@ class SimulationCV(services.base.simulation.Simulation,
             try:
                 result = storage.gethtml(id)
                 if secrecy is True and self.ishideprivate(id):
-                    result = self.secretsmd(md)
+                    result = self.secretsmd(id, md)
                 break
             except IOError:
                 continue
@@ -103,7 +103,7 @@ class SimulationCV(services.base.simulation.Simulation,
             info['secrecy'] = True
         return info
 
-    def secretsmd(self, md, info=None):
+    def secretsmd(self, id, md, info=None):
         result = md
         if self.ishideprivate(id):
             if info is None:

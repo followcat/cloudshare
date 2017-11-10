@@ -54,7 +54,7 @@ class SimulationCV(services.base.simulation.Simulation,
         hidden = '[****]'
         for key in self.yaml_private_key:
             if key in yaml and yaml[key]:
-                result = result.replace(info[key], hidden+' '*(len(info[key])-len(hidden)))
+                result = result.replace(yaml[key], hidden+' '*(len(yaml[key])-len(hidden)))
             elif key == 'phone':
                 value = extractor.information_explorer.get_phone(result)
                 if len(value) > 6:

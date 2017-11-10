@@ -1,22 +1,22 @@
 import re
 
 
-def match_gen(keywords):
+def match_gen(key, keywords, slop=50):
     result = {'must': [], 'should': [], 'filter': []}
     match_str = re.sub('"(.*?)"', '', keywords)
     match_phrase_list = re.findall('"(.*?)"', keywords)
     if len(match_str.replace(' ', '')) > 0:
         result["should"] = [{
                 "match_phrase": {
-                    "content": {
+                    key: {
                         "query": match_str,
-                        "slop":  50}
+                        "slop":  slop}
                     }
             }]
-        result['must'].append({"match": {"content": {"query": match_str,
-                                                   "minimum_should_match": "30%"}}})
+        result['must'].append({"match": {key: {"query": match_str,
+                                               "minimum_should_match": "30%"}}})
     for keyword in match_phrase_list:
-        result['must'].append({"match_phrase": {"content": {"query": keyword}}})
+        result['must'].append({"match_phrase": {key: {"query": keyword}}})
     return result
 
 
@@ -26,7 +26,7 @@ def filter_gen(filterdict):
         for index in range(len(filterdict['date'])):
             filterdict['date'][index] = filterdict['date'][index].replace('-', '')
     for key, value in filterdict.items():
-        if not value:
+        if value is None:
             continue
         if key == 'date':
             if len(value[0]) > 0:
@@ -51,23 +51,40 @@ def filter_gen(filterdict):
     return result
 
 
-def request_gen(keywords=None, filterdict=None, ids=None):
-    if keywords is None:
-        keywords = ''
+def getmappings(esconn, fields, index=None, doctype=None):
+    results = dict()
+    mapping = esconn.indices.get_field_mapping(fields=fields, index=index, doc_type=doctype)
+    for index in mapping:
+        for mapid in mapping[index]['mappings']:
+            for name in mapping[index]['mappings'][mapid]:
+                for key in mapping[index]['mappings'][mapid][name]['mapping']:
+                    if key in results:
+                        continue
+                    results[key] = mapping[index]['mappings'][mapid]\
+                                   [name]['mapping'][key]['type']
+    return results
+
+
+def request_gen(esconn, index=None, doctype=None, filterdict=None, ids=None, slop=50):
+    querydict = dict()
     if filterdict is None:
         filterdict = dict()
     if ids is not None:
-        filterdict['_id'] = list(ids)
-    querydict = {'query': {'bool': {}}}
-    match_query = match_gen(keywords)
-    filter_query = filter_gen(filterdict)
-    if keywords:
-        for each in match_query:
-            if match_query[each]:
-                if each not in querydict['query']['bool']:
-                    querydict['query']['bool'][each] = list()
-                querydict['query']['bool'][each].extend(match_query[each])
+        filterdict['_id'] = ids
     if filterdict:
+        querydict = {'query': {'bool': {}}}
+        mappings = getmappings(esconn, fields=filterdict.keys(),
+                               index=index, doctype=doctype)
+        for key in mappings:
+            if mappings[key] == 'text' and filterdict[key]:
+                match_query = match_gen(key, filterdict[key], slop=slop)
+                for each in match_query:
+                    if match_query[each]:
+                        if each not in querydict['query']['bool']:
+                            querydict['query']['bool'][each] = list()
+                        querydict['query']['bool'][each].extend(match_query[each])
+                filterdict.pop(key)
+        filter_query = filter_gen(filterdict)
         for each in filter_query:
             if filter_query[each]:
                 if each not in querydict['query']['bool']:
@@ -85,6 +102,11 @@ def scroll(esconn, kwargs, index=None, doctype=None, start=0, size=None):
     if scroll:
         start = 0
         kwargs['scroll'] = '1m'
+    if 'sort' in kwargs:
+        sort = kwargs.pop('sort')
+        if 'body' not in kwargs:
+            kwargs['body'] = dict()
+        kwargs['body']['sort'] = sort
     page = esconn.search(
             index=index,
             doc_type=doctype,
@@ -92,6 +114,7 @@ def scroll(esconn, kwargs, index=None, doctype=None, start=0, size=None):
             size=size,
             request_timeout=30,
             **kwargs)
+    total = page['hits']['total']
     if size is None or (size+start) > page['hits']['total']:
         size = page['hits']['total']-start
 
@@ -101,7 +124,7 @@ def scroll(esconn, kwargs, index=None, doctype=None, start=0, size=None):
         if scroll:
             sid = page['_scroll_id']
             page = esconn.scroll(scroll_id = sid, scroll = '1m', request_timeout=30)
-    return result
+    return total, result
 
 
 def count(esconn, kwargs, index=None, doctype=None):

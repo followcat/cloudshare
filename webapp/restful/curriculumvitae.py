@@ -1,4 +1,6 @@
 import os
+import math
+import datetime
 
 import flask
 import flask.ext.login
@@ -81,7 +83,6 @@ class SearchCVbyTextAPI(Resource):
         super(SearchCVbyTextAPI, self).__init__()
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
@@ -98,11 +99,26 @@ class SearchCVbyTextAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        searchs = member.cv_search(keywords=text, filterdict=filterdict,
-                                   start=(cur_page-1)*count, size=count)
-        total = member.cv_count(keywords=text, filterdict=filterdict)
-        pages = total/count
-        datas = self.paginate([each[0] for each in searchs], project)
+        index = self.svc_index.config['CV_MEM']
+        doctype = [p.id for p in member.projects.values()]
+        filterdict['content'] = text
+        total, searchs = self.svc_index.search(index=index, doctype=doctype,
+                                        filterdict=filterdict, source=True,
+                                        start=(cur_page-1)*count, size=count)
+        pages = int(math.ceil(total/count))
+        datas = list()
+        for item in searchs:
+            yaml_info = item['_source']
+            yaml_info.pop('content')
+            project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
+            info = {
+                'author': yaml_info['committer'],
+                'time': datetime.datetime.strptime(yaml_info['date'],
+                                                   '%Y%m%d').strftime('%Y-%m-%d')
+            }
+            datas.append({ 'cv_id': yaml_info['id'],
+                           'yaml_info': yaml_info,
+                           'info': info})
         return {
             'code': 200,
             'data': {

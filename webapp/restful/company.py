@@ -1,4 +1,5 @@
 import json
+import math
 
 import core.basedata
 import extractor.information_explorer
@@ -57,8 +58,9 @@ class CompanyAllAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(CompanyAllAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('page_size', type = int, location = 'json')
@@ -75,24 +77,35 @@ class CompanyAllAPI(Resource):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        cur_page = args['current_page']
         page_size = args['page_size']
         projectname = args['project']
-        current_page = args['current_page']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        data = []
-        ids = project.company.sorted_ids('modifytime')
-        for id in ids[(current_page-1)*page_size : current_page*page_size]:
-            data.append(project.company.getyaml(id))
-        return { 'code': 200, 'data': data, 'total': len(ids) }
+        index = self.svc_index.config['CO_MEM']
+        total, searches = self.svc_index.search(index=index,
+                                            doctype=[p.id for p in member.projects.values()],
+                                            kwargs={'sort': {"modifytime": "desc"}},
+                                            start=(cur_page-1)*page_size,
+                                            size=page_size)
+        pages = int(math.ceil(total/page_size))
+        datas = list()
+        for item in searches:
+            datas.append(project.company_get(item['_id']))
+        return {
+            'code': 200,
+            'data': datas,
+            'total': total
+        }
 
 
 class AddedCompanyListAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(AddedCompanyListAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('text', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -105,7 +118,12 @@ class AddedCompanyListAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         customer_ids = project.company_customers()
-        company_ids = project.company.search_key('name', text)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        index = self.svc_index.config['CO_MEM']
+        company_ids = self.svc_index.search(index=index, filterdict={'name': text},
+                                            doctype=[p.id for p in member.projects.values()],
+                                            size=5, onlyid=True)
         data = []
         for company_id in company_ids:
             if company_id in customer_ids:
@@ -235,6 +253,7 @@ class SearchCObyTextAPI(Resource):
 
     def __init__(self):
         super(SearchCObyTextAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
@@ -251,10 +270,12 @@ class SearchCObyTextAPI(Resource):
         cur_page = args['current_page']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        search_results = project.company.search(keywords=text)
-        search_yaml_results = project.company.search_yaml(keywords=text)
-        search_results.update(search_yaml_results)
-        results = map(lambda x:x[0], search_results)
+        index = self.svc_index.config['CO_MEM']
+        total, search_results = self.svc_index.search(index=index,
+                                               filterdict={'name': text},
+                                               doctype=[p.id for p in member.projects.values()],
+                                               size=10000)
+        results = map(lambda x:x['_id'], search_results)
         sorted_results = project.company.sorted_ids('modifytime', ids=results)
         datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
         return {
@@ -283,6 +304,7 @@ class SearchCObyKeyAPI(Resource):
 
     def __init__(self):
         super(SearchCObyKeyAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('current_page', type = int, location = 'json')
@@ -299,32 +321,22 @@ class SearchCObyKeyAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        results = set(project.company.ids)
-        for each in search_items:
-            key = each[0]
-            value = each[1]
-            results.intersection_update(set(project.company.search_key(key, value)))
-        sorted_results = project.company.sorted_ids('modifytime', ids=results)
-        datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
+        index = self.svc_index.config['CO_MEM']
+        total, searches = self.svc_index.search(index=index, filterdict=dict(search_items),
+                                            doctype=[p.id for p in member.projects.values()],
+                                            kwargs={'sort': {"modifytime": "desc"}},
+                                            start=(cur_page-1)*page_size,
+                                            size=page_size)
+        pages = int(math.ceil(total/page_size))
+        datas = list()
+        for item in searches:
+            datas.append(project.company_get(item['_id']))
         return {
             'code': 200,
             'data': datas,
             'pages': pages,
             'total': total
         }
-
-    def paginate(self, svc_co, results, cur_page, eve_count):
-        if not cur_page:
-            cur_page = 1
-        total = len(results)
-        if total%eve_count != 0:
-            pages = total/eve_count + 1
-        else:
-            pages = total/eve_count
-        datas = []
-        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            datas.append(svc_co.getyaml(id))
-        return datas, pages, total
 
 
 class CompanyUploadExcelAPI(Resource):

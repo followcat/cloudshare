@@ -92,8 +92,8 @@ class CompanyProjectAPI(MatchbaseAPI):
     def post(self):
         super(CompanyProjectAPI, self).post()
         result = list()
-        cv_indexname = self.es_config['CV_INDEXNAME']
-        search = self.svc_index.filter(cv_indexname,
+        index = self.svc_index.config['CV_MEM']
+        total, search = self.svc_index.search(index=index,
                                        filterdict={'experience.project.company': self.doc},
                                        start=(self.page-1)*self.numbers,
                                        size=self.numbers, source=True)

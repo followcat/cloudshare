@@ -45,7 +45,6 @@ class UploadCVAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
-        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type=str, location='json')
         self.reqparse.add_argument('updates', type=list, location='json')

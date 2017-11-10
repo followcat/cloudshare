@@ -11,7 +11,7 @@ import utils.esquery
 class ElasticsearchIndexing(object):
 
     doctype = 'index'
-    index_config_body = {
+    index_config_CV = {
         "template": doctype,
         "mappings": {
             "_default_": {
@@ -28,18 +28,80 @@ class ElasticsearchIndexing(object):
                     {
                         "strings": {
                             "match_mapping_type": "string",
-                                "mapping": {
-                                    "type":       "keyword"
-                                }
+                            "mapping": {
+                                "type":       "keyword"
+                            }
+                    }}
+                ]
+            }
+        }
+    }
+    index_config_CO = {
+        "template": doctype,
+        "mappings": {
+            "_default_": {
+                "dynamic_templates": [
+                    {
+                        "name": {
+                            "match":              "name",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_smart"
+                            }
+                    }},
+                    {
+                        "introduction": {
+                            "match":              "introduction",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "clientcontact": {
+                            "match":              "clientcontact",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "reminder": {
+                            "match":              "reminder",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "id": {
+                            "match":              "id",
+                            "mapping": {
+                                "type":           "keyword"
+                            }
+                    }},
+                    {
+                        "modifytime": {
+                            "match":              "modifytime",
+                            "mapping": {
+                                "type":           "keyword"
+                            }
                     }}
                 ]
             }
         }
     }
 
-    def setup(self, esconn, index):
+    def setup(self, esconn, config):
+        self.config = config
         self.es = esconn
-        self.es.indices.create(index=index, body=self.index_config_body, ignore=400)
+        for each in config:
+            if each.startswith('CV'):
+                self.es.indices.create(index=config[each],
+                                       body=self.index_config_CV, ignore=400)
+            elif each.startswith('CO'):
+                self.es.indices.create(index=config[each],
+                                       body=self.index_config_CO, ignore=400)
 
     def update(self, index, doctype, svcs, numbers=5000):
         for svc in svcs:
@@ -61,7 +123,8 @@ class ElasticsearchIndexing(object):
 
     def updatesvc(self, index, doctype, svc, numbers=5000):
         assert svc.name
-        update_ids = set([item['_id'] for item in self.ESsearch(index=index, doctype=doctype )])
+        total, searchs = self.ESsearch(index=index, doctype=doctype)
+        update_ids = set([item['_id'] for item in searchs])
         ACTIONS = list()
         times = 0
         count = 0
@@ -125,17 +188,16 @@ class ElasticsearchIndexing(object):
         if kwargs is None:
             kwargs = dict()
         kwargs.update({'body': querydict})
-        kwargs['sort'] = '_doc' if 'sort' not in kwargs else kwargs['sort']
         kwargs['_source'] = 'false' if source is False else 'true'
         result = utils.esquery.scroll(self.es, kwargs, index=index, doctype=doctype,
                                       start=start, size=size)
         return result
 
-    def count(self, index=None, doctype=None, keywords=None, filterdict=None,
-              ids=None, kwargs=None):
+    def count(self, index=None, doctype=None, filterdict=None,
+              ids=None, kwargs=None, slop=50):
         result = 0
-        querydict = utils.esquery.request_gen(keywords=keywords,
-                                              filterdict=filterdict, ids=ids)
+        querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
+                                              filterdict=filterdict, ids=ids, slop=slop)
         if kwargs is None:
             kwargs = dict()
         kwargs.update({'body': querydict})
@@ -144,26 +206,17 @@ class ElasticsearchIndexing(object):
             result = utils.esquery.count(self.es, kwargs, index=index, doctype=doctype)
         return result
 
-    def filter(self, index=None, doctype=None, keywords=None, filterdict=None, ids=None,
-               source=False, start=0, size=None, kwargs=None):
-        results = set()
-        querydict = utils.esquery.request_gen(keywords=keywords,
-                                              filterdict=filterdict, ids=ids)
-        if ('filter' in querydict['query']['bool'] and querydict['query']['bool']['filter']) or\
-            ('must' in querydict['query']['bool'] and querydict['query']['bool']['must']):
-            results = self.ESsearch(index=index, doctype=doctype, querydict=querydict,
-                                    kwargs=kwargs, source=source, start=start, size=size)
+    def search(self, index=None, doctype=None, filterdict=None, ids=None, source=False,
+               start=0, size=None, kwargs=None, onlyid=False, slop=50):
+        results = (0, list())
+        querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
+                                              filterdict=filterdict, ids=ids, slop=slop)
+        results = self.ESsearch(index=index, doctype=doctype, querydict=querydict,
+                                kwargs=kwargs, source=source, start=start, size=size)
+        if onlyid:
+            total, searchs = results
+            results = [each['_id'] for each in searchs]
         return results
-
-    def filter_ids(self, index=None, doctype=None, keywords=None, filterdict=None,
-                   ids=None, source=False, start=0, size=None, kwargs=None):
-        result = ids
-        if filterdict:
-            filterset = self.filter(index=index, doctype=doctype, keywords=keywords,
-                                    filterdict=filterdict, ids=ids, source=source,
-                                    start=start, size=size, kwargs=kwargs)
-            result = set([item['_id'] for item in filterset])
-        return result
 
     def lastday(self, index=None, doctype=None):
         lastday = '19800101'

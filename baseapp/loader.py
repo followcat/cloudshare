@@ -55,10 +55,10 @@ class Config(object):
     )
 
     es_template = (
-        ("cvstorage",          "cvstorage"),    # SVC_CV_STO
-        ("cvmembers",          "cvmembers"),    # SVC_CO_MEMBERS
-        ("jdmembers",          "jdmembers"),    # SVC_JD_MEMBERS
-        ("comembers",          "cormembers"),   # SVC_CO_MEMBERS
+        ("CV_STO",          "cvstorage"),    # SVC_CV_STO
+        ("CV_MEM",          "cvmembers"),    # SVC_CO_MEMBERS
+        ("JD_MEM",          "jdmembers"),    # SVC_JD_MEMBERS
+        ("CO_MEM",          "comembers"),   # SVC_CO_MEMBERS
     )
 
     min_template = (
@@ -181,8 +181,7 @@ def load_doc_processor(name):
 def load_esindex(es_conn):
     global config
     SVC_INDEX = services.esindex.ElasticsearchIndexing()
-    for each in config.es_config:
-        SVC_INDEX.setup(es_conn, config.es_config[each])
+    SVC_INDEX.setup(es_conn, config.es_config)
     return SVC_INDEX
 
 

@@ -103,5 +103,4 @@ class CompanyProjectAPI(MatchbaseAPI):
                     result.append( {'id': each['_source']['id'],
                                     'value': 1,
                                     'data': project} )
-                    break
         return { 'code': 200, 'data': result }

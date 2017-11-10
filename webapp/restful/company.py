@@ -84,7 +84,7 @@ class CompanyAllAPI(Resource):
         project = member.getproject(projectname)
         index = self.svc_index.config['CO_MEM']
         total, searches = self.svc_index.search(index=index,
-                                            doctype=[p.id for p in member.projects.values()],
+                                            doctype=[project.id],
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
                                             size=page_size)
@@ -122,7 +122,7 @@ class AddedCompanyListAPI(Resource):
         project = member.getproject(projectname)
         index = self.svc_index.config['CO_MEM']
         company_ids = self.svc_index.search(index=index, filterdict={'name': text},
-                                            doctype=[p.id for p in member.projects.values()],
+                                            doctype=[project.id],
                                             size=5, onlyid=True)
         data = []
         for company_id in company_ids:
@@ -274,7 +274,7 @@ class SearchCObyTextAPI(Resource):
         index = self.svc_index.config['CO_MEM']
         total, search_results = self.svc_index.search(index=index,
                                                filterdict={'name': text},
-                                               doctype=[p.id for p in member.projects.values()],
+                                               doctype=[project.id],
                                                size=10000)
         results = map(lambda x:x['_id'], search_results)
         sorted_results = project.company.sorted_ids('modifytime', ids=results)
@@ -324,7 +324,7 @@ class SearchCObyKeyAPI(Resource):
         project = member.getproject(projectname)
         index = self.svc_index.config['CO_MEM']
         total, searches = self.svc_index.search(index=index, filterdict=dict(search_items),
-                                            doctype=[p.id for p in member.projects.values()],
+                                            doctype=[project.id],
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
                                             size=page_size)

@@ -239,7 +239,8 @@ class CompanyInfoUpdateAPI(Resource):
         result = project.company_update_info(id, origin_info, user.name)
         if result:
             co_info = project.company_get(id)
-            self.svc_index.add(self.co_indexname, id, co_info)
+            self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+                               id, None, co_info)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
@@ -397,7 +398,8 @@ class CompanyConfirmExcelAPI(Resource):
         results = project.company_add_excel(datas, user.name)
         for id in results:
             co_info = project.company_get(id)
-            self.svc_index.add(self.co_indexname, id, co_info)
+            self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+                               id, None, co_info)
         return {
             'code': 200,
             'data': results

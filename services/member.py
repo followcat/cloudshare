@@ -28,7 +28,6 @@ class Member(services.base.service.Service):
     def __init__(self, acc_repos, co_repos, cv_repos, jd_repos,
                  mult_peo, path, name, iotype='git'):
         super(Member, self).__init__(path, name, iotype=iotype)
-        self.name = name
         self.path = path
         self.cv_path = os.path.join(path, self.CV_PATH)
         self.jd_path = os.path.join(path, self.JD_PATH)

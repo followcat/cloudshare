@@ -8,9 +8,9 @@ class Service(object):
     
     def __init__(self, path, name=None, iotype=None):
         if name is None:
-            self.name = path.split('/')[-1]
+            self._name = path.split('/')[-1]
         else:
-            self.name = name
+            self._name = name
         if iotype is None:
             if os.path.exists(os.path.join(path, '.git')):
                 self.interface = interface.gitinterface.GitInterface(path, name)
@@ -25,3 +25,12 @@ class Service(object):
 
     def backup(self, path, bare=False):
         self.interface.backup(path, bare=bare)
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def id(self):
+        return self._name
+    

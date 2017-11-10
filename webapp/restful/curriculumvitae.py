@@ -128,19 +128,3 @@ class SearchCVbyTextAPI(Resource):
                 'totals': total,
             }
         }
-
-    def paginate(self, results, project):
-        datas = list()
-        for id in results:
-            yaml_info = project.cv_getyaml(id)
-            try:
-                info = {
-                    'author': yaml_info['committer'],
-                    'time': utils.builtin.strftime(yaml_info['date']),
-                }
-            except Exception:
-                continue
-            datas.append({ 'cv_id': yaml_info['id'],
-                           'yaml_info': yaml_info,
-                           'info': info})
-        return datas

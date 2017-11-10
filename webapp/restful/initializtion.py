@@ -41,7 +41,6 @@ def initialize(app):
                      endpoint = 'coconfirmexcel')
     api.add_resource(CompanyCustomerListAPI, '/api/companycustomerlist',
                      endpoint = 'companycustomerlist')
-    api.add_resource(SearchCObyTextAPI, '/api/searchcobytext', endpoint = 'searchcobytext')
     api.add_resource(SearchCObyKeyAPI, '/api/searchcobykey', endpoint = 'searchcobykey')
     api.add_resource(CompanyCustomerAPI, '/api/companycustomer', endpoint = 'companycustomer')
     api.add_resource(CompanyInfoUpdateAPI, '/api/companyinfoupdate',

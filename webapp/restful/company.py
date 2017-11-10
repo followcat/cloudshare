@@ -248,59 +248,6 @@ class CompanyInfoUpdateAPI(Resource):
         return response
 
 
-class SearchCObyTextAPI(Resource):
-
-    decorators = [flask.ext.login.login_required]
-
-    def __init__(self):
-        super(SearchCObyTextAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('search_text', location = 'json')
-        self.reqparse.add_argument('current_page', type = int, location = 'json')
-        self.reqparse.add_argument('page_size', type = int, location = 'json')
-
-    def post(self):
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        text = args['search_text']
-        page_size = args['page_size']
-        projectname = args['project']
-        cur_page = args['current_page']
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
-        index = self.svc_index.config['CO_MEM']
-        total, search_results = self.svc_index.search(index=index,
-                                               filterdict={'name': text},
-                                               doctype=[project.id],
-                                               size=10000)
-        results = map(lambda x:x['_id'], search_results)
-        sorted_results = project.company.sorted_ids('modifytime', ids=results)
-        datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
-        return {
-            'code': 200,
-            'data': datas,
-            'keyword': text,
-            'pages': pages,
-            'total': total
-        }
-
-    def paginate(self, svc_co, results, cur_page, eve_count):
-        if not cur_page:
-            cur_page = 1
-        total = len(results)
-        if total%eve_count != 0:
-            pages = total/eve_count + 1
-        else:
-            pages = total/eve_count
-        datas = []
-        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            datas.append(svc_co.getyaml(id))
-        return datas, pages, total
-
-
 class SearchCObyKeyAPI(Resource):
 
     def __init__(self):

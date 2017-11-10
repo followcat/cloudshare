@@ -165,9 +165,6 @@ class Simulation(services.base.storage.BaseStorage):
         self.memdatas.update('modifytime', id)
         return result
 
-    def sorted_ids(self, key, ids=None, reverse=True):
-        return self.memdatas.sorted_ids(key, ids=ids, reverse=reverse)
-
     @property
     def ids(self):
         if self._ids is None:

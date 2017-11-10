@@ -13,11 +13,10 @@ class BaseStorage(services.base.service.Service):
     commitinfo = 'BaseData'
     YAML_TEMPLATE = ()
 
-    def __init__(self, path, name=None, searchengine=None, iotype=None):
+    def __init__(self, path, name=None, iotype=None):
         self.path = path
         self.yamlpath = ''
-        super(BaseStorage, self).__init__(path, name=name,
-                                          searchengine=searchengine, iotype=iotype)
+        super(BaseStorage, self).__init__(path, name=name, iotype=iotype)
         self.unique_checker = None
         self.info = ""
         self._nums = 0
@@ -186,30 +185,6 @@ class BaseStorage(services.base.service.Service):
         else:
             result = unicode(str(markdown), 'utf-8')
         return result
-
-    def count(self, keywords=None, filterdict=None, ids=None):
-        results = self.interface.SEcount(keywords=keywords,
-                                         filterdict=filterdict, ids=ids)
-        return results
-
-    def count_yaml(self, keywords=None, filterdict=None, ids=None):
-        results = self.interface.SEcount_yaml(keywords=keywords,
-                                              filterdict=filterdict, ids=ids)
-        return results
-
-    def search(self, keywords=None, filterdict=None, ids=None,
-               source=False, start=0, size=10):
-        results = self.interface.search(keywords=keywords, filterdict=filterdict,
-                                        ids=ids, source=source,
-                                        start=start, size=size)
-        return results
-
-    def search_yaml(self, keywords=None, filterdict=None, ids=None,
-                    source=False, start=0, size=10):
-        results = self.interface.search_yaml(keywords=keywords, filterdict=filterdict,
-                                            ids=ids, source=source,
-                                            start=start, size=size)
-        return results
 
     def names(self):
         for id in self.ids:

@@ -213,42 +213,6 @@ class Project(services.base.service.Service):
     def cv_datas(self):
         return self.curriculumvitae.datas()
 
-    def cv_count(self, keywords=None, filterdict=None, ids=None, selected=None):
-        if selected is None:
-            selected = [self.storageCV.name]
-        if ids is None:
-            ids = self.curriculumvitae.names()
-        return self.curriculumvitae.count(keywords=keywords, filterdict=filterdict,
-                                           ids=ids, selected=selected)
-
-    def cv_count_yaml(self, keywords=None, filterdict=None, ids=None, selected=None):
-        if selected is None:
-            selected = [self.storageCV.name]
-        if ids is None:
-            ids = self.curriculumvitae.yamls()
-        return self.curriculumvitae.count_yaml(keywords=keywords, filterdict=filterdict,
-                                               ids=ids, selected=selected)
-
-    def cv_search(self, keywords=None, filterdict=None, ids=None,
-                  source=False, start=0, size=10, selected=None):
-        if selected is None:
-            selected = [self.storageCV.name]
-        if ids is None:
-            ids = self.curriculumvitae.names()
-        return self.curriculumvitae.search(keywords=keywords, filterdict=filterdict,
-                                           ids=ids, source=source,
-                                           start=start, size=None, selected=selected)
-
-    def cv_search_yaml(self, keywords=None, filterdict=None, ids=None,
-                       source=False, start=0, size=10, selected=None):
-        if selected is None:
-            selected = [self.storageCV.name]
-        if ids is None:
-            ids = self.curriculumvitae.names()
-        return self.curriculumvitae.search_yaml(keywords=keywords, filterdict=filterdict,
-                                                ids=ids, source=source,
-                                                start=start, size=size, selected=selected)
-
     def cv_gethtml(self, id):
         return self.curriculumvitae.gethtml(id)
 
@@ -364,9 +328,6 @@ class Project(services.base.service.Service):
             result = self.storageJD.modify(id, description, status,
                                            commentary, followup, committer)
         return result
-
-    def jd_search(self, keyword, selected=None):
-        return self.jobdescription.search(keyword, selected=selected)
 
     def jd_datas(self):
         return self.jobdescription.datas()

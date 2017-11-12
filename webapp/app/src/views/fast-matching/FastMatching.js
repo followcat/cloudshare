@@ -5,6 +5,9 @@ import React, { Component } from 'react';
 import { FilterCard } from 'components/filter-card';
 import SearchResultBox from 'components/search-result-box';
 import SiderBar from 'components/sider-bar';
+import Guide from 'components/guide';
+
+import { introJs } from 'intro.js';
 
 import {
   getLSIAllSIMS,
@@ -28,6 +31,7 @@ class FastMatching extends Component {
       industry: {},
       dataSource: [],
       selection: [],
+      guide: false,
       visible: false,
       spinning: false,
       siderbarVisible: false,
@@ -40,6 +44,17 @@ class FastMatching extends Component {
     this.getLSIAllSIMSDataSource = this.getLSIAllSIMSDataSource.bind(this);
     this.getIndustryDataSource = this.getIndustryDataSource.bind(this);
     this.getResultDataSource = this.getResultDataSource.bind(this);
+  }
+
+  componentWillMount () {
+    const { location } = this.props;
+    if(location.query.guide) {
+      this.setState({
+        guide: true,
+        siderbarVisible: true,
+        visible: true,
+      })
+    }
   }
 
   componentDidMount() {
@@ -96,6 +111,39 @@ class FastMatching extends Component {
           postAPI: API.LSI_BY_DOC_API
         });
       });
+    }
+
+    if(this.state.guide) {
+      introJs().setOptions({
+        'skipLabel': '退出', 
+        'prevLabel':'上一步', 
+        'nextLabel':'下一步',
+        'doneLabel': '完成',
+        'scrollToElement': false,
+        steps: [                    
+                    {
+                        //第一步引导
+                        element: '.ant-card-body',
+                        intro: '职位描述较关键词匹配更精确，可以选择多种筛选条件。'+
+                        '<a href="/pm/jobdescription" target="_blank">推荐使用会员服务-已开放职位的匹配!</a>',
+                        position: 'right'
+                    },
+                    {
+                        element: '.cs-search-result',
+                        intro: '匹配结果展示，可以勾选多个结果后对比',
+                        position: 'bottom'
+                    },
+                    {
+                        //这个属性类似于jquery的选择器， 可以通过jquery选择器的方式来选择你需要选中的对象进行指引
+                        element: '.anticon-caret-left',
+                        //这里是每个引导框具体的文字内容，中间可以编写HTML代码
+                        intro: '勾选后点击侧边栏，选择雷达图或者分析，进行可视化分析数据。',
+                        //这里可以规定引导框相对于选中对象出现的位置 top,bottom,left,right
+                        position: 'top'
+                    },
+                ]
+
+      }).start()
     }
   }
 
@@ -260,6 +308,7 @@ class FastMatching extends Component {
 
     return (
       <div className="cs-fast-matching">
+        <Guide />
         <FilterCard
           textarea={textarea}
           classify={classify}

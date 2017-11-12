@@ -30,10 +30,12 @@ class SearchResultItem extends Component {
 
   getNameTextRender() {
     const { yaml_info } = this.props;
-
     const name = yaml_info.name ? yaml_info.name : yaml_info.id,
           origin = yaml_info.origin ? ' - ' + yaml_info.origin : '';
-    return name + origin;
+          if(name === "[*****]") {
+            return 'id-'+yaml_info.id;
+          }
+    return name ;
   }
 
   render() {

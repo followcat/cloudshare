@@ -10,10 +10,11 @@ class Charts extends Component {
 
   componentDidMount() {
     this.init();
+    this.setOption();
   }
 
   componentDidUpdate() {
-    this.setOption();
+     this.setOption();
   }
 
   componentUnMount() {

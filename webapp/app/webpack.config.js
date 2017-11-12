@@ -35,6 +35,11 @@ let webpackConfig = {
 
   module: {
     rules: [{
+      test: /\.html$/,
+      exclude: /node_modules/,
+      use: ['html-loader'],
+      include: config.SRC_PATH,
+    },{
       test: /\.js|jsx$/,
       exclude: /node_modules/,
       use: ['babel-loader'],

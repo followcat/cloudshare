@@ -66,11 +66,19 @@ class SiderBar extends Component {
   renderSelectionDOM() {
     let dom = this.props.selection.map((item, index) => {
       return (
+         item.name === "[*****]" ?
+        <Tag
+          key={index}
+          text={item.id || item.true}
+          onClick={() => this.handleTagClose(item.id, item.name)}
+        />
+        :
         <Tag
           key={index}
           text={item.name || item.id}
           onClick={() => this.handleTagClose(item.id, item.name)}
         />
+
       );
     });
     return dom;
@@ -127,6 +135,7 @@ class SiderBar extends Component {
               <RadarChart 
                 selection={selection}
                 postData={postData}
+                dataSource={dataSource}
               />
               <div className="selection-box">
                 <div className="selection-title">

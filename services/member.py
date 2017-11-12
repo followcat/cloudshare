@@ -115,15 +115,21 @@ class Member(services.base.service.Service):
                                                        [self.curriculumvitaes],
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'storageCV': self.config['storageCV'],
-                                          'storagePEO': self.config['storagePEO']})
+                                          'storagePEO': self.config['storagePEO'],
+                                          'limitPEO': self.config['limitPEO']})
                 tmp_project.cv_private = False
                 if not tmp_project.config['autosetup'] and not tmp_project.config['autoupdate']:
                     tmp_project._modelname = self.default_model
                 self.projects[name] = tmp_project
 
+    def exists_project(self, name):
+        return name in self.projects
+
     def add_project(self, name, classify, adminID, autosetup=False, autoupdate=False):
         result = False
-        if self.check_admin(adminID) and len(self.projects) < self.max_project_nums:
+        max_project_nums = self.config['max_project_nums'] if 'max_project_nums'\
+                            in self.config else self.max_project_nums
+        if self.check_admin(adminID) and len(self.projects) < max_project_nums:
             result = self._add_project(name, classify, autosetup=autosetup, autoupdate=autoupdate)
         return result
 
@@ -136,7 +142,8 @@ class Member(services.base.service.Service):
             tmp_project.setup(classify, config={'autosetup': autosetup,
                                                 'autoupdate': autoupdate,
                                                 'storageCV': self.config['storageCV'],
-                                                'storagePEO': self.config['storagePEO']})
+                                                'storagePEO': self.config['storagePEO'],
+                                                'limitPEO': self.config['limitPEO']})
             tmp_project.cv_private = False
             tmp_project._modelname = self.default_model
             self.projects[name] = tmp_project

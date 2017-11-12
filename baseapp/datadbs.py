@@ -15,6 +15,7 @@ SVC_MSG = services.account.Message(SVC_ACCOUNT, 'message', 'msgrepo')
 SVC_CV_REPO = services.curriculumvitae.CurriculumVitae('repo/CV', 'cloudshare',
                                                        searchengine=baseapp.searchengine.ES)
 SVC_PEO_REPO = services.people.People(SVC_CV_REPO, 'repo/PEO', 'peorepo', iotype='base')
+SVC_PEO_LIMIT = services.people.People(SVC_CV_REPO, 'repo/LIMITPEO', 'peolimit', iotype='base')
 
 SVC_CV_STO = services.curriculumvitae.CurriculumVitae('storage/CV', 'cvstorage')
 SVC_PEO_STO = services.people.People(SVC_CV_STO, 'storage/PEO', 'peostorage', iotype='base')
@@ -22,6 +23,7 @@ SVC_CV_INDIV = services.curriculumvitae.CurriculumVitae('indiv/CV', 'cvindividua
                                                         searchengine=baseapp.searchengine.ES,
                                                         iotype='base')
 SVC_PEO_INDIV = services.people.People(SVC_CV_INDIV, 'indiv/PEO', 'peoindividual', iotype='base')
-SVC_MULT_PEO = services.multipeople.MultiPeople([SVC_PEO_REPO, SVC_PEO_STO, SVC_PEO_INDIV])
+SVC_MULT_PEO = services.multipeople.MultiPeople([SVC_PEO_REPO, SVC_PEO_STO,
+                                                 SVC_PEO_INDIV, SVC_PEO_LIMIT])
 
 SVC_MULT_CLSIFY, SVC_CLS_CV = baseapp.loader.load_mult_classify([SVC_CV_STO, SVC_CV_INDIV])

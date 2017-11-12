@@ -61,21 +61,25 @@ class ProjectList extends Component {
      this.handleSubmit();
   }
 
-  handleSubmit (feildValue) {
-    addProject({
-      projectname: this.state.projectName,
-    }, (json) => {
-      if  (json.result === true) {
-        this.setState({
-        visible: false,
-        projects: [...this.state.projects],
-    });
-
-      message.success(language.ADD_SUCCESS_MSG);
-      } else {
-        message.error(language.ADD_FAIL_MSG);
-      }
-    })
+  handleSubmit () {
+    if(this.state.projectName !== null) {
+      addProject({
+        projectname: this.state.projectName,
+        classify: []
+      }, (json) => {
+        if  (json.result === true) {
+          this.setState({
+          visible: false,
+          projects: [...this.state.projects],
+        });
+        message.success(language.ADD_SUCCESS_MSG);
+        } else {
+            message.error(language.ADD_FAIL_MSG);
+        }
+      })
+    } else {
+            message.error(language.ADD_NULL_MSG);
+          }
   }
 
   handleCancelClick() {
@@ -130,21 +134,23 @@ class ProjectList extends Component {
   		title: '项目名称',
   		dataIndex: 'projectname',
   		render: text => <span>{text}</span>,
-		}, {
- 		 title: '操作',
-  		className: 'action',
-  		dataIndex: 'action',
-      render: (text, record) => {
-        return (
-          this.state.projects.length > 0 ?
-          (
-            <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record.key)}>
-              <a href="#">{language.DELETE}</a>
-            </Popconfirm>
-          ) : null
-        );
-      },
-		}];
+		}, 
+  //   {
+ 	// 	 title: '操作',
+  // 		className: 'action',
+  // 		dataIndex: 'action',
+  //     render: (text, record) => {
+  //       return (
+  //         this.state.projects.length > 0 ?
+  //         (
+  //           <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record.key)}>
+  //             <a href="#">{language.DELETE}</a>
+  //           </Popconfirm>
+  //         ) : null
+  //       );
+  //     },
+		// }
+    ];
 
     return (
     <div className="cs-project-list">

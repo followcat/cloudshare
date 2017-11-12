@@ -101,7 +101,7 @@ class ElasticsearchIndexing(object):
         for id in ids:
             yamlinfo = self.genindex(svc.getyaml(id))
             action = {
-                "_op_type": "update",
+                "_op_type": 'index',
                 "_index": self.indexname,
                 "_type": 'index',
                 "_source": yamlinfo,

@@ -1,5 +1,8 @@
 'use strcit';
 import React, { Component } from 'react';
+import { browserHistory } from 'react-router';
+
+import { introJs } from 'intro.js';
 
 import TablePlus from 'components/table-plus';
 import SiderPanel from 'components/sider-panel';
@@ -11,7 +14,8 @@ import {
   Popconfirm,
   message,
   Select,
-  Form
+  Form,
+  Spin
 } from 'antd';
 
 import {
@@ -42,9 +46,11 @@ class Customer extends Component {
     super();
     this.state = {
       dataSource: [],
+      fetching: false,
       loading: false,
       visible: false,
       siderPanelVisible: false,
+      guide: false,
       detailData: {},
       companyDataSource: [],
       value: '',
@@ -60,10 +66,6 @@ class Customer extends Component {
     this.getDataSource = this.getDataSource.bind(this);
     this.getCompanyDataSource = this.getCompanyDataSource.bind(this);
     this.getElements = this.getElements.bind(this);
-  }
-
-  componentDidMount() {
-    this.getDataSource();
   }
 
   handleDeleteCustomerConfirm(id) {
@@ -123,7 +125,10 @@ class Customer extends Component {
   handleChange(value) {
     const { companyDataSource } = this.state;
 
-    this.setState({ value });
+    this.setState({ 
+      value: value,
+      fetching: true
+    });
 
     let object = find(companyDataSource, (item) => item.company_name === value);
     if (object) {
@@ -135,8 +140,13 @@ class Customer extends Component {
         id: ''
       });
     }
-
-    this.getCompanyDataSource(value);
+    if(value){
+      this.getCompanyDataSource(value);
+    } else {
+      this.setState({
+            companyDataSource: []
+          });
+    }
   }
 
   getDataSource() {
@@ -159,23 +169,23 @@ class Customer extends Component {
       clearTimeout(timer);
       timer = null;
     }
-
-    
     timer = setTimeout(() => {
       getAddedCompanyList({
         text: text
       }, json => {
         if (json.code === 200) {
           this.setState({
-            companyDataSource: json.data
+            companyDataSource: json.data,
+            fetching: false
           });
         }
       });
-    }, 500);
+    }, 300);
   }
 
   getElements() {
     const {
+      fetching,
       companyDataSource,
       visible,
     } = this.state;
@@ -188,9 +198,9 @@ class Customer extends Component {
         <ButtonWithModal
           buttonStyle={{ marginLeft: 8 }}
           buttonType="primary"
-          buttonText="创建新的客户"
+          buttonText="新建已签约客户"
           visible={visible}
-          modalTitle="创建新的客户"
+          modalTitle="新建已签约客户"
           modalOkText="提交"
           modalCancelText="取消"
           onButtonClick={this.handleButtonClick}
@@ -207,9 +217,11 @@ class Customer extends Component {
                 filterOption={false}
                 onChange={this.handleChange}
               >
-                {companyDataSource.map(item => {
-                  return <Select.Option key={item.company_name}>{item.company_name}</Select.Option>;
-                })}
+                { 
+                  companyDataSource.map(item => {
+                  return <Select.Option key={item.company_name}>{item.company_name}</Select.Option>
+                })
+                }
               </Select>
             </Form.Item>
           </Form>
@@ -218,6 +230,52 @@ class Customer extends Component {
     }];
 
     return elements;
+  }
+
+  componentWillMount() {
+    if(this.props.location.query.guide) {
+      this.setState({
+      guide: this.props.location.query.guide
+      })
+    }
+  }
+
+  componentDidMount() {
+    this.getDataSource();
+    if(this.state.guide) {
+      introJs().setOptions({
+        'skipLabel': '退出', 
+        'prevLabel':'上一步', 
+        'nextLabel':'下一步',
+        'doneLabel': '跳转到下个页面',
+        'scrollToElement': false,
+        steps: [                    
+                    {
+                        //第一步引导
+                        element: '.cs-layout-subhead-customer',
+                        intro: '已签约客户',
+                        position: 'right'
+                    },
+                    {
+                        element: '.ant-btn-primary',
+                        intro: '确定新建客户存在于待开发客户中，不可重复创建！',
+                        position: 'bottom'
+                    }, 
+                    {
+                        //这个属性类似于jquery的选择器， 可以通过jquery选择器的方式来选择你需要选中的对象进行指引
+                        element: '.ant-table-body',
+                        //这里是每个引导框具体的文字内容，中间可以编写HTML代码
+                        intro: '已签约客户展示',
+                        //这里可以规定引导框相对于选中对象出现的位置 top,bottom,left,right
+                        position: 'top'
+                    },
+                ]
+
+      }).start().oncomplete(() => {  
+          browserHistory.push('/pm/jobdescription?guide=true'); 
+        });
+      // introJs().start();
+    }
   }
 
   render() {

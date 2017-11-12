@@ -13,6 +13,7 @@ class SimulationCV(services.base.simulation.Simulation,
     )
 
     yaml_private_key = {
+        "secrecy":              True,
         "phone":                '[*****]',
         "email":                '[*****]',
         "name":                 '[*****]',
@@ -54,7 +55,7 @@ class SimulationCV(services.base.simulation.Simulation,
         hidden = '[****]'
         info = self.getyaml(id, secrecy=False)
         for key in self.yaml_private_key:
-            if info[key]:
+            if key in info and info[key]:
                 result = result.replace(info[key], hidden+' '*(len(info[key])-len(hidden)))
             elif key == 'phone':
                 value = extractor.information_explorer.get_phone(result)
@@ -63,9 +64,16 @@ class SimulationCV(services.base.simulation.Simulation,
         return result
 
     def gethtml(self, id, secrecy=True):
-        md = self.getmd(id, secrecy=secrecy)
-        html = utils.pandocconverter.md_to_html(md)
-        return html
+        result = None
+        for storage in self.storages:
+            try:
+                result = storage.gethtml(id)
+                if secrecy is True and self.ishideprivate(id):
+                    result = self.cleanprivate(id, result)
+                break
+            except IOError:
+                continue
+        return result
 
     def getuniqueid(self, id):
         result = None
@@ -84,11 +92,11 @@ class SimulationCV(services.base.simulation.Simulation,
         return result
 
     def getyaml(self, id, secrecy=True):
-        result = {'secrecy': False}
-        result.update(super(SimulationCV, self).getyaml(id))
+        result = super(SimulationCV, self).getyaml(id)
+        if 'secrecy' not in result:
+            result['secrecy'] = False
         if secrecy is True and self.ishideprivate(id):
             result.update(self.yaml_private_key)
-            result['secrecy'] = True
         return result
 
     def getprivatekeys(self):

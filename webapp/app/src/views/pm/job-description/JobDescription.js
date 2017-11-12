@@ -1,11 +1,14 @@
 'use strict';
 import React, { Component } from 'react';
+import { browserHistory } from 'react-router';
 
 import TablePlus from 'components/table-plus';
 import EditJobDescriptionForm from './EditJobDescriptionForm';
 import CreateNewJobDescription from './CreateNewJobDescription';
 import Status from './Status';
 import Operation from './Operation';
+
+import { introJs } from 'intro.js';
 
 import { message } from 'antd';
 
@@ -49,11 +52,6 @@ class JobDescription extends Component {
     this.getJobDescriptionByID = this.getJobDescriptionByID.bind(this);
     this.getExpandedRowRender = this.getExpandedRowRender.bind(this);
     this.getJobDescriptionElements = this.getJobDescriptionElements.bind(this);
-  }
-
-  componentDidMount() {
-    this.getjobDescriptionDataSource();
-    this.getCustomerDataSource();
   }
 
   handleEditClick(record) {
@@ -293,6 +291,53 @@ class JobDescription extends Component {
     return elements;
   }
 
+  componentWillMount() {
+    if(this.props.location.query.guide) {
+      this.setState({
+      guide: this.props.location.query.guide
+      })
+    }
+  }
+
+  componentDidMount() {
+    this.getjobDescriptionDataSource();
+    this.getCustomerDataSource();
+    if(this.state.guide) {
+      introJs().setOptions({
+        'skipLabel': '退出', 
+        'prevLabel':'上一步', 
+        'nextLabel':'下一步',
+        'doneLabel': '完成',
+        'scrollToElement': false,
+        steps: [                    
+                    {
+                        //第一步引导
+                        element: '.cs-layout-subhead-jobdescription',
+                        intro: '已开放职位',
+                        position: 'right'
+                    },
+                    {
+                        //第三步引导
+                        element: '.ant-btn-primary',
+                        intro: '新建开放职位！',
+                        position: 'bottom'
+                    },
+                    {
+                        //这个属性类似于jquery的选择器， 可以通过jquery选择器的方式来选择你需要选中的对象进行指引
+                        element: '.cs-job-description',
+                        //这里是每个引导框具体的文字内容，中间可以编写HTML代码
+                        intro: '新建职位结果展示，且可以进行快速匹配!',
+                        //这里可以规定引导框相对于选中对象出现的位置 top,bottom,left,right
+                        position: 'top'
+                    },
+                ]
+
+      }).start().oncomplete(() => {  
+          browserHistory.push('/pm/company/list'); 
+        });
+    }
+  }
+
   render() {
     const columns = [{
       title: language.COMPANY_NAME,
@@ -345,6 +390,7 @@ class JobDescription extends Component {
           expandedRowRender={record => this.getExpandedRowRender(record)}
           dataSource={state.filterDataSource.length > 0 ? state.filterDataSource : state.dataSource}
         />
+        <div className='cs-job-description-result'>
         <EditJobDescriptionForm
           visible={state.editVisible}
           confirmLoading={state.editConfirmLoading}
@@ -353,6 +399,7 @@ class JobDescription extends Component {
           record={this.state.record}
           customerDataSource={this.state.customerDataSource}
         />
+        </div>
       </div>
     );
   }

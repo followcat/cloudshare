@@ -43,7 +43,7 @@ const websiteText = {
     JOB_DESCRIPTION_MANAGEMENT: '职位管理',
     OPEN_JOB_DESCRIPTION: '已开放职位',
     CUSTOMER_MANAGEMENT: '客户管理',
-    OWN_CUSTOMER_MANAGEMENT: '已拥有客户',
+    OWN_CUSTOMER_MANAGEMENT: '已签约客户',
     DEVELOPMENT_CUSTOMER_MANAGEMENT: '待开发客户',
     
     COMPANY_NAME: '公司名称',
@@ -127,6 +127,7 @@ const websiteText = {
     ADD_CONFIRM_MSG: '确定要添加这个条目吗?',
     ADD_SUCCESS_MSG: '添加成功!',
     ADD_FAIL_MSG: '添加失败!',
+    ADD_NULL_MSG: '项目名不能为空!',
     DELETE_CONFIRM_MSG: '确定要删除这个条目吗?',
     DELETE_SUCCESS_MSG: '删除成功!',
     DELETE_FAIL_MSG: '删除失败!',

@@ -7,8 +7,7 @@ from flask.ext.restful import Resource
 
 import core.basedata
 import core.exception
-import utils.timeout.process
-import utils.timeout.exception
+import utils.timeout.thread
 import extractor.information_explorer
 
 
@@ -49,31 +48,31 @@ class UploadCVAPI(Resource):
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
-                if 'unique_id' in cvobj.metadata:
-                    try:
-                        result = project.cv_add(cvobj, user.name, unique=True)
-                        if result['repo_cv_result']:
-                            self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
-                        if result['project_cv_result']:
-                            result['member_cv_result'] = member.cv_add(cvobj, user.name,
-                                                                       unique=True)
-                            status = 'success'
-                            message = 'Add to CV database and project.'
-                            names.append(cvobj.name.md)
-                            documents.append(cvobj.data)
-                            if not result['repo_cv_result']:
-                                message = 'Existed in other project.'
-                        else:
-                            message = 'Resume existed in database and project.'
-                    except core.exception.NotExistsContactException:
-                        message = 'The contact information is empty.'
-                else:
-                    message = 'Unable to extract personal information, please modify and try again'
+                try:
+                    result = project.cv_add(cvobj, user.name, unique=True)
+                    if result['repo_cv_result']:
+                        self.svc_index.add(cvobj.metadata['id'], cvobj.metadata)
+                    if result['project_cv_result']:
+                        result['member_cv_result'] = member.cv_add(cvobj, user.name,
+                                                                   unique=True)
+                        status = 'success'
+                        message = 'Add to CV database and project.'
+                        names.append(cvobj.name.md)
+                        documents.append(cvobj.data)
+                        if not result['repo_cv_result']:
+                            message = 'Existed in other project.'
+                    else:
+                        message = 'Resume existed in database and project.'
+                except core.exception.NotExistsContactException:
+                    message = 'The contact information is empty.'
                 results.append({ 'id': id,
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
-        self.svc_min.sim[project.modelname][projectname].add_documents(names, documents)
+        if projectname not in self.svc_min.sim[project.modelname]:
+            self.svc_min.make_sim(project.modelname, projectname)
+        else:
+            self.svc_min.sim[project.modelname][projectname].add_documents(names, documents)
         return { 'code': 200, 'data': results }
 
     def post(self):
@@ -88,15 +87,8 @@ class UploadCVAPI(Resource):
             return { 'code': 401, 'data': { 'result': False,
                                             'resultid': filepro.resultcode,
                                             'name': '', 'filename': filename } }
-        try:
-            yamlinfo = utils.timeout.process.process_timeout_call(
-                                 extractor.information_explorer.catch_cvinfo, 120,
-                                 kwargs={'stream': filepro.markdown_stream.decode('utf8'),
-                                         'filename': filename})
-        except utils.timeout.process.KilledExecTimeout as e:
-            return { 'code': 401, 'data': { 'result': False,
-                                            'resultid': '',
-                                            'name': '', 'filename': filename } }
+        yamlinfo = extractor.information_explorer.catch_cvinfo(
+                        filepro.markdown_stream.decode('utf8'), filename, timing=True)
         filepro.renameconvert(yamlinfo['id'])
         dataobj = core.basedata.DataObject(metadata=yamlinfo,
                                            data=filepro.markdown_stream,)

@@ -123,19 +123,10 @@ def update_selected(svc_cv, yamlname, selected, as_date=None):
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
                                                          selected, explorer_name, as_date)
-    try:
-        experience = info.pop('experience')
-        try:
-            obj['experience'].update(experience)
-        except AttributeError:
-            obj['experience'] = experience
-    except KeyError:
-            pass
-    try:
-        obj.update(info)
-    except AttributeError:
-        obj = info
-    yamlstream = yaml.safe_dump(obj, allow_unicode=True)
+    if obj is None:
+        obj = dict()
+    result = utils.builtin.merge(obj, info, update=True)
+    yamlstream = yaml.safe_dump(result, allow_unicode=True)
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
@@ -176,17 +167,58 @@ def originid(svc_cv, yamlname):
     with open(yamlpathfile, 'w') as fp:
         fp.write(yamlstream)
 
-def timeout_yamlaction(svc_cv, action, timeout, *args, **kwargs):
+def timeout_process_action(svc_cv, action, timeout, *args, **kwargs):
     import utils.timeout.process
+    import utils.timeout.exception
     i = 0
     t1 = time.time()
     for yamlname in svc_cv.yamls():
         i += 1
         try:
-            utils.timeout.process.process_timeout_call(action, timeout,
+            utils.timeout.process.timeout_call(action, timeout,
                                     args=tuple([svc_cv, yamlname]+list(args)),
                                     kwargs=kwargs)
-        except utils.timeout.process.KilledExecTimeout as e:
+        except utils.timeout.exception.ExecTimeout as e:
+            print(yamlname, action, e)
+        if i % 100 == 0:
+            usetime = time.time() - t1
+            t1 = time.time()
+            print("100 Action use %s."%(str(usetime)))
+            print i
+
+def timeout_thread_action(svc_cv, action, timeout, *args, **kwargs):
+    import utils.timeout.thread
+    import utils.timeout.exception
+    i = 0
+    t1 = time.time()
+    for yamlname in svc_cv.yamls():
+        i += 1
+        try:
+            utils.timeout.thread.timeout_call(action, timeout,
+                                    args=tuple([svc_cv, yamlname]+list(args)),
+                                    kwargs=kwargs)
+        except utils.timeout.exception.ExecTimeout as e:
+            print(yamlname, action, e)
+        except utils.timeout.exception.FailedKillExecTimeout as e:
+            print(yamlname, action, e)
+        if i % 100 == 0:
+            usetime = time.time() - t1
+            t1 = time.time()
+            print("100 Action use %s."%(str(usetime)))
+            print i
+
+def timeout_action(svc_cv, action, timeout, *args, **kwargs):
+    import utils.timeout.inprocess
+    import utils.timeout.exception
+    i = 0
+    t1 = time.time()
+    for yamlname in svc_cv.yamls():
+        i += 1
+        try:
+            utils.timeout.inprocess.timeout_call(action, timeout,
+                                    args=tuple([svc_cv, yamlname]+list(args)),
+                                    kwargs=kwargs)
+        except utils.timeout.exception.ExecTimeout as e:
             print(yamlname, action, e)
         if i % 100 == 0:
             usetime = time.time() - t1

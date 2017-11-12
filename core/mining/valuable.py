@@ -13,11 +13,10 @@ from extractor.utils_parsing import *
 EDUCATION_REQUIREMENT = re.compile(ur'[\d .]*(?P<education>.{2})(?=[及或以上]{0,3}学历)')
 
 
-def rate(miner, project, doc, top=10, selected=5,
-         uses=None, name_list=None, education_req=True):
+def rate(name_list, miner, project, doc, top, uses=None, education_req=True):
     result = []
-    rating = next(miner, project, doc, top, project.modelname,
-                  uses=uses, name_list=name_list, education_req=education_req)
+    rating = next(name_list, miner, project, doc, top, project.modelname,
+                  uses=uses, education_req=education_req)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]
     for text, rate in rating:
@@ -29,22 +28,17 @@ def rate(miner, project, doc, top=10, selected=5,
             else:
                 score.append(float(rate[high.index(n)][2]))
         precent = [(float(each))*100 for each in score]
-        if name_list is not None:
-            namelist_candidate = []
-            namelist_precent = []
-            namelist_score = []
-            for name in name_list:
-                id = name.split('.')[0]
-                index = candidate.index(id)
-                namelist_candidate.append(candidate[index])
-                namelist_precent.append(precent[index])
-                namelist_score.append(score[index])
-            result.append((text, zip(namelist_candidate,
-                                     namelist_precent, namelist_score)))
-        else:
-            result.append((text, zip(candidate[:selected],
-                                     precent[:selected],
-                                     score[:selected])))
+        namelist_candidate = []
+        namelist_precent = []
+        namelist_score = []
+        for name in name_list:
+            id = name.split('.')[0]
+            index = candidate.index(id)
+            namelist_candidate.append(candidate[index])
+            namelist_precent.append(precent[index])
+            namelist_score.append(score[index])
+        result.append((text, zip(namelist_candidate,
+                                 namelist_precent, namelist_score)))
     return result
     
 def extract(datas):
@@ -53,22 +47,13 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(miner, project, doc, top, basemodel, uses=None,
-         name_list=None, education_req=True):
+def next(name_list, miner, project, doc, top, basemodel, minimum=10000,
+         uses=None, education_req=True):
     rating = []
     extract_data_full = []
-    if name_list is not None:
-        names_data_full = miner.minelist(doc, name_list, basemodel)
-        extract_data_full.extend(extract(names_data_full))
-    else:
-        name_list = []
-        top_data_full = miner.minetop(doc, basemodel, top=top, uses=uses)
-        extract_data_full = extract(top_data_full)
-        name_list.extend([core.outputstorage.ConvertName(each[1]).md
-                          for each in extract_data_full])
-    uses = miner.idsims(basemodel, name_list)
+    names_data_full = miner.minelist(doc, name_list, basemodel)
+    extract_data_full.extend(extract(names_data_full))
     rating.append((doc, extract_data_full))
-    total = miner.lenght(basemodel, uses=[project.name])
     for text in doc.split('\n'):
         if not text.strip():
             continue
@@ -77,8 +62,9 @@ def next(miner, project, doc, top, basemodel, uses=None,
             total_point = mine_education(project,
                 education_requirement.group('education'), name_list)
         else:
-            value_res = miner.minelist(text, name_list, basemodel, uses=uses)
-            rank_res = miner.minelistrank(text, value_res, basemodel, uses=[project.name])
+            value_res = miner.minelist(text, name_list, basemodel)
+            total, rank_res = miner.minelistrank(text, value_res, basemodel,
+                                                 top=top, minimum=minimum)
             value_point = map(lambda x: (x[0], float(x[1])/2), value_res)
             rank_point = map(lambda x: (x[0], rankvalue(x[1], total)), rank_res)
             total_point = map(lambda x: (x[0][0], x[0][1]*0.5+x[1][1]*0.5),

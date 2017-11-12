@@ -9,6 +9,8 @@ import { confirmExcelUpload } from 'request/company';
 
 import StorageUtil from 'utils/storage';
 
+import { introJs } from 'intro.js';
+
 import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
@@ -63,6 +65,7 @@ class Company extends Component {
       loading: false,
       uploading: false,
       disabled: true,
+      guide: false,
       status: 'ready'
     };
     this.handleChange = this.handleChange.bind(this);
@@ -119,6 +122,55 @@ class Company extends Component {
         }, 1000);
       }
     });
+  }
+
+  componentWillMount() {
+    if(this.props.location.query.guide) {
+      this.setState({
+      guide: this.props.location.query.guide
+      })
+    }
+  }
+
+  componentDidMount() {
+    if(this.state.guide) {
+      introJs().setOptions({
+        'skipLabel': '退出', 
+        'prevLabel':'上一步', 
+        'nextLabel':'下一步',
+        'doneLabel': '跳转到下个页面',
+        'scrollToElement': false,
+        steps: [       
+                    {
+                        //第一步引导
+                        element: '.cs-layout-subhead-list',
+                        intro: '待开发客户',
+                        position: 'right'
+                    },
+                    {
+                        element: '.cs-card-inner-top  ',
+                        intro: '单个新建或者批量上传',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '.ant-btn-ghost',
+                        intro: '<a href="">推荐Excel上传,点击下载Excel模板!</a>',
+                        position: 'bottom'
+                    },
+                    {
+                        //这个属性类似于jquery的选择器， 可以通过jquery选择器的方式来选择你需要选中的对象进行指引
+                        element: '.ant-spin-nested-loading',
+                        //这里是每个引导框具体的文字内容，中间可以编写HTML代码
+                        intro: '上传和新建结果展示',
+                        //这里可以规定引导框相对于选中对象出现的位置 top,bottom,left,right
+                        position: 'top'
+                    },
+                ]
+
+      }).start().oncomplete(() => {  
+          browserHistory.push('/pm/customer?guide=true'); 
+        });
+    }
   }
 
   render() {

@@ -2,6 +2,7 @@
 import os
 import ujson
 
+import core.outputstorage
 from gensim import similarities
 
 
@@ -58,6 +59,10 @@ class LSIsimilarity(object):
         self.index.save(os.path.join(self.path, self.matrix_save_name))
         self.clear()
 
+    def exists(self, name):
+        mdname = core.outputstorage.ConvertName(name).md
+        return mdname in self.names
+
     def clear(self):
         self.corpus = None
 
@@ -88,6 +93,8 @@ class LSIsimilarity(object):
         assert(self.lsi_model.dictionary)
         assert len(names) == len(documents)
         for name, document in zip(names, documents):
+            if name in self.names:
+                 continue
             text = self.lsi_model.slicer(document, id=name)
             self.names.append(name)
             corpu = self.lsi_model.dictionary.doc2bow(text)

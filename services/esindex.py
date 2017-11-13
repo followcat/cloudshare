@@ -107,9 +107,9 @@ class ElasticsearchIndexing(object):
         for svc in svcs:
             self.updatesvc(index, doctype, svc, numbers=numbers)
 
-    def genaction(self, index, doctype, id, data, info):
+    def genaction(self, index, doctype, id, data, info, content=True):
         _source = data
-        if _source is None:
+        if _source is None or content is False:
             _source = ''
         info.update({"content": _source})
         action = {
@@ -121,7 +121,7 @@ class ElasticsearchIndexing(object):
             }
         return action
 
-    def updatesvc(self, index, doctype, svc, numbers=5000):
+    def updatesvc(self, index, doctype, svc, content=True, numbers=5000):
         assert svc.name
         total, searchs = self.ESsearch(index=index, doctype=doctype)
         update_ids = set([item['_id'] for item in searchs])
@@ -129,9 +129,13 @@ class ElasticsearchIndexing(object):
         times = 0
         count = 0
         for id in svc.ids-update_ids:
-            geninfo = self.genindex(svc.getyaml(id))
+            try:
+                geninfo = self.genindex(svc.getyaml(id))
+            except Exception:
+                print id
+                continue
             data = svc.getmd(id)
-            action = self.genaction(index, doctype, id, data, geninfo)
+            action = self.genaction(index, doctype, id, data, geninfo, content=content)
             ACTIONS.append(action)
             count += 1
             if count%numbers == 0:
@@ -145,10 +149,10 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Add numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def add(self, index, doctype, id, data, info):
+    def add(self, index, doctype, id, data, info, content=True):
         ACTIONS = list()
         geninfo = self.genindex(info)
-        action = self.genaction(index, doctype, id, data, geninfo)
+        action = self.genaction(index, doctype, id, data, geninfo, content=content)
         ACTIONS.append(action)
         elasticsearch.helpers.bulk(self.es, ACTIONS,
                 raise_on_error=False, raise_on_exception=False, stats_only=True)
@@ -157,7 +161,7 @@ class ElasticsearchIndexing(object):
         for svc in svcs:
             self.upgradesvc(index, doctype, svc, ids=ids)
 
-    def upgradesvc(self, index, doctype, svc, ids=None, numbers=5000):
+    def upgradesvc(self, index, doctype, svc, ids=None, content=True, numbers=5000):
         assert svc.name
         if ids is None:
             ids = svc.ids
@@ -169,7 +173,7 @@ class ElasticsearchIndexing(object):
         for id in ids:
             geninfo = self.genindex(svc.getyaml(id))
             data = svc.getmd(id)
-            action = self.genaction(index, doctype, id, data, geninfo)
+            action = self.genaction(index, doctype, id, data, geninfo, content=content)
             ACTIONS.append(action)
             count += 1
             if count%numbers == 0:
@@ -188,7 +192,7 @@ class ElasticsearchIndexing(object):
         if kwargs is None:
             kwargs = dict()
         kwargs.update({'body': querydict})
-        kwargs['_source'] = 'false' if source is False else 'true'
+        kwargs['_source'] = source
         result = utils.esquery.scroll(self.es, kwargs, index=index, doctype=doctype,
                                       start=start, size=size)
         return result

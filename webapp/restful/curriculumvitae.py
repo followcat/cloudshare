@@ -104,12 +104,12 @@ class SearchCVbyTextAPI(Resource):
         filterdict['content'] = text
         total, searchs = self.svc_index.search(index=index, doctype=doctype,
                                         filterdict=filterdict, source=True,
+                                        kwargs={'_source_exclude': ['content']},
                                         start=(cur_page-1)*count, size=count)
         pages = int(math.ceil(total/count))
         datas = list()
         for item in searchs:
             yaml_info = item['_source']
-            yaml_info.pop('content')
             project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
             info = {
                 'author': yaml_info['committer'],

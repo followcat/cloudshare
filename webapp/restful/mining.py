@@ -199,7 +199,8 @@ class LSIbaseAPI(Resource):
         count, searchs = self.svc_index.search(index=list(index), doctype=doctype,
                                                filterdict=filterdict,
                                                ids=ids,
-                                               kwargs={'sort': sort},
+                                               kwargs={'sort': sort,
+                                                       '_source_exclude': ['content']},
                                                start=(cur_page-1)*size, size=size,
                                                source=True)
         totals = len(result)
@@ -208,11 +209,6 @@ class LSIbaseAPI(Resource):
         datas = list()
         for item in searchs:
             yaml_info = item['_source']
-            try:
-                yaml_info.pop('content')
-            except:
-                print yaml_info['id']
-                continue
             project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
             info = {
                 'author': yaml_info['committer'],

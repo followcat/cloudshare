@@ -30,7 +30,7 @@ class LSIsimilarity(object):
                 added = True
         if added or newmodel:
             self.set_index()
-        return added
+        return added or newmodel
 
     def build(self, svccv_list):
         names = []

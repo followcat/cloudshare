@@ -49,13 +49,17 @@ class LSImodel(object):
 
     def update(self, svccv_list):
         added = False
+        names = []
+        texts = []
         for svc_cv in svccv_list:
             for name in svc_cv.names():
                 if name not in self.names:
                     doc = svc_cv.getmd(name)
-                    self.add(name, doc)
+                    names.append(name)
+                    texts.append(doc)
                     added = True
         if added:
+            self.add_documents(names, texts)
             self.save()
         return added
 
@@ -145,21 +149,27 @@ class LSImodel(object):
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
                                                              self.corpu_dict_save_name))
 
-    def add(self, name, document):
-        text = self.slicer(document, id=name)
-        self.names.append(name)
-        self.texts.append(text)
+    def add_documents(self, names, documents):
+        assert len(names) == len(documents)
         if self.dictionary is None:
             self.set_dictionary()
-        corpu = self.dictionary.doc2bow(text)
-        self.corpus.append(corpu)
+        corpus = list()
+        corpu_tfidf = list()
         tfidf = models.TfidfModel(self.corpus)
-        corpu_tfidf = tfidf[[corpu]]
+        for name, document in zip(names, documents):
+            text = self.slicer(document, id=name)
+            corpu = self.dictionary.doc2bow(text)
+            corpus.append(corpu)
+        corpu_tfidf = tfidf[corpus]
         if self.lsi is None:
             self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
-                            num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
+                            num_topics=self.topics, power_iters=self.power_iters,
+                            extra_samples=self.extra_samples)
         else:
             self.lsi.add_documents(corpu_tfidf)
+        self.names.extend(names)
+        self.corpus.extend(corpus)
+        self.texts.extend(documents)
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)

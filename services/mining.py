@@ -291,10 +291,12 @@ class Mining(object):
             if lsimodel.getconfig('autoupdate') is True:
                 updated = self.lsi_model[modelname].update(
                     [self.services['default'][modelname]])
-                self.update_sims(newmodel=updated)
+                self.update_sims([modelname], newmodel=updated)
 
-    def update_sims(self, newmodel=False):
-        for modelname in self.sim:
+    def update_sims(self, modelnames=None, newmodel=False):
+        if modelnames is None:
+            modelnames = self.sim.keys()
+        for modelname in modelnames:
             for simname in self.sim[modelname]:
                 svc = self.services['all'][simname]
                 updated = self.sim[modelname][simname].update([svc], newmodel)

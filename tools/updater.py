@@ -31,7 +31,7 @@ def update_cv_models(SVC_MIN, SVC_MEMBERS, additionals=None):
                     trains.extend([(name, svc.getmd(name)) for name in
                                    set(svc.names()).difference(set(lsimodel.names))])
             updated = SVC_MIN.lsi_model[modelname].update(trains)
-            SVC_MIN.update_sims(newmodel=updated)
+            SVC_MIN.update_sims([modelname], newmodel=updated)
 
 
 def update_jd_sims(modelname, SVC_MIN, SVC_JDS, newmodel=False):

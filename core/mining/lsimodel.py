@@ -67,12 +67,16 @@ class LSImodel(object):
                 f.write(utils.builtin.dump_yaml(self.config))
 
     def update(self, gen):
+        names = []
+        texts = []
         added = False
         for name, doc in gen:
             if name not in self.names:
-                self.add(name, doc)
+                names.append(name)
+                texts.append(doc)
                 added = True
         if added:
+            self.add_documents(names, texts)
             self.save()
         return added
 
@@ -164,21 +168,27 @@ class LSImodel(object):
         id = core.outputstorage.ConvertName(name).base
         return id in self.ids
 
-    def add(self, name, document):
-        text = self.slicer(document, id=name)
-        self.names.append(name)
-        self.texts.append(text)
+    def add_documents(self, names, documents):
+        assert len(names) == len(documents)
         if self.dictionary is None:
             self.set_dictionary()
-        corpu = self.dictionary.doc2bow(text)
-        self.corpus.append(corpu)
+        corpus = list()
+        corpu_tfidf = list()
         tfidf = models.TfidfModel(self.corpus)
-        corpu_tfidf = tfidf[[corpu]]
+        for name, document in zip(names, documents):
+            text = self.slicer(document, id=name)
+            corpu = self.dictionary.doc2bow(text)
+            corpus.append(corpu)
+        corpu_tfidf = tfidf[corpus]
         if self.lsi is None:
             self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
-                            num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
+                            num_topics=self.topics, power_iters=self.power_iters,
+                            extra_samples=self.extra_samples)
         else:
             self.lsi.add_documents(corpu_tfidf)
+        self.names.extend(names)
+        self.corpus.extend(corpus)
+        self.texts.extend(documents)
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)

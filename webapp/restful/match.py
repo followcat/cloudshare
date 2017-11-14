@@ -1,5 +1,6 @@
 import flask
 import flask.ext.login
+from flask import request
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
@@ -30,6 +31,8 @@ class JDmathAPI(MatchbaseAPI):
         super(JDmathAPI, self).__init__()
         self.jd_repo = flask.current_app.config['SVC_JD_REPO']
         self.co_repo = flask.current_app.config['SVC_CO_REPO']
+        self.peo_mult = flask.current_app.config['SVC_MULT_PEO']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
 
     def post(self):
         super(JDmathAPI, self).post()
@@ -40,6 +43,25 @@ class JDmathAPI(MatchbaseAPI):
             jdinfo['companyID'] = jdinfo['company']
             jdinfo['company'] = self.co_repo.getyaml(jdinfo['company'])['name']
         return { 'code': 200, 'data': result, 'lenght': total }
+
+    def get(self):
+        args = request.args
+        self.page = int(args['page'])
+        self.numbers = int(args['numbers'])
+        user = flask.ext.login.current_user
+        total = 0
+        result = list()
+        code = 204
+        if user.peopleID:
+            code = 200
+            doc = self.peo_mult.getmd(user.peopleID).next()
+            total, result = core.mining.correlation.jobdescription_correlation(self.miner,
+                        [self.jd_repo], doc=doc, page=self.page, numbers=self.numbers)
+            for each in result:
+                jdinfo = each['data']
+                jdinfo['companyID'] = jdinfo['company']
+                jdinfo['company'] = self.co_repo.getyaml(jdinfo['company'])['name']
+        return { 'code': code, 'data': result, 'lenght': total }
 
 
 class COmathAPI(MatchbaseAPI):

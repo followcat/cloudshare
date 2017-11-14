@@ -29,7 +29,7 @@ class LSIsimilarity(object):
         if added or newmodel:
             self.set_index()
             self.save()
-        return added
+        return added or newmodel
 
     def build(self, gen):
         names = []

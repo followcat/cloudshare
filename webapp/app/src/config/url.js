@@ -50,6 +50,10 @@ export const URL = {
     return `/uploader`;
   },
 
+  getProUploaderURL: () => {
+    return `/prouploader`;
+  },
+
   getUserInfoURL: () => {
     return `/userinfo/history`;
   },

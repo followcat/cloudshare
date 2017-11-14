@@ -21,15 +21,18 @@ class Layout extends Component {
         this.setState({
           ismember: true,
         });
+        global.ismember = true
       }else{
         this.setState({
           ismember: false,
         });
+        global.ismember = false
       }
     });
   }
 
   render() {
+    console.log(global.ismember);
     return (
       <div className="cs-layout">
       { this.state.ismember ? 

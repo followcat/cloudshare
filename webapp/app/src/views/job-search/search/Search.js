@@ -20,7 +20,7 @@ class Search extends Component {
 
   handleSearch(value) {
     browserHistory.push({
-      pathname: 'search/result',
+      pathname: 'jobsearch/result',
       query: { search_text: value }
     });
   }
@@ -38,7 +38,7 @@ class Search extends Component {
         <Guide />
         <div className="cs-search">
           <KeywordSearch
-            btnText="简历搜索"
+            btnText="职位匹配"
             horizontal
             onSearch={this.handleSearch}
           />

@@ -1,0 +1,62 @@
+@import "../../../introjs.css";
+.cs-layout-search {
+  /* Seach form style */
+  .cs-search {
+    padding-top: 210px;
+    width: 720px;
+    margin: 0 auto;
+  }
+
+  /* DatabaseInfo component style */
+  .count-box {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    
+    width: 180px;
+    background-color: #FFF;
+
+    .count-list {
+      width: inherit;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 6px 24px;
+      text-align: center;
+      border-top: 1px solid #c2c2c2;
+      border-left: 1px solid #c2c2c2;
+
+      li {
+        padding: 8px 0;
+        border-bottom: 1px dotted #c2c2c2;
+      }
+
+      li:nth-child(1) {
+        font-weight: bold;
+      }
+    }
+
+    .total {
+      width: inherit;
+      text-align: center;
+      background-color: #337ab7;
+      cursor: pointer;
+      color: #FFF;
+      font-weight: bold;
+      padding: 6px 24px;
+    }
+
+    .radius {
+      border-top-left-radius: 4px;
+    }
+
+    .showed {
+      display: block;
+      border-top-left-radius: 4px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  }
+}
+

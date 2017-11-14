@@ -67,7 +67,8 @@ class Uploader extends Component {
       currentPreview: 0,
       total: 0,
       guide:false,
-      confirmLoading: false
+      confirmLoading: false,
+      setpeople: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
@@ -203,6 +204,7 @@ class Uploader extends Component {
   }
 
   handleConfirmClick(value) {
+
     const confirmList = updateConfirmList(value, this.state.confirmList);
 
     this.setState({
@@ -211,6 +213,7 @@ class Uploader extends Component {
     });
 
     confirmUpload(API.UPLOAD_RESUME_API, {
+      setpeople: value.setPeople,
       updates: confirmList
     }, (json) => {
       if (json.code === 200) {

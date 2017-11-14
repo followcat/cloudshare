@@ -66,8 +66,8 @@ class UploadCVAPI(Resource):
         documents = []
         for item in self.updates:
             status = 'failed'
-            self.cvobj = cvobj
-            cvobj = upload[self.user.name].pop(item['filename'])
+            self.cvobj = upload[self.user.name].pop(item['filename'])
+            cvobj=self.cvobj
             if cvobj is not None:
                 id = cvobj.metadata['id']
                 for key, value in item.iteritems():
@@ -80,6 +80,7 @@ class UploadCVAPI(Resource):
                                            cvobj.metadata['id'],
                                            cvobj.metadata)
                     if result['project_cv_result']:
+                        print result['project_cv_result']
                         result['member_cv_result'] = self.member.cv_add(cvobj, user.name,
                                                                         unique=True)
                         status = 'success'
@@ -140,15 +141,14 @@ class UserUploadCVAPI(UploadCVAPI):
 
     def __init__(self):
         super(UserUploadCVAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('setpeople', type=bool, location='json')
 
     def put(self):
         args = self.reqparse.parse_args()
         setpeople = args['setpeople']
         result = super(UserUploadCVAPI, self).put()
-        if result['data']['status'] == 'success' and setpeople:
-            self.user.peopleID = cvobj.metadata['unique_id']
+        if result['data'][0]['status'] == 'success' and setpeople:
+            self.user.peopleID = self.cvobj.metadata['unique_id']
         return result
 
     def post(self):
@@ -164,7 +164,6 @@ class MemberUploadCVAPI(UploadCVAPI):
 
     def __init__(self):
         super(MemberUploadCVAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
 
     def putparam(self):

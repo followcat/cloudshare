@@ -384,7 +384,7 @@ class Account(services.base.storage.BaseStorage):
         return result
 
     def setpeople(self, id, people, committer):
-        return self.updateinfo(id, 'people', committer)
+        return self.updateinfo(id, 'people', people, committer)
 
     def createmember(self, id, name, svc_members):
         """

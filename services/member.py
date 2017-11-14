@@ -28,7 +28,6 @@ class Member(services.base.service.Service):
     def __init__(self, acc_repos, co_repos, cv_repos, jd_repos,
                  mult_peo, path, name, iotype='git'):
         super(Member, self).__init__(path, name, iotype=iotype)
-        self.name = name
         self.path = path
         self.cv_path = os.path.join(path, self.CV_PATH)
         self.jd_path = os.path.join(path, self.JD_PATH)
@@ -103,6 +102,22 @@ class Member(services.base.service.Service):
                     self.administrator.remove(invited_id)
                     self.save()
                     result = True
+        return result
+
+    @property
+    def storageCV(self):
+        result = None
+        servicename = self.config['storageCV']
+        for cvrepo in self.cvrepos:
+            if isinstance(cvrepo, services.simulationcv.SimulationCV):
+                for each in cvrepo.storages:
+                    if each.name == servicename:
+                        result = each
+                        break
+            elif cvrepo.name == servicename:
+                result = each
+            if result is not None:
+                break
         return result
 
     @property
@@ -185,12 +200,6 @@ class Member(services.base.service.Service):
         result = self.curriculumvitaes.add(cvobj, committer,
                                           unique=unique, do_commit=do_commit)
         return result
-
-    def cv_search(self, keyword):
-        return self.curriculumvitaes.search(keyword, selected=self.config['storageCV'])
-
-    def cv_search_yaml(self, keyword):
-        return self.curriculumvitaes.search_yaml(keyword, selected=self.config['storageCV'])
 
     def cv_projects(self, id):
         return [p.name for p in self.projects.values() if id in p.cv_ids()]

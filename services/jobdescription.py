@@ -23,7 +23,7 @@ class JobDescription(services.base.storage.BaseStorage):
         ("status",          str),
     )
 
-    def __init__(self, path, name=None, searchengine=None, iotype=None):
+    def __init__(self, path, name=None, iotype=None):
         """
             >>> import shutil
             >>> import services.jobdescription
@@ -33,7 +33,7 @@ class JobDescription(services.base.storage.BaseStorage):
             >>> svc_jd = services.jobdescription.JobDescription(path, 'testjd')
             >>> svc_jd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
             True
-            >>> results = list(svc_jd.search('JD-A'))
+            >>> results = list(svc_jd.interface.grep('JD-A'))
             >>> data = svc_jd.getyaml(results[0][0])
             >>> data['description']
             'JD-A description'
@@ -48,7 +48,7 @@ class JobDescription(services.base.storage.BaseStorage):
             >>> svc_jd.add('CompanyC', 'JD-C', 'JD-C description', 'Dever',
             ...     commentary='this is JD-C commentary', followup='JD-C followup')
             True
-            >>> results = list(svc_jd.search('JD-C'))
+            >>> results = list(svc_jd..interface.grep('JD-C'))
             >>> data = svc_jd.getyaml(results[0][0])
             >>> data['description'], data['commentary']
             ('JD-C description', 'this is JD-C commentary')
@@ -60,8 +60,7 @@ class JobDescription(services.base.storage.BaseStorage):
             ('JD-C description', 'this is UPDATED JD-C commentary', 'UPDATED JD-C followup')
             >>> shutil.rmtree(path)
         """
-        super(JobDescription, self).__init__(path, name=name,
-                                             searchengine=searchengine, iotype=iotype)
+        super(JobDescription, self).__init__(path, name=name, iotype=iotype)
         self.path = path
 
     def _metadata(self, info):

@@ -1,4 +1,6 @@
 import os
+import math
+import datetime
 
 import flask
 import flask.ext.login
@@ -81,7 +83,6 @@ class SearchCVbyTextAPI(Resource):
         super(SearchCVbyTextAPI, self).__init__()
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
@@ -89,60 +90,41 @@ class SearchCVbyTextAPI(Resource):
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
+        count = 20
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         text = args['search_text']
-        cur_page = args['page']
+        cur_page = args['page'] if args['page'] else 1
         filterdict = args['filterdict'] if args['filterdict'] else {}
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        searchs = dict(member.cv_search(text))
-        yaml_searchs = dict(member.cv_search_yaml(text))
-        for id in yaml_searchs:
-            if id in searchs:
-                searchs[id] += yaml_searchs[id]
-            else:
-                searchs[id] = yaml_searchs[id]
-        result = sorted(searchs.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
-        ids = set([cv[0] for cv in result])
-        ids = self.svc_index.filter_ids(self.cv_indexname, ids, filterdict)
-        result = filter(lambda x: x[0] in ids, result)
-        count = 20
-        datas, pages = self.paginate([cv[0] for cv in result], cur_page, count, project)
+        index = self.svc_index.config['CV_MEM']
+        doctype = [p.id for p in member.projects.values()]
+        filterdict['content'] = text
+        total, searchs = self.svc_index.search(index=index, doctype=doctype,
+                                        filterdict=filterdict, source=True,
+                                        kwargs={'_source_exclude': ['content']},
+                                        start=(cur_page-1)*count, size=count)
+        pages = int(math.ceil(total/count))
+        datas = list()
+        for item in searchs:
+            yaml_info = item['_source']
+            project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
+            info = {
+                'author': yaml_info['committer'],
+                'time': datetime.datetime.strptime(yaml_info['date'],
+                                                   '%Y%m%d').strftime('%Y-%m-%d')
+            }
+            datas.append({ 'cv_id': yaml_info['id'],
+                           'yaml_info': yaml_info,
+                           'info': info})
         return {
             'code': 200,
             'data': {
                 'keyword': text,
                 'datas': datas,
                 'pages': pages,
-                'totals': len(result),
+                'totals': total,
             }
         }
-
-    def paginate(self, results, cur_page, eve_count, project):
-        if not cur_page:
-            cur_page = 1
-        sum = len(results)
-        if sum%eve_count != 0:
-            pages = sum/eve_count + 1
-        else:
-            pages = sum/eve_count
-        datas = []
-        ids = []
-        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            if id not in ids:
-                ids.append(id)
-            else:
-                continue
-            try:
-                yaml_info = project.cv_getyaml(id)
-            except IOError:
-                ids.remove(id)
-                continue
-            info = {
-                'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
-            }
-            datas.append({ 'cv_id': id, 'yaml_info': yaml_info, 'info': info})
-        return datas, pages

@@ -45,7 +45,6 @@ class UploadCVAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
-        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type=str, location='json')
         self.reqparse.add_argument('updates', type=list, location='json')
@@ -76,9 +75,8 @@ class UploadCVAPI(Resource):
                 try:
                     result = self.project.cv_add(cvobj, self.user.name, unique=True)
                     if result['repo_cv_result']:
-                        self.svc_index.add(self.cv_indexname,
-                                           cvobj.metadata['id'],
-                                           cvobj.metadata)
+                        self.svc_index.add(self.svc_index.config['CV_MEM'], self.project.id,
+                                           id, cvobj.data, cvobj.metadata)
                     if result['project_cv_result']:
                         print result['project_cv_result']
                         result['member_cv_result'] = self.member.cv_add(cvobj, user.name,

@@ -31,9 +31,8 @@ class Password(services.base.storage.BaseStorage):
 
     MUST_KEY = ['id', 'password']
 
-    def __init__(self, path, name=None, searchengine=None, iotype='git'):
-        super(Password, self).__init__(path, name=name,
-                                       searchengine=searchengine, iotype=iotype)
+    def __init__(self, path, name=None, iotype='git'):
+        super(Password, self).__init__(path, name=name, iotype=iotype)
 
     def baseobj(self, info):
         metadata = self._metadata(info)
@@ -141,9 +140,8 @@ class Message(services.base.storage.BaseStorage):
                  "sent_chat", "read_chat", "unread_chat"}
     fix_item  = {"id"}
 
-    def __init__(self, svc_account, path, name=None, searchengine=None, iotype='git'):
-        super(Message, self).__init__(path, name=name,
-                                      searchengine=searchengine, iotype=iotype)
+    def __init__(self, svc_account, path, name=None, iotype='git'):
+        super(Message, self).__init__(path, name=name, iotype=iotype)
         self.svc_account = svc_account
 
     def baseobj(self, info):
@@ -335,10 +333,9 @@ class Account(services.base.storage.BaseStorage):
         ("people",              str),
     )
 
-    def __init__(self, svc_password, path, name=None, searchengine=None, iotype='git'):
+    def __init__(self, svc_password, path, name=None, iotype='git'):
         self.svc_password = svc_password
-        super(Account, self).__init__(path, name=name,
-                                      searchengine=searchengine, iotype=iotype)
+        super(Account, self).__init__(path, name=name, iotype=iotype)
 
     def unique(self, bsobj):
         id = bsobj.ID

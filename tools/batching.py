@@ -431,3 +431,17 @@ def init_people(SVC_CV, SVC_PEO):
         peopmeta = extractor.information_explorer.catch_peopinfo(info)
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
         SVC_PEO.add(peopobj)
+
+def init_esindex_mem(SVC_INDEX, SVC_MEMBERS):
+    for memname, mem in SVC_MEMBERS.members.items():
+        for prjname, prj in mem.projects.items():
+            SVC_INDEX.updatesvc(SVC_INDEX.config['CO_MEM'], prj.id,
+                                prj.company, numbers=1000)
+            SVC_INDEX.updatesvc(SVC_INDEX.config['JD_MEM'], prj.id,
+                                prj.jobdescription, numbers=1000)
+            SVC_INDEX.updatesvc(SVC_INDEX.config['CV_MEM'], prj.id,
+                                prj.curriculumvitae, numbers=1000)
+
+def init_esindex_cvsto(SVC_INDEX, SVC_CV_STO, content=False):
+    SVC_INDEX.updatesvc(SVC_INDEX.config['CV_STO'], SVC_CV_STO.id,
+                        SVC_CV_STO, content=content, numbers=5000)

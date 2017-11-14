@@ -1,4 +1,5 @@
 import time
+import math
 import datetime
 
 import flask
@@ -35,6 +36,7 @@ class PositionAPI(BaseAPI):
 
     def __init__(self):
         super(PositionAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.reqparse.add_argument('search_text', location = 'json')
 
     def post(self):
@@ -47,13 +49,16 @@ class PositionAPI(BaseAPI):
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            searches = project.cv_search(text)
+            index = self.svc_index.config['CV_MEM']
+            doctype = [p.id for p in member.projects.values()]
+            searches = self.svc_index.search(index=index, doctype=doctype,
+                                     filterdict={'name': text},
+                                     size=self.numbers, onlyid=True)
         result = []
-        for search in list(searches)[:self.numbers]:
-            name = search[0]
+        for id in searches[:self.numbers]:
             positions = []
             try:
-                yaml_data = project.cv_getyaml(name)
+                yaml_data = project.cv_getyaml(id)
             except IOError:
                 continue
             if 'position' in yaml_data['experience']:
@@ -61,9 +66,9 @@ class PositionAPI(BaseAPI):
             for position in positions:
                 index = self.position_indexof(position, result)
                 if index > -1:
-                    result[index]['id_list'].append(name)
+                    result[index]['id_list'].append(id)
                 else:
-                    result.append({ 'position_name': position, 'id_list': [name] })
+                    result.append({ 'position_name': position, 'id_list': [id] })
         return { 'code': 200, 'data': result }
 
     def position_indexof(self, position, result):
@@ -162,36 +167,58 @@ class LSIbaseAPI(Resource):
         self.miner = flask.current_app.config['SVC_MIN']
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
 
-    def process(self, member, project, doc, uses, filterdict, cur_page, eve_count=20):
+    def process(self, member, project, doc, uses, filterdict, cur_page, size=20):
         if not cur_page:
             cur_page = 1
         datas = list()
         iduses = list()
+        index = set([self.svc_index.config['CV_MEM']])
+        doctype = list()
         for use in uses:
             if use in member.projects:
                 iduses.append(member.projects[use].id)
+                doctype.append(member.projects[use].id)
             else:
-                iduses.append(use)
+                index.add(self.svc_index.config['CV_STO'])
         result = self.miner.probability(project.modelname, doc, uses=iduses,
-                                        top=self.top, minimum=1000)
-        ids = set([cv[0] for cv in result])
-        ids = self.svc_index.filter_ids(self.cv_indexname, ids, filterdict)
-        result = filter(lambda x: x[0] in ids, result)
+                                        top=self.top, minimum=500)
+        ids = [cv[0] for cv in result]
+        sort = {
+                "_script" : {
+                      "type" : "number",
+                      "script" : {
+                          "inline": "params.ids.indexOf(doc['id'].value)",
+                          "params" : {
+                              "ids": ids
+                          }
+                      },
+                      "order" : "asc"
+                  }
+                }
+        count, searchs = self.svc_index.search(index=list(index), doctype=doctype,
+                                               filterdict=filterdict,
+                                               ids=ids,
+                                               kwargs={'sort': sort,
+                                                       '_source_exclude': ['content']},
+                                               start=(cur_page-1)*size, size=size,
+                                               source=True)
         totals = len(result)
-        if totals%eve_count != 0:
-            pages = totals/eve_count + 1
-        else:
-            pages = totals/eve_count
-        for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = project.cv_getyaml(name)
+        pages = int(math.ceil(totals/size))
+        result_dict = dict(result)
+        datas = list()
+        for item in searchs:
+            yaml_info = item['_source']
+            project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
             info = {
                 'author': yaml_info['committer'],
-                'time': utils.builtin.strftime(yaml_info['date']),
-                'match': score
+                'time': datetime.datetime.strptime(yaml_info['date'], 
+                                                   '%Y%m%d').strftime('%Y-%m-%d'),
+                'match': result_dict[yaml_info['id']]
             }
-            datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
+            datas.append({ 'cv_id': yaml_info['id'],
+                           'yaml_info': yaml_info,
+                           'info': info})
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
 
@@ -234,14 +261,13 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         super(LSIbyAllJDAPI, self).__init__()
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.cv_indexname = flask.current_app.config['ES_CONFIG']['CV_INDEXNAME']
         self.reqparse.add_argument('fromcache', type=bool, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
 
-    def fromcache(self, project, filterdict, threshold, cache=True):
+    def fromcache(self, project, filterdict, threshold, numbers, cache=True):
         date = int(time.strftime('%Y%m%d',time.localtime(time.time())))
         projectname = project.name
         if cache is True:
@@ -256,16 +282,19 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         else:
             bestjds = self.findbest(project, threshold)
         results = dict()
+        index = self.svc_index.config['CV_MEM']
         for jdid in bestjds:
             output = {}
             output['CV'] = list()
             bestids = set([cv[0] for cv in bestjds[jdid]])
-            filterids = self.svc_index.filter_ids(self.cv_indexname, bestids,
-                                                  filterdict)
-            for cv in filterids:
-                cvinfo = project.cv_getyaml(cv[0])
-                cvinfo['CVvalue'] = cv[1]
-                output['CV'].append(cvinfo)
+            searchids = self.svc_index.search(index=index, doctype=[project.id],
+                                              filterdict=filterdict, ids=bestids,
+                                              size=numbers, onlyid=True)
+            for cv in bestjds[jdid]:
+                if cv[0] in searchids:
+                    cvinfo = project.cv_getyaml(cv[0])
+                    cvinfo['CVvalue'] = cv[1]
+                    output['CV'].append(cvinfo)
             if not output['CV']:
                 continue
             jd = project.jd_get(jdid)
@@ -307,7 +336,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         results = list()
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        alls = self.fromcache(project, filterdict, threshold, cache=fromcache)
+        alls = self.fromcache(project, filterdict, threshold, numbers, cache=fromcache)
         for jdid in alls:
             results.append({'ID': jdid, 'name': alls[jdid]['name'],
                             'company': alls[jdid]['company'],

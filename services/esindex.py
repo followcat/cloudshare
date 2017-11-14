@@ -11,48 +11,131 @@ import utils.esquery
 class ElasticsearchIndexing(object):
 
     doctype = 'index'
-    index_config_body = {
+    index_config_CV = {
         "template": doctype,
         "mappings": {
             "_default_": {
                 "dynamic_templates": [
-                {
-                    "strings": {
-                        "match_mapping_type": "string",
+                    {
+                        "content": {
+                            "match":              "content",
+                            "match_mapping_type": "string",
                             "mapping": {
-                                "type": "keyword"
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
                             }
-                        }
-                    }
+                    }},
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":       "keyword"
+                            }
+                    }}
+                ]
+            }
+        }
+    }
+    index_config_CO = {
+        "template": doctype,
+        "mappings": {
+            "_default_": {
+                "dynamic_templates": [
+                    {
+                        "name": {
+                            "match":              "name",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_smart"
+                            }
+                    }},
+                    {
+                        "introduction": {
+                            "match":              "introduction",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "clientcontact": {
+                            "match":              "clientcontact",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "reminder": {
+                            "match":              "reminder",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "id": {
+                            "match":              "id",
+                            "mapping": {
+                                "type":           "keyword"
+                            }
+                    }},
+                    {
+                        "modifytime": {
+                            "match":              "modifytime",
+                            "mapping": {
+                                "type":           "keyword"
+                            }
+                    }}
                 ]
             }
         }
     }
 
-    def setup(self, esconn, indexname):
+    def setup(self, esconn, config):
+        self.config = config
         self.es = esconn
-        self.es.indices.create(index=indexname, body=self.index_config_body, ignore=400)
+        for each in config:
+            if each.startswith('CV'):
+                self.es.indices.create(index=config[each],
+                                       body=self.index_config_CV, ignore=400)
+            elif each.startswith('CO'):
+                self.es.indices.create(index=config[each],
+                                       body=self.index_config_CO, ignore=400)
 
-    def update(self, indexname, svcs):
+    def update(self, index, doctype, svcs, numbers=5000):
         for svc in svcs:
-            self.updatesvc(indexname, svc)
+            self.updatesvc(index, doctype, svc, numbers=numbers)
 
-    def updatesvc(self, indexname, svc, numbers=5000):
+    def genaction(self, index, doctype, id, data, info, content=True):
+        _source = data
+        if _source is None or content is False:
+            _source = ''
+        info.update({"content": _source})
+        action = {
+            "_op_type": 'index',
+            "_index": index,
+            "_type": doctype,
+            "_source": info,
+            "_id": id
+            }
+        return action
+
+    def updatesvc(self, index, doctype, svc, content=True, numbers=5000):
         assert svc.name
-        update_ids = set([item['_id'] for item in self.ES(indexname, {})])
+        total, searchs = self.ESsearch(index=index, doctype=doctype)
+        update_ids = set([item['_id'] for item in searchs])
         ACTIONS = list()
         times = 0
         count = 0
         for id in svc.ids-update_ids:
-            info = svc.getyaml(id)
-            geninfo = self.genindex(info)
-            action = {
-                "_op_type": "index",
-                "_index": indexname,
-                "_type": 'index',
-                "_source": geninfo,
-                '_id': id
-                }
+            try:
+                geninfo = self.genindex(svc.getyaml(id))
+            except Exception:
+                print id
+                continue
+            data = svc.getmd(id)
+            action = self.genaction(index, doctype, id, data, geninfo, content=content)
             ACTIONS.append(action)
             count += 1
             if count%numbers == 0:
@@ -66,25 +149,19 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Add numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def add(self, indexname, id, info):
+    def add(self, index, doctype, id, data, info, content=True):
         ACTIONS = list()
         geninfo = self.genindex(info)
-        action = {
-            "_op_type": "index",
-            "_index": indexname,
-            "_type": 'index',
-            "_source": geninfo,
-            '_id': id
-            }
+        action = self.genaction(index, doctype, id, data, geninfo, content=content)
         ACTIONS.append(action)
         elasticsearch.helpers.bulk(self.es, ACTIONS,
                 raise_on_error=False, raise_on_exception=False, stats_only=True)
 
-    def upgrade(self, indexname, svcs, selected, ids=None):
+    def upgrade(self, index, doctype, svcs, ids=None):
         for svc in svcs:
-            self.upgradesvc(indexname, svc, selected, ids=ids)
+            self.upgradesvc(index, doctype, svc, ids=ids)
 
-    def upgradesvc(self, indexname, svc, selected, ids=None, numbers=5000):
+    def upgradesvc(self, index, doctype, svc, ids=None, content=True, numbers=5000):
         assert svc.name
         if ids is None:
             ids = svc.ids
@@ -94,14 +171,9 @@ class ElasticsearchIndexing(object):
         count = 0
         ACTIONS = list()
         for id in ids:
-            yamlinfo = self.genindex(svc.getyaml(id))
-            action = {
-                "_op_type": 'index',
-                "_index": indexname,
-                "_type": 'index',
-                "_source": yamlinfo,
-                '_id': id
-                }
+            geninfo = self.genindex(svc.getyaml(id))
+            data = svc.getmd(id)
+            action = self.genaction(index, doctype, id, data, geninfo, content=content)
             ACTIONS.append(action)
             count += 1
             if count%numbers == 0:
@@ -115,41 +187,44 @@ class ElasticsearchIndexing(object):
                     raise_on_error=False, raise_on_exception=False, stats_only=True)
             print("Update numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
-    def get(self, indexname, querydict, source=False, pagesize=10000, start=0, size=None):
-        kwargs={'body': querydict}
-        results = self.ES(indexname, kwargs, source=source,
-                          pagesize=pagesize, start=start, size=None)
-        return results
-
-    def ES(self, indexname, kwargs, source=False, pagesize=10000, start=0, size=None):
-        kwargs['doc_type'] = 'index'
-        kwargs['sort'] = '_doc'
-        kwargs['_source'] = 'false' if source is False else 'true'
-        result = utils.esquery.scroll(self.es, indexname, kwargs,
-                                      pagesize=pagesize, start=start, size=size)
+    def ESsearch(self, index=None, doctype=None, querydict=None, kwargs=None,
+                 source=False, start=0, size=None):
+        if kwargs is None:
+            kwargs = dict()
+        kwargs.update({'body': querydict})
+        kwargs['_source'] = source
+        result = utils.esquery.scroll(self.es, kwargs, index=index, doctype=doctype,
+                                      start=start, size=size)
         return result
 
-    def filter(self, indexname, filterdict, ids=None, source=False,
-               pagesize=10000, start=0, size=None):
-        results = set()
-        querydict = utils.esquery.request_gen(filterdict=filterdict, ids=ids)
-        if querydict['query']['bool']['filter']:
-            results = self.get(indexname, querydict, source=source,
-                               pagesize=pagesize, start=start, size=size)
-        return results
-
-    def filter_ids(self, indexname, ids, filterdict, source=False,
-                   pagesize=10000, start=0, size=None):
-        result = ids
-        if filterdict:
-            filterset = self.filter(indexname, filterdict, ids=ids, source=source,
-                                    pagesize=pagesize, start=start, size=size)
-            result = set([item['_id'] for item in filterset])
+    def count(self, index=None, doctype=None, filterdict=None,
+              ids=None, kwargs=None, slop=50):
+        result = 0
+        querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
+                                              filterdict=filterdict, ids=ids, slop=slop)
+        if kwargs is None:
+            kwargs = dict()
+        kwargs.update({'body': querydict})
+        if ('filter' in querydict['query']['bool'] and querydict['query']['bool']['filter']) or\
+            ('must' in querydict['query']['bool'] and querydict['query']['bool']['must']):
+            result = utils.esquery.count(self.es, kwargs, index=index, doctype=doctype)
         return result
 
-    def lastday(self, indexname):
+    def search(self, index=None, doctype=None, filterdict=None, ids=None, source=False,
+               start=0, size=None, kwargs=None, onlyid=False, slop=50):
+        results = (0, list())
+        querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
+                                              filterdict=filterdict, ids=ids, slop=slop)
+        results = self.ESsearch(index=index, doctype=doctype, querydict=querydict,
+                                kwargs=kwargs, source=source, start=start, size=size)
+        if onlyid:
+            total, searchs = results
+            results = [each['_id'] for each in searchs]
+        return results
+
+    def lastday(self, index=None, doctype=None):
         lastday = '19800101'
-        search_result = self.es.search(index=indexname, doc_type=self.doctype,
+        search_result = self.es.search(index=index, doc_type=doctype,
                                        sort='_score,date:desc', size = 1)
         try:
             lastday = search_result['hits']['hits'][0]['_source']['date']

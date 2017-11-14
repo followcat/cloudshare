@@ -213,16 +213,6 @@ class Project(services.base.service.Service):
     def cv_datas(self):
         return self.curriculumvitae.datas()
 
-    def cv_search(self, keyword, selected=None):
-        if selected is None:
-            selected = [self.storageCV.name]
-        return self.curriculumvitae.search(keyword, selected=selected)
-
-    def cv_search_yaml(self, keyword, selected=None):
-        if selected is None:
-            selected = [self.storageCV.name]
-        return self.curriculumvitae.search_yaml(keyword, selected=selected)
-
     def cv_gethtml(self, id):
         return self.curriculumvitae.gethtml(id)
 
@@ -338,9 +328,6 @@ class Project(services.base.service.Service):
             result = self.storageJD.modify(id, description, status,
                                            commentary, followup, committer)
         return result
-
-    def jd_search(self, keyword, selected=None):
-        return self.jobdescription.search(keyword, selected=selected)
 
     def jd_datas(self):
         return self.jobdescription.datas()

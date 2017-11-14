@@ -69,8 +69,6 @@ export const API = {
   ADDED_COMPANY_LIST_API: `${HOST}/api/addedcompanylist`,
 
   ALL_COMPANY_API: `${HOST}/api/companyall`,
-
-  COMPANY_BY_SEARCH_TEXT_API: `${HOST}/api/searchcobytext`,
   
   COMPANY_BY_SEARCH_KEY_API: `${HOST}/api/searchcobykey`,
 

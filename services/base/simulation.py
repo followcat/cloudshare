@@ -165,44 +165,6 @@ class Simulation(services.base.storage.BaseStorage):
         self.memdatas.update('modifytime', id)
         return result
 
-    def search(self, keyword, selected=None):
-        if selected is None:
-            selected = [storage.name for storage in self.storages]
-        results = set()
-        allfile = set()
-        for storage in self.storages:
-            if isinstance(storage, Simulation):
-                allfile.update(storage.search(keyword, selected=selected))
-            elif storage.name in selected:
-                allfile.update(storage.search(keyword))
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            if id in self.ids:
-                results.add((id, result[1]))
-        return results
-
-    def search_yaml(self, keyword, selected=None):
-        if selected is None:
-            selected = [storage.name for storage in self.storages]
-        results = set()
-        allfile = set()
-        for storage in self.storages:
-            if isinstance(storage, Simulation):
-                allfile.update(storage.search_yaml(keyword, selected=selected))
-            elif storage.name in selected:
-                allfile.update(storage.search_yaml(keyword))
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            if id in self.ids:
-                results.add((id, result[1]))
-        return results
-
-    def search_key(self, key, value, ids=None):
-        return self.memdatas.search_key(key, value, ids)
-
-    def sorted_ids(self, key, ids=None, reverse=True):
-        return self.memdatas.sorted_ids(key, ids=ids, reverse=reverse)
-
     @property
     def ids(self):
         if self._ids is None:

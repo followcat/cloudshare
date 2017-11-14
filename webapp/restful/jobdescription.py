@@ -50,7 +50,8 @@ class JobDescriptionAPI(Resource):
                                    commentary, followup, user.name)
         if result is True:
             jd_info = project.jd_get(jd_id)
-            self.svc_index.add(self.jd_indexname, jd_id, jd_info)
+            self.svc_index.add(self.svc_index.config['JD_MEM'], project.id,
+                               id, None, jd_info)
         if result: 
             response = { 'code': 200, 'data': result,
                          'message': 'Update job description successed.' }
@@ -94,7 +95,9 @@ class JobDescriptionUploadAPI(Resource):
         jdobj = project.storageJD.baseobj(info)
         result = project.jd_add(jdobj, committer=user.name)
         if result is True:
-            self.svc_index.add(self.jd_indexname, jdobj.metadata['id'], jdobj.metadata)
+            id = jdobj.metadata['id']
+            self.svc_index.add(self.svc_index.config['JD_MEM'], project.id,
+                               id, None, jdobj.metadata)
         return { 'code': 200, 'data': result, 'message': 'Create job description successed.' }
 
 

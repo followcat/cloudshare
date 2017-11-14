@@ -92,11 +92,10 @@ class CompanyProjectAPI(MatchbaseAPI):
     def post(self):
         super(CompanyProjectAPI, self).post()
         result = list()
-        cv_indexname = self.es_config['CV_INDEXNAME']
-        search = self.svc_index.filter(cv_indexname,
-                                       {'experience.project.company': self.doc},
-                                       pagesize=self.numbers,
-                                       start=self.page*self.numbers,
+        index = self.svc_index.config['CV_MEM']
+        total, search = self.svc_index.search(index=index,
+                                       filterdict={'experience.project.company': self.doc},
+                                       start=(self.page-1)*self.numbers,
                                        size=self.numbers, source=True)
         for each in search:
             for project in each['_source']['experience']['project']:
@@ -104,5 +103,4 @@ class CompanyProjectAPI(MatchbaseAPI):
                     result.append( {'id': each['_source']['id'],
                                     'value': 1,
                                     'data': project} )
-                    break
         return { 'code': 200, 'data': result }

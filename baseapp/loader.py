@@ -27,7 +27,6 @@ except ImportError:
 
 class Config(object):
 
-<<<<<<< HEAD
     es_config_file = 'es.yaml'
     min_config_file = 'min.yaml'
     storage_config_file = 'storage.yaml'
@@ -174,7 +173,7 @@ class Config(object):
  
 
 CONFIG_PATH = 'config'
-config = Config(CONFIG_PATH, version='1.5')
+config = Config(CONFIG_PATH, version='1.2')
 
 def load_mult_classify(svc_storages):
     global config

@@ -75,7 +75,6 @@ class Config(object):
     '1.5': (
         ("LSI",             "model/lsimodel"),
         ("CUTWORD",         "cache/cutwords"),
-        ("REINDEX",         "cache/Index"),
         ("ACCOUNT",         "account/account"),
         ("PASSWORD",        "account/password"),
         ("MESSAGE",         "account/message"),
@@ -175,7 +174,7 @@ class Config(object):
  
 
 CONFIG_PATH = 'config'
-config = Config(CONFIG_PATH, version='1.2')
+config = Config(CONFIG_PATH, version='1.5')
 
 def load_mult_classify(svc_storages):
     global config

@@ -139,23 +139,21 @@ class LSImodel(object):
 
     def add_documents(self, names, documents):
         assert len(names) == len(documents)
-        corpus = list()
-        corpu_tfidf = list()
-        self.set_tfidf()
-        for name, document in zip(names, documents):
-            text = self.slicer(document, id=name)
-            corpu = self.lsi.id2word(text)
-            corpus.append(corpu)
-        corpu_tfidf = self.tfidf[corpus]
         if self.lsi is None:
-            self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
-                            num_topics=self.topics, power_iters=self.power_iters,
-                            extra_samples=self.extra_samples)
+            self.setup(names, documents)
         else:
+            corpus = list()
+            corpu_tfidf = list()
+            for name, document in zip(names, documents):
+                text = self.slicer(document, id=name)
+                corpu = self.lsi.id2word(text)
+                corpus.append(corpu)
+            self.names.extend(names)
+            self.corpus.extend(corpus)
+            self.texts.extend(documents)
+            self.set_tfidf()
+            corpu_tfidf = self.tfidf[corpus]
             self.lsi.add_documents(corpu_tfidf)
-        self.names.extend(names)
-        self.corpus.extend(corpus)
-        self.texts.extend(documents)
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)

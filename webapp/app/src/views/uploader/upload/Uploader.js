@@ -63,6 +63,7 @@ class Uploader extends Component {
       failedList: [],
       classifyList: [],
       confirmResult: [],
+      origin: '',
       origins: [],
       currentPreview: 0,
       total: 0,
@@ -71,6 +72,7 @@ class Uploader extends Component {
       setpeople: false
     };
     this.handleChange = this.handleChange.bind(this);
+    this.handleChangeOrigin = this.handleChangeOrigin.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
     this.handlePrevClick = this.handlePrevClick.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
@@ -106,6 +108,12 @@ class Uploader extends Component {
       }).start();
       // introJs().start();
     }
+  }
+
+  handleChangeOrigin(origin) {
+    this.setState({
+      origin: origin
+    });
   }
 
   handleChange(info) {
@@ -250,6 +258,7 @@ class Uploader extends Component {
       classifyList,
       currentPreview,
       total,
+      origin,
       origins,
       confirmLoading
     } = this.state;
@@ -261,6 +270,7 @@ class Uploader extends Component {
           classifyList={classifyList}
           currentPreview={currentPreview}
           origins={origins}
+          defaultOrigin={origin}
           total={total}
           confirmLoading={confirmLoading}
           onPrevClick={this.handlePrevClick}
@@ -305,6 +315,7 @@ class Uploader extends Component {
           <DraggerUpload
             {...uploadProps}
             fileList={fileList}
+            handleChangeOrigin={this.handleChangeOrigin}
           />
           </div>
           {guide ?

@@ -32,7 +32,6 @@ class Layout extends Component {
   }
 
   render() {
-    console.log(global.ismember);
     return (
       <div className="cs-layout">
       { this.state.ismember ? 

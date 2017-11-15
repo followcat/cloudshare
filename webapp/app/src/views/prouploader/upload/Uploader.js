@@ -5,12 +5,16 @@ import { browserHistory } from 'react-router';
 import ShowCard from 'components/show-card';
 import DraggerUpload from 'components/dragger-upload';
 import Guide from 'components/guide';
+import Summary from 'components/summary';
+import SearchResultBox from 'components/jd-search-result-box';
+
 import Preview from './Preview';
 
 import { message } from 'antd';
 
 import { introJs } from 'intro.js';
 
+import { jdMatching, proJdMatching } from 'request/matching';
 import { getClassify } from 'request/classify';
 import { uploadPreview, confirmUpload } from 'request/upload';
 import { getUploadOrigin } from 'request/classify';
@@ -18,6 +22,7 @@ import { getUploadOrigin } from 'request/classify';
 import { API } from 'API';
 
 import StorageUtil from 'utils/storage';
+import { generateSummary } from 'utils/summary-generator';
 
 import remove from 'lodash/remove';
 import findIndex from 'lodash/findIndex';
@@ -64,6 +69,8 @@ class Uploader extends Component {
       classifyList: [],
       confirmResult: [],
       origins: [],
+      origin: '',
+      totals: 0,
       currentPreview: 0,
       total: 0,
       guide:false,
@@ -71,6 +78,7 @@ class Uploader extends Component {
       setpeople: false
     };
     this.handleChange = this.handleChange.bind(this);
+    this.handleChangeOrigin = this.handleChangeOrigin.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
     this.handlePrevClick = this.handlePrevClick.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
@@ -84,6 +92,17 @@ class Uploader extends Component {
       if (json.code === 200) {
         this.setState({
           origins: json.data,
+        });
+      }
+    });
+
+    proJdMatching({
+      'page': `page=0`,
+      'numbers': `numbers=5`
+    }, json => {
+      if (json.code === 200) {
+        this.setState({
+          dataSource: json.data,
         });
       }
     });
@@ -108,11 +127,17 @@ class Uploader extends Component {
     }
   }
 
+  handleChangeOrigin(origin) {
+    this.setState({
+      origin: origin
+    });
+  }
+
   handleChange(info) {
     let fileList = info.fileList,
         { completedList, failedList } = this.state;
 
-    fileList = fileList.slice(-1);
+        fileList = fileList.slice(-1);
 
     fileList = fileList.map(file => {
       if (file.response && file.status === 'done' && !file.completed) {
@@ -217,7 +242,7 @@ class Uploader extends Component {
     });
 
     confirmUpload(API.UPLOAD_RESUME_API, {
-      setpeople: value.setPeople,
+      setpeople: true,
       updates: confirmList
     }, (json) => {
       if (json.code === 200) {
@@ -254,6 +279,7 @@ class Uploader extends Component {
       classifyList,
       currentPreview,
       total,
+      origin,
       origins,
       confirmLoading
     } = this.state;
@@ -265,6 +291,7 @@ class Uploader extends Component {
           classifyList={classifyList}
           currentPreview={currentPreview}
           origins={origins}
+          defaultOrigin={origin}
           total={total}
           confirmLoading={confirmLoading}
           onPrevClick={this.handlePrevClick}
@@ -284,7 +311,9 @@ class Uploader extends Component {
       failedList,
       confirmResult,
       guide,
-      origins
+      origins,
+      totals,
+      dataSource
     } = this.state;
 
     const uploadProps = {
@@ -296,7 +325,7 @@ class Uploader extends Component {
       origins: origins,
       multiple: false,
       text: '点击上传或拖放文件到此区域',
-      hint: '支持单文件或多文件上传',
+      hint: '只支持单文件上传',
       onChange: this.handleChange,
       onRemove: this.handleRemove,
     };
@@ -309,6 +338,7 @@ class Uploader extends Component {
           <DraggerUpload
             {...uploadProps}
             fileList={fileList}
+            handleChangeOrigin={this.handleChangeOrigin}
           />
           </div>
           {guide ?
@@ -323,6 +353,21 @@ class Uploader extends Component {
             fileList: fileList,
             confirmResult: confirmResult
           })}
+          { dataSource ?
+          <SearchResultBox
+            visible={true}
+            current={0}
+            total={totals}
+            spinning={false}
+            dataSource={dataSource}
+            educationExperienceText="教育经历"
+            workExperienceText="工作经历"
+            foldText="展开"
+            unfoldText="收起"
+          /> 
+          :
+          null
+          }
         </ShowCard>
       </div>
     );

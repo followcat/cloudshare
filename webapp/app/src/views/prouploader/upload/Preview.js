@@ -15,9 +15,8 @@ class Preview extends Component {
     const {
       completedList,
       currentPreview,
-      origins
+      origins,
     } = this.props;
-
     return (
       <div>
         {completedList.map((item, index) => {

@@ -13,10 +13,8 @@ class PreviewTopBarForm extends Component {
     super();
     this.state = {
       origins: [],
-      setPeople: false
     }
     this.handleClick = this.handleClick.bind(this);
-    this.handleSetPeople = this.handleSetPeople.bind(this);
   }
 
   handleClick(e) {
@@ -27,14 +25,7 @@ class PreviewTopBarForm extends Component {
     this.props.onConfirmClick({
       id: this.props.id,
       fieldsValue: fieldsValue,
-      setPeople: this.state.setPeople
     });
-  }
-
-  handleSetPeople() {
-    this.setState({
-      setPeople: !this.state.setPeople
-    })
   }
 
   render() {
@@ -49,9 +40,11 @@ class PreviewTopBarForm extends Component {
       currentPreview,
       total,
       confirmLoading,
-      btnText
+      btnText,
+      defaultOrigin
     } = this.props,
     { getFieldDecorator } = form;
+
     return (
       <Form layout="inline" className={`${prefixCls}-form`}>
         <FormItem label="简历ID">
@@ -78,7 +71,9 @@ class PreviewTopBarForm extends Component {
           )}
         </FormItem>
         <FormItem label="简历来源">
-          {getFieldDecorator('origin')(
+          {getFieldDecorator('origin',{
+            initialValue: defaultOrigin
+            })(
             <Select
               showSearch
               optionFilterProp="children"
@@ -113,28 +108,6 @@ class PreviewTopBarForm extends Component {
           )}
         </FormItem>
         <FormItem>
-        { total === 1 && !global.ismember && !this.state.setPeople ?
-            <Button
-              type="primary"
-              className="cs-preview-setpeople"
-              onClick={this.handleSetPeople}
-              size="small"
-            >
-              {'设为个人简历'}
-            </Button>  :
-          null
-        }
-        { total === 1 && !global.ismember && this.state.setPeople ?
-            <Button
-              type="danger"
-              className="cs-preview-cancelsetpeople"
-              onClick={this.handleSetPeople}
-              size="small"
-            >
-              {'取消'}
-            </Button>  :
-          null
-        }  
         {currentPreview === total - 1 ?
             <Button
               type="primary"

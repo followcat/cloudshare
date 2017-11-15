@@ -15,7 +15,8 @@ class DraggerUpload extends Component {
   handleChange(value) {
     this.setState({
        selected: { 'origin' : value }
-    })
+    });
+    this.props.handleChangeOrigin(value)
   }
 
   render() {
@@ -34,7 +35,7 @@ class DraggerUpload extends Component {
       hint
     } = this.props;
     const { selected } = this.state;
-    
+
     return (
       <div className={prefixCls}>
         <Dragger

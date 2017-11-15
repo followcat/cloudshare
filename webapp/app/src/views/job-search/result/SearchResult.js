@@ -6,7 +6,7 @@ import KeywordSearch from 'components/keyword-search';
 import SearchResultBox from 'components/jd-search-result-box';
 import ResultInfo from './ResultInfo';
 
-import { jdMatching } from 'request/matching';
+import { jdMatching, proJdMatching } from 'request/matching';
 import { getIndustry } from 'request/classify';
 
 class SearchResult extends Component {
@@ -27,6 +27,26 @@ class SearchResult extends Component {
     this.handleFilter = this.handleFilter.bind(this);
     this.getIndustryDataSource = this.getIndustryDataSource.bind(this);
     this.loadResultDataSource = this.loadResultDataSource.bind(this);
+  }
+
+  componentWillMount() {
+    const { searchText, pages } = this.state;
+
+    if(!searchText) {
+      proJdMatching({
+        page: `page=${pages}`,
+        numbers: `numbers=20`
+      }, json => {
+        if (json.code === 200) {
+          this.setState({
+            spinning: false,
+            pages: pages,
+            dataSource: json.data,
+            totals: json.lenght
+          });
+        }
+      });
+    }
   }
 
   componentDidMount() {
@@ -55,20 +75,36 @@ class SearchResult extends Component {
       spinning: true,
       dataSource: []
     });
-
-    jdMatching({
-      'doc': this.state.searchText,
-      'page': page-1,
-      'numbers':20
-    }, json => {
-      if (json.code === 200) {
-        this.setState({
-          spinning: false,
-          dataSource: json.data,
-          totals: json.lenght
-        });
-      }
-    });
+    if(!this.state.searchText) {
+      proJdMatching({
+        'page': `page=${page-1}`,
+        'numbers': `numbers=20`
+      }, json => {
+        if (json.code === 200) {
+          this.setState({
+            spinning: false,
+            pages: json.data.pages,
+            dataSource: json.data,
+            totals: json.lenght
+          });
+        }
+      });
+    } else {
+      jdMatching({
+        'doc': searchText,
+        'page': `page=${page-1}`,
+        'numbers': `numbers=20`
+      }, (json) => {
+        if (json.code === 200) {
+          this.setState({
+            spinning: false,
+            pages: json.data.pages,
+            dataSource: json.data,
+            totals: json.lenght
+          });
+        }
+      });
+    }
   }
 
   handleFilter(fieldValue) {

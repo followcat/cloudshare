@@ -42,7 +42,7 @@ class LSIsimilarity(object):
                 names.append(name)
                 documents.append(doc)
                 words = self.lsi_model.slicer(doc, id=name)
-                corpus.append(self.lsi_model.dictionary.doc2bow(words))
+                corpus.append(self.lsi_model.lsi.id2word.doc2bow(words))
         self.setup(names, corpus)
 
     def setup(self, names, corpus):
@@ -67,7 +67,7 @@ class LSIsimilarity(object):
                                                   self.matrix_save_name))
 
     def add_documents(self, names, documents):
-        assert(self.lsi_model.dictionary)
+        assert(self.lsi_model.lsi.id2word)
         assert len(names) == len(documents)
         names = list()
         corpus = list()
@@ -76,7 +76,7 @@ class LSIsimilarity(object):
                  continue
             names.append(name)
             text = self.lsi_model.slicer(document, id=name)
-            corpu = self.lsi_model.dictionary.doc2bow(text)
+            corpu = self.lsi_model.lsi.id2word.doc2bow(text)
             corpus.append(corpu)
         self.names.extend(names)
         self.index.add_documents(corpus)

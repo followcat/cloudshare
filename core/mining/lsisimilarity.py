@@ -77,7 +77,7 @@ class LSIsimilarity(object):
             corpu = self.lsi_model.lsi.id2word.doc2bow(text)
             corpus.append(corpu)
         self.names.extend(names)
-        self.index.add_documents(corpus)
+        self.index.add_documents(self.lsi_model.lsi[corpus])
 
     def set_index(self, corpus):
         if not os.path.exists(self.path):

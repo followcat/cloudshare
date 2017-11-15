@@ -46,6 +46,10 @@ export const URL = {
     return `/jobsearch`;
   },
 
+  getProJobSearchURL: () => {
+    return `/jobsearch/result?search_text=`;
+  },
+
   getUploaderURL: () => {
     return `/uploader`;
   },

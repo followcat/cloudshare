@@ -37,7 +37,7 @@ class UploaderResult extends Component {
       render: (record) => {
         return (
           <a
-            href={URL.getResumeURL(record.id)}
+            href={URL.getProJobSearchURL()}
             target="_blank"
             disabled={record.status !== 'success' ? true : false}
           >

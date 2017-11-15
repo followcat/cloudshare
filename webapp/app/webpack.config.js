@@ -68,7 +68,8 @@ let webpackConfig = {
   
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons'
+      name: 'commons',
+      drop_console: true
     })
   ]
 };

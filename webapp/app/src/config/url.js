@@ -42,8 +42,16 @@ export const URL = {
     return `/search`;
   },
 
+  getJobSearchURL: () => {
+    return `/jobsearch`;
+  },
+
   getUploaderURL: () => {
     return `/uploader`;
+  },
+
+  getProUploaderURL: () => {
+    return `/prouploader`;
   },
 
   getUserInfoURL: () => {

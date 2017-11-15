@@ -8,5 +8,5 @@ import LayoutHeader from './LayoutHeader';
 export {
   Layout,
   LayoutContainer,
-  LayoutHeader
+  LayoutHeader,
 };

@@ -48,7 +48,6 @@ class UploadCVAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type=str, location='json')
         self.reqparse.add_argument('updates', type=list, location='json')
-        self.reqparse.add_argument('origin', type=str, location='json')
 
     def putparam(self):
         self.user = flask.ext.login.current_user
@@ -66,8 +65,8 @@ class UploadCVAPI(Resource):
         documents = []
         for item in self.updates:
             status = 'failed'
-            self.cvobj = cvobj
-            cvobj = upload[self.user.name].pop(item['filename'])
+            self.cvobj = upload[self.user.name].pop(item['filename'])
+            cvobj=self.cvobj
             if cvobj is not None:
                 id = cvobj.metadata['id']
                 for key, value in item.iteritems():
@@ -79,6 +78,7 @@ class UploadCVAPI(Resource):
                         self.svc_index.add(self.svc_index.config['CV_MEM'], self.project.id,
                                            id, cvobj.data, cvobj.metadata)
                     if result['project_cv_result']:
+                        print result['project_cv_result']
                         result['member_cv_result'] = self.member.cv_add(cvobj, user.name,
                                                                         unique=True)
                         status = 'success'
@@ -105,9 +105,9 @@ class UploadCVAPI(Resource):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        origin = args['origin']
         if user.name not in upload:
             upload[user.name] = dict()
+        origin = flask.request.form['origin']
         network_file = flask.request.files['files']
         filename = network_file.filename
         filepro = self.svc_docpro(network_file, filename.encode('utf-8'),
@@ -138,15 +138,15 @@ class UploadCVAPI(Resource):
 class UserUploadCVAPI(UploadCVAPI):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
+        super(UserUploadCVAPI, self).__init__()
         self.reqparse.add_argument('setpeople', type=bool, location='json')
 
     def put(self):
         args = self.reqparse.parse_args()
         setpeople = args['setpeople']
         result = super(UserUploadCVAPI, self).put()
-        if result['data']['status'] == 'success' and setpeople:
-            self.user.peopleID = cvobj.metadata['unique_id']
+        if result['data'][0]['status'] == 'success' and setpeople:
+            self.user.peopleID = self.cvobj.metadata['unique_id']
         return result
 
     def post(self):
@@ -161,7 +161,7 @@ class UserUploadCVAPI(UploadCVAPI):
 class MemberUploadCVAPI(UploadCVAPI):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
+        super(MemberUploadCVAPI, self).__init__()
         self.reqparse.add_argument('project', location = 'json')
 
     def putparam(self):

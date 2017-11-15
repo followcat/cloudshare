@@ -38,7 +38,7 @@ class Search extends Component {
         <Guide />
         <div className="cs-search">
           <KeywordSearch
-            btnText="搜索"
+            btnText="简历搜索"
             horizontal
             onSearch={this.handleSearch}
           />

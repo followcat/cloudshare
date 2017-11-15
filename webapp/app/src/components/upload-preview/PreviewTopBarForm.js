@@ -1,9 +1,9 @@
 'use strict';
-import React, { Component, PropTypes } from 'react';
+import React, { Component, PropTypes, message, } from 'react';
 
 import { Form, Input, Select, Button } from 'antd';
 
-import { resumeSource } from 'config/source';
+import { getUploadOrigin } from 'request/classify';
 
 const FormItem = Form.Item,
       Option = Select.Option;
@@ -11,7 +11,12 @@ const FormItem = Form.Item,
 class PreviewTopBarForm extends Component {
   constructor() {
     super();
+    this.state = {
+      origins: [],
+      setPeople: false
+    }
     this.handleClick = this.handleClick.bind(this);
+    this.handleSetPeople = this.handleSetPeople.bind(this);
   }
 
   handleClick(e) {
@@ -21,8 +26,15 @@ class PreviewTopBarForm extends Component {
 
     this.props.onConfirmClick({
       id: this.props.id,
-      fieldsValue: fieldsValue
+      fieldsValue: fieldsValue,
+      setPeople: this.state.setPeople
     });
+  }
+
+  handleSetPeople() {
+    this.setState({
+      setPeople: !this.state.setPeople
+    })
   }
 
   render() {
@@ -31,6 +43,7 @@ class PreviewTopBarForm extends Component {
       name,
       prefixCls,
       resumeID,
+      origins,
       classifyValue,
       classifyList,
       currentPreview,
@@ -38,8 +51,7 @@ class PreviewTopBarForm extends Component {
       confirmLoading,
       btnText
     } = this.props,
-      { getFieldDecorator } = form;
-
+    { getFieldDecorator } = form;
     return (
       <Form layout="inline" className={`${prefixCls}-form`}>
         <FormItem label="简历ID">
@@ -47,7 +59,7 @@ class PreviewTopBarForm extends Component {
             initialValue: resumeID || ''
           })(
             <Input
-              style={{ width: 120 }}
+              style={{ width: 100 }}
               readOnly
               size="small"
             />
@@ -60,7 +72,7 @@ class PreviewTopBarForm extends Component {
           })(
             <Input
               placeholder="请输入候选人名字"
-              style={{ width: 100 }}
+              style={{ width: 70 }}
               size="small"
             />
           )}
@@ -69,13 +81,12 @@ class PreviewTopBarForm extends Component {
           {getFieldDecorator('origin')(
             <Select
               showSearch
-              placeholder="选择简历来源"
               optionFilterProp="children"
               notFoundContent="Not found"
-              style={{ width: 120 }}
+              style={{ width: 90 }}
               size="small"
             >
-              {resumeSource.map(item => {
+              {origins.map(item => {
                 return (
                   <Option key={item.id} value={item.name}>{item.name}</Option>
                 );
@@ -101,19 +112,42 @@ class PreviewTopBarForm extends Component {
             </Select>
           )}
         </FormItem>
-        {currentPreview === total - 1 ?
-          <FormItem>
+        <FormItem>
+        { total === 1 && !global.ismember && !this.state.setPeople ?
             <Button
               type="primary"
+              className="cs-preview-setpeople"
+              onClick={this.handleSetPeople}
+              size="small"
+            >
+              {'设为个人简历'}
+            </Button>  :
+          null
+        }
+        { total === 1 && !global.ismember && this.state.setPeople ?
+            <Button
+              type="danger"
+              className="cs-preview-cancelsetpeople"
+              onClick={this.handleSetPeople}
+              size="small"
+            >
+              {'取消'}
+            </Button>  :
+          null
+        }  
+        {currentPreview === total - 1 ?
+            <Button
+              type="primary"
+              className="cs-preview-comfirm"
               loading={confirmLoading}
               onClick={this.handleClick}
               size="small"
             >
               {btnText}
-            </Button>
-          </FormItem> :
+            </Button>    :
           null
         }
+        </FormItem>
       </Form>
     );
   }

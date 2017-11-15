@@ -6,6 +6,8 @@ import StorageUtil from 'utils/storage';
 
 import 'components/global.less';
 
+import { isMember } from 'request/member';
+
 const rootRoute = {
   path: '/',
   indexRoute: {
@@ -26,12 +28,17 @@ const rootRoute = {
         token = StorageUtil.get('token');
 
     if (pathname === '/' && user && token) {
-      replace({ pathname: 'search' });
+      if(global.ismember){
+        replace({ pathname: 'search' });
+      }else{
+        replace({ pathname: 'jobsearch' });
+      }
     }
   },
   childRoutes: [
     require('routes/search'),
     require('routes/uploader'),
+    require('routes/prouploader'),
     require('routes/become-member'),
     require('routes/pm'),
     require('routes/fast-matching'),
@@ -46,12 +53,15 @@ const rootRoute = {
     require('routes/upload-preview'),
     require('routes/go-to-signin'),
     require('routes/agreement'),
-    // require('routes/manage'),
+    require('routes/job-search'),
     require('routes/best-excellent'),
+    require('routes/company'),
+    require('routes/job-description'),
   ]
 };
 
 class rootContainer extends Component {
+
   render() {
     return (
       <Router history={browserHistory} routes={rootRoute} />

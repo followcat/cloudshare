@@ -146,7 +146,7 @@ class LSImodel(object):
             corpu_tfidf = list()
             for name, document in zip(names, documents):
                 text = self.slicer(document, id=name)
-                corpu = self.lsi.id2word(text)
+                corpu = self.lsi.id2word.doc2bow(text)
                 corpus.append(corpu)
             self.names.extend(names)
             self.corpus.extend(corpus)
@@ -379,7 +379,7 @@ class LSImodel(object):
             >>> assert not u'英文' in mapping_topic_words(jd['text'], model) #FIXME
         """
         texts = self.slicer(doc)
-        vec_bow = self.dictionary.doc2bow(texts)
+        vec_bow = self.lsi.id2word.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
         return vec_lsi
 

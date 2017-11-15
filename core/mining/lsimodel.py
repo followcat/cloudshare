@@ -54,17 +54,26 @@ class LSImodel(object):
         self.load_config()
 
     def load_config(self):
+        config = dict()
         try:
             config = utils.builtin.load_yaml(self.path, self.config_file)
         except IOError:
             config = dict()
+        if 'name' not in config or 'id' not in config:
+            if 'name' not in config:
+                config['name'] = self.name
+            if 'id' not in config:
+                config['id'] = utils.builtin.genuuid()
+            self.save_config(config=config)
         self.config.update(config)
-        self.config['name'] = self.name
-        if 'id' not in self.config:
-            self.config['id'] = utils.builtin.genuuid()
-        if self.config != config:
-            with open(os.path.join(self.path, self.config_file), 'w') as f:
-                f.write(utils.builtin.dump_yaml(self.config))
+
+    def save_config(self, config=None):
+        if config is None:
+            config = self.config
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+        with open(os.path.join(self.path, self.config_file), 'w') as f:
+            f.write(utils.builtin.dump_yaml(config))
 
     def update(self, gen):
         names = []

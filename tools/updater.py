@@ -12,6 +12,8 @@ def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None, newmodel=False):
         assert isinstance(additionals, dict)
         svcdict.update(additionals)
     for modelname in modelnames:
+        if modelname not in SVC_MIN.sim:
+            continue
         for simname in SVC_MIN.sim[modelname]:
             if simname not in svcdict:
                 continue
@@ -26,6 +28,8 @@ def update_cv_models(SVC_MIN, SVC_MEMBERS, additionals=None):
         assert isinstance(additionals, dict)
         svcdict.update(additionals)
     for modelname in modelnames:
+        if modelname not in SVC_MIN.sim:
+            continue
         lsimodel = SVC_MIN.lsi_model[modelname]
         if lsimodel.getconfig('autoupdate') is True:
             trains = list()

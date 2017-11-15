@@ -190,17 +190,19 @@ class Mining(object):
             self.slicer = slicer
 
     def setup(self, modelname, simnames):
-        result = False
+        result = True
         if modelname not in self.lsi_model:
-            self.init_lsi(modelname)
-        model = self.lsi_model[modelname]
-        if model.names:
-            if modelname not in self.sim:
-                self.sim[modelname] = dict()
-            for simname in simnames:
-                if simname in self.sim[modelname]:
-                    continue
-                self.init_sim(modelname, simname)
+            result = self.init_lsi(modelname)
+        if result is True:
+            model = self.lsi_model[modelname]
+            if model.names:
+                if modelname not in self.sim:
+                    self.sim[modelname] = dict()
+                for simname in simnames:
+                    if simname in self.sim[modelname]:
+                        continue
+                    self.init_sim(modelname, simname)
+        return result
 
     def init_sim(self, modelname, svc_name, gen=None):
         model = self.lsi_model[modelname]
@@ -237,10 +239,12 @@ class Mining(object):
         result = False
         if modelname not in self.lsi_model:
             lsi_path = os.path.join(self.path, modelname, 'model')
-            lsi = core.mining.lsimodel.LSImodel(modelname, lsi_path, slicer=self.slicer,
+            lsi = core.mining.lsimodel.LSImodel(modelname, lsi_path,
+                                                slicer=self.slicer,
                                                 no_above=1./3, config=config)
             try:
                 lsi.load()
+                result = True
             except IOError:
                 if gen is not None and lsi.getconfig('autosetup') is True:
                     result = lsi.build(gen)
@@ -248,7 +252,6 @@ class Mining(object):
                         lsi.load_config()
                         lsi.save()
             self.lsi_model[modelname] = lsi
-            result = True
         return result
 
     def probability(self, basemodel, doc, uses=None, top=None, minimum=None):

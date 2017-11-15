@@ -76,37 +76,6 @@ class LSImodel(object):
             return True
         return False
 
-    def build_from_names(self, svccv_list, names):
-        texts = []
-        if len(names) < 6:
-            return False
-        for name in names:
-            for svc_cv in svccv_list:
-                if svc_cv.exists(name):
-                    doc = svc_cv.getmd(name)
-                    texts.append(doc)
-                    break
-            else:
-                raise Exception("Not exists name: " + name)
-        self.setup(names, texts)
-        return True
-
-    def build_from_words(self, svccv_list, words):
-        names = []
-        texts = []
-        for svc_cv in svccv_list:
-            for data in svc_cv.datas():
-                name, doc = data
-                for word in words:
-                    if word in doc:
-                        names.append(name)
-                        texts.append(doc)
-                        break
-        if len(names) > 5:
-            self.setup(names, texts)
-            return True
-        return False
-
     def setup(self, names, texts):
         assert len(names) == len(texts)
         self.names = names
@@ -151,16 +120,14 @@ class LSImodel(object):
 
     def add_documents(self, names, documents):
         assert len(names) == len(documents)
-        if self.dictionary is None:
-            self.set_dictionary()
         corpus = list()
         corpu_tfidf = list()
-        tfidf = models.TfidfModel(self.corpus)
+        self.set_tfidf()
         for name, document in zip(names, documents):
             text = self.slicer(document, id=name)
-            corpu = self.dictionary.doc2bow(text)
+            corpu = self.lsi.id2word(text)
             corpus.append(corpu)
-        corpu_tfidf = tfidf[corpus]
+        corpu_tfidf = self.tfidf[corpus]
         if self.lsi is None:
             self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
                             num_topics=self.topics, power_iters=self.power_iters,
@@ -295,7 +262,8 @@ class LSImodel(object):
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
+                                   num_topics=self.topics, power_iters=self.power_iters,
+                                   extra_samples=self.extra_samples)
 
     def probability(self, doc):
         u"""

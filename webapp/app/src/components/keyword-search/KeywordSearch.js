@@ -33,9 +33,7 @@ class KeywordSearch extends Component {
   handleClick() {
     const { value } = this.state;
     
-    if (value.trim()) {
       this.props.onSearch(value);
-    }
   }
 
   handleKeyPress(e) {

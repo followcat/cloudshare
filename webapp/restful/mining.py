@@ -180,7 +180,9 @@ class LSIbaseAPI(Resource):
                 iduses.append(member.projects[use].id)
                 doctype.append(member.projects[use].id)
             else:
+                iduses.append(use)
                 index.add(self.svc_index.config['CV_STO'])
+                doctype.append(self.svc_index.config['CV_STO'])
         result = self.miner.probability(project.modelname, doc, uses=iduses,
                                         top=self.top, minimum=500)
         ids = [cv[0] for cv in result]

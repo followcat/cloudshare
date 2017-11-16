@@ -55,7 +55,6 @@ const rootRoute = {
     require('routes/agreement'),
     require('routes/job-search'),
     require('routes/best-excellent'),
-    require('routes/company'),
   ]
 };
 

@@ -51,7 +51,7 @@ class Config(object):
                                                     [self.SVC_CV_REPO], [self.SVC_MULT_PEO])
         self.SVC_MEMBERS.create('test_member')
         self.SVC_MEMBER = self.SVC_MEMBERS.get('test_member')
-        self.SVC_MEMBER._add_project('project_test', {})
+        self.SVC_MEMBER._add_project('project_test')
         self.SVC_PRJ_TEST = self.SVC_MEMBER.projects['project_test']
 
         self.SVC_MIN = services.mining.Mining(self.LSI_PATH, self.SVC_MEMBERS.allprojects(),

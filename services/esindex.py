@@ -91,7 +91,58 @@ class ElasticsearchIndexing(object):
             }
         }
     }
-
+    index_config_JD = {
+        "template": doctype,
+        "mappings": {
+            "_default_": {
+                "dynamic_templates": [
+                    {
+                        "name": {
+                            "match":              "name",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "description": {
+                            "match":              "description",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "followup": {
+                            "match":              "followup",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "commentary": {
+                            "match":              "commentary",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":       "keyword"
+                            }
+                    }}
+                ]
+            }
+        }
+    }
     def setup(self, esconn, config):
         self.config = config
         self.es = esconn
@@ -102,6 +153,9 @@ class ElasticsearchIndexing(object):
             elif each.startswith('CO'):
                 self.es.indices.create(index=config[each],
                                        body=self.index_config_CO, ignore=400)
+            elif each.startswith('JD'):
+                self.es.indices.create(index=config[each],
+                                       body=self.index_config_JD, ignore=400)
 
     def update(self, index, doctype, svcs, numbers=5000):
         for svc in svcs:
@@ -205,9 +259,7 @@ class ElasticsearchIndexing(object):
         if kwargs is None:
             kwargs = dict()
         kwargs.update({'body': querydict})
-        if ('filter' in querydict['query']['bool'] and querydict['query']['bool']['filter']) or\
-            ('must' in querydict['query']['bool'] and querydict['query']['bool']['must']):
-            result = utils.esquery.count(self.es, kwargs, index=index, doctype=doctype)
+        result = utils.esquery.count(self.es, kwargs, index=index, doctype=doctype)
         return result
 
     def search(self, index=None, doctype=None, filterdict=None, ids=None, source=False,

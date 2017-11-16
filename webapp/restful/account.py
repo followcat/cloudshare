@@ -37,11 +37,12 @@ class UserPeopleIDAPI(UserAPI):
 
     def __init__(self):
         super(UserAPI, self).__init__()
+        self.svc_account = flask.current_app.config['SVC_MULT_PEO']
 
     def get(self):
         user = flask.ext.login.current_user
-        user.peopleID
-        return { 'code': 200, 'result': user.peopleID }
+        peopinfo = self.svc_account.getyaml(user.peopleID)
+        return { 'code': 200, 'result': peopinfo }
 
 
 class ExistsEmailAPI(Resource):

@@ -8,9 +8,8 @@ from baseapp.sync import *
 
 
 SVC_ADD_SYNC.update(filterfunc=update_bydate)
-SVC_MULT_CLSIFY.updatenewids()
-tools.updater.update_cv_models(SVC_MIN, SVC_MEMBERS, SVC_CLS_CV)
-tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS, SVC_CLS_CV)
+tools.updater.update_cv_models(SVC_MIN, SVC_MEMBERS)
+tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS)
 tools.updater.update_jd_sims('jdmatch', SVC_MIN, [SVC_JD_REPO])
 tools.updater.update_co_sims('comatch', SVC_MIN, [SVC_CV_REPO])
 tools.updater.update_pos_sims('posmatch', SVC_MIN, [SVC_CV_REPO])

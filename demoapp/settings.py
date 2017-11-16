@@ -24,7 +24,6 @@ MEMBERS_PATH = 'members'
 SVC_MEMBERS = services.members.Members(MEMBERS_PATH, [], [],
                                        [SVC_CV_REPO, SVC_CV_STO], [])
 
-SVC_MULT_CLSIFY, SVC_CLS_CV = baseapp.loader.load_mult_classify([SVC_CV_STO])
 SVC_MIN = baseapp.loader.load_mining(services.mining.silencer)
 baseapp.loader.load_cv_mining(SVC_MIN, SVC_MEMBERS)
 SVC_DOCPROCESSOR = baseapp.loader.load_doc_processor('pandoc')

@@ -34,5 +34,3 @@ SVC_PEO_INDIV = services.people.People(SVC_CV_INDIV, PATHS['PEO_INDIV'],
                                        'peoindividual', iotype='base')
 SVC_MULT_PEO = services.multipeople.MultiPeople([SVC_PEO_REPO, SVC_PEO_STO,
                                                  SVC_PEO_INDIV, SVC_PEO_LIMIT])
-
-SVC_MULT_CLSIFY, SVC_CLS_CV = baseapp.loader.load_mult_classify([SVC_CV_STO, SVC_CV_INDIV])

@@ -86,7 +86,6 @@ class Config(object):
         ("PEO_INDIV",       "PEO/indiv"),
         ("PEO_STO",         "PEO/storage"),
         ("PEO_LIMIT",       "PEO/limit"),
-        ("MULT_CLSIFY",     "CV/classify"),
         ("MEMBERS",         "members"),
         ("UPLOAD_TEMP",     "output"),
         ("RAW",             "raw")
@@ -197,7 +196,7 @@ def load_cv_mining(SVC_MIN, SVC_MEMBERS):
     for member in SVC_MEMBERS.members.values():
         for project in member.projects.values():
             modelname = project.modelname
-            simnames = [prj.id for prj in member.projects.values()] + project.getclassify()
+            simnames = [prj.id for prj in member.projects.values()]
             result = SVC_MIN.setup(modelname, simnames)
     tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS)
 

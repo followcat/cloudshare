@@ -130,7 +130,7 @@ sections = {
     'computer_skills': u'(?:IT'+POASP+u'?技能)',
     'personal_skills': u'(?:素质技能)',
     'internship': u'(?:(实习|工作(与)?实践|学生实践){1,}'+POASP+u'*经'+POASP+u'*[历验])',
-    'training': u'(?:接受培训|培训背景)',
+    'training': u'(?:接受培训|培训背景|培训经历)',
     'certifications': u'(?:(?:技能'+POASP+u'?)?证'+POASP+u'?书)',
     'publications': u'(?:发表论文)',
     'associations': u'(?:社会经验)',
@@ -184,8 +184,8 @@ MARITALSTATUS = u'(?:(?P<marital_status>未婚|已婚)|保密)'
 BIRTHDATE = FULLDATE+ u'|'+DATE.replace(u'|'+TODAY, '')
 AGEANDBIRTH = u'('+AGE+ u'|((?P<abbr>'+UNIBRALEFT+u')?(?P<birthdate>' +BIRTHDATE+u')生?(?(abbr)' +UNIBRARIGHT + u')))+'
 
-CURRENCY = u'(?:(?:(?:元|Yuan)|'+ASP+u'*/'+ASP+u'*(?:月|Month)){1,2})'
-SALARY = u'(?:(?P<salarylabel>(?:(?<=月薪：)|月薪(?:[\(（]税前[\)）])?)[:：]?)?'+ASP+u'*(?:(?P<salary>\d[\-到 \d\|]*(?:\+)?(?:月/月)?(?(salarylabel)'+CURRENCY+u'?|'+CURRENCY+u')(?:以[上下])?)'+ASP+u'*(?:\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?|(?(salarylabel)保密))|(?:(?:年薪(?:[\(（]税前[\)）])?[:：]?)?'+ASP+u'*(?P<salary_yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
+CURRENCY = u'(?(salarylabel)(?:(?:元|Yuan)|'+ASP+u'*/'+ASP+u'*(?:月|Month)){1,2}|(?:元|Yuan)?'+ASP+u'*/'+ASP+u'*(?:月|Month))'
+SALARY = u'(?:(?P<salarylabel>(?:(?<=月薪：)|月薪(?:[\(（]税前[\)）])?)[:：]?)?'+ASP+u'*(?:(?P<salary>\d[\-到 \d\|]*(?:\+)?(?:月/月)?(?(salarylabel)'+CURRENCY+u'?|'+CURRENCY+u')(?:以[上下]|左右)?)'+ASP+u'*(?:\\\\\*'+ASP+u'*(?P<salary_months>\d{1,2})'+ASP+u'?个月)?)|(?:(?:年薪(?:[\(（]税前[\)）])?[:：]?)?'+ASP+u'*(?P<salary_yearly>\d[\- \d\|]*[万W])'+ASP+u'*人民币))'
 
 EMPLOYEES = u'(?:(?P<employees>(?:少于)?\d+([ '+SEP+u']+(?:(?<= )-0 )?\d+)?'+ASP+u'*(?:人(?:以[上下])?|people))|未填写)'
 BEMPLOYEES = u'('+ UNIBRALEFT +ASP+u'*' + EMPLOYEES + POASP+ u'*(['+FIELDSEP+u']'+POASP+u'*(?P<type>'+COMPANY_TYPE+u'))?' +ASP+u'*' + UNIBRARIGHT +u')'
@@ -194,12 +194,12 @@ BDURATION = u'(((?P<br>(?P<dit>\*)?\\\\?'+UNIBRALEFT+u')|(\*\-{3}\*))[\n'+SP+u']
 
 PLACES = u'(?:(\S+)['+SENTENCESEP+SEP+']?)+'
 
-SEPRTED = lambda l:u'(?:(?:'+u')|(?:'.join([_+POASP+u'*?(?:(?:__SEP__)|$)' for _ in l])+u'))'
+SEPRTED = lambda l:u'(?:(?:'+u')|(?:'.join([_+POASP+u'*?(?:(?:[__SEP__]+)|$)' for _ in l])+u'))'
 # Can't have newline followed by (ASP*) as it breaks (^...)
-PIPESEPRTED = lambda l:SEPRTED([POASP+'*'+_ for _ in l]).replace('__SEP__', u'[\n\|；]+')
+PIPESEPRTED = lambda l:SEPRTED([POASP+'*'+_ for _ in l]).replace('__SEP__', u'\n\|；')
 PIPEONLYSEPRTED = lambda l:SEPRTED([POASP+'*'+_ for _ in l]).replace('__SEP__', u'\|')
-SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '[ \n]+')
-NOTSEPRTED = lambda l:SEPRTED(l).replace('__SEP__', '[ \n]*')
+SPACESEPRTED = lambda l:SEPRTED(l).replace('__SEP__', ' \n')
+NOTSEPRTED = lambda l:SPACESEPRTED(l).replace(']+)|$)', ']*)|$)')
 
 def any_separated(item, ANY, label=''):
     output = u'(?:(?<=^)(?:'+PREFIX+u')+)?'
@@ -229,6 +229,7 @@ SET_ALL_ITEMS_SPACE = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DE
 SET_ALL_ITEMS_NOSPACE = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(NOTSEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
 SET_ALL_ITEMS_PIPEONLY = lambda DEFAULT: lambda DETAILS: lambda LABEL_SEPARATOR: DEFAULT(PIPEONLYSEPRTED(map(label_separated(LABEL_SEPARATOR), DETAILS.items())))
 
+NO_RECURSIVE = lambda RE: lambda STR: STR.replace('__NORECURSIVE__', RE.pattern)
 
 MONTH_ID = re.compile('(?P<emonth>'+ENMONTH+')')
 
@@ -270,7 +271,7 @@ fix_position = lambda x: fix_name(x).replace('*', '')
 range_repl = lambda x: x.group('low')+'-'+x.group('high')+u'元/月'
 salary_range = lambda x: re.compile(u'(?P<low>\d+)到(?P<high>\d+)').sub(range_repl, x)
 ten_thousands = lambda x: re.compile(u'(?<=\d)'+ASP+u'*W').sub(u'万', x)
-salary_unit = lambda x: re.compile(u'(?<=\d)/(?=[年月])').sub(u'元/', x.replace(u'月/月', ''))
+salary_unit = lambda x: re.compile(u'(?<=\d)元?/'+ASP+u'*(?=[年月])').sub(u'元/', x.replace(u'月/月', ''))
 salary_to_ch = lambda x: re.compile('[Yy]uan(?:'+ASP+u'*/'+ASP+u'*[Mn]onth)?').sub(u'元/月', x)
 fix_salary = lambda x: salary_unit(ten_thousands(salary_range(salary_to_ch(aspstrip(x).replace(' ', '')))))
 

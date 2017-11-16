@@ -2,7 +2,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Button, Icon } from 'antd';
 
-import  SingleUpload  from 'components/single-upload';
 import { FilterForm } from 'components/filter-card';
 
 import { API } from 'API';
@@ -36,7 +35,6 @@ class ResultInfo extends Component {
         </div>
         <div className="right-wrap">
           <div><p style={{ fontWeight: 'bold' }}>简历分析:</p></div>
-          <SingleUpload propsdate={props}/>
         </div>
       </div>
     );

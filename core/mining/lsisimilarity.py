@@ -10,58 +10,52 @@ class LSIsimilarity(object):
 
     names_save_name = 'lsi.names'
     matrix_save_name = 'lsi.matrix'
-    corpus_save_name = 'lsi.corpus'
 
     def __init__(self, name, savepath, lsi_model):
         self.name = name
         self.path = savepath
         self.names = []
-        self._corpus = []
 
         self.lsi_model = lsi_model
         self.index = None
 
     def update(self, gen, newmodel=False):
         added = False
+        names = []
+        documents = []
         for name, doc in gen:
-            self.add(name, doc)
+            names.append(name)
+            documents.append(doc)
             added = True
         if added or newmodel:
-            self.set_index()
+            self.add_documents(names, documents)
             self.save()
-        return added
+        return added or newmodel
 
     def build(self, gen):
         names = []
         corpus = []
         for name, doc in gen:
             names.append(name)
+            documents.append(doc)
             words = self.lsi_model.slicer(doc, id=name)
-            corpus.append(self.lsi_model.dictionary.doc2bow(words))
+            corpus.append(self.lsi_model.lsi.id2word.doc2bow(words))
         self.setup(names, corpus)
 
     def setup(self, names, corpus):
         self.names = names
-        self.set_corpus(corpus)
-        self.set_index()
+        self.set_index(corpus)
 
     def save(self):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
             ujson.dump(self.names, f)
-        if self.corpus:
-            with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-                ujson.dump(self.corpus, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
-        self.clear()
 
     def exists(self, name):
         id = core.outputstorage.ConvertName(name).base
         return id in self.ids
-
-    def clear(self):
-        self.corpus = list()
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
@@ -69,43 +63,25 @@ class LSIsimilarity(object):
         self.index = similarities.Similarity.load(os.path.join(self.path,
                                                   self.matrix_save_name))
 
-    def add(self, name, document):
-        assert(self.lsi_model.dictionary)
-        text = self.lsi_model.slicer(document, id=name)
-        self.names.append(name)
-        corpu = self.lsi_model.dictionary.doc2bow(text)
-        self.corpus.append(corpu)
-
-    def delete(self, name):
-        assert(self.lsi_model.dictionary)
-        result = False
-        index = self.names.index(name)
-        if self.corpus[index]:
-            self.names.pop(index)
-            self.corpus.pop(index)
-            result = True
-        return result
-
     def add_documents(self, names, documents):
-        assert(self.lsi_model.dictionary)
+        assert(self.lsi_model.lsi.id2word)
         assert len(names) == len(documents)
+        corpus = list()
         for name, document in zip(names, documents):
             if name in self.names:
                  continue
             text = self.lsi_model.slicer(document, id=name)
-            self.names.append(name)
-            corpu = self.lsi_model.dictionary.doc2bow(text)
-            self.corpus.append(corpu)
-        self.set_index()
+            corpu = self.lsi_model.lsi.id2word.doc2bow(text)
+            corpus.append(corpu)
+        self.names.extend(names)
+        self.index.add_documents(self.lsi_model.lsi[corpus])
 
-    def set_corpus(self, corpus):
-        self.corpus = corpus
-
-    def set_index(self):
+    def set_index(self, corpus):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
-                                             self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
+                                             self.lsi_model.lsi[corpus],
+                                             self.lsi_model.topics)
 
     def probability(self, doc, top=None, minimum=0):
         """
@@ -220,21 +196,6 @@ class LSIsimilarity(object):
     @num_best.setter
     def num_best(self, value):
         self.index.num_best = value
-
-    @property
-    def corpus(self):
-        corpus_path = os.path.join(self.path, self.corpus_save_name)
-        if os.path.exists(corpus_path) and not self._corpus:
-            with open(corpus_path, 'r') as f:
-                try:
-                    self._corpus = ujson.load(f)
-                except ValueError:
-                    self._corpus = list()
-        return self._corpus
-
-    @corpus.setter
-    def corpus(self, value):
-        self._corpus = value
 
     @property
     def ids(self):

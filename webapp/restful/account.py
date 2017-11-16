@@ -31,7 +31,7 @@ class UserAPI(Resource):
         return { 'code': 200, 'result': result }
 
 
-class UserPeopleIDAPI(Resource):
+class UserPeopleIDAPI(UserAPI):
 
     decorators = [flask.ext.login.login_required]
 

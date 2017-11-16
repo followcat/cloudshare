@@ -38,7 +38,6 @@ class SearchResultBox extends Component {
     } = this.props;
 
     const type = this.props.type || 'default';
-
     if (type === 'default') {
       return dataSource.map((item, index) => {
         return (

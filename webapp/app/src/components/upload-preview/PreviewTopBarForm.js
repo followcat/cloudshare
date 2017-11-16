@@ -1,9 +1,9 @@
 'use strict';
-import React, { Component, PropTypes } from 'react';
+import React, { Component, PropTypes, message, } from 'react';
 
 import { Form, Input, Select, Button } from 'antd';
 
-import { resumeSource } from 'config/source';
+import { getUploadOrigin } from 'request/classify';
 
 const FormItem = Form.Item,
       Option = Select.Option;
@@ -11,6 +11,9 @@ const FormItem = Form.Item,
 class PreviewTopBarForm extends Component {
   constructor() {
     super();
+    this.state = {
+      origins: [],
+    }
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -21,7 +24,7 @@ class PreviewTopBarForm extends Component {
 
     this.props.onConfirmClick({
       id: this.props.id,
-      fieldsValue: fieldsValue
+      fieldsValue: fieldsValue,
     });
   }
 
@@ -31,14 +34,16 @@ class PreviewTopBarForm extends Component {
       name,
       prefixCls,
       resumeID,
+      origins,
       classifyValue,
       classifyList,
       currentPreview,
       total,
       confirmLoading,
-      btnText
+      btnText,
+      defaultOrigin
     } = this.props,
-      { getFieldDecorator } = form;
+    { getFieldDecorator } = form;
 
     return (
       <Form layout="inline" className={`${prefixCls}-form`}>
@@ -47,7 +52,7 @@ class PreviewTopBarForm extends Component {
             initialValue: resumeID || ''
           })(
             <Input
-              style={{ width: 120 }}
+              style={{ width: 100 }}
               readOnly
               size="small"
             />
@@ -60,22 +65,23 @@ class PreviewTopBarForm extends Component {
           })(
             <Input
               placeholder="请输入候选人名字"
-              style={{ width: 100 }}
+              style={{ width: 70 }}
               size="small"
             />
           )}
         </FormItem>
         <FormItem label="简历来源">
-          {getFieldDecorator('origin')(
+          {getFieldDecorator('origin',{
+            initialValue: defaultOrigin
+            })(
             <Select
               showSearch
-              placeholder="选择简历来源"
               optionFilterProp="children"
               notFoundContent="Not found"
-              style={{ width: 120 }}
+              style={{ width: 90 }}
               size="small"
             >
-              {resumeSource.map(item => {
+              {origins.map(item => {
                 return (
                   <Option key={item.id} value={item.name}>{item.name}</Option>
                 );
@@ -101,19 +107,20 @@ class PreviewTopBarForm extends Component {
             </Select>
           )}
         </FormItem>
+        <FormItem>
         {currentPreview === total - 1 ?
-          <FormItem>
             <Button
               type="primary"
+              className="cs-preview-comfirm"
               loading={confirmLoading}
               onClick={this.handleClick}
               size="small"
             >
               {btnText}
-            </Button>
-          </FormItem> :
+            </Button>    :
           null
         }
+        </FormItem>
       </Form>
     );
   }

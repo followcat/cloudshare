@@ -44,7 +44,8 @@ class PreviewTopBar extends Component {
       currentPreview,
       prevText,
       nextText,
-      total
+      total,
+      origins
     } = this.props;
 
     return (

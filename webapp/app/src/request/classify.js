@@ -45,3 +45,16 @@ export const getIndustry = (callback) => {
   .then(response => response.json())
   .then(json => callbackFunction(callback, json));
 };
+
+export const getUploadOrigin = (callback) => {
+  return fetch(API.UPLOAD_ORIGIN_API, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};

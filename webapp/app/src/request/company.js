@@ -5,6 +5,21 @@ import { API } from 'config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
+// 获取公司信息
+export const getCompanyInfo = (params, callback) => {
+  return fetch(`${API.COMPANY_API}/${params.id}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
 /**
  * 获取客户公司列表
  * @param  {fucntion} callback [description]

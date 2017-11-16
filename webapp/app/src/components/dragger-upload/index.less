@@ -1,9 +1,17 @@
 @draggerUploadPrefixCls: cs-upload;
 
 .@{draggerUploadPrefixCls} {
+  border: 2px dashed #649ac8;
   width: 720px;
   min-height: 180px;
   margin: 0 auto;
+
+  .ant-upload-drag{
+    border-top: 0  !important;
+    border-right: 0 !important;
+    border-left: 0 !important;
+    border-bottom: 2px dashed #649ac8 !important;
+  }
 
   .ant-upload-list-item-done{
     color: #22b918;

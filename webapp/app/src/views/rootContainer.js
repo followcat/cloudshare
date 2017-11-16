@@ -28,10 +28,10 @@ const rootRoute = {
         token = StorageUtil.get('token');
 
     if (pathname === '/' && user && token) {
-      if(global.ismember){
-        replace({ pathname: 'search' });
+      if(!global.ismember){
+        replace({ pathname: 'prouploader' });
       }else{
-        replace({ pathname: 'jobsearch' });
+        replace({ pathname: 'search' });
       }
     }
   },

@@ -24,34 +24,25 @@ class SearchResult extends Component {
     };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSwitchPage = this.handleSwitchPage.bind(this);
-    this.handleFilter = this.handleFilter.bind(this);
-    this.getIndustryDataSource = this.getIndustryDataSource.bind(this);
+    // this.handleFilter = this.handleFilter.bind(this);
+    // this.getIndustryDataSource = this.getIndustryDataSource.bind(this);
     this.loadResultDataSource = this.loadResultDataSource.bind(this);
+    this.loadResultProDataSource = this.loadResultProDataSource.bind(this);
   }
 
   componentWillMount() {
     const { searchText, pages } = this.state;
 
     if(!searchText) {
-      proJdMatching({
-        page: `page=${pages}`,
-        numbers: `numbers=20`
-      }, json => {
-        if (json.code === 200) {
-          this.setState({
-            spinning: false,
-            pages: pages,
-            dataSource: json.data,
-            totals: json.lenght
-          });
-        }
-      });
+      this.loadResultProDataSource();
+    } else {
+      this.loadResultDataSource(searchText);
     }
   }
 
   componentDidMount() {
-    this.loadResultDataSource(this.state.searchText);
-    this.getIndustryDataSource();
+    // this.loadResultDataSource(this.state.searchText);
+    // this.getIndustryDataSource();
   }
 
   handleSearch(value) {
@@ -64,7 +55,11 @@ class SearchResult extends Component {
       totals: 1,
     });
 
-    this.loadResultDataSource(value);
+    if(!value) {
+      this.loadResultProDataSource();
+    } else {
+      this.loadResultDataSource(value);
+    }
   }
 
   handleSwitchPage(page) {
@@ -91,9 +86,9 @@ class SearchResult extends Component {
       });
     } else {
       jdMatching({
-        'doc': searchText,
-        'page': `page=${page-1}`,
-        'numbers': `numbers=20`
+        'doc': this.state.searchText,
+        'page': `${page-1}`,
+        'numbers': `20`
       }, (json) => {
         if (json.code === 200) {
           this.setState({
@@ -107,46 +102,65 @@ class SearchResult extends Component {
     }
   }
 
-  handleFilter(fieldValue) {
-    const { searchText } = this.state;
-    let filterData = {};
+  // handleFilter(fieldValue) {
+  //   const { searchText } = this.state;
+  //   let filterData = {};
   
+  //   this.setState({
+  //     spinning: true,
+  //     filterValue: fieldValue
+  //   });
+
+  //   for (let key in fieldValue) {
+  //     if (fieldValue[key] instanceof Array) {
+  //       filterData[key] = fieldValue[key];
+  //     } else {
+  //       filterData[key] = fieldValue[key] ? fieldValue[key].split(' ') : [];
+  //     }
+  //   }
+
+  //   jdMatching({
+  //     'doc': searchText,
+  //     'page': 0,
+  //     'numbers': 20
+  //   }, (json) => {
+  //     if (json.code === 200) {
+  //       this.setState({
+  //         spinning: false,
+  //         pages: json.data.pages,
+  //         dataSource: json.data,
+  //         totals: json.lenght
+  //       });
+  //     }
+  //   });
+  // }
+
+  // getIndustryDataSource() {
+  //   getIndustry(json => {
+  //     if (json.code === 200) {
+  //       this.setState({
+  //         industry: json.data
+  //       });
+  //     }
+  //   });
+  // }
+
+  loadResultProDataSource() {
     this.setState({
-      spinning: true,
-      filterValue: fieldValue
+      spinning: true
     });
 
-    for (let key in fieldValue) {
-      if (fieldValue[key] instanceof Array) {
-        filterData[key] = fieldValue[key];
-      } else {
-        filterData[key] = fieldValue[key] ? fieldValue[key].split(' ') : [];
-      }
-    }
-
-    jdMatching({
-      'doc': searchText,
-      'page': 0,
-      'numbers': 20
-    }, (json) => {
-      if (json.code === 200) {
-        this.setState({
-          spinning: false,
-          pages: json.data.pages,
-          dataSource: json.data,
-          totals: json.lenght
-        });
-      }
-    });
-  }
-
-  getIndustryDataSource() {
-    getIndustry(json => {
-      if (json.code === 200) {
-        this.setState({
-          industry: json.data
-        });
-      }
+    proJdMatching({
+        'page': `page=0`,
+        'numbers': `numbers=20`
+      }, json => {
+        if (json.code === 200) {
+          this.setState({
+            spinning: false,
+            dataSource: json.data,
+            totals: json.lenght
+          });
+        }
     });
   }
 

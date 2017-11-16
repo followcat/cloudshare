@@ -56,7 +56,6 @@ const rootRoute = {
     require('routes/job-search'),
     require('routes/best-excellent'),
     require('routes/company'),
-    require('routes/job-description'),
   ]
 };
 

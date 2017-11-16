@@ -173,7 +173,7 @@ class Config(object):
  
 
 CONFIG_PATH = 'config'
-config = Config(CONFIG_PATH, version='1.2')
+config = Config(CONFIG_PATH, version='1.5')
 
 def load_mult_classify(svc_storages):
     global config

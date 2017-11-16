@@ -54,17 +54,26 @@ class LSImodel(object):
         self.load_config()
 
     def load_config(self):
+        config = dict()
         try:
             config = utils.builtin.load_yaml(self.path, self.config_file)
         except IOError:
             config = dict()
+        if 'name' not in config or 'id' not in config:
+            if 'name' not in config:
+                config['name'] = self.name
+            if 'id' not in config:
+                config['id'] = utils.builtin.genuuid()
+            self.save_config(config=config)
         self.config.update(config)
-        self.config['name'] = self.name
-        if 'id' not in self.config:
-            self.config['id'] = utils.builtin.genuuid()
-        if self.config != config:
-            with open(os.path.join(self.path, self.config_file), 'w') as f:
-                f.write(utils.builtin.dump_yaml(self.config))
+
+    def save_config(self, config=None):
+        if config is None:
+            config = self.config
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+        with open(os.path.join(self.path, self.config_file), 'w') as f:
+            f.write(utils.builtin.dump_yaml(config))
 
     def update(self, gen):
         names = []
@@ -86,37 +95,6 @@ class LSImodel(object):
         for name, doc in gen:
             names.append(name)
             texts.append(doc)
-        if len(names) > 5:
-            self.setup(names, texts)
-            return True
-        return False
-
-    def build_from_names(self, svccv, names):
-        texts = []
-        if len(names) < 6:
-            return False
-        for name in names:
-            for prj_id, svc_cv in svccv:
-                if svc_cv.exists(name):
-                    doc = svc_cv.getmd(name)
-                    texts.append(doc)
-                    break
-            else:
-                raise Exception("Not exists name: " + name)
-        self.setup(names, texts)
-        return True
-
-    def build_from_words(self, svccv, words):
-        names = []
-        texts = []
-        for prj_id, svc_cv in svccv:
-            for data in svc_cv.datas():
-                name, doc = data
-                for word in words:
-                    if word in doc:
-                        names.append(name)
-                        texts.append(doc)
-                        break
         if len(names) > 5:
             self.setup(names, texts)
             return True
@@ -170,25 +148,21 @@ class LSImodel(object):
 
     def add_documents(self, names, documents):
         assert len(names) == len(documents)
-        if self.dictionary is None:
-            self.set_dictionary()
-        corpus = list()
-        corpu_tfidf = list()
-        tfidf = models.TfidfModel(self.corpus)
-        for name, document in zip(names, documents):
-            text = self.slicer(document, id=name)
-            corpu = self.dictionary.doc2bow(text)
-            corpus.append(corpu)
-        corpu_tfidf = tfidf[corpus]
         if self.lsi is None:
-            self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
-                            num_topics=self.topics, power_iters=self.power_iters,
-                            extra_samples=self.extra_samples)
+            self.setup(names, documents)
         else:
+            corpus = list()
+            corpu_tfidf = list()
+            for name, document in zip(names, documents):
+                text = self.slicer(document, id=name)
+                corpu = self.lsi.id2word.doc2bow(text)
+                corpus.append(corpu)
+            self.names.extend(names)
+            self.corpus.extend(corpus)
+            self.texts.extend(documents)
+            self.set_tfidf()
+            corpu_tfidf = self.tfidf[corpus]
             self.lsi.add_documents(corpu_tfidf)
-        self.names.extend(names)
-        self.corpus.extend(corpus)
-        self.texts.extend(documents)
 
     def set_dictionary(self):
         self.dictionary = corpora.Dictionary(self.texts)
@@ -314,7 +288,8 @@ class LSImodel(object):
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
+                                   num_topics=self.topics, power_iters=self.power_iters,
+                                   extra_samples=self.extra_samples)
 
     def probability(self, doc):
         u"""
@@ -413,7 +388,7 @@ class LSImodel(object):
             >>> assert not u'英文' in mapping_topic_words(jd['text'], model) #FIXME
         """
         texts = self.slicer(doc)
-        vec_bow = self.dictionary.doc2bow(texts)
+        vec_bow = self.lsi.id2word.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
         return vec_lsi
 

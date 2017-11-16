@@ -155,7 +155,7 @@ def load_cv_mining(SVC_MIN, SVC_MEMBERS):
         for project in member.projects.values():
             modelname = project.modelname
             simnames = [prj.id for prj in member.projects.values()] + project.getclassify()
-            SVC_MIN.setup(modelname, simnames)
+            result = SVC_MIN.setup(modelname, simnames)
     tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS)
 
 

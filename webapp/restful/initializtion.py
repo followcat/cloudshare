@@ -100,7 +100,6 @@ def initialize(app):
     api.add_resource(PeopleByCVAPI, '/api/peoplebycv', endpoint = 'peoplebycv')
 
     api.add_resource(ProjectNamesAPI, '/api/projectnames', endpoint = 'projectnames')
-    api.add_resource(AdditionNamesAPI, '/api/additionnames', endpoint = 'additionnames')
     api.add_resource(DBNumbersAPI, '/api/dbnumbers', endpoint = 'dbnumbers')
     api.add_resource(ClassifyAPI, '/api/classify', endpoint = 'classify')
     api.add_resource(AllSIMSAPI, '/api/lsiallsims', endpoint = 'lsiallsims')

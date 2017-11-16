@@ -320,7 +320,6 @@ class LSIbyAllJDAPI(LSIbaseAPI):
             doc = jd['description']
             doc += jd['commentary']
             result = self.miner.probability(project.modelname, doc,
-                                            uses=[project.id]+project.getclassify(),
                                             top=0.01, minimum=3000)
             if result:
                 candidates = filter(lambda x: float(x[1])>float(threshold), result)
@@ -417,15 +416,10 @@ class SimilarAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         doc = project.cv_getmd(id)
-        uses = [project.id]
-        project_classify = project.getclassify()
-        for classify in project.cv_getyaml(id)['classify']:
-            if classify in project_classify:
-                uses.append(classify)
         top = 0
         datas = []
         for name, score in self.miner.probability(project.modelname, doc,
-                                                  uses=uses, top=100):
+                                                  top=100):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
             if float(score) < 0.8 or top==5:

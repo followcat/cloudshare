@@ -118,13 +118,9 @@ class MemberProjectAPI(MemberAPI):
 
     def __init__(self):
         super(MemberProjectAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('classify', type = list, location = 'json')
 
     def post(self, projectname):
         user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        classify = args['classify']
         member = user.getmember(self.svc_members)
-        result = member.add_project(projectname, classify, user.id)
+        result = member.add_project(projectname, user.id)
         return { 'code': 200, 'result': result }

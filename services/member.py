@@ -150,15 +150,15 @@ class Member(services.base.service.Service):
     def exists_project(self, name):
         return name in self.projects
 
-    def add_project(self, name, classify, adminID, autosetup=False, autoupdate=False):
+    def add_project(self, name, adminID, autosetup=False, autoupdate=False):
         result = False
         max_project_nums = self.config['max_project_nums'] if 'max_project_nums'\
                             in self.config else self.max_project_nums
         if self.check_admin(adminID) and len(self.projects) < max_project_nums:
-            result = self._add_project(name, classify, autosetup=autosetup, autoupdate=autoupdate)
+            result = self._add_project(name, autosetup=autosetup, autoupdate=autoupdate)
         return result
 
-    def _add_project(self, name, classify, autosetup=False, autoupdate=False):
+    def _add_project(self, name, autosetup=False, autoupdate=False):
         result = False
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
@@ -166,13 +166,13 @@ class Member(services.base.service.Service):
                                                    [self.curriculumvitaes],
                                                    [self.jobdescriptions],
                                                    self.mult_peo, name)
-            tmp_project.setup(classify, config={'autosetup':    autosetup,
-                                                'autoupdate':   autoupdate,
-                                                'storageCV':    self.config['storageCV'],
-                                                'storagePEO':   self.config['storagePEO'],
-                                                'limitPEO':     self.config['limitPEO'],
-                                                'storageCO':    self.config['storageCO'],
-                                                'storageJD':    self.config['storageJD']})
+            tmp_project.setup(config={'autosetup':    autosetup,
+                                      'autoupdate':   autoupdate,
+                                      'storageCV':    self.config['storageCV'],
+                                      'storagePEO':   self.config['storagePEO'],
+                                      'limitPEO':     self.config['limitPEO'],
+                                      'storageCO':    self.config['storageCO'],
+                                      'storageJD':    self.config['storageJD']})
             tmp_project.cv_private = False
             tmp_project._modelname = self.default_model
             self.projects[name] = tmp_project
@@ -260,8 +260,7 @@ class DefaultMember(Member):
     def load_projects(self):
         super(DefaultMember, self).load_projects()
         if self.default_name not in self.projects:
-            super(DefaultMember, self)._add_project(self.default_name,
-                                                    sources.industry_id.sources)
+            super(DefaultMember, self)._add_project(self.default_name)
         self.projects[self.default_name].cv_secrecy = True
         self.projects[self.default_name]._modelname = self.default_model
 

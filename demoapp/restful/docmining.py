@@ -117,9 +117,7 @@ class DocMiningAPI(Resource):
                                                            uses=[project.name]))
             result = sorted(result, key=lambda x:float(x[1]), reverse=True)
         else:
-            result = self.miner.probability(model, doc,
-                                            uses=project.getclassify(),
-                                            top=0.05, minimum=1000)
+            result = self.miner.probability(model, doc, top=0.05, minimum=1000)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1

@@ -51,9 +51,8 @@ class Project(services.base.service.Service):
         dumpconfig = utils.builtin.dump_yaml(self.config)
         self.interface.add(self.config_file, dumpconfig, message="Update config file.")
 
-    def setup(self, classify=None, committer=None, config=None):
+    def setup(self, committer=None, config=None):
         self.setconfig(config)
-        self.setclassify(classify, committer=committer)
 
     def setconfig(self, config=None):
         if config is None:
@@ -64,11 +63,6 @@ class Project(services.base.service.Service):
                 self.config[key] = config[key]
                 modified = True
         if modified:
-            self.save()
-
-    def setclassify(self, classify=None, committer=None):
-        if not os.path.exists(os.path.join(self.path, self.config_file)) or classify is not None:
-            self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
             self.save()
 
     @property
@@ -162,22 +156,6 @@ class Project(services.base.service.Service):
     @cv_private.setter
     def cv_private(self, value):
         self.curriculumvitae.private_default = value
-
-    @property
-    def classify(self):
-        result = [c for c in sources.industry_id.industryID]
-        if 'classify' in self.config:
-            result = self.config['classify']
-        return result
-
-    def getclassify(self):
-        return self.classify
-
-    def getindustry(self):
-        result = dict()
-        for each in self.classify:
-            result.update({each: sources.industry_id.sources[each]})
-        return result
 
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
         result = {

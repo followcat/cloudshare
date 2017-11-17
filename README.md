@@ -24,7 +24,6 @@ share，edit your doc，pdf，md and so on...
 
     Elasticsearch plugins
 
-        fscrawler-2.2
         elasticsearch-analysis-ik-5.4.3
 
 ### Draw && View router graph

@@ -34,7 +34,6 @@ class ResultInfo extends Component {
           <p>关键词: <strong>{keyword}</strong></p>
         </div>
         <div className="right-wrap">
-          <div><p style={{ fontWeight: 'bold' }}>简历分析:</p></div>
         </div>
       </div>
     );

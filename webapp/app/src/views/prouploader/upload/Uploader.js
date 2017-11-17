@@ -18,6 +18,8 @@ import { jdMatching, proJdMatching } from 'request/matching';
 import { getClassify } from 'request/classify';
 import { uploadPreview, confirmUpload } from 'request/upload';
 import { getUploadOrigin } from 'request/classify';
+import { getPeopleID } from 'request/account';
+import {  getResumeInfo } from 'request/resume';
 
 import { API } from 'API';
 
@@ -68,8 +70,10 @@ class Uploader extends Component {
       failedList: [],
       classifyList: [],
       confirmResult: [],
+      yaml_info: [],
       origins: [],
       origin: '',
+      peopleid: '',
       totals: 0,
       currentPreview: 0,
       total: 0,
@@ -88,6 +92,15 @@ class Uploader extends Component {
   }
 
   componentWillMount() {
+
+    getPeopleID((json) => {
+      if (json.code === 200) {
+        this.setState({
+          peopleid: json.result,
+        });
+      } 
+    });
+
     getUploadOrigin((json) => {
       if (json.code === 200) {
         this.setState({
@@ -98,7 +111,7 @@ class Uploader extends Component {
 
     proJdMatching({
       'page': `page=0`,
-      'numbers': `numbers=5`
+      'numbers': `numbers=3`
     }, json => {
       if (json.code === 200) {
         this.setState({
@@ -125,6 +138,24 @@ class Uploader extends Component {
       }).start();
       // introJs().start();
     }
+  }
+
+  componentDidUpdate() {
+    if(this.state.peopleid)  {  
+      this.getProResume()
+    }
+  }
+
+  getProResume() {
+    getResumeInfo({
+      id: this.state.peopleid
+      }, json => {
+        if (json.code === 200) {
+            this.setState({
+              yaml_info: json.data.yaml_info
+            });
+        }
+      });
   }
 
   handleChangeOrigin(origin) {
@@ -313,7 +344,8 @@ class Uploader extends Component {
       guide,
       origins,
       totals,
-      dataSource
+      dataSource,
+      yaml_info
     } = this.state;
 
     const uploadProps = {
@@ -354,17 +386,25 @@ class Uploader extends Component {
             confirmResult: confirmResult
           })}
           { dataSource ?
-          <SearchResultBox
-            visible={true}
-            current={0}
-            total={totals}
-            spinning={false}
-            dataSource={dataSource}
-            educationExperienceText="教育经历"
-            workExperienceText="工作经历"
-            foldText="展开"
-            unfoldText="收起"
-          /> 
+            <div>
+            { (completedList.length==0) ?
+              <div>
+                <Summary dataSource={generateSummary(yaml_info)} />
+                <SearchResultBox
+                  visible={true}
+                  current={0}
+                  total={totals}
+                  spinning={false}
+                  dataSource={dataSource}
+                  educationExperienceText="教育经历"
+                  workExperienceText="工作经历"
+                  foldText="展开"
+                  unfoldText="收起"
+                />
+              </div>
+              : null
+            } 
+          </div>
           :
           null
           }

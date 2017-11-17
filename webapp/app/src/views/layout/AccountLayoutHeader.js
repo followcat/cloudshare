@@ -28,10 +28,10 @@ const navMenuUser = [{
   text: language.JOBSEARCH
 }, {
   url: URL.getFastMatchingByDoc(),
-  text: language.MATCH
+  text: language.PROJECT_SEARCH
 }, {
   url: URL.getProUploaderURL(),
-  text: language.RESUME_UPLOADER
+  text: language.PRO_RESUME_UPLOADER
 }, {
   url: URL.getBecomeMember(),
   text: language.BECOME_MEMBER

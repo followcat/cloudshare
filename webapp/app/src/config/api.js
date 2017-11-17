@@ -52,6 +52,8 @@ export const API = {
 
   ACCOUNTS_API: `${HOST}/api/accounts`,
 
+  PEOPLEID_API: `${HOST}/api/userpeopleid`,
+
   CLASSIFY_API: `${HOST}/api/classify`,
 
   LSIALLSIMS_API: `${HOST}/api/lsiallsims`,

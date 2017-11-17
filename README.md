@@ -3,6 +3,8 @@ share，edit your doc，pdf，md and so on...
 
 ## Dependencies
 
+### Document conversion
+
     See requirement.txt
 
     pandoc==1.13.2.1 in webapp.
@@ -11,17 +13,30 @@ share，edit your doc，pdf，md and so on...
 
     pandoc==1.19.2.1 in demoapp.
 
-### for test
+    libreoffice and its uno
 
-    nose==1.3.7
-    Flask-Testing==0.4.2
+### Search
 
-### draw && view router graph
+    Elasticsearch env
+
+        jre-8u131
+        elasticsearch-5.4.3
+
+    Elasticsearch plugins
+
+        fscrawler-2.2
+        elasticsearch-analysis-ik-5.4.3
+
+### Draw && View router graph
 
     xdot 0.4
     networkx==1.10
     pygraphviz==1.4.dev
 
+### Test
+
+    nose==1.3.7
+    Flask-Testing==0.4.2
 
 You can do the automatic test by using Jenkins with karma, nose and so on.
 Here is a demo bash script to run Jenkins test:

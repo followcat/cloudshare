@@ -11,7 +11,6 @@ class JobDescriptionAPI(Resource):
     def __init__(self):
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.jd_indexname = flask.current_app.config['ES_CONFIG']['JD_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_id', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -68,7 +67,6 @@ class JobDescriptionUploadAPI(Resource):
     def __init__(self):
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.jd_indexname = flask.current_app.config['ES_CONFIG']['JD_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_name', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')

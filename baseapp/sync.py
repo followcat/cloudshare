@@ -16,6 +16,6 @@ if os.path.exists(config.storage_config['RAW']):
         RAW_DB[name] = interface.predator.PredatorInterface(namepath, name=name)
 
 SVC_ADD_SYNC = services.cvstoragesync.CVStorageSync(SVC_PEO_STO, SVC_PEO_LIMIT, SVC_CV_STO, RAW_DB)
-lastday = SVC_INDEX.lastday(config.es_config['CV_INDEXNAME'])
+lastday = SVC_INDEX.lastday(config.es_config['CV_STO'])
 lastdate = time.mktime(time.strptime(lastday, "%Y%m%d"))
 update_bydate = functools.partial(services.cvstoragesync.update_bydate, lastdate=lastdate)

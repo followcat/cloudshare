@@ -17,7 +17,6 @@ class CompanyAPI(Resource):
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_co_repo = flask.current_app.config['SVC_CO_REPO']
-        self.co_indexname = flask.current_app.config['ES_CONFIG']['CO_INDEXNAME']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -42,7 +41,8 @@ class CompanyAPI(Resource):
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.company_add(coobj, user.name)
         if result is True:
-            self.svc_index.add(self.co_indexname, coobj.metadata['id'], coobj.metadata)
+            self.svc_index.add(self.svc_index.config['CO_MEM'], coobj.metadata['id'],
+                               coobj.metadata)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -203,7 +203,6 @@ class CompanyInfoUpdateAPI(Resource):
     def __init__(self):
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.co_indexname = flask.current_app.config['ES_CONFIG']['CO_INDEXNAME']
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', location = 'json')
@@ -327,7 +326,6 @@ class CompanyConfirmExcelAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.co_indexname = flask.current_app.config['ES_CONFIG']['CO_INDEXNAME']
         self.reqparse.add_argument('data', type = list, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
 

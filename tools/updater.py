@@ -1,8 +1,8 @@
 def update_cv_sim(SVC_MIN, modelname, simname, svc):
-    names = SVC_MIN.sim[modelname][simname].names
-    if len(names) != len(svc.ids):
-        trains = [(name, svc.getmd(name)) for name in
-                  set(svc.names()).difference(set(names))]
+    ids = SVC_MIN.sim[modelname][simname].ids
+    if len(ids) != len(svc.ids):
+        trains = iter([(name, svc.getmd(name)) for name in
+                       svc.ids.difference(ids)])
         result = SVC_MIN.sim[modelname][simname].update(trains)
         if result is True:
             SVC_MIN.sim[modelname][simname].save()
@@ -25,18 +25,21 @@ def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
 
 
 def update_cv_models(SVC_MIN, SVC_MEMBERS):
+    def gen(lsimodel, cvs):
+        for cv in cvs:
+            if len(lsimodel.ids) != len(svcdict[cv].ids):
+                for name in set(svcdict[cv].ids).difference(set(lsimodel.ids)):
+                    yield (name, svcdict[cv].getmd(name))
+
     modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
-    svcdict = dict([(prj.id, prj.curriculumvitae) for prj in SVC_MEMBERS.allprojects().values()])
+    svcdict = dict([(prj.id, prj.curriculumvitae) for prj in
+                     SVC_MEMBERS.allprojects().values()])
     for modelname in modelnames:
         if modelname not in SVC_MIN.sim:
             continue
         lsimodel = SVC_MIN.lsi_model[modelname]
         if lsimodel.getconfig('autoupdate') is True:
-            trains = list()
-            for cv in lsimodel.getconfig('origin'):
-                if len(lsimodel.names) != len(svcdict[cv].ids):
-                    trains.extend([(name, svcdict[cv].getmd(name)) for name in
-                                   set(svcdict[cv].names()).difference(set(lsimodel.names))])
+            trains = gen(lsimodel, lsimodel.getconfig('origin'))
             updated = SVC_MIN.lsi_model[modelname].update(trains)
             if updated is True:
                 SVC_MIN.lsi_model[modelname].save()
@@ -46,72 +49,69 @@ def update_jd_sims(modelname, SVC_MIN, SVC_JDS):
     for svc in SVC_JDS:
         trains = list()
         simids = SVC_MIN.sim[modelname][svc.name].ids
-        trains.extend([(id, svc.getyaml(id)['description']) for id in
-                        svc.ids.difference(simids)])
+        trains = iter([(id, svc.getyaml(id)['description']) for id in
+                       svc.ids.difference(simids)])
         result = SVC_MIN.sim[modelname][svc.name].update(trains)
         if result is True:
             SVC_MIN.sim[modelname][svc.name].save()
 
 
 def update_co_sims(modelname, SVC_MIN, SVC_CVS):
-    for svc in SVC_CVS:
-        trains = list()
-        simids = SVC_MIN.sim[modelname][svc.name].ids
+    def gen(svc, simids):
         for id in svc.ids.difference(simids):
             info = svc.getyaml(id)
             try:
                 datas = info['experience']['company']
             except KeyError, TypeError:
-                trains.append(('.'.join([id, '']), ''))
+                yield ('.'.join([id, '']), '')
                 continue
             for data in datas:
                 if 'description' not in data:
-                    trains.append(('.'.join([id, data['name']]).encode('utf-8'),
-                                   ''))
                     continue
-                trains.append(('.'.join([id, data['name']]).encode('utf-8'), data['description']))
+                yield ('.'.join([id, data['name']]).encode('utf-8'),
+                       data['description'])
+
+    for svc in SVC_CVS:
+        trains = list()
+        simids = SVC_MIN.sim[modelname][svc.name].ids
+        trains = gen(svc, simids)
         result = SVC_MIN.sim[modelname][svc.name].update(trains)
         if result is True:
             SVC_MIN.sim[modelname][svc.name].save()
 
 
 def update_pos_sims(modelname, SVC_MIN, SVC_CVS):
-    for svc in SVC_CVS:
-        trains = list()
-        simids = SVC_MIN.sim[modelname][svc.name].ids
+    def gen(svc, simids):
         for id in svc.ids.difference(simids):
             info = svc.getyaml(id)
             try:
                 datas = info['experience']['position']
             except KeyError, TypeError:
-                trains.append(('.'.join([id, '']), ''))
                 continue
             for data in datas:
                 if 'description' not in data:
-                    trains.append(('.'.join([id,
-                                         info['experience']['company'][data['at_company']]['name'],
-                                         data['name']]).encode('utf-8'),
-                                   ''))
                     continue
-                trains.append(('.'.join([id,
-                                         info['experience']['company'][data['at_company']]['name'],
-                                         data['name']]).encode('utf-8'),
-                               data['description']))
+                yield ('.'.join([id,
+                                 info['experience']['company'][data['at_company']]['name'],
+                                 data['name']]).encode('utf-8'),
+                       data['description'])
+
+    for svc in SVC_CVS:
+        trains = list()
+        simids = SVC_MIN.sim[modelname][svc.name].ids
+        trains = gen(svc, simids)
         result = SVC_MIN.sim[modelname][svc.name].update(trains)
         if result is True:
             SVC_MIN.sim[modelname][svc.name].save()
 
 
 def update_prj_sims(modelname, SVC_MIN, SVC_CVS):
-    for svc in SVC_CVS:
-        trains = list()
-        simids = SVC_MIN.sim[modelname][svc.name].ids
+    def gen(svc, simids):
         for id in svc.ids.difference(simids):
             info = svc.getyaml(id)
             try:
                 datas = info['experience']['project']
             except KeyError, TypeError:
-                trains.append(('.'.join([id, '']), ''))
                 continue
             for data in datas:
                 name = data['name'] if 'name' in data else '-'
@@ -119,11 +119,14 @@ def update_prj_sims(modelname, SVC_MIN, SVC_CVS):
                 description = data['description'] if 'description' in data else ''
                 responsibility = data['responsibility'] if 'responsibility' in data else ''
                 if not description and not responsibility:
-                    trains.append(('.'.join([id, company, name]).encode('utf-8'),
-                                   ''))
                     continue
-                trains.append(('.'.join([id, company, name]).encode('utf-8'),
-                               '\n'.join([description, responsibility])))
+                yield (('.'.join([id, company, name]).encode('utf-8'),
+                        '\n'.join([description, responsibility])))
+
+    for svc in SVC_CVS:
+        trains = list()
+        simids = SVC_MIN.sim[modelname][svc.name].ids
+        trains = gen(svc, simids)
         result = SVC_MIN.sim[modelname][svc.name].update(trains)
         if result is True:
             SVC_MIN.sim[modelname][svc.name].save()

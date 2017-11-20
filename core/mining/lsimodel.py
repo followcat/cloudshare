@@ -82,7 +82,7 @@ class LSImodel(object):
             f.write(utils.builtin.dump_yaml(config))
 
     def set_origin(self, origin):
-        config['origin'] = origin
+        self.config['origin'] = origin
         self.save_config()
 
     def update(self, gen):

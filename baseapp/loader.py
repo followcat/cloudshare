@@ -201,9 +201,20 @@ def load_cv_mining(SVC_MIN, SVC_MEMBERS):
     tools.updater.update_cv_sims(SVC_MIN, SVC_MEMBERS)
 
 
+def load_addedcv_mining(SVC_MIN, SVC_MEMBERS, additions):
+    for member in SVC_MEMBERS.members.values():
+        for project in member.projects.values():
+            modelname = project.modelname
+            if modelname in additions:
+                for added in additions[modelname]:
+                    result = SVC_MIN.setup(modelname, added)
+            if '*' in additions:
+                result = SVC_MIN.setup(modelname, additions['*'])
+
+
 def load_jd_mining(SVC_MIN, SVC_JDS):
     SVC_MIN.setup('jdmatch', [JD.name for JD in SVC_JDS])
-    tools.updater.update_jd_sims('jdmatch', SVC_MIN, SVC_JDS)
+    #tools.updater.update_jd_sims('jdmatch', SVC_MIN, SVC_JDS)
 
 
 def load_co_mining(SVC_MIN, SVC_CVS):

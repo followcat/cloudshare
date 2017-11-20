@@ -28,6 +28,8 @@ class LSIsimilarity(object):
         if self.index is None:
             self.set_index([])
         for name, doc in gen:
+            if self.exists(name) is True:
+                continue
             names.append(name)
             documents.append(doc)
             number += 1

@@ -13,13 +13,13 @@ class JobDescription(services.base.storage.BaseStorage):
     commitinfo = 'JobDescription'
 
     YAML_TEMPLATE = (
-        ("name",            str),
+        ("name",            unicode),
         ("id",              str),
-        ("company",         str),
-        ("description",     str),
+        ("company",         unicode),
+        ("description",     unicode),
         ("committer",       str),
-        ("commentary",      str),
-        ("followup",        str),
+        ("commentary",      unicode),
+        ("followup",        unicode),
         ("status",          str),
     )
 

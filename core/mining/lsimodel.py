@@ -86,28 +86,18 @@ class LSImodel(object):
         self.config['origin'] = origin
         self.save_config()
 
-    def update(self, gen):
-        names = []
-        texts = []
-        added = False
-        for name, doc in gen:
-            if self.exists(name) is False:
-                names.append(name)
-                texts.append(doc)
-                added = True
-        if added:
-            self.add_documents(names, texts)
-        return added
-
-    def build(self, gen, numbers=5000):
+    def update(self, gen, numbers=5000):
         result = False
-        number =0
         names = []
         documents = []
+        number =0
+        if self.lsi is None:
+            self.set_dictionary()
+            self.set_lsimodel()
         for name, doc in gen:
-            number += 1
             names.append(name)
             documents.append(doc)
+            number += 1
             if number%numbers == 0:
                 self.add_documents(names, documents)
                 number = 0
@@ -118,6 +108,9 @@ class LSImodel(object):
             self.add_documents(names, documents)
             result = True
         return result
+
+    def build(self, gen, numbers=5000):
+        return self.update(gen, numbers=numbers)
 
     def getconfig(self, param):
         result = False
@@ -143,9 +136,6 @@ class LSImodel(object):
 
     def add_documents(self, names, documents):
         assert len(names) == len(documents)
-        if self.lsi is None:
-            self.set_dictionary()
-            self.set_lsimodel()
         texts = list()
         corpus = list()
         corpu_tfidf = list()

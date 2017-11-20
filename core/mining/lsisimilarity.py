@@ -30,6 +30,7 @@ class LSIsimilarity(object):
         for name, doc in gen:
             names.append(name)
             documents.append(doc)
+            number += 1
             if number%numbers == 0:
                 self.add_documents(names, documents)
                 number = 0

@@ -12,6 +12,7 @@ class LSIsimilarity(object):
     matrix_save_name = 'lsi.matrix'
 
     def __init__(self, name, savepath, lsi_model):
+        self._ids = None
         self.name = name
         self.path = savepath
         self.names = []
@@ -50,8 +51,7 @@ class LSIsimilarity(object):
             ujson.dump(self.names, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
 
-    def exists(self, name):
-        id = core.outputstorage.ConvertName(name).base
+    def exists(self, id):
         return id in self.ids
 
     def load(self):
@@ -65,12 +65,13 @@ class LSIsimilarity(object):
         assert len(names) == len(documents)
         corpus = list()
         for name, document in zip(names, documents):
-            if name in self.names:
+            if self.exists(name) is True:
                  continue
             text = self.lsi_model.slicer(document, id=name)
             corpu = self.lsi_model.lsi.id2word.doc2bow(text)
             corpus.append(corpu)
         self.names.extend(names)
+        self.ids = names
         modelcorpus = self.lsi_model.lsi[corpus]
         self.index.add_documents(modelcorpus)
 
@@ -160,11 +161,11 @@ class LSIsimilarity(object):
         """
         self.num_best = None
         p = self.base_probability(doc, top=top, minimum=minimum)
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), p)
+        results = map(lambda x: (self.names[x[0]], str(x[1])), p)
         return results
 
     def probability_by_id(self, doc, id):
-        if id not in self.names:
+        if self.exists(id) is False:
             return None
         index = self.names.index(id)
         vec_lsi = self.lsi_model.probability(doc)
@@ -194,4 +195,10 @@ class LSIsimilarity(object):
 
     @property
     def ids(self):
-        return set([name.split('.', 1)[0] for name in self.names])
+        if self._ids is None:
+            self._ids = set(self.names)
+        return self._ids
+
+    @ids.setter
+    def ids(self, value):
+        self._ids.update(set(value))

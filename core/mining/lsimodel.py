@@ -30,6 +30,7 @@ class LSImodel(object):
                  tfidf_local=None, slicer=None, config=None):
         if config is None:
             config = {}
+        self._ids = None
         self.name = name
         self.path = savepath
         self.corpus_path = os.path.join(savepath, self.corpus_path)
@@ -90,7 +91,7 @@ class LSImodel(object):
         texts = []
         added = False
         for name, doc in gen:
-            if name not in self.names:
+            if self.exists(name) is False:
                 names.append(name)
                 texts.append(doc)
                 added = True
@@ -137,8 +138,7 @@ class LSImodel(object):
         self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
         self.dictionary = self.lsi.id2word
 
-    def exists(self, name):
-        id = core.outputstorage.ConvertName(name).base
+    def exists(self, id):
         return id in self.ids
 
     def add_documents(self, names, documents):
@@ -156,6 +156,7 @@ class LSImodel(object):
             corpu = self.lsi.id2word.doc2bow(text)
             corpus.append(corpu)
         self.names.extend(names)
+        self.ids = names
         self.storage_corpus(corpus)
         self.set_dictionary()
         self.set_tfidf()
@@ -408,7 +409,13 @@ class LSImodel(object):
 
     @property
     def ids(self):
-        return set([name.split('.', 1)[0] for name in self.names])
+        if self._ids is None:
+            self._ids = set(self.names)
+        return self._ids
+
+    @ids.setter
+    def ids(self, value):
+        self._ids.update(set(value))
 
 
 def tf_cal(term_freq):

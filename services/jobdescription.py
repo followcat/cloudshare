@@ -80,7 +80,7 @@ class JobDescription(services.base.storage.BaseStorage):
     def add(self, bsobj, committer=None, unique=True, yamlfile=True,
             mdfile=False, do_commit=True):
         return super(JobDescription, self).add(bsobj, committer=committer, unique=unique,
-                                               yamlfile=yaml, mdfile=mdfile,
+                                               yamlfile=yamlfile, mdfile=mdfile,
                                                do_commit=do_commit)
 
     def modify(self, id, description, status, commentary, followup, committer):

@@ -209,9 +209,22 @@ class Member(services.base.service.Service):
                                           unique=unique, do_commit=do_commit)
         return result
 
-    def co_add(self, coobj, committer=None, unique=True, do_commit=True):
+    def company_add(self, coobj, committer=None, unique=True, do_commit=True):
         result = self.companies.add(coobj, committer, unique=unique, do_commit=do_commit)
         return result
+
+    def company_add_excel(self, items, committer=None):
+        results = dict()
+        member_result = set()
+        for item in items:
+            yamlname = core.outputstorage.ConvertName(item[1]).yaml
+            coobj = core.basedata.DataObject(*item[2][:2])
+            member_result.add(self.companies.ids_file)
+            member_result.add(os.path.join(self.companies.YAML_DIR, yamlname))
+            result = self.companies.add(coobj, committer=item[2][-1], do_commit=False)
+            results[item[1]] = result
+        self.companies.interface.do_commit(list(member_result), committer=committer)
+        return results
 
     def getproject(self, projectname):
         return self.projects[projectname]

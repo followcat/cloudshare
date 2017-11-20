@@ -77,6 +77,7 @@ class JobDescriptionUploadAPI(Resource):
         super(JobDescriptionUploadAPI, self).__init__()
 
     def post(self):
+        result = False
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
@@ -91,7 +92,9 @@ class JobDescriptionUploadAPI(Resource):
             'followup': args['followup'] if args['followup'] else '',
         }
         jdobj = project.storageJD.baseobj(info)
-        result = project.jd_add(jdobj, committer=user.name)
+        mbr_result = member.jd_add(jdobj, committer=user.name)
+        if mbr_result is True:
+            result = project.jd_add(jdobj, committer=user.name)
         if result is True:
             id = jdobj.metadata['id']
             self.svc_index.add(self.svc_index.config['JD_MEM'], project.id,

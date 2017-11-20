@@ -29,6 +29,7 @@ class CompanyAPI(Resource):
         return { 'code': 200,'result': result }
 
     def post(self, id):
+        result = False
         args = self.reqparse.parse_args()
         coname = args['name']
         projectname = args['project']
@@ -39,7 +40,9 @@ class CompanyAPI(Resource):
         project = member.getproject(projectname)
         metadata = extractor.information_explorer.catch_coinfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
-        result = project.company_add(coobj, user.name)
+        mbr_result = member.company_add(coobj, committer=user.name)
+        if mbr_result is True:
+            result = project.company_add(coobj, committer=user.name)
         if result is True:
             self.svc_index.add(self.svc_index.config['CO_MEM'], coobj.metadata['id'],
                                coobj.metadata)
@@ -336,7 +339,8 @@ class CompanyConfirmExcelAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        results = project.company_add_excel(datas, user.name)
+        meb_results = member.company_add_excel(datas, committer=user.name)
+        results = project.company_add_excel(datas, committer=user.name)
         for id in results:
             co_info = project.company_get(id)
             self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,

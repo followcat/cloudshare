@@ -68,7 +68,7 @@ def update_co_sims(modelname, SVC_MIN, SVC_CVS):
             for data in datas:
                 if 'description' not in data:
                     continue
-                yield ('.'.join([id, data['name']]).encode('utf-8'),
+                yield ('.'.join([id, data['name']]),
                        data['description'])
 
     for svc in SVC_CVS:
@@ -93,7 +93,7 @@ def update_pos_sims(modelname, SVC_MIN, SVC_CVS):
                     continue
                 yield ('.'.join([id,
                                  info['experience']['company'][data['at_company']]['name'],
-                                 data['name']]).encode('utf-8'),
+                                 data['name']]),
                        data['description'])
 
     for svc in SVC_CVS:
@@ -120,7 +120,7 @@ def update_prj_sims(modelname, SVC_MIN, SVC_CVS):
                 responsibility = data['responsibility'] if 'responsibility' in data else ''
                 if not description and not responsibility:
                     continue
-                yield (('.'.join([id, company, name]).encode('utf-8'),
+                yield (('.'.join([id, company, name]),
                         '\n'.join([description, responsibility])))
 
     for svc in SVC_CVS:

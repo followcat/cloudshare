@@ -82,10 +82,10 @@ class AddPosition extends Component {
           newjd: array
         },() => {this.getFastMatchingByID()});
 
-        message.success(json.message);
+        message.success(language.ACTION_SUCCESS);
       } else {
 
-        message.error(json.message);
+        message.error(language.ACTION_Fail);
       }
     });
   }

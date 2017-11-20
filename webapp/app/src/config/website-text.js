@@ -38,6 +38,9 @@ const websiteText = {
     BECOME_MEMBER: '成为会员',
     BEST_EXCELLENT: '每日优秀',
 
+    ACTION_SUCCESS: '操作成功！',
+    ACTION_FAIL: '操作失败！',
+
     ADMIN_MANAGEMENT: '权限管理',
     MEMBER_MANAGEMENT: '成员管理',
     PROJECT_MANAGEMENT: '项目管理',

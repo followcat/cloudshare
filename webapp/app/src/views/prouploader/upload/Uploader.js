@@ -78,6 +78,7 @@ class Uploader extends Component {
       currentPreview: 0,
       total: 0,
       guide:false,
+      getproend: false,
       confirmLoading: false,
       setpeople: false
     };
@@ -91,13 +92,13 @@ class Uploader extends Component {
     this.getPreviewRender = this.getPreviewRender.bind(this);
   }
 
-  componentWillMount() {
+  async componentWillMount() {
 
-    getPeopleID((json) => {
+    await getPeopleID((json) => {
       if (json.code === 200) {
         this.setState({
-          peopleid: json.result,
-        });
+          peopleid: json.result.cv[0],
+        },() => {this.getProResume()});
       } 
     });
 
@@ -138,11 +139,12 @@ class Uploader extends Component {
       }).start();
       // introJs().start();
     }
+    // this.getProResume();
   }
 
   componentDidUpdate() {
-    if(this.state.peopleid)  {  
-      this.getProResume()
+    if(this.state.peopleid&&!this.state.getproend)  {
+      // this.getProResume()
     }
   }
 
@@ -152,7 +154,8 @@ class Uploader extends Component {
       }, json => {
         if (json.code === 200) {
             this.setState({
-              yaml_info: json.data.yaml_info
+              yaml_info: json.data.yaml_info,
+              getproend: true
             });
         }
       });

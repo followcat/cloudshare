@@ -35,7 +35,6 @@ class Operation extends Component {
       <ul>
         <li><Checkbox defaultChecked={true} onChange={this.handleAppendCommentary}>{language.APPEND_COMMENTARY}</Checkbox></li>
         <li><a href={URL.getFastMatching(this.props.record.id, this.state.appendCommentary)}>{language.MATCH_ACTION}</a></li>
-        <li><a onClick={this.handleClick}>{language.EDIT}</a></li>
       </ul>
     );
   }

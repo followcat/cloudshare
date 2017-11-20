@@ -10,6 +10,7 @@ import ShowCard from 'components/show-card';
 import TablePlus from 'components/table-plus';
 import SearchResultBox from 'components/search-result-box';
 
+import EditJobDescriptionForm from './EditJobDescriptionForm';
 import Operation from './Operation';
 
 import StorageUtil from 'utils/storage';
@@ -45,12 +46,14 @@ class AddPosition extends Component {
       jdConfirmLoading: false
     };
     this.handleJobDescriptionCreate = this.handleJobDescriptionCreate.bind(this);
-    this.getLSIAllSIMSDataSource = this.getLSIAllSIMSDataSource.bind(this);
+    // this.getLSIAllSIMSDataSource = this.getLSIAllSIMSDataSource.bind(this);
+    this.getFastMatchingByID = this.getFastMatchingByID.bind(this);
+    this.getExpandedRowRender = this.getExpandedRowRender.bind(this);
   }
 
   componentWillMount () {
     this.getCustomerDataSource();
-    this.getFastMatchingByID();
+    // this.getFastMatchingByID();
     // this.getJobDescriptionByID();
   }
 
@@ -67,13 +70,17 @@ class AddPosition extends Component {
 
    // 新建职位
   handleJobDescriptionCreate(fieldValues) {
-    console.log(fieldValues);
     createJobDescription(fieldValues, (json) => {
       if (json.code === 200) {
+        this.state.customerDataSource.map((item) => {
+          if(item.id === json.data.info.company)
+            json.data.info.company_name = item.name;
+        })
         let array = new Array(json.data.info);
+        console.log(array);
         this.setState({
           newjd: array
-        });
+        },() => {this.getFastMatchingByID()});
 
         message.success(json.message);
       } else {
@@ -83,37 +90,19 @@ class AddPosition extends Component {
     });
   }
 
-    // 根据id获取最新数据
-  getJobDescriptionByID(id) {
-    let dataSource = this.state.dataSource,
-        filterDataSource = this.state.filterDataSource;
-
-    getJobDescription({
-      'jd_id': 'be97722a0cff11e6a3e16c3be51cefca'
-    }, json => {
-      if (json.code === 200) {
-        let array = new Array(json.data);
-        this.setState({
-          newjd: array
-        });
-      }
-    });
-  }
-
-  getFastMatchingByID(id) {
+  getFastMatchingByID() {
     const date = new Date();
     const defFilterData = {date: [moment(date).add(-180, 'days').format('YYYY-MM-DD'),
                                   moment(date).format('YYYY-MM-DD')]};
 
-    let promise = new Promise((resolve, reject) => {
-      this.getLSIAllSIMSDataSource(resolve);
-    });
+    // let promise = new Promise((resolve, reject) => {
+    //   this.getLSIAllSIMSDataSource(resolve);
+    // });
     let postAPI = API.LSI_BY_JD_ID_API;
-
-    promise.then((data) => {
+        let array = new Array(StorageUtil.get("_pj"));
         let postData = {
-            id: 'be97722a0cff11e6a3e16c3be51cefca',
-            uses: data,
+            id: this.state.newjd[0].id,
+            uses: array,
             filterdict: defFilterData,
         };
         getFastMatching(postAPI, postData, json => {
@@ -125,19 +114,28 @@ class AddPosition extends Component {
             });
           }
         });
-    });
-  }
+    }
 
-  getLSIAllSIMSDataSource(resolve) {
-    getLSIAllSIMS(json => {
-      if (json.code === 200) {
-        this.setState({
-          classify: json.classify,
-          projects: json.projects
-        });
-        resolve(json.projects.concat(json.classify));
-      }
-    });
+  // getLSIAllSIMSDataSource(resolve) {
+  //   getLSIAllSIMS(json => {
+  //     if (json.code === 200) {
+  //       this.setState({
+  //         classify: json.classify,
+  //         projects: json.projects
+  //       });
+  //       resolve(json.projects.concat(json.classify));
+  //     }
+  //   });
+  // }
+
+  // 获取渲染扩展JD展开行
+  getExpandedRowRender(record) {
+    console.log(record);
+    return (
+      <div>
+        {record.description.split('\n').map((item, index) => { return (<p key={index}>{item}</p>); })}
+      </div>
+    )
   }
 
   render() {
@@ -155,24 +153,19 @@ class AddPosition extends Component {
       title: language.CREATOR,
       dataIndex: 'committer',
       key: 'committer',
-      width: '10%'
+      width: '15%'
     },{
       title: language.OPERATION,
       key: 'operation',
-      width: '10%',
+      width: '15%',
       render: (record) => (
-        <Operation 
-          record={record}
-          onEdit={this.handleEditClick}
-        />
+        <Operation record={record}/>
       )
     }];
-
     return (
-      <div className="cs-addposition" >
+      <div className="cs-addposition">
       <ShowCard>
         <CreateNewJobDescription
-          buttonStyle={{ marginLeft: 10 }}
           buttonType="primary"
           buttonText={language.CREATION}
           modalTitle={language.JOB_DESCRIPTION_CREATION}
@@ -183,7 +176,17 @@ class AddPosition extends Component {
           visible={this.state.jdVisible}
           onCreate={this.handleJobDescriptionCreate}
         />
-        <Table dataSource={this.state.newjd} columns={columns} />
+
+        { this.state.newjd.length > 0 ?
+        <div className="cs-addposition-result">
+        <Table 
+          dataSource={this.state.newjd} 
+          columns={columns} 
+          pagination={false}
+          rowKey={record => record.id}
+          expandedRowRender={record => this.getExpandedRowRender(record)}
+          defaultExpandAllRows={true}
+        />
         <SearchResultBox
           type="match"
           visible={true}
@@ -196,7 +199,11 @@ class AddPosition extends Component {
           foldText="展开"
           unfoldText="收起"
           onToggleSelection={null}
+          showPagination={false}
         />
+        </div>
+        : null
+        }
       </ShowCard>
       </div>
     );

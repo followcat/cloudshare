@@ -291,7 +291,7 @@ class Project(services.base.service.Service):
             'repo_result' : False,
             'project_result' : False
         }
-        if self.company.exists(company):
+        if jdobj.metadata['company'] in self.company.customers:
             result['repo_result'] = self.storageJD.add(jdobj, committer,
                                                        unique=unique, do_commit=do_commit)
             if result['repo_result']:

@@ -3,12 +3,14 @@ def update_cv_sim(SVC_MIN, modelname, simname, svc):
     if len(names) != len(svc.ids):
         trains = [(name, svc.getmd(name)) for name in
                   set(svc.names()).difference(set(names))]
-        SVC_MIN.sim[modelname][simname].update(trains)
-        SVC_MIN.sim[modelname][simname].save()
+        result = SVC_MIN.sim[modelname][simname].update(trains)
+        if result is True:
+            SVC_MIN.sim[modelname][simname].save()
 
 def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
     modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
-    svcdict = dict([(prj.id, prj.curriculumvitae) for prj in SVC_MEMBERS.allprojects().values()])
+    svcdict = dict([(prj.id, prj.curriculumvitae) for prj in
+                     SVC_MEMBERS.allprojects().values()])
     if additionals is not None:
         assert isinstance(additionals, dict)
         svcdict.update(additionals)
@@ -22,12 +24,9 @@ def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
             update_cv_sim(SVC_MIN, modelname, simname, svc)
 
 
-def update_cv_models(SVC_MIN, SVC_MEMBERS, additionals=None):
+def update_cv_models(SVC_MIN, SVC_MEMBERS):
     modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
     svcdict = dict([(prj.id, prj.curriculumvitae) for prj in SVC_MEMBERS.allprojects().values()])
-    if additionals is not None:
-        assert isinstance(additionals, dict)
-        svcdict.update(additionals)
     for modelname in modelnames:
         if modelname not in SVC_MIN.sim:
             continue
@@ -49,8 +48,9 @@ def update_jd_sims(modelname, SVC_MIN, SVC_JDS):
         simids = SVC_MIN.sim[modelname][svc.name].ids
         trains.extend([(id, svc.getyaml(id)['description']) for id in
                         svc.ids.difference(simids)])
-        SVC_MIN.sim[modelname][svc.name].update(trains)
-        SVC_MIN.sim[modelname][svc.name].save()
+        result = SVC_MIN.sim[modelname][svc.name].update(trains)
+        if result is True:
+            SVC_MIN.sim[modelname][svc.name].save()
 
 
 def update_co_sims(modelname, SVC_MIN, SVC_CVS):
@@ -70,8 +70,9 @@ def update_co_sims(modelname, SVC_MIN, SVC_CVS):
                                    ''))
                     continue
                 trains.append(('.'.join([id, data['name']]).encode('utf-8'), data['description']))
-        SVC_MIN.sim[modelname][svc.name].update(trains)
-        SVC_MIN.sim[modelname][svc.name].save()
+        result = SVC_MIN.sim[modelname][svc.name].update(trains)
+        if result is True:
+            SVC_MIN.sim[modelname][svc.name].save()
 
 
 def update_pos_sims(modelname, SVC_MIN, SVC_CVS):
@@ -96,8 +97,9 @@ def update_pos_sims(modelname, SVC_MIN, SVC_CVS):
                                          info['experience']['company'][data['at_company']]['name'],
                                          data['name']]).encode('utf-8'),
                                data['description']))
-        SVC_MIN.sim[modelname][svc.name].update(trains)
-        SVC_MIN.sim[modelname][svc.name].save()
+        result = SVC_MIN.sim[modelname][svc.name].update(trains)
+        if result is True:
+            SVC_MIN.sim[modelname][svc.name].save()
 
 
 def update_prj_sims(modelname, SVC_MIN, SVC_CVS):
@@ -122,5 +124,6 @@ def update_prj_sims(modelname, SVC_MIN, SVC_CVS):
                     continue
                 trains.append(('.'.join([id, company, name]).encode('utf-8'),
                                '\n'.join([description, responsibility])))
-        SVC_MIN.sim[modelname][svc.name].update(trains)
-        SVC_MIN.sim[modelname][svc.name].save()
+        result = SVC_MIN.sim[modelname][svc.name].update(trains)
+        if result is True:
+            SVC_MIN.sim[modelname][svc.name].save()

@@ -75,8 +75,6 @@ class LSIsimilarity(object):
         self.index.add_documents(modelcorpus)
 
     def set_index(self, modelcorpus):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
                                              modelcorpus, self.lsi_model.topics)
 

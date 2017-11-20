@@ -19,32 +19,29 @@ class LSIsimilarity(object):
         self.lsi_model = lsi_model
         self.index = None
 
-    def update(self, gen, newmodel=False):
-        added = False
+    def update(self, gen, numbers=5000):
+        result = False
         names = []
         documents = []
+        number =0
+        if self.index is None:
+            self.set_index([])
         for name, doc in gen:
             names.append(name)
             documents.append(doc)
-            added = True
-        if added or newmodel:
+            if number%numbers == 0:
+                self.add_documents(names, documents)
+                number = 0
+                result = True
+                names = list()
+                documents = list()
+        if number != 0:
             self.add_documents(names, documents)
-            self.save()
-        return added or newmodel
+            result = True
+        return result
 
-    def build(self, gen):
-        names = []
-        corpus = []
-        for name, doc in gen:
-            names.append(name)
-            documents.append(doc)
-            words = self.lsi_model.slicer(doc, id=name)
-            corpus.append(self.lsi_model.lsi.id2word.doc2bow(words))
-        self.setup(names, corpus)
-
-    def setup(self, names, corpus):
-        self.names = names
-        self.set_index(corpus)
+    def build(self, gen, numbers=5000):
+        return self.update(gen, numbers=numbers)
 
     def save(self):
         if not os.path.exists(self.path):
@@ -74,14 +71,14 @@ class LSIsimilarity(object):
             corpu = self.lsi_model.lsi.id2word.doc2bow(text)
             corpus.append(corpu)
         self.names.extend(names)
-        self.index.add_documents(self.lsi_model.lsi[corpus])
+        modelcorpus = self.lsi_model.lsi[corpus]
+        self.index.add_documents(modelcorpus)
 
-    def set_index(self, corpus):
+    def set_index(self, modelcorpus):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
-                                             self.lsi_model.lsi[corpus],
-                                             self.lsi_model.topics)
+                                             modelcorpus, self.lsi_model.topics)
 
     def probability(self, doc, top=None, minimum=0):
         """

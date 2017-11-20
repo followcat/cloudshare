@@ -1,11 +1,12 @@
-def update_cv_sim(SVC_MIN, modelname, simname, svc, newmodel=False):
+def update_cv_sim(SVC_MIN, modelname, simname, svc):
     names = SVC_MIN.sim[modelname][simname].names
     if len(names) != len(svc.ids):
         trains = [(name, svc.getmd(name)) for name in
                   set(svc.names()).difference(set(names))]
-        SVC_MIN.sim[modelname][simname].update(trains, newmodel=newmodel)
+        SVC_MIN.sim[modelname][simname].update(trains)
+        SVC_MIN.sim[modelname][simname].save()
 
-def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None, newmodel=False):
+def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
     modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
     svcdict = dict([(prj.id, prj.curriculumvitae) for prj in SVC_MEMBERS.allprojects().values()])
     if additionals is not None:
@@ -18,7 +19,7 @@ def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None, newmodel=False):
             if simname not in svcdict:
                 continue
             svc = svcdict[simname]
-            update_cv_sim(SVC_MIN, modelname, simname, svc, newmodel=newmodel)
+            update_cv_sim(SVC_MIN, modelname, simname, svc)
 
 
 def update_cv_models(SVC_MIN, SVC_MEMBERS, additionals=None):
@@ -38,21 +39,21 @@ def update_cv_models(SVC_MIN, SVC_MEMBERS, additionals=None):
                     trains.extend([(name, svcdict[cv].getmd(name)) for name in
                                    set(svcdict[cv].names()).difference(set(lsimodel.names))])
             updated = SVC_MIN.lsi_model[modelname].update(trains)
-            for simname in SVC_MIN.sim[modelname]:
-                svc = svcdict[simname]
-                update_cv_sim(SVC_MIN, modelname, simname, svc, newmodel=updated)
+            if updated is True:
+                SVC_MIN.lsi_model[modelname].save()
 
 
-def update_jd_sims(modelname, SVC_MIN, SVC_JDS, newmodel=False):
+def update_jd_sims(modelname, SVC_MIN, SVC_JDS):
     for svc in SVC_JDS:
         trains = list()
         simids = SVC_MIN.sim[modelname][svc.name].ids
         trains.extend([(id, svc.getyaml(id)['description']) for id in
                         svc.ids.difference(simids)])
-        SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)
+        SVC_MIN.sim[modelname][svc.name].update(trains)
+        SVC_MIN.sim[modelname][svc.name].save()
 
 
-def update_co_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
+def update_co_sims(modelname, SVC_MIN, SVC_CVS):
     for svc in SVC_CVS:
         trains = list()
         simids = SVC_MIN.sim[modelname][svc.name].ids
@@ -69,10 +70,11 @@ def update_co_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
                                    ''))
                     continue
                 trains.append(('.'.join([id, data['name']]).encode('utf-8'), data['description']))
-        SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)
+        SVC_MIN.sim[modelname][svc.name].update(trains)
+        SVC_MIN.sim[modelname][svc.name].save()
 
 
-def update_pos_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
+def update_pos_sims(modelname, SVC_MIN, SVC_CVS):
     for svc in SVC_CVS:
         trains = list()
         simids = SVC_MIN.sim[modelname][svc.name].ids
@@ -94,10 +96,11 @@ def update_pos_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
                                          info['experience']['company'][data['at_company']]['name'],
                                          data['name']]).encode('utf-8'),
                                data['description']))
-        SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)
+        SVC_MIN.sim[modelname][svc.name].update(trains)
+        SVC_MIN.sim[modelname][svc.name].save()
 
 
-def update_prj_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
+def update_prj_sims(modelname, SVC_MIN, SVC_CVS):
     for svc in SVC_CVS:
         trains = list()
         simids = SVC_MIN.sim[modelname][svc.name].ids
@@ -119,4 +122,5 @@ def update_prj_sims(modelname, SVC_MIN, SVC_CVS, newmodel=False):
                     continue
                 trains.append(('.'.join([id, company, name]).encode('utf-8'),
                                '\n'.join([description, responsibility])))
-        SVC_MIN.sim[modelname][svc.name].update(trains, newmodel=newmodel)
+        SVC_MIN.sim[modelname][svc.name].update(trains)
+        SVC_MIN.sim[modelname][svc.name].save()

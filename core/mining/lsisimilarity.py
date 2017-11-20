@@ -12,7 +12,7 @@ class LSIsimilarity(object):
     matrix_save_name = 'lsi.matrix'
 
     def __init__(self, name, savepath, lsi_model):
-        self._ids = None
+        self._ids = set()
         self.name = name
         self.path = savepath
         self.names = []
@@ -198,7 +198,7 @@ class LSIsimilarity(object):
 
     @property
     def ids(self):
-        if self._ids is None:
+        if not self._ids:
             self._ids = set(self.names)
         return self._ids
 

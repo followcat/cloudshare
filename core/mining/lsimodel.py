@@ -30,7 +30,7 @@ class LSImodel(object):
                  tfidf_local=None, slicer=None, config=None):
         if config is None:
             config = {}
-        self._ids = None
+        self._ids = set()
         self.name = name
         self.path = savepath
         self.corpus_path = os.path.join(savepath, self.corpus_path)
@@ -399,7 +399,7 @@ class LSImodel(object):
 
     @property
     def ids(self):
-        if self._ids is None:
+        if not self._ids:
             self._ids = set(self.names)
         return self._ids
 

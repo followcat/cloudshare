@@ -45,8 +45,8 @@ class Project(services.base.service.Service):
         self.config['name'] = self.name
         if 'id' not in self.config:
             self.config['id'] = utils.builtin.genuuid()
-        if 'modelname' not in self.config:
-            self.config['modelname'] = self.name
+        if 'model' not in self.config:
+            self.config['model'] = 'default'
 
     def save(self):
         dumpconfig = utils.builtin.dump_yaml(self.config)
@@ -136,7 +136,7 @@ class Project(services.base.service.Service):
 
     @property
     def modelname(self):
-        return self.config['modelname']
+        return self.config['model']
 
     @property
     def id(self):

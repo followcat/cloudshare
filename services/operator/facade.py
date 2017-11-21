@@ -5,7 +5,7 @@ class Facade(services.base.service.Service):
 
     def __init__(self, service):
         self.service = service
-        super(Facade, self).__init__(service.path)
+        super(Facade, self).__init__()
 
     @property
     def ids(self):

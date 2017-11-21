@@ -140,12 +140,12 @@ class JobDescriptionListAPI(Resource):
                                             filterdict={ 'status': status },
                                             start=(cur_page-1)*page_size,
                                             size=page_size, source=True)
-        pages = int(math.ceil(total/page_size))
+        pages = int(math.ceil(float(total)/page_size))
         datas = [item['_source'] for item in searches]
         return {
             'code': 200,
             'data': datas,
-            'total': total,
-            'pages': pages
+            'pages': pages,
+            'totals': total
         }
 

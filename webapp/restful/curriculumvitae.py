@@ -106,7 +106,7 @@ class SearchCVbyTextAPI(Resource):
                                         filterdict=filterdict, source=True,
                                         kwargs={'_source_exclude': ['content']},
                                         start=(cur_page-1)*count, size=count)
-        pages = int(math.ceil(total/count))
+        pages = int(math.ceil(float(total)/count))
         datas = list()
         for item in searchs:
             yaml_info = item['_source']

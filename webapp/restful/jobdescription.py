@@ -149,3 +149,36 @@ class JobDescriptionListAPI(Resource):
             'totals': total
         }
 
+
+class JobDescriptionSearchAPI(JobDescriptionListAPI):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(JobDescriptionSearchAPI, self).__init__()
+        self.reqparse.add_argument('keyword', location = 'json')
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        status = args['status']
+        keyword = args['keyword']
+        cur_page = args['current_page']
+        page_size = args['page_size']
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        index = self.svc_index.config['JD_MEM']
+        total, searches = self.svc_index.search(index=index,
+                                            doctype=[project.id],
+                                            filterdict={ 'status': status, 'name': keyword},
+                                            start=(cur_page-1)*page_size,
+                                            size=page_size, source=True)
+        pages = int(math.ceil(float(total)/page_size))
+        datas = [item['_source'] for item in searches]
+        return {
+            'code': 200,
+            'data': datas,
+            'pages': pages,
+            'totals': total
+        }

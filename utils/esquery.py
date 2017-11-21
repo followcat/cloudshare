@@ -1,7 +1,7 @@
 import re
 
 
-def match_gen(key, keywords, slop=50):
+def match_gen(key, keywords, must=True, slop=50):
     result = {'must': [], 'should': [], 'filter': []}
     match_str = re.sub('"(.*?)"', '', keywords)
     match_phrase_list = re.findall('"(.*?)"', keywords)
@@ -13,8 +13,9 @@ def match_gen(key, keywords, slop=50):
                         "slop":  slop}
                     }
             }]
-        result['must'].append({"match": {key: {"query": match_str,
-                                               "minimum_should_match": "30%"}}})
+        if must is True:
+            result['must'].append({"match": {key: {"query": match_str,
+                                                   "minimum_should_match": "30%"}}})
     for keyword in match_phrase_list:
         result['must'].append({"match_phrase": {key: {"query": keyword}}})
     return result
@@ -75,15 +76,23 @@ def request_gen(esconn, index=None, doctype=None, filterdict=None, ids=None, slo
         querydict = {'query': {'bool': {}}}
         mappings = getmappings(esconn, fields=filterdict.keys(),
                                index=index, doctype=doctype)
+        if '*' in filterdict:
+            allshould = filterdict['*']
+            filterdict.pop('*')
         for key in mappings:
-            if mappings[key] == 'text' and filterdict[key]:
-                match_query = match_gen(key, filterdict[key], slop=slop)
-                for each in match_query:
-                    if match_query[each]:
-                        if each not in querydict['query']['bool']:
-                            querydict['query']['bool'][each] = list()
-                        querydict['query']['bool'][each].extend(match_query[each])
-                filterdict.pop(key)
+            must = True
+            if mappings[key] != 'text':
+                continue
+            if key not in filterdict:
+                must = False
+                filterdict[key] = allshould
+            match_query = match_gen(key, filterdict[key], must=must, slop=slop)
+            for each in match_query:
+                if match_query[each]:
+                    if each not in querydict['query']['bool']:
+                        querydict['query']['bool'][each] = list()
+                    querydict['query']['bool'][each].extend(match_query[each])
+            filterdict.pop(key)
         filter_query = filter_gen(filterdict)
         for each in filter_query:
             if filter_query[each]:

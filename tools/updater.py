@@ -1,29 +1,3 @@
-def update_cv_sim(SVC_MIN, modelname, simname, svc):
-    ids = SVC_MIN.sim[modelname][simname].ids
-    if len(ids) != len(svc.ids):
-        trains = iter([(name, svc.getmd(name)) for name in
-                       svc.ids.difference(ids)])
-        result = SVC_MIN.sim[modelname][simname].update(trains)
-        if result is True:
-            SVC_MIN.sim[modelname][simname].save()
-
-def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
-    modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
-    svcdict = dict([(prj.id, prj.curriculumvitae) for prj in
-                     SVC_MEMBERS.allprojects().values()])
-    if additionals is not None:
-        assert isinstance(additionals, dict)
-        svcdict.update(additionals)
-    for modelname in modelnames:
-        if modelname not in SVC_MIN.sim:
-            continue
-        for simname in SVC_MIN.sim[modelname]:
-            if simname not in svcdict:
-                continue
-            svc = svcdict[simname]
-            update_cv_sim(SVC_MIN, modelname, simname, svc)
-
-
 def update_cv_models(SVC_MIN, SVC_MEMBERS):
     def gen(lsimodel, cvs):
         for cv in cvs:
@@ -45,15 +19,49 @@ def update_cv_models(SVC_MIN, SVC_MEMBERS):
                 SVC_MIN.lsi_model[modelname].save()
 
 
-def update_jd_sims(modelname, SVC_MIN, SVC_JDS):
-    for svc in SVC_JDS:
-        trains = list()
-        simids = SVC_MIN.sim[modelname][svc.name].ids
-        trains = iter([(id, svc.getyaml(id)['description']) for id in
-                       svc.ids.difference(simids)])
-        result = SVC_MIN.sim[modelname][svc.name].update(trains)
+def gupdate(SVC_MIN, SVCS, modelname, gen, simname=None):
+    for svc in SVCS:
+        if simname is None:
+            simname = svc.name
+        simids = SVC_MIN.sim[modelname][simname].ids
+        trains = gen(svc, simids)
+        result = SVC_MIN.sim[modelname][simname].update(trains)
         if result is True:
-            SVC_MIN.sim[modelname][svc.name].save()
+            SVC_MIN.sim[modelname][simname].save()
+
+
+def update_cv_sim(SVC_MIN, svc, modelname, simname):
+    def gen(svc, simids):
+        for id in svc.ids.difference(simids):
+            yield (id, svc.getmd(id))
+
+    gupdate(SVC_MIN, [svc], modelname, gen, simname=simname)
+
+
+def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
+    modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
+    svcdict = dict([(prj.id, prj.curriculumvitae) for prj in
+                     SVC_MEMBERS.allprojects().values()])
+    if additionals is not None:
+        assert isinstance(additionals, dict)
+        svcdict.update(additionals)
+    for modelname in modelnames:
+        if modelname not in SVC_MIN.sim:
+            continue
+        for simname in SVC_MIN.sim[modelname]:
+            if simname not in svcdict:
+                continue
+            svc = svcdict[simname]
+            if len(svc.ids) != len(SVC_MIN.sim[modelname][simname].ids):
+                update_cv_sim(SVC_MIN, svc, modelname, simname)
+
+
+def update_jd_sims(modelname, SVC_MIN, SVC_JDS):
+    def gen(svc, simids):
+        for id in svc.ids.difference(simids):
+            yield (id, svc.getyaml(id)['description'])
+
+    gupdate(SVC_MIN, SVC_JDS, modelname, gen)
 
 
 def update_co_sims(modelname, SVC_MIN, SVC_CVS):
@@ -71,13 +79,7 @@ def update_co_sims(modelname, SVC_MIN, SVC_CVS):
                 yield ('.'.join([id, data['name']]),
                        data['description'])
 
-    for svc in SVC_CVS:
-        trains = list()
-        simids = SVC_MIN.sim[modelname][svc.name].ids
-        trains = gen(svc, simids)
-        result = SVC_MIN.sim[modelname][svc.name].update(trains)
-        if result is True:
-            SVC_MIN.sim[modelname][svc.name].save()
+    gupdate(SVC_MIN, SVC_CVS, modelname, gen)
 
 
 def update_pos_sims(modelname, SVC_MIN, SVC_CVS):
@@ -96,13 +98,7 @@ def update_pos_sims(modelname, SVC_MIN, SVC_CVS):
                                  data['name']]),
                        data['description'])
 
-    for svc in SVC_CVS:
-        trains = list()
-        simids = SVC_MIN.sim[modelname][svc.name].ids
-        trains = gen(svc, simids)
-        result = SVC_MIN.sim[modelname][svc.name].update(trains)
-        if result is True:
-            SVC_MIN.sim[modelname][svc.name].save()
+    gupdate(SVC_MIN, SVC_CVS, modelname, gen)
 
 
 def update_prj_sims(modelname, SVC_MIN, SVC_CVS):
@@ -123,10 +119,4 @@ def update_prj_sims(modelname, SVC_MIN, SVC_CVS):
                 yield (('.'.join([id, company, name]),
                         '\n'.join([description, responsibility])))
 
-    for svc in SVC_CVS:
-        trains = list()
-        simids = SVC_MIN.sim[modelname][svc.name].ids
-        trains = gen(svc, simids)
-        result = SVC_MIN.sim[modelname][svc.name].update(trains)
-        if result is True:
-            SVC_MIN.sim[modelname][svc.name].save()
+    gupdate(SVC_MIN, SVC_CVS, modelname, gen)

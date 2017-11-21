@@ -198,14 +198,13 @@ class LSIbaseAPI(Resource):
                       "order" : "asc"
                   }
                 }
-        count, searchs = self.svc_index.search(index=list(index), doctype=doctype,
+        totals, searchs = self.svc_index.search(index=list(index), doctype=doctype,
                                                filterdict=filterdict,
                                                ids=ids,
                                                kwargs={'sort': sort,
                                                        '_source_exclude': ['content']},
                                                start=(cur_page-1)*size, size=size,
                                                source=True)
-        totals = len(result)
         pages = int(math.ceil(float(totals)/size))
         result_dict = dict(result)
         datas = list()

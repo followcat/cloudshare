@@ -22,8 +22,6 @@ class SimulationCV(services.base.simulation.Simulation,
     }
 
     list_item = {}
-    secrecy_default = False
-    private_default = True
 
     def __init__(self, path, name, storages, iotype='git'):
         """
@@ -50,27 +48,11 @@ class SimulationCV(services.base.simulation.Simulation,
                 continue
         return html
 
-    def cleanprivate(self, id, source):
-        result = source
-        hidden = '[****]'
-        info = self.getyaml(id, secrecy=False)
-        for key in self.yaml_private_key:
-            if key in info and info[key]:
-                result = result.replace(info[key], hidden+' '*(len(info[key])-len(hidden)))
-            elif key == 'phone':
-                value = extractor.information_explorer.get_phone(result)
-                if len(value) > 6:
-                    result = result.replace(value, hidden+' '*(len(value)-len(hidden)))
-        return result
-
-    def gethtml(self, id, secrecy=True):
+    def gethtml(self, id):
         result = None
         for storage in self.storages:
             try:
                 result = storage.gethtml(id)
-                if secrecy is True and self.ishideprivate(id):
-                    result = self.cleanprivate(id, result)
-                break
             except IOError:
                 continue
         return result
@@ -85,23 +67,11 @@ class SimulationCV(services.base.simulation.Simulation,
                 continue
         return result
 
-    def getmd(self, id, secrecy=True):
+    def getmd(self, id):
         result = super(SimulationCV, self).getmd(id)
-        if secrecy is True and self.ishideprivate(id):
-            result = self.cleanprivate(id, result)
         return result
 
-    def getyaml(self, id, secrecy=True):
+    def getyaml(self, id):
         result = super(SimulationCV, self).getyaml(id)
-        if 'secrecy' not in result:
-            result['secrecy'] = False
-        if secrecy is True and self.ishideprivate(id):
-            result.update(self.yaml_private_key)
         return result
 
-    def getprivatekeys(self):
-        return self.yaml_private_key.keys()
-
-    def ishideprivate(self, id):
-        return self.secrecy_default is True or (self.private_default is True and
-                                                self.exists(id) is False)

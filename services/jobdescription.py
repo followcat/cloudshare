@@ -5,10 +5,10 @@ import os.path
 import yaml
 
 import core.outputstorage
-import services.base.service
+import services.base.storage
 
 
-class JobDescription(services.base.service.Service):
+class JobDescription(services.base.storage.BaseStorage):
     """
         >>> import shutil
         >>> import services.jobdescription

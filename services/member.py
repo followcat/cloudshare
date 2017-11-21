@@ -5,13 +5,14 @@ import core.basedata
 import utils.builtin
 import services.company
 import services.project
-import services.base.service
+import services.secret
+import services.base.storage
 import services.simulationacc
 
 import sources.industry_id
 
 
-class Member(services.base.service.Service):
+class Member(services.base.storage.BaseStorage):
 
     commitinfo = 'Member'
     PRJ_PATH = 'projects'
@@ -36,8 +37,10 @@ class Member(services.base.service.Service):
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.companies = services.company.Company(self.co_path, name)
-        self.curriculumvitaes = services.simulationcv.SimulationCV.autoservice(
+        self.curriculumvitaes = services.secret.Secret(
+                                    services.simulationcv.SimulationCV.autoservice(
                                                             self.cv_path, name, cv_repos)
+                                )
         self.config = dict()
         try:
             self.load()

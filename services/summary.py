@@ -3,7 +3,7 @@ import yaml
 import os.path
 
 import core.outputstorage
-import services.base.service
+import services.base.storage
 
 
 def yaml_to_doc(d):
@@ -17,7 +17,7 @@ def yaml_to_doc(d):
     return output + k + '\n' + xp
 
 
-class CandidateSummary(services.base.service.Service):
+class CandidateSummary(services.base.storage.BaseStorage):
 
     path = 'CV'
 

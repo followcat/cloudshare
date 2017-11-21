@@ -6,6 +6,8 @@ import utils.issue
 import utils._yaml
 import core.outputstorage
 import services.base.service
+import interface.basefs
+import interface.gitinterface
 
 
 class BaseStorage(services.base.service.Service):
@@ -22,6 +24,26 @@ class BaseStorage(services.base.service.Service):
         self.info = ""
         self._nums = 0
 
+        if name is None:
+            self.name = path.split('/')[-1]
+        else:
+            self.name = name
+        if iotype is None:
+            if os.path.exists(os.path.join(path, '.git')):
+                self.interface = interface.gitinterface.GitInterface(path, name,
+                    searchengine=searchengine)
+            else:
+                self.interface = interface.basefs.BaseFSInterface(path, name,
+                    searchengine=searchengine)
+        elif iotype == 'git':
+            self.interface = interface.gitinterface.GitInterface(path, name,
+                searchengine=searchengine)
+        elif iotype == 'base':
+            self.interface = interface.basefs.BaseFSInterface(path, name,
+                searchengine=searchengine)
+        else:
+            raise Exception("Not support iotype.")
+
     def exists(self, id):
         """
             >>> import services.base.storage
@@ -29,7 +51,7 @@ class BaseStorage(services.base.service.Service):
             >>> SVC_BSSTO = services.base.storage.BaseStorage(DIR)
             >>> assert SVC_BSSTO.exists('blr6dter')
         """
-        return id in self.ids
+        return super(BaseStorage, self).exists(id)
 
     def unique(self, bsobj):
         """
@@ -59,8 +81,7 @@ class BaseStorage(services.base.service.Service):
             >>> shutil.rmtree(repo_name)
             >>> shutil.rmtree(test_path)
         """
-        id = bsobj.ID
-        return not self.exists(id)
+        return super(BaseStorage, self).unique(bsobj)
 
     def generate_info_template(self):
         info = {}
@@ -203,14 +224,6 @@ class BaseStorage(services.base.service.Service):
             results.add((id, result[1]))
         return results
 
-    def names(self):
-        for id in self.ids:
-            yield core.outputstorage.ConvertName(id).md
-
-    def yamls(self):
-        for id in self.ids:
-            yield core.outputstorage.ConvertName(id).yaml
-
     def datas(self):
         for id in self.ids:
             name = core.outputstorage.ConvertName(id).md
@@ -219,6 +232,9 @@ class BaseStorage(services.base.service.Service):
 
     def history(self, author=None, entries=10, skip=0):
         return self.interface.history(author=author, max_commits=entries, skip=skip)
+
+    def backup(self, path, bare=False):
+        self.interface.backup(path, bare=bare)
 
     @property
     def ids(self):

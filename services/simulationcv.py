@@ -53,6 +53,7 @@ class SimulationCV(services.base.simulation.Simulation,
         for storage in self.storages:
             try:
                 result = storage.gethtml(id)
+                break
             except IOError:
                 continue
         return result

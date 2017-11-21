@@ -1,10 +1,10 @@
 'use strict';
 import React, { Component } from 'react';
 
-import Storage from '../../utils/storage';
-import Generator from '../../utils/generator';
+import Storage from 'utils/storage';
+import Generator from 'utils/generator';
 import 'whatwg-fetch';
-import './databasebox.less';
+import 'databasebox.less';
 
 export default class DataBaseBox extends Component {
 

@@ -49,13 +49,17 @@ class LSImodel(object):
 
     def update(self, svccv_list):
         added = False
+        names = []
+        texts = []
         for svc_cv in svccv_list:
             for name in svc_cv.names():
                 if name not in self.names:
                     doc = svc_cv.getmd(name)
-                    self.add(name, doc)
+                    names.append(name)
+                    texts.append(doc)
                     added = True
         if added:
+            self.add_documents(names, texts)
             self.save()
         return added
 
@@ -67,37 +71,6 @@ class LSImodel(object):
                 name, doc = data
                 names.append(name)
                 texts.append(doc)
-        if len(names) > 5:
-            self.setup(names, texts)
-            return True
-        return False
-
-    def build_from_names(self, svccv_list, names):
-        texts = []
-        if len(names) < 6:
-            return False
-        for name in names:
-            for svc_cv in svccv_list:
-                if svc_cv.exists(name):
-                    doc = svc_cv.getmd(name)
-                    texts.append(doc)
-                    break
-            else:
-                raise Exception("Not exists name: " + name)
-        self.setup(names, texts)
-        return True
-
-    def build_from_words(self, svccv_list, words):
-        names = []
-        texts = []
-        for svc_cv in svccv_list:
-            for data in svc_cv.datas():
-                name, doc = data
-                for word in words:
-                    if word in doc:
-                        names.append(name)
-                        texts.append(doc)
-                        break
         if len(names) > 5:
             self.setup(names, texts)
             return True
@@ -124,12 +97,19 @@ class LSImodel(object):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
             ujson.dump(self.names, f)
-        with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-            ujson.dump(self.corpus, f)
-        with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
-            ujson.dump(self.texts, f)
+        if self.corpus:
+            with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
+                ujson.dump(self.corpus, f)
+        if self.texts:
+            with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
+                ujson.dump(self.texts, f)
         self.lsi.save(os.path.join(self.path, self.model_save_name))
         self.dictionary.save(os.path.join(self.path, self.corpu_dict_save_name))
+        self.clear()
+
+    def clear(self):
+        self.corpus = None
+        self.texts = None
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
@@ -138,20 +118,22 @@ class LSImodel(object):
         self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
                                                              self.corpu_dict_save_name))
 
-    def add(self, name, document):
-        text = self.slicer(document, id=name)
-        self.names.append(name)
-        self.texts.append(text)
-        if self.dictionary is None:
-            self.set_dictionary()
-        corpu = self.dictionary.doc2bow(text)
-        self.corpus.append(corpu)
-        tfidf = models.TfidfModel(self.corpus)
-        corpu_tfidf = tfidf[[corpu]]
+    def add_documents(self, names, documents):
+        assert len(names) == len(documents)
         if self.lsi is None:
-            self.lsi = models.LsiModel(corpu_tfidf, id2word=self.dictionary,
-                            num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
+            self.setup(names, documents)
         else:
+            corpus = list()
+            corpu_tfidf = list()
+            for name, document in zip(names, documents):
+                text = self.slicer(document, id=name)
+                corpu = self.lsi.id2word.doc2bow(text)
+                corpus.append(corpu)
+            self.names.extend(names)
+            self.corpus.extend(corpus)
+            self.texts.extend(documents)
+            self.set_tfidf()
+            corpu_tfidf = self.tfidf[corpus]
             self.lsi.add_documents(corpu_tfidf)
 
     def set_dictionary(self):
@@ -278,7 +260,8 @@ class LSImodel(object):
 
     def set_lsimodel(self):
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
-                                   num_topics=self.topics, power_iters=self.power_iters, extra_samples=self.extra_samples)
+                                   num_topics=self.topics, power_iters=self.power_iters,
+                                   extra_samples=self.extra_samples)
 
     def probability(self, doc):
         u"""
@@ -377,7 +360,7 @@ class LSImodel(object):
             >>> assert not u'英文' in mapping_topic_words(jd['text'], model) #FIXME
         """
         texts = self.slicer(doc)
-        vec_bow = self.dictionary.doc2bow(texts)
+        vec_bow = self.lsi.id2word.doc2bow(texts)
         vec_lsi = self.lsi[vec_bow]
         return vec_lsi
 

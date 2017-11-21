@@ -3,10 +3,10 @@ import React, { Component, PropTypes } from 'react';
 
 import { Button, Modal } from 'antd';
 
-import Charts from '../Charts';
+import Charts from 'Charts';
 
-import Storage from '../../../utils/storage';
-import Generator from '../../../utils/generator';
+import Storage from 'utils/storage';
+import Generator from 'utils/generator';
 
 import 'whatwg-fetch';
 
@@ -149,4 +149,4 @@ export default class Position extends Component {
       </div>
     );
   }
-}``
+}

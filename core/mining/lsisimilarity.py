@@ -2,6 +2,7 @@
 import os
 import ujson
 
+import core.outputstorage
 from gensim import similarities
 
 
@@ -9,26 +10,28 @@ class LSIsimilarity(object):
 
     names_save_name = 'lsi.names'
     matrix_save_name = 'lsi.matrix'
-    corpus_save_name = 'lsi.corpus'
 
-    def __init__(self, savepath, lsi_model):
+    def __init__(self, name, savepath, lsi_model):
+        self.name = name
         self.path = savepath
         self.names = []
-        self._corpus = []
 
         self.lsi_model = lsi_model
         self.index = None
 
-    def update(self, svccv_list):
+    def update(self, svccv_list, newmodel=False):
         added = False
+        names = []
+        documents = []
         for svc_cv in svccv_list:
-            for name in svc_cv.names():
-                if name not in self.names:
-                    doc = svc_cv.getmd(name)
-                    self.add(name, doc)
-                    added = True
-        self.set_index()
-        return added
+            for name in set(svc_cv.names()).difference(set(self.names)):
+                doc = svc_cv.getmd(name)
+                names.append(name)
+                documents.append(doc)
+                added = True
+        if added or newmodel:
+            self.add_documents(names, documents)
+        return added or newmodel
 
     def build(self, svccv_list):
         names = []
@@ -37,27 +40,25 @@ class LSIsimilarity(object):
             for data in svc_cv.datas():
                 name, doc = data
                 names.append(name)
+                documents.append(doc)
                 words = self.lsi_model.slicer(doc, id=name)
-                corpus.append(self.lsi_model.dictionary.doc2bow(words))
+                corpus.append(self.lsi_model.lsi.id2word.doc2bow(words))
         self.setup(names, corpus)
 
     def setup(self, names, corpus):
         self.names = names
-        self.set_corpus(corpus)
-        self.set_index()
+        self.set_index(corpus)
 
     def save(self):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
             ujson.dump(self.names, f)
-        with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-            ujson.dump(self.corpus, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
-        self.clear()
 
-    def clear(self):
-        self.corpus = None
+    def exists(self, name):
+        mdname = core.outputstorage.ConvertName(name).md
+        return mdname in self.names
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
@@ -65,33 +66,27 @@ class LSIsimilarity(object):
         self.index = similarities.Similarity.load(os.path.join(self.path,
                                                   self.matrix_save_name))
 
-    def add(self, name, document):
-        assert(self.lsi_model.dictionary)
-        text = self.lsi_model.slicer(document, id=name)
-        self.names.append(name)
-        corpu = self.lsi_model.dictionary.doc2bow(text)
-        self.corpus.append(corpu)
-
     def add_documents(self, names, documents):
-        assert(self.lsi_model.dictionary)
+        assert(self.lsi_model.lsi.id2word)
         assert len(names) == len(documents)
+        corpus = list()
         for name, document in zip(names, documents):
+            if name in self.names:
+                 continue
             text = self.lsi_model.slicer(document, id=name)
-            self.names.append(name)
-            corpu = self.lsi_model.dictionary.doc2bow(text)
-            self.corpus.append(corpu)
-        self.set_index()
+            corpu = self.lsi_model.lsi.id2word.doc2bow(text)
+            corpus.append(corpu)
+        self.names.extend(names)
+        self.index.add_documents(self.lsi_model.lsi[corpus])
 
-    def set_corpus(self, corpus):
-        self.corpus = corpus
-
-    def set_index(self):
+    def set_index(self, corpus):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
-                                             self.lsi_model.lsi[self.corpus], self.lsi_model.topics)
+                                             self.lsi_model.lsi[corpus],
+                                             self.lsi_model.topics)
 
-    def probability(self, doc, top=None):
+    def probability(self, doc, top=None, minimum=0):
         """
             >>> from tests.test_model import *
             >>> from webapp.settings import *
@@ -173,13 +168,15 @@ class LSIsimilarity(object):
         """
         if top is None:
             top = len(self.index)
+        elif top < 1:
+            top = int(len(self.index)*top)
+        top = top if top > minimum else minimum
         results = []
+        self.num_best = top
         vec_lsi = self.lsi_model.probability(doc)
-        try:
-            sims = sorted(enumerate(abs(self.index[vec_lsi])), key=lambda item: item[1], reverse=True)
-        except IndexError:
-            return results
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), sims[0:top])
+        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])),
+                                self.index[vec_lsi])
+        self.num_best = None
         return results
 
     def probability_by_id(self, doc, id):
@@ -188,19 +185,12 @@ class LSIsimilarity(object):
         index = self.names.index(id)
         vec_lsi = self.lsi_model.probability(doc)
         result = abs(self.index[vec_lsi][index])
-        return (id, str(result))
+        return (os.path.splitext(id)[0], str(result))
 
     @property
-    def corpus(self):
-        corpus_path = os.path.join(self.path, self.corpus_save_name)
-        if os.path.exists(corpus_path) and not self._corpus:
-            with open(corpus_path, 'r') as f:
-                try:
-                    self._corpus = ujson.load(f)
-                except ValueError:
-                    self._corpus = []
-        return self._corpus
+    def num_best(self):
+        return self.index.num_best
 
-    @corpus.setter
-    def corpus(self, value):
-        self._corpus = value
+    @num_best.setter
+    def num_best(self, value):
+        self.index.num_best = value

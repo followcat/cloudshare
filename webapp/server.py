@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
+
 import flask
+import flask.ext.cache
 import flask.ext.session
 import jinja2.ext
+import flask_compress
 
 import ext.views
 import webapp.restful.initializtion
@@ -11,15 +14,20 @@ import webapp.restful.initializtion
 import webapp.jsonencoder
 
 app = flask.Flask(__name__, template_folder="templates_dist")
+flask_compress.Compress(app)
 app.config.from_object('webapp.settings')
 app.json_encoder = webapp.jsonencoder.CustomJSONEncoder
 app.jinja_env.add_extension(jinja2.ext.loopcontrols)
+
+ext.views.init_login(app)
 ext.views.configure(app)
 
 app.secret_key = 'super secret key'
 app.config['SESSION_TYPE'] = 'filesystem'
 sess = flask.ext.session.Session()
 sess.init_app(app)
+app.config['CACHE_TYPE'] = 'simple'
+app.cache = flask.ext.cache.Cache(app)
 webapp.restful.initializtion.initialize(app)
 
 @app.route("/download/<path:filename>")

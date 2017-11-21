@@ -1,6 +1,6 @@
 'use strict';
-import StorageUtil from '../utils/storage';
-import { API } from '../config/api';
+import StorageUtil from 'utils/storage';
+import { API } from 'config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
@@ -23,6 +23,11 @@ export const getBookmark = (callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
+/**
+ * 添加简历到书签
+ * @param {object} params 简历Id
+ * @param {*} callback    回调方法
+ */
 export const addBookmark = (params, callback) => {
   return fetch(BOOKMARK_API, {
     method: 'POST',

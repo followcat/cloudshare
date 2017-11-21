@@ -1,6 +1,11 @@
-import services.index
-from baseapp.multicv import SVC_MULT_CV
+import baseapp.loader
 
 
-SVC_INDEX = services.index.ReverseIndexing('Index', SVC_MULT_CV)
-SVC_INDEX.setup()
+#from baseapp.datadbs import SVC_CLS_CV
+#from baseapp.member import SVC_MEMBERS
+#SVC_INDEX = baseapp.loader.load_index(SVC_MEMBERS, SVC_CLS_CV)
+
+import baseapp.searchengine
+from baseapp.datadbs import SVC_CV_REPO, SVC_CV_STO, SVC_CV_INDIV
+SVC_INDEX = baseapp.loader.load_esindex(baseapp.searchengine.ES,
+                                        [SVC_CV_REPO, SVC_CV_STO, SVC_CV_INDIV])

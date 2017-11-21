@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import math
 
 import core.basedata
 import core.mining.lsimodel
@@ -177,18 +178,12 @@ class Mining(object):
 
     SIMS_PATH = 'all'
 
-    def __init__(self, path, cvsvc, slicer=None):
+    def __init__(self, path, members, classifycvs, slicer=None):
         self.sim = {}
         self.path = path
         self.lsi_model = dict()
-        self.projects = cvsvc.projects
-        self.additionals = cvsvc.additionals
-        self.services = {'default': cvsvc.projectscv,
-                         'classify': dict(),
-                         'all': dict()}
-        self.services['all'].update(cvsvc.projectscv)
-        self.services['all'].update(cvsvc.additionals)
-        self.services['classify'].update(cvsvc.additionals)
+        self.members = members
+        self.additionals = classifycvs
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
@@ -197,112 +192,24 @@ class Mining(object):
             self.slicer = slicer
         self.make_lsi()
 
-    def setup(self, modelnames=None):
-        assert self.lsi_model
-        if modelnames is None:
-            modelnames = self.lsi_model
-        for modelname in modelnames:
-            lsimodel = self.lsi_model[modelname]
-            if not lsimodel.names:
-                continue
-            model = self.lsi_model[modelname]
-            save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
-            self.sim[modelname] = dict()
-            service_names = [modelname] + self.projects[modelname].getclassify()
-            for svc_name in service_names:
-                svc = self.services['all'][svc_name]
-                industrypath = industrytopath(svc_name)
-                index = core.mining.lsisimilarity.LSIsimilarity(os.path.join(save_path,
-                                                                industrypath), model)
-                try:
-                    index.load()
-                except IOError:
-                    index.build([svc])
-                    index.save()
-                self.sim[modelname][svc_name] = index
+    @property
+    def projects(self):
+        return self.members.allprojects()
 
-    def make_lsi(self):
-        self.lsi_model = dict()
-        for project in self.projects.values():
-            service = project.curriculumvitae
-            lsi_path = os.path.join(self.path, project.name, 'model')
-            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer,
-                                                no_above=1./3, config=project.config)
-            try:
-                lsi.load()
-            except IOError:
-                if lsi.getconfig('autosetup') is True:
-                    if lsi.build([service]):
-                        lsi.save()
-            self.lsi_model[project.name] = lsi
-
-    def update_model(self):
-        for modelname in self.lsi_model:
-            lsimodel = self.lsi_model[modelname]
-            if lsimodel.getconfig('autoupdate') is True:
-                updated = self.lsi_model[modelname].update(
-                    [self.services['default'][modelname]])
-                if updated:
-                    self.update_sims()
-
-    def update_sims(self):
-        for modelname in self.sim:
-            for simname in self.sim[modelname]:
-                svc = self.services['all'][simname]
-                self.sim[modelname][simname].update([svc])
-                self.sim[modelname][simname].save()
-
-    def probability(self, basemodel, doc, uses=None, top=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
-        result = []
-        for name in uses:
-            sim = self.sim[basemodel][name]
-            result.extend(sim.probability(doc, top=top))
-        results_set = set(result)
-        return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
-
-    def probability_by_id(self, basemodel, doc, id, uses=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
-        result = tuple()
-        for dbname in uses:
-            sim = self.sim[basemodel][dbname]
-            probability = sim.probability_by_id(doc, id)
-            if probability is not None:
-                result = probability
-                break
+    @property
+    def projectscv(self):
+        return dict([(project.id, project.curriculumvitae)
+                     for project in self.projects.values()])
+    
+    @property
+    def services(self):
+        result = {'default': self.projectscv,
+                  'classify': dict(),
+                  'all': dict()}
+        result['all'].update(self.projectscv)
+        result['all'].update(self.additionals)
+        result['classify'].update(self.additionals)
         return result
-
-    def lenght(self, basemodel, uses=None):
-        if uses is None:
-            uses = self.sim[basemodel].keys()
-        result = 0
-        for name in uses:
-            sim = self.sim[basemodel][name]
-            result += len(sim.names)
-        return result
-
-    def minetop(self, doc, basemodel, top=None, uses=None):
-        results = self.probability(basemodel, doc, uses=uses)
-        if top is None:
-            top = len(results)
-        return results[:top]
-
-    def minelist(self, doc, lists, basemodel, uses=None):
-        return map(lambda x: self.probability_by_id(basemodel, doc, x, uses=uses), lists)
-
-    def minelistrank(self, doc, lists, basemodel, uses=None):
-        probalist = set(self.probability(basemodel, doc, uses=uses))
-        probalist.update(set(lists))
-        ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
-        return map(lambda x: (x[0], ranklist.index(x)), lists)
-
-    def default_names(self):
-        return [name for name in self.services['default']]
-
-    def addition_names(self):
-        return [name for name in self.additionals]
 
     @property
     def SIMS(self):
@@ -311,3 +218,159 @@ class Mining(object):
             for simname in self.sim[modelname]:
                 results.append(self.sim[modelname][simname])
         return results
+
+    def setup(self, members=None):
+        assert self.lsi_model
+        if members is None:
+            members = self.members.members.values()
+        for member in members:
+            member_projects = member.projects.keys()
+            for project in member.projects.values():
+                modelname = project.modelname
+                model = self.lsi_model[modelname]
+                if not model.names:
+                    continue
+                if modelname not in self.sim:
+                    self.sim[modelname] = dict()
+                svccv_names = member_projects + self.projects[modelname].getclassify()
+                for svc_name in svccv_names:
+                    if svc_name in self.sim[modelname]:
+                        continue
+                    self.make_sim(modelname, svc_name)
+
+    def make_sim(self, modelname, svc_name):
+        model = self.lsi_model[modelname]
+        save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
+        svc = self.services['all'][svc_name]
+        industrypath = industrytopath(svc_name)
+        index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
+                                                        os.path.join(save_path,
+                                                        industrypath), model)
+        try:
+            index.load()
+        except IOError:
+            index.build([svc])
+            index.save()
+        self.sim[modelname][svc_name] = index
+
+    def getsims(self, basemodel, uses=None):
+        sims = []
+        if uses is None:
+            try:
+                uses = self.sim[basemodel].keys()
+            except KeyError:
+                return sims
+        for each in uses:
+            try:
+                sim = self.sim[basemodel][each]
+            except KeyError:
+                continue
+            sims.append(sim)
+        return sims
+
+    def make_lsi(self):
+        self.lsi_model = dict()
+        for project in self.projects.values():
+            if project.modelname in self.lsi_model:
+                continue
+            service = project.curriculumvitae
+            lsi_path = os.path.join(self.path, project.modelname, 'model')
+            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer,
+                                                no_above=1./3, config=project.config)
+            try:
+                lsi.load()
+            except IOError:
+                if lsi.getconfig('autosetup') is True:
+                    if lsi.build([service]):
+                        lsi.save()
+            self.lsi_model[project.modelname] = lsi
+
+    def update_model(self):
+        for modelname in self.lsi_model:
+            lsimodel = self.lsi_model[modelname]
+            if lsimodel.getconfig('autoupdate') is True:
+                updated = self.lsi_model[modelname].update(
+                    [self.services['default'][modelname]])
+                self.update_sims([modelname], newmodel=updated)
+
+    def update_sims(self, modelnames=None, newmodel=False):
+        if modelnames is None:
+            modelnames = self.sim.keys()
+        for modelname in modelnames:
+            for simname in self.sim[modelname]:
+                svc = self.services['all'][simname]
+                updated = self.sim[modelname][simname].update([svc], newmodel)
+                if newmodel or updated:
+                    self.sim[modelname][simname].save()
+
+    def update_project_sims(self, newmodel=False):
+        for modelname in self.sim:
+            for projectname in self.projects:
+                if (projectname in self.sim[modelname] and
+                    len(self.projects[projectname].curriculumvitae.ids) !=
+                    len(self.sim[modelname][projectname].names)):
+                    svc = self.services['all'][projectname]
+                    updated = self.sim[modelname][projectname].update([svc], newmodel)
+                    if newmodel or updated:
+                        self.sim[modelname][projectname].save()
+
+    def probability(self, basemodel, doc, uses=None, top=None, minimum=None):
+        result = []
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
+            result.extend(sim.probability(doc, top=top, minimum=minimum))
+        results_set = set(result)
+        return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
+
+    def probability_by_id(self, basemodel, doc, id, uses=None):
+        result = tuple()
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
+            probability = sim.probability_by_id(doc, id)
+            if probability is not None:
+                result = probability
+                break
+        return result
+
+    def idsims(self, modelname, ids):
+        results = list()
+        for id in ids:
+            for sim in self.sim[modelname].values():
+                if id in sim.names:
+                    results.append(sim.name)
+                    break
+        return results
+
+    def minetop(self, doc, basemodel, top=None, uses=None):
+        results = self.probability(basemodel, doc, top=top, uses=uses)
+        return results
+
+    def minelist(self, doc, lists, basemodel, uses=None):
+        result = list()
+        for name in lists:
+            uses = list()
+            for sim in self.sim[basemodel].values():
+                if sim.exists(name):
+                    uses.append(sim.name)
+                    break
+            result.append(self.probability_by_id(basemodel, doc, name, uses=uses))
+        return result
+
+    def minelistrank(self, doc, lists, basemodel, uses=None, top=None, minimum=None):
+        if uses is None:
+            uses = list()
+            for name, value in lists:
+                for sim in self.sim[basemodel].values():
+                    if sim.exists(name):
+                        uses.append(sim.name)
+        probalist = set(self.probability(basemodel, doc, uses=uses,
+                                         top=top, minimum=minimum))
+        probalist.update(set(lists))
+        ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
+        return len(ranklist), map(lambda x: (x[0], ranklist.index(x)), lists)
+
+    def default_names(self):
+        return [name for name in self.services['default']]
+
+    def addition_names(self):
+        return [name for name in self.additionals]

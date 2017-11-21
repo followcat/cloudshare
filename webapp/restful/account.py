@@ -2,23 +2,98 @@ import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
-import services
-import json
-import utils.builtin
 
-class AccountAPI(Resource):
-    """
-        Accout RESTful API
+import services.exception
+import webapp.restful.captchaverify
 
-        PUT     str id
-                {'oldpassword': str, 'newpassword': str}
-                Modify password.
-        POST    str id
-                {'password': str}
-                Add new account, need root.
-        DELETE  str id
-                Delete account.
-    """
+class UserAPI(Resource):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(UserAPI, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('email', type = str, required = True,
+                                   help = 'No email provided', location = 'json')
+        self.reqparse.add_argument('phone', type = str, required = True,
+                                   help = 'No phone provided', location = 'json')
+
+    def get(self):
+        user = flask.ext.login.current_user
+        return { 'code': 200, 'result': user.info }
+
+    def put(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        phone = args['phone']
+        email = args['email']
+        result = user.updateinfo({'phone': phone, 'email': email})
+        return { 'code': 200, 'result': result }
+
+
+class ExistsEmailAPI(Resource):
+
+    def __init__(self):
+        super(ExistsEmailAPI, self).__init__()
+        self.svc_account = flask.current_app.config['SVC_ACCOUNT']
+
+    def get(self, email):
+        result = email in self.svc_account.EMAILS
+        return { 'code': 200, 'result': result}
+
+
+class ExistsPhoneAPI(Resource):
+
+    def __init__(self):
+        super(ExistsPhoneAPI, self).__init__()
+        self.svc_account = flask.current_app.config['SVC_ACCOUNT']
+
+    def get(self, phone):
+        result = phone in self.svc_account.PHONES
+        return { 'code': 200, 'result': result}
+
+
+class AccountAPI(webapp.restful.captchaverify.SMSAPI):
+
+    def __init__(self):
+        super(AccountAPI, self).__init__()
+        self.svc_msg = flask.current_app.config['SVC_MSG']
+        self.svc_account = flask.current_app.config['SVC_ACCOUNT']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('password', type = str,
+                                   help = 'No password provided', location = 'json')
+        self.reqparse.add_argument('email', type = str, required = True,
+                                   help = 'No email provided', location = 'json')
+        self.reqparse.add_argument('phone', type = str, required = True,
+                                   help = 'No phone provided', location = 'json')
+        self.reqparse.add_argument('smscode', type = str, required = True, location = 'json')
+
+    def get(self, name):
+        result = name in self.svc_account.USERS
+        return { 'code': 200, 'result': result}
+
+    def post(self, name):
+        args = self.reqparse.parse_args()
+        phone = args['phone']
+        email = args['email']
+        smscode = args['smscode']
+        password = args['password']
+        cachecode = self.getcache(flask.session.sid, self.prefix)
+        result = { 'code': 400, 'message': 'SMS code verify failed.'}
+        if cachecode is not None and smscode.lower() == cachecode.lower():
+            result = { 'code': 400, 'message': 'This username is existed.'}
+            bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
+            addresult = self.svc_account.add(bsobj, password)
+            if addresult is True:
+                msgobj = self.svc_msg.baseobj({'id': bsobj.ID.base})
+                msgresult = self.svc_msg.add(msgobj, committer=name)
+                if msgresult:
+                    self.deletecache(flask.session.sid, self.prefix)
+                result = { 'code': 200, 'message': 'Create user successed.','redirect_url': '/'}
+        return result
+
+
+class PasswordAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
 
@@ -27,47 +102,22 @@ class AccountAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('oldpassword', type = str, location = 'json')
         self.reqparse.add_argument('newpassword', type = str, location = 'json')
-        super(AccountAPI, self).__init__()
+        super(PasswordAPI, self).__init__()
 
-    def put(self, id):
-        result = False
-        info = ''
+    def put(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        if 'oldpassword' not in args or 'newpassword' not in args:
-            result = { 'code': 400, 'message': 'Change password failed.', 'error': 'Request arguments error.' }
-        else:
+        result = { 'code': 400, 'message': 'Change password failed.',
+                   'error': 'Request arguments error.' }
+        if 'oldpassword' in args and 'newpassword' in args:
             oldpassword = args['oldpassword']
             newpassword = args['newpassword']
-        md5newpwd = utils.builtin.md5(oldpassword)
-        user = flask.ext.login.current_user
-        try:
-            if(user.password == md5newpwd):
-                user.changepassword(newpassword)
+            changeresult = user.changepassword(oldpassword, newpassword)
+            if changeresult is True:
                 result = { 'code': 200, 'message': 'Change password successed.' }
             else:
                 result = { 'code': 400, 'message': 'Old password validation errors.' }
-        except services.exception.ExistsUser:
-            pass
         return  result
-
-    def post(self, id):
-        result = False
-        args = self.reqparse.parse_args()
-        password = args['password']
-        user = flask.ext.login.current_user
-        try:
-            result = self.svc_account.add(user.id, id, password)
-        except services.exception.ExistsUser:
-            pass
-        return { 'data': result }
-
-    def delete(self, id):
-        root_user = flask.ext.login.current_user
-        if self.svc_account.delete(root_user.id, id):
-            result = { 'code': 200, 'message': 'Delete ' + id + ' successed.' }
-        else:
-            result = { 'code': 400, 'message': 'Deleted ' + id + ' failed.' }
-        return result
 
 
 class AccountListAPI(Resource):
@@ -77,34 +127,19 @@ class AccountListAPI(Resource):
         GET    Get Account List.
     """
 
-    decorators = [flask.ext.login.login_required]
-
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.svc_account = flask.current_app.config['SVC_ACCOUNT']
         super(AccountListAPI, self).__init__()
-        self.reqparse.add_argument('name', type = str, required = True,
+        self.reqparse.add_argument('name', type = unicode, required = True,
                                    help = 'No name provided', location = 'json')
         self.reqparse.add_argument('password', type = str, required = True,
                                    help = 'No password provided', location = 'json')
 
+    @flask.ext.login.login_required
     def get(self):
         userlist = self.svc_account.get_user_list()
         return { 'code': 200, 'data': userlist }
-
-    def post(self):
-        args = self.reqparse.parse_args()
-        name = args['name']
-        password = args['password']
-        root_user = flask.ext.login.current_user
-        try:
-            if self.svc_account.add(root_user.id, name, password):
-                result = { 'code': 200, 'message': 'Create user successed.'}
-            else:
-                result = { 'code': 400, 'message': 'The currently logged in user does not have permissions.'}
-        except services.exception.ExistsUser:
-            result = { 'code': 400, 'message': 'This username is existed.'}
-        return result
 
 
 class AccountHistoryAPI(Resource):
@@ -116,16 +151,17 @@ class AccountHistoryAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(AccountHistoryAPI, self).__init__()
 
     def get(self, project):
         user = flask.ext.login.current_user
-        info_list = self.svc_mult_cv.getproject(project).cv_history(user.id, entries=10)
+        member = user.getmember(self.svc_members)
+        info_list = member.getproject(project).cv_history(user.name, entries=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:
-                    info['information'] = self.svc_mult_cv.getyaml(md5)
+                    info['information'] = member.getproject(project).cv_getyaml(id)
                 except IOError:
                     info['information'] = md5
                 info['name'] = md5

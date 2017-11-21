@@ -14,43 +14,75 @@ class SimulationCO(services.base.simulation.Simulation,
         ("relatedcompany",     list),
         ("position",           list),
         ("clientcontact",      list),
-        ("caller",             list),
         ("progress",           list),
         ("updatednumber",      list),
+        ("reminder",           list),
+        ("priority",           int),
+        ("responsible",        str),
     )
 
     list_item = {"relatedcompany", "position", "clientcontact",
-                 "caller", "progress", "updatednumber"}
+                 "progress", "updatednumber", "reminder"}
     fix_item  = {"id", "name"}
     customers_file = 'customers.json'
 
-    def __init__(self, path, name, costorage, iotype='git'):
-        super(SimulationCO, self).__init__(path, name, costorage, iotype)
+    def __init__(self, path, name, storages, iotype='git'):
+        super(SimulationCO, self).__init__(path, name, storages, iotype=iotype)
         self._customers = None
 
+    def _templateinfo(self, committer):
+        info = super(SimulationCO, self)._templateinfo(committer)
+        info['responsible'] = committer
+        return info
+
+    def update_info(self, id, info, committer):
+        bas_res = False
+        prj_res = False
+        baseinfo = dict()
+        projectinfo = dict()
+        for item in info:
+            if item in dict(self.YAML_TEMPLATE):
+                projectinfo[item] = info[item]
+            else:
+                baseinfo[item] = info[item]
+        prj_res = self.saveinfo(id, projectinfo,
+                                "Update %s information."%id, committer)
+        for storage in self.storages:
+            if storage.exists(id):
+                bas_res = storage.saveinfo(id, baseinfo,
+                                           "Update %s information."%id, committer)
+                break
+        return prj_res or bas_res
+
     def compare_excel(self, stream, committer):
-        datas = list()
         output = list()
         excels = utils.companyexcel.convert(stream)
         for excel in excels:
-            metadata = extractor.information_explorer.catch_coinfo(excel, excel['name'])
+            metadata = extractor.information_explorer.catch_coinfo(excel)
             data = core.basedata.DataObject(metadata, excel)
-            datas.append(data)
-        for key in self.list_item:
-            for excel in excels:
-                id = extractor.unique_id.company_id(excel['name'])
-                caller = committer
-                existvalues = list()
-                if self.exists(id):
-                    info = self.getyaml(id)
-                    if excel['caller']:
-                        caller = excel['caller'][0]
-                    existvalues = [v['content'] for v in info[key]]
-                for value in excel[key]:
-                    if value in existvalues:
-                        continue
-                    existvalues.append(value)
-                    output.append(('followup', (id, key, value, caller)))
+            id = data.name
+            responsible = excel['responsible'] if excel['responsible'] else committer
+            if not self.exists(id):
+                for item in self.list_item:
+                    if item in metadata:
+                        metadata.pop(item)
+                output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
+            else:
+                info = self.getyaml(id)
+            for key in dict(self.YAML_TEMPLATE):
+                if dict(self.YAML_TEMPLATE)[key] == list:
+                    existvalues = [v['content'] for v in info[key]]\
+                                    if self.exists(id) else list()
+                    if key in excel:
+                        for value in excel[key]:
+                            if value in existvalues:
+                                continue
+                            existvalues.append(value)
+                            output.append(('listadd', id, (id, key, value, responsible)))
+                else:
+                    if not self.exists(id) or info[key] != excel[key]:
+                        output.append(('listadd', id,
+                                       (id, key, excel[key], responsible)))
         return output
 
     def addcustomer(self, id, user, do_commit=True):
@@ -86,6 +118,5 @@ class SimulationCO(services.base.simulation.Simulation,
             except IOError:
                 self._customers = set()
                 self.interface.add(self.customers_file,
-                                   ujson.dumps(ujson.dumps(sorted(self._customers),
-                                                           indent=4)))
+                                   ujson.dumps(sorted(self._customers), indent=4))
         return self._customers

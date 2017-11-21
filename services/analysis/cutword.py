@@ -9,6 +9,9 @@ class Cutword(services.base.storage.BaseStorage):
 
     commitinfo = 'Cutword'
 
+    def unique(self, docobj):
+        return not self.exists(docobj.name)
+
     def datas(self):
         for id in self.ids:
             yield id, self.getyaml(id)
@@ -24,7 +27,7 @@ class Cutword(services.base.storage.BaseStorage):
 
     def add(self, docobj, committer=None, unique=True, yamlfile=True):
         name = core.outputstorage.ConvertName(docobj.name)
-        if unique is True and self.unique(docobj.name) is not True:
+        if unique is True and self.unique(docobj) is False:
             return False
         message = "Add %s: %s metadata." % (self.commitinfo, name)
         self.interface.add(name.yaml, ujson.dumps(docobj.metadata,

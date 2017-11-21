@@ -10,9 +10,9 @@ class People(services.base.storage.BaseStorage):
 
     commitinfo = 'People'
 
-    def __init__(self, path, storages, iotype):
-        super(People, self).__init__(path, iotype=iotype)
-        self.storages = storages
+    def __init__(self, storage, path, name=None, searchengine=None, iotype=None):
+        self.storage = storage
+        super(People, self).__init__(path, name=name, searchengine=None, iotype=iotype)
 
     def exists(self, id):
         id_yaml = core.outputstorage.ConvertName(id).yaml
@@ -21,22 +21,18 @@ class People(services.base.storage.BaseStorage):
     def getmd(self, id):
         info = self.getyaml(id)
         for id in info['cv']:
-            for sto in self.storages:
-                if sto.exists(id):
-                    yield sto.getmd(id)
-                    break
+            if self.storage.exists(id):
+                yield self.storage.getmd(id)
 
     def getinfo(self, id):
         info = self.getyaml(id)
         for id in info['cv']:
-            for sto in self.storages:
-                if sto.exists(id):
-                    yield sto.getyaml(id)
-                    break
+            if self.storage.exists(id):
+                yield self.storage.getyaml(id)
 
     def add(self, peopobj, committer=None, unique=True, yamlfile=True, do_commit=True):
         name = core.outputstorage.ConvertName(peopobj.name)
-        if unique is True and self.unique(peopobj.name) is not True:
+        if unique is True and self.unique(peopobj) is False:
             savedobj = self.getyaml(name)
             if peopobj.metadata['cv'][0] in savedobj['cv']:
                 return False

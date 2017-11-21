@@ -1,6 +1,7 @@
+@siderPanelMaskPrefixCls: sider-panel-mask;
 @borderRadiusWidth: 6px;
 
-.sider-panel-mask {
+.@{siderPanelMaskPrefixCls} {
   position: fixed;
   top: 0;
   right: 0;
@@ -22,6 +23,12 @@
   z-index: 999;
   color: #666;
   outline: none;
+
+  .sider-panel-header {
+    padding-bottom: 24px;
+    font-size: 24px;
+    font-weight: bold;
+  }
 
   .close {
     position: absolute;
@@ -48,11 +55,7 @@
   border-bottom-left-radius: @borderRadiusWidth;
 }
 
-.sider-panel-header {
-  padding-bottom: 24px;
-  font-size: 24px;
-  font-weight: bold;
-}
+
 
 .mask-enter {
   opacity: 0;

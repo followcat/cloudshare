@@ -6,7 +6,7 @@ import { Row, Col, Card, Checkbox, Button } from 'antd';
 import WorkExperience from './WorkExperience';
 import EducationExperience from './EducationExperience';
 
-import { generateWorkExperience } from '../../../utils/summary-generator';
+import { generateWorkExperience } from 'utils/summary-generator';
 
 export default class SearchResultItem extends Component {
 
@@ -29,7 +29,7 @@ export default class SearchResultItem extends Component {
   renderNameText() {
     const name = this.props.yaml_info.name ? this.props.yaml_info.name : this.props.yaml_info.id,
           origin = this.props.yaml_info.origin ? ' - ' + this.props.yaml_info.origin : '';
-    return name + origin;
+    return name ;
   }
 
   render() {

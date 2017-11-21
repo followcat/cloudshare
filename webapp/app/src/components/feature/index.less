@@ -1,5 +1,6 @@
 @import '../default.less';
 @featurePrefixCls: cs-feature;
+@featureWrapPrefixCls: cs-feature-wrap;
 @featureWidth: 100px;
 @textColor: #FFF;
 
@@ -7,7 +8,6 @@
   width: @featureWidth;
   height: inherit;
   line-height: inherit;
-  background-color: @backgroundColor;
   text-align: center;
   cursor: pointer;
 
@@ -21,17 +21,19 @@
   }
 }
 
-.ant-modal-body {
-  max-height: 460px;
-  overflow-y: scroll;
-}
+.@{featureWrapPrefixCls} {
+  .ant-modal-body {
+    max-height: 460px;
+    overflow-y: scroll;
+  }
 
-.vertical-center-modal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .vertical-center-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.vertical-center-modal .ant-modal {
-  top: 0;
+  .vertical-center-modal .ant-modal {
+    top: 0;
+  }
 }

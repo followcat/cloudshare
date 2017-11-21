@@ -7,11 +7,23 @@ export const URL = {
   },
 
   getFastMatchingByCV: (id) => {
-    return `/fastmatching?cv_id=${id}`
+    return `/fastmatching?cv_id=${id}`;
   },
 
   getFastMatchingByDoc: () => {
-    return `/fastmatching`
+    return `/fastmatching`;
+  },
+
+  getDocMining: () => {
+    return `/docmining`;
+  },
+
+  getCVDocMining: () => {
+    return `/cvdocmining`;
+  },
+
+  getCVsDocMining: () => {
+    return `/cvsdocmining`;
   },
 
   getListJDURL: () => {
@@ -35,7 +47,7 @@ export const URL = {
   },
 
   getUserInfoURL: () => {
-    return `/userinfo`;
+    return `/userinfo/history`;
   },
 
   getDownloadURL: (id, fileName) => {
@@ -43,7 +55,40 @@ export const URL = {
   },
 
   getProjectManagement: () => {
-    return `/pm`;
+    return `/pm/jobdescription`;
   },
 
+  getBestExcellent: () => {
+    return `/excellent`;
+  },
+  getProjectList: () => {
+    return `/pm/projectlist`;
+  },
+  getNotcieURL: () => {
+    return `/notice`;
+  },
+  getInvitedMessageURL: () => {
+    return `/notice/invitedmessage`;
+  },
+  getInviterMessageURL: () => {
+    return `/notice/invitermessage`;
+  },
+  getUnreadMessageURL: () => {
+    return `/notice/unreadmessage`;
+  },
+  getProcessedMessageURL: () => {
+    return `/notice/processedmessage`;
+  },
+  getReadMessageURL: () => {
+    return `/notice/readmessage`;
+  },
+  getSentMessageURL: () => {
+    return `/notice/sentmessage`;
+  },
+  getBecomeMember: () => {
+    return `/becomemember`;
+  },
+  getManagement: () => {
+    return `/management`;
+  },
 };

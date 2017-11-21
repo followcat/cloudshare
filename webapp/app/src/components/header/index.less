@@ -1,17 +1,16 @@
 @import '../default.less';
 @headerPrefixCls: cs-header;
-@boxShadow: 0 2px 3px #99bddb;
+@boxShadow: 0 0px 0px #99bddb;
 
 .@{headerPrefixCls} {
   width: 100%;
   height: @headerHeight;
   line-height: @headerHeight;
-  background-color: @backgroundColor;
   box-shadow: @boxShadow;
 
   &-container {
     position: relative;
-    width: @width;
+    max-width: @width;
     height: inherit;
     margin: 0 auto;
     padding: 0 15px;

@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import re
+import time
 import string
 import os.path
 import functools
 
 import utils.chsname
+import utils.timeout.process
+import utils.timeout.exception
+import extractor.project
 import extractor.unique_id
 import extractor.education
 import extractor.expectation
@@ -37,6 +41,7 @@ cv_template = (
     ("comment",             list),
     ("tag",                 list),
     ("tracking",            list),
+    ("date",                time.time),
 )
 
 co_template = (
@@ -49,6 +54,7 @@ co_template = (
     ("address",             str),
     ("introduction",        str),
     ("email",               str),
+    ("date",                time.time),
 )
 
 peo_template = (
@@ -148,7 +154,23 @@ def get_expectation(stream):
     return result
 
 
-def get_experience(stream, name=None):
+def get_project(stream, name=None, as_date=None):
+    fix_func = {
+        'default': extractor.project.fix,
+        # 'jingying': extractor.project.fix_jingying,
+        # 'liepin': extractor.project.fix_liepin,
+        'yingcai': extractor.project.fix_yingcai,
+        'zhilian': extractor.project.fix_zhilian,
+    }
+    try:
+        assert name in fix_func
+    except AssertionError:
+        name = 'default'
+    result = fix_func[name](stream, as_date)
+    return result
+
+
+def get_experience(stream, name=None, as_date=None):
     u"""
         >>> xp = get_experience(u"工作经历\\n2010.03 - 2015.05 公司")['experience']['company'][0]
         >>> xp['date_from'], xp['date_to']
@@ -163,12 +185,12 @@ def get_experience(stream, name=None):
     """
 
     fix_func = {
-        'default': functools.partial(extractor.extract_experience.fix, stream, True),
-        'cloudshare': functools.partial(extractor.extract_experience.fix, stream, True),
-        'liepin': functools.partial(extractor.extract_experience.fix_liepin, stream),
-        'jingying': functools.partial(extractor.extract_experience.fix_jingying, stream),
-        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream),
-        'yingcai': functools.partial(extractor.extract_experience.fix_yingcai, stream),
+        'default': functools.partial(extractor.extract_experience.fix, stream, True, as_date),
+        'cloudshare': functools.partial(extractor.extract_experience.fix, stream, True, as_date),
+        'liepin': functools.partial(extractor.extract_experience.fix_liepin, stream, as_date),
+        'jingying': functools.partial(extractor.extract_experience.fix_jingying, stream, as_date),
+        'zhilian': functools.partial(extractor.extract_experience.fix_zhilian, stream, as_date),
+        'yingcai': functools.partial(extractor.extract_experience.fix_yingcai, stream, as_date),
     }
     experiences = []
     current_company = None
@@ -220,10 +242,11 @@ def get_name(stream):
 
 
 def get_email(stream):
-    email_restr = u'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'
-    email = info_by_re_iter(stream, email_restr)
-    result = get_tagfromstring(u'邮件', stream, email_restr) or \
-        get_tagfromstring(u'邮箱', stream) or email
+    clean_stream = stream.replace('\\', '')
+    email_restr = u'[\w\.-]+@[\w\.-]+\.\w+'
+    email = info_by_re_iter(clean_stream, email_restr)
+    result = get_tagfromstring(u'邮件', clean_stream, email_restr) or \
+        get_tagfromstring(u'邮箱', clean_stream) or email
     return result
 
 
@@ -235,7 +258,8 @@ def get_originid(stream):
 def get_phone(stream):
     phone_restr = u'1\d{10}'
     phone = info_by_re_iter(stream, phone_restr)
-    result = get_tagfromstring(u'电话', stream, ur'\d\-－()') or phone
+    result = get_tagfromstring(u'电话', stream, ur'\d\-－()') or \
+            get_tagfromstring(u'手机号码', stream, ur'\d\-－()') or phone
     return result
 
 
@@ -249,48 +273,93 @@ def get_age(stream):
 
 all_selected = ('name', 'originid', 'age', 'phone', 'email',
                 'education', 'experience', 'expectation',
+                'classify', 'unique_id', 'project')
+upload_selected = ('name', 'originid', 'age', 'phone', 'email',
+                'education', 'experience', 'expectation',
                 'classify', 'unique_id')
 
-def catch_selected(stream, selected, name=None):
+
+def catch_selected(stream, selected, name=None, as_date=None, timing=False):
+    def catch_one(method, args, kwargs, timing=False, timeout=0):
+        result = dict()
+        if timing is False:
+            result = method(*args, **kwargs)
+        else:
+            try:
+                result = utils.timeout.process.timeout_call(method, timeout,
+                                                              args=args, kwargs=kwargs)
+            except utils.timeout.exception.ExecTimeout as e:
+                pass
+        return result
+
     assert set(selected).issubset(set(all_selected))
     info_dict = dict()
     if 'name' in selected:
-        info_dict["name"] = get_name(stream)
+        name = catch_one(get_name, ([stream]), {}, timing=False)
+        info_dict["name"] = name if name else ''
     if 'originid' in selected:
-        info_dict["originid"] = get_originid(stream)
+        originid = catch_one(get_originid, ([stream]), {}, timing=False)
+        info_dict["originid"] = originid if not originid else ''
     if 'age' in selected:
-        info_dict["age"] = get_age(stream)
+        age = catch_one(get_age, ([stream]), {}, timing=False)
+        info_dict["age"] = age if age else ''
     if 'phone' in selected:
-        info_dict["phone"] = get_phone(stream)
+        phone = catch_one(get_phone, ([stream]), {}, timing=False)
+        info_dict["phone"] = phone if phone else ''
     if 'email' in selected:
-        info_dict["email"] = get_email(stream)
+        email = catch_one(get_email, ([stream]), {}, timing=False)
+        info_dict['email'] = email if email else ''
     if 'education' in selected:
-        info_dict.update(get_education(stream, name))     # education_history, education, school
+        education = catch_one(get_education, ([stream]), {'name': name},
+                              timing=timing, timeout=5)
+        info_dict.update(education)     # education_history, education, school
     if 'experience' in selected:
-        info_dict.update(get_experience(stream, name))    # experience, company, position
+        experience = catch_one(get_experience, ([stream]),
+                               {'name': name, 'as_date': as_date},
+                               timing=timing, timeout=10)
+        info_dict.update(experience)    # experience, company, position
+    if 'project' in selected:
+        project = catch_one(get_project, ([stream]), {
+                            'name': name, 'as_date': as_date},
+                            timing=timing, timeout=5)
+        if 'experience' in project:
+            try:
+                info_dict['experience'].update(project['experience'])
+            except KeyError:
+                info_dict['experience'] = {}
+                info_dict['experience'].update(project['experience'])
     if 'expectation' in selected:
-        info_dict.update(get_expectation(stream))   # expectation, current, gender,
-                                                    # marital_status, age
+        expectation = catch_one(get_expectation, ([stream]), {}, timing=timing, timeout=5)
+        info_dict.update(expectation)   # expectation, current, gender,
+                                        # marital_status, age
     if 'unique_id' in selected:
         extractor.unique_id.unique_id(info_dict)
     if 'classify' in selected and 'classify' not in info_dict:
-        experience = get_experience(stream, name)
-        info_dict["classify"] = get_classify(experience['experience'])
+        try:
+            experience = info_dict['experience']
+        except KeyError:
+            result = catch_one(get_experience, ([stream]),
+                               {'name': name, 'as_date': as_date},
+                               timing=timing, timeout=10)
+            experience = result['experience'] if 'experience' in result else dict()
+        info_dict['classify'] = get_classify(experience)
     return info_dict
 
 catch = functools.partial(catch_selected, selected=all_selected)
 
-
-def catch_cvinfo(stream, filename, catch_info=True):
+def catch_cvinfo(stream, filename, selected=None, catch_info=True, timing=False):
     """
         >>> import core.outputstorage
         >>> st = 'curriculum vitea'
         >>> name = core.outputstorage.ConvertName('name.docx')
         >>> assert catch_cvinfo(stream=st, filename=name.base)['filename'] == name.base
     """
+    if selected is None:
+        global upload_selected
+        selected = upload_selected
     info = generate_info_template(cv_template)
     if catch_info is True:
-        catchinfo = catch(stream)
+        catchinfo = catch_selected(stream, selected=selected, timing=timing)
         info.update(catchinfo)
         if not info['name']:
             info['name'] = utils.chsname.name_from_filename(filename)
@@ -299,14 +368,12 @@ def catch_cvinfo(stream, filename, catch_info=True):
     return info
 
 
-def catch_coinfo(stream, name):
+def catch_coinfo(stream):
     """
-        >>> intro = {'introduction': 'introduction'}
-        >>> assert catch_coinfo(name='sgwgewtgqe', stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
+        >>> intro = {'name': 'sgwgewtgqe', 'introduction': 'introduction'}
+        >>> assert catch_coinfo(stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
     """
     info = generate_info_template(co_template)
-    info['name'] = name
-    info['id'] = extractor.unique_id.company_id(name)
     if isinstance(stream, dict):
         for key in info:
             if key in stream and stream[key]:
@@ -320,6 +387,7 @@ def catch_coinfo(stream, name):
             info['business'].append(stream['business'])
         except KeyError:
             pass
+    info['id'] = extractor.unique_id.company_id(info['name'])
     return info
 
 def catch_peopinfo(stream):

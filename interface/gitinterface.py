@@ -14,7 +14,7 @@ class GitInterface(interface.base.Interface):
     author = 'developer<developer@email.com>'
     encoding = 'UTF-8'
 
-    def __init__(self, path):
+    def __init__(self, path, name=None, searchengine=None):
         """
             >>> import shutil
             >>> import interface.gitinterface
@@ -24,10 +24,10 @@ class GitInterface(interface.base.Interface):
             <Repo at ...
             >>> shutil.rmtree(repo_name)
         """
-        super(GitInterface, self).__init__(path)
-        try:
+        super(GitInterface, self).__init__(path, name=name, searchengine=searchengine)
+        if not os.path.exists(path):
             self.repo = dulwich.repo.Repo.init(path, mkdir=True)
-        except OSError:
+        else:
             self.repo = dulwich.repo.Repo(path)
 
     def exists(self, filename):
@@ -57,6 +57,16 @@ class GitInterface(interface.base.Interface):
 
     def getraw(self, filename):
         raise IOError
+
+    def do_commit(self, filenames, message=None, committer=None):
+        commit_id = ''
+        if message is None:
+            message = "Batch commits."
+        if filenames:
+            committer = self.committer(committer)
+            self.repo.stage(filenames)
+            commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
+        return commit_id
 
     def add(self, filename, filedata, message=None, committer=None, do_commit=True):
         """
@@ -145,13 +155,64 @@ class GitInterface(interface.base.Interface):
             commit_id = self.repo.do_commit(message, committer=bytes(committer))
         return commit_id
 
+    def delete(self, filename, message=None, committer=None, do_commit=True):
+        """
+            >>> import shutil
+            >>> import interface.gitinterface
+            >>> repo_name = 'interface/test_repo'
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
+            >>> commit_id = interface.add_files(['test_file'], ['test'],
+            ... 'Test commit', 'test<test@test.com>')
+            >>> commit_id = interface.delete('test_file')
+            >>> commit_id == interface.repo.head()
+            True
+            >>> shutil.rmtree(repo_name)
+        """
+        commit_id = ''
+        if not self.exists(filename):
+            raise Exception('Not exists file:', filename)
+        if message is None:
+            message = "Delete %s." % filename
+        committer = self.committer(committer)
+        os.remove(os.path.join(self.repo.path, filename))
+        if do_commit is True:
+            self.repo.stage([bytes(filename)])
+            commit_id = self.repo.do_commit(message, committer=bytes(committer))
+        return commit_id
+
     def grep(self, restrings, path='', files=None):
         if files is None:
             files = []
-        grep_list = []
-        greppath = os.path.join(self.repo.path, path)
-        if not os.path.exists(greppath):
-            return grep_list
+        command = self.gencommand(restrings, files)
+        result = self.subprocess_grep(command, path, shell=False)
+        return result
+
+    def grep_yaml(self, restrings, path='', files=None):
+        """
+            >>> import yaml
+            >>> import shutil
+            >>> import interface.gitinterface
+            >>> repo_name = 'interface/test_repo'
+            >>> interface = interface.gitinterface.GitInterface(repo_name)
+            >>> data = {'name': u'中文名字'}
+            >>> commit_id = interface.add('test_file.yaml',
+            ... yaml.safe_dump(data, allow_unicode=True),
+            ... b'Test commit', b'test<test@test.com>')
+            >>> interface.grep_yaml('name', '.')
+            ['test_file.yaml']
+            >>> shutil.rmtree(repo_name)
+        """
+        if files is None:
+            files = []
+        unicode_str = re.sub(r'\\u[a-z0-9]{4}',
+                             lambda a: a.group().upper(),
+                             restrings.__repr__()[2:-1]).replace('\\U', '\\\\\\u')
+        command = self.gencommand(unicode_str, files)
+        result = self.subprocess_grep(command, path, shell=False)
+        return result
+
+    def gencommand(self, restrings, files):
+        command = ''
         keywords = restrings.split()
         if keywords:
             command = ['git', 'grep', '-l', '--all-match']
@@ -159,15 +220,7 @@ class GitInterface(interface.base.Interface):
                 command.append('-e')
                 command.append(each.encode('utf-8'))
             command.extend(files)
-            p = subprocess.Popen(command,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT,
-                                 cwd=greppath)
-            returncode = p.communicate()[0]
-            for each in returncode.split('\n'):
-                if each:
-                    grep_list.append(each)
-        return grep_list
+        return command
 
     def lsfiles(self, prefix, filtefile):
         lsfiles = []
@@ -184,42 +237,6 @@ class GitInterface(interface.base.Interface):
         if  lsfiles and 'not found' in lsfiles[0]:
             lsfiles = []
         return lsfiles
-
-    def grep_yaml(self, restrings, path=''):
-        """
-            >>> import yaml
-            >>> import shutil
-            >>> import interface.gitinterface
-            >>> repo_name = 'interface/test_repo'
-            >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> data = {'name': u'中文名字'}
-            >>> commit_id = interface.add('test_file.yaml',
-            ... yaml.safe_dump(data, allow_unicode=True),
-            ... b'Test commit', b'test<test@test.com>')
-            >>> interface.grep_yaml('name', '.')
-            ['test_file.yaml']
-            >>> shutil.rmtree(repo_name)
-        """
-        grep_list = []
-        keywords = restrings.split()
-        if keywords:
-            command = ['git', 'grep', '-l', '--all-match']
-            for each in keywords:
-                command.append('-e')
-                unicode_str = re.sub(r'\\u[a-z0-9]{4}',
-                                     lambda a: a.group().upper(),
-                                     each.__repr__()[2:-1]).replace('\\U',
-                                                                    '\\\\\\u')
-                command.append(unicode_str)
-            p = subprocess.Popen(command,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT,
-                                 cwd=os.path.join(self.repo.path, path))
-            returncode = p.communicate()[0]
-            for each in returncode.split('\n'):
-                if each:
-                    grep_list.append(each)
-        return grep_list
 
     def get_file_create_info(self, filename):
         """
@@ -292,4 +309,8 @@ class GitInterface(interface.base.Interface):
         return result
 
     def backup(self, path, bare=False):
-        dulwich.porcelain.clone(self.path, path, bare=bare)
+        try:
+            dulwich.porcelain.clone(self.path, path, bare=bare)
+        except KeyError:
+            self.repo.do_commit("Init repo %s."%(name), committer="Cloudshare")
+            dulwich.porcelain.clone(self.path, path, bare=bare)

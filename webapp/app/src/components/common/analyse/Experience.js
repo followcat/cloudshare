@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 
 import { Button, Modal } from 'antd';
 
-import Charts from '../Charts';
+import Charts from 'Charts';
 
 import 'whatwg-fetch';
 

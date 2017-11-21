@@ -2,6 +2,10 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Card } from 'antd';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 const TOTAL_COLUMN = 24;  // 栅栏格一行总格子数
 
 const groupArray = (data, number) => {
@@ -27,6 +31,25 @@ const groupArray = (data, number) => {
   return list;
 };
 
+  const replaceName = (name) => {
+    switch (name){
+      case 'name' :  return language.NAME; break;
+      case 'email' :  return language.EMAIL; break;
+      case 'gender' :  return language.GENDER; break;
+      case 'phone' :  return language.PHONE; break;
+      case 'age' :  return language.AGE; break;
+      case 'education' :  return language.EDUCATION; break;
+      case 'marital_status' :  return language.MARITAL_STATUS; break;
+      case 'school' :  return language.SCHOOL; break;
+      case 'position' :  return language.POSITION; break;
+      case 'company' :  return language.COMPANY; break;
+      case 'experience' :  return language.EXPERIENCE; break;
+      case 'experience' :  return language.EXPERIENCE; break;
+      case 'education_history' :  return language.EDUCATION_HISTORY; break;
+      case 'classify' :  return language.CLASSIFY; break;
+    }
+  }
+
 class Summary extends Component {
   render() {
     const props = this.props,
@@ -34,51 +57,51 @@ class Summary extends Component {
           colValue = TOTAL_COLUMN / props.number;
 
     return (
-      <Card>
-      {data.map((dataItem, index) => {
-        if (Array.isArray(dataItem)) {
-          return (
-            <Row key={index}>
-              {dataItem.map((v, i) => {
-                return (
-                  <Col
-                    key={i}
-                    span={colValue}
-                  >
-                    <Col
-                      span={10}
-                      className={`${props.prefixCls}-label`}
-                    >
-                      {`${v.name}: `}
-                    </Col>  
-                    <Col span={14}>
-                      {v.value}
-                    </Col>
-                  </Col>
-                );
-              })}
-            </Row>
-          );
-        } else {
-          return (
-            <Row key={index}>
-              <Col
-                span={5}
-                className={`${props.prefixCls}-label`}
-              >
-                {`${dataItem.name}: `}
-              </Col>
-              <Col span={19}>
-                {dataItem.value.reverse().map((valueItem, index) => {
+      <Card className={props.prefixCls}>
+        {data.map((dataItem, index) => {
+          if (Array.isArray(dataItem)) {
+            return (
+              <Row key={index}>
+                {dataItem.map((v, i) => {
                   return (
-                    <p key={index}>{valueItem.join(' | ')}</p>
+                    <Col
+                      key={i}
+                      span={colValue}
+                    >
+                      <Col
+                        span={10}
+                        className={`${props.prefixCls}-label`}
+                      >
+                        {`${replaceName(v.name)}: `}
+                      </Col>  
+                      <Col span={14}>
+                        {v.value}
+                      </Col>
+                    </Col>
                   );
                 })}
-              </Col>
-            </Row>
-          );
-        }
-      })}
+              </Row>
+            );
+          } else {
+            return (
+              <Row key={index}>
+                <Col
+                  span={5}
+                  className={`${props.prefixCls}-label`}
+                >
+                  {`${replaceName(dataItem.name)}: `}
+                </Col>
+                <Col span={19}>
+                  {dataItem.value.reverse().map((valueItem, index) => {
+                    return (
+                      <p key={index}>{valueItem.join(' | ')}</p>
+                    );
+                  })}
+                </Col>
+              </Row>
+            );
+          }
+        })}
       </Card>
     );
   }

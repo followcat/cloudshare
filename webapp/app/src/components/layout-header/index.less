@@ -6,7 +6,10 @@
   width: 100%;
   height: @headerHeight;
   background-color: @backgroundColor;
-  margin-bottom: 24px;
+
+  .cs-layout-wrapper {
+    padding: 0 50px;
+  }
   
   .ant-menu-horizontal > .ant-menu-item-selected,
   .ant-menu-horizontal > .ant-menu-item-active {
@@ -24,12 +27,17 @@
       color: @textColor;
     }
   }
+
+  .cs-layout-header-wrapper {
+    position: relative;
+    padding: 0 50px;
+  }
 }
-    
+
 .cs-layout-logo {
   width: 180px;
-  height: 32px;
-  margin: 16px 28px 16px 0;
+  height: 54px;
+  margin-top: 8px;
   float: left;
 }
 
@@ -42,13 +50,19 @@
 .cs-header-project {
   position: absolute;
   top: 0;
-  width: 140px;
   height: @headerHeight;
   line-height: @headerHeight;
   overflow: hidden;
   color: #fff;
-  right: 212px;
+  right: 236px;
   text-align: center;
+    .ant-select {
+      left: 5px;
+    }
+}
+
+.cs-header-project-selection {
+  width: 120px;
 }
 
 .cs-layout-profile {
@@ -75,6 +89,9 @@
 
   .cs-layout-profile-content {
     line-height: @headerHeight;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     .cs-dropdown-link {
       color: @textColor;
@@ -83,6 +100,12 @@
       &:hover {
         color: #fff;
       }
+    }
+
+    .ant-badge-count {
+      height: 18px;
+      min-width: 18px;
+      top: -20px;
     }
   }
 }

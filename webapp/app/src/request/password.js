@@ -1,11 +1,11 @@
 'use strict';
-import StorageUtil from '../utils/storage';
-import { API } from '../config/api';
+import StorageUtil from 'utils/storage';
+import { API } from 'config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
 export const resetPassword = (params, callback) => {
-  return fetch(`${API.ACCOUNTS_API}/${StorageUtil.get('user')}`, {
+  return fetch(API.PASSWORD_API, {
     method: 'PUT',
     credentials: 'include',
     headers: {
@@ -16,5 +16,5 @@ export const resetPassword = (params, callback) => {
     body: JSON.stringify(params)
   })
   .then(response => response.json())
-  .then(json => callbackFunction(callback, json));
+  .then(json => callbackFunction(callback, json))
 };

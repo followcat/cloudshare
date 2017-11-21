@@ -1,10 +1,11 @@
 import os
-import glob
+import copy
 import time
 import cPickle
 import collections
 
 import utils.builtin
+import core.outputstorage
 
 
 class ReverseIndexing(object):
@@ -18,9 +19,9 @@ class ReverseIndexing(object):
                  'business',
                  'date')
 
-    def __init__(self, path, cvsvc):
+    def __init__(self, path, cvs):
         self.path = path
-        self.cvs = cvsvc.svcls
+        self.cvs = cvs
         self.index = {}
 
     def setup(self):
@@ -83,22 +84,26 @@ class ReverseIndexing(object):
                 self.merge(cv_index, index)
         self.index[svc_name] = cv_index
 
-    def upgrade(self, selected):
+    def upgrade(self, selected, ids=None):
         assert set(selected).issubset(set(self.indexkeys))
         for svc in self.cvs:
-            self.upgradecv(svc, selected)
+            self.upgradecv(svc, selected, ids)
         self.save()
 
-    def upgradecv(self, svc, selected):
+    def upgradecv(self, svc, selected, ids=None):
         assert svc.name
         svc_name = svc.name
         if svc_name in self.index:
             cv_index = self.index[svc_name]
-        for name in svc.names():
-            if name in cv_index['names']:
-                yamlinfo = svc.getyaml(name)
-                index = self.genindex(name, yamlinfo, selected)
-                self.merge(cv_index, index)
+        if ids is not None:
+            ids = set([core.outputstorage.ConvertName(id).md for id in ids])
+            names = set(svc.names()) & ids
+        else:
+            names = svc.names()
+        for name in names:
+            yamlinfo = svc.getyaml(name)
+            index = self.genindex(name, yamlinfo, selected)
+            self.merge(cv_index, index)
         self.index[svc_name] = cv_index
         self.save()
 
@@ -188,6 +193,34 @@ class ReverseIndexing(object):
                                 index[selecte])
                 results.update(result)
         return results
+
+    def filter(self, filterdict, ids, uses=None):
+        indexdict = {}
+        filterdict = copy.deepcopy(filterdict)
+        if 'date' in filterdict:
+            try:
+                filterdict['date'] = utils.builtin.nemudate(filterdict['date'])
+            except ValueError:
+                filterdict.pop('date')
+        for key in filterdict:
+            if filterdict[key]:
+                indexdict[key] = self.get_indexkeys([key], filterdict[key], uses)
+        filterset = self.get(filterdict, uses=uses)
+        if indexdict:
+            ids = filter(lambda x: x in filterset or x[0] in filterset, ids)
+        return ids
+
+    def filter_ids(self, source, filterdict, ids, uses=None):
+        result = source
+        if filterdict:
+            if not isinstance(ids, set):
+                ids = set(ids)
+            filterset = self.filter(filterdict, ids=ids)
+            result = filter(lambda x: x in filterset or x[0] in filterset, source)
+        return result
+
+    def lastday(self):
+        return max([max(i['date'].keys()) for i in self.index.values() if i['date']])
 
     def _cur_places(self, yamlinfo):
         result = dict()

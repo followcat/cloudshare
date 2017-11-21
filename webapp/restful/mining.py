@@ -1,4 +1,4 @@
-import os.path
+import time
 import datetime
 
 import flask
@@ -9,19 +9,20 @@ from flask.ext.restful import Resource
 import utils.builtin
 import core.mining.info
 import core.mining.valuable
+import core.outputstorage
 
-import json
 
 class BaseAPI(Resource):
 
+    numbers = 500
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         super(BaseAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('md_ids', type = list, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def calculate_work_month(self, begin_y, begin_m, end_y, end_m):
         year = int(end_y) - int(begin_y)
@@ -37,19 +38,22 @@ class PositionAPI(BaseAPI):
         self.reqparse.add_argument('search_text', location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         text = args['search_text']
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
             searches = project.cv_search(text)
         result = []
-        for name in searches:
+        for search in list(searches)[:self.numbers]:
+            name = search[0]
             positions = []
             try:
-                yaml_data = self.svc_mult_cv.getyaml(name)
+                yaml_data = project.cv_getyaml(name)
             except IOError:
                 continue
             if 'position' in yaml_data['experience']:
@@ -72,10 +76,14 @@ class PositionAPI(BaseAPI):
 class RegionAPI(BaseAPI):
 
     def get(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = []
-        for id in args['md_ids']:
-            stream = self.svc_mult_cv.getmd(id)
+        for id in args['md_ids'][:self.numbers]:
+            stream = project.cv_getmd(id)
             result.append(core.mining.info.region(stream))
         return { 'result': result }
 
@@ -83,10 +91,14 @@ class RegionAPI(BaseAPI):
 class CapacityAPI(BaseAPI):
 
     def get(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = []
-        for id in args['md_ids']:
-            stream = self.svc_mult_cv.getmd(id)
+        for id in args['md_ids'][:self.numbers]:
+            stream = project.cv_getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return { 'result': result }
 
@@ -94,13 +106,17 @@ class CapacityAPI(BaseAPI):
 class AbilityAPI(BaseAPI):
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = []
         for id in args['md_ids']:
             month = 0
             doclen = 0
             actpoint = 0
-            stream = self.svc_mult_cv.getmd(id)
+            stream = project.cv_getmd(id)
             capacitys = core.mining.info.capacity(stream)
             if not capacitys:
                 doclen = 100000
@@ -116,10 +132,14 @@ class AbilityAPI(BaseAPI):
 class ExperienceAPI(BaseAPI):
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = []
         for id in args['md_ids']:
-            stream = self.svc_mult_cv.getmd(id)
+            stream = project.cv_getmd(id)
             capacitys = core.mining.info.capacity(stream)
             month = 0
             actpoint = 0
@@ -133,72 +153,47 @@ class ExperienceAPI(BaseAPI):
 
 class LSIbaseAPI(Resource):
 
+    top = 0.03
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.miner = flask.current_app.config['SVC_MIN']
         self.index = flask.current_app.config['SVC_INDEX']
         self.sim_names = self.miner.addition_names()
 
-    def _post(self, project, doc, uses, filterdict, cur_page):
-        def nemudate(dates):
-            str_result = []
-            datetimes_result = []
-            datetimes = [datetime.datetime.strptime(t,'%Y-%m-%d') for t in dates]
-            tstart = min(datetimes)
-            tend = max(datetimes)
-            while(tstart <= tend):
-                datetimes_result.append(tstart)
-                tstart += datetime.timedelta(days = 1)
-            for each in datetimes_result:
-                str_result.append(each.strftime('%Y%m%d'))
-            return str_result
-        indexdict = {}
-        if 'date' in filterdict:
-            try:
-                filterdict['date'] = nemudate(filterdict['date'])
-            except ValueError:
-                filterdict.pop('date')
-        for key in filterdict:
-            if filterdict[key]:
-                indexdict[key] = self.index.get_indexkeys([key], filterdict[key], uses)
-        count = 20
-        datas, pages, totals = self.process(project, uses, doc, cur_page, count, indexdict)
-        return { 'datas': datas, 'pages': pages, 'totals': totals }
-
-    def process(self, project, uses, doc, cur_page, eve_count, filterdict=None):
+    def process(self, project, doc, uses, filterdict, cur_page, eve_count=20):
         if not cur_page:
             cur_page = 1
         datas = []
-        result = self.miner.probability(project, doc, uses=uses, top=500)
-        filteset = self.index.get(filterdict, uses=uses)
-        if filterdict:
-            result = filter(lambda x: os.path.splitext(x[0])[0] in filteset, result)
+        result = self.miner.probability(project.modelname, doc, uses=uses,
+                                        top=self.top, minimum=1000)
+        ids = set([cv[0] for cv in result])
+        result = self.index.filter_ids(result, filterdict, ids, uses=uses)
         totals = len(result)
         if totals%eve_count != 0:
             pages = totals/eve_count + 1
         else:
             pages = totals/eve_count
         for name, score in result[(cur_page-1)*eve_count:cur_page*eve_count]:
-            yaml_info = self.svc_mult_cv.getyaml(name)
+            yaml_info = project.cv_getyaml(name)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
                 'match': score
             }
             datas.append({ 'cv_id': name, 'yaml_info': yaml_info, 'info': info})
-        return datas, pages, totals
+        return { 'datas': datas, 'pages': pages, 'totals': totals }
 
 
 class LSIbyJDidAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbyJDidAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('appendcomment', type = bool, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
@@ -206,43 +201,135 @@ class LSIbyJDidAPI(LSIbaseAPI):
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
         append_comment = args['appendcomment'] if args['appendcomment'] else False
         if append_comment:
             doc += jd_yaml['commentary']
-        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
+        uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(projectname, doc, uses, filterdict, cur_page)
+        result = self.process(project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
+
+
+class LSIbyAllJDAPI(LSIbaseAPI):
+
+    cache = {}
+
+    def __init__(self):
+        super(LSIbyAllJDAPI, self).__init__()
+        self.index = flask.current_app.config['SVC_INDEX']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.reqparse.add_argument('fromcache', type=bool, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
+        self.reqparse.add_argument('threshold', type=float, location = 'json')
+        self.reqparse.add_argument('numbers', type=int, location = 'json')
+
+    def fromcache(self, project, filterdict, threshold, cache=True):
+        date = int(time.strftime('%Y%m%d',time.localtime(time.time())))
+        projectname = project.name
+        if cache is True:
+            if projectname not in self.cache:
+                bestjds = self.findbest(project, threshold)
+                self.cache[projectname] = (date, bestjds)
+            elif self.cache[projectname][0] < date:
+                bestjds = self.findbest(project, threshold)
+                self.cache[projectname] = (date, bestjds)
+            else:
+                bestjds = self.cache[projectname][1]
+        else:
+            bestjds = self.findbest(project, threshold)
+        results = dict()
+        for jdid in bestjds:
+            output = {}
+            output['CV'] = list()
+            bestids = set([cv[0] for cv in bestjds[jdid]])
+            filterids = self.index.filter_ids(bestjds[jdid], filterdict, bestids)
+            for cv in filterids:
+                cvinfo = project.cv_getyaml(cv[0])
+                cvinfo['CVvalue'] = cv[1]
+                output['CV'].append(cvinfo)
+            if not output['CV']:
+                continue
+            jd = project.jd_get(jdid)
+            output['id'] = jdid
+            output['name'] = jd['name']
+            output['description'] = jd['description']
+            output['company'] = project.company_get(jd['company'])['name']
+            results[jdid] = output
+        return results
+
+    def findbest(self, project, threshold=None):
+        if threshold is None:
+            threshold = 0.8
+        results = {}
+        for jd in project.jobdescription.lists():
+            try:
+                if jd['status'] == 'Closed':
+                    continue
+            except KeyError:
+                continue
+            doc = jd['description']
+            doc += jd['commentary']
+            result = self.miner.probability(project.modelname, doc,
+                                            uses=[project.id]+project.getclassify(),
+                                            top=0.01, minimum=3000)
+            if result:
+                candidates = filter(lambda x: float(x[1])>float(threshold), result)
+                results[jd['id']] = candidates
+        return results
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        threshold = args['threshold']
+        fromcache = args['fromcache']
+        projectname = args['project']
+        filterdict = args['filterdict']
+        numbers = args['numbers']
+        results = list()
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        alls = self.fromcache(project, filterdict, threshold, cache=fromcache)
+        for jdid in alls:
+            results.append({'ID': jdid, 'name': alls[jdid]['name'],
+                            'company': alls[jdid]['company'],
+                            'description': alls[jdid]['description'],
+                            'CV': alls[jdid]['CV'][0:numbers]})
+        return { 'code': 200, 'data': results }
 
 
 class LSIbyCVidAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbyCVidAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         doc = project.cv_getmd(id)
-        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
+        uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(projectname, doc, uses, filterdict, cur_page)
+        result = self.process(project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -250,21 +337,23 @@ class LSIbydocAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbydocAPI, self).__init__()
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         doc = args['doc']
         projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
-        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
-        result = self._post(projectname, doc, uses, filterdict, cur_page)
+        result = self.process(project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
 
@@ -274,54 +363,57 @@ class SimilarAPI(Resource):
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        doc = self.svc_mult_cv.getmd(id)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        doc = project.cv_getmd(id)
         uses = [projectname]
-        project = self.svc_mult_cv.getproject(projectname)
         project_classify = project.getclassify()
-        for classify in self.svc_mult_cv.getyaml(id)['classify']:
+        for classify in project.cv_getyaml(id)['classify']:
             if classify in project_classify:
                 uses.append(classify)
+        top = 0
         datas = []
-        for name, score in self.miner.probability(projectname, doc,
-                                                  uses=uses, top=6)[1:6]:
-            yaml_info = self.svc_mult_cv.getyaml(name)
+        for name, score in self.miner.probability(project.modelname, doc,
+                                                  uses=uses, top=100):
+            if id == core.outputstorage.ConvertName(name).base:
+                continue
+            if float(score) < 0.8 or top==5:
+                break
+            yaml_info = project.cv_getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
+            top += 1
         return { 'code': 200, 'data': datas }
 
 
 class ValuablebaseAPI(Resource):
 
+    top = 0.05
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
         super(ValuablebaseAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
 
     def _get(self, doc, project):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = project.name
-        uses = [projectname] + args['uses'] if args['uses'] else [projectname]
+        uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
-        if len(name_list) == 0:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
-                                               doc, projectname, uses=uses)
-        else:
-            result = core.mining.valuable.rate(self.miner, self.svc_mult_cv,
-                                               doc, projectname, uses=uses, name_list=name_list)
+        result = core.mining.valuable.rate(name_list, self.miner, project, doc, self.top)
         response = dict()
         datas = []
         for index in result:
@@ -330,11 +422,12 @@ class ValuablebaseAPI(Resource):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = self.svc_mult_cv.getyaml(name+'.yaml')
+                yaml_data = project.cv_getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
                 values.append({ 'match': match_item[1],
                                 'id': yaml_data['id'],
-                                'name': yaml_data['name'] })
+                                'name': yaml_data['name'],
+                                'secrecy': yaml_data['secrecy'] })
             item['value'] = values
             datas.append(item)
         response['result'] = datas
@@ -346,15 +439,17 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
 
     def __init__(self):
         super(ValuablebyJDidAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('id', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
         result = self._get(doc, project)
@@ -365,7 +460,7 @@ class ValuablebydocAPI(ValuablebaseAPI):
     def __init__(self):
         super(ValuablebydocAPI, self).__init__()
         self.reqparse.add_argument('doc', type = str, location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -379,15 +474,17 @@ class ValuableAPI(ValuablebaseAPI):
 
     def __init__(self):
         super(ValuableAPI, self).__init__()
-        self.svc_mult_cv = flask.current_app.config['SVC_MULT_CV']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('doc', location = 'json')
-        self.reqparse.add_argument('project', type = str, location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        project = self.svc_mult_cv.getproject(projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         doc = ''
         if args['id']:
             jd_yaml = project.jd_get(args['id'])

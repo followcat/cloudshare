@@ -1,3 +1,5 @@
+import math
+
 import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
@@ -114,21 +116,69 @@ class JobDescriptionListAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(JobDescriptionListAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('status', type = unicode, location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        status = args['status']
+        cur_page = args['current_page']
+        page_size = args['page_size']
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = [jd for jd_id, jd in project.jd_datas()]
-        for jd in result:
-            co_id = jd['company']
-            co_name = project.company_get(co_id)['name']
-            jd['company_name'] = co_name
-        return { 'code': 200, 'data': result }
+        index = self.svc_index.config['JD_MEM']
+        total, searches = self.svc_index.search(index=index,
+                                            doctype=[project.id],
+                                            filterdict={ 'status': status },
+                                            start=(cur_page-1)*page_size,
+                                            size=page_size, source=True)
+        pages = int(math.ceil(float(total)/page_size))
+        datas = [item['_source'] for item in searches]
+        return {
+            'code': 200,
+            'data': datas,
+            'pages': pages,
+            'totals': total
+        }
 
+
+class JobDescriptionSearchAPI(JobDescriptionListAPI):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(JobDescriptionSearchAPI, self).__init__()
+        self.reqparse.add_argument('keyword', location = 'json')
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        status = args['status']
+        keyword = args['keyword']
+        cur_page = args['current_page']
+        page_size = args['page_size']
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        index = self.svc_index.config['JD_MEM']
+        total, searches = self.svc_index.search(index=index,
+                                            doctype=[project.id],
+                                            filterdict={ 'status': status, 'name': keyword},
+                                            start=(cur_page-1)*page_size,
+                                            size=page_size, source=True)
+        pages = int(math.ceil(float(total)/page_size))
+        datas = [item['_source'] for item in searches]
+        return {
+            'code': 200,
+            'data': datas,
+            'pages': pages,
+            'totals': total
+        }

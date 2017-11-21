@@ -52,6 +52,8 @@ def initialize(app):
                      endpoint = 'jobdescription')
     api.add_resource(JobDescriptionListAPI, '/api/jdlist',
                      endpoint = 'jobdescriptionlist')
+    api.add_resource(JobDescriptionSearchAPI, '/api/jdsearch',
+                     endpoint = 'jobdescriptionsearch')
 
     api.add_resource(CurrivulumvitaeAPI, '/api/resume',
                      endpoint = 'curriculumvitae')

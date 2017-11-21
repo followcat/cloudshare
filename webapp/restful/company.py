@@ -87,7 +87,7 @@ class CompanyAllAPI(Resource):
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
                                             size=page_size)
-        pages = int(math.ceil(total/page_size))
+        pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:
             datas.append(project.company_get(item['_id']))
@@ -273,7 +273,7 @@ class SearchCObyKeyAPI(Resource):
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
                                             size=page_size)
-        pages = int(math.ceil(total/page_size))
+        pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:
             datas.append(project.company_get(item['_id']))

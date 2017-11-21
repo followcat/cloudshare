@@ -206,7 +206,7 @@ class LSIbaseAPI(Resource):
                                                start=(cur_page-1)*size, size=size,
                                                source=True)
         totals = len(result)
-        pages = int(math.ceil(totals/size))
+        pages = int(math.ceil(float(totals)/size))
         result_dict = dict(result)
         datas = list()
         for item in searchs:

@@ -100,11 +100,10 @@ class LSImodel(object):
             number += 1
             if number%numbers == 0:
                 self.add_documents(names, documents)
-                number = 0
                 result = True
                 names = list()
                 documents = list()
-        if number != 0:
+        if number%numbers != 0:
             self.add_documents(names, documents)
             result = True
         return result

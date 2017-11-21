@@ -24,7 +24,7 @@ class LSIsimilarity(object):
         result = False
         names = []
         documents = []
-        number =0
+        number = 0
         if self.index is None:
             self.set_index([])
         for name, doc in gen:
@@ -35,11 +35,10 @@ class LSIsimilarity(object):
             number += 1
             if number%numbers == 0:
                 self.add_documents(names, documents)
-                number = 0
                 result = True
                 names = list()
                 documents = list()
-        if number != 0:
+        if number%numbers != 0:
             self.add_documents(names, documents)
             result = True
         return result

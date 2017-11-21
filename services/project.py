@@ -21,7 +21,6 @@ class Project(services.base.service.Service):
     def __init__(self, path, corepos, cvrepos, jdrepos, svcpeos, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
-        self._modelname = name
         self.corepos = corepos
         self.jdrepos = jdrepos
         self.cvrepos = cvrepos
@@ -46,6 +45,8 @@ class Project(services.base.service.Service):
         self.config['name'] = self.name
         if 'id' not in self.config:
             self.config['id'] = utils.builtin.genuuid()
+        if 'model' not in self.config:
+            self.config['model'] = 'default'
 
     def save(self):
         dumpconfig = utils.builtin.dump_yaml(self.config)
@@ -135,7 +136,7 @@ class Project(services.base.service.Service):
 
     @property
     def modelname(self):
-        return self._modelname
+        return self.config['model']
 
     @property
     def id(self):

@@ -135,6 +135,8 @@ def repl_web(m):
         return '\n'
 
 def silencer(document, cutservice=None, id=None):
+    if isinstance(id, unicode):
+        id = id.encode('utf-8')
     if (cutservice and id) and cutservice.exists(id):
         return cutservice.getyaml(id)['words']
     if isinstance(document, list):

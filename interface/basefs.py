@@ -75,8 +75,8 @@ class BaseFSInterface(interface.base.Interface):
         return result
 
     def lsfiles(self, prefix, filterfile):
-        return [os.path.split(f)[1] for f in glob.glob(
-                os.path.join(self.path, prefix, filterfile))]
+        return iter([os.path.split(f)[1] for f in glob.iglob(
+                     os.path.join(self.path, prefix, filterfile))])
 
     def grep(self, restrings, path='', files=None):
         if files is None:

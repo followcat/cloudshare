@@ -196,9 +196,8 @@ class BaseStorage(services.base.service.Service):
 
     def datas(self):
         for id in self.ids:
-            name = core.outputstorage.ConvertName(id).md
             text = self.getmd(id)
-            yield name, text
+            yield id, text
 
     def history(self, author=None, entries=10, skip=0):
         return self.interface.history(author=author, max_commits=entries, skip=skip)

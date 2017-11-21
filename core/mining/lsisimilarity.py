@@ -12,6 +12,7 @@ class LSIsimilarity(object):
     matrix_save_name = 'lsi.matrix'
 
     def __init__(self, name, savepath, lsi_model):
+        self._ids = set()
         self.name = name
         self.path = savepath
         self.names = []
@@ -19,32 +20,31 @@ class LSIsimilarity(object):
         self.lsi_model = lsi_model
         self.index = None
 
-    def update(self, gen, newmodel=False):
-        added = False
+    def update(self, gen, numbers=5000):
+        result = False
         names = []
         documents = []
+        number = 0
+        if self.index is None:
+            self.set_index([])
         for name, doc in gen:
+            if self.exists(name) is True:
+                continue
             names.append(name)
             documents.append(doc)
-            added = True
-        if added or newmodel:
+            number += 1
+            if number%numbers == 0:
+                self.add_documents(names, documents)
+                result = True
+                names = list()
+                documents = list()
+        if number%numbers != 0:
             self.add_documents(names, documents)
-            self.save()
-        return added or newmodel
+            result = True
+        return result
 
-    def build(self, gen):
-        names = []
-        corpus = []
-        for name, doc in gen:
-            names.append(name)
-            documents.append(doc)
-            words = self.lsi_model.slicer(doc, id=name)
-            corpus.append(self.lsi_model.lsi.id2word.doc2bow(words))
-        self.setup(names, corpus)
-
-    def setup(self, names, corpus):
-        self.names = names
-        self.set_index(corpus)
+    def build(self, gen, numbers=5000):
+        return self.update(gen, numbers=numbers)
 
     def save(self):
         if not os.path.exists(self.path):
@@ -53,8 +53,7 @@ class LSIsimilarity(object):
             ujson.dump(self.names, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
 
-    def exists(self, name):
-        id = core.outputstorage.ConvertName(name).base
+    def exists(self, id):
         return id in self.ids
 
     def load(self):
@@ -68,20 +67,19 @@ class LSIsimilarity(object):
         assert len(names) == len(documents)
         corpus = list()
         for name, document in zip(names, documents):
-            if name in self.names:
+            if self.exists(name) is True:
                  continue
             text = self.lsi_model.slicer(document, id=name)
             corpu = self.lsi_model.lsi.id2word.doc2bow(text)
             corpus.append(corpu)
         self.names.extend(names)
-        self.index.add_documents(self.lsi_model.lsi[corpus])
+        self.ids = names
+        modelcorpus = self.lsi_model.lsi[corpus]
+        self.index.add_documents(modelcorpus)
 
-    def set_index(self, corpus):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+    def set_index(self, modelcorpus):
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
-                                             self.lsi_model.lsi[corpus],
-                                             self.lsi_model.topics)
+                                             modelcorpus, self.lsi_model.topics)
 
     def probability(self, doc, top=None, minimum=0):
         """
@@ -165,11 +163,11 @@ class LSIsimilarity(object):
         """
         self.num_best = None
         p = self.base_probability(doc, top=top, minimum=minimum)
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])), p)
+        results = map(lambda x: (self.names[x[0]], str(x[1])), p)
         return results
 
     def probability_by_id(self, doc, id):
-        if id not in self.names:
+        if self.exists(id) is False:
             return None
         index = self.names.index(id)
         vec_lsi = self.lsi_model.probability(doc)
@@ -199,4 +197,10 @@ class LSIsimilarity(object):
 
     @property
     def ids(self):
-        return set([name.split('.', 1)[0] for name in self.names])
+        if not self._ids:
+            self._ids = set(self.names)
+        return self._ids
+
+    @ids.setter
+    def ids(self, value):
+        self._ids.update(set(value))

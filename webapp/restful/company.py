@@ -155,12 +155,14 @@ class CompanyCustomerListAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = project.company_customers()
-        data = []
+        result = list(project.company_customers())
+        total = len(result)
+        pages = int(math.ceil(float(total)/page_size))
+        data = list()
         for coname in result[(cur_page-1)*page_size:cur_page*page_size]:
             co = project.company_get(coname)
             data.append(co)
-        return { 'code': 200, 'data': data }
+        return { 'code': 200, 'data': data, 'pages': pages, 'totals': total}
     
 #create, delete
 class CompanyCustomerAPI(Resource):

@@ -26,14 +26,13 @@ const rootRoute = {
     let pathname = nextState.location.pathname,
         user = StorageUtil.get('user'),
         token = StorageUtil.get('token');
-
-    if (pathname === '/' && user && token) {
-      if(!global.ismember){
-        replace({ pathname: 'prouploader' });
-      }else{
-        replace({ pathname: 'search' });
-      }
-    }
+    // if (pathname === '/' && user && token) {
+    //   if(!global.ismember){
+    //     replace({ pathname: 'prouploader' });
+    //   }else{
+    //     replace({ pathname: 'search' });
+    //   }
+    // }
   },
   childRoutes: [
     require('routes/search'),
@@ -60,6 +59,22 @@ const rootRoute = {
 };
 
 class rootContainer extends Component {
+
+  componentWillMount () {
+      isMember((json) => {
+        if (json.result === true) {
+          this.setState({
+            ismember: true,
+          });
+          global.ismember = true
+        }else{
+          this.setState({
+            ismember: false,
+          });
+          global.ismember = false
+        }
+      });
+  }
 
   render() {
     return (

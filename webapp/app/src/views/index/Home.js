@@ -1,6 +1,8 @@
 'use strict';
 import React, { Component } from 'react';
 
+import { browserHistory } from 'react-router';
+
 import SignIn from 'components/signin';
 import Header from 'components/header';
 import Feature from 'components/feature';
@@ -89,6 +91,14 @@ class Home extends Component {
     });
   }
 
+  componentWillMount () {
+    if(global.ismember) {
+      // window.location.href = "/search"
+      browserHistory.push("/search");
+    } else {
+      browserHistory.push("/prouploader");
+    }
+  }
 
   render() {
     return (

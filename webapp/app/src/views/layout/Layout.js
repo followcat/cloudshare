@@ -15,26 +15,26 @@ class Layout extends Component {
     };
   }
 
-  async componentWillMount() {
-    await isMember((json) => {
-      if (json.result === true) {
-        this.setState({
-          ismember: true,
-        });
-        global.ismember = true
-      }else{
-        this.setState({
-          ismember: false,
-        });
-        global.ismember = false
-      }
-    });
-  }
+  // async componentWillMount() {
+  //   await isMember((json) => {
+  //     if (json.result === true) {
+  //       this.setState({
+  //         ismember: true,
+  //       });
+  //       global.ismember = true
+  //     }else{
+  //       this.setState({
+  //         ismember: false,
+  //       });
+  //       global.ismember = false
+  //     }
+  //   });
+  // }
 
   render() {
     return (
       <div className="cs-layout">
-      { this.state.ismember ? 
+      { global.ismember ? 
         <LayoutHeader />
         :
         <AccountLayoutHeader />

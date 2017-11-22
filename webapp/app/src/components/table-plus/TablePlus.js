@@ -104,6 +104,7 @@ class TablePlus extends Component {
 TablePlus.defaultProps = {
   prefixCls: 'cs-table',
   className: '',
+  pagination: false,
   isToolbarShowed: false,
   isSearched: false,
   searchPlaceholder: 'search',

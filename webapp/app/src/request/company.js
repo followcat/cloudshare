@@ -149,7 +149,7 @@ export const updateCompanyInfo = (params, callback) => {
  * 获取客户公司列表
  * @param {function} callback  回调函数
  */
-export const getCustomerList = (callback) => {
+export const getCustomerList = (params,callback) => {
   return fetch(API.COMPANY_CUSTOMER_LIST_API, {
     method: 'POST',
     credentials: 'include',
@@ -158,7 +158,7 @@ export const getCustomerList = (callback) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
-    body: Generator.getPostData()
+    body: Generator.getPostData(params)
   })
   .then(response => response.json())
   .then(json => callbackFunction(callback, json));

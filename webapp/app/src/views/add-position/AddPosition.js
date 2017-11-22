@@ -85,7 +85,7 @@ class AddPosition extends Component {
         message.success(language.ACTION_SUCCESS);
       } else {
 
-        message.error(language.ACTION_Fail);
+        message.error(language.ACTION_FAIL);
       }
     });
   }
@@ -184,8 +184,8 @@ class AddPosition extends Component {
           columns={columns} 
           pagination={false}
           rowKey={record => record.id}
-          expandedRowRender={record => this.getExpandedRowRender(record)}
           defaultExpandAllRows={true}
+          expandedRowRender={record => this.getExpandedRowRender(record)}
         />
         <SearchResultBox
           type="match"

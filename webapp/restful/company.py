@@ -144,16 +144,20 @@ class CompanyCustomerListAPI(Resource):
         super(CompanyCustomerListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        cur_page = args['current_page']
+        page_size = args['page_size']
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         result = project.company_customers()
         data = []
-        for coname in result:
+        for coname in result[(cur_page-1)*page_size:cur_page*page_size]:
             co = project.company_get(coname)
             data.append(co)
         return { 'code': 200, 'data': data }

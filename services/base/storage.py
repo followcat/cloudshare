@@ -13,7 +13,6 @@ import interface.gitinterface
 class BaseStorage(services.base.service.Service):
 
     commitinfo = 'BaseData'
-    YAML_TEMPLATE = ()
 
     def __init__(self, path, name=None, searchengine=None, iotype=None):
         self.path = path
@@ -83,71 +82,6 @@ class BaseStorage(services.base.service.Service):
         """
         return super(BaseStorage, self).unique(bsobj)
 
-    def generate_info_template(self):
-        info = {}
-        for each in self.YAML_TEMPLATE:
-            info[each[0]] = each[1]()
-        return info
-
-    def _listframe(self, value, username, date=None):
-        if date is None:
-            date = time.strftime('%Y-%m-%d %H:%M:%S')
-        data = {'author': username,
-                'content': value,
-                'date': date}
-        return data
-
-    def _modifyinfo(self, id, key, value, committer, do_commit=True):
-        result = {}
-        projectinfo = self.getinfo(id)
-        if not projectinfo[key] == value:
-            projectinfo[key] = value
-            self.saveinfo(id, projectinfo,
-                          'Modify %s key %s.' % (id, key), committer, do_commit=do_commit)
-            result = {key: value}
-        return result
-
-    def _addinfo(self, id, key, value, committer, do_commit=True):
-        projectinfo = self.getinfo(id)
-        data = self._listframe(value, committer)
-        projectinfo[key].insert(0, data)
-        self.saveinfo(id, projectinfo,
-                      'Add %s key %s.' % (id, key), committer, do_commit=do_commit)
-        return data
-
-    def _deleteinfo(self, id, key, value, date, committer, do_commit=True):
-        projectinfo = self.getinfo(id)
-        data = self._listframe(value, committer, date)
-        if data in projectinfo[key]:
-            projectinfo[key].remove(data)
-            self.saveinfo(id, projectinfo,
-                          'Delete %s key %s.' % (id, key), committer, do_commit=do_commit)
-            return data
-
-    @utils.issue.fix_issue('issues/update_name.rst')
-    def updateinfo(self, id, key, value, committer, do_commit=True):
-        assert self.exists(id)
-        result = None
-        if key in key in [each[0] for each in self.YAML_TEMPLATE]:
-            result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
-        return result
-
-    def saveinfo(self, id, info, message, committer, do_commit=True):
-        result = False
-        baseinfo = self.getinfo(id)
-        saveinfo = dict(filter(lambda k: k[0] in baseinfo.keys()+
-                                                 self.generate_info_template().keys(),
-                                                 info.items()))
-        if baseinfo != saveinfo:
-            name = core.outputstorage.ConvertName(id).yaml
-            saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
-                                 allow_unicode=True, default_flow_style=False)
-            self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
-                                  message=message, committer=committer, do_commit=do_commit)
-            result = True
-        return result
-
     def modify(self, filename, stream, message=None, committer=None, do_commit=True):
         self.interface.modify(filename, stream, message, committer, do_commit=do_commit)
         return True
@@ -169,11 +103,6 @@ class BaseStorage(services.base.service.Service):
                                message=message, committer=committer, do_commit=do_commit)
         self._nums += 1
         return True
-
-    def getinfo(self, id):
-        info = self.generate_info_template()
-        info.update(self.getyaml(id))
-        return info
 
     def getyaml(self, id):
         """
@@ -208,20 +137,22 @@ class BaseStorage(services.base.service.Service):
             result = unicode(str(markdown), 'utf-8')
         return result
 
-    def search(self, keyword):
+    def search(self, keyword, selected=None):
         results = set()
-        allfile = self.interface.search(keyword)
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            results.add((id, result[1]))
+        if selected and self.name in selected:
+            allfile = self.interface.search(keyword)
+            for result in allfile:
+                id = core.outputstorage.ConvertName(result[0]).base
+                results.add((id, result[1]))
         return results
 
-    def search_yaml(self, keyword):
+    def search_yaml(self, keyword, selected=None):
         results = set()
-        allfile = self.interface.search_yaml(keyword)
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            results.add((id, result[1]))
+        if selected and self.name in selected:
+            allfile = self.interface.search_yaml(keyword)
+            for result in allfile:
+                id = core.outputstorage.ConvertName(result[0]).base
+                results.add((id, result[1]))
         return results
 
     def datas(self):

@@ -3,14 +3,14 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
-import services.base.storage
+import services.base.template_storage
 import services.simulationcv
 import services.simulationco
 import services.simulationpeo
 import services.jobdescription
 import extractor.information_explorer
 
-class Project(services.base.storage.BaseStorage):
+class Project(services.base.template_storage.TemplateStorage):
 
     CV_PATH = 'CV'
     CO_PATH = 'CO'

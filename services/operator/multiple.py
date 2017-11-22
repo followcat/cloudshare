@@ -5,12 +5,13 @@ import services.base.service
 
 class Multiple(services.base.service.Service):
     """"""
-    combine_all = ('getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid',)
-    match_any = ('exists',)
+    combine_all = ()
+    match_any = ('exists', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid',)
 
     def __init__(self, services):
         assert services
         self.services = services
+        self.service_type = type(services[0])
         self.match_any_partial = {}
         for attr in self.match_any:
             self.match_any_partial[attr] = functools.partial(self.do_match_any, attr=attr)
@@ -58,3 +59,31 @@ class Multiple(services.base.service.Service):
             if md not in results:
                 results.append(md)
                 yield md
+        yield None
+
+    def search(self, keyword, selected=None):
+        if selected is None:
+            selected = [service.name for service in self.services]
+        results = set()
+        allfile = set()
+        for service in self.services:
+            allfile.update(service.search(keyword, selected=selected))
+        for result in allfile:
+            id = self.get_id(result[0])
+            if id in self.ids:
+                results.add((id, result[1]))
+        return results
+
+    def search_yaml(self, keyword, selected=None):
+        if selected is None:
+            selected = [service.name for service in self.services]
+        results = set()
+        allfile = set()
+        for service in self.services:
+            allfile.update(service.search_yaml(keyword, selected=selected))
+        for result in allfile:
+            id = self.get_id(result[0])
+            if id in self.ids:
+                results.add((id, result[1]))
+        return results
+

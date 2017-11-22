@@ -141,7 +141,13 @@ class JobDescriptionListAPI(Resource):
                                             start=(cur_page-1)*page_size,
                                             size=page_size, source=True)
         pages = int(math.ceil(float(total)/page_size))
-        datas = [item['_source'] for item in searches]
+        datas = list()
+        for item in searches:
+            jd = item['_source']
+            co_id = jd['company']
+            co_name = project.company_get(co_id)['name']
+            jd['company_name'] = co_name
+            datas.append(jd)
         return {
             'code': 200,
             'data': datas,
@@ -175,7 +181,13 @@ class JobDescriptionSearchAPI(JobDescriptionListAPI):
                                             start=(cur_page-1)*page_size,
                                             size=page_size, source=True)
         pages = int(math.ceil(float(total)/page_size))
-        datas = [item['_source'] for item in searches]
+        datas = list()
+        for item in searches:
+            jd = item['_source']
+            co_id = jd['company']
+            co_name = project.company_get(co_id)['name']
+            jd['company_name'] = co_name
+            datas.append(jd)
         return {
             'code': 200,
             'data': datas,

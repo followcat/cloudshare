@@ -7,6 +7,7 @@ from com.sun.star.task import ErrorCodeIOException
 from com.sun.star.connection import NoConnectException
 
 import utils.builtin
+from utils.docprocessor.base import logger
 
 DEFAULT_OPENOFFICE_PORT = 8100
 
@@ -58,13 +59,25 @@ class DocumentConverter:
         self.resolver = self.localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver",
                         self.localContext)
 
+
     def startservice(self):
+        def wait_until_port_open(timeout=3):
+            count = 0
+            while(utils.builtin.is_port_open(self.host, self.port)):
+                time.sleep(0.01)
+                count += 0.01
+                if count > timeout:
+                    logger.info("Can not connect unoconverter server.")
+                    break
+
         if not utils.builtin.is_port_open(self.host, self.port):
             command = ['libreoffice',
                        '--accept=socket,host=%s,port=%s;urp;'%(self.host, self.port)]
             if self.invisible is True:
                 command.append('--invisible')
             self.p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+            self.wait_until_port_open()
+
 
     def convert(self, inputFile, outputFile):
         try:

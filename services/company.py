@@ -4,7 +4,7 @@ import yaml
 
 import utils._yaml
 import utils.companyexcel
-import core.outputstorage
+import core.basedata
 import services.base.storage
 import extractor.information_explorer
 
@@ -14,10 +14,9 @@ class Company(services.base.storage.BaseStorage):
         >>> import shutil
         >>> import services.company
         >>> import core.basedata
-        >>> import interface.gitinterface
         >>> import extractor.information_explorer
-        >>> DIR = 'services/test_repo'
-        >>> svc_co = services.company.Company(DIR)
+        >>> path = 'services/test_repo'
+        >>> svc_co = services.company.Company(path)
         >>> name, committer, introduction = 'CompanyA', 'tester', 'This is Co.A'
         >>> metadata = extractor.information_explorer.catch_coinfo({'introduction': introduction,
         ...                                                         'name': name})
@@ -29,7 +28,7 @@ class Company(services.base.storage.BaseStorage):
         'CompanyA'
         >>> co['introduction']
         'This is Co.A'
-        >>> svc_co.add(coobj, 'Dever') # doctest: +ELLIPSIS
+        >>> svc_co.add(coobj, 'Dever')
         False
         >>> list(svc_co.ids)
         ['4de25a98bc371bf87220e500215317f4b2c24933']
@@ -37,7 +36,7 @@ class Company(services.base.storage.BaseStorage):
         Traceback (most recent call last):
         ...
         IOError...
-        >>> shutil.rmtree(DIR)
+        >>> shutil.rmtree(path)
     """
     commitinfo = 'Company'
 
@@ -55,6 +54,3 @@ class Company(services.base.storage.BaseStorage):
                 output.append(('companyadd', metadata['id'], (metadata, excel, committer)))
         return output
 
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False, do_commit=True):
-        return super(Company, self).add(bsobj, committer, unique,
-                                        yamlfile, mdfile, do_commit=do_commit)

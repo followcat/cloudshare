@@ -12,12 +12,9 @@ class JobDescription(services.base.storage.BaseStorage):
     """
         >>> import shutil
         >>> import services.jobdescription
-        >>> import interface.gitinterface
 
         >>> repo_name = 'services/test_repo'
-        >>> interface = interface.gitinterface.GitInterface(repo_name)
-
-        >>> svc_jd = services.jobdescription.JobDescription(interface.path)
+        >>> svc_jd = services.jobdescription.JobDescription(repo_name)
         >>> svc_jd.add('CompanyA', 'JD-A', 'JD-A description', 'Dever')
         True
         >>> results = svc_jd.search('JD-A')
@@ -47,10 +44,6 @@ class JobDescription(services.base.storage.BaseStorage):
         ('JD-C description', 'this is UPDATED JD-C commentary', 'UPDATED JD-C followup')
         >>> shutil.rmtree(repo_name)
     """
-
-    def __init__(self, interface, name=None):
-        super(JobDescription, self).__init__(interface, name)
-        self.path = self.interface.path
 
     def get(self, hex_id):
         name = self.filename(hex_id)

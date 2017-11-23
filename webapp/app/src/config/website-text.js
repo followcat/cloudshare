@@ -38,6 +38,8 @@ const websiteText = {
     BECOME_MEMBER: '成为会员',
     BEST_EXCELLENT: '每日优秀',
 
+    SUCCESS: '成功',
+    FAIL: '失败',
     ACTION_SUCCESS: '操作成功！',
     ACTION_FAIL: '操作失败！',
 
@@ -142,6 +144,11 @@ const websiteText = {
     CHANGE: '变更',
     CONFIRM_UOLOAD: '确认上传',
     UPLOAD_SUCCESS_MSG: '上传成功',
+    CONFIRM_UPLOAD: '检测到已有个人简历，确认上传更新？',
+    UPLOAD_SUCCESS: '简历存入数据库和项目中',
+    UPLOAD_EXISTED_PROJECTS: '其他项目中已有该简历',
+    UPLOAD_EXISTED_PROJECT: '本项目中已有该简历',
+    UPLOAD_NO_CONTACT: '简历中联系方式为空',
 
     FOLD_MSG: '收起所有信息',
     UNFOLD_MSG: '展开所有信息',

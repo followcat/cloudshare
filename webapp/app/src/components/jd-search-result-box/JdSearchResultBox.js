@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react';
 
 import SearchResultHeader from './SearchResultHeader';
 import SearchResultItem from './SearchResultItem';
-import SearchResultPagination from './SearchResultPagination';
 
 import { Spin } from 'antd';
 
@@ -90,11 +89,6 @@ class SearchResultBox extends Component {
         <Spin spinning={spinning}>
           {this.getResultDOMRender()}
         </Spin>
-        <SearchResultPagination
-          current={current}
-          total={total}
-          onSwitchPage={this.props.onSwitchPage}
-        />
       </div>
     );
   }

@@ -1,9 +1,13 @@
 'use strict';
 import React, { Component, PropTypes, message, } from 'react';
 
-import { Form, Input, Select, Button } from 'antd';
+import { Form, Input, Select, Button, Popconfirm } from 'antd';
 
 import { getUploadOrigin } from 'request/classify';
+
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
 
 const FormItem = Form.Item,
       Option = Select.Option;
@@ -28,12 +32,50 @@ class PreviewTopBarForm extends Component {
     });
   }
 
+  getButton () {
+    const {
+      peopleid,
+      confirmLoading,
+      btnText,
+    } = this.props;
+    console.log(peopleid);
+    if(peopleid) {
+        return (
+            <Popconfirm title={language.CONFIRM_UPLOAD}
+            onConfirm={this.handleClick}
+            onCancel={null}
+            okText={language.YES} cancelText={language.NO}>
+            <Button
+              type="primary"
+              className="cs-preview-comfirm"
+              loading={confirmLoading}
+              size="small"
+            >
+              {btnText}
+            </Button>
+          </Popconfirm>
+          )}
+          else {
+          return (
+            <Button
+              type="primary"
+              onClick={this.handleClick}
+              className="cs-preview-comfirm"
+              loading={confirmLoading}
+              size="small"
+            >
+              {btnText}
+            </Button>
+            )}
+  }
+
   render() {
     const {
       form,
       name,
       prefixCls,
       resumeID,
+      peopleid,
       origins,
       classifyValue,
       classifyList,
@@ -109,16 +151,8 @@ class PreviewTopBarForm extends Component {
         </FormItem>
         <FormItem>
         {currentPreview === total - 1 ?
-            <Button
-              type="primary"
-              className="cs-preview-comfirm"
-              loading={confirmLoading}
-              onClick={this.handleClick}
-              size="small"
-            >
-              {btnText}
-            </Button>    :
-          null
+         this.getButton()
+         : null
         }
         </FormItem>
       </Form>

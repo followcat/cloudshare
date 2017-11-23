@@ -152,10 +152,11 @@ class UserUploadCVAPI(UploadCVAPI):
 
     def post(self):
         result = super(UserUploadCVAPI, self).post()
-        result['data']['user_peo'] = False
-        user = flask.ext.login.current_user
-        if user.peopleID == result['data']['unique_id']:
-            result['data']['user_peo'] = True
+        if result['data']['result'] is True:
+            result['data']['user_peo'] = False
+            user = flask.ext.login.current_user
+            if user.peopleID == result['data']['unique_id']:
+                result['data']['user_peo'] = True
         return result
 
 

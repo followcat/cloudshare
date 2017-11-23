@@ -40,7 +40,6 @@ class LSIsimilarity(object):
             for data in svc_cv.datas():
                 name, doc = data
                 names.append(name)
-                documents.append(doc)
                 words = self.lsi_model.slicer(doc, id=name)
                 corpus.append(self.lsi_model.lsi.id2word.doc2bow(words))
         self.setup(names, corpus)

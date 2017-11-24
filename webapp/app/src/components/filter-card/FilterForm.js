@@ -23,9 +23,10 @@ const FormItem = Form.Item,
       OptGroup = Select.OptGroup;
 
 class FilterForm extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
+      searchText: props.searchText,
       expand: false,
       gender: [],
       education: [],
@@ -150,7 +151,6 @@ class FilterForm extends Component {
     };
 
     const dateFormat = 'YYYY-MM-DD';
-
     return (
       <Form layout="horizontal">
         {textarea ?
@@ -161,7 +161,9 @@ class FilterForm extends Component {
                 labelCol={{ span: 3 }}
                  wrapperCol={{ span: 19 }}
               >
-                {getFieldDecorator('doc')(
+                {getFieldDecorator('doc',{
+                  initialValue: this.state.searchText
+                })(
                   <Input type="textarea" rows={1} />)}
               </FormItem>
             </Col>
@@ -316,7 +318,8 @@ class FilterForm extends Component {
 }
 
 FilterForm.defaultProps = {
-  databaseDisplay: true
+  databaseDisplay: true,
+  searchText: ''
 };
 
 FilterForm.propTypes = {

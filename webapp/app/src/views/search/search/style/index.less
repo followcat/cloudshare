@@ -2,10 +2,42 @@
 .cs-layout-search {
   /* Seach form style */
   .cs-search {
-    padding-top: 210px;
-    width: 720px;
-    margin: 0 auto;
+       position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 55%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
   }
+
+.card-container .ant-tabs-card .ant-tabs-content {
+  height: 120px;
+  margin-top: -16px;
+}
+
+.card-container .ant-tabs-card .ant-tabs-content .ant-tabs-tabpane {
+  background: #fff;
+  padding: 16px;
+  border: 2px solid #23ade5;
+  border-radius: 5px;
+}
+
+.card-container .ant-tabs-card .ant-tabs-bar {
+  border-color: #fff;
+}
+
+.card-container .ant-tabs-card .ant-tabs-bar .ant-tabs-tab {
+  border-color: transparent;
+  background: transparent;
+}
+
+.card-container .ant-tabs-card .ant-tabs-bar .ant-tabs-tab-active {
+  background: #fff;
+  border: 2px solid #23ade5;
+  border-radius: 5px;
+}
 
   /* DatabaseInfo component style */
   .count-box {

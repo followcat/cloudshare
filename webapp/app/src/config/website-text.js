@@ -33,6 +33,7 @@ const websiteText = {
     MATCH: '匹配',
     PROJECT_SEARCH: '项目查询',
     RESUME_UPLOADER: '简历上传',
+    POSITION_RECOMMEND: '职位推荐', 
     PRO_RESUME_UPLOADER: '个人简历',
     VIP_MANAGEMENT: '会员服务',
     BECOME_MEMBER: '成为会员',

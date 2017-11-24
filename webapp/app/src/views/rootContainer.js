@@ -8,15 +8,33 @@ import 'components/global.less';
 
 import { isMember } from 'request/member';
 
+let promise = new Promise((resolve, reject) => {
+      isMember((json) => {
+        if (json.result === true) {
+          // this.setState({
+          //   ismember: true,
+          // });
+          global.ismember = true
+        }else{
+          // this.setState({
+          //   ismember: false,
+          // });
+          global.ismember = false
+        }
+        resolve(global.ismember);
+      });
+  });
+
 const rootRoute = {
   path: '/',
-  indexRoute: {
-    getComponent(nextState, callback) {
-      require.ensure([], (require) => {
-        callback(null, require('views/index').default);
-      }, 'index');
-    }
-  },
+  // indexRoute: {
+  //   path: 'hp',
+  //   getComponent(nextState, callback) {
+  //     require.ensure([], (require) => {
+  //       callback(null, require('views/home').default);
+  //     }, 'home');
+  //   }
+  // },
   getComponent(nextState, callback) {
     require.ensure([], (require) => {
       callback(null, require('views/App').default);
@@ -26,15 +44,21 @@ const rootRoute = {
     let pathname = nextState.location.pathname,
         user = StorageUtil.get('user'),
         token = StorageUtil.get('token');
-    // if (pathname === '/' && user && token) {
-    //   if(!global.ismember){
-    //     replace({ pathname: 'prouploader' });
-    //   }else{
-    //     replace({ pathname: 'search' });
-    //   }
-    // }
+    if (user && token) {
+      if(pathname === '/')
+        promise.then((data) => {
+          if(global.ismember){
+            browserHistory.replace("/search");
+            replace({ pathname: 'search' });
+          }else{
+            browserHistory.replace("/prouploader");
+            replace({ pathname: 'prouploader' });
+           }
+        })
+    } else if (pathname == 'index') replace({ pathname: 'index' });
   },
   childRoutes: [
+    require('routes/index'),
     require('routes/search'),
     require('routes/uploader'),
     require('routes/prouploader'),
@@ -59,23 +83,6 @@ const rootRoute = {
 };
 
 class rootContainer extends Component {
-
-  componentWillMount () {
-      isMember((json) => {
-        if (json.result === true) {
-          this.setState({
-            ismember: true,
-          });
-          global.ismember = true
-        }else{
-          this.setState({
-            ismember: false,
-          });
-          global.ismember = false
-        }
-      });
-  }
-
   render() {
     return (
       <Router history={browserHistory} routes={rootRoute} />

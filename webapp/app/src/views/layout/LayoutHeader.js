@@ -27,10 +27,10 @@ const MenuItem = Menu.Item,
 const navMenusMember = [{
   url: URL.getSearchURL(),
   text: language.SEARCH
-}, {
+}, /*{
   url: URL.getFastMatchingByDoc(),
   text: language.MATCH
-}, {
+}, */{
   url: URL.getUploaderURL(),
   text: language.RESUME_UPLOADER
 }, {

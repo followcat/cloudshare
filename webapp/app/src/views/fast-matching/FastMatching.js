@@ -20,12 +20,13 @@ import { API } from 'API';
 import findIndex from 'lodash/findIndex';
 
 class FastMatching extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       current: 1,
       id: '',
       postAPI: '',
+      searchText: props.location.query.search_text,
       classify: [],
       projects: [],
       industry: {},
@@ -70,7 +71,7 @@ class FastMatching extends Component {
     const date = new Date();
     const defFilterData = {date: [moment(date).add(-180, 'days').format('YYYY-MM-DD'),
                                   moment(date).format('YYYY-MM-DD')]};
-    
+
     if (location.query.jd_id) {
       postAPI = API.LSI_BY_JD_ID_API;
 
@@ -109,6 +110,17 @@ class FastMatching extends Component {
           textarea: true,
           postData: Object.assign({}, {filterdict: defFilterData}),
           postAPI: API.LSI_BY_DOC_API
+        });
+      });
+    }
+
+    if(this.state.searchText){
+      promise.then((uses) => {
+        this.setState({
+          postData: Object.assign({uses}, {filterdict: {}},{doc:this.state.searchText}),
+          postAPI: API.LSI_BY_DOC_API
+        },() => {
+          this.getResultDataSource(this.state.postAPI,this.state.postData);
         });
       });
     }
@@ -300,17 +312,18 @@ class FastMatching extends Component {
       spinning,
       current,
       total,
+      searchText,
       dataSource,
       selection,
       siderbarClosable,
       siderbarVisible
     } = this.state;
-
     return (
       <div className="cs-fast-matching">
         <Guide />
         <FilterCard
           textarea={textarea}
+          searchText={searchText}
           classify={classify}
           projects={projects}
           industry={industry}

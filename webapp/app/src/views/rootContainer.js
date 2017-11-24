@@ -55,7 +55,7 @@ const rootRoute = {
             replace({ pathname: 'prouploader' });
            }
         })
-    } else if (pathname == 'index') replace({ pathname: 'index' });
+    } else if (pathname == '/') replace({ pathname: 'index' });
   },
   childRoutes: [
     require('routes/index'),

@@ -34,6 +34,9 @@ const navMenusMember = [{
   url: URL.getUploaderURL(),
   text: language.RESUME_UPLOADER
 }, {
+  url: URL.getAddPositionURL(),
+  text: language.POSITION_RECOMMEND
+},{
   url: URL.getProjectManagement(),
   text: language.VIP_MANAGEMENT
 }, {

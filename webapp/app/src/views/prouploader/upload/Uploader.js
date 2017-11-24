@@ -92,9 +92,9 @@ class Uploader extends Component {
     this.getPreviewRender = this.getPreviewRender.bind(this);
   }
 
-  async componentWillMount() {
+  componentWillMount() {
 
-    await getPeopleID((json) => {
+    getPeopleID((json) => {
       if (json.code === 200) {
         this.setState({
           peopleid: json.result.cv[0],
@@ -315,12 +315,14 @@ class Uploader extends Component {
       total,
       origin,
       origins,
+      peopleid,
       confirmLoading
     } = this.state;
 
     if (completedList.length > 0) {
       return (
         <Preview
+          peopleid={peopleid}
           completedList={completedList}
           classifyList={classifyList}
           currentPreview={currentPreview}
@@ -392,12 +394,15 @@ class Uploader extends Component {
             <div>
             { (completedList.length==0) ?
               <div>
+                <div className="cs-uploader-preview">
                 <Summary dataSource={generateSummary(yaml_info)} />
+                </div>
                 <SearchResultBox
                   visible={true}
                   current={0}
                   total={totals}
                   spinning={false}
+                  showPagination={false}
                   dataSource={dataSource}
                   educationExperienceText="教育经历"
                   workExperienceText="工作经历"

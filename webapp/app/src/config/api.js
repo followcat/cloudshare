@@ -94,6 +94,8 @@ export const API = {
 
   UPLOAD_RESUME_API: `${HOST}/api/userupcv`,
 
+  UPLOAD_MEMBER_RESUME_API: `${HOST}/api/memberupcv`,
+
   UPLOAD_RESUME_PREVIEW_API: `${HOST}/api/uploadcv/preview`,
 
   UPLOAD_ENGLISH_RESUME_API: `${HOST}/api/uploadengcv`,

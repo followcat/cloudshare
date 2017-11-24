@@ -82,16 +82,20 @@ class UploadCVAPI(Resource):
                         result['member_cv_result'] = self.member.cv_add(cvobj, user.name,
                                                                         unique=True)
                         status = 'success'
-                        message = 'Add to CV database and project.'
+                        # Add to CV database and project
+                        message = '200'
                         names.append(cvobj.name.md)
                         documents.append(cvobj.data)
                         if not result['repo_cv_result']:
-                            message = 'Existed in other project.'
+                            # Existed in other project
+                            message = '201'
                     else:
                         status = 'success'
-                        message = 'Resume existed in database and project.'
+                        # Resume existed in database and project
+                        message = '202'
                 except core.exception.NotExistsContactException:
-                    message = 'The contact information is empty.'
+                    # The contact information is empty
+                    message = '203'
                 results.append({ 'id': id,
                                  'status': status,
                                  'message': message,

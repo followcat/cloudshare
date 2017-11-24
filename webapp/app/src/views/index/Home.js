@@ -31,6 +31,12 @@ class Home extends Component {
     this.handleSignInSubmit = this.handleSignInSubmit.bind(this);
     this.handleCreateAccountSubmit = this.handleCreateAccountSubmit.bind(this);
     this.getFeatureData = this.getFeatureData.bind(this);
+    //     if(global.ismember) {
+    //   // window.location.href = "/search"
+    //   browserHistory.replace("/search");
+    // } else {
+    //   browserHistory.replace("/prouploader");
+    // }
   }
 
   handleFeatureClick() {
@@ -91,14 +97,14 @@ class Home extends Component {
     });
   }
 
-  componentWillMount () {
-    if(global.ismember) {
-      // window.location.href = "/search"
-      browserHistory.push("/search");
-    } else {
-      browserHistory.push("/prouploader");
-    }
-  }
+  // componentWillMount () {
+  //   if(global.ismember) {
+  //     // window.location.href = "/search"
+  //     browserHistory.replace("/search");
+  //   } else {
+  //     browserHistory.replace("/prouploader");
+  //   }
+  // }
 
   render() {
     return (

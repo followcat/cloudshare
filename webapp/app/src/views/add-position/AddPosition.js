@@ -59,7 +59,10 @@ class AddPosition extends Component {
 
     // 获取客户公司列表
   getCustomerDataSource() {
-    getCustomerList((json) => {
+    getCustomerList({
+      current_page: 1,
+      page_size: 999,
+    },(json) => {
       if (json.code === 200) {
         this.setState({
           customerDataSource: json.data

@@ -57,6 +57,10 @@ export const URL = {
   getProUploaderURL: () => {
     return `/prouploader`;
   },
+  
+  getAddPositionURL: () => {
+    return `/addposition`;
+  },
 
   getUserInfoURL: () => {
     return `/userinfo/history`;

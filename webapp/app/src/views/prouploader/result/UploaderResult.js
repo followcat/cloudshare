@@ -5,6 +5,10 @@ import ConfirmResult from 'components/confirm-result';
 
 import { URL } from 'URL';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 class UploaderResult extends Component {
   constructor() {
     super();
@@ -23,14 +27,19 @@ class UploaderResult extends Component {
       key: 'status',
       render: (text) => (
         text === 'success' ?
-            <span style={{ color: 'green' }}>{text}</span> :
-            <span style={{ color: 'red' }}>{text}</span>
+            <span style={{ color: 'green' }}>{language.SUCCESS}</span> :
+            <span style={{ color: 'red' }}>{language.FAIL}</span>
       )
     }, {
       title: '信息',
       dataIndex: 'message',
       key: 'message',
-      render: (text) => <span>{text}</span>
+      render: (text) => {switch(text){
+        case "200": return (<span>{language.UPLOAD_SUCCESS}</span> );
+        case "201": return (<span>{language.UPLOAD_EXISTED_PROJECTS}</span> );
+        case "202": return (<span>{language.UPLOAD_EXISTED_PROJECT}</span> );
+        case "203": return (<span>{language.UPLOAD_NO_CONTACT}</span> );
+      }}
     }, {
       title: '操作',
       key: 'operation',

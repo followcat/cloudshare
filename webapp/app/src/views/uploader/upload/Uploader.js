@@ -295,7 +295,7 @@ class Uploader extends Component {
 
     const uploadProps = {
       name: 'files',
-      action: API.UPLOAD_RESUME_API,
+      action: API.UPLOAD_MEMBER_RESUME_API,
       headers: {
         'Authorization': `Basic ${StorageUtil.get('token')}`
       },

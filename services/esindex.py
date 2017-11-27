@@ -177,7 +177,7 @@ class ElasticsearchIndexing(object):
 
     def updatesvc(self, index, doctype, svc, content=True, numbers=5000):
         assert svc.name
-        total, searchs = self.ESsearch(index=index, doctype=doctype)
+        total, searchs = self.ESsearch(index=index, doctype=doctype, size=10000, scroll='1m')
         update_ids = set([item['_id'] for item in searchs])
         ACTIONS = list()
         times = 0
@@ -242,13 +242,13 @@ class ElasticsearchIndexing(object):
             print("Update numbers %d to index. And finished."%(times*numbers+len(ACTIONS)))
 
     def ESsearch(self, index=None, doctype=None, querydict=None, kwargs=None,
-                 source=False, start=0, size=None):
+                 source=False, start=0, size=None, scroll=None):
         if kwargs is None:
             kwargs = dict()
         kwargs.update({'body': querydict})
         kwargs['_source'] = source
         result = utils.esquery.scroll(self.es, kwargs, index=index, doctype=doctype,
-                                      start=start, size=size)
+                                      start=start, size=size, scroll=scroll)
         return result
 
     def count(self, index=None, doctype=None, filterdict=None,
@@ -263,12 +263,13 @@ class ElasticsearchIndexing(object):
         return result
 
     def search(self, index=None, doctype=None, filterdict=None, ids=None, source=False,
-               start=0, size=None, kwargs=None, onlyid=False, slop=50):
+               start=0, size=None, kwargs=None, onlyid=False, slop=50, scroll=None):
         results = (0, list())
         querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
                                               filterdict=filterdict, ids=ids, slop=slop)
         results = self.ESsearch(index=index, doctype=doctype, querydict=querydict,
-                                kwargs=kwargs, source=source, start=start, size=size)
+                                kwargs=kwargs, source=source, start=start,
+                                size=size, scroll=scroll)
         if onlyid:
             total, searchs = results
             results = [each['_id'] for each in searchs]

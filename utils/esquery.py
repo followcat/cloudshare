@@ -102,15 +102,13 @@ def request_gen(esconn, index=None, doctype=None, filterdict=None, ids=None, slo
     return querydict
 
 
-def scroll(esconn, kwargs, index=None, doctype=None, start=0, size=None):
+def scroll(esconn, kwargs, index=None, doctype=None, start=0, size=None, scroll=None):
     count = 0
     result = list()
     if size is None:
         size = 10000
-    scroll = True if start + size > 10000 else False
-    if scroll:
-        start = 0
-        kwargs['scroll'] = '1m'
+    if scroll is not None:
+        kwargs['scroll'] = scroll
     if 'sort' in kwargs:
         sort = kwargs.pop('sort')
         if 'body' not in kwargs:
@@ -124,8 +122,8 @@ def scroll(esconn, kwargs, index=None, doctype=None, start=0, size=None):
             request_timeout=30,
             **kwargs)
     total = page['hits']['total']
-    if size is None or (size+start) > page['hits']['total']:
-        size = page['hits']['total']-start
+    if scroll is not None:
+        size = page['hits']['total']
 
     while (len(page['hits']['hits']) > 0 and count < size):
         result.extend(page['hits']['hits'])

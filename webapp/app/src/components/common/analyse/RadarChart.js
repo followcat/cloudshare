@@ -44,7 +44,7 @@ export default class RadarChart extends Component {
         'Content-Type': 'application/json',
       },
       body: Generator.getPostData(Object.assign(postData, {
-        name_list: this.props.selection.toJS().map(item => { return item.id + '.md' }),
+        name_list: this.props.selection.toJS().map(item => { return item.id }),
         uses: this.props.postData.uses,
       })),
     })

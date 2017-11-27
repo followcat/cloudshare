@@ -32,7 +32,6 @@ class Layout extends Component {
   // }
 
   componentDidMount() {
-    console.log(global.ismember);
     if(global.ismember) {
       this.setState({
         ismember: global.ismember

@@ -39,7 +39,6 @@ class Guide extends Component {
     this.setState({
       visible : false
     });
-    console.log(this.state.visible);
   }
 
   UploadClick() {

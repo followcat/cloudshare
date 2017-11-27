@@ -77,11 +77,6 @@ const rootRoute = {
 };
 
 class rootContainer extends Component {
-
-  componentWillUnmount() {
-    console.log(global.ismember);
-  }
-
   render() {
     return (
       <Router history={browserHistory} routes={rootRoute} {...global.ismember}/>

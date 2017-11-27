@@ -164,6 +164,28 @@ def convert_member(current_template, next_template, version):
                             if data in ('CO', 'CV', 'PEO'):
                                 with open(os.path.join(next_template['MEMBERS'], member, subdir, 'default', data, 'names.json'), 'w') as out:
                                     json.dump([], out)
+    elif version == '1.5':
+        for member in ('default', 'willendare'):
+            for subdir in ('projects',):
+                if subdir in ('projects',):
+                    if member == 'willendare':
+                        try:
+                            os.makedirs(next_template['JD_REPO'])
+                        except OSError:
+                            pass
+                        for project in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).dirs():
+                            for data in ('CO', 'CV', 'PEO', 'JD'):
+                                if data in ('JD', ):
+                                    files = [os.path.basename(_) for _ in path.Path(os.path.join(project, data)).files()]
+                                    with open(os.path.join(project, data, 'names.json'), 'w') as out:
+                                        json.dump([_.split(os.extsep)[0] for _ in files], out)
+                                    for f in path.Path(os.path.join(project, data)).files():
+                                        if os.path.basename(f) == 'names.json':
+                                            continue
+                                        try:
+                                            os.renames(f, os.path.join(next_template['JD_REPO'], os.path.basename(f)))
+                                        except IOError:
+                                            pass
 
 def convert_password(current_template, next_template, version):
     if version == '1.1':
@@ -188,6 +210,20 @@ def convert_password(current_template, next_template, version):
                 with open(os.path.join(next_template['PASSWORD'], d['id']+'.yaml'), 'w') as out:
                     out.write(yaml.dump(d, Dumper=utils._yaml.SafeDumper, default_flow_style=False))
 
+def convert_model(current_template, next_template, version):
+    if version == '1.5':
+        for model in ('default', 'ArtificialIntelligence',):
+            for subdir in ('all', 'model',):
+                try:
+                    os.makedirs(os.path.join(next_template['LSI'], model, subdir))
+                except OSError:
+                    pass
+            if model in ('default',):
+                try:
+                    os.makedirs(os.path.join(next_template['LSI'], model, 'all', model))
+                except OSError:
+                    pass
+
 conversion_rules = {
     # Backward conversions
     ('1.2', '1.1'): collections.OrderedDict({
@@ -199,6 +235,10 @@ conversion_rules = {
         'PASSWORD': functools.partial(convert_password, version='1.2'),
         'MESSAGE': functools.partial(convert_message, version='1.2'),
         'MEMBERS': functools.partial(convert_member, version='1.2'),
+        }),
+    ('1.2', '1.5'): collections.OrderedDict({
+        'MEMBERS': functools.partial(convert_member, version='1.5'),
+        'LSI': functools.partial(convert_model, version='1.5'),
         }),
     }
 

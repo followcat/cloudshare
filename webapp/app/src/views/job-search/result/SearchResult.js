@@ -6,6 +6,8 @@ import KeywordSearch from 'components/keyword-search';
 import SearchResultBox from 'components/jd-search-result-box';
 import ResultInfo from './ResultInfo';
 
+import { Pagination } from 'antd';
+
 import { jdMatching, proJdMatching } from 'request/matching';
 import { getIndustry } from 'request/classify';
 
@@ -13,6 +15,7 @@ class SearchResult extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      pageSize: 10,
       searchText: props.location.query.search_text,
       dataSource: [],
       pages: 0,
@@ -28,6 +31,8 @@ class SearchResult extends Component {
     // this.getIndustryDataSource = this.getIndustryDataSource.bind(this);
     this.loadResultDataSource = this.loadResultDataSource.bind(this);
     this.loadResultProDataSource = this.loadResultProDataSource.bind(this);
+    this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
+    this.handlePaginationChange = this.handlePaginationChange.bind(this);
   }
 
   componentWillMount() {
@@ -43,6 +48,19 @@ class SearchResult extends Component {
   componentDidMount() {
     // this.loadResultDataSource(this.state.searchText);
     // this.getIndustryDataSource();
+  }
+
+  handleShowSizeChange(current, pageSize) {
+      this.setState({
+        current: current,
+        pageSize: pageSize
+      },() => this.handleSwitchPage(current));
+  }
+
+  handlePaginationChange(current) {
+      this.setState({
+        current: current
+      },() => {this.handleSwitchPage(current)});
   }
 
   handleSearch(value) {
@@ -63,7 +81,7 @@ class SearchResult extends Component {
   }
 
   handleSwitchPage(page) {
-    const { filterValue } = this.state;
+    const { filterValue, pageSize } = this.state;
 
     this.setState({
       current: page,
@@ -73,7 +91,7 @@ class SearchResult extends Component {
     if(!this.state.searchText) {
       proJdMatching({
         'page': `page=${page-1}`,
-        'numbers': `numbers=20`
+        'numbers': `numbers=${pageSize}`
       }, json => {
         if (json.code === 200) {
           this.setState({
@@ -88,7 +106,7 @@ class SearchResult extends Component {
       jdMatching({
         'doc': this.state.searchText,
         'page': `${page-1}`,
-        'numbers': `20`
+        'numbers': `${pageSize}`
       }, (json) => {
         if (json.code === 200) {
           this.setState({
@@ -172,7 +190,7 @@ class SearchResult extends Component {
     jdMatching({
       doc: searchText,
       page: 0,
-      numbers: 20
+      numbers: 10
     }, json => {
       if (json.code === 200) {
         this.setState({
@@ -187,12 +205,25 @@ class SearchResult extends Component {
   render() {
     const { prefixCls, location } = this.props,
           { totals,
+            pageSize,
             searchText,
             current,
             spinning,
             dataSource,
             industry
           } = this.state;
+
+    const pagination = {
+      current: current,
+      total: totals,
+      pageSize: pageSize,
+      showSizeChanger: true,
+      showQuickJumper: true,
+      defaultPageSize: 20,
+      showTotal: totals => `共 ${totals} 条`,
+      onShowSizeChange: this.handleShowSizeChange,
+      onChange: this.handlePaginationChange
+    };
 
     return (
       <div className={prefixCls}>
@@ -224,6 +255,9 @@ class SearchResult extends Component {
             unfoldText="收起"
             onSwitchPage={this.handleSwitchPage}
           />
+        </div>
+        <div className="cs-card-inner-pagination">
+          <Pagination {...pagination}/>
         </div>
       </div>
     );

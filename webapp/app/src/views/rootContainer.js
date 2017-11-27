@@ -8,17 +8,11 @@ import 'components/global.less';
 
 import { isMember } from 'request/member';
 
-let promise = new Promise((resolve, reject) => {
+const promise = new Promise((resolve, reject) => {
       isMember((json) => {
         if (json.result === true) {
-          // this.setState({
-          //   ismember: true,
-          // });
           global.ismember = true
         }else{
-          // this.setState({
-          //   ismember: false,
-          // });
           global.ismember = false
         }
         resolve(global.ismember);
@@ -83,9 +77,14 @@ const rootRoute = {
 };
 
 class rootContainer extends Component {
+
+  componentWillUnmount() {
+    console.log(global.ismember);
+  }
+
   render() {
     return (
-      <Router history={browserHistory} routes={rootRoute} />
+      <Router history={browserHistory} routes={rootRoute} {...global.ismember}/>
     );
   }
 }

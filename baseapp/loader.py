@@ -22,9 +22,106 @@ except ImportError:
     pass
 
 
-LSI_PATH = 'lsimodel'
+class Config(object):
+
+    storage_config_file = 'storage.yaml'
+
+    default_storage_path = {'1.1': '.',
+        '1.2': '.',
+        '1.5': 'datas',
+        }
+    storage_template = {'1.1': (
+        ("RAW",             "raw"),
+        ("UPLOAD_TEMP",     "output"),
+        ("CUTWORD",         "cutwords"),
+        ("LSI",             "lsimodel"),
+        ("PROJECT",         "projects"),
+        ("ACCOUNT",         "account"),
+        ("JD_REPO",         "repo/JD"),
+        ("CO_REPO",         "repo/CO"),
+        ("CV_REPO",         "repo/CV"),
+        ("PEO_REPO",        "repo/PEO"),
+        ("CV_STO",          "storage/CV"),
+        ("PEO_STO",         "storage/PEO"),
+        ("MULT_CLSIFY",     "classify"),
+    ),
+    '1.2': (
+        ("RAW",             "raw"),
+        ("UPLOAD_TEMP",     "output"),
+        ("REINDEX",         "Index"),
+        ("CUTWORD",         "cutwords"),
+        ("LSI",             "lsimodel"),
+        ("MEMBERS",         "members"),
+        ("ACCOUNT",         "account"),
+        ("PASSWORD",        "password"),
+        ("MESSAGE",         "message"),
+        ("JD_REPO",         "repo/JD"),
+        ("CO_REPO",         "repo/CO"),
+        ("CV_REPO",         "repo/CV"),
+        ("PEO_REPO",        "repo/PEO"),
+        ("PEO_LIMIT",       "repo/LIMITPEO"),
+        ("CV_INDIV",        "indiv/CV"),
+        ("PEO_INDIV",       "indiv/PEO"),
+        ("CV_STO",          "storage/CV"),
+        ("PEO_STO",         "storage/PEO"),
+        ("MULT_CLSIFY",     "classify"),
+    ),
+    '1.5': (
+        ("LSI",             "model/lsimodel"),
+        ("CUTWORD",         "cache/cutwords"),
+        ("REINDEX",         "cache/Index"),
+        ("ACCOUNT",         "account/account"),
+        ("PASSWORD",        "account/password"),
+        ("MESSAGE",         "account/message"),
+        ("JD_REPO",         "JD/repo"),
+        ("CO_REPO",         "CO/repo"),
+        ("CV_REPO",         "CV/repo"),
+        ("CV_INDIV",        "CV/indiv"),
+        ("CV_STO",          "CV/storage"),
+        ("PEO_REPO",        "PEO/repo"),
+        ("PEO_INDIV",       "PEO/indiv"),
+        ("PEO_STO",         "PEO/storage"),
+        ("PEO_LIMIT",       "PEO/limit"),
+        ("MULT_CLSIFY",     "CV/classify"),
+        ("MEMBERS",         "members"),
+        ("UPLOAD_TEMP",     "output"),
+        ("RAW",             "raw")
+    ),
+    }
+
+    def __init__(self, path, version):
+        self.path = path
+        self.version = version
+
+    def generate_storage_template(self, base_dir):
+        storage_config = {}
+        for each in self.storage_template[self.version]:
+            storage_config[each[0]] = os.path.join(base_dir, each[1])
+        return storage_config
+
+    @property
+    def storage_config(self):
+        config = dict()
+        try:
+            base_dir = self.default_storage_path[self.version]
+        except KeyError:
+            base_dir = '.'
+        try:
+            stream = open(os.path.join(self.path, self.storage_config_file)).read()
+            config = yaml.load(stream)
+        except IOError:
+            pass
+        if 'path' in config:
+            base_dir = config['path']
+        storage_config = self.generate_storage_template(base_dir)
+        storage_config.update(config)
+        return storage_config
+ 
 CONFIG_PATH = 'config'
-CUTWORD_PATH = 'cutwords'
+config = Config(CONFIG_PATH, version='1.2')
+
+LSI_PATH = config.storage_config['LSI']
+CUTWORD_PATH = config.storage_config['CUTWORD']
 
 
 def load_mult_classify(svc_storages):

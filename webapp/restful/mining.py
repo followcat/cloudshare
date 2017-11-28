@@ -158,7 +158,7 @@ class ExperienceAPI(BaseAPI):
 
 class LSIbaseAPI(Resource):
 
-    top = 0.03
+    top = 1000
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):

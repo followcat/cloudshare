@@ -17,6 +17,8 @@ import { getFastMatching } from 'request/fastmatching';
 
 import { API } from 'API';
 
+import StorageUtil from 'utils/storage';
+
 import findIndex from 'lodash/findIndex';
 
 class FastMatching extends Component {
@@ -63,6 +65,11 @@ class FastMatching extends Component {
           { location } = this.props;
     let postAPI;
 
+    function usesdata(item) { 
+      if(item === StorageUtil.get('_pj')) 
+        return item
+    }
+
     this.getIndustryDataSource();
     var promise = new Promise((resolve, reject) => {
       this.getLSIAllSIMSDataSource(resolve);
@@ -85,7 +92,7 @@ class FastMatching extends Component {
       promise.then((data) => {
         this.getResultDataSource(postAPI, {
           id: location.query.jd_id,
-          uses: data,
+          uses: data.filter(usesdata),
           filterdict: defFilterData,
         });
       });
@@ -100,7 +107,7 @@ class FastMatching extends Component {
       promise.then((data) => {
         this.getResultDataSource(postAPI, {
           id: location.query.cv_id,
-          uses: data,
+          uses: data.filter(usesdata),
           filterdict: defFilterData,
         });
       });

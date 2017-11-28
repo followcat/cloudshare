@@ -87,7 +87,7 @@ def convert_member(current_template, next_template, version):
                             except OSError:
                                 pass
                             if data in ('CO', 'CV', 'PEO'):
-                                files = path.Path(current_template[data+'_REPO']).files()
+                                files = path.Path(current_template['_'.join((data, 'REPO'))]).files()
                                 with open(os.path.join(current_template['MEMBERS'], member, subdir, project, data, 'names.json')) as f:
                                     names = [_+'.yaml' for _ in json.loads(f.read())]
                                     for name in [_ for _ in files if os.path.basename(_) in names]:
@@ -169,13 +169,13 @@ def convert_member(current_template, next_template, version):
             for subdir in ('projects',):
                 if subdir in ('projects',):
                     if member == 'willendare':
-                        try:
-                            os.makedirs(next_template['JD_REPO'])
-                        except OSError:
-                            pass
-                        for project in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).dirs():
-                            for data in ('CO', 'CV', 'PEO', 'JD'):
-                                if data in ('JD', ):
+                        for data in ('CO', 'CV', 'PEO', 'JD'):
+                            if data in ('JD', 'CO'):
+                                try:
+                                    os.makedirs(next_template['_'.join((data, 'REPO'))])
+                                except OSError:
+                                    pass
+                                for project in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).dirs():
                                     files = [os.path.basename(_) for _ in path.Path(os.path.join(project, data)).files()]
                                     with open(os.path.join(project, data, 'names.json'), 'w') as out:
                                         json.dump([_.split(os.extsep)[0] for _ in files], out)
@@ -183,7 +183,7 @@ def convert_member(current_template, next_template, version):
                                         if os.path.basename(f) == 'names.json':
                                             continue
                                         try:
-                                            os.renames(f, os.path.join(next_template['JD_REPO'], os.path.basename(f)))
+                                            os.renames(f, os.path.join(next_template['_'.join((data, 'REPO'))], os.path.basename(f)))
                                         except IOError:
                                             pass
 

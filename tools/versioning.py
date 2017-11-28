@@ -30,7 +30,7 @@ def pack_template(to_t, with_storage=False, name='data.tar', path='/tmp'):
     The resulting tar file is stored as $name under $path (default: /tmp/data.tar).
     """
     command = ['tar', 'cvf', os.path.join(path, name)]
-    storage_filter = lambda x: x.endswith('_STO') or x.endswith('_REPO')
+    storage_filter = lambda x: x.endswith('_STO') or x.endswith('_REPO') or x in ('CUTWORD', 'LSI', 'REINDEX', 'RAW')
     command.extend([to_t[option] for option in to_t if not storage_filter(option)])
     if with_storage:
         command.extend([to_t[option] for option in to_t if storage_filter(option)])

@@ -1,6 +1,8 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
+import StorageUtil from 'utils/storage';
+
 import {
   Row,
   Col,
@@ -179,7 +181,9 @@ class FilterForm extends Component {
               >
                 {getFieldDecorator('uses', {
                   // textarea ? [] : 默认数据库
-                  initialValue: textarea ?  projects.concat(classify) : [] ,
+                  initialValue: projects.concat(classify).filter(
+                    (item) => { if(item === StorageUtil.get('_pj')) return item}
+                    ),
                   rules: [{ type: 'array' }]
                 })(<Select multiple={true}>
                     <OptGroup key='projects' label="项目数据库">

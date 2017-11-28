@@ -55,8 +55,6 @@ class Config(object):
         ("ACCOUNT",         "account"),
         ("PASSWORD",        "password"),
         ("MESSAGE",         "message"),
-        ("JD_REPO",         "repo/JD"),
-        ("CO_REPO",         "repo/CO"),
         ("CV_REPO",         "repo/CV"),
         ("PEO_REPO",        "repo/PEO"),
         ("PEO_LIMIT",       "repo/LIMITPEO"),

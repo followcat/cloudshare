@@ -95,7 +95,7 @@ def merge(a, b, path=None, update=False):
                 merge(a[key], b[key], path + [str(key)], update=update)
             elif a[key] == b[key]:
                 pass # same leaf value
-            elif update is True:
+            elif update is True and b[key]:
                 a[key] = b[key]
             else:
                 raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))

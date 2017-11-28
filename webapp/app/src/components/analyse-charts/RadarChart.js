@@ -47,7 +47,7 @@ class RadarChart extends Component {
     }
 
     getValuableData(Object.assign(param, {
-        name_list: defaultSelection.map(item => `${item.id}.md`),
+        name_list: defaultSelection.map(item => `${item.id}`),
         uses: postData.uses,
       }), json => {
         if (json.code === 200) {

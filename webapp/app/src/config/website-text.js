@@ -28,7 +28,7 @@ const websiteText = {
     PROFILE: '个人中心',
     NOTICE: '消息',
     MANGEMENT: '管理',
-    SEARCH: '搜索',
+    SEARCH: '查询',
     JD_SEARCH: '简历搜索',
     JOBSEARCH: '职位匹配',
     MATCH: '匹配',

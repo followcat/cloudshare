@@ -19,6 +19,7 @@ import { getJobDescriptionList } from 'request/jobdescription';
 
 import { getRadarOption } from 'utils/chart_option';
 
+
 class DrawChart extends Component {
 
   constructor() {
@@ -48,7 +49,11 @@ class DrawChart extends Component {
   }
 
   handleClick() {
-    getJobDescriptionList(json => {
+    getJobDescriptionList({
+      current_page: 1,
+      page_size: 9999,
+      status: 'Opening'
+    },json => {
       if (json.code === 200) {
         this.setState({
           visible: true,
@@ -99,7 +104,7 @@ class DrawChart extends Component {
     });
 
     getValuableData(Object.assign(requestParams, {
-      name_list: [`${resumeId}.md`]
+      name_list: [`${resumeId}`]
     }), (json) => {
       if (json.code === 200) {
         const option = getRadarOption(json.data.max, json.data.result, anonymized);

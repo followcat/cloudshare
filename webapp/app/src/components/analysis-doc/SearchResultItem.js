@@ -54,7 +54,7 @@ class SearchResultItem extends Component {
 
     getValuableData(Object.assign({}, {
         doc: postData.doc,
-        name_list: [cv_id+'.md'],
+        name_list: [cv_id],
         uses: ['medical'],
       }), json => {
         if (json.code === 200) {

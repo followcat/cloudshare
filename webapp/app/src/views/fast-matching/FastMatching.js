@@ -118,7 +118,8 @@ class FastMatching extends Component {
       promise.then((uses) => {
         this.setState({
           postData: Object.assign({uses}, {filterdict: {}},{doc:this.state.searchText}),
-          postAPI: API.LSI_BY_DOC_API
+          postAPI: API.LSI_BY_DOC_API,
+          siderbarVisible: true
         },() => {
           this.getResultDataSource(this.state.postAPI,this.state.postData);
         });

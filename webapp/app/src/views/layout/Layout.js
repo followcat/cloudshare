@@ -31,10 +31,18 @@ class Layout extends Component {
   //   });
   // }
 
+  componentDidMount() {
+    if(global.ismember) {
+      this.setState({
+        ismember: global.ismember
+      })
+    }
+  }
+
   render() {
     return (
       <div className="cs-layout">
-      { global.ismember ? 
+      { global.ismember || this.state.ismember? 
         <LayoutHeader />
         :
         <AccountLayoutHeader />

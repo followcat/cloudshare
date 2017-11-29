@@ -20,9 +20,9 @@ modifytime: ''
 name: ''
 phone: ''"""
 
-password_12 = """id: 
-modifytime: 
-password: 
+password_12 = """id:
+modifytime:
+password:
 """
 
 message_12 = """id:
@@ -87,7 +87,7 @@ def convert_member(current_template, next_template, version):
                             except OSError:
                                 pass
                             if data in ('CO', 'CV', 'PEO'):
-                                files = path.Path(current_template[data+'_REPO']).files()
+                                files = path.Path(current_template['_'.join((data, 'REPO'))]).files()
                                 with open(os.path.join(current_template['MEMBERS'], member, subdir, project, data, 'names.json')) as f:
                                     names = [_+'.yaml' for _ in json.loads(f.read())]
                                     for name in [_ for _ in files if os.path.basename(_) in names]:
@@ -165,17 +165,34 @@ def convert_member(current_template, next_template, version):
                                 with open(os.path.join(next_template['MEMBERS'], member, subdir, 'default', data, 'names.json'), 'w') as out:
                                     json.dump([], out)
     elif version == '1.5':
-        for member in ('default', 'willendare'):
-            for subdir in ('projects',):
-                if subdir in ('projects',):
-                    if member == 'willendare':
+        for member in [os.path.basename(_) for _ in path.Path(os.path.join(next_template['MEMBERS'])).dirs()]:
+            if member:
+                for subdir in ('jobdescriptions', 'projects', 'companies', ):
+                    if subdir in ('jobdescriptions',):
                         try:
-                            os.makedirs(next_template['JD_REPO'])
+                            os.makedirs(os.path.join(next_template['MEMBERS'], member, subdir))
                         except OSError:
                             pass
-                        for project in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).dirs():
-                            for data in ('CO', 'CV', 'PEO', 'JD'):
-                                if data in ('JD', ):
+                        for data in ('CO', 'CV', 'PEO', 'JD'):
+                            if data in ('JD', ):
+                                list_all_files = set()
+                                for project in path.Path(os.path.join(next_template['MEMBERS'], member, 'projects')).dirs():
+                                    files = [os.path.basename(_) for _ in path.Path(os.path.join(project, data)).files()]
+                                    list_all_files.update([_.split(os.extsep)[0] for _ in files])
+                                try:
+                                    list_all_files.remove('names.json'.split(os.extsep)[0])
+                                except KeyError:
+                                    pass
+                                with open(os.path.join(next_template['MEMBERS'], member, subdir, 'names.json'), 'w') as out:
+                                    json.dump(list(list_all_files), out)
+                    elif subdir in ('projects',):
+                        for data in ('CO', 'CV', 'PEO', 'JD'):
+                            if data in ('JD', ):
+                                try:
+                                    os.makedirs(next_template['_'.join((data, 'REPO'))])
+                                except OSError:
+                                    pass
+                                for project in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).dirs():
                                     files = [os.path.basename(_) for _ in path.Path(os.path.join(project, data)).files()]
                                     with open(os.path.join(project, data, 'names.json'), 'w') as out:
                                         json.dump([_.split(os.extsep)[0] for _ in files], out)
@@ -183,7 +200,24 @@ def convert_member(current_template, next_template, version):
                                         if os.path.basename(f) == 'names.json':
                                             continue
                                         try:
-                                            os.renames(f, os.path.join(next_template['JD_REPO'], os.path.basename(f)))
+                                            os.renames(f, os.path.join(next_template['_'.join((data, 'REPO'))], os.path.basename(f)))
+                                        except IOError:
+                                            pass
+                    elif subdir in ('companies',):
+                        for data in ('CO', 'CV', 'PEO', 'JD'):
+                            if data in ('CO', ):
+                                try:
+                                    os.makedirs(next_template['_'.join((data, 'REPO'))])
+                                except OSError:
+                                    pass
+                                files = [os.path.basename(_) for _ in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).files()]
+                                with open(os.path.join(next_template['MEMBERS'], member, subdir, 'names.json'), 'w') as out:
+                                    json.dump([_.split(os.extsep)[0] for _ in files], out)
+                                for f in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).files():
+                                        if os.path.basename(f) == 'names.json':
+                                            continue
+                                        try:
+                                            os.renames(f, os.path.join(next_template['_'.join((data, 'REPO'))], os.path.basename(f)))
                                         except IOError:
                                             pass
 

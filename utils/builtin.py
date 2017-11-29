@@ -71,21 +71,6 @@ except ImportError:
 def strftime(t, format='%Y-%m-%d %H:%M:%S'):
     return time.strftime(format, time.localtime(t))
 
-def merge(a, b, path=None):
-    "merges b into a"
-    if path is None: path = []
-    for key in b:
-        if key in a:
-            if isinstance(a[key], dict) and isinstance(b[key], dict):
-                merge(a[key], b[key], path + [str(key)])
-            elif a[key] == b[key]:
-                pass # same leaf value
-            else:
-                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
-        else:
-            a[key] = b[key]
-    return a
-
 def merge(a, b, path=None, update=False):
     "merges b into a"
     if path is None: path = []
@@ -97,6 +82,9 @@ def merge(a, b, path=None, update=False):
                 pass # same leaf value
             elif update is True and b[key]:
                 a[key] = b[key]
+            elif b[key] is None or not b[key]:
+                print('Conflict at %s' % '.'.join(path + [str(key)]), str(b[key]))
+                continue
             else:
                 raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
         else:

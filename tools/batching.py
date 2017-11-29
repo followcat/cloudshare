@@ -117,13 +117,16 @@ def get_explorer_name(svc_cv, yamlname):
         pass
     return explorer_name
 
-def update_selected(svc_cv, yamlname, selected, as_date=None):
+def update_selected(svc_cv, yamlname, selected, as_date=None, timing=False):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.path, core.outputstorage.ConvertName(yamlname).yaml)
     explorer_name = get_explorer_name(svc_cv, yamlname)
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
-                                                         selected, explorer_name, as_date)
+                                                         selected,
+                                                         fix_func=explorer_name,
+                                                         as_date=as_date,
+                                                         timing=timing)
     if obj is None:
         obj = dict()
     result = utils.builtin.merge(obj, info, update=True)

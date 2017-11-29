@@ -167,8 +167,21 @@ def convert_member(current_template, next_template, version):
     elif version == '1.5':
         for member in path.Path(os.path.join(next_template['MEMBERS'])).dirs():
             if member:
-                for subdir in ('projects', 'companies'):
-                    if subdir in ('projects',):
+                for subdir in ('jobdescriptions', 'projects', 'companies', ):
+                    if subdir in ('jobdescriptions',):
+                        for data in ('CO', 'CV', 'PEO', 'JD'):
+                            if data in ('JD', ):
+                                list_all_files = set()
+                                for project in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).dirs():
+                                    files = [os.path.basename(_) for _ in path.Path(os.path.join(project, data)).files()]
+                                    list_all_files.update([_.split(os.extsep)[0] for _ in files])
+                                try:
+                                    list_all_files.remove('names.json'.split(os.extsep)[0])
+                                except KeyError:
+                                    pass
+                                with open(os.path.join(next_template['MEMBERS'], member, subdir, 'names.json'), 'w') as out:
+                                    json.dump(list_all_files, out)
+                    elif subdir in ('projects',):
                         for data in ('CO', 'CV', 'PEO', 'JD'):
                             if data in ('JD', ):
                                 try:

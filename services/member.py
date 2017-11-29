@@ -137,7 +137,8 @@ class Member(services.base.service.Service):
                                                        [self.curriculumvitaes],
                                                        [self.jobdescriptions],
                                                        self.mult_peo, name)
-                tmp_project.setup(config={'storageCV':  self.config['storageCV'],
+                tmp_project.setup(config={'id':         utils.builtin.hash(self.name+name),
+                                          'storageCV':  self.config['storageCV'],
                                           'storagePEO': self.config['storagePEO'],
                                           'limitPEO':   self.config['limitPEO'],
                                           'storageCO':  self.config['storageCO'],
@@ -166,7 +167,8 @@ class Member(services.base.service.Service):
                                                    [self.curriculumvitaes],
                                                    [self.jobdescriptions],
                                                    self.mult_peo, name)
-            tmp_project.setup(config={'autosetup':    autosetup,
+            tmp_project.setup(config={'id':           utils.builtin.hash(self.name+name),
+                                      'autosetup':    autosetup,
                                       'autoupdate':   autoupdate,
                                       'storageCV':    self.config['storageCV'],
                                       'storagePEO':   self.config['storagePEO'],

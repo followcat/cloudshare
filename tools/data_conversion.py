@@ -165,10 +165,10 @@ def convert_member(current_template, next_template, version):
                                 with open(os.path.join(next_template['MEMBERS'], member, subdir, 'default', data, 'names.json'), 'w') as out:
                                     json.dump([], out)
     elif version == '1.5':
-        for member in ('default', 'willendare'):
-            for subdir in ('projects', 'companies'):
-                if subdir in ('projects',):
-                    if member == 'willendare':
+        for member in path.Path(os.path.join(next_template['MEMBERS'])).dirs():
+            if member:
+                for subdir in ('projects', 'companies'):
+                    if subdir in ('projects',):
                         for data in ('CO', 'CV', 'PEO', 'JD'):
                             if data in ('JD', ):
                                 try:
@@ -186,8 +186,7 @@ def convert_member(current_template, next_template, version):
                                             os.renames(f, os.path.join(next_template['_'.join((data, 'REPO'))], os.path.basename(f)))
                                         except IOError:
                                             pass
-                elif subdir in ('companies',):
-                    if member == 'willendare':
+                    elif subdir in ('companies',):
                         for data in ('CO', 'CV', 'PEO', 'JD'):
                             if data in ('CO', ):
                                 try:

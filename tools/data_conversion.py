@@ -172,7 +172,7 @@ def convert_member(current_template, next_template, version):
                         for data in ('CO', 'CV', 'PEO', 'JD'):
                             if data in ('JD', ):
                                 list_all_files = set()
-                                for project in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).dirs():
+                                for project in path.Path(os.path.join(next_template['MEMBERS'], member, 'projects')).dirs():
                                     files = [os.path.basename(_) for _ in path.Path(os.path.join(project, data)).files()]
                                     list_all_files.update([_.split(os.extsep)[0] for _ in files])
                                 try:

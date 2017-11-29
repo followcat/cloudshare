@@ -368,7 +368,7 @@ class CompanyList extends Component {
             <Button onClick={this.handleFilterClick}>{language.SUBMIT}</Button>
           </div>
         </div>
-        <div className="cs-card-inner-pagination">
+        <div className="cs-company-pagination">
           <Pagination {...pagination} />
         </div>
         <Spin
@@ -389,7 +389,7 @@ class CompanyList extends Component {
             );
           })}
         </Spin>
-        <div className="cs-card-inner-pagination">
+        <div className="cs-company-pagination">
           <Pagination {...pagination} />
         </div>
       </div>

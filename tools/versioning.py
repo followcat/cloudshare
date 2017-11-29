@@ -51,21 +51,33 @@ def remove_template(to_t, path='/tmp'):
             continue
 
 
-def assert_valid_version(version):
-    assert version in get_ordered_versions(), ' '.join([version,
-        'is not a predefined version'])
-
-def assert_valid_template(version, compatible=True):
-    for path in get_template(version).values():
+def assert_valid_template(template, compatible=True):
+    for path in template.values():
         if compatible:
             assert os.path.isdir(path), ' '.join([path, 'is not directory or compatible'])
         else:
             assert os.path.isdir(path) and not os.path.islink(path), ' '.join([path, 'is not directory'])
 
+def assert_template_update_clean(to_t, from_t=None):
+    if not from_t:
+        from_t = {}
+    for item in to_t:
+        if item in from_t:
+            if from_t[item] == to_t[item]:
+                continue
+            if not to_t[item].startswith(from_t[item]):
+                assert not os.path.exists(to_t[item]), ' '.join([to_t[item], 'already exists'])
+        else:
+            assert not os.path.exists(to_t[item]), ' '.join([to_t[item], 'already exists'])
+
+def assert_valid_version(version):
+    assert version in get_ordered_versions(), ' '.join([version,
+        'is not a predefined version'])
+
 def assert_data_version(version, compatible=True):
     """Assert data structure is at the given version"""
     assert_valid_version(version)
-    assert_valid_template(version, compatible)
+    assert_valid_template(get_template(version), compatible)
 
 
 def get_next_version(version):
@@ -161,12 +173,16 @@ def update_to_version(version, backward_compatible=True):
         >>> import os
         >>> import tools.versioning
         >>> os.chdir('/tmp')
+        >>> # Setup
         >>> tools.versioning.remove_template(tools.versioning.get_template('1.1'))
         >>> tools.versioning.remove_template(tools.versioning.get_template('1.2'))
         >>> tools.versioning.initialize_template(tools.versioning.get_template('1.1'))
+        >>> # Test
+        >>> tools.versioning.assert_data_version('1.1')
         >>> tools.versioning.update_to_version('1.2')
         >>> tools.versioning.get_data_version()
         '1.2'
+        >>> # Teardown
         >>> tools.versioning.remove_template(tools.versioning.get_template('1.2'))
     """
     known_versions = get_ordered_versions()
@@ -178,6 +194,7 @@ def update_to_version(version, backward_compatible=True):
 
     while (not current_version == version):
         next_version = get_next_version(current_version)
+        assert_template_update_clean(get_template(next_version), from_t=get_template(current_version))
         update_template(get_template(current_version), get_template(next_version))
         try:
             data_conversion_rules = tools.data_conversion.conversion_rules[(current_version, next_version)]

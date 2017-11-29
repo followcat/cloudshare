@@ -6,6 +6,7 @@ import ujson
 
 import utils._yaml
 import utils.builtin
+import core.basedata
 import core.outputstorage
 import services.memdatas
 import services.base.storage
@@ -56,12 +57,6 @@ class Simulation(services.base.storage.BaseStorage):
         id = core.outputstorage.ConvertName(name).base
         return id in self.ids
 
-    def generate_info_template(self):
-        info = {}
-        for each in self.YAML_TEMPLATE:
-            info[each[0]] = each[1]()
-        return info
-
     def _add(self, name):
         id = core.outputstorage.ConvertName(name).base
         self.ids.add(id)
@@ -79,6 +74,10 @@ class Simulation(services.base.storage.BaseStorage):
         if 'date' not in info or not info['date']:
             info['date'] = time.time()
         return info
+
+    def baseobj(self, info):
+        bsobj = core.basedata.DataObject(metadata=info, data=None)
+        return bsobj
 
     def add(self, bsobj, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
@@ -165,44 +164,6 @@ class Simulation(services.base.storage.BaseStorage):
         result = super(Simulation, self).saveinfo(id, info, message, committer, do_commit)
         self.memdatas.update('modifytime', id)
         return result
-
-    def search(self, keyword, selected=None):
-        if selected is None:
-            selected = [storage.name for storage in self.storages]
-        results = set()
-        allfile = set()
-        for storage in self.storages:
-            if isinstance(storage, Simulation):
-                allfile.update(storage.search(keyword, selected=selected))
-            elif storage.name in selected:
-                allfile.update(storage.search(keyword))
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            if id in self.ids:
-                results.add((id, result[1]))
-        return results
-
-    def search_yaml(self, keyword, selected=None):
-        if selected is None:
-            selected = [storage.name for storage in self.storages]
-        results = set()
-        allfile = set()
-        for storage in self.storages:
-            if isinstance(storage, Simulation):
-                allfile.update(storage.search_yaml(keyword, selected=selected))
-            elif storage.name in selected:
-                allfile.update(storage.search_yaml(keyword))
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            if id in self.ids:
-                results.add((id, result[1]))
-        return results
-
-    def search_key(self, key, value, ids=None):
-        return self.memdatas.search_key(key, value, ids)
-
-    def sorted_ids(self, key, ids=None, reverse=True):
-        return self.memdatas.sorted_ids(key, ids=ids, reverse=reverse)
 
     @property
     def ids(self):

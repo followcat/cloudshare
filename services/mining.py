@@ -135,6 +135,8 @@ def repl_web(m):
         return '\n'
 
 def silencer(document, cutservice=None, id=None):
+    if isinstance(id, unicode):
+        id = id.encode('utf-8')
     if (cutservice and id) and cutservice.exists(id):
         return cutservice.getyaml(id)['words']
     if isinstance(document, list):
@@ -178,70 +180,35 @@ class Mining(object):
 
     SIMS_PATH = 'all'
 
-    def __init__(self, path, members, classifycvs, slicer=None):
-        self.sim = {}
+    def __init__(self, path, slicer=None):
+        self.sim = dict()
         self.path = path
         self.lsi_model = dict()
-        self.members = members
-        self.additionals = classifycvs
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if slicer is None:
             self.slicer = silencer
         else:
             self.slicer = slicer
-        self.make_lsi()
 
-    @property
-    def projects(self):
-        return self.members.allprojects()
-
-    @property
-    def projectscv(self):
-        return dict([(project.id, project.curriculumvitae)
-                     for project in self.projects.values()])
-    
-    @property
-    def services(self):
-        result = {'default': self.projectscv,
-                  'classify': dict(),
-                  'all': dict()}
-        result['all'].update(self.projectscv)
-        result['all'].update(self.additionals)
-        result['classify'].update(self.additionals)
-        return result
-
-    @property
-    def SIMS(self):
-        results = list()
-        for modelname in self.lsi_model:
-            for simname in self.sim[modelname]:
-                results.append(self.sim[modelname][simname])
-        return results
-
-    def setup(self, members=None):
-        assert self.lsi_model
-        if members is None:
-            members = self.members.members.values()
-        for member in members:
-            member_projects = member.projects.keys()
-            for project in member.projects.values():
-                modelname = project.modelname
-                model = self.lsi_model[modelname]
-                if not model.names:
-                    continue
+    def setup(self, modelname, simnames):
+        result = True
+        if modelname not in self.lsi_model:
+            result = self.init_lsi(modelname)
+        if result is True:
+            model = self.lsi_model[modelname]
+            if model.names:
                 if modelname not in self.sim:
                     self.sim[modelname] = dict()
-                svccv_names = member_projects + self.projects[modelname].getclassify()
-                for svc_name in svccv_names:
-                    if svc_name in self.sim[modelname]:
+                for simname in simnames:
+                    if simname in self.sim[modelname]:
                         continue
-                    self.make_sim(modelname, svc_name)
+                    self.init_sim(modelname, simname)
+        return result
 
-    def make_sim(self, modelname, svc_name):
+    def init_sim(self, modelname, svc_name, gen=None):
         model = self.lsi_model[modelname]
         save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
-        svc = self.services['all'][svc_name]
         industrypath = industrytopath(svc_name)
         index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
                                                         os.path.join(save_path,
@@ -249,7 +216,9 @@ class Mining(object):
         try:
             index.load()
         except IOError:
-            index.build([svc])
+            if gen is None:
+                gen = list()
+            index.build(gen)
             index.save()
         self.sim[modelname][svc_name] = index
 
@@ -268,51 +237,24 @@ class Mining(object):
             sims.append(sim)
         return sims
 
-    def make_lsi(self):
-        self.lsi_model = dict()
-        for project in self.projects.values():
-            if project.modelname in self.lsi_model:
-                continue
-            service = project.curriculumvitae
-            lsi_path = os.path.join(self.path, project.modelname, 'model')
-            lsi = core.mining.lsimodel.LSImodel(lsi_path, slicer=self.slicer,
-                                                no_above=1./3, config=project.config)
+    def init_lsi(self, modelname, gen=None, config=None):
+        result = False
+        if modelname not in self.lsi_model:
+            lsi_path = os.path.join(self.path, modelname, 'model')
+            lsi = core.mining.lsimodel.LSImodel(modelname, lsi_path,
+                                                slicer=self.slicer,
+                                                no_above=1./3, config=config)
             try:
                 lsi.load()
+                result = True
             except IOError:
-                if lsi.getconfig('autosetup') is True:
-                    if lsi.build([service]):
+                if gen is not None and lsi.getconfig('autosetup') is True:
+                    result = lsi.build(gen)
+                    if result is True:
+                        lsi.load_config()
                         lsi.save()
-            self.lsi_model[project.modelname] = lsi
-
-    def update_model(self):
-        for modelname in self.lsi_model:
-            lsimodel = self.lsi_model[modelname]
-            if lsimodel.getconfig('autoupdate') is True:
-                updated = self.lsi_model[modelname].update(
-                    [self.services['default'][modelname]])
-                self.update_sims([modelname], newmodel=updated)
-
-    def update_sims(self, modelnames=None, newmodel=False):
-        if modelnames is None:
-            modelnames = self.sim.keys()
-        for modelname in modelnames:
-            for simname in self.sim[modelname]:
-                svc = self.services['all'][simname]
-                updated = self.sim[modelname][simname].update([svc], newmodel)
-                if newmodel or updated:
-                    self.sim[modelname][simname].save()
-
-    def update_project_sims(self, newmodel=False):
-        for modelname in self.sim:
-            for projectname in self.projects:
-                if (projectname in self.sim[modelname] and
-                    len(self.projects[projectname].curriculumvitae.ids) !=
-                    len(self.sim[modelname][projectname].names)):
-                    svc = self.services['all'][projectname]
-                    updated = self.sim[modelname][projectname].update([svc], newmodel)
-                    if newmodel or updated:
-                        self.sim[modelname][projectname].save()
+            self.lsi_model[modelname] = lsi
+        return result
 
     def probability(self, basemodel, doc, uses=None, top=None, minimum=None):
         result = []
@@ -368,9 +310,3 @@ class Mining(object):
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return len(ranklist), map(lambda x: (x[0], ranklist.index(x)), lists)
-
-    def default_names(self):
-        return [name for name in self.services['default']]
-
-    def addition_names(self):
-        return [name for name in self.additionals]

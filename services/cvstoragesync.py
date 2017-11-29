@@ -13,7 +13,7 @@ import extractor.information_explorer
 
 logger = logging.getLogger("CVStorageSyncLogger")
 log_level = logging.DEBUG
-log_file = 'cvstoragesync.log'
+log_file = 'log/cvstoragesync.log'
 handler = logging.FileHandler(log_file)
 formatter = logging.Formatter("[%(levelname)s][%(asctime)s]%(message)s")
 handler.setFormatter(formatter)

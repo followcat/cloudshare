@@ -12,6 +12,7 @@ class LSIsimilarity(object):
     matrix_save_name = 'lsi.matrix'
 
     def __init__(self, name, savepath, lsi_model):
+        self._ids = set()
         self.name = name
         self.path = savepath
         self.names = []
@@ -19,34 +20,31 @@ class LSIsimilarity(object):
         self.lsi_model = lsi_model
         self.index = None
 
-    def update(self, svccv_list, newmodel=False):
-        added = False
+    def update(self, gen, numbers=5000):
+        result = False
         names = []
         documents = []
-        for svc_cv in svccv_list:
-            for name in set(svc_cv.names()).difference(set(self.names)):
-                doc = svc_cv.getmd(name)
-                names.append(name)
-                documents.append(doc)
-                added = True
-        if added or newmodel:
+        number = 0
+        if self.index is None:
+            self.set_index([])
+        for name, doc in gen:
+            if self.exists(name) is True:
+                continue
+            names.append(name)
+            documents.append(doc)
+            number += 1
+            if number%numbers == 0:
+                self.add_documents(names, documents)
+                result = True
+                names = list()
+                documents = list()
+        if number%numbers != 0:
             self.add_documents(names, documents)
-        return added or newmodel
+            result = True
+        return result
 
-    def build(self, svccv_list):
-        names = []
-        corpus = []
-        for svc_cv in svccv_list:
-            for data in svc_cv.datas():
-                name, doc = data
-                names.append(name)
-                words = self.lsi_model.slicer(doc, id=name)
-                corpus.append(self.lsi_model.lsi.id2word.doc2bow(words))
-        self.setup(names, corpus)
-
-    def setup(self, names, corpus):
-        self.names = names
-        self.set_index(corpus)
+    def build(self, gen, numbers=5000):
+        return self.update(gen, numbers=numbers)
 
     def save(self):
         if not os.path.exists(self.path):
@@ -55,9 +53,8 @@ class LSIsimilarity(object):
             ujson.dump(self.names, f)
         self.index.save(os.path.join(self.path, self.matrix_save_name))
 
-    def exists(self, name):
-        mdname = core.outputstorage.ConvertName(name).md
-        return mdname in self.names
+    def exists(self, id):
+        return id in self.ids
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
@@ -70,20 +67,19 @@ class LSIsimilarity(object):
         assert len(names) == len(documents)
         corpus = list()
         for name, document in zip(names, documents):
-            if name in self.names:
+            if self.exists(name) is True:
                  continue
             text = self.lsi_model.slicer(document, id=name)
             corpu = self.lsi_model.lsi.id2word.doc2bow(text)
             corpus.append(corpu)
         self.names.extend(names)
-        self.index.add_documents(self.lsi_model.lsi[corpus])
+        self.ids = names
+        modelcorpus = self.lsi_model.lsi[corpus]
+        self.index.add_documents(modelcorpus)
 
-    def set_index(self, corpus):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+    def set_index(self, modelcorpus):
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
-                                             self.lsi_model.lsi[corpus],
-                                             self.lsi_model.topics)
+                                             modelcorpus, self.lsi_model.topics)
 
     def probability(self, doc, top=None, minimum=0):
         """
@@ -165,6 +161,20 @@ class LSIsimilarity(object):
             >>> count_in[0] - origin
             60
         """
+        self.num_best = None
+        p = self.base_probability(doc, top=top, minimum=minimum)
+        results = map(lambda x: (self.names[x[0]], str(x[1])), p)
+        return results
+
+    def probability_by_id(self, doc, id):
+        if self.exists(id) is False:
+            return None
+        index = self.names.index(id)
+        vec_lsi = self.lsi_model.probability(doc)
+        result = abs(self.index[vec_lsi][index])
+        return (os.path.splitext(id)[0], str(result))
+
+    def base_probability(self, doc, top=None, minimum=0):
         if top is None:
             top = len(self.index)
         elif top < 1:
@@ -173,18 +183,9 @@ class LSIsimilarity(object):
         results = []
         self.num_best = top
         vec_lsi = self.lsi_model.probability(doc)
-        results = map(lambda x: (os.path.splitext(self.names[x[0]])[0], str(x[1])),
-                                self.index[vec_lsi])
+        result = self.index[vec_lsi]
         self.num_best = None
-        return results
-
-    def probability_by_id(self, doc, id):
-        if id not in self.names:
-            return None
-        index = self.names.index(id)
-        vec_lsi = self.lsi_model.probability(doc)
-        result = abs(self.index[vec_lsi][index])
-        return (os.path.splitext(id)[0], str(result))
+        return result
 
     @property
     def num_best(self):
@@ -193,3 +194,13 @@ class LSIsimilarity(object):
     @num_best.setter
     def num_best(self, value):
         self.index.num_best = value
+
+    @property
+    def ids(self):
+        if not self._ids:
+            self._ids = set(self.names)
+        return self._ids
+
+    @ids.setter
+    def ids(self, value):
+        self._ids.update(set(value))

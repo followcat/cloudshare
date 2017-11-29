@@ -6,7 +6,7 @@ def generate_keywords(path, projects):
     if not os.path.exists(path):
         os.makedirs(path)
     for project in projects:
-        for jd in project.jobdescription.lists():
+        for jd_id, jd in project.jobdescription.datas():
             try:
                 if jd['status'] == 'Closed':
                     continue

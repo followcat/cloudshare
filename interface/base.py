@@ -9,10 +9,9 @@ class NotImplementedInterface(Exception):
 
 class Interface(object):
 
-    def __init__(self, path, name, searchengine=None):
+    def __init__(self, path, name):
         self.path = path
         self.name = name
-        self.searchengine = searchengine
 
     def do_commit(self, filenames):
         raise NotImplementedInterface
@@ -35,45 +34,11 @@ class Interface(object):
     def lsfiles(self):
         raise NotImplementedInterface
 
-    def search(self, keywords, path='', files=None):
-        if self.searchengine is None:
-            result = self.grep(keywords, path=path, files=files)
-        else:
-            result = self.SEsearch(keywords)
-        return result
-
-    def search_yaml(self, keywords, path='', files=None):
-        if self.searchengine is None:
-            result = self.grep_yaml(keywords, path=path, files=files)
-        else:
-            result = self.SEsearch_yaml(keywords)
-        return result
-
     def grep(self):
         raise NotImplementedInterface
 
     def grep_yaml(self):
         raise NotImplementedInterface
-
-    def SEquery(self, indexname, keywords):
-        query_dict = utils.esquery.request_gen(keywords=keywords)
-        kwargs = {
-            '_source_include': 'file',
-            'body': query_dict
-        }
-        result = utils.esquery.scroll_ids(self.searchengine, indexname, kwargs)
-        return set(map(lambda x: (os.path.splitext(x['_source']['file']['filename'])[0],
-                                  x['_score']), result))
-
-    def SEsearch(self, keywords):
-        indexname = '.'.join([self.name])
-        result = self.SEquery(indexname, keywords)
-        return result
-
-    def SEsearch_yaml(self, keywords):
-        indexname = '.'.join([self.name, 'yaml'])
-        result = self.SEquery(indexname, keywords)
-        return result
 
     def subprocess_grep(self, command, path, shell):
         grep_list = []

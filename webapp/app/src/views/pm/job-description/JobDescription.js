@@ -10,7 +10,7 @@ import Operation from './Operation';
 
 import { introJs } from 'intro.js';
 
-import { message } from 'antd';
+import { message, Pagination, } from 'antd';
 
 import findIndex from 'lodash/findIndex';
 
@@ -30,6 +30,9 @@ class JobDescription extends Component {
   constructor() {
     super();
     this.state = {
+      current: 1,
+      totals: 0,
+      pageSize: 10,
       dataSource: [],
       filterDataSource: [],
       customerDataSource: [],
@@ -52,6 +55,8 @@ class JobDescription extends Component {
     this.getJobDescriptionByID = this.getJobDescriptionByID.bind(this);
     this.getExpandedRowRender = this.getExpandedRowRender.bind(this);
     this.getJobDescriptionElements = this.getJobDescriptionElements.bind(this);
+    this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
+    this.handlePaginationChange = this.handlePaginationChange.bind(this);
   }
 
   handleEditClick(record) {
@@ -93,12 +98,12 @@ class JobDescription extends Component {
           editConfirmLoading: false,
           editVisible: false
         });
-        message.success(json.message);
+        message.success(language.ACTION_SUCCESS);
       } else {
         this.setState({
           editConfirmLoading: false
         });
-        message.error(json.message);
+        message.error(language.ACTION_FAIL);
       }
     });
   }
@@ -129,12 +134,12 @@ class JobDescription extends Component {
           jdVisible: false,
           jdConfirmLoading: false
         });
-        message.success(json.message);
+        message.success(language.ACTION_SUCCESS);
       } else {
         this.setState({
           jdConfirmLoading: false
         });
-        message.error(json.message);
+        message.error(language.ACTION_FAIL);
       }
     });
   }
@@ -152,23 +157,45 @@ class JobDescription extends Component {
     this.setState({
       statusValue: value,
       filterDataSource: filterDataSource
-    });
+    },() => this.getjobDescriptionDataSource());
+  }
+
+  handleShowSizeChange(current, pageSize) {
+      this.setState({
+        current: current,
+        pageSize: pageSize
+      },() => this.getjobDescriptionDataSource());
+  }
+
+  handlePaginationChange(current) {
+      this.setState({
+        current: current
+      },() => {this.getjobDescriptionDataSource()});
   }
 
   // 获取所有JD列表
   getjobDescriptionDataSource() {
-    const statusValue = this.state.statusValue;
+    const { dataSource,
+            filterDataSource,
+            current,
+            pageSize,
+            statusValue } = this.state;
     
     this.setState({
       loading: true
     });
     
-    getJobDescriptionList((json) => {
+    getJobDescriptionList({
+      status: statusValue,
+      current_page: current,
+      page_size: pageSize,
+    },(json) => {
       if (json.code === 200) {
         this.setState({
           dataSource: json.data,
           filterDataSource: json.data.filter(item => item.status === statusValue),
-          loading: false
+          loading: false,
+          totals: json.totals
         });
       }
     });
@@ -176,8 +203,7 @@ class JobDescription extends Component {
 
   // 根据id获取最新数据
   getJobDescriptionByID(id) {
-    let dataSource = this.state.dataSource,
-        filterDataSource = this.state.filterDataSource;
+    let { dataSource,filterDataSource, pageSize } = this.state;
 
     getJobDescription({
       'jd_id': id
@@ -208,7 +234,10 @@ class JobDescription extends Component {
 
   // 获取客户公司列表
   getCustomerDataSource() {
-    getCustomerList((json) => {
+    getCustomerList({
+      current_page: 1,
+      page_size: 999,
+    },(json) => {
       if (json.code === 200) {
         this.setState({
           customerDataSource: json.data
@@ -243,9 +272,6 @@ class JobDescription extends Component {
   // 获取职位描述组件toolbar所要渲染组件
   getJobDescriptionElements() {
     const statusList = [{
-      text: language.ALL,
-      value: ''
-    }, {
       text: language.OPENING,
       value: 'Opening'
     }, {
@@ -376,6 +402,20 @@ class JobDescription extends Component {
       )
     }];
 
+    const { current, totals, pageSize } = this.state;
+    // 主体表格分页
+    const pagination = {
+      current: current,
+      total: totals,
+      pageSize: pageSize,
+      showSizeChanger: true,
+      showQuickJumper: true,
+      defaultPageSize: 20,
+      showTotal: totals => `共 ${totals} 条`,
+      onShowSizeChange: this.handleShowSizeChange,
+      onChange: this.handlePaginationChange
+    };
+
     const state = this.state;
 
     return (
@@ -399,6 +439,9 @@ class JobDescription extends Component {
           record={this.state.record}
           customerDataSource={this.state.customerDataSource}
         />
+        </div>
+        <div className="cs-card-inner-pagination">
+          <Pagination {...pagination}/>
         </div>
       </div>
     );

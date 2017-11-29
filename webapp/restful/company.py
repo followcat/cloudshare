@@ -1,4 +1,5 @@
 import json
+import math
 
 import core.basedata
 import extractor.information_explorer
@@ -13,22 +14,22 @@ class CompanyAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.svc_co_repo = flask.current_app.config['SVC_CO_REPO']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('introduction', location = 'json')
         super(CompanyAPI, self).__init__()
 
-    def get(self, name):
-        projectname = args['project']
+    def get(self, id):
         user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
-        result = project.company_get(name)
-        return { 'result': result }
+        result = self.svc_co_repo.getyaml(id)
+        return { 'code': 200,'result': result }
 
-    def post(self):
+    def post(self, id):
+        result = False
         args = self.reqparse.parse_args()
         coname = args['name']
         projectname = args['project']
@@ -39,7 +40,12 @@ class CompanyAPI(Resource):
         project = member.getproject(projectname)
         metadata = extractor.information_explorer.catch_coinfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
-        result = project.company_add(coobj, user.name)
+        mbr_result = member.company_add(coobj, committer=user.name)
+        if mbr_result is True:
+            result = project.company_add(coobj, committer=user.name)
+        if result is True:
+            self.svc_index.add(self.svc_index.config['CO_MEM'], coobj.metadata['id'],
+                               coobj.metadata)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -51,8 +57,9 @@ class CompanyAllAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(CompanyAllAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('page_size', type = int, location = 'json')
@@ -69,24 +76,35 @@ class CompanyAllAPI(Resource):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        cur_page = args['current_page']
         page_size = args['page_size']
         projectname = args['project']
-        current_page = args['current_page']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        data = []
-        ids = project.company.sorted_ids('modifytime')
-        for id in ids[(current_page-1)*page_size : current_page*page_size]:
-            data.append(project.company.getyaml(id))
-        return { 'code': 200, 'data': data, 'total': len(ids) }
+        index = self.svc_index.config['CO_MEM']
+        total, searches = self.svc_index.search(index=index,
+                                            doctype=[project.id],
+                                            kwargs={'sort': {"modifytime": "desc"}},
+                                            start=(cur_page-1)*page_size,
+                                            size=page_size)
+        pages = int(math.ceil(float(total)/page_size))
+        datas = list()
+        for item in searches:
+            datas.append(project.company_get(item['_id']))
+        return {
+            'code': 200,
+            'data': datas,
+            'total': total
+        }
 
 
 class AddedCompanyListAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(AddedCompanyListAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('text', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -99,7 +117,12 @@ class AddedCompanyListAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         customer_ids = project.company_customers()
-        company_ids = project.company.search_key('name', text)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        index = self.svc_index.config['CO_MEM']
+        company_ids = self.svc_index.search(index=index, filterdict={'name': text},
+                                            doctype=[project.id],
+                                            size=5, onlyid=True)
         data = []
         for company_id in company_ids:
             if company_id in customer_ids:
@@ -121,19 +144,25 @@ class CompanyCustomerListAPI(Resource):
         super(CompanyCustomerListAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('page_size', type = int, location = 'json')
+        self.reqparse.add_argument('current_page', type = int, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        cur_page = args['current_page']
+        page_size = args['page_size']
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = project.company_customers()
-        data = []
-        for coname in result:
+        result = list(project.company_customers())
+        total = len(result)
+        pages = int(math.ceil(float(total)/page_size))
+        data = list()
+        for coname in result[(cur_page-1)*page_size:cur_page*page_size]:
             co = project.company_get(coname)
             data.append(co)
-        return { 'code': 200, 'data': data }
+        return { 'code': 200, 'data': data, 'pages': pages, 'totals': total}
     
 #create, delete
 class CompanyCustomerAPI(Resource):
@@ -144,8 +173,8 @@ class CompanyCustomerAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(CompanyCustomerAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', location = 'json')
+        self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
@@ -181,6 +210,7 @@ class CompanyInfoUpdateAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -212,66 +242,21 @@ class CompanyInfoUpdateAPI(Resource):
                 origin_info[key].remove(data)
         result = project.company_update_info(id, origin_info, user.name)
         if result:
+            co_info = project.company_get(id)
+            self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+                               id, None, co_info)
+        if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
             response = { 'code': 400, 'message': 'Update information error.' }
         return response
 
 
-class SearchCObyTextAPI(Resource):
-
-    decorators = [flask.ext.login.login_required]
-
-    def __init__(self):
-        super(SearchCObyTextAPI, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('search_text', location = 'json')
-        self.reqparse.add_argument('current_page', type = int, location = 'json')
-        self.reqparse.add_argument('page_size', type = int, location = 'json')
-
-    def post(self):
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        text = args['search_text']
-        page_size = args['page_size']
-        projectname = args['project']
-        cur_page = args['current_page']
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
-        search_results = project.company.search(text)
-        search_yaml_results = project.company.search_yaml(text)
-        search_results.update(search_yaml_results)
-        results = map(lambda x:x[0], search_results)
-        sorted_results = project.company.sorted_ids('modifytime', ids=results)
-        datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
-        return {
-            'code': 200,
-            'data': datas,
-            'keyword': text,
-            'pages': pages,
-            'total': total
-        }
-
-    def paginate(self, svc_co, results, cur_page, eve_count):
-        if not cur_page:
-            cur_page = 1
-        total = len(results)
-        if total%eve_count != 0:
-            pages = total/eve_count + 1
-        else:
-            pages = total/eve_count
-        datas = []
-        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            datas.append(svc_co.getyaml(id))
-        return datas, pages, total
-
-
 class SearchCObyKeyAPI(Resource):
 
     def __init__(self):
         super(SearchCObyKeyAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('current_page', type = int, location = 'json')
@@ -288,32 +273,22 @@ class SearchCObyKeyAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        results = set(project.company.ids)
-        for each in search_items:
-            key = each[0]
-            value = each[1]
-            results.intersection_update(set(project.company.search_key(key, value)))
-        sorted_results = project.company.sorted_ids('modifytime', ids=results)
-        datas, pages, total = self.paginate(project.company, sorted_results, cur_page, page_size)
+        index = self.svc_index.config['CO_MEM']
+        total, searches = self.svc_index.search(index=index, filterdict=dict(search_items),
+                                            doctype=[project.id],
+                                            kwargs={'sort': {"modifytime": "desc"}},
+                                            start=(cur_page-1)*page_size,
+                                            size=page_size)
+        pages = int(math.ceil(float(total)/page_size))
+        datas = list()
+        for item in searches:
+            datas.append(project.company_get(item['_id']))
         return {
             'code': 200,
             'data': datas,
             'pages': pages,
             'total': total
         }
-
-    def paginate(self, svc_co, results, cur_page, eve_count):
-        if not cur_page:
-            cur_page = 1
-        total = len(results)
-        if total%eve_count != 0:
-            pages = total/eve_count + 1
-        else:
-            pages = total/eve_count
-        datas = []
-        for id in results[(cur_page-1)*eve_count:cur_page*eve_count]:
-            datas.append(svc_co.getyaml(id))
-        return datas, pages, total
 
 
 class CompanyUploadExcelAPI(Resource):
@@ -340,7 +315,7 @@ class CompanyUploadExcelAPI(Resource):
         for item in compare_result:
             coid = item[1]
             if coid not in infos:
-                if project.corepo.exists(coid):
+                if project.company.exists(coid):
                     infos[coid] = project.company_get(coid)
                 else:
                     infos[coid] = item[2][0]
@@ -358,6 +333,7 @@ class CompanyConfirmExcelAPI(Resource):
     def __init__(self):
         super(CompanyConfirmExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('data', type = list, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -369,7 +345,12 @@ class CompanyConfirmExcelAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        results = project.company_add_excel(datas, user.name)
+        meb_results = member.company_add_excel(datas, committer=user.name)
+        results = project.company_add_excel(datas, committer=user.name)
+        for id in results:
+            co_info = project.company_get(id)
+            self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+                               id, None, co_info)
         return {
             'code': 200,
             'data': results

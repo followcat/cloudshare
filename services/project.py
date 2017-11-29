@@ -6,8 +6,8 @@ import sources.industry_id
 import services.base.service
 import services.simulationcv
 import services.simulationco
+import services.simulationjd
 import services.simulationpeo
-import services.jobdescription
 import extractor.information_explorer
 
 class Project(services.base.service.Service):
@@ -18,11 +18,11 @@ class Project(services.base.service.Service):
     PEO_PATH = 'PEO'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepo, cvrepos, svcpeos, name, iotype='git'):
+    def __init__(self, path, corepos, cvrepos, jdrepos, svcpeos, name, iotype='git'):
         super(Project, self).__init__(path, name, iotype=iotype)
         self.path = path
-        self._modelname = name
-        self.corepo = corepo
+        self.corepos = corepos
+        self.jdrepos = jdrepos
         self.cvrepos = cvrepos
         self.svcpeos = svcpeos
         cvpath = os.path.join(path, self.CV_PATH)
@@ -30,11 +30,9 @@ class Project(services.base.service.Service):
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
 
-        self.curriculumvitae = services.simulationcv.SimulationCV.autoservice(
-                                                        cvpath, name, cvrepos)
-        self.company = services.simulationco.SimulationCO.autoservice(
-                                                        copath, name, [corepo])
-        self.jobdescription = services.jobdescription.JobDescription(jdpath, name)
+        self.company = services.simulationco.SimulationCO(copath, name, corepos)
+        self.curriculumvitae = services.simulationcv.SimulationCV(cvpath, name, cvrepos)
+        self.jobdescription = services.simulationjd.SimulationJD(jdpath, name, jdrepos)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
         self.config = dict()
         try:
@@ -44,14 +42,18 @@ class Project(services.base.service.Service):
 
     def load(self):
         self.config = utils.builtin.load_yaml(self.path, self.config_file)
+        self.config['name'] = self.name
+        if 'id' not in self.config:
+            self.config['id'] = utils.builtin.genuuid()
+        if 'model' not in self.config:
+            self.config['model'] = 'default'
 
     def save(self):
         dumpconfig = utils.builtin.dump_yaml(self.config)
         self.interface.add(self.config_file, dumpconfig, message="Update config file.")
 
-    def setup(self, classify=None, committer=None, config=None):
+    def setup(self, committer=None, config=None):
         self.setconfig(config)
-        self.setclassify(classify, committer=committer)
 
     def setconfig(self, config=None):
         if config is None:
@@ -64,10 +66,21 @@ class Project(services.base.service.Service):
         if modified:
             self.save()
 
-    def setclassify(self, classify=None, committer=None):
-        if not os.path.exists(os.path.join(self.path, self.config_file)) or classify is not None:
-            self.config['classify'] = [c for c in classify if c in sources.industry_id.industryID]
-            self.save()
+    @property
+    def storageCO(self):
+        result = None
+        servicename = self.config['storageCO']
+        for corepo in self.corepos:
+            if isinstance(corepo, services.simulationco.SimulationCO):
+                for each in corepo.storages:
+                    if each.name == servicename:
+                        result = each
+                        break
+            elif corepo.name == servicename:
+                result = each
+            if result is not None:
+                break
+        return result
 
     @property
     def storageCV(self):
@@ -80,6 +93,22 @@ class Project(services.base.service.Service):
                         result = each
                         break
             elif cvrepo.name == servicename:
+                result = each
+            if result is not None:
+                break
+        return result
+
+    @property
+    def storageJD(self):
+        result = None
+        servicename = self.config['storageJD']
+        for jdrepo in self.jdrepos:
+            if isinstance(jdrepo, services.simulationjd.SimulationJD):
+                for each in jdrepo.storages:
+                    if each.name == servicename:
+                        result = each
+                        break
+            elif jdrepo.name == servicename:
                 result = each
             if result is not None:
                 break
@@ -107,11 +136,11 @@ class Project(services.base.service.Service):
 
     @property
     def modelname(self):
-        return self._modelname
+        return self.config['model']
 
     @property
     def id(self):
-        return self.name
+        return self.config['id']
 
     @property
     def cv_secrecy(self):
@@ -128,22 +157,6 @@ class Project(services.base.service.Service):
     @cv_private.setter
     def cv_private(self, value):
         self.curriculumvitae.private_default = value
-
-    @property
-    def classify(self):
-        result = [c for c in sources.industry_id.industryID]
-        if 'classify' in self.config:
-            result = self.config['classify']
-        return result
-
-    def getclassify(self):
-        return self.classify
-
-    def getindustry(self):
-        result = dict()
-        for each in self.classify:
-            result.update({each: sources.industry_id.sources[each]})
-        return result
 
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
         result = {
@@ -178,16 +191,6 @@ class Project(services.base.service.Service):
 
     def cv_datas(self):
         return self.curriculumvitae.datas()
-
-    def cv_search(self, keyword, selected=None):
-        if selected is None:
-            selected = [self.storageCV.name]
-        return self.curriculumvitae.search(keyword, selected=selected)
-
-    def cv_search_yaml(self, keyword, selected=None):
-        if selected is None:
-            selected = [self.storageCV.name]
-        return self.curriculumvitae.search_yaml(keyword, selected=selected)
 
     def cv_gethtml(self, id):
         return self.curriculumvitae.gethtml(id)
@@ -224,12 +227,17 @@ class Project(services.base.service.Service):
                                               end_y, end_m, end_d)
 
     def company_update_info(self, id, info, committer):
-        result = self.company.update_info(id, info, committer)
+        result = False
+        if self.company.exists(id):
+            repo_result = self.storageCO.saveinfo(id, info, "Update %s information."%id,
+                                                  committer)
+            project_result = self.company.update_info(id, info, committer)
+            result = repo_result or project_result
         return result
 
     def company_compare_excel(self, stream, committer):
         outputs = list()
-        outputs.extend(self.corepo.compare_excel(stream, committer))
+        outputs.extend(self.storageCO.compare_excel(stream, committer))
         outputs.extend(self.company.compare_excel(stream, committer))
         return outputs
 
@@ -242,7 +250,7 @@ class Project(services.base.service.Service):
             if item[0] == 'companyadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 repo_result.add(yamlname)
-                result = self.corepo.add(baseobj, committer=item[2][-1], do_commit=False)
+                result = self.storageCO.add(baseobj, committer=item[2][-1], do_commit=False)
             elif item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 project_result.add(self.company.ids_file)
@@ -252,13 +260,19 @@ class Project(services.base.service.Service):
                 project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
                 result = self.company.updateinfo(*item[2], do_commit=False)
             results[item[1]] = result
-        self.corepo.interface.do_commit(list(repo_result), committer=committer)
+        self.storageCO.interface.do_commit(list(repo_result), committer=committer)
         self.company.interface.do_commit(list(project_result), committer=committer)
         return results
 
     def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
-        result = self.corepo.add(coobj, committer, unique, yamlfile, mdfile)
-        result = self.company.add(coobj, committer, unique, yamlfile, mdfile)
+        result = {
+            'repo_result' : False,
+            'project_result' : False
+        }
+        result['repo_result'] = self.storageCO.add(coobj, committer, unique, yamlfile, mdfile)
+        if result['repo_result']:
+            result['project_result'] = self.company.add(coobj, committer, unique,
+                                                        yamlfile, mdfile)
         return result
 
     def company_get(self, name):
@@ -270,27 +284,32 @@ class Project(services.base.service.Service):
     def company_names(self):
         return self.company.ids
 
-    def jd_get(self, hex_id):
-        return self.jobdescription.get(hex_id)
+    def jd_get(self, id):
+        return self.jobdescription.getyaml(id)
 
-    def jd_add(self, company, name, description, commentary, followup, committer,
-                status=None):
-        try:
-            self.company_get(company)
-        except IOError:
-            return False
-        return self.jobdescription.add(company, name, description, committer,
-                                        status, commentary, followup)
+    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True):
+        result = {
+            'repo_result' : False,
+            'project_result' : False
+        }
+        if jdobj.metadata['company'] in self.company.customers:
+            result['repo_result'] = self.storageJD.add(jdobj, committer,
+                                                       unique=unique, do_commit=do_commit)
+            if result['repo_result']:
+                result['project_result'] = self.jobdescription.add(jdobj, committer,
+                                                                unique=unique,
+                                                                do_commit=do_commit)
+        return result
 
-    def jd_modify(self, hex_id, description, status, commentary, followup, committer):
-        return self.jobdescription.modify(hex_id, description, status,
-                                            commentary, followup, committer)
+    def jd_modify(self, id, description, status, commentary, followup, committer):
+        result = False
+        if self.jobdescription.exists(id):
+            result = self.storageJD.modify(id, description, status,
+                                           commentary, followup, committer)
+        return result
 
-    def jd_search(self, keyword, selected=None):
-        return self.jobdescription.search(keyword, selected=selected)
-
-    def jd_lists(self):
-        return self.jobdescription.lists()
+    def jd_datas(self):
+        return self.jobdescription.datas()
 
     def peo_add(self, peopobj, committer=None, unique=True, do_commit=True):
         result = {

@@ -52,13 +52,15 @@ export const API = {
 
   ACCOUNTS_API: `${HOST}/api/accounts`,
 
-  ADDITIONALS_API: `${HOST}/api/additionnames`,
+  PEOPLEID_API: `${HOST}/api/userpeopleid`,
 
   CLASSIFY_API: `${HOST}/api/classify`,
 
   LSIALLSIMS_API: `${HOST}/api/lsiallsims`,
 
   INDUSTRY_API: `${HOST}/api/industry`,
+
+  UPLOAD_ORIGIN_API: `${HOST}/api/uploadorigins`,
 
   COMPANYLIST_API: `${HOST}/api/companylist`,
 
@@ -67,8 +69,6 @@ export const API = {
   ADDED_COMPANY_LIST_API: `${HOST}/api/addedcompanylist`,
 
   ALL_COMPANY_API: `${HOST}/api/companyall`,
-
-  COMPANY_BY_SEARCH_TEXT_API: `${HOST}/api/searchcobytext`,
   
   COMPANY_BY_SEARCH_KEY_API: `${HOST}/api/searchcobykey`,
 
@@ -92,7 +92,9 @@ export const API = {
 
   SESSION_API: `${HOST}/api/session`,
 
-  UPLOAD_RESUME_API: `${HOST}/api/uploadcv`,
+  UPLOAD_RESUME_API: `${HOST}/api/userupcv`,
+
+  UPLOAD_MEMBER_RESUME_API: `${HOST}/api/memberupcv`,
 
   UPLOAD_RESUME_PREVIEW_API: `${HOST}/api/uploadcv/preview`,
 
@@ -138,6 +140,8 @@ export const API = {
 
   MINING_VALUABLE_API: `${HOST}/api/mining/valuable`,
 
-  MINING_CV_API: `${HOST}/api/mining/cv`
+  MINING_CV_API: `${HOST}/api/mining/cv`,
+
+  MINING_JD_MATCING_API: `${HOST}/api/mining/jdmatch`,
 };
 

@@ -13,11 +13,10 @@ class BaseStorage(services.base.service.Service):
     commitinfo = 'BaseData'
     YAML_TEMPLATE = ()
 
-    def __init__(self, path, name=None, searchengine=None, iotype=None):
+    def __init__(self, path, name=None, iotype=None):
         self.path = path
         self.yamlpath = ''
-        super(BaseStorage, self).__init__(path, name=name,
-                                          searchengine=searchengine, iotype=iotype)
+        super(BaseStorage, self).__init__(path, name=name, iotype=iotype)
         self.unique_checker = None
         self.info = ""
         self._nums = 0
@@ -187,22 +186,6 @@ class BaseStorage(services.base.service.Service):
             result = unicode(str(markdown), 'utf-8')
         return result
 
-    def search(self, keyword):
-        results = set()
-        allfile = self.interface.search(keyword)
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            results.add((id, result[1]))
-        return results
-
-    def search_yaml(self, keyword):
-        results = set()
-        allfile = self.interface.search_yaml(keyword)
-        for result in allfile:
-            id = core.outputstorage.ConvertName(result[0]).base
-            results.add((id, result[1]))
-        return results
-
     def names(self):
         for id in self.ids:
             yield core.outputstorage.ConvertName(id).md
@@ -213,9 +196,8 @@ class BaseStorage(services.base.service.Service):
 
     def datas(self):
         for id in self.ids:
-            name = core.outputstorage.ConvertName(id).md
             text = self.getmd(id)
-            yield name, text
+            yield id, text
 
     def history(self, author=None, entries=10, skip=0):
         return self.interface.history(author=author, max_commits=entries, skip=skip)

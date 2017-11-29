@@ -1,9 +1,24 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
-import { Upload, Icon } from 'antd';
+import { Upload, Icon, Select } from 'antd';
 const Dragger = Upload.Dragger;
 
 class DraggerUpload extends Component {
+  constructor() {
+    super();
+    this.state = {
+      selected: { 'origin' : '其他' }
+    }
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(value) {
+    this.setState({
+       selected: { 'origin' : value }
+    });
+    this.props.handleChangeOrigin(value)
+  }
+
   render() {
     const {
       prefixCls,
@@ -16,8 +31,10 @@ class DraggerUpload extends Component {
       disabled,
       beforeUpload,
       text,
+      origins,
       hint
     } = this.props;
+    const { selected } = this.state;
 
     return (
       <div className={prefixCls}>
@@ -32,6 +49,7 @@ class DraggerUpload extends Component {
           onRemove={this.props.onRemove}
           disabled={disabled}
           beforeUpload={beforeUpload}
+          data={selected}
         >
           <p className="ant-upload-drag-icon">
             <Icon type="inbox" />
@@ -39,6 +57,18 @@ class DraggerUpload extends Component {
           <p className="ant-upload-text">{text}</p>
           <p className="ant-upload-hint">{hint}</p>
         </Dragger>
+        <div className='cs-upload-origin'>
+          <Select 
+            placeholder="选择简历来源"
+            notFoundContent="Not found" 
+            onChange={this.handleChange}>
+              {origins && origins.map(item  => {
+                return (
+                  <Select.Option key={item.id} value={item.name}>{item.name}</Select.Option>
+                );
+              })}
+          </Select>
+        </div>
       </div>
     );
   }

@@ -2,6 +2,7 @@ import yaml
 
 import webapp.jsonencoder
 from baseapp.settings import *
+from baseapp.loader import config
 
 
 def load_config(path):
@@ -14,8 +15,8 @@ def load_config(path):
     return config
 
 CONFIG_PATH = 'webapp/config'
+UPLOAD_TEMP = config.storage_config['UPLOAD_TEMP']
 RESTFUL_JSON = {'cls': webapp.jsonencoder.CustomJSONEncoder}
 
-UPLOAD_TEMP = 'output'
 SECRET_KEY = 'SET T0 4NY SECRET KEY L1KE RAND0M H4SH'
 ACCESS = load_config(CONFIG_PATH)

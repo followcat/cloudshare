@@ -28,9 +28,9 @@
 }
 
 .@{previewTopBarPrefixCls} {
+  margin-top: 5px;
+  border: 1px solid #e9e9e9;
   position: relative;
-  height: auto;
-  margin: 0 auto;
   padding: 4px 0;
 
   &-prev,
@@ -41,17 +41,28 @@
   }
 
   &-prev {
+    position: absolute;
     left: 8px;
   }
 
   &-next {
-   right: 8px;
+    position: absolute;
+    right: 8px;
   }
 
   .@{topBarForm} {
     width: 800px;
     margin: 0 auto;
     padding-top: 3px;
+
+    .cs-preview-setpeople{
+      display: block
+    }
+
+    .cs-preview-cancelsetpeople{
+      width: 64px;
+      display: block
+    }
   }
 
 }

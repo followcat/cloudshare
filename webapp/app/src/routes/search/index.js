@@ -15,7 +15,12 @@ module.exports = {
       }, 'search');
     }
   },
-  onEnter: checkStatus,
+  onEnter(nextState, replace) {
+    checkStatus();
+    if (nextState.location.pathname === `/${this.path}`) {
+      // replace({ pathname: '/jobsearch' });
+    }
+  },
   childRoutes: [
     require('./result')
   ]

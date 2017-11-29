@@ -27,32 +27,21 @@ const MenuItem = Menu.Item,
 const navMenusMember = [{
   url: URL.getSearchURL(),
   text: language.SEARCH
-}, {
+}, /*{
   url: URL.getFastMatchingByDoc(),
   text: language.MATCH
-}, {
+}, */{
   url: URL.getUploaderURL(),
   text: language.RESUME_UPLOADER
 }, {
+  url: URL.getAddPositionURL(),
+  text: language.POSITION_RECOMMEND
+},{
   url: URL.getProjectManagement(),
   text: language.VIP_MANAGEMENT
 }, {
   url: URL.getBestExcellent(),
   text: language.BEST_EXCELLENT
-}];
-//account
-const navMenuUser = [{
-  url: URL.getSearchURL(),
-  text: language.SEARCH
-}, {
-  url: URL.getFastMatchingByDoc(),
-  text: language.MATCH
-}, {
-  url: URL.getUploaderURL(),
-  text: language.RESUME_UPLOADER
-}, {
-  url: URL.getBecomeMember(),
-  text: language.BECOME_MEMBER
 }];
 
 class LayoutHeader extends Component {
@@ -111,20 +100,6 @@ class LayoutHeader extends Component {
   </Menu>
     );
 
-    await isMember((json) => {
-      if (json.result === true) {
-        this.setState({
-          navMenus: navMenusMember,
-          ismember: true,
-        });
-      }else{
-        this.setState({
-          navMenus: navMenuUser,
-          ismember: false,
-        });
-      }
-      });
-
     isMemberAdmin((json) => {
       if (json.result === true) {
         this.setState({
@@ -155,20 +130,6 @@ class LayoutHeader extends Component {
         selectedKeys.push(v.url);
       }
     });
-
-
-    isMember((json) => {
-      if (json.result === true) {
-             this.setState({
-          navMenus: navMenusMember,
-          ismember: true,
-        });
-      }else{
-        this.setState({
-           ismember: false,
-        });
-      }
-      });
 
     this.setState({
       selectedKeys: selectedKeys
@@ -203,9 +164,9 @@ class LayoutHeader extends Component {
     return (
       <Header
         logoImg={logo}
-        navMenus={navMenus}
+        navMenus={navMenusMember}
         profileMenu={profileMenus}
-        isMember={ismember}
+        isMember={true}
         projects={projects}
         project={StorageUtil.get('_pj')}
         profileText={StorageUtil.get('user')}

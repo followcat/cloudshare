@@ -16,7 +16,9 @@ SVC_MSG = baseapp.datadbs.SVC_MSG
 SVC_PWD = baseapp.datadbs.SVC_PWD
 SVC_ACCOUNT = baseapp.datadbs.SVC_ACCOUNT
 
+SVC_CO_REPO = baseapp.datadbs.SVC_CO_REPO
 SVC_CV_REPO = baseapp.datadbs.SVC_CV_REPO
+SVC_JD_REPO = baseapp.datadbs.SVC_JD_REPO
 SVC_PEO_REPO = baseapp.datadbs.SVC_PEO_REPO
 SVC_CV_INDIV = baseapp.datadbs.SVC_CV_INDIV
 SVC_PEO_INDIV = baseapp.datadbs.SVC_PEO_INDIV
@@ -39,7 +41,9 @@ if __name__ == '__main__':
         account_backup_path = os.path.join(folder, 'account', backup_name)
         message_backup_path = os.path.join(folder, 'message', backup_name)
         password_backup_path = os.path.join(folder, 'password', backup_name)
+        corepo_backup_path = os.path.join(folder, 'corepo', backup_name)
         cvrepo_backup_path = os.path.join(folder, 'cvrepo', backup_name)
+        jdrepo_backup_path = os.path.join(folder, 'jdrepo', backup_name)
         peorepo_backup_path = os.path.join(folder, 'peorepo', backup_name)
         cvindiv_backup_path = os.path.join(folder, 'cvindiv', backup_name)
         peoindiv_backup_path = os.path.join(folder, 'peoindiv', backup_name)
@@ -47,7 +51,9 @@ if __name__ == '__main__':
         utils.builtin.assure_path_exists(account_backup_path)
         utils.builtin.assure_path_exists(message_backup_path)
         utils.builtin.assure_path_exists(password_backup_path)
+        utils.builtin.assure_path_exists(corepo_backup_path)
         utils.builtin.assure_path_exists(cvrepo_backup_path)
+        utils.builtin.assure_path_exists(jdrepo_backup_path)
         utils.builtin.assure_path_exists(peorepo_backup_path)
         utils.builtin.assure_path_exists(cvindiv_backup_path)
         utils.builtin.assure_path_exists(peoindiv_backup_path)
@@ -55,7 +61,9 @@ if __name__ == '__main__':
         SVC_MSG.backup(message_backup_path, bare=True)
         SVC_PWD.backup(password_backup_path, bare=True)
         SVC_ACCOUNT.backup(account_backup_path, bare=True)
+        SVC_CO_REPO.backup(corepo_backup_path, bare=True)
         SVC_CV_REPO.backup(cvrepo_backup_path, bare=True)
+        SVC_JD_REPO.backup(jdrepo_backup_path, bare=True)
         SVC_PEO_REPO.backup(peorepo_backup_path, bare=True)
         SVC_CV_INDIV.backup(cvindiv_backup_path, bare=True)
         SVC_PEO_INDIV.backup(peoindiv_backup_path, bare=True)

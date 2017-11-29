@@ -4,6 +4,7 @@ import os
 import time
 import shutil
 
+import utils.builtin
 import utils.chsname
 import core.exception
 import core.outputstorage
@@ -382,8 +383,7 @@ def update_jd_co_id(SVC_JD, SVC_CO):
         co_info = SVC_CO.getyaml(id)
         co_dict[co_info['name']] = co_info
 
-    for jd in SVC_JD.lists():
-        jd_id = jd['id']
+    for jd_id, jd in SVC_JD.datas():
         jd_company = jd['company']
         if jd_company in co_dict:
             jd['company'] = co_dict[jd_company]['id']
@@ -395,10 +395,9 @@ def update_jd_co_id(SVC_JD, SVC_CO):
 
 def update_jd_commentary(SVC_JD, comments_dict):
     import yaml
-    for jd in SVC_JD.lists():
+    for jd_id, jd in SVC_JD.datas():
         if 'commentary' in jd:
             continue
-        jd_id = jd['id']
         if jd_id in comments_dict:
             jd['commentary'] = comments_dict[jd_id]
         else:
@@ -412,10 +411,9 @@ def update_jd_commentary(SVC_JD, comments_dict):
 def add_jd_followup(SVC_PRJ):
     import yaml
     SVC_JD = SVC_PRJ.jobdescription
-    for jd in SVC_JD.lists():
+    for jd_id, jd in SVC_JD.datas():
         if 'followup' in jd:
             continue
-        jd_id = jd['id']
         jd['followup'] = ''
         if '\n' in jd['commentary']:
             jd['followup'] = jd['commentary']
@@ -433,3 +431,17 @@ def init_people(SVC_CV, SVC_PEO):
         peopmeta = extractor.information_explorer.catch_peopinfo(info)
         peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
         SVC_PEO.add(peopobj)
+
+def init_esindex_mem(SVC_INDEX, SVC_MEMBERS):
+    for memname, mem in SVC_MEMBERS.members.items():
+        for prjname, prj in mem.projects.items():
+            SVC_INDEX.updatesvc(SVC_INDEX.config['CO_MEM'], prj.id,
+                                prj.company, numbers=1000)
+            SVC_INDEX.updatesvc(SVC_INDEX.config['JD_MEM'], prj.id,
+                                prj.jobdescription, numbers=1000)
+            SVC_INDEX.updatesvc(SVC_INDEX.config['CV_MEM'], prj.id,
+                                prj.curriculumvitae, numbers=1000)
+
+def init_esindex_cvsto(SVC_INDEX, SVC_CV_STO, content=True):
+    SVC_INDEX.updatesvc(SVC_INDEX.config['CV_STO'], SVC_CV_STO.id,
+                        SVC_CV_STO, content=content, numbers=5000)

@@ -8,31 +8,41 @@ class Members(object):
 
     default_member_name = 'default'
 
-    def __init__(self, path, acc_repos, cv_repos, mult_peo):
+    def __init__(self, path, acc_repos, co_repos, cv_repos, jd_repos, mult_peo):
         self.path = path
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         self.acc_repos = acc_repos
+        self.co_repos = co_repos
         self.cv_repos = cv_repos
+        self.jd_repos = jd_repos
         self.mult_peo = mult_peo
         self.members = dict()
         for member_path in glob.glob(os.path.join(self.path, '*')):
             if os.path.isdir(member_path):
                 str_name = os.path.split(member_path)[1]
                 name = unicode(str_name, 'utf-8')
-                member = services.member.Member(acc_repos, cv_repos, mult_peo,
-                                                member_path, name)
-                member.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage',
-                              'limitPEO': 'peolimit'})
+                member = services.member.Member(acc_repos, co_repos, cv_repos, jd_repos,
+                                                mult_peo, member_path, name)
+                member.setup({'storageCV':  'cloudshare',
+                              'storagePEO': 'peostorage',
+                              'limitPEO':   'peolimit',
+                              'storageCO':  'corepo',
+                              'storageJD':  'jdrepo'})
                 self.members[name] = member
         self.load_default_member()
+        self._defaultmember = self.members[self.default_member_name]
 
     def load_default_member(self):
         path = os.path.join(self.path, self.default_member_name)
-        member = services.member.DefaultMember(self.acc_repos, self.cv_repos, self.mult_peo,
-                                               path, self.default_member_name)
-        member.setup({'storageCV': 'cvindividual', 'storagePEO': 'peoindividual',
-                      'limitPEO': 'peolimit'})
+        member = services.member.DefaultMember(self.acc_repos, self.co_repos,
+                                               self.cv_repos, self.jd_repos,
+                                               self.mult_peo, path, self.default_member_name)
+        member.setup({'storageCV':  'cvindividual',
+                      'storagePEO': 'peoindividual',
+                      'limitPEO':   'peolimit',
+                      'storageCO':  'corepo',
+                      'storageJD':  'jdrepo'})
         self.members[self.default_member_name] = member
 
     def exists(self, name):
@@ -41,10 +51,13 @@ class Members(object):
     def create(self, name):
         assert not self.exists(name)
         path = os.path.join(self.path, name)
-        member = services.member.Member(self.acc_repos, self.cv_repos, self.mult_peo,
-                                        path, name)
-        member.setup({'storageCV': 'cloudshare', 'storagePEO': 'peostorage',
-                      'limitPEO': 'peolimit'})
+        member = services.member.Member(self.acc_repos, self.co_repos, self.cv_repos,
+                                        self.jd_repos, self.mult_peo, path, name)
+        member.setup({'storageCV':  'cloudshare',
+                      'storagePEO': 'peostorage',
+                      'limitPEO':   'peolimit',
+                      'storageCO':  'corepo',
+                      'storageJD':  'jdrepo'})
         self.members[name] = member
 
     def get(self, name):
@@ -63,7 +76,8 @@ class Members(object):
         result = dict()
         for each in self.members:
             member = self.members[each]
-            result.update(member.projects)
+            for name, project in member.projects.items():
+                result[project.id] = project
         return result
 
     def backup(self, path):
@@ -72,3 +86,7 @@ class Members(object):
         for each in self.members:
             member = self.members[each]
             member.backup(members_path)
+
+    @property
+    def defaultmember(self):
+        return self._defaultmember

@@ -16,7 +16,7 @@ class KeywordSearch extends Component {
 
   componentWillMount() {
     const { defaultValue } = this.props;
-    
+
     if (defaultValue) {
       this.setState({
         value: defaultValue
@@ -33,9 +33,7 @@ class KeywordSearch extends Component {
   handleClick() {
     const { value } = this.state;
     
-    if (value.trim()) {
       this.props.onSearch(value);
-    }
   }
 
   handleKeyPress(e) {
@@ -45,7 +43,7 @@ class KeywordSearch extends Component {
   }
 
   getHorizontalRender() {
-    const { btnText } = this.props,
+    const { btnText, defaultText } = this.props,
           { value } = this.state;
 
     return (
@@ -55,7 +53,7 @@ class KeywordSearch extends Component {
             <Input
               value={value}
               size="large"
-              placeholder="在关键字前后添加双引号&quot; &quot;可进行精确搜索"
+              placeholder={defaultText}
               onChange={this.handleChange}
               onKeyPress={this.handleKeyPress}
             />
@@ -77,7 +75,7 @@ class KeywordSearch extends Component {
   }
 
   getInlineRender() {
-    const { btnText } = this.props,
+    const { btnText, defaultText} = this.props,
           { value } = this.state;
 
     return (
@@ -85,7 +83,7 @@ class KeywordSearch extends Component {
         <Col span={19}>
           <Input
             value={value}
-            placeholder="在关键字前后添加双引号&quot; &quot;可进行精确搜索"
+            placeholder={defaultText}
             size="large"
             onChange={this.handleChange}
             onKeyPress={this.handleKeyPress}
@@ -103,7 +101,6 @@ class KeywordSearch extends Component {
       </Row>
     );
   }
-
   render() {
     const { prefixCls, horizontal, inline } = this.props;
 
@@ -117,6 +114,7 @@ class KeywordSearch extends Component {
 
 KeywordSearch.defaultProps = {
   prefixCls: 'cs-keyword-search',
+  defaultText: "在关键字前后添加双引号,可进行精确搜索",
   btnText: 'Search',
   horizontal: false,
   inline: false,

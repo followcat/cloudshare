@@ -12,6 +12,7 @@ import ExtractInfo from './ExtractInfo';
 
 import {
   Popconfirm,
+  Pagination,
   message,
   Select,
   Form,
@@ -45,6 +46,9 @@ class Customer extends Component {
   constructor() {
     super();
     this.state = {
+      current: 1,
+      totals: 0,
+      pageSize: 10,
       dataSource: [],
       fetching: false,
       loading: false,
@@ -66,6 +70,8 @@ class Customer extends Component {
     this.getDataSource = this.getDataSource.bind(this);
     this.getCompanyDataSource = this.getCompanyDataSource.bind(this);
     this.getElements = this.getElements.bind(this);
+    this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
+    this.handlePaginationChange = this.handlePaginationChange.bind(this);
   }
 
   handleDeleteCustomerConfirm(id) {
@@ -149,15 +155,34 @@ class Customer extends Component {
     }
   }
 
+  handleShowSizeChange(current, pageSize) {
+      this.setState({
+        current: current,
+        pageSize: pageSize
+      },() => this.getDataSource());
+  }
+
+  handlePaginationChange(current) {
+      this.setState({
+        current: current
+      },() => {this.getDataSource()});
+  }
+
   getDataSource() {
+    const { current,
+            pageSize,} = this.state;
     this.setState({
       loading: true
     });
 
-    getCustomerList(json => {
+    getCustomerList({
+      current_page: current,
+      page_size: pageSize,
+    },json => {
       if (json.code === 200) {
         this.setState({
           dataSource: json.data,
+          totals: json.totals,
           loading: false
         });
       }
@@ -386,6 +411,20 @@ class Customer extends Component {
       type: 'textarea'
     }];
 
+    const { current, totals, pageSize } = this.state;
+    // 主体表格分页
+    const pagination = {
+      current: current,
+      total: totals,
+      pageSize: pageSize,
+      showSizeChanger: true,
+      showQuickJumper: true,
+      defaultPageSize: 20,
+      showTotal: totals => `共 ${totals} 条`,
+      onShowSizeChange: this.handleShowSizeChange,
+      onChange: this.handlePaginationChange
+    };
+
     return (
       <div className="cs-Customer">
         <TablePlus
@@ -421,6 +460,9 @@ class Customer extends Component {
             onSave={this.handleBasicInfoSave}
           />
         </SiderPanel>
+        <div className="cs-card-inner-pagination">
+          <Pagination {...pagination}/>
+        </div>
       </div>
     );
   }

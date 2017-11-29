@@ -9,18 +9,30 @@ import DatabaseInfo from './DatabaseInfo';
 
 import { introJs } from 'intro.js';
 
-import { Steps, Icon } from 'antd';
+import { Steps, Icon, Tabs } from 'antd';
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
 const Step = Steps.Step;
+const TabPane = Tabs.TabPane;
 
 class Search extends Component {
   constructor() {
     super();
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleJDSearch = this.handleJDSearch.bind(this);
   }
 
   handleSearch(value) {
     browserHistory.push({
       pathname: 'search/result',
+      query: { search_text: value }
+    });
+  }
+
+  handleJDSearch(value) {
+    browserHistory.push({
+      pathname: '/fastmatching',
       query: { search_text: value }
     });
   }
@@ -36,12 +48,26 @@ class Search extends Component {
     return (
       <div className="cs-layout-search">
         <Guide />
-        <div className="cs-search">
-          <KeywordSearch
-            btnText="搜索"
-            horizontal
-            onSearch={this.handleSearch}
-          />
+        <div className="card-container">
+          <div className="cs-search">
+            <Tabs type="card">
+            <TabPane tab={language.JD_SEARCH} key="1">
+                <KeywordSearch
+                  btnText={language.JD_SEARCH}
+                  horizontal
+                  onSearch={this.handleSearch}
+                />
+              </TabPane>
+              <TabPane tab={language.JOBSEARCH} key="2">
+                <KeywordSearch
+                  btnText={language.JOBSEARCH}
+                  defaultText={'输入职位职责进行匹配'}
+                  horizontal
+                  onSearch={this.handleJDSearch}
+                />
+              </TabPane>
+              </Tabs>
+          </div>
         </div>
         <DatabaseInfo />
       </div>

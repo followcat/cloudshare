@@ -69,3 +69,17 @@ export const deleteAccount = (userId, callback) => {
   .then(response => response.json())
   .then(json => callbackFunction(callback, json));
 }
+
+export const getPeopleID = (callback) => {
+  return fetch(API.PEOPLEID_API, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    }
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};

@@ -13,7 +13,6 @@ class SimulationCV(services.base.simulation.Simulation,
     )
 
     yaml_private_key = {
-        "secrecy":              True,
         "phone":                '[*****]',
         "email":                '[*****]',
         "name":                 '[*****]',
@@ -50,13 +49,12 @@ class SimulationCV(services.base.simulation.Simulation,
                 continue
         return html
 
-    def cleanprivate(self, id, source):
-        result = source
+    def cleanprivate(self, md, yaml):
+        result = md
         hidden = '[****]'
-        info = self.getyaml(id, secrecy=False)
         for key in self.yaml_private_key:
-            if key in info and info[key]:
-                result = result.replace(info[key], hidden+' '*(len(info[key])-len(hidden)))
+            if key in yaml and yaml[key]:
+                result = result.replace(yaml[key], hidden+' '*(len(yaml[key])-len(hidden)))
             elif key == 'phone':
                 value = extractor.information_explorer.get_phone(result)
                 if len(value) > 6:
@@ -69,7 +67,7 @@ class SimulationCV(services.base.simulation.Simulation,
             try:
                 result = storage.gethtml(id)
                 if secrecy is True and self.ishideprivate(id):
-                    result = self.cleanprivate(id, result)
+                    result = self.secretsmd(id, result)
                 break
             except IOError:
                 continue
@@ -87,16 +85,30 @@ class SimulationCV(services.base.simulation.Simulation,
 
     def getmd(self, id, secrecy=True):
         result = super(SimulationCV, self).getmd(id)
-        if secrecy is True and self.ishideprivate(id):
-            result = self.cleanprivate(id, result)
+        if secrecy is True:
+            result = self.secretsmd(id, result)
         return result
 
     def getyaml(self, id, secrecy=True):
         result = super(SimulationCV, self).getyaml(id)
         if 'secrecy' not in result:
             result['secrecy'] = False
-        if secrecy is True and self.ishideprivate(id):
-            result.update(self.yaml_private_key)
+        if secrecy is True:
+            result = self.secretsyaml(id, result)
+        return result
+
+    def secretsyaml(self, id, info):
+        if self.ishideprivate(id):
+            info.update(self.yaml_private_key)
+            info['secrecy'] = True
+        return info
+
+    def secretsmd(self, id, md, info=None):
+        result = md
+        if self.ishideprivate(id):
+            if info is None:
+                info = self.getyaml(id, secrecy=False)
+            result = self.cleanprivate(md, info)
         return result
 
     def getprivatekeys(self):

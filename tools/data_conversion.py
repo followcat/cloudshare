@@ -166,11 +166,11 @@ def convert_member(current_template, next_template, version):
                                     json.dump([], out)
     elif version == '1.5':
         for member in ('default', 'willendare'):
-            for subdir in ('projects',):
+            for subdir in ('projects', 'companies'):
                 if subdir in ('projects',):
                     if member == 'willendare':
                         for data in ('CO', 'CV', 'PEO', 'JD'):
-                            if data in ('JD', 'CO'):
+                            if data in ('JD', ):
                                 try:
                                     os.makedirs(next_template['_'.join((data, 'REPO'))])
                                 except OSError:
@@ -180,6 +180,24 @@ def convert_member(current_template, next_template, version):
                                     with open(os.path.join(project, data, 'names.json'), 'w') as out:
                                         json.dump([_.split(os.extsep)[0] for _ in files], out)
                                     for f in path.Path(os.path.join(project, data)).files():
+                                        if os.path.basename(f) == 'names.json':
+                                            continue
+                                        try:
+                                            os.renames(f, os.path.join(next_template['_'.join((data, 'REPO'))], os.path.basename(f)))
+                                        except IOError:
+                                            pass
+                elif subdir in ('companies',):
+                    if member == 'willendare':
+                        for data in ('CO', 'CV', 'PEO', 'JD'):
+                            if data in ('CO', ):
+                                try:
+                                    os.makedirs(next_template['_'.join((data, 'REPO'))])
+                                except OSError:
+                                    pass
+                                files = [os.path.basename(_) for _ in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).files()]
+                                with open(os.path.join(project, data, 'names.json'), 'w') as out:
+                                    json.dump([_.split(os.extsep)[0] for _ in files], out)
+                                for f in path.Path(os.path.join(next_template['MEMBERS'], member, subdir)).files():
                                         if os.path.basename(f) == 'names.json':
                                             continue
                                         try:

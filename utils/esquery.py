@@ -122,7 +122,7 @@ def scroll(esconn, kwargs, index=None, doctype=None, start=0, size=None, scroll=
             request_timeout=30,
             **kwargs)
     total = page['hits']['total']
-    if scroll is not None:
+    if scroll is not None or total < size:
         size = page['hits']['total']
 
     while (len(page['hits']['hits']) > 0 and count < size):

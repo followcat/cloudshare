@@ -174,7 +174,7 @@ class MemberUploadCVAPI(UploadCVAPI):
     def putparam(self):
         super(MemberUploadCVAPI, self).putparam()
         projectname = self.args['project']
-        self.member = user.getmember(self.svc_members)
+        self.member = self.user.getmember(self.svc_members)
         self.project = member.getproject(projectname)
         self.projectid = self.project.id
         self.modelname = self.project.modelname

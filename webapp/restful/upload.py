@@ -66,7 +66,7 @@ class UploadCVAPI(Resource):
         for item in self.updates:
             status = 'failed'
             self.uploaddata = upload[self.user.name].pop(item['filename'])
-            self.cvobj = uploaddata['cv']
+            self.cvobj = self.uploaddata['cv']
             cvobj=self.cvobj
             if cvobj is not None:
                 id = cvobj.metadata['id']

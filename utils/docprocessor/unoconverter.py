@@ -76,7 +76,7 @@ class DocumentConverter:
             if self.invisible is True:
                 command.append('--invisible')
             self.p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
-            self.wait_until_port_open()
+            wait_until_port_open()
 
 
     def convert(self, inputFile, outputFile):

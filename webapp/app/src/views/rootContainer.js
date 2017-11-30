@@ -15,6 +15,7 @@ const promise = new Promise((resolve, reject) => {
         }else{
           global.ismember = false
         }
+        sessionStorage.setItem("ismember", global.ismember);
         resolve(global.ismember);
       });
   });
@@ -41,7 +42,7 @@ const rootRoute = {
     if (user && token) {
       if(pathname === '/')
         promise.then((data) => {
-          if(global.ismember){
+          if(data){
             browserHistory.replace("/search");
             replace({ pathname: 'search' });
           }else{

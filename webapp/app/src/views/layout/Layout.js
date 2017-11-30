@@ -11,7 +11,7 @@ class Layout extends Component {
   constructor() {
     super();
     this.state = {
-      ismember: false,
+      ismember: sessionStorage.getItem("ismember"),
     };
   }
 
@@ -32,17 +32,18 @@ class Layout extends Component {
   // }
 
   componentDidMount() {
-    if(global.ismember) {
+    if( !this.state.ismember || global.ismember) {
       this.setState({
-        ismember: global.ismember
+        ismember: true
       })
     }
   }
 
   render() {
+    console.log(this.state.ismember);
     return (
       <div className="cs-layout">
-      { global.ismember || this.state.ismember? 
+      { this.state.ismember || global.ismember? 
         <LayoutHeader />
         :
         <AccountLayoutHeader />

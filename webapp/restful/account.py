@@ -31,6 +31,20 @@ class UserAPI(Resource):
         return { 'code': 200, 'result': result }
 
 
+class UserPeopleIDAPI(UserAPI):
+
+    decorators = [flask.ext.login.login_required]
+
+    def __init__(self):
+        super(UserAPI, self).__init__()
+        self.svc_account = flask.current_app.config['SVC_MULT_PEO']
+
+    def get(self):
+        user = flask.ext.login.current_user
+        peopinfo = self.svc_account.getyaml(user.peopleID)
+        return { 'code': 200, 'result': peopinfo }
+
+
 class ExistsEmailAPI(Resource):
 
     def __init__(self):

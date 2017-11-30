@@ -3,6 +3,8 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
+import sources.industry_id
+
 
 class ProjectNamesAPI(Resource):
 
@@ -16,16 +18,6 @@ class ProjectNamesAPI(Resource):
         user = flask.ext.login.current_user
         member = user.getmember(self.svc_members)
         return { 'code': 200, 'data': member.projects.keys() }
-
-
-class AdditionNamesAPI(Resource):
-
-    def __init__(self):
-        self.svc_cls_cv = flask.current_app.config['SVC_CLS_CV']
-        super(AdditionNamesAPI, self).__init__()
-
-    def get(self):
-        return { 'code': 200, 'data': self.svc_cls_cv.keys() }
 
 
 class DBNumbersAPI(flask.views.MethodView):
@@ -63,41 +55,22 @@ class AllSIMSAPI(flask.views.MethodView):
         projectname = args['project']
         user = flask.ext.login.current_user
         member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         return { 'code': 200, 'projects': member.projects.keys(),
-                 'classify': member.getproject(projectname).getclassify() }
+                 'classify': list(set(self.svc_min.sim[project.modelname].keys())-
+                                  set([p.id for p in member.projects.values()])) }
 
 
 class ClassifyAPI(flask.views.MethodView):
 
-    decorators = [flask.ext.login.login_required]
-
-    def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        super(ClassifyAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', location = 'json')
-
-    def post(self):
-        args = self.reqparse.parse_args()
-        projectname = args['project']
-        user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
-        return { 'code': 200, 'data': member.getproject(projectname).getclassify() }
+    def get(self):
+        return { 'code': 200, 'data': sources.industry_id.industryID.keys() }
 
 
 class IndustryAPI(flask.views.MethodView):
 
-    decorators = [flask.ext.login.login_required]
-
-    def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        super(IndustryAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', location = 'json')
-
-    def post(self):
-        args = self.reqparse.parse_args()
-        projectname = args['project']
-        user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
-        return { 'code': 200, 'data': member.getproject(projectname).getindustry() }
+    def get(self):
+        result = dict()
+        for each in sources.industry_id.industryID:
+            result.update({each: sources.industry_id.sources[each]})
+        return { 'code': 200, 'data': result }

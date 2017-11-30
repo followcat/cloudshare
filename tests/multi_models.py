@@ -34,7 +34,7 @@ def build_lsimodel(path, slicer, names=None, texts=None, no_above=1.,
             topics = 30
         else:
             topics = 100
-    m = core.mining.lsimodel.LSImodel(path,
+    m = core.mining.lsimodel.LSImodel('testmodel', path,
                                       no_above=no_above,
                                       topics=topics,
                                       power_iters=power_iters,
@@ -82,6 +82,9 @@ def build_sim(path, model, svcs):
     try:
         sim.load()
     except IOError:
-        sim.build(svcs)
+        trains = list()
+        for svc in svcs:
+            trains.extend(svc.datas())
+        sim.build(trains)
         sim.save()
     return sim

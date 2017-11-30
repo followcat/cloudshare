@@ -38,7 +38,6 @@ class SearchResultBox extends Component {
     } = this.props;
 
     const type = this.props.type || 'default';
-
     if (type === 'default') {
       return dataSource.map((item, index) => {
         return (
@@ -79,7 +78,8 @@ class SearchResultBox extends Component {
       visible,
       spinning,
       current,
-      total
+      total,
+      showPagination
     } = this.props;
 
     const classSet = classNames({
@@ -94,24 +94,29 @@ class SearchResultBox extends Component {
           <SearchResultHeader />
           {this.getResultDOMRender()}
         </Spin>
+        { showPagination ?
         <SearchResultPagination
           current={current}
           total={total}
           onSwitchPage={this.props.onSwitchPage}
         />
+        : null
+        }
       </div>
     );
   }
 }
 
 SearchResultBox.defaultProps = {
-  prefixCls: 'cs-search-result'
+  prefixCls: 'cs-search-result',
+  showPagination: true
 };
 
 SearchResultBox.propTypes = {
   prefixCls: PropTypes.string,
   type: PropTypes.string,
   visible: PropTypes.bool,
+  showPagination: PropTypes.bool,
   spinning: PropTypes.bool,
   current: PropTypes.number,
   total: PropTypes.number,

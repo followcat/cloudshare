@@ -39,15 +39,20 @@ class Guide extends Component {
     this.setState({
       visible : false
     });
-    console.log(this.state.visible);
   }
 
   UploadClick() {
     StorageUtil.set('guideStatus',1);
+    if(global.ismember)
     browserHistory.push({
-      pathname: 'uploader',
-      query: { guide: true }
+        pathname: 'uploader',
+        query: { guide: true }
     });
+    else
+      browserHistory.push({
+        pathname: 'prouploader',
+        query: { guide: true }
+      });
   }
 
   CustomerClick() {
@@ -84,7 +89,11 @@ class Guide extends Component {
         <Icon type="close" />
         </div>
         <Steps  direction="vertical" current={guideStatus} >
+          { global.ismember ?
           <Step title="简历上传" ref="step1" description="可以批量上传简历" onClick={this.UploadClick}/>
+          :
+          <Step title="简历上传" ref="step1" description="可以上传个人简历" onClick={this.UploadClick}/>
+          }
           <Step title="客户管理" description="跟踪管理客户状态" onClick={this.CustomerClick}/>
           <Step title="匹配" description="新建职位后进行匹配， 精确查找候选人" onClick={this.MathingClick}/>
         </Steps>

@@ -1,6 +1,8 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
+import StorageUtil from 'utils/storage';
+
 import {
   Row,
   Col,
@@ -23,9 +25,10 @@ const FormItem = Form.Item,
       OptGroup = Select.OptGroup;
 
 class FilterForm extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
+      searchText: props.searchText,
       expand: false,
       gender: [],
       education: [],
@@ -150,7 +153,6 @@ class FilterForm extends Component {
     };
 
     const dateFormat = 'YYYY-MM-DD';
-
     return (
       <Form layout="horizontal">
         {textarea ?
@@ -161,7 +163,9 @@ class FilterForm extends Component {
                 labelCol={{ span: 3 }}
                  wrapperCol={{ span: 19 }}
               >
-                {getFieldDecorator('doc')(
+                {getFieldDecorator('doc',{
+                  initialValue: this.state.searchText
+                })(
                   <Input type="textarea" rows={1} />)}
               </FormItem>
             </Col>
@@ -177,7 +181,9 @@ class FilterForm extends Component {
               >
                 {getFieldDecorator('uses', {
                   // textarea ? [] : 默认数据库
-                  initialValue: textarea ?  projects.concat(classify) : [] ,
+                  initialValue: projects.concat(classify).filter(
+                    (item) => { if(item === StorageUtil.get('_pj')) return item}
+                    ),
                   rules: [{ type: 'array' }]
                 })(<Select multiple={true}>
                     <OptGroup key='projects' label="项目数据库">
@@ -316,7 +322,8 @@ class FilterForm extends Component {
 }
 
 FilterForm.defaultProps = {
-  databaseDisplay: true
+  databaseDisplay: true,
+  searchText: ''
 };
 
 FilterForm.propTypes = {

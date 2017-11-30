@@ -14,7 +14,8 @@ class Preview extends Component {
   render() {
     const {
       completedList,
-      currentPreview
+      currentPreview,
+      origins
     } = this.props;
 
     return (
@@ -32,6 +33,7 @@ class Preview extends Component {
                 id={item.filename}  // id是标记文件唯一的标准,这里用filename作为辨识
                 resumeID={item.yaml_info.id}
                 name={item.yaml_info.name}
+                origins={origins}
                 classifyValue={item.yaml_info.classify}
                 prevText="上一个"
                 nextText="下一个"

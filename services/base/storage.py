@@ -14,11 +14,10 @@ class BaseStorage(services.base.service.Service):
 
     commitinfo = 'BaseData'
 
-    def __init__(self, path, name=None, searchengine=None, iotype=None):
+    def __init__(self, path, name=None, iotype=None):
         self.path = path
         self.yamlpath = ''
-        super(BaseStorage, self).__init__(path, name=name,
-                                          searchengine=searchengine, iotype=iotype)
+        super(BaseStorage, self).__init__(path, name=name, iotype=iotype)
         self.unique_checker = None
         self.info = ""
         self._nums = 0

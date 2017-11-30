@@ -1,0 +1,67 @@
+@import "../../../introjs.css";
+.cs-layout-search {
+  /* Seach form style */
+  .cs-search {
+       position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 55%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+  }
+
+  /* DatabaseInfo component style */
+  .count-box {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    
+    width: 180px;
+    background-color: #FFF;
+
+    .count-list {
+      width: inherit;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 6px 24px;
+      text-align: center;
+      border-top: 1px solid #c2c2c2;
+      border-left: 1px solid #c2c2c2;
+
+      li {
+        padding: 8px 0;
+        border-bottom: 1px dotted #c2c2c2;
+      }
+
+      li:nth-child(1) {
+        font-weight: bold;
+      }
+    }
+
+    .total {
+      width: inherit;
+      text-align: center;
+      background-color: #337ab7;
+      cursor: pointer;
+      color: #FFF;
+      font-weight: bold;
+      padding: 6px 24px;
+    }
+
+    .radius {
+      border-top-left-radius: 4px;
+    }
+
+    .showed {
+      display: block;
+      border-top-left-radius: 4px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  }
+}
+

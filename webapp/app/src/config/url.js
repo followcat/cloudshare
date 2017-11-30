@@ -42,8 +42,24 @@ export const URL = {
     return `/search`;
   },
 
+  getJobSearchURL: () => {
+    return `/jobsearch`;
+  },
+
+  getProJobSearchURL: () => {
+    return `/jobsearch/result?search_text=`;
+  },
+
   getUploaderURL: () => {
     return `/uploader`;
+  },
+
+  getProUploaderURL: () => {
+    return `/prouploader`;
+  },
+  
+  getAddPositionURL: () => {
+    return `/addposition`;
   },
 
   getUserInfoURL: () => {

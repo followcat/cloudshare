@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import os
+import glob
 import math
 import ujson
+import itertools
 
-from gensim import corpora, models
+from gensim import models, corpora
+from gensim.corpora import hashdictionary
+
+import utils.builtin
+import core.outputstorage
 
 
 class LSImodel(object):
@@ -12,24 +18,32 @@ class LSImodel(object):
     names_save_name = 'lsi.names'
     model_save_name = 'lsi.model'
     corpu_dict_save_name = 'lsi.dict'
-    corpus_save_name = 'lsi.corpus'
     texts_save_name = 'lsi.texts'
     most_save_name = 'lsi.most'
+    config_file = 'config.yaml'
+    corpus_path = 'corpus'
+    corpus_suffix = 'corpus'
 
 
-    def __init__(self, savepath, no_above=1./1, topics=100, extra_samples=300,
-                 power_iters=6, tfidf_local=None, slicer=None, config=None):
+    def __init__(self, name, savepath, no_above=1./1, topics=100, extra_samples=300,
+                 power_iters=6, dict_range=40000,
+                 tfidf_local=None, slicer=None, config=None):
         if config is None:
             config = {}
+        self._ids = set()
+        self.name = name
         self.path = savepath
+        self.corpus_path = os.path.join(savepath, self.corpus_path)
         self.topics = topics
         self.power_iters = power_iters
         self.no_above = no_above
+        self.dict_range = dict_range
         self.config = {
             'topics': topics,
             'no_above': no_above,
             'power_iters': power_iters,
             'extra_samples': extra_samples,
+            'dict_range': dict_range
         }
         self.config.update(config)
         if slicer:
@@ -38,53 +52,64 @@ class LSImodel(object):
             self.slicer = lambda x:x.split('\n')
         self.extra_samples = extra_samples
         self.tfidf_local = tfidf_local
-        self.names = []
-        self._texts = []
-        self._corpus = []
+        self.names = list()
 
         self.lsi = None
         self.tfidf = None
         self.dictionary = None
         self.corpus_tfidf = None
+        self.load_config()
 
-    def update(self, svccv_list):
-        added = False
+    def load_config(self):
+        config = dict()
+        try:
+            config = utils.builtin.load_yaml(self.path, self.config_file)
+        except IOError:
+            config = dict()
+        if 'name' not in config or 'id' not in config:
+            if 'name' not in config:
+                config['name'] = self.name
+            if 'id' not in config:
+                config['id'] = utils.builtin.genuuid()
+            self.save_config(config=config)
+        self.config.update(config)
+
+    def save_config(self, config=None):
+        if config is None:
+            config = self.config
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+        with open(os.path.join(self.path, self.config_file), 'w') as f:
+            f.write(utils.builtin.dump_yaml(config))
+
+    def set_origin(self, origin):
+        self.config['origin'] = origin
+        self.save_config()
+
+    def update(self, gen, numbers=5000):
+        result = False
         names = []
-        texts = []
-        for svc_cv in svccv_list:
-            for name in svc_cv.names():
-                if name not in self.names:
-                    doc = svc_cv.getmd(name)
-                    names.append(name)
-                    texts.append(doc)
-                    added = True
-        if added:
-            self.add_documents(names, texts)
-            self.save()
-        return added
+        documents = []
+        number =0
+        if self.lsi is None:
+            self.set_dictionary()
+            self.set_lsimodel()
+        for name, doc in gen:
+            names.append(name)
+            documents.append(doc)
+            number += 1
+            if number%numbers == 0:
+                self.add_documents(names, documents)
+                result = True
+                names = list()
+                documents = list()
+        if number%numbers != 0:
+            self.add_documents(names, documents)
+            result = True
+        return result
 
-    def build(self, svccv_list):
-        names = []
-        texts = []
-        for svc_cv in svccv_list:
-            for data in svc_cv.datas():
-                name, doc = data
-                names.append(name)
-                texts.append(doc)
-        if len(names) > 5:
-            self.setup(names, texts)
-            return True
-        return False
-
-    def setup(self, names, texts):
-        assert len(names) == len(texts)
-        self.names = names
-        for name, doc in zip(names, texts):
-            self.texts.append(self.slicer(doc, id=name))
-        self.set_dictionary()
-        self.set_corpus()
-        self.set_tfidf()
-        self.set_lsimodel()
+    def build(self, gen, numbers=5000):
+        return self.update(gen, numbers=numbers)
 
     def getconfig(self, param):
         result = False
@@ -97,53 +122,49 @@ class LSImodel(object):
             os.makedirs(self.path)
         with open(os.path.join(self.path, self.names_save_name), 'w') as f:
             ujson.dump(self.names, f)
-        if self.corpus:
-            with open(os.path.join(self.path, self.corpus_save_name), 'w') as f:
-                ujson.dump(self.corpus, f)
-        if self.texts:
-            with open(os.path.join(self.path, self.texts_save_name), 'w') as f:
-                ujson.dump(self.texts, f)
         self.lsi.save(os.path.join(self.path, self.model_save_name))
-        self.dictionary.save(os.path.join(self.path, self.corpu_dict_save_name))
-        self.clear()
-
-    def clear(self):
-        self.corpus = None
-        self.texts = None
 
     def load(self):
         with open(os.path.join(self.path, self.names_save_name), 'r') as f:
             self.names = ujson.load(f)
         self.lsi = models.LsiModel.load(os.path.join(self.path, self.model_save_name))
-        self.dictionary = corpora.dictionary.Dictionary.load(os.path.join(self.path,
-                                                             self.corpu_dict_save_name))
+        self.dictionary = self.lsi.id2word
+
+    def exists(self, id):
+        return id in self.ids
 
     def add_documents(self, names, documents):
         assert len(names) == len(documents)
-        if self.lsi is None:
-            self.setup(names, documents)
-        else:
-            corpus = list()
-            corpu_tfidf = list()
-            for name, document in zip(names, documents):
-                text = self.slicer(document, id=name)
-                corpu = self.lsi.id2word.doc2bow(text)
-                corpus.append(corpu)
-            self.names.extend(names)
-            self.corpus.extend(corpus)
-            self.texts.extend(documents)
-            self.set_tfidf()
-            corpu_tfidf = self.tfidf[corpus]
-            self.lsi.add_documents(corpu_tfidf)
+        texts = list()
+        corpus = list()
+        corpu_tfidf = list()
+        for name, document in zip(names, documents):
+            texts.append(self.slicer(document, id=name))
+        self.lsi.id2word.add_documents(texts)
+        for text in texts:
+            corpu = self.lsi.id2word.doc2bow(text)
+            corpus.append(corpu)
+        self.names.extend(names)
+        self.ids = names
+        self.storage_corpus(corpus)
+        self.set_dictionary()
+        self.set_tfidf()
+        corpu_tfidf = self.tfidf[corpus]
+        self.lsi.add_documents(corpu_tfidf)
 
     def set_dictionary(self):
-        self.dictionary = corpora.Dictionary(self.texts)
+        if self.dictionary is None:
+            self.dictionary = hashdictionary.HashDictionary(id_range=self.dict_range)
         self.dictionary.filter_extremes(no_below=int(len(self.names)*0.005),
                                         no_above=self.no_above)
 
-    def set_corpus(self):
-        for text in self.texts:
-            self.corpus.append(self.dictionary.doc2bow(text))
+    def storage_corpus(self, corpus):
+        if not os.path.exists(self.corpus_path):
+            os.makedirs(self.corpus_path)
+        corpora.MmCorpus.serialize(os.path.join(self.corpus_path,
+                                   '.'.join([str(len(self.names)),
+                                             self.corpus_suffix])),
+                                   corpus)
 
     def set_tfidf(self):
         u"""
@@ -253,12 +274,13 @@ class LSImodel(object):
             >>> assert doc_match_topic(get_cv_md('tn8cdk92'), model, sw_topic2_index, match_range=3)
         """
         if self.tfidf_local is None:
-            self.tfidf = models.TfidfModel(self.corpus)
+            self.tfidf = models.TfidfModel(self.allcorpus)
         else:
-            self.tfidf = models.TfidfModel(self.corpus, wlocal=self.tfidf_local)
-        self.corpus_tfidf = self.tfidf[self.corpus]
+            self.tfidf = models.TfidfModel(self.allcorpus, wlocal=self.tfidf_local)
 
     def set_lsimodel(self):
+        if self.corpus_tfidf is None:
+            self.corpus_tfidf = list()
         self.lsi = models.LsiModel(self.corpus_tfidf, id2word=self.dictionary,
                                    num_topics=self.topics, power_iters=self.power_iters,
                                    extra_samples=self.extra_samples)
@@ -365,34 +387,24 @@ class LSImodel(object):
         return vec_lsi
 
     @property
-    def corpus(self):
-        corpus_path = os.path.join(self.path, self.corpus_save_name)
-        if os.path.exists(corpus_path) and not self._corpus:
-            with open(corpus_path, 'r') as f:
-                try:
-                    self._corpus = ujson.load(f)
-                except ValueError:
-                    self._corpus = []
-        return self._corpus
-
-    @corpus.setter
-    def corpus(self, value):
-        self._corpus = value
+    def allcorpus(self):
+        names = sorted([int(os.path.splitext(os.path.split(f)[-1])[0]) for f in
+                        glob.glob(os.path.join(self.corpus_path,
+                                  '.'.join(['*', self.corpus_suffix])))])
+        mmcs = [corpora.MmCorpus(os.path.join(self.corpus_path,
+                                              '.'.join([str(n), self.corpus_suffix])))
+                for n in names]
+        return itertools.chain(*mmcs)
 
     @property
-    def texts(self):
-        texts_path = os.path.join(self.path, self.texts_save_name)
-        if os.path.exists(texts_path) and not self._texts:
-            with open(texts_path, 'r') as f:
-                try:
-                    self._texts = ujson.load(f)
-                except ValueError:
-                    self._texts = []
-        return self._texts
+    def ids(self):
+        if not self._ids:
+            self._ids = set(self.names)
+        return self._ids
 
-    @texts.setter
-    def texts(self, value):
-        self._texts = value
+    @ids.setter
+    def ids(self, value):
+        self._ids.update(set(value))
 
 
 def tf_cal(term_freq):

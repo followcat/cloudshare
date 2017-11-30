@@ -24,7 +24,6 @@ share，edit your doc，pdf，md and so on...
 
     Elasticsearch plugins
 
-        fscrawler-2.2
         elasticsearch-analysis-ik-5.4.3
 
 ### Draw && View router graph
@@ -60,6 +59,30 @@ Here is a demo bash script to run Jenkins test:
     java -jar $JENKINS_ROOT/jenkins.war --httpPort=8001
 ```
 
+## Searchengine Datastructure Design
+
+### Search engine in cloudshare.
+
+Use Elasticsearch as cloudshare default search engine.
+Run elasticsearch and config its address, port, user/password in es config file.
+The loader will init from baseapp/loader. And the default settings load from
+class Config in module loader.
+
+### Elasticsearch Indices and Doctype
+
+- Index
+
+    1) Different storage block will have different index.
+    2) And different type of yaml info structure also in different index,
+       such as Companys/Currivulumvitaes will use different Index.
+       Defined from es config file in loader.
+    3) The base storage index will defined from es config file in loader.
+
+- Doctype
+
+    1) Different projects have different doctype in its storage block index,
+       the project id is doctype name.
+    2) The base storage doctype will define from es config file in loader.
 
 ## Front-end Building
 

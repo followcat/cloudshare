@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
+import uuid
 import socket
 import hashlib
 import datetime
@@ -25,6 +26,10 @@ def hash(text):
     m = hashlib.md5()
     m.update(text)
     return m.hexdigest()
+
+
+def genuuid():
+    return uuid.uuid1().get_hex()
 
 
 def dump_yaml(data, default_flow_style=None):
@@ -66,7 +71,6 @@ except ImportError:
 def strftime(t, format='%Y-%m-%d %H:%M:%S'):
     return time.strftime(format, time.localtime(t))
 
-
 def merge(a, b, path=None, update=False):
     "merges b into a"
     if path is None: path = []
@@ -76,8 +80,11 @@ def merge(a, b, path=None, update=False):
                 merge(a[key], b[key], path + [str(key)], update=update)
             elif a[key] == b[key]:
                 pass # same leaf value
-            elif update is True:
+            elif update is True and b[key]:
                 a[key] = b[key]
+            elif b[key] is None or not b[key]:
+                print('Conflict at %s' % '.'.join(path + [str(key)]), str(b[key]))
+                continue
             else:
                 raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
         else:

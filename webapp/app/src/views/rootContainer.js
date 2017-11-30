@@ -6,15 +6,30 @@ import StorageUtil from 'utils/storage';
 
 import 'components/global.less';
 
+import { isMember } from 'request/member';
+
+const promise = new Promise((resolve, reject) => {
+      isMember((json) => {
+        if (json.result === true) {
+          global.ismember = true
+        }else{
+          global.ismember = false
+        }
+        sessionStorage.setItem("ismember", global.ismember);
+        resolve(global.ismember);
+      });
+  });
+
 const rootRoute = {
   path: '/',
-  indexRoute: {
-    getComponent(nextState, callback) {
-      require.ensure([], (require) => {
-        callback(null, require('views/index').default);
-      }, 'index');
-    }
-  },
+  // indexRoute: {
+  //   path: 'hp',
+  //   getComponent(nextState, callback) {
+  //     require.ensure([], (require) => {
+  //       callback(null, require('views/home').default);
+  //     }, 'home');
+  //   }
+  // },
   getComponent(nextState, callback) {
     require.ensure([], (require) => {
       callback(null, require('views/App').default);
@@ -24,14 +39,24 @@ const rootRoute = {
     let pathname = nextState.location.pathname,
         user = StorageUtil.get('user'),
         token = StorageUtil.get('token');
-
-    if (pathname === '/' && user && token) {
-      replace({ pathname: 'search' });
-    }
+    if (user && token) {
+      if(pathname === '/')
+        promise.then((data) => {
+          if(data){
+            browserHistory.replace("/search");
+            replace({ pathname: 'search' });
+          }else{
+            browserHistory.replace("/prouploader");
+            replace({ pathname: 'prouploader' });
+           }
+        })
+    } else if (pathname == '/') replace({ pathname: 'index' });
   },
   childRoutes: [
+    require('routes/index'),
     require('routes/search'),
     require('routes/uploader'),
+    require('routes/prouploader'),
     require('routes/become-member'),
     require('routes/pm'),
     require('routes/fast-matching'),
@@ -46,15 +71,16 @@ const rootRoute = {
     require('routes/upload-preview'),
     require('routes/go-to-signin'),
     require('routes/agreement'),
-    // require('routes/manage'),
+    require('routes/job-search'),
     require('routes/best-excellent'),
+    require('routes/add-position'),
   ]
 };
 
 class rootContainer extends Component {
   render() {
     return (
-      <Router history={browserHistory} routes={rootRoute} />
+      <Router history={browserHistory} routes={rootRoute} {...global.ismember}/>
     );
   }
 }

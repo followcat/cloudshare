@@ -1,4 +1,5 @@
 import uno
+import time
 import os.path
 import subprocess
 
@@ -61,9 +62,9 @@ class DocumentConverter:
 
 
     def startservice(self):
-        def wait_until_port_open(timeout=3):
+        def wait_until_port_open(timeout=10):
             count = 0
-            while(utils.builtin.is_port_open(self.host, self.port)):
+            while(not utils.builtin.is_port_open(self.host, self.port)):
                 time.sleep(0.01)
                 count += 0.01
                 if count > timeout:

@@ -7,7 +7,6 @@ import ujson
 import utils._yaml
 import utils.builtin
 import core.outputstorage
-import services.memdatas
 import services.operator.facade
 import services.base.name_storage
 
@@ -18,14 +17,12 @@ class Simulation(services.operator.facade.Facade):
         super(Simulation, self).__init__(service)
         self._ids = None
         self.service = service
-        self.memdatas = services.memdatas.MemoryDatas(self)
         self.storage = services.base.name_storage.NameStorage(path, name, iotype=iotype)
 
     def add(self, bsobj, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
         result = False
         if self.storage(bsobj, committer, unique, yamlfile, mdfile, do_commit):
-            self.memdatas.update('modifytime', id)
             result = True
         return result
 
@@ -49,14 +46,7 @@ class Simulation(services.operator.facade.Facade):
 
     def saveinfo(self, id, info, message, committer, do_commit=True):
         result = self.storage.saveinfo(id, info, message, committer, do_commit)
-        self.memdatas.update('modifytime', id)
         return result
-
-    def search_key(self, key, value, ids=None):
-        return self.memdatas.search_key(key, value, ids)
-
-    def sorted_ids(self, key, ids=None, reverse=True):
-        return self.memdatas.sorted_ids(key, ids=ids, reverse=reverse)
 
     @property
     def ids(self):

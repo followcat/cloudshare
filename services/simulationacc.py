@@ -59,6 +59,5 @@ class SimulationACC(services.operator.simulation.Simulation):
             self.interface.add_files(filenames, filedatas,
                                      message='Remove %s in ids file.'%id,
                                      committer=committer, do_commit=do_commit)
-            self.memdatas.remove(id)
             result = True
         return result

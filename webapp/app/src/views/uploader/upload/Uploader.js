@@ -220,7 +220,7 @@ class Uploader extends Component {
       confirmLoading: true,
     });
 
-    confirmUpload(API.UPLOAD_RESUME_API, {
+    confirmUpload(API.UPLOAD_MEMBER_RESUME_API, {
       setpeople: value.setPeople,
       updates: confirmList
     }, (json) => {

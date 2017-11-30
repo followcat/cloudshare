@@ -315,5 +315,5 @@ class GitInterface(interface.base.Interface):
         try:
             dulwich.porcelain.clone(self.path, path, bare=bare)
         except KeyError:
-            self.repo.do_commit("Init repo %s."%(name), committer="Cloudshare")
+            self.repo.do_commit("Init repo %s."%(self.name), committer="Cloudshare")
             dulwich.porcelain.clone(self.path, path, bare=bare)

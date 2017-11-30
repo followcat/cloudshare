@@ -32,7 +32,7 @@ class Layout extends Component {
   // }
 
   componentDidMount() {
-    if( this.state.ismember || global.ismember) {
+    if( sessionStorage.getItem("ismember") == null && global.ismember) {
       this.setState({
         ismember: true
       })

@@ -80,7 +80,7 @@ class UploadCVAPI(Resource):
                         self.svc_index.add(self.svc_index.config['CV_MEM'], self.project.id,
                                            id, md, cvobj.metadata)
                     if result['project_cv_result']:
-                        result['member_cv_result'] = self.member.cv_add(cvobj, user.name,
+                        result['member_cv_result'] = self.member.cv_add(cvobj, self.user.name,
                                                                         unique=True)
                         status = 'success'
                         # Add to CV database and project

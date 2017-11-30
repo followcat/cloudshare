@@ -76,8 +76,9 @@ class UploadCVAPI(Resource):
                 try:
                     result = self.project.cv_add(cvobj, self.user.name, unique=True)
                     if result['repo_cv_result']:
+                        md = self.project.cv_getmd(id)
                         self.svc_index.add(self.svc_index.config['CV_MEM'], self.project.id,
-                                           id, cvobj.data, cvobj.metadata)
+                                           id, md, cvobj.metadata)
                     if result['project_cv_result']:
                         result['member_cv_result'] = self.member.cv_add(cvobj, user.name,
                                                                         unique=True)

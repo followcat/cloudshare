@@ -1,8 +1,8 @@
 import services.people
-import services.base.simulation
+import services.operator.simulation
 
 
-class SimulationPEO(services.base.simulation.Simulation):
+class SimulationPEO(services.operator.simulation.Simulation):
 
     YAML_TEMPLATE = (
         ("committer",           str),

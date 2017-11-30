@@ -1,11 +1,11 @@
-import services.base.simulation
 import services.curriculumvitae
+import services.operator.simulation
 
 import utils.pandocconverter
 import extractor.information_explorer
 
 
-class SimulationCV(services.base.simulation.Simulation,
+class SimulationCV(services.operator.simulation.Simulation,
                    services.curriculumvitae.CurriculumVitae):
 
     YAML_TEMPLATE = (

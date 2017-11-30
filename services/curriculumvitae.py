@@ -1,57 +1,18 @@
-import yaml
 import time
-import os.path
 import datetime
 
 import core.exception
 import core.outputstorage
 import utils.pandocconverter
-import services.base.storage
+import services.operator.split
 
 
-class CurriculumVitae(services.base.storage.BaseStorage):
+class CurriculumVitae(services.operator.split.SplitData):
 
     commitinfo = 'CurriculumVitae'
 
-    def exists(self, id):
-        mdname = core.outputstorage.ConvertName(id).md
-        return os.path.exists(os.path.join(self.path, mdname))
-
     def add_md(self, cvobj, committer=None, do_commit=True):
-        """
-            >>> import glob
-            >>> import shutil
-            >>> import os.path
-            >>> import core.basedata
-            >>> import services.curriculumvitae
-            >>> import utils.docprocessor.libreoffice
-            >>> import extractor.information_explorer
-            >>> root = "core/test"
-            >>> name = "cv_1.doc"
-            >>> test_path = "services/test_output"
-            >>> DIR = 'services/test_repo'
-            >>> svc_cv = services.curriculumvitae.CurriculumVitae(DIR)
-            >>> obj = open(os.path.join(root, name))
-            >>> os.makedirs(test_path)
-            >>> fp1 = utils.docprocessor.libreoffice.LibreOfficeProcessor(obj, name, test_path)
-            >>> yamlinfo = extractor.information_explorer.catch_cvinfo(
-            ...     stream=fp1.markdown_stream.decode('utf8'), filename=fp1.base.base)
-            >>> cv1 = core.basedata.DataObject(data=fp1.markdown_stream, metadata=yamlinfo)
-            >>> svc_cv.add_md(cv1)
-            True
-            >>> md_files = glob.glob(os.path.join(svc_cv.path, '*.md'))
-            >>> len(md_files)
-            1
-            >>> yaml_files = glob.glob(os.path.join(svc_cv.path, '*.yaml'))
-            >>> len(yaml_files)
-            0
-            >>> obj.close()
-            >>> shutil.rmtree(DIR)
-            >>> shutil.rmtree(test_path)
-        """
-        name = core.outputstorage.ConvertName(cvobj.metadata['id'])
-        self.interface.add(name.md, cvobj.data, committer=committer, do_commit=do_commit)
-        return True
+        return self.add(cvobj, committer, unique=False, kv_file=False, text_file=True, do_commit=do_commit)
 
     def getuniqueid(self, id):
         info = self.getyaml(id)
@@ -90,7 +51,7 @@ class CurriculumVitae(services.base.storage.BaseStorage):
         if contacts and not bsobj.metadata['email'] and not bsobj.metadata['phone']:
             raise core.exception.NotExistsContactException
         return super(CurriculumVitae, self).add(bsobj, committer, unique,
-                                                yamlfile, mdfile, do_commit=do_commit)
+                                kv_file=yamlfile, text_file=mdfile, do_commit=do_commit)
 
     def addcv(self, bsobj, rawdata=None, do_commit=True):
         result = self.add(bsobj, contacts=False)

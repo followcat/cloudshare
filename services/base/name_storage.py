@@ -22,7 +22,7 @@ class NameStorage(services.base.storage.BaseStorage):
             return self._ids
         except AttributeError:
             try:
-                return ujson.loads(self.interface.get(self.ids_file))
+                return set(ujson.loads(self.interface.get(self.ids_file)))
             except IOError:
                 return super(NameStorage, self).ids
 

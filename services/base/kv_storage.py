@@ -15,8 +15,8 @@ class KeyValueStorage(services.base.storage.BaseStorage):
     fix_item = {}
     list_item = {}
 
-    def __init__(self, path, name=None, searchengine=None, iotype=None):
-        super(KeyValueStorage, self).__init__(path, name, searchengine, iotype=iotype)
+    def __init__(self, path, name=None, iotype=None):
+        super(KeyValueStorage, self).__init__(path, name, iotype=iotype)
         self.yamlpath = self.YAML_DIR
 
     def _listframe(self, value, username, date=None):

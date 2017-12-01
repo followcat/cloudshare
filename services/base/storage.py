@@ -28,17 +28,13 @@ class BaseStorage(services.base.service.Service):
             self.name = name
         if iotype is None:
             if os.path.exists(os.path.join(path, '.git')):
-                self.interface = interface.gitinterface.GitInterface(path, name,
-                    searchengine=searchengine)
+                self.interface = interface.gitinterface.GitInterface(path, name)
             else:
-                self.interface = interface.basefs.BaseFSInterface(path, name,
-                    searchengine=searchengine)
+                self.interface = interface.basefs.BaseFSInterface(path, name)
         elif iotype == 'git':
-            self.interface = interface.gitinterface.GitInterface(path, name,
-                searchengine=searchengine)
+            self.interface = interface.gitinterface.GitInterface(path, name)
         elif iotype == 'base':
-            self.interface = interface.basefs.BaseFSInterface(path, name,
-                searchengine=searchengine)
+            self.interface = interface.basefs.BaseFSInterface(path, name)
         else:
             raise Exception("Not support iotype.")
 

@@ -5,10 +5,10 @@ import core.basedata
 import utils.builtin
 import services.exception
 import core.outputstorage
-import services.base.template_storage
+import services.base.kv_storage
 
 
-class Password(services.base.template_storage.TemplateStorage):
+class Password(services.base.kv_storage.KeyValueStorage):
     """
         >>> import shutil
         >>> import services.account
@@ -68,7 +68,7 @@ class Password(services.base.template_storage.TemplateStorage):
         return info['password']
 
 
-class Message(services.base.template_storage.TemplateStorage):
+class Message(services.base.kv_storage.KeyValueStorage):
     """
         >>> import shutil
         >>> import services.account
@@ -299,7 +299,7 @@ class Message(services.base.template_storage.TemplateStorage):
         return sent_result and receive_result
 
 
-class Account(services.base.template_storage.TemplateStorage):
+class Account(services.base.kv_storage.KeyValueStorage):
     """
         >>> import shutil
         >>> import services.account

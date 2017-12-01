@@ -3,14 +3,14 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
-import services.base.template_storage
+import services.base.kv_storage
 import services.simulationcv
 import services.simulationco
 import services.simulationjd
 import services.simulationpeo
 import extractor.information_explorer
 
-class Project(services.base.template_storage.TemplateStorage):
+class Project(services.base.kv_storage.KeyValueStorage):
 
     CV_PATH = 'CV'
     CO_PATH = 'CO'

@@ -310,6 +310,3 @@ class GitInterface(interface.base.Interface):
         elif '@' not in committer:
             result = committer+'<%s@email.com>'%committer
         return result
-
-    def backup(self, path, bare=False):
-        dulwich.porcelain.clone(self.path, path, bare=bare)

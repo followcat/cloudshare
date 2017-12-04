@@ -85,7 +85,7 @@ class UploadCVAPI(Resource):
                         status = 'success'
                         # Add to CV database and project
                         message = '200'
-                        names.append(cvobj.name.md)
+                        names.append(cvobj.ID)
                         documents.append(cvobj.data)
                         if not result['repo_cv_result']:
                             # Existed in other project

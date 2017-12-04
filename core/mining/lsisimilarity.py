@@ -62,20 +62,23 @@ class LSIsimilarity(object):
         self.index = similarities.Similarity.load(os.path.join(self.path,
                                                   self.matrix_save_name))
 
-    def add_documents(self, names, documents):
+    def add_documents(self, ids, documents):
         assert(self.lsi_model.lsi.id2word)
-        assert len(names) == len(documents)
+        assert len(ids) == len(documents)
+        names = list()
         corpus = list()
-        for name, document in zip(names, documents):
-            if self.exists(name) is True:
+        for id, document in zip(ids, documents):
+            if self.exists(id) is True:
                  continue
-            text = self.lsi_model.slicer(document, id=name)
+            text = self.lsi_model.slicer(document, id=id)
             corpu = self.lsi_model.lsi.id2word.doc2bow(text)
+            names.append(id)
             corpus.append(corpu)
-        self.names.extend(names)
-        self.ids = names
-        modelcorpus = self.lsi_model.lsi[corpus]
-        self.index.add_documents(modelcorpus)
+        if names and corpus:
+            modelcorpus = self.lsi_model.lsi[corpus]
+            self.index.add_documents(modelcorpus)
+            self.names.extend(names)
+            self.ids = self.names
 
     def set_index(self, modelcorpus):
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),

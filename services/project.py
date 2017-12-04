@@ -339,7 +339,7 @@ class Project(services.base.service.Service):
     def peo_deleteyaml(self, id, key, value, username, date):
         return self.people.deleteinfo(id, key, value, username, date)
 
-    def backup(self, path, bare=True):
+    def backup(self, path):
         backup_path = os.path.join(path, self.name)
         project_path = os.path.join(backup_path, 'project')
         cv_path = os.path.join(backup_path, 'curriculumvitae')
@@ -351,8 +351,8 @@ class Project(services.base.service.Service):
         utils.builtin.assure_path_exists(jd_path)
         utils.builtin.assure_path_exists(co_path)
         utils.builtin.assure_path_exists(peo_path)
-        self.interface.backup(project_path, bare=bare)
-        self.curriculumvitae.backup(cv_path, bare=bare)
-        self.jobdescription.backup(jd_path, bare=bare)
-        self.company.backup(co_path, bare=bare)
-        self.people.backup(peo_path, bare=bare)
+        self.interface.backup(project_path)
+        self.curriculumvitae.backup(cv_path)
+        self.jobdescription.backup(jd_path)
+        self.company.backup(co_path)
+        self.people.backup(peo_path)

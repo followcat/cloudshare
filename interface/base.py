@@ -66,5 +66,5 @@ class Interface(object):
                 continue
             for file in files:
                 fullpath=os.path.join(root, file)
-                tar.add(fullpath, arcname=file)
+                tar.add(fullpath, arcname=fullpath)
         tar.close()

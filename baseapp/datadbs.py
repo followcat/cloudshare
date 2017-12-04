@@ -2,8 +2,9 @@ import os
 
 import baseapp.loader
 import services.people
-import services.account
 import services.company
+import services.account
+import services.message
 import services.multipeople
 import services.jobdescription
 import services.curriculumvitae
@@ -15,7 +16,7 @@ PATHS = config.storage_config
 
 SVC_PWD = services.account.Password(PATHS['PASSWORD'], 'pwdrepo')
 SVC_ACCOUNT = services.account.Account(SVC_PWD, PATHS['ACCOUNT'], 'accrepo')
-SVC_MSG = services.account.Message(SVC_ACCOUNT, PATHS['MESSAGE'], 'msgrepo')
+SVC_MSG = services.message.Message(SVC_ACCOUNT, PATHS['MESSAGE'], 'msgrepo')
 
 SVC_CO_REPO = services.company.Company(PATHS['CO_REPO'], 'corepo')
 SVC_JD_REPO = services.jobdescription.JobDescription(PATHS['JD_REPO'], 'jdrepo')

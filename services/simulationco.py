@@ -2,13 +2,11 @@ import ujson
 
 import utils.companyexcel
 import core.outputstorage
-import services.company
 import services.operator.simulation
 import extractor.information_explorer
 
 
-class SimulationCO(services.operator.simulation.Simulation,
-                   services.company.Company):
+class SimulationCO(services.operator.simulation.Simulation):
 
     YAML_TEMPLATE = (
         ("relatedcompany",     list),

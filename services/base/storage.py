@@ -17,7 +17,7 @@ class BaseStorage(services.base.service.Service):
     def __init__(self, path, name=None, iotype=None):
         self.path = path
         self.yamlpath = ''
-        super(BaseStorage, self).__init__(path, name=name, iotype=iotype)
+        super(BaseStorage, self).__init__()
         self.unique_checker = None
         self.info = ""
         self._nums = 0

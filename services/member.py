@@ -6,14 +6,15 @@ import utils.builtin
 import services.company
 import services.project
 import services.secret
-import services.base.storage
 import services.simulationjd
 import services.simulationacc
+import services.base.kv_storage
+import services.operator.multiple
 
 import sources.industry_id
 
 
-class Member(services.base.storage.BaseStorage):
+class Member(services.base.kv_storage.KeyValueStorage):
 
     commitinfo = 'Member'
     PRJ_PATH = 'projects'
@@ -42,8 +43,9 @@ class Member(services.base.storage.BaseStorage):
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.companies = services.company.Company(self.co_path, name)
         self.curriculumvitaes = services.secret.Secret(
-                                    services.simulationcv.SimulationCV.autoservice(
-                                                            self.cv_path, name, cv_repos)
+                                    services.simulationcv.SimulationCV(
+                                        self.cv_path, name,
+                                        services.operator.multiple.Multiple(cv_repos))
                                 )
         self.jobdescriptions = services.simulationjd.SimulationJD(self.jd_path, name, jd_repos)
         self.config = dict()

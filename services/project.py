@@ -4,6 +4,7 @@ import utils.builtin
 import core.outputstorage
 import sources.industry_id
 import services.base.kv_storage
+import services.operator.multiple
 import services.simulationcv
 import services.simulationco
 import services.simulationjd
@@ -31,7 +32,9 @@ class Project(services.base.kv_storage.KeyValueStorage):
         peopath = os.path.join(path, self.PEO_PATH)
 
         self.company = services.simulationco.SimulationCO(copath, name, corepos)
-        self.curriculumvitae = services.simulationcv.SimulationCV(cvpath, name, cvrepos)
+        self.curriculumvitae = services.simulationcv.SimulationCV(
+                                        cvpath, name,
+                                        services.operator.multiple.Multiple(cvrepos))
         self.jobdescription = services.simulationjd.SimulationJD(jdpath, name, jdrepos)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
         self.config = dict()

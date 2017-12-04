@@ -4,9 +4,9 @@ import services.base.service
 class Facade(services.base.service.Service):
     """"""
     def __init__(self, service):
+        super(Facade, self).__init__()
         self.data_service = service
         self.service = self.data_service
-        super(Facade, self).__init__()
 
     @property
     def ids(self):

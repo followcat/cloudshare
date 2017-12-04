@@ -3,9 +3,6 @@ import core.outputstorage
 
 class Service(object):
     
-    def __init__(self, *args, **kwargs):
-        """"""
-
     def get_id(self, name):
         return core.outputstorage.ConvertName(name).base
 

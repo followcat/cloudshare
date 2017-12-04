@@ -1,4 +1,3 @@
-import services.people
 import services.operator.simulation
 
 

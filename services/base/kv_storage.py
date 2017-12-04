@@ -8,6 +8,11 @@ import services.base.storage
 
 
 class KeyValueStorage(services.base.storage.BaseStorage):
+    """ Backward compatible definition of kv storage service.
+
+    The service takes its yamlpath from service name instead of
+    hardcoded YAMLDIR.
+    """
 
     YAML_DIR = 'YAML'
     YAML_TEMPLATE = ()
@@ -17,7 +22,8 @@ class KeyValueStorage(services.base.storage.BaseStorage):
 
     def __init__(self, path, name=None, iotype=None):
         super(KeyValueStorage, self).__init__(path, name, iotype=iotype)
-        self.yamlpath = self.YAML_DIR
+        #self.yamlpath = self.YAML_DIR
+        self.yamlpath = self.name
 
     def _listframe(self, value, username, date=None):
         if date is None:

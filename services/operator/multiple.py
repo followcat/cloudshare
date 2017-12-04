@@ -10,6 +10,7 @@ class Multiple(services.base.service.Service):
 
     def __init__(self, services):
         assert services
+        super(Multiple, self).__init__()
         self.services = services
         self.service_type = type(services[0])
         self.match_any_partial = {}

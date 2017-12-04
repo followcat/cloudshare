@@ -1,7 +1,5 @@
-import services.jobdescription
-import services.base.simulation
+import services.operator.simulation
 
 
-class SimulationJD(services.base.simulation.Simulation,
-                   services.jobdescription.JobDescription):
-    pass
+class SimulationJD(services.operator.simulation.Simulation):
+    """"""

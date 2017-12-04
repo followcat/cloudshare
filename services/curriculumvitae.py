@@ -5,11 +5,26 @@ import core.exception
 import core.outputstorage
 import utils.pandocconverter
 import services.operator.split
+import services.base.kv_storage
+import services.base.text_storage
 
 
 class CurriculumVitae(services.operator.split.SplitData):
+    """ Backward compatible definition of curriculum service.
+
+    The service will mix:
+        - plain text content from markdown file
+        - kv content from *local* yaml file
+
+    Use *local* yaml file by hardcode yamlpath ('.') in data service.
+    """
 
     commitinfo = 'CurriculumVitae'
+
+    def __init__(self, path, name=None, iotype=None):
+        data_service = services.base.kv_storage.KeyValueStorage(path, '.', iotype)
+        operator_service = services.base.text_storage.PlainTextStorage(path, name, iotype)
+        super(CurriculumVitae, self).__init__(data_service, operator_service)
 
     def add_md(self, cvobj, committer=None, do_commit=True):
         return self.add(cvobj, committer, unique=False, kv_file=False, text_file=True, do_commit=do_commit)

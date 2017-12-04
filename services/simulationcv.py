@@ -1,12 +1,7 @@
-import services.curriculumvitae
 import services.operator.simulation
 
-import utils.pandocconverter
-import extractor.information_explorer
 
-
-class SimulationCV(services.operator.simulation.Simulation,
-                   services.curriculumvitae.CurriculumVitae):
+class SimulationCV(services.operator.simulation.Simulation):
 
     YAML_TEMPLATE = (
         ("committer",           str),
@@ -22,7 +17,7 @@ class SimulationCV(services.operator.simulation.Simulation,
 
     list_item = {}
 
-    def __init__(self, path, name, storages, iotype='git'):
+    def __init__(self, path, name, service, iotype='git'):
         """
             >>> from tests.settings import *
             >>> config = Config()
@@ -33,5 +28,5 @@ class SimulationCV(services.operator.simulation.Simulation,
             {'committer': 'dev'}
             >>> config.destory()
         """
-        super(SimulationCV, self).__init__(path, name, storages, iotype=iotype)
+        super(SimulationCV, self).__init__(path, name, service, iotype=iotype)
 

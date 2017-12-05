@@ -380,7 +380,7 @@ class Resume extends Component {
       similar,
       project
     } = this.state;
-
+    console.log(dataSource);
     const uploadProps = {
       name: 'file',
       action: API.UPLOAD_ENGLISH_RESUME_API,

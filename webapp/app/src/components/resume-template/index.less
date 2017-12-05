@@ -1,0 +1,77 @@
+@import '../default.less';
+@resumePrefixCls: cs-resume-template;
+@borderColor: #c2c2c2;
+
+.@{resumePrefixCls}-wrapper {
+  & h2 {
+    display: inline-block;
+    font-size: 20px;
+    vertical-align:middle;
+  }
+
+  & p {
+    word-break:break-all;
+    text-align:justify;
+  }
+
+  & i {
+    width: 60px;
+    vertical-align:middle
+  }
+
+  .@{resumePrefixCls}-content {
+    padding: 20px 60px;
+
+
+    & > p {
+      padding: 15px 0 0;
+    }
+  }
+
+  .@{resumePrefixCls}-info {
+    & span {
+      padding-right: 15px;
+    }
+
+    & .info-contact {
+      padding: 15px 0 0;
+
+      & > i {
+      width: 15px;
+      vertical-align:middle
+    }
+    }
+  }
+
+  .@{resumePrefixCls}-position {
+    .position-item {
+      padding-top: 15px;
+    }
+  }
+
+  .@{resumePrefixCls}-project {
+    &-content {
+      padding-top: 20px;
+    }
+    .project-company-name {
+      position: absolute;
+      left: 280px;
+    }
+    .project-description {
+      padding-left: 55px;
+    }
+  }
+
+  .@{resumePrefixCls}-education {
+  }
+
+  .@{resumePrefixCls}-assessment {
+
+  }
+
+  .@{resumePrefixCls}-hr {
+    width: 100%;
+    margin: 16px 0;
+  }
+
+}

@@ -107,6 +107,7 @@ class UploadCVAPI(Resource):
             self.svc_min.init_sim(self.modelname, self.projectid)
         else:
             self.svc_min.sim[self.modelname][self.projectid].add_documents(names, documents)
+            self.svc_min.sim[self.modelname][self.projectid].save()
         return { 'code': 200, 'data': results }
 
     def post(self):

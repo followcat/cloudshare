@@ -3,15 +3,18 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
+import services.base.service
 import services.base.kv_storage
+import services.operator.split
+import services.operator.filter
 import services.operator.multiple
-import services.simulationcv
 import services.simulationco
+import services.simulationcv
 import services.simulationjd
 import services.simulationpeo
 import extractor.information_explorer
 
-class Project(services.base.kv_storage.KeyValueStorage):
+class Project(services.base.service.Service):
 
     CV_PATH = 'CV'
     CO_PATH = 'CO'
@@ -19,8 +22,9 @@ class Project(services.base.kv_storage.KeyValueStorage):
     PEO_PATH = 'PEO'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepos, cvrepos, jdrepos, svcpeos, name, iotype='git'):
-        super(Project, self).__init__(path, name, iotype=iotype)
+    def __init__(self, path, corepos, cvrepos, jdrepos, svcpeos, name, iotype=None):
+        super(Project, self).__init__()
+        self.name = name
         self.path = path
         self.corepos = corepos
         self.jdrepos = jdrepos
@@ -31,12 +35,19 @@ class Project(services.base.kv_storage.KeyValueStorage):
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
 
-        self.company = services.simulationco.SimulationCO(copath, name, corepos)
-        self.curriculumvitae = services.simulationcv.SimulationCV(
-                                        cvpath, name,
-                                        services.operator.multiple.Multiple(cvrepos))
+        self.company = services.operator.filter.Filter(
+                data_service=services.operator.split.SplitData(
+                    services.simulationco.SimulationCO(copath, name, iotype=iotype),
+                    services.operator.multiple.Multiple(corepos)),
+                operator_service=services.simulationco.SelectionCO(copath, name, iotype=iotype))
+        self.curriculumvitae = services.operator.filter.Filter(
+                data_service=services.operator.split.SplitData(
+                    services.simulationcv.SimulationCV(cvpath, name, iotype=iotype),
+                    services.operator.multiple.Multiple(cvrepos)),
+                operator_service=services.simulationcv.SelectionCV(cvpath, name, iotype=iotype))
         self.jobdescription = services.simulationjd.SimulationJD(jdpath, name, jdrepos)
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
+        self.config_service = services.base.kv_storage.KeyValueStorage(path, name, iotype=iotype)
         self.config = dict()
         try:
             self.load()
@@ -44,7 +55,7 @@ class Project(services.base.kv_storage.KeyValueStorage):
             pass
 
     def load(self):
-        self.config = utils.builtin.load_yaml(self.path, self.config_file)
+        self.config = self.config_service.getyaml(self.config_file)
         self.config['name'] = self.name
         if 'id' not in self.config:
             self.config['id'] = utils.builtin.genuuid()
@@ -52,8 +63,7 @@ class Project(services.base.kv_storage.KeyValueStorage):
             self.config['model'] = 'default'
 
     def save(self):
-        dumpconfig = utils.builtin.dump_yaml(self.config)
-        self.interface.add(self.config_file, dumpconfig, message="Update config file.")
+        return self.config_service.saveinfo(self.config_file, self.config, committer=None, message="Update config file.")
 
     def setup(self, committer=None, config=None):
         self.setconfig(config)

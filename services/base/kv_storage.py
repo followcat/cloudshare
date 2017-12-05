@@ -9,21 +9,17 @@ import services.base.storage
 
 class KeyValueStorage(services.base.storage.BaseStorage):
     """ Backward compatible definition of kv storage service.
-
-    The service takes its yamlpath from service name instead of
-    hardcoded YAMLDIR.
     """
 
-    YAML_DIR = 'YAML'
+    YAML_DIR = '.'
     YAML_TEMPLATE = ()
 
     fix_item = {}
     list_item = {}
 
     def __init__(self, path, name=None, iotype=None):
-        super(KeyValueStorage, self).__init__(path, name, iotype=iotype)
-        #self.yamlpath = self.YAML_DIR
-        self.yamlpath = self.name
+        self.yamlpath = self.YAML_DIR
+        super(KeyValueStorage, self).__init__(os.path.join(path, self.yamlpath), name, iotype=iotype)
 
     def _listframe(self, value, username, date=None):
         if date is None:
@@ -90,15 +86,9 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
-            self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
+            self.interface.modify(name, dumpinfo,
                                   message=message, committer=committer, do_commit=do_commit)
             result = True
-        if result:
-            for k in keys:
-                try:
-                    del info[k]
-                except KeyError:
-                    continue
         return result
 
     def add(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):

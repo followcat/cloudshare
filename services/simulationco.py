@@ -1,13 +1,32 @@
-import ujson
+import collections
 
 import utils.companyexcel
-import core.outputstorage
-import services.operator.simulation
+import services.base.kv_storage
+import services.base.name_storage
 import extractor.information_explorer
 
 
-class SimulationCO(services.operator.simulation.Simulation):
+class SelectionCO(services.base.name_storage.NameStorage):
 
+    ids_file = 'customer.json'
+
+    #addcustomer = services.base.name_storage.NameStorage.add
+    #deletecustomer = services.base.name_storage.NameStorage.delete
+
+    def addcustomer(self, id, user, do_commit=True):
+        FakeObj = collections.namedtuple('FakeObj', ['id'])
+        return super(Customer, self).add(bsobj=FakeObj(id), committer=user, do_commit=do_commit)
+
+    def deletecustomer(self, id, user, do_commit=True):
+        FakeObj = collections.namedtuple('FakeObj', ['id'])
+        return super(Customer, self).delete(bsobj=FakeObj(id), committer=user, do_commit=do_commit)
+
+    customers = services.base.name_storage.NameStorage.ids
+
+
+class SimulationCO(services.base.kv_storage.KeyValueStorage):
+
+    YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
         ("relatedcompany",     list),
         ("position",           list),
@@ -22,11 +41,6 @@ class SimulationCO(services.operator.simulation.Simulation):
     list_item = {"relatedcompany", "position", "clientcontact",
                  "progress", "updatednumber", "reminder"}
     fix_item  = {"id", "name"}
-    customers_file = 'customers.json'
-
-    def __init__(self, path, name, storages, iotype='git'):
-        super(SimulationCO, self).__init__(path, name, storages, iotype=iotype)
-        self._customers = None
 
     def _templateinfo(self, committer):
         info = super(SimulationCO, self)._templateinfo(committer)
@@ -83,38 +97,3 @@ class SimulationCO(services.operator.simulation.Simulation):
                                        (id, key, excel[key], responsible)))
         return output
 
-    def addcustomer(self, id, user, do_commit=True):
-        result = False
-        if id in self.customers or not self.exists(id):
-            return result
-        self.customers.add(id)
-        self.interface.modify(self.customers_file,
-                              ujson.dumps(sorted(self.customers), indent=4),
-                              message="Add id: " + id + " to customers.\n",
-                              committer=user, do_commit=do_commit)
-        result = True
-        return result
-
-    def deletecustomer(self, id, user, do_commit=True):
-        result = False
-        if id not in self.customers or not self.exists(id):
-            return result
-        self.customers.remove(id)
-        self.interface.modify(self.customers_file,
-                              ujson.dumps(sorted(self.customers), indent=4),
-                              message="Delete id: " + id + " in customers.\n",
-                              committer=user, do_commit=do_commit)
-        result = True
-        return result
-
-    @property
-    def customers(self):
-        if self._customers is None:
-            try:
-                stream = self.interface.get(self.customers_file)
-                self._customers = set(ujson.loads(stream))
-            except IOError:
-                self._customers = set()
-                self.interface.add(self.customers_file,
-                                   ujson.dumps(sorted(self._customers), indent=4))
-        return self._customers

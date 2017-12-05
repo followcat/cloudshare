@@ -15,14 +15,12 @@ class CurriculumVitae(services.operator.split.SplitData):
     The service will mix:
         - plain text content from markdown file
         - kv content from *local* yaml file
-
-    Use *local* yaml file by hardcode yamlpath ('.') in data service.
     """
 
     commitinfo = 'CurriculumVitae'
 
     def __init__(self, path, name=None, iotype=None):
-        data_service = services.base.kv_storage.KeyValueStorage(path, '.', iotype)
+        data_service = services.base.kv_storage.KeyValueStorage(path, name, iotype)
         operator_service = services.base.text_storage.PlainTextStorage(path, name, iotype)
         super(CurriculumVitae, self).__init__(data_service, operator_service)
 

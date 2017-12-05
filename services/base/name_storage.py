@@ -11,7 +11,7 @@ class NameStorage(services.base.storage.BaseStorage):
 
     def __init__(self, path, name, iotype='git'):
         super(NameStorage, self).__init__(path, name, iotype=iotype)
-        idsfile = os.path.join(path, NameStorage.ids_file)
+        idsfile = os.path.join(path, self.ids_file)
         if not os.path.exists(idsfile):
             dumpinfo = ujson.dumps(sorted(self.ids), indent=4)
             self.interface.add(self.ids_file, dumpinfo, message="Init ids file.")

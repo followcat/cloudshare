@@ -1,8 +1,15 @@
-import services.operator.simulation
+import services.base.kv_storage
+import services.base.name_storage
 
 
-class SimulationCV(services.operator.simulation.Simulation):
+class SelectionCV(services.base.name_storage.NameStorage):
 
+    ids_file = 'names.json'
+
+
+class SimulationCV(services.base.kv_storage.KeyValueStorage):
+
+    YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
         ("committer",           str),
     )
@@ -16,17 +23,4 @@ class SimulationCV(services.operator.simulation.Simulation):
     }
 
     list_item = {}
-
-    def __init__(self, path, name, service, iotype='git'):
-        """
-            >>> from tests.settings import *
-            >>> config = Config()
-            >>> config.init_samplecv()
-            >>> SVC_PRJ_TEST = config.SVC_PRJ_TEST
-            >>> id = list(SVC_PRJ_TEST.cv_ids())[0]
-            >>> SVC_PRJ_TEST.curriculumvitae.updateinfo(id, 'committer', 'dev', 'dev')
-            {'committer': 'dev'}
-            >>> config.destory()
-        """
-        super(SimulationCV, self).__init__(path, name, service, iotype=iotype)
 

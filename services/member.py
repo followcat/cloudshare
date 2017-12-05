@@ -6,15 +6,18 @@ import utils.builtin
 import services.company
 import services.project
 import services.secret
+import services.simulationcv
 import services.simulationjd
 import services.simulationacc
+import services.base.service
 import services.base.kv_storage
+import services.operator.filter
 import services.operator.multiple
 
 import sources.industry_id
 
 
-class Member(services.base.kv_storage.KeyValueStorage):
+class Member(services.base.service.Service):
 
     commitinfo = 'Member'
     PRJ_PATH = 'projects'
@@ -28,8 +31,9 @@ class Member(services.base.kv_storage.KeyValueStorage):
     max_project_nums = 3
 
     def __init__(self, acc_repos, co_repos, cv_repos, jd_repos,
-                 mult_peo, path, name, iotype='git'):
-        super(Member, self).__init__(path, name, iotype=iotype)
+                 mult_peo, path, name, iotype=None):
+        super(Member, self).__init__()
+        self.name = name
         self.path = path
         self.cv_path = os.path.join(path, self.CV_PATH)
         self.jd_path = os.path.join(path, self.JD_PATH)
@@ -43,11 +47,15 @@ class Member(services.base.kv_storage.KeyValueStorage):
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.companies = services.company.Company(self.co_path, name)
         self.curriculumvitaes = services.secret.Secret(
-                                    services.simulationcv.SimulationCV(
-                                        self.cv_path, name,
-                                        services.operator.multiple.Multiple(cv_repos))
-                                )
+                services.operator.filter.Filter(
+                        data_service=services.operator.split.SplitData(
+                            services.simulationcv.SimulationCV(self.cv_path, name, iotype=iotype),
+                            services.operator.multiple.Multiple(cv_repos)),
+                        operator_service=services.simulationcv.SelectionCV(self.cv_path, name, iotype=iotype)
+                        )
+                )
         self.jobdescriptions = services.simulationjd.SimulationJD(self.jd_path, name, jd_repos)
+        self.config_service = services.base.kv_storage.KeyValueStorage(path, name, iotype=iotype)
         self.config = dict()
         try:
             self.load()
@@ -57,13 +65,12 @@ class Member(services.base.kv_storage.KeyValueStorage):
             os.makedirs(self.projects_path)
 
     def load(self):
-        config = utils.builtin.load_yaml(self.path, self.config_file)
+        config = self.config_service.getyaml(self.config_file)
         if config:
             self.config.update(config)
 
     def save(self):
-        dumpconfig = utils.builtin.dump_yaml(self.config)
-        self.interface.add(self.config_file, dumpconfig, message="Update config file.")
+        return self.config_service.saveinfo(self.config_file, self.config, committer=None, message="Update config file.")
 
     def setup(self, config=None, committer=None):
         if config is None:
@@ -274,7 +281,7 @@ class DefaultMember(Member):
     default_name = 'default'
 
     def __init__(self, acc_repos, co_repos, cv_repos, jd_repos, mult_peo, path,
-                 name='default', iotype='git'):
+                 name='default', iotype=None):
         super(DefaultMember, self).__init__(acc_repos, co_repos, cv_repos, jd_repos,
                                             mult_peo, path, name, iotype=iotype)
 

@@ -125,18 +125,18 @@ class Simulation(services.base.storage.BaseStorage):
 
     def getyaml(self, id):
         baseinfo = dict()
-        prjinfo = self.getinfo(id)
+        selfinfo = self.getinfo(id)
         for storage in self.storages:
             try:
                 baseinfo = storage.getyaml(id)
                 basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
-                prjtime = prjinfo['modifytime'] if 'modifytime' in prjinfo else 0
-                prjinfo.update(baseinfo)
-                prjinfo['modifytime'] = max(basetime, prjtime)
+                prjtime = selfinfo['modifytime'] if 'modifytime' in selfinfo else 0
+                selfinfo = utils.builtin.merge(baseinfo, selfinfo, update=True)
+                selfinfo['modifytime'] = max(basetime, prjtime)
                 break
             except IOError:
                 continue
-        return prjinfo
+        return selfinfo
 
     def updateinfo(self, id, key, value, committer, do_commit=True):
         assert key not in self.fix_item

@@ -126,5 +126,7 @@ const generateSummary = (dataSource) => {
 
 module.exports = {
   generateSummary,
+  parseExperience,
+  parseEducation,
   generateWorkExperience
 };

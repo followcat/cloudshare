@@ -287,7 +287,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         for jdid in bestjds:
             output = {}
             output['CV'] = list()
-            bestids = set([cv[0] for cv in bestjds[jdid]])
+            bestids = [cv[0] for cv in bestjds[jdid]]
             searchids = self.svc_index.search(index=index, doctype=[project.id],
                                               filterdict=filterdict, ids=bestids,
                                               size=numbers, onlyid=True)

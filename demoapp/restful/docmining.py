@@ -106,14 +106,14 @@ class DocMiningAPI(Resource):
             documents = []
             sim = self.miner.sim[self.projectname][self.projectname]
             for cv in cvlist:
-                mdid = core.outputstorage.ConvertName(cv['id']).md
-                if mdid not in sim.names:
-                    names.append(mdid)
+                id = core.outputstorage.ConvertName(cv['id'])
+                if id not in sim.names:
+                    names.append(id)
                     documents.append(project.cv_getmd(cv['id']))
             sim.add_documents(names, documents)
             for cv in cvlist:
-                mdid = core.outputstorage.ConvertName(cv['id']).md
-                result.append(self.miner.probability_by_id(model, doc, mdid,
+                id = core.outputstorage.ConvertName(cv['id'])
+                result.append(self.miner.probability_by_id(model, doc, id,
                                                            uses=[project.name]))
             result = sorted(result, key=lambda x:float(x[1]), reverse=True)
         else:

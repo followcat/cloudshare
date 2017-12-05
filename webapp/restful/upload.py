@@ -66,7 +66,7 @@ class UploadCVAPI(Resource):
         for item in self.updates:
             status = 'failed'
             self.uploaddata = upload[self.user.name].pop(item['filename'])
-            self.cvobj = self.uploaddata['cv']
+            self.cvobj = self.uploaddata['CV']
             cvobj=self.cvobj
             if cvobj is not None:
                 id = cvobj.metadata['id']
@@ -76,15 +76,16 @@ class UploadCVAPI(Resource):
                 try:
                     result = self.project.cv_add(cvobj, self.user.name, unique=True)
                     if result['repo_cv_result']:
+                        md = self.project.cv_getmd(id)
                         self.svc_index.add(self.svc_index.config['CV_MEM'], self.project.id,
-                                           id, cvobj.data, cvobj.metadata)
+                                           id, md, cvobj.metadata)
                     if result['project_cv_result']:
-                        result['member_cv_result'] = self.member.cv_add(cvobj, user.name,
+                        result['member_cv_result'] = self.member.cv_add(cvobj, self.user.name,
                                                                         unique=True)
                         status = 'success'
                         # Add to CV database and project
                         message = '200'
-                        names.append(cvobj.name.md)
+                        names.append(cvobj.ID)
                         documents.append(cvobj.data)
                         if not result['repo_cv_result']:
                             # Existed in other project
@@ -173,8 +174,8 @@ class MemberUploadCVAPI(UploadCVAPI):
     def putparam(self):
         super(MemberUploadCVAPI, self).putparam()
         projectname = self.args['project']
-        self.member = user.getmember(self.svc_members)
-        self.project = member.getproject(projectname)
+        self.member = self.user.getmember(self.svc_members)
+        self.project = self.member.getproject(projectname)
         self.projectid = self.project.id
         self.modelname = self.project.modelname
 

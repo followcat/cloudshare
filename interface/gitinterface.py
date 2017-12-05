@@ -312,8 +312,4 @@ class GitInterface(interface.base.Interface):
         return result
 
     def backup(self, path, bare=False):
-        try:
-            dulwich.porcelain.clone(self.path, path, bare=bare)
-        except KeyError:
-            self.repo.do_commit("Init repo %s."%(name), committer="Cloudshare")
-            dulwich.porcelain.clone(self.path, path, bare=bare)
+        dulwich.porcelain.clone(self.path, path, bare=bare)

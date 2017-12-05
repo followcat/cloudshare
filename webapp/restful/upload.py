@@ -76,12 +76,14 @@ class UploadCVAPI(Resource):
                 try:
                     result = self.project.cv_add(cvobj, self.user.name, unique=True)
                     if result['project_cv_result']:
-                        self.svc_index.add(self.svc_index.config['CV_MEM'],
-                                           self.project.id, id,
-                                           cvobj.data.decode('utf-8'), cvobj.metadata)
                         result['member_cv_result'] = self.member.cv_add(cvobj,
                                                                         self.user.name,
                                                                         unique=True)
+                        md = self.project.cv_getmd(id)
+                        info = self.project.cv_getyaml(id)
+                        self.svc_index.add(self.svc_index.config['CV_MEM'],
+                                           self.project.id, id, md, info)
+
                         status = 'success'
                         # Add to CV database and project
                         message = '200'
@@ -105,6 +107,7 @@ class UploadCVAPI(Resource):
             self.svc_min.init_sim(self.modelname, self.projectid)
         else:
             self.svc_min.sim[self.modelname][self.projectid].add_documents(names, documents)
+            self.svc_min.sim[self.modelname][self.projectid].save()
         return { 'code': 200, 'data': results }
 
     def post(self):

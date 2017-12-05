@@ -5,6 +5,7 @@ import { browserHistory } from 'react-router';
 import { Layout } from 'views/layout';
 
 import ResumeContent from 'components/resume-content';
+import ResumeTemplate from 'components/resume-template';
 import Summary from 'components/summary';
 
 import ResumeHeader from './ResumeHeader';
@@ -417,7 +418,10 @@ class Resume extends Component {
                             onUploadModalOk={this.handleUploadModalOk}
                           />
                           <Summary dataSource={generateSummary(dataSource)} />
-                          <Tabs defaultActiveKey="chinese">
+                          <Tabs defaultActiveKey="RUJUchinese">
+                            <Tabs.TabPane tab="标准" key="RUJUchinese">
+                              <ResumeTemplate dataSource={dataSource} />
+                            </Tabs.TabPane>
                             <Tabs.TabPane tab="中文" key="chinese">
                               <ResumeContent html={html} />
                             </Tabs.TabPane>

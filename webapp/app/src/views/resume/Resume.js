@@ -380,7 +380,6 @@ class Resume extends Component {
       similar,
       project
     } = this.state;
-    console.log(dataSource);
     const uploadProps = {
       name: 'file',
       action: API.UPLOAD_ENGLISH_RESUME_API,
@@ -418,11 +417,11 @@ class Resume extends Component {
                             onUploadModalOk={this.handleUploadModalOk}
                           />
                           <Summary dataSource={generateSummary(dataSource)} />
-                          <Tabs defaultActiveKey="RUJUchinese">
-                            <Tabs.TabPane tab="标准" key="RUJUchinese">
+                          <Tabs defaultActiveKey="chinese">
+                            <Tabs.TabPane tab="中文" key="chinese">
                               <ResumeTemplate dataSource={dataSource} />
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab="中文" key="chinese">
+                            <Tabs.TabPane tab="原文" key="html">
                               <ResumeContent html={html} />
                             </Tabs.TabPane>
                             <Tabs.TabPane

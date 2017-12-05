@@ -27,6 +27,7 @@ class Preview extends Component {
               index={index}
               currentPreview={currentPreview}
               html={item.markdown || item.html}
+              dataSource={item.yaml_info}
             >
               <PreviewTopBar
                 {...this.props}

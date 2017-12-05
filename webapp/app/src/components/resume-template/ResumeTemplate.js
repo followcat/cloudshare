@@ -33,25 +33,28 @@ class ResumeTemplate extends Component {
   }
 
   combines (a) {
-    if(!a.places && Object.keys(a.salary || null).length == 0) {
+    if(a == {}) {
       return null
     }
-    let places = a.places || null,
-        salary = a.salary || null;
-    if(places) {
-      places = places.join(',');
-    }
-    if(salary) {
-      if(salary.salary || salary.yearly) {
-        salary  = salary.salary || salary.yearly
-      } else {
-        salary = null
+    if(a.places || a.salary) {
+      let places = a.places || null,
+          salary = a.salary || null;
+      if(places) {
+        places = places.join(',');
       }
+      if(salary) {
+        if(salary.salary || salary.yearly) {
+          salary  = salary.salary || salary.yearly
+        } else {
+          salary = null
+        }
+      }
+      return [places,salary]
+              .filter(item => item!=undefined && item!==null)
+              .join('|')
+    } else{
+      return null
     }
-    return [places,salary]
-            .filter(item => item!=undefined && item!==null)
-            .join('|')
-
   }
 
   render() {

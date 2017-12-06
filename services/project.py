@@ -10,7 +10,6 @@ import services.operator.checker
 import services.operator.multiple
 import services.simulationco
 import services.simulationcv
-import services.simulationjd
 import services.simulationpeo
 import extractor.information_explorer
 

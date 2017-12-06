@@ -7,7 +7,6 @@ import services.company
 import services.project
 import services.secret
 import services.simulationcv
-import services.simulationjd
 import services.simulationacc
 import services.base.service
 import services.base.kv_storage

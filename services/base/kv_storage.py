@@ -104,6 +104,11 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                             message, committer, do_commit)
         return True
 
+    def remove(self, id, committer=None, do_commit=True):
+        name = core.outputstorage.ConvertName(id).yaml
+        return self.interface.delete(name, message='Remove user %s'%id,
+                              committer=committer, do_commit=do_commit)
+
     def getyaml(self, id):
         """
         Expects an IOError exception if file not found.

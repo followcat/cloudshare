@@ -30,7 +30,7 @@ class Password(services.base.kv_storage.KeyValueStorage):
 
     MUST_KEY = ['id', 'password']
 
-    def __init__(self, path, name=None, iotype='git'):
+    def __init__(self, path, name=None, iotype=None):
         super(Password, self).__init__(path, name=name, iotype=iotype)
 
     def baseobj(self, info):
@@ -101,7 +101,7 @@ class Account(services.base.kv_storage.KeyValueStorage):
         ("people",              str),
     )
 
-    def __init__(self, svc_password, path, name=None, iotype='git'):
+    def __init__(self, svc_password, path, name=None, iotype=None):
         self.svc_password = svc_password
         super(Account, self).__init__(path, name=name, iotype=iotype)
 

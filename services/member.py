@@ -83,8 +83,11 @@ class Member(services.base.service.Service):
         if modified:
             self.save()
         self.load_projects()
-        self.accounts = services.simulationacc.SimulationACC(self.accounts_path, self.name,
-                                                             self.acc_repos)
+        self.accounts = services.operator.filter.Checker(
+                data_service=services.operator.split.SplitData(
+                    services.simulationacc.SimulationACC(self.accounts_path, self.name),
+                    services.operator.multiple.Multiple(self.acc_repos)),
+                operator_service=services.simulationacc.SelectionACC(self.accounts_path, self.name))
 
     def use(self, id):
         result = None

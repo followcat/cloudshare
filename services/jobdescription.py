@@ -5,10 +5,10 @@ import yaml
 
 import utils.builtin
 import core.outputstorage
-import services.base.storage
+import services.base.kv_storage
 
 
-class JobDescription(services.base.storage.BaseStorage):
+class JobDescription(services.base.kv_storage.KeyValueStorage):
 
     commitinfo = 'JobDescription'
 
@@ -61,7 +61,6 @@ class JobDescription(services.base.storage.BaseStorage):
             >>> shutil.rmtree(path)
         """
         super(JobDescription, self).__init__(path, name=name, iotype=iotype)
-        self.path = path
 
     def _metadata(self, info):
         origin = self.generate_info_template()
@@ -76,12 +75,6 @@ class JobDescription(services.base.storage.BaseStorage):
         metadata = self._metadata(info)
         bsobj = core.basedata.DataObject(metadata=metadata, data=None)
         return bsobj
-
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True,
-            mdfile=False, do_commit=True):
-        return super(JobDescription, self).add(bsobj, committer=committer, unique=unique,
-                                               yamlfile=yamlfile, mdfile=mdfile,
-                                               do_commit=do_commit)
 
     def modify(self, id, description, status, commentary, followup, committer):
         data = self.getyaml(id)

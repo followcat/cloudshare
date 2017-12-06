@@ -54,7 +54,9 @@ class Member(services.base.service.Service):
                         operator_service=services.simulationcv.SelectionCV(self.cv_path, name, iotype=iotype)
                         )
                 )
-        self.jobdescriptions = services.simulationjd.SimulationJD(self.jd_path, name, jd_repos)
+        self.jobdescriptions = services.operator.checker.Filter(
+                data_service=services.operator.multiple.Multiple(jd_repos),
+                operator_service=services.base.name_storage.NameStorage(self.jd_path, name, iotype=iotype))
         self.config_service = services.base.kv_storage.KeyValueStorage(path, name, iotype=iotype)
         self.config = dict()
         try:

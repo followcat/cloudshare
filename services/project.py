@@ -45,7 +45,9 @@ class Project(services.base.service.Service):
                     services.simulationcv.SimulationCV(cvpath, name, iotype=iotype),
                     services.operator.multiple.Multiple(cvrepos)),
                 operator_service=services.simulationcv.SelectionCV(cvpath, name, iotype=iotype))
-        self.jobdescription = services.simulationjd.SimulationJD(jdpath, name, jdrepos)
+        self.jobdescription = services.operator.checker.Filter(
+                data_service=services.operator.multiple.Multiple(jdrepos),
+                operator_service=services.base.name_storage.NameStorage(jdpath, name, iotype=iotype))
         self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
         self.config_service = services.base.kv_storage.KeyValueStorage(path, name, iotype=iotype)
         self.config = dict()

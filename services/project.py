@@ -247,19 +247,38 @@ class Project(services.base.service.Service):
         project_result = set()
         for item in items:
             yamlname = core.outputstorage.ConvertName(item[1]).yaml
+            result = None
+            success = False
             if item[0] == 'companyadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
-                repo_result.add(yamlname)
-                result = self.storageCO.add(baseobj, committer=item[2][-1], do_commit=False)
+                try:
+                    result = self.storageCO.add(baseobj, committer=item[2][-1], do_commit=False)
+                    success = True
+                except Exception:
+                    success = False
+                if success is True:
+                    repo_result.add(yamlname)
             elif item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
-                project_result.add(self.company.ids_file)
-                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
-                result = self.company.add(baseobj, committer=item[2][-1], do_commit=False)
+                try:
+                    result = self.company.add(baseobj, committer=item[2][-1], do_commit=False)
+                    success = True
+                except Exception:
+                    success = False
+                if success is True:
+                    project_result.add(self.company.ids_file)
+                    project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
             elif item[0] == 'listadd':
-                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
-                result = self.company.updateinfo(*item[2], do_commit=False)
-            results[item[1]] = result
+                try:
+                    result = self.company.updateinfo(*item[2], do_commit=False)
+                    success = True
+                except Exception:
+                    success = False
+                if success is True:
+                    project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+            else:
+                success = False
+            results[item[1]] = {'data': item, 'success': success, 'result': result}
         self.storageCO.interface.do_commit(list(repo_result), committer=committer)
         self.company.interface.do_commit(list(project_result), committer=committer)
         return results

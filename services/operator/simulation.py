@@ -1,10 +1,10 @@
 import services.operator.split
-import services.operator.filter
+import services.operator.checker
 import services.base.kv_storage
 import services.base.name_storage
 
 
-class Simulation(services.operator.filter.Filter):
+class Simulation(services.operator.checker.Filter):
     """ Backward compatible definition of a simulation service,
 
     A simulation will:

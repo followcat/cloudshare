@@ -11,7 +11,7 @@ import services.simulationjd
 import services.simulationacc
 import services.base.service
 import services.base.kv_storage
-import services.operator.filter
+import services.operator.checker
 import services.operator.multiple
 
 import sources.industry_id
@@ -47,7 +47,7 @@ class Member(services.base.service.Service):
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.companies = services.company.Company(self.co_path, name)
         self.curriculumvitaes = services.secret.Secret(
-                services.operator.filter.Filter(
+                services.operator.checker.Filter(
                         data_service=services.operator.split.SplitData(
                             services.simulationcv.SimulationCV(self.cv_path, name, iotype=iotype),
                             services.operator.multiple.Multiple(cv_repos)),
@@ -83,7 +83,7 @@ class Member(services.base.service.Service):
         if modified:
             self.save()
         self.load_projects()
-        self.accounts = services.operator.filter.Checker(
+        self.accounts = services.operator.checker.Checker(
                 data_service=services.operator.split.SplitData(
                     services.simulationacc.SimulationACC(self.accounts_path, self.name),
                     services.operator.multiple.Multiple(self.acc_repos)),

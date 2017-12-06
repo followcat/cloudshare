@@ -6,7 +6,7 @@ import sources.industry_id
 import services.base.service
 import services.base.kv_storage
 import services.operator.split
-import services.operator.filter
+import services.operator.checker
 import services.operator.multiple
 import services.simulationco
 import services.simulationcv
@@ -35,12 +35,12 @@ class Project(services.base.service.Service):
         jdpath = os.path.join(path, self.JD_PATH)
         peopath = os.path.join(path, self.PEO_PATH)
 
-        self.company = services.operator.filter.Filter(
+        self.company = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
                     services.simulationco.SimulationCO(copath, name, iotype=iotype),
                     services.operator.multiple.Multiple(corepos)),
                 operator_service=services.simulationco.SelectionCO(copath, name, iotype=iotype))
-        self.curriculumvitae = services.operator.filter.Filter(
+        self.curriculumvitae = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
                     services.simulationcv.SimulationCV(cvpath, name, iotype=iotype),
                     services.operator.multiple.Multiple(cvrepos)),

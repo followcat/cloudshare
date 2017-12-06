@@ -1,5 +1,7 @@
 import os
 import xml
+import shutil
+
 import mimetypes
 
 import pypandoc
@@ -39,17 +41,6 @@ class LibreOfficeProcessor(utils.docprocessor.base.Processor):
             logger.info(e)
             result = False
         return result
-
-    def process_mht(self):
-        message = email.message_from_string(self.stream)
-        for part in message.walk():
-            if part.get_content_charset() is not None:
-                part.set_param('charset', 'utf-8')
-        html_src = emaildata.text.Text.html(message)
-        core.outputstorage.save_stream(self.html_path, self.name.html, html_src)
-        returncode = self.convert_docfile(self.html_path, self.name.html,
-                                          self.docx_path, self.name.docx)
-        return returncode
 
     def remove_note(self):
         position = os.path.join(self.docbook_path, self.name.xml)
@@ -99,21 +90,17 @@ class LibreOfficeProcessor(utils.docprocessor.base.Processor):
             >>> shutil.rmtree(basepath)
         """
         logger.info('Convert: %s' % self.base)
-        if self.mimetype in ['application/msword',
+        if self.mimetype in ["application/msword",
                              "application/vnd.openxmlformats-officedocument"
                              ".wordprocessingml.document"]:
-            if 'multipart/related' in self.stream:
-                self.process_mht()
-                returncode = self.convert_docfile(self.docx_path, self.name.docx,
-                                                  self.docbook_path, self.name.xml)
-            else:
-                returncode = self.convert_docfile(self.source_path, self.name,
-                                                  self.docbook_path, self.name.xml)
-            if returncode is False:
+            if self.mimetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                shutil.copyfile(os.path.join(self.source_path, self.name),
+                                os.path.join(self.docx_path, self.name.docx))
+            elif self.mimetype == "application/msword":
                 returncode = self.convert_docfile(self.source_path, self.name,
                                                   self.docx_path, self.name.docx)
-                returncode = self.convert_docfile(self.docx_path, self.name.docx,
-                                                  self.docbook_path, self.name.xml)
+            returncode = self.convert_docfile(self.docx_path, self.name.docx,
+                                              self.docbook_path, self.name.xml)
             if not os.path.exists(os.path.join(
                                   self.docbook_path, self.name.xml)):
                 logger.info('Not exists')

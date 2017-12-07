@@ -47,28 +47,35 @@ class LsiSustain(Resource):
 
     def getvec(self, model, doc, sort=False, reverse=True):
         vec_bow = model.lsi.id2word.doc2bow(model.slicer(doc))
-        result = model.lsi[vec_bow]
+        modelvec = model.lsi[vec_bow]
+        modelvec_sum = sum([i[1] for i in modelvec])
+        resultvec = [(i[0], i[1]/modelvec_sum) for i in modelvec]
         if sort is True:
-            result = sorted(result, key=lambda x: abs(x[1]), reverse=reverse)
-        return result
+            modelvec = sorted(modelvec, key=lambda x: abs(x[1]), reverse=reverse)
+        return modelvec
 
-    def crosstopics(self, model, origin, out, top=None):
+    def crosstopics(self, model, origin, correlation, top=None):
         if top is None:
             top = self.top
         origin_words = set(model.slicer(origin))
         origin_vec = self.getvec(model, origin)
-        out_vec = self.getvec(model, out)
+        correlation_vec = self.getvec(model, correlation)
 
         near_topics = list()
         results_dict = collections.defaultdict(float)
         for i in range(model.lsi.num_topics):
-            result = min(origin_vec[i][1], out_vec[i][1])/max(origin_vec[i][1],
-                                                              out_vec[i][1])**3
+            origin_value = abs(origin_vec[i][1])
+            correlation_value = abs(correlation_vec[i][1])
+            result = min(origin_value, correlation_value)/max(origin_value, correlation_value)
             model_topic = model.topicsinfo[i]
             for each in model_topic:
                 for word in each[0]:
                     if word in origin_words:
                         results_dict[word] += each[1]*result
+        results_range = (max(results_dict.values()), min(results_dict.values()))
+        for each in results_dict:
+            results_dict[each] = (results_dict[each]+abs(results_range[1]))/sum(
+                                 [abs(results_range[0]), abs(results_range[1])])
         sort = sorted(results_dict.items(), key=lambda r: r[1], reverse=True)
         return sort[:top]
 
@@ -95,6 +102,7 @@ class LsiSustainCVByJDAPI(LsiSustain):
         md = project.cv_getmd(cvid)
         jdinfo = project.jd_get(jdid)
         datas = self.crosstopics(model, md, jdinfo['description'], top=top)
+
         return {
             'code': 200,
             'data': datas,

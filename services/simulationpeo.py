@@ -1,8 +1,9 @@
-import services.operator.simulation
+import services.base.kv_storage
 
 
-class SimulationPEO(services.operator.simulation.Simulation):
+class SimulationPEO(services.base.kv_storage.KeyValueStorage):
 
+    YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
         ("committer",           str),
         ("comment",             list),
@@ -12,7 +13,7 @@ class SimulationPEO(services.operator.simulation.Simulation):
 
     list_item = {"tag", "comment", "tracking"}
 
-    def __init__(self, path, name, storages, iotype='git'):
+    def __init__(self, path, name, iotype=None):
         """
             >>> from tests.settings import *
             >>> config = Config()
@@ -35,13 +36,10 @@ class SimulationPEO(services.operator.simulation.Simulation):
             True
             >>> config.destory()
         """
-        super(SimulationPEO, self).__init__(path, name, storages, iotype=iotype)
+        super(SimulationPEO, self).__init__(path, name, iotype=iotype)
 
     def getyaml(self, id):
-        try:
-            return super(SimulationPEO, self).getyaml(id)
-        except IOError:
-            yaml = {'id': id, 'cv': [id]}
-            info = self.getinfo(id)
-            yaml.update(info)
-            return yaml
+        info = super(SimulationPEO, self).getyaml(id)
+        if not info:
+            info = {'id': id, 'cv': [id]}
+        return info

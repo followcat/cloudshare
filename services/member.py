@@ -155,6 +155,8 @@ class Member(services.base.service.Service):
                                                        [self.jobdescriptions],
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'id':         utils.builtin.hash(self.name+name),
+                                          'autosetup':  False,
+                                          'autoupdate': False,
                                           'storageCV':  self.config['storageCV'],
                                           'storagePEO': self.config['storagePEO'],
                                           'limitPEO':   self.config['limitPEO'],

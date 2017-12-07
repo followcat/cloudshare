@@ -11,6 +11,7 @@ import services.operator.multiple
 import services.simulationco
 import services.simulationcv
 import services.simulationpeo
+import services.multipeople
 import extractor.information_explorer
 
 class Project(services.base.service.Service):
@@ -47,7 +48,11 @@ class Project(services.base.service.Service):
         self.jobdescription = services.operator.checker.Filter(
                 data_service=services.operator.multiple.Multiple(jdrepos),
                 operator_service=services.base.name_storage.NameStorage(jdpath, name, iotype=iotype))
-        self.people = services.simulationpeo.SimulationPEO(peopath, name, svcpeos)
+        self.people = services.operator.checker.Filter(
+                data_service=services.operator.split.SplitData(
+                    services.simulationpeo.SimulationPEO(peopath, name, iotype=iotype),
+                    services.multipeople.MultiPeople(svcpeos)),
+                operator_service=services.base.name_storage.NameStorage(peopath, name, iotype=iotype))
         self.config_service = services.base.kv_storage.KeyValueStorage(path, name, iotype=iotype)
         self.config = dict()
         try:
@@ -338,6 +343,18 @@ class Project(services.base.service.Service):
         result['project_peo_result'] = self.people.add(peopobj, committer,
                                                        unique=unique, do_commit=do_commit)
         return result
+
+    def peo_getinfo(self, id):
+        info = self.people.getyaml(id)
+        for id in info['cv']:
+            if self.curriculumvitae.exists(id):
+                yield self.curriculumvitae.getinfo(id)
+
+    def peo_getmd(self, id):
+        info = self.people.getyaml(id)
+        for id in info['cv']:
+            if self.curriculumvitae.exists(id):
+                yield self.curriculumvitae.getmd(id)
 
     def peo_getyaml(self, id):
         return self.people.getyaml(id)

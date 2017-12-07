@@ -95,11 +95,6 @@ class Message(services.base.kv_storage.KeyValueStorage):
                 origin[key] = info[key]
         return origin
 
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True,
-        mdfile=False, do_commit=True):
-        return super(Message, self).add(bsobj, committer, unique,
-                                        yamlfile, mdfile, do_commit=do_commit)
-
     def _listframe(self, value, userid, date=None):
         if date is None:
             date = time.strftime('%Y-%m-%d %H:%M:%S')

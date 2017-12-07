@@ -22,6 +22,10 @@ import StorageUtil from 'utils/storage';
 import remove from 'lodash/remove';
 import findIndex from 'lodash/findIndex';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 /*
  * 更新confirm列表数据
  * @param  {object} value       表单值
@@ -74,6 +78,7 @@ class Uploader extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeOrigin = this.handleChangeOrigin.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
+    this.handleBeforeUpload = this.handleBeforeUpload.bind(this);
     this.handlePrevClick = this.handlePrevClick.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
     this.handleConfirmClick = this.handleConfirmClick.bind(this);
@@ -193,6 +198,14 @@ class Uploader extends Component {
     });
   }
 
+  handleBeforeUpload(file) {
+    if(this.state.origin) {
+      return true
+    }
+    message.error(language.UPLOAD_NO_ORIGIN);
+    return false;
+  }
+
   handlePrevClick(value) {
     let { currentPreview, confirmList } = this.state;
 
@@ -305,6 +318,7 @@ class Uploader extends Component {
       hint: '支持单文件或多文件上传',
       onChange: this.handleChange,
       onRemove: this.handleRemove,
+      beforeUpload: this.handleBeforeUpload,
     };
 
     return (

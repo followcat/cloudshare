@@ -16,7 +16,6 @@ class UploadPreview extends Component {
       html,
       children
     } = this.props;
-
     return (
       <PreviewWrapper
         actived={currentPreview === index}

@@ -159,6 +159,7 @@ const websiteText = {
     UPLOAD_EXISTED_PROJECTS: '其他项目中已有该简历',
     UPLOAD_EXISTED_PROJECT: '本项目中已有该简历',
     UPLOAD_NO_CONTACT: '简历中联系方式为空',
+    UPLOAD_NO_ORIGIN: '请先选择简历来源！',
 
     FOLD_MSG: '收起所有信息',
     UNFOLD_MSG: '展开所有信息',

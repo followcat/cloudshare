@@ -54,7 +54,13 @@ def filter_gen(filterdict):
 
 def getmappings(esconn, fields, index=None, doctype=None):
     results = dict()
-    mapping = esconn.indices.get_field_mapping(fields=fields, index=index, doc_type=doctype)
+    try:
+        mapping = esconn.indices.get_field_mapping(fields=fields, index=index, doc_type=doctype)
+    except Exception as e:
+        if e.status_code == 404:
+            mapping = {}
+        else:
+            raise e
     for index in mapping:
         for mapid in mapping[index]['mappings']:
             for name in mapping[index]['mappings'][mapid]:

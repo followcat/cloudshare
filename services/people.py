@@ -14,3 +14,7 @@ class People(services.base.kv_storage.KeyValueStorage):
             peopobj.metadata['cv'] = savedobj['cv'] + peopobj.metadata['cv']
         return super(People, self).add(peopobj, committer, unique, kv_file, do_commit=do_commit)
 
+class CVSelector(services.operator.checker.Selector):
+    def selection(self, x):
+        return self.operator_service.getyaml(x)['cv']
+

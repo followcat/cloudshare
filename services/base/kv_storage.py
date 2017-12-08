@@ -68,9 +68,18 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             return data
 
     def updateinfo(self, id, key, value, committer, do_commit=True):
+        assert key not in self.fix_item
         result = None
         if key in [each[0] for each in self.YAML_TEMPLATE]:
-            result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
+            if key in self.list_item:
+                result = self._addinfo(id, key, value, relation,
+                                       committer, do_commit=do_commit)
+            else:
+                result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
+        return result
+
+    def deleteinfo(self, id, msgid, committer, do_commit=True):
+        result = self._deleteinfo(id, msgid, committer, do_commit=do_commit)
         return result
 
     def saveinfo(self, id, info, message, committer, do_commit=True):

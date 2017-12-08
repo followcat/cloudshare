@@ -33,3 +33,7 @@ SVC_CV_INDIV = services.curriculumvitae.CurriculumVitae(PATHS['CV_INDIV'], 'cvin
 SVC_PEO_INDIV = services.people.People(PATHS['PEO_INDIV'], 'peoindividual')
 SVC_MULT_PEO = services.multipeople.MultiPeople([SVC_PEO_REPO, SVC_PEO_STO,
                                                  SVC_PEO_INDIV, SVC_PEO_LIMIT])
+SVC_PEO_CV = services.people.CVSelector(
+                operator_service=services.people.People(PATHS['PEO_REPO'], 'peorepo'),
+                data_service=SVC_MULT_PEO
+                )

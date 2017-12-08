@@ -28,6 +28,23 @@ class Filter(services.operator.facade.Application):
             return super(Filter, self).__getattr__(attr)(*args, **kwargs)
 
 
+class Selector(Filter):
+    """"""
+    def selection(self, x):
+        return x
+
+    def apply_filter(self, *args, **kwargs):
+        id = args[0]
+        attr = kwargs.pop('attr')
+        assert attr.startswith('get')
+        if self.operator_service.exists(id):
+            copied_args = list(args)
+            for selected_id in self.selection(id):
+                copied_args.pop(0)
+                copied_args.insert(0, selected_id)
+                yield super(Filter, self).__getattr__(attr)(*copied_args, **kwargs)
+
+
 class Checker(Filter):
     """ CheckData enforce existence check before execution """
 
@@ -46,3 +63,5 @@ class Checker(Filter):
             self.operator_service.remove(id, committer, do_commit)
             result = True
         return result
+
+

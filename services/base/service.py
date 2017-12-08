@@ -23,8 +23,8 @@ class Service(object):
         else:
             raise Exception("Not support iotype.")
 
-    def backup(self, path):
-        self.interface.backup(path)
+    def backup(self, path, bare=False, git=False):
+        self.interface.backup(path, bare=bare, git=git)
 
     @property
     def name(self):

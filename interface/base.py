@@ -4,6 +4,8 @@ import subprocess
 
 import utils.esquery
 
+import dulwich
+
 
 class NotImplementedInterface(Exception):
     pass
@@ -59,12 +61,15 @@ class Interface(object):
     def delete(self):
         raise NotImplementedInterface
 
-    def backup(self, path, git=False):
-        tar=tarfile.open(os.path.join(path, 'backup.tar.gz'), 'w:gz')
-        for root, dir, files in os.walk(self.path):
-            if git is False and '.git' in root.split('/'):
-                continue
-            for file in files:
-                fullpath=os.path.join(root, file)
-                tar.add(fullpath, arcname=fullpath)
-        tar.close()
+    def backup(self, path, bare=False, git=False):
+        if bare is True and os.path.exists(os.path.join(self.path, '.git')):
+            dulwich.porcelain.clone(self.path, path, bare=True)
+        else:
+            tar=tarfile.open(os.path.join(path, 'backup.tar.gz'), 'w:gz')
+            for root, dir, files in os.walk(self.path):
+                if git is False and '.git' in root.split('/'):
+                    continue
+                for file in files:
+                    fullpath=os.path.join(root, file)
+                    tar.add(fullpath, arcname=fullpath)
+            tar.close()

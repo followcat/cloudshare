@@ -23,7 +23,7 @@ class SearchKeywordAPI(Resource):
         args = self.reqparse.parse_args()
         keyword = args['keyword']
         tokens = self.svc_index.es.indices.analyze(self.svc_index.config['CV_MEM'],
-                                                   analyzer='ik_max_word', text=keyword)
+                                                   analyzer='ik_smart', text=keyword)
         results = dict()
         for each in tokens['tokens']:
             results[each['token']] = 1

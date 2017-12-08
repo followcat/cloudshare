@@ -17,6 +17,7 @@ class Preview extends Component {
       currentPreview,
       origins,
     } = this.props;
+
     return (
       <div>
         {completedList.map((item, index) => {
@@ -26,6 +27,7 @@ class Preview extends Component {
               index={index}
               currentPreview={currentPreview}
               html={item.markdown || item.html}
+              dataSource={item.yaml_info}
             >
               <PreviewTopBar
                 {...this.props}

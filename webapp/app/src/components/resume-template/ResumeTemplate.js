@@ -19,28 +19,35 @@ class ResumeTemplate extends Component {
   }
 
   combine (current,gender,age,education,marital_status) {
-   let a_gender = gender || null,
+   let a_current =  current || null,
+    a_gender = gender || null,
     a_age = age || null,
     a_education = education || null,
     a_marital_status = marital_status || null,
     a_places = null,
     a = [];
-    if(current) {
-      a_places = current.places || null;
+    if(a_current) {
+      a_places = a_current.places || null;
+    } else {
+      a_places = null;
     }
     a.push(a_places,a_gender,a_age,a_education,a_marital_status);
-    return a.filter(item => item!=undefined && item!==null);
+    a = a.filter(item => item!=undefined && item!==null);
+    if(a.length == 0)
+      return null
+    else
+      return a.filter(item => item!=undefined && item!==null);
   }
 
   combines (a) {
-    if(a == {}) {
+    if(typeof a == 'undefined') {
       return null
     }
     if(a.places || a.salary) {
       let places = a.places || null,
           salary = a.salary || null;
       if(places) {
-        places = places.join(',');
+        places = places.join('/');
       }
       if(salary) {
         if(salary.salary || salary.yearly) {
@@ -62,8 +69,10 @@ class ResumeTemplate extends Component {
             email, phone, experience, education_history, self_assessment
             } = this.props.dataSource
     let c_current = this.combines(current),
-        c_expectation = this.combines(expectation);
-
+        c_combine = this.combine(current,gender,age,education,marital_status),
+        c_expectation = this.combines(expectation),
+        c_education_history = parseEducation(education_history),
+        c_experience = parseExperience(experience);
     return (
       <div className={`${this.props.prefixCls}-wrapper`}>
         <div className={`${this.props.prefixCls}`}>
@@ -71,7 +80,10 @@ class ResumeTemplate extends Component {
             <Icon type="user" style={{ fontSize:'25px'}}/>
             <h2>{name}</h2>
             <div className={`${this.props.prefixCls}-content`}>
-              <p>{this.combine(current,gender,age,education,marital_status).join(" | ")}</p>
+              { c_combine?
+              <p>{c_combine.join(" | ")}</p>
+                : null
+              }
               <p>
               { c_current?
               <span>{language.CURRENT}:{c_current}</span>
@@ -91,7 +103,7 @@ class ResumeTemplate extends Component {
               <hr />
             </div>
           </div>
-          {education_history?
+          { c_education_history.length > 0?
           <div className={`${this.props.prefixCls}-education`}>
             <Icon type="edit" style={{ fontSize:'25px'}}/>
             <h2>{language.EDUCATION_HISTORY}</h2>
@@ -107,16 +119,23 @@ class ResumeTemplate extends Component {
             </div>
           </div>
           : null }
-          {experience?
+          { c_experience.length > 0?
           <div className={`${this.props.prefixCls}-position`}>
             <Icon type="tool" style={{ fontSize:'25px'}}/>
             <h2>{language.EXPERIENCE}</h2>
             <div className={`${this.props.prefixCls}-content`}>
-                  {parseExperience(experience).reverse().map((valueItem, index) => {
+                  {c_experience.reverse().map((valueItem, index) => {
+                    if(typeof(experience.position[index].description) != 'undefined')
                     return (
                       <div className='position-item'>
                       <p key={index}>{valueItem.join('  |  ')}</p>
-                      <p>{experience.position[index].description}</p>
+                      <pre>{experience.position[index].description}</pre>
+                      </div>
+                    );
+                  else
+                    return (
+                      <div className='position-item'>
+                      <p key={index}>{valueItem.join('  |  ')}</p>
                       </div>
                     );
                   })}
@@ -142,9 +161,9 @@ class ResumeTemplate extends Component {
                         :null
                       }
                       <p>{language.PROJECT_DESCRIPTION}:
-                      <p className="project-description">{valueItem.description}</p></p>
+                      <pre className="project-description">{valueItem.description}</pre></p>
                       <span>{language.RESPONSIBILITY_DESCRIPTION}:
-                      <p className="project-description">{valueItem.responsibility}</p></span>
+                      <pre className="project-description">{valueItem.responsibility}</pre></span>
                       </div>
                     );
                     })
@@ -160,7 +179,7 @@ class ResumeTemplate extends Component {
             <Icon type="file-text" style={{ fontSize:'25px'}}/>
             <h2>{language.SELF_ASSESSMENT}</h2>
             <div className={`${this.props.prefixCls}-content`}>
-            <p>{self_assessment}</p>
+            <pre>{self_assessment}</pre>
             </div>
             <div className={`${this.props.prefixCls}-hr`}>
               <hr />
@@ -175,6 +194,7 @@ class ResumeTemplate extends Component {
 
 ResumeTemplate.defaultProps = {
   prefixCls: 'cs-resume-template',
+  dataSource: null,
   html: '',
 };
 

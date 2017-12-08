@@ -48,7 +48,7 @@ class Resume extends Component {
       resumeId: '',
       resumeList: [],
       fileList: [],
-      dataSource: {},
+      dataSource: null,
       html: '',
       enHTML: '',
       project: [],
@@ -419,7 +419,10 @@ class Resume extends Component {
                           <Summary dataSource={generateSummary(dataSource)} />
                           <Tabs defaultActiveKey="chinese">
                             <Tabs.TabPane tab="中文" key="chinese">
+                            { dataSource?
                               <ResumeTemplate dataSource={dataSource} />
+                               : null
+                            }
                             </Tabs.TabPane>
                             <Tabs.TabPane tab="原文" key="html">
                               <ResumeContent html={html} />

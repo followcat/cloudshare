@@ -29,6 +29,10 @@ import { generateSummary } from 'utils/summary-generator';
 import remove from 'lodash/remove';
 import findIndex from 'lodash/findIndex';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 /*
  * 更新confirm列表数据
  * @param  {object} value       表单值
@@ -85,6 +89,7 @@ class Uploader extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeOrigin = this.handleChangeOrigin.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
+    this.handleBeforeUpload = this.handleBeforeUpload.bind(this);
     this.handlePrevClick = this.handlePrevClick.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
     this.handleConfirmClick = this.handleConfirmClick.bind(this);
@@ -248,6 +253,14 @@ class Uploader extends Component {
     });
   }
 
+  handleBeforeUpload(file) {
+    if(this.state.origin) {
+      return true
+    }
+    message.error(language.UPLOAD_NO_ORIGIN);
+    return false;
+  }
+
   handlePrevClick(value) {
     let { currentPreview, confirmList } = this.state;
 
@@ -318,7 +331,6 @@ class Uploader extends Component {
       peopleid,
       confirmLoading
     } = this.state;
-
     if (completedList.length > 0) {
       return (
         <Preview
@@ -332,8 +344,7 @@ class Uploader extends Component {
           confirmLoading={confirmLoading}
           onPrevClick={this.handlePrevClick}
           onNextClick={this.handleNextClick}
-          onConfirmClick={this.handleConfirmClick}
-        />
+          onConfirmClick={this.handleConfirmClick}/>
       );
     }
 
@@ -365,8 +376,8 @@ class Uploader extends Component {
       hint: '只支持单文件上传',
       onChange: this.handleChange,
       onRemove: this.handleRemove,
+      beforeUpload: this.handleBeforeUpload,
     };
-
     return (
       <div className="cs-uploader" >
         <Guide />
@@ -390,9 +401,7 @@ class Uploader extends Component {
             fileList: fileList,
             confirmResult: confirmResult
           })}
-          { dataSource ?
-            <div>
-            { (completedList.length==0) ?
+          { dataSource && (completedList.length==0) ?
               <div>
                 <div className="cs-uploader-preview">
                 <Summary dataSource={generateSummary(yaml_info)} />
@@ -410,11 +419,7 @@ class Uploader extends Component {
                   unfoldText="收起"
                 />
               </div>
-              : null
-            } 
-          </div>
-          :
-          null
+            : null
           }
         </ShowCard>
       </div>

@@ -347,11 +347,19 @@ class CompanyConfirmExcelAPI(Resource):
         project = member.getproject(projectname)
         meb_results = member.company_add_excel(datas, committer=user.name)
         results = project.company_add_excel(datas, committer=user.name)
-        for id in results:
-            co_info = project.company_get(id)
-            self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
-                               id, None, co_info)
+        infos = dict()
+        for coid in results:
+            if coid not in infos:
+                if project.company.exists(coid):
+                    infos[coid] = project.company_get(coid)
+                else:
+                    infos[coid] = results[coid][data][0]
+            if results[coid]['success'] is True:
+                co_info = project.company_get(coid)
+                self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+                                   coid, None, co_info)
         return {
             'code': 200,
-            'data': results
+            'data': results,
+            'info': infos
         }

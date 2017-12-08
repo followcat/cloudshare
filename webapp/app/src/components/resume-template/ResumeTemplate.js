@@ -47,7 +47,7 @@ class ResumeTemplate extends Component {
       let places = a.places || null,
           salary = a.salary || null;
       if(places) {
-        places = places.join('/');
+        places = places.join(',');
       }
       if(salary) {
         if(salary.salary || salary.yearly) {
@@ -73,6 +73,7 @@ class ResumeTemplate extends Component {
         c_expectation = this.combines(expectation),
         c_education_history = parseEducation(education_history),
         c_experience = parseExperience(experience);
+        console.log(c_experience);
     return (
       <div className={`${this.props.prefixCls}-wrapper`}>
         <div className={`${this.props.prefixCls}`}>
@@ -86,11 +87,11 @@ class ResumeTemplate extends Component {
               }
               <p>
               { c_current?
-              <span>{language.CURRENT}:{c_current}</span>
+              <span>{language.CURRENT}：{c_current}</span>
                 : null
               }
               { c_expectation?
-              <span>{language.EXPECTATION}:{c_expectation}</span>
+              <span>{language.EXPECTATION}：{c_expectation}</span>
                 : null
               }
               </p>
@@ -110,7 +111,13 @@ class ResumeTemplate extends Component {
             <div className={`${this.props.prefixCls}-content`}>
                   {parseEducation(education_history).map((valueItem, index) => {
                     return (
-                      <p key={index}>{valueItem.join(' | ')}</p>
+                      <p key={index} className='education-item-title'>
+                      {valueItem.map(item => {
+                        return (
+                          <span>{item}</span>
+                          )
+                      })}
+                      </p>
                     );
                   })}
             </div>
@@ -125,17 +132,37 @@ class ResumeTemplate extends Component {
             <h2>{language.EXPERIENCE}</h2>
             <div className={`${this.props.prefixCls}-content`}>
                   {c_experience.reverse().map((valueItem, index) => {
-                    if(typeof(experience.position[index].description) != 'undefined')
+                    if(experience.position.length > 0 && 
+                      typeof(experience.position[index].description) != 'undefined')
                     return (
                       <div className='position-item'>
-                      <p key={index}>{valueItem.join('  |  ')}</p>
+                      <p key={index} className='position-item-title'>
+                        <span>{valueItem[0]}</span>
+                        <span className='position-item-name'>
+                          <strong>{valueItem[2]}</strong>
+                        </span>
+                        <span>
+                        <strong>{valueItem[3]}</strong>
+                        </span>
+                      </p>
+                      <p>{[valueItem[1],valueItem[4]].join('  |  ')}</p>
+                      <p>{language.POSITION_DESCRIPTION}：</p>
                       <pre>{experience.position[index].description}</pre>
                       </div>
                     );
                   else
                     return (
                       <div className='position-item'>
-                      <p key={index}>{valueItem.join('  |  ')}</p>
+                      <p key={index} className='position-item-title'>
+                        <span>{valueItem[0]}</span>
+                        <span className='position-item-name'>
+                          <strong>{valueItem[2]}</strong>
+                        </span>
+                        <span>
+                        <strong>{valueItem[3]}</strong>
+                        </span>
+                      </p>
+                      <p>{[valueItem[1],valueItem[4]].join('  |  ')}</p>
                       </div>
                     );
                   })}
@@ -155,15 +182,21 @@ class ResumeTemplate extends Component {
                     return (
                       <div className={`${this.props.prefixCls}-project-content`}>
                       <span>{valueItem.date_from} - {valueItem.date_to}</span>
-                      <span className="project-company-name">{valueItem.name}</span>
+                      <span className="project-company-name"><strong>{valueItem.name}</strong></span>
                       { valueItem.company ?
-                      <p>{`${language.FROM_COMPANY}:${valueItem.company}`}</p>
+                      <p>{`${language.FROM_COMPANY}：${valueItem.company}`}</p>
                         :null
                       }
-                      <p>{language.PROJECT_DESCRIPTION}:
+                      { valueItem.description ?
+                      <p>{language.PROJECT_DESCRIPTION}：
                       <pre className="project-description">{valueItem.description}</pre></p>
-                      <span>{language.RESPONSIBILITY_DESCRIPTION}:
+                      :null
+                      }
+                      { valueItem.responsibility ?
+                      <span>{language.RESPONSIBILITY_DESCRIPTION}：
                       <pre className="project-description">{valueItem.responsibility}</pre></span>
+                      :null
+                      }
                       </div>
                     );
                     })

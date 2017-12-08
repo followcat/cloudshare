@@ -44,7 +44,7 @@ def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
                      SVC_MEMBERS.allprojects().values()])
     if additionals is not None:
         assert isinstance(additionals, dict)
-        svcdict.update(additionals)
+        svcdict = additionals
     for modelname in modelnames:
         if modelname not in SVC_MIN.sim:
             continue

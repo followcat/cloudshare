@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import baseapp.loader
 from baseapp.datadbs import *
 from baseapp.index import *

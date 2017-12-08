@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { browserHistory } from 'react-router';
 
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 
 import { API } from 'API';
 import { confirmExcelUpload } from 'request/company';
@@ -62,6 +62,8 @@ class Company extends Component {
       fileList: [],
       previewList: [],
       dataSource: [],
+      resinfo: {},
+      resdata: {},
       loading: false,
       uploading: false,
       disabled: true,
@@ -69,6 +71,7 @@ class Company extends Component {
       status: 'ready'
     };
     this.handleChange = this.handleChange.bind(this);
+    this.showFailList = this.showFailList.bind(this);
     this.handleConfirmUpload = this.handleConfirmUpload.bind(this);
   }
 
@@ -101,6 +104,25 @@ class Company extends Component {
     }
   }
 
+  showFailList() {
+    const { resdata, resinfo } = this.state
+    JSON.stringify
+    if(Object.keys(resdata.failed).length > 0) {
+      Modal.error({
+        title: '下列公司上传失败',
+        content:  (
+        <div>
+          {
+            Object.keys(resdata.failed).map(item =>{
+              return(<p>{resinfo[item].name}</p>)
+           })
+          }
+        </div>
+      ),
+      });
+    }
+  }
+
   handleConfirmUpload() {
     this.setState({
       loading: true,
@@ -114,9 +136,10 @@ class Company extends Component {
         message.success(language.UPLOAD_SUCCESS_MSG);
         this.setState({
           loading: false,
-          status: 'done'
-        });
-        
+          status: 'done',
+          resdata: json.data,
+          resinfo: json.info
+        },() => this.showFailList());
         setTimeout(() => {
           browserHistory.push('/pm/company/list');
         }, 1000);

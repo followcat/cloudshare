@@ -59,7 +59,7 @@ class Interface(object):
     def delete(self):
         raise NotImplementedInterface
 
-    def backup(self, path, git=False):
+    def backup(self, path, git=False, **kwargs):
         tar=tarfile.open(os.path.join(path, 'backup.tar.gz'), 'w:gz')
         for root, dir, files in os.walk(self.path):
             if git is False and '.git' in root.split('/'):

@@ -14,13 +14,5 @@ class SimulationCV(services.base.kv_storage.KeyValueStorage):
         ("committer",           str),
     )
 
-    yaml_private_key = {
-        "phone":                '[*****]',
-        "email":                '[*****]',
-        "name":                 '[*****]',
-        "committer":            '[*****]',
-        "origin":               '[*****]'
-    }
-
     list_item = {}
 

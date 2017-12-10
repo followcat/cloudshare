@@ -19,8 +19,17 @@ class CurriculumVitae(services.operator.split.SplitData):
 
     commitinfo = 'CurriculumVitae'
 
+    yaml_private_key = {
+        "phone":                '[*****]',
+        "email":                '[*****]',
+        "name":                 '[*****]',
+        "committer":            '[*****]',
+        "origin":               '[*****]'
+    }
+
     def __init__(self, path, name=None, iotype=None):
         data_service = services.base.kv_storage.KeyValueStorage(path, name, iotype)
+        setattr(data_service, 'yaml_private_key', self.yaml_private_key)
         operator_service = services.base.text_storage.PlainTextStorage(path, name, iotype)
         super(CurriculumVitae, self).__init__(data_service, operator_service)
 

@@ -15,7 +15,9 @@ class Filter(services.operator.facade.Application):
         return self.operator_service.NUMS
 
     def __getattr__(self, attr):
-        if attr.startswith('get'):
+        if attr == 'get_id':
+            return super(Filter, self).get_id
+        elif attr.startswith('get'):
             return functools.partial(self.apply_filter, attr=attr)
         else:
             return super(Filter, self).__getattr__(attr)

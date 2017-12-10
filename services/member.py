@@ -45,13 +45,11 @@ class Member(services.base.service.Service):
         self.projects_path = os.path.join(path, self.PRJ_PATH)
         self.accounts_path = os.path.join(path, self.ACC_PATH)
         self.companies = services.company.Company(self.co_path, name)
-        self.curriculumvitaes = services.secret.Secret(
-                services.operator.checker.Filter(
-                        data_service=services.operator.split.SplitData(
-                            services.simulationcv.SimulationCV(self.cv_path, name, iotype=iotype),
-                            services.operator.multiple.Multiple(cv_repos)),
-                        operator_service=services.simulationcv.SelectionCV(self.cv_path, name, iotype=iotype)
-                        )
+        self.curriculumvitaes = services.secret.Private(
+                data_service=services.operator.split.SplitData(
+                        services.simulationcv.SimulationCV(self.cv_path, name, iotype=iotype),
+                        services.operator.multiple.Multiple(cv_repos)),
+                operator_service=services.simulationcv.SelectionCV(self.cv_path, name, iotype=iotype)
                 )
         self.jobdescriptions = services.operator.checker.Filter(
                 data_service=services.operator.multiple.Multiple(jd_repos),

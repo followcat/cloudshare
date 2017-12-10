@@ -36,6 +36,12 @@ class SplitData(services.operator.facade.Application):
         templateinfo['modifytime'] = max(basetime, templatetime, 0)
         return templateinfo
 
+    def private_keys(self):
+        try:
+            return self.operator_service.private_keys()
+        except AttributeError:
+            return self.data_service.private_keys()
+
     def getmd(self, name):
         return self.operator_service.getmd(name)
 

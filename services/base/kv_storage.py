@@ -17,6 +17,8 @@ class KeyValueStorage(services.base.storage.BaseStorage):
     fix_item = {}
     list_item = {}
 
+    yaml_private_key = {}
+
     def __init__(self, path, name=None, iotype=None):
         self.yamlpath = self.YAML_DIR
         super(KeyValueStorage, self).__init__(os.path.join(path, self.yamlpath), name, iotype=iotype)
@@ -34,6 +36,9 @@ class KeyValueStorage(services.base.storage.BaseStorage):
         for each in self.YAML_TEMPLATE:
             info[each[0]] = each[1]()
         return info
+
+    def private_keys(self):
+        return self.yaml_private_key
 
     def getinfo(self, id):
         info = self.generate_info_template()

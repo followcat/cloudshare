@@ -15,6 +15,10 @@ class CurriculumVitae(services.operator.split.SplitData):
     The service will mix:
         - plain text content from markdown file
         - kv content from *local* yaml file
+
+    This is the only service to use PlainTextStorage. The handling
+    of this case is hardcoded, so that CurriculumVitae behaviour is
+    a bit different from its base class SplitData.
     """
 
     commitinfo = 'CurriculumVitae'
@@ -28,10 +32,13 @@ class CurriculumVitae(services.operator.split.SplitData):
     }
 
     def __init__(self, path, name=None, iotype=None):
-        data_service = services.base.kv_storage.KeyValueStorage(path, name, iotype)
-        setattr(data_service, 'yaml_private_key', self.yaml_private_key)
-        operator_service = services.base.text_storage.PlainTextStorage(path, name, iotype)
+        data_service = services.base.text_storage.PlainTextStorage(path, name, iotype)
+        operator_service = services.base.kv_storage.KeyValueStorage(path, name, iotype)
+        setattr(operator_service, 'yaml_private_key', self.yaml_private_key)
         super(CurriculumVitae, self).__init__(data_service, operator_service)
+
+    def private_keys(self):
+        return self.operator_service.private_keys()
 
     def add_md(self, cvobj, committer=None, do_commit=True):
         return self.add(cvobj, committer, unique=False, kv_file=False, text_file=True, do_commit=do_commit)

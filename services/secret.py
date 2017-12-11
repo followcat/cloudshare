@@ -8,7 +8,7 @@ class Secret(services.operator.facade.Facade):
 
     secrecy_default = True
 
-    def cleanprivate(self, id, source):
+    def clean_plaintext(self, id, source):
         if not source:
             return source
         result = source
@@ -23,16 +23,26 @@ class Secret(services.operator.facade.Facade):
                     result = result.replace(value, hidden+' '*(len(value)-len(hidden)))
         return result
 
+    def clean_keyvalue(self, id, source):
+        source.update(self.service.private_keys())
+        return source
+
+    def cleanprivate(self, id, source):
+        if isinstance(source, dict):
+            return self.clean_keyvalue(id, source)
+        else:
+            return self.clean_plaintext(id, source)
+
     def gethtml(self, id, secrecy=True):
         result = self.service.gethtml(id)
         if secrecy is True and self.secrecy_default:
-            result = self.cleanprivate(id, result)
+            result = self.clean_plaintext(id, result)
         return result
 
     def getmd(self, id, secrecy=True):
         result = self.service.getmd(id)
         if secrecy is True and self.secrecy_default:
-            result = self.cleanprivate(id, result)
+            result = self.clean_plaintext(id, result)
         return result
 
     def getyaml(self, id, secrecy=True):
@@ -40,7 +50,7 @@ class Secret(services.operator.facade.Facade):
         if 'secrecy' not in result:
             result['secrecy'] = False
         if secrecy is True and self.secrecy_default:
-            result.update(self.service.private_keys())
+            result = self.clean_keyvalue(id, result)
         return result
 
 
@@ -59,8 +69,8 @@ class Private(services.operator.checker.Filter):
     Private service is using the operator_service as filter on exists()
         >>> sec = services.secret.Private(
         ...         data_service=services.operator.split.SplitData(
-        ...             services.simulationcv.SimulationCV(aipath, 'aicv'),
-        ...             services.operator.multiple.Multiple([SVC_CV_REPO, SVC_CV_STO])),
+        ...             services.operator.multiple.Multiple([SVC_CV_REPO, SVC_CV_STO]),
+        ...             services.simulationcv.SimulationCV(aipath, 'aicv')),
         ...         operator_service=services.simulationcv.SelectionCV(aipath, 'aicv'))
         >>> existing = '0015a72dad9196506ee820202a011dec2bc017db'
         >>> missing = '00f3ffce388e6175e5e18695892c69d4291a3b56'
@@ -76,8 +86,8 @@ class Private(services.operator.checker.Filter):
         ...         operator_service=services.simulationcv.SelectionCV(aipath, 'aicv'))
         >>> sec = services.secret.Private(
         ...         data_service=services.operator.split.SplitData(
-        ...             services.simulationcv.SimulationCV(aipath, 'aicv'),
-        ...             services.operator.multiple.Multiple([repo, SVC_CV_STO])),
+        ...             services.operator.multiple.Multiple([repo, SVC_CV_STO]),
+        ...             services.simulationcv.SimulationCV(aipath, 'aicv')),
         ...         operator_service=services.simulationcv.SelectionCV(aipath, 'aicv'))
         >>> assert sec.getmd(existing)
         >>> assert not sec.getmd(missing)

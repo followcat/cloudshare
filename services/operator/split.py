@@ -19,8 +19,7 @@ class SplitData(services.operator.facade.Application):
                 basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
             else:
                 baseinfo = {}
-        except AttributeError:
-            # assert type(self.operator_service) == services.base.text_storage.PlainTextStorage
+        except IOError:
             baseinfo = {}
         try:
             # No call to __getattr__ on ancestor class because getyaml() declaration is found here
@@ -30,23 +29,12 @@ class SplitData(services.operator.facade.Application):
                 templatetime = templateinfo['modifytime'] if 'modifytime' in templateinfo else 0
             else:
                 templateinfo = {}
-        except IOError:
+        except AttributeError:
+            # assert type(self.operator_service) == services.base.text_storage.PlainTextStorage
             templateinfo = {}
         templateinfo.update(baseinfo)
         templateinfo['modifytime'] = max(basetime, templatetime, 0)
         return templateinfo
-
-    def private_keys(self):
-        try:
-            return self.operator_service.private_keys()
-        except AttributeError:
-            return self.data_service.private_keys()
-
-    def getmd(self, name):
-        return self.operator_service.getmd(name)
-
-    def search(self, keyword, selected=None):
-        return self.operator_service.search(keyword, selected)
 
     def datas(self):
         for name, text in self.operator_service.datas():

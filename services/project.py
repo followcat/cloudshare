@@ -266,19 +266,38 @@ class Project(services.base.service.Service):
         project_result = set()
         for item in items:
             yamlname = core.outputstorage.ConvertName(item[1]).yaml
+            result = None
+            success = False
             if item[0] == 'companyadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
-                repo_result.add(yamlname)
-                result = self.storageCO.add(baseobj, committer=item[2][-1], do_commit=False)
+                try:
+                    result = self.storageCO.add(baseobj, committer=item[2][-1], do_commit=False)
+                    success = True
+                except Exception:
+                    success = False
+                if success is True:
+                    repo_result.add(yamlname)
             elif item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
-                project_result.add(self.company.ids_file)
-                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
-                result = self.company.add(baseobj, committer=item[2][-1], do_commit=False)
+                try:
+                    result = self.company.add(baseobj, committer=item[2][-1], do_commit=False)
+                    success = True
+                except Exception:
+                    success = False
+                if success is True:
+                    project_result.add(self.company.ids_file)
+                    project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
             elif item[0] == 'listadd':
-                project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
-                result = self.company.updateinfo(*item[2], do_commit=False)
-            results[item[1]] = result
+                try:
+                    result = self.company.updateinfo(*item[2], do_commit=False)
+                    success = True
+                except Exception:
+                    success = False
+                if success is True:
+                    project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+            else:
+                success = False
+            results[item[1]] = {'data': item, 'success': success, 'result': result}
         self.storageCO.interface.do_commit(list(repo_result), committer=committer)
         self.company.interface.do_commit(list(project_result), committer=committer)
         return results
@@ -370,7 +389,7 @@ class Project(services.base.service.Service):
     def peo_deleteyaml(self, id, key, value, username, date):
         return self.people.deleteinfo(id, key, value, username, date)
 
-    def backup(self, path, bare=True):
+    def backup(self, path):
         backup_path = os.path.join(path, self.name)
         project_path = os.path.join(backup_path, 'project')
         cv_path = os.path.join(backup_path, 'curriculumvitae')
@@ -382,8 +401,8 @@ class Project(services.base.service.Service):
         utils.builtin.assure_path_exists(jd_path)
         utils.builtin.assure_path_exists(co_path)
         utils.builtin.assure_path_exists(peo_path)
-        self.interface.backup(project_path, bare=bare)
-        self.curriculumvitae.backup(cv_path, bare=bare)
-        self.jobdescription.backup(jd_path, bare=bare)
-        self.company.backup(co_path, bare=bare)
-        self.people.backup(peo_path, bare=bare)
+        self.interface.backup(project_path, bare=True)
+        self.curriculumvitae.backup(cv_path, bare=True)
+        self.jobdescription.backup(jd_path, bare=True)
+        self.company.backup(co_path, bare=True)
+        self.people.backup(peo_path, bare=True)

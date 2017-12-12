@@ -22,7 +22,7 @@ class UploadOriginsAPI(Resource):
         results = [
                   { "id" : 1, "name" : u"前程无忧", "origin": "default"},
                   { "id" : 2, "name" : u"无忧精英", "origin": "jingying"},
-                  { "id" : 3, "name" : u"智联招聘", "origin": "default"},
+                  { "id" : 3, "name" : u"智联招聘", "origin": "zhilian"},
                   { "id" : 4, "name" : u"智联卓聘", "origin": "zhilian"},
                   { "id" : 5, "name" : u"猎聘", "origin": "liepin"},
                   { "id" : 6, "name" : u"领英", "origin": "default"},
@@ -75,13 +75,15 @@ class UploadCVAPI(Resource):
                         cvobj.metadata[key] = value
                 try:
                     result = self.project.cv_add(cvobj, self.user.name, unique=True)
-                    if result['repo_cv_result']:
-                        md = self.project.cv_getmd(id)
-                        self.svc_index.add(self.svc_index.config['CV_MEM'], self.project.id,
-                                           id, md, cvobj.metadata)
                     if result['project_cv_result']:
-                        result['member_cv_result'] = self.member.cv_add(cvobj, self.user.name,
+                        result['member_cv_result'] = self.member.cv_add(cvobj,
+                                                                        self.user.name,
                                                                         unique=True)
+                        md = self.project.cv_getmd(id)
+                        info = self.project.cv_getyaml(id)
+                        self.svc_index.add(self.svc_index.config['CV_MEM'],
+                                           self.project.id, id, md, info)
+
                         status = 'success'
                         # Add to CV database and project
                         message = '200'
@@ -105,6 +107,7 @@ class UploadCVAPI(Resource):
             self.svc_min.init_sim(self.modelname, self.projectid)
         else:
             self.svc_min.sim[self.modelname][self.projectid].add_documents(names, documents)
+            self.svc_min.sim[self.modelname][self.projectid].save()
         return { 'code': 200, 'data': results }
 
     def post(self):

@@ -89,8 +89,8 @@ class BaseStorage(services.base.service.Service):
     def history(self, author=None, entries=10, skip=0):
         return self.interface.history(author=author, max_commits=entries, skip=skip)
 
-    def backup(self, path, bare=False):
-        self.interface.backup(path, bare=bare)
+    def backup(self, path, **kwargs):
+        self.interface.backup(path, **kwargs)
 
     @property
     def NUMS(self):

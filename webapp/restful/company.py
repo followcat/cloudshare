@@ -1,12 +1,14 @@
 import json
 import math
 
-import core.basedata
-import extractor.information_explorer
 import flask
 import flask.ext.login
-import utils.builtin
+from flask import request
 from flask.ext.restful import Resource, reqparse
+
+import core.basedata
+import extractor.information_explorer
+import utils.builtin
 
 
 class CompanyAPI(Resource):
@@ -23,12 +25,13 @@ class CompanyAPI(Resource):
         self.reqparse.add_argument('introduction', location = 'json')
         super(CompanyAPI, self).__init__()
 
-    def get(self, id):
+    def get(self):
+        args = request.args
         user = flask.ext.login.current_user
-        result = self.svc_co_repo.getyaml(id)
+        result = self.svc_co_repo.getyaml(args['id'])
         return { 'code': 200,'result': result }
 
-    def post(self, id):
+    def post(self):
         result = False
         args = self.reqparse.parse_args()
         coname = args['name']
@@ -346,12 +349,23 @@ class CompanyConfirmExcelAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         meb_results = member.company_add_excel(datas, committer=user.name)
-        results = project.company_add_excel(datas, committer=user.name)
-        for id in results:
-            co_info = project.company_get(id)
-            self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
-                               id, None, co_info)
+        prj_results = project.company_add_excel(datas, committer=user.name)
+        infos = dict()
+        results = { 'success': dict(), 'failed': dict() }
+        for coid in prj_results:
+            if project.company.exists(coid):
+                result_info = project.company_get(coid)
+            else:
+                result_info = prj_results[coid][data][0]
+            infos[coid] = result_info
+            result_key = 'success' if prj_results[coid]['success'] is True else 'failed'
+            results[result_key][coid] = prj_results[coid]
+            if prj_results[coid]['success'] is True:
+                co_info = project.company_get(coid)
+                self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+                                   coid, None, co_info)
         return {
             'code': 200,
-            'data': results
+            'data': results,
+            'info': infos
         }

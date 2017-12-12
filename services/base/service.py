@@ -2,7 +2,7 @@ import core.outputstorage
 
 
 class Service(object):
-    
+
     def get_id(self, name):
         return core.outputstorage.ConvertName(name).base
 

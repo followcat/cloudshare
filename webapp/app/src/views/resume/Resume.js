@@ -5,6 +5,7 @@ import { browserHistory } from 'react-router';
 import { Layout } from 'views/layout';
 
 import ResumeContent from 'components/resume-content';
+import ResumeTemplate from 'components/resume-template';
 import Summary from 'components/summary';
 
 import ResumeHeader from './ResumeHeader';
@@ -47,7 +48,7 @@ class Resume extends Component {
       resumeId: '',
       resumeList: [],
       fileList: [],
-      dataSource: {},
+      dataSource: null,
       html: '',
       enHTML: '',
       project: [],
@@ -379,7 +380,6 @@ class Resume extends Component {
       similar,
       project
     } = this.state;
-
     const uploadProps = {
       name: 'file',
       action: API.UPLOAD_ENGLISH_RESUME_API,
@@ -419,6 +419,12 @@ class Resume extends Component {
                           <Summary dataSource={generateSummary(dataSource)} />
                           <Tabs defaultActiveKey="chinese">
                             <Tabs.TabPane tab="中文" key="chinese">
+                            { dataSource?
+                              <ResumeTemplate dataSource={dataSource} />
+                               : null
+                            }
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab="原文" key="html">
                               <ResumeContent html={html} />
                             </Tabs.TabPane>
                             <Tabs.TabPane

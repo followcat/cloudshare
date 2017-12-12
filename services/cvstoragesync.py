@@ -27,9 +27,9 @@ def update_bydate(yamlinfo, lastdate):
 def generate_md(raw_html):
     return pypandoc.convert(raw_html, 'markdown', format='docbook')
 
-def generate_yaml(md, yamlobj, selected=extractor.information_explorer.upload_selected,
-                  name=None):
-    catchinfo = extractor.information_explorer.catch_selected(md, selected, name=name)
+def generate_yaml(md, yamlobj, selected=extractor.information_explorer.all_selected,
+                  fix_func=None):
+    catchinfo = extractor.information_explorer.catch_selected(md, selected, fix_func=name)
     for key in catchinfo:
         if catchinfo[key] or (selected is not None and key in selected):
             yamlobj[key] = catchinfo[key]
@@ -110,7 +110,7 @@ class CVStorageSync(object):
             return result
         t1 = time.time()
         try:
-            info = generate_yaml(md, raw_yaml_obj, name=dbname)
+            info = generate_yaml(md, raw_yaml_obj, fix_func=dbname)
         except KeyboardInterrupt:
             usetime = time.time() - t1
             self.logger.info((' ').join(["KeyboardInterrupt", logidname,

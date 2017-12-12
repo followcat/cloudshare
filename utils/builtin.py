@@ -83,7 +83,6 @@ def merge(a, b, path=None, update=False):
             elif update is True and b[key]:
                 a[key] = b[key]
             elif b[key] is None or not b[key]:
-                print('Conflict at %s' % '.'.join(path + [str(key)]), str(b[key]))
                 continue
             else:
                 raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))

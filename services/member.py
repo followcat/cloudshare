@@ -148,7 +148,7 @@ class Member(services.base.service.Service):
             if os.path.isdir(path):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
-                tmp_project = services.project.Project(path, [self.companies],
+                tmp_project = services.project.Project(unicode(path, 'utf-8'), [self.companies],
                                                        [self.curriculumvitaes],
                                                        [self.jobdescriptions],
                                                        self.mult_peo, name)
@@ -236,12 +236,13 @@ class Member(services.base.service.Service):
         results = dict()
         member_result = set()
         for item in items:
-            yamlname = core.outputstorage.ConvertName(item[1]).yaml
-            coobj = core.basedata.DataObject(*item[2][:2])
-            member_result.add(self.companies.ids_file)
-            member_result.add(os.path.join(self.companies.YAML_DIR, yamlname))
-            result = self.companies.add(coobj, committer=item[2][-1], do_commit=False)
-            results[item[1]] = result
+            if item[0] == 'projectadd':
+                yamlname = core.outputstorage.ConvertName(item[1]).yaml
+                coobj = core.basedata.DataObject(*item[2][:2])
+                member_result.add(self.companies.ids_file)
+                member_result.add(os.path.join(self.companies.YAML_DIR, yamlname))
+                result = self.companies.add(coobj, committer=item[2][-1], do_commit=False)
+                results[item[1]] = result
         self.companies.interface.do_commit(list(member_result), committer=committer)
         return results
 

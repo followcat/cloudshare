@@ -16,6 +16,7 @@ from webapp.restful.feature import *
 from webapp.restful.session import *
 from webapp.restful.bookmark import *
 from webapp.restful.databases import *
+from webapp.restful.highlight import *
 
 def initialize(app):
     api = flask.ext.restful.Api(app)
@@ -32,7 +33,7 @@ def initialize(app):
 
     api.add_resource(BookmarkAPI, '/api/accounts/<string:name>/bookmark')
 
-    api.add_resource(CompanyAPI, '/api/company/<string:id>', endpoint = 'company')
+    api.add_resource(CompanyAPI, '/api/company', endpoint = 'company')
     api.add_resource(CompanyAllAPI, '/api/companyall', endpoint = 'companyall')
     api.add_resource(AddedCompanyListAPI, '/api/addedcompanylist', endpoint = 'adddedcompanylist')
     api.add_resource(CompanyUploadExcelAPI, '/api/couploadexcel',
@@ -95,6 +96,9 @@ def initialize(app):
     api.add_resource(POSmathAPI, '/api/mining/posmatch', endpoint = 'posmatch')
     api.add_resource(PRJmathAPI, '/api/mining/prjmatch', endpoint = 'prjmatch')
     api.add_resource(CompanyProjectAPI, '/api/mining/coprjsearch', endpoint = 'coprjsearch')
+
+    api.add_resource(SearchKeywordAPI, '/api/highlight/search', endpoint = 'searchkeyword')
+    api.add_resource(LsiSustainCVByJDAPI, '/api/highlight/lsicvjd', endpoint = 'lsisustaincvbyjd')
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
 

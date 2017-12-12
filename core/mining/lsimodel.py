@@ -24,6 +24,8 @@ class LSImodel(object):
     corpus_path = 'corpus'
     corpus_suffix = 'corpus'
 
+    topicswords_percentage = 0.1
+
 
     def __init__(self, name, savepath, no_above=1./1, topics=100, extra_samples=300,
                  power_iters=6, dict_range=40000,
@@ -31,6 +33,7 @@ class LSImodel(object):
         if config is None:
             config = {}
         self._ids = set()
+        self._topicsinfo = None
         self.name = name
         self.path = savepath
         self.corpus_path = os.path.join(savepath, self.corpus_path)
@@ -405,6 +408,16 @@ class LSImodel(object):
     @ids.setter
     def ids(self, value):
         self._ids.update(set(value))
+
+    @property
+    def topicsinfo(self):
+        if self._topicsinfo is None:
+            self._topicsinfo = list()
+            for topic in self.lsi.show_topics(num_words=int(self.lsi.num_terms*
+                                                            self.topicswords_percentage),
+                                              formatted=False):
+                self._topicsinfo.append(topic[1])
+        return self._topicsinfo
 
 
 def tf_cal(term_freq):

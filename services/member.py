@@ -47,8 +47,8 @@ class Member(services.base.service.Service):
         self.companies = services.company.Company(self.co_path, name)
         self.curriculumvitaes = services.secret.Private(
                 data_service=services.operator.split.SplitData(
-                        services.simulationcv.SimulationCV(self.cv_path, name, iotype=iotype),
-                        services.operator.multiple.Multiple(cv_repos)),
+                        services.operator.multiple.Multiple(cv_repos),
+                        services.simulationcv.SimulationCV(self.cv_path, name, iotype=iotype)),
                 operator_service=services.simulationcv.SelectionCV(self.cv_path, name, iotype=iotype)
                 )
         self.jobdescriptions = services.operator.checker.Filter(

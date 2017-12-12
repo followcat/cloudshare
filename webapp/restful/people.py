@@ -81,7 +81,7 @@ class PeopleByCVAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        yamlinfo = project.cv_getyaml(cv_id)
+        yamlinfo = member.curriculumvitaes.getyaml(cv_id)
         try:
             unique_id = yamlinfo['unique_id']
         except KeyError:

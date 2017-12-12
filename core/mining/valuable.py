@@ -13,9 +13,9 @@ from extractor.utils_parsing import *
 EDUCATION_REQUIREMENT = re.compile(ur'[\d .]*(?P<education>.{2})(?=[及或以上]{0,3}学历)')
 
 
-def rate(name_list, miner, project, doc, top, uses=None, education_req=True):
+def rate(name_list, miner, modelname, member, doc, top, uses=None, education_req=True):
     result = []
-    rating = next(name_list, miner, project, doc, top, project.modelname,
+    rating = next(name_list, miner, member, doc, top, project.modelname,
                   uses=uses, education_req=education_req)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]
@@ -47,7 +47,7 @@ def extract(datas):
         result.append((i, d[0].split('.')[0], d[1]))
     return result
 
-def next(name_list, miner, project, doc, top, basemodel, minimum=10000,
+def next(name_list, miner, member, doc, top, basemodel, minimum=10000,
          uses=None, education_req=True):
     rating = []
     extract_data_full = []
@@ -59,7 +59,7 @@ def next(name_list, miner, project, doc, top, basemodel, minimum=10000,
             continue
         education_requirement = EDUCATION_REQUIREMENT.match(text)
         if education_req and education_requirement:
-            total_point = mine_education(project,
+            total_point = mine_education(member,
                 education_requirement.group('education'), name_list)
         else:
             value_res = miner.minelist(text, name_list, basemodel)
@@ -91,12 +91,12 @@ def rankvalue(rank, total):
         rankvalue = float(total - rank)/botstandard*0.2
     return rankvalue
 
-def mine_education(projcet, text, name_list):
+def mine_education(member, text, name_list):
     assert text
     assert name_list
     datas = []
     for name in name_list:
-        education = education_rate(projcet.cv_getyaml(name)['education'])
+        education = education_rate(member.curriculumvitaes.getyaml(name)['education'])
         req = education_rate(text)
         if education and req:
             datas.append((name, str((5 + education - req)*0.1)))

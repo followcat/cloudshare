@@ -79,8 +79,8 @@ class UploadCVAPI(Resource):
                         result['member_cv_result'] = self.member.cv_add(cvobj,
                                                                         self.user.name,
                                                                         unique=True)
-                        md = self.project.cv_getmd(id)
-                        info = self.project.cv_getyaml(id)
+                        md = self.member.curriculumvitaes.getmd(id)
+                        info = self.member.curriculumvitaes.getyaml(id)
                         self.svc_index.add(self.svc_index.config['CV_MEM'],
                                            self.project.id, id, md, info)
 
@@ -212,7 +212,7 @@ class UploadEnglishCVAPI(Resource):
         dataobj = uploadeng[user.name]['CV']
         result = project.cv_add_eng(id, dataobj, user.name)
         uploadeng[user.name] = None
-        en_html = project.cv_getmd_en(id)
+        en_html = member.curriculumvitaes.getmd_en(id)
         return { 'code': 200, 'data': { 'status': result, 'en_html': en_html } }
 
     def post(self):

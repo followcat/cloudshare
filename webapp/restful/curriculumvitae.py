@@ -37,9 +37,9 @@ class CurrivulumvitaeAPI(Resource):
         yaml['date'] = utils.builtin.strftime(yaml['date'])
         cv_projects = member.cv_projects(id)
         en_html = ''
-        html = project.cv_gethtml(id)
+        html = member.curriculumvitaes.gethtml(id)
         if 'enversion' in yaml:
-            en_html = project.cv_getmd_en(id)
+            en_html = member.curriculumvitaes.getmd_en(id)
         return { 'code': 200, 'data': { 'html': html, 'en_html': en_html,
                                         'yaml_info': yaml, 'projects': cv_projects } }
 
@@ -103,18 +103,17 @@ class SearchCVbyTextAPI(Resource):
         doctype = [p.id for p in member.projects.values()]
         filterdict['content'] = text
         total, searchs = self.svc_index.search(index=index, doctype=doctype,
-                                        filterdict=filterdict, source=True,
+                                        filterdict=filterdict, source=False,
                                         kwargs={'_source_exclude': ['content']},
                                         start=(cur_page-1)*count, size=count)
         pages = int(math.ceil(float(total)/count))
         datas = list()
         for item in searchs:
-            yaml_info = item['_source']
-            project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
+            id = item['_id']
+            yaml_info = member.curriculumvitaes.getyaml(id)
             info = {
                 'author': yaml_info['committer'],
-                'time': datetime.datetime.strptime(yaml_info['date'],
-                                                   '%Y%m%d').strftime('%Y-%m-%d')
+                'time': utils.builtin.strftime(yaml_info['date']),
             }
             datas.append({ 'cv_id': yaml_info['id'],
                            'yaml_info': yaml_info,

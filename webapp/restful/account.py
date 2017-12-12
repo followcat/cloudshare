@@ -175,7 +175,7 @@ class AccountHistoryAPI(Resource):
         for info in info_list:
             for md5 in info['filenames']:
                 try:
-                    info['information'] = member.getproject(project).cv_getyaml(id)
+                    info['information'] = member.curriculumvitaes.getyaml(id)
                 except IOError:
                     info['information'] = md5
                 info['name'] = md5

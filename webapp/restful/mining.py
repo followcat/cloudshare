@@ -58,7 +58,7 @@ class PositionAPI(BaseAPI):
         for id in searches[:self.numbers]:
             positions = []
             try:
-                yaml_data = project.cv_getyaml(id)
+                yaml_data = member.curriculumvitaes.getyaml(id)
             except IOError:
                 continue
             if 'position' in yaml_data['experience']:
@@ -83,12 +83,10 @@ class RegionAPI(BaseAPI):
     def get(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         result = []
         for id in args['md_ids'][:self.numbers]:
-            stream = project.cv_getmd(id)
+            stream = member.curriculumvitaes.getmd(id)
             result.append(core.mining.info.region(stream))
         return { 'result': result }
 
@@ -98,12 +96,10 @@ class CapacityAPI(BaseAPI):
     def get(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         result = []
         for id in args['md_ids'][:self.numbers]:
-            stream = project.cv_getmd(id)
+            stream = member.curriculumvitaes.getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return { 'result': result }
 
@@ -113,15 +109,13 @@ class AbilityAPI(BaseAPI):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         result = []
         for id in args['md_ids']:
             month = 0
             doclen = 0
             actpoint = 0
-            stream = project.cv_getmd(id)
+            stream = member.curriculumvitaes.getmd(id)
             capacitys = core.mining.info.capacity(stream)
             if not capacitys:
                 doclen = 100000
@@ -139,12 +133,10 @@ class ExperienceAPI(BaseAPI):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         result = []
         for id in args['md_ids']:
-            stream = project.cv_getmd(id)
+            stream = member.curriculumvitaes.getmd(id)
             capacitys = core.mining.info.capacity(stream)
             month = 0
             actpoint = 0
@@ -204,17 +196,16 @@ class LSIbaseAPI(Resource):
                                                kwargs={'sort': sort,
                                                        '_source_exclude': ['content']},
                                                start=(cur_page-1)*size, size=size,
-                                               source=True)
+                                               source=False)
         pages = int(math.ceil(float(totals)/size))
         result_dict = dict(result)
         datas = list()
         for item in searchs:
-            yaml_info = item['_source']
-            project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
+            id = item['_id']
+            yaml_info = member.curriculumvitaes.getyaml(id)
             info = {
                 'author': yaml_info['committer'],
-                'time': datetime.datetime.strptime(yaml_info['date'], 
-                                                   '%Y%m%d').strftime('%Y-%m-%d'),
+                'time': utils.builtin.strftime(yaml_info['date']),
                 'match': result_dict[yaml_info['id']]
             }
             datas.append({ 'cv_id': yaml_info['id'],
@@ -268,7 +259,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
 
-    def fromcache(self, project, filterdict, threshold, numbers, cache=True):
+    def fromcache(self, member, project, filterdict, threshold, numbers, cache=True):
         date = int(time.strftime('%Y%m%d',time.localtime(time.time())))
         projectname = project.name
         if cache is True:
@@ -293,7 +284,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                                               size=numbers, onlyid=True)
             for cv in bestjds[jdid]:
                 if cv[0] in searchids:
-                    cvinfo = project.cv_getyaml(cv[0])
+                    cvinfo = member.curriculumvitaes.getyaml(cv[0])
                     cvinfo['CVvalue'] = cv[1]
                     output['CV'].append(cvinfo)
             if not output['CV']:
@@ -336,7 +327,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         results = list()
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        alls = self.fromcache(project, filterdict, threshold, numbers, cache=fromcache)
+        alls = self.fromcache(member, project, filterdict, threshold, numbers, cache=fromcache)
         for jdid in alls:
             results.append({'ID': jdid, 'name': alls[jdid]['name'],
                             'company': alls[jdid]['company'],
@@ -363,7 +354,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        doc = project.cv_getmd(id)
+        doc = member.curriculumvitaes.getmd(id)
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
@@ -414,7 +405,7 @@ class SimilarAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        doc = project.cv_getmd(id)
+        doc = member.curriculumvitaes.getmd(id)
         top = 0
         datas = []
         for name, score in self.miner.probability(project.modelname, doc,
@@ -423,7 +414,7 @@ class SimilarAPI(Resource):
                 continue
             if float(score) < 0.8 or top==5:
                 break
-            yaml_info = project.cv_getyaml(name)
+            yaml_info = member.curriculumvitaes.getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
             top += 1
         return { 'code': 200, 'data': datas }
@@ -441,12 +432,12 @@ class ValuablebaseAPI(Resource):
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
 
-    def _get(self, doc, project):
+    def _get(self, doc, member, modelname):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
-        result = core.mining.valuable.rate(name_list, self.miner, project, doc, self.top)
+        result = core.mining.valuable.rate(name_list, self.miner, modelname, member, doc, self.top)
         response = dict()
         datas = []
         for index in result:
@@ -455,7 +446,7 @@ class ValuablebaseAPI(Resource):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = project.cv_getyaml(name+'.yaml')
+                yaml_data = member.curriculumvitaes.getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
                 values.append({ 'match': match_item[1],
                                 'id': yaml_data['id'],
@@ -485,7 +476,7 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
         project = member.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
-        result = self._get(doc, project)
+        result = self._get(doc, member, project.modelname)
         return { 'code': 200, 'data': result }
 
 class ValuablebydocAPI(ValuablebaseAPI):
@@ -496,10 +487,13 @@ class ValuablebydocAPI(ValuablebaseAPI):
         self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
+        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         doc = args['doc']
         projectname = args['project']
-        result = self._get(doc, projectname)
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        result = self._get(doc, member, project.modelname)
         return { 'result': result }
 
 
@@ -524,5 +518,5 @@ class ValuableAPI(ValuablebaseAPI):
             doc = jd_yaml['description']
         elif args['doc']:
             doc = args['doc']
-        result = self._get(doc, project)
+        result = self._get(doc, member, project.modelname)
         return { 'code': 200, 'data': result }

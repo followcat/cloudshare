@@ -71,7 +71,7 @@ class GitInterface(interface.base.Interface):
             commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
         return commit_id
 
-    def add(self, filename, filedata, message=None, committer=None, do_commit=True):
+    def add(self, filename, stream, message=None, committer=None, do_commit=True):
         """
             >>> import shutil
             >>> import interface.gitinterface
@@ -92,7 +92,7 @@ class GitInterface(interface.base.Interface):
         if not os.path.exists(path):
             os.makedirs(path)
         with open(full_path, 'w') as fp:
-            fp.write(filedata)
+            fp.write(stream)
         if do_commit is True:
             self.repo.stage(filename)
             commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))

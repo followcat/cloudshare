@@ -106,10 +106,10 @@ class BaseFSInterface(interface.base.Interface):
     def do_commit(self, filenames, message=None, committer=None):
         return ''
 
-    def add(self, filepath, filedate, message=None, committer=None, do_commit=True):
+    def add(self, filepath, stream, message=None, committer=None, do_commit=True):
         path = os.path.join(self.path, filepath)
         with open(path, 'w') as f:
-            f.write(filedate)
+            f.write(stream)
         return True
 
     def delete(self, filepath, message=None, committer=None, do_commit=True):

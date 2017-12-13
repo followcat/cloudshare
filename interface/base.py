@@ -23,13 +23,13 @@ class Interface(object):
     def getraw(self, filename):
         raise NotImplementedInterface
 
-    def add(self, filename, filedata):
+    def add(self, filename, stream):
         raise NotImplementedInterface
 
     def exists(self, filename):
         raise NotImplementedInterface
 
-    def modify(self, filename, filedata):
+    def modify(self, filename, stream):
         raise NotImplementedInterface
 
     def lsfiles(self):

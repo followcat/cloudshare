@@ -42,7 +42,10 @@ class KeyValueStorage(services.base.storage.BaseStorage):
 
     def getinfo(self, id):
         info = self.generate_info_template()
-        info.update(self.getyaml(id))
+        try:
+            info.update(self.getyaml(id))
+        except IOError:
+            pass
         return info
 
     def _modifyinfo(self, id, key, value, committer, do_commit=True):
@@ -100,12 +103,12 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
-            self.interface.modify(name, dumpinfo,
+            result = self.interface.modify(name, dumpinfo,
                                   message=message, committer=committer, do_commit=do_commit)
-            result = True
         return result
 
     def add(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
+        result = False
         if unique is True and self.unique(bsobj) is False:
             self.info = "Exists File"
             return False
@@ -114,9 +117,14 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             if committer is not None:
                 bsobj.metadata['committer'] = committer
             message = "Add %s: %s metadata." % (self.commitinfo, name)
-            return self.saveinfo(name, bsobj.metadata,
-                            message, committer, do_commit)
-        return True
+            name = core.outputstorage.ConvertName(bsobj.name).yaml
+            saveinfo = {'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}
+            saveinfo.update(bsobj.metadata)
+            dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
+                                 allow_unicode=True, default_flow_style=False)
+            result = self.interface.add(name, dumpinfo,
+                            message, committer, do_commit=do_commit)
+        return result
 
     def remove(self, id, committer=None, do_commit=True):
         name = core.outputstorage.ConvertName(id).yaml

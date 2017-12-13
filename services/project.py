@@ -37,21 +37,21 @@ class Project(services.base.service.Service):
 
         self.company = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    services.simulationco.SimulationCO(copath, name, iotype=iotype),
-                    services.operator.multiple.Multiple(corepos)),
+                    data_service=services.operator.multiple.Multiple(corepos),
+                    operator_service=services.simulationco.SimulationCO(copath, name, iotype=iotype)),
                 operator_service=services.simulationco.SelectionCO(copath, name, iotype=iotype))
         self.curriculumvitae = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    services.simulationcv.SimulationCV(cvpath, name, iotype=iotype),
-                    services.operator.multiple.Multiple(cvrepos)),
+                    data_service=services.operator.multiple.Multiple(cvrepos),
+                    operator_service=services.simulationcv.SimulationCV(cvpath, name, iotype=iotype)),
                 operator_service=services.simulationcv.SelectionCV(cvpath, name, iotype=iotype))
         self.jobdescription = services.operator.checker.Filter(
                 data_service=services.operator.multiple.Multiple(jdrepos),
                 operator_service=services.base.name_storage.NameStorage(jdpath, name, iotype=iotype))
         self.people = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    services.simulationpeo.SimulationPEO(peopath, name, iotype=iotype),
-                    services.multipeople.MultiPeople(svcpeos)),
+                    data_service=services.multipeople.MultiPeople(svcpeos),
+                    operator_service=services.simulationpeo.SimulationPEO(peopath, name, iotype=iotype)),
                 operator_service=services.base.name_storage.NameStorage(peopath, name, iotype=iotype))
         self.config_service = services.base.kv_storage.KeyValueStorage(path, name, iotype=iotype)
         self.config = dict()

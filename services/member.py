@@ -47,8 +47,8 @@ class Member(services.base.service.Service):
         self.companies = services.company.Company(self.co_path, name)
         self.curriculumvitaes = services.secret.Private(
                 data_service=services.operator.split.SplitData(
-                        services.operator.multiple.Multiple(cv_repos),
-                        services.simulationcv.SimulationCV(self.cv_path, name, iotype=iotype)),
+                        data_service=services.operator.multiple.Multiple(cv_repos),
+                        operator_service=services.simulationcv.SimulationCV(self.cv_path, name, iotype=iotype)),
                 operator_service=services.simulationcv.SelectionCV(self.cv_path, name, iotype=iotype)
                 )
         self.jobdescriptions = services.operator.checker.Filter(
@@ -84,8 +84,8 @@ class Member(services.base.service.Service):
         self.load_projects()
         self.accounts = services.operator.checker.Checker(
                 data_service=services.operator.split.SplitData(
-                    services.simulationacc.SimulationACC(self.accounts_path, self.name),
-                    services.operator.multiple.Multiple(self.acc_repos)),
+                    data_service=services.operator.multiple.Multiple(self.acc_repos),
+                    operator_service=services.simulationacc.SimulationACC(self.accounts_path, self.name)),
                 operator_service=services.simulationacc.SelectionACC(self.accounts_path, self.name))
 
     def use(self, id):

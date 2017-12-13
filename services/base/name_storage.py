@@ -18,13 +18,12 @@ class NameStorage(services.base.storage.BaseStorage):
 
     @property
     def ids(self):
-        try:
-            return self._ids
-        except AttributeError:
+        if not hasattr(self, '_ids'):
             try:
-                return set(ujson.loads(self.interface.get(self.ids_file)))
+                self._ids = set(ujson.loads(self.interface.get(self.ids_file)))
             except IOError:
                 return super(NameStorage, self).ids
+        return self._ids
 
     def saveids(self):
         self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))

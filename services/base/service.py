@@ -8,10 +8,9 @@ class Service(object):
 
     @property
     def ids(self):
-        try:
-            return self._ids
-        except AttributeError:
-            return set()
+        if not hasattr(self, '_ids'):
+            self._ids = set()
+        return self._ids
 
     def names(self):
         for id in self.ids:

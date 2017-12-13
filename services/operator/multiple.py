@@ -6,7 +6,7 @@ import services.base.service
 class Multiple(services.base.service.Service):
     """"""
     combine_all = ()
-    match_any = ('exists', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys')
+    match_any = ('exists', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys', 'add')
 
     def __init__(self, services):
         assert services
@@ -31,9 +31,7 @@ class Multiple(services.base.service.Service):
             return self._ids
 
     def __getattr__(self, attr):
-        if attr == '_ids':
-            raise AttributeError()
-        elif attr == 'get_id':
+        if attr == 'get_id':
             super(Multiple, self).get_id
         elif attr in self.match_any_partial:
             return self.match_any_partial[attr]

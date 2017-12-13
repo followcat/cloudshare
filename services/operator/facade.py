@@ -16,9 +16,7 @@ class Facade(services.base.service.Service):
             return self.data_service.ids
 
     def __getattr__(self, attr):
-        if attr == '_ids':
-            raise AttributeError()
-        elif attr == 'get_id':
+        if attr == 'get_id':
             return super(Facade, self).get_id
         else:
             return getattr(self.data_service, attr)

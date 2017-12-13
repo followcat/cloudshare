@@ -112,7 +112,7 @@ class Project(services.base.service.Service):
                         result = each
                         break
             elif cvrepo.name == servicename:
-                result = each
+                result = cvrepo
             if result is not None:
                 break
         return result
@@ -128,7 +128,7 @@ class Project(services.base.service.Service):
                         result = each
                         break
             elif jdrepo.name == servicename:
-                result = each
+                result = jdrepo
             if result is not None:
                 break
         return result

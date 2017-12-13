@@ -40,14 +40,17 @@ class Multiple(services.base.service.Service):
         raise AttributeError()
 
     def do_match_any(self, *args, **kwargs):
+        res = False
         attr = kwargs.pop('attr')
         for service in self.services:
             try:
-                return getattr(service, attr)(*args, **kwargs)
+                res = getattr(service, attr)(*args, **kwargs)
+                break
             except IOError:
                 continue
             except AttributeError:
                 continue
+        return res
 
     def do_combine_all(self, *args, **kwargs):
         results = list()

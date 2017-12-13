@@ -31,6 +31,12 @@ class Filter(services.operator.facade.Application):
         if self.operator_service.exists(id):
             return super(Filter, self).__getattr__(attr)(*args, **kwargs)
 
+    def add(self, *args, **kwargs):
+        res = self.data_service.add(*args, **kwargs)
+        if res:
+            res = self.operator_service.add(*args, **kwargs)
+        return res
+
 
 class Selector(Filter):
     """"""

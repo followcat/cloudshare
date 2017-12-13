@@ -123,7 +123,7 @@ class Member(services.base.service.Service):
     def storageCV(self):
         result = None
         servicename = self.config['storageCV']
-        for cvrepo in self.cvrepos:
+        for cvrepo in self.cv_repos:
             if isinstance(cvrepo, services.simulationcv.SimulationCV):
                 for each in cvrepo.storages:
                     if each.name == servicename:
@@ -149,7 +149,7 @@ class Member(services.base.service.Service):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
                 tmp_project = services.project.Project(unicode(path, 'utf-8'), [self.companies],
-                                                       [self.curriculumvitaes],
+                                                       self.cv_repos,
                                                        [self.jobdescriptions],
                                                        self.mult_peo, name)
                 tmp_project.setup(config={'id':         utils.builtin.hash(self.name+name),
@@ -181,7 +181,7 @@ class Member(services.base.service.Service):
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
             tmp_project = services.project.Project(path, [self.companies],
-                                                   [self.curriculumvitaes],
+                                                   self.cv_repos,
                                                    [self.jobdescriptions],
                                                    self.mult_peo, name)
             tmp_project.setup(config={'id':           utils.builtin.hash(self.name+name),

@@ -99,7 +99,7 @@ class SearchResultBox extends Component {
 }
 
 SearchResultBox.defaultProps = {
-  prefixCls: 'cs-search-result'
+  prefixCls: 'cs-jd-search-result'
 };
 
 SearchResultBox.propTypes = {

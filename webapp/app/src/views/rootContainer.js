@@ -50,6 +50,8 @@ const rootRoute = {
             replace({ pathname: 'prouploader' });
            }
         })
+      else
+        promise.then((data) =>{})
     } else if (pathname == '/') replace({ pathname: 'index' });
   },
   childRoutes: [

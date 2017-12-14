@@ -57,7 +57,6 @@ class CompanyList extends Component {
     this.updateDataSource = this.updateDataSource.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getDataSourceBySearch = this.getDataSourceBySearch.bind(this);
-    this.getCustomerDataSource = this.getCustomerDataSource.bind(this);
   }
 
   componentDidMount() {
@@ -65,7 +64,6 @@ class CompanyList extends Component {
           pageSize = this.state.pageSize;
 
     this.getDataSource(current, pageSize);
-    this.getCustomerDataSource();
   }
 
   handleShowSizeChange(current, pageSize) {
@@ -256,17 +254,6 @@ class CompanyList extends Component {
           dataSource: json.data,
           total: json.total,
           loading: false
-        });
-      }
-    });
-  }
-
-  getCustomerDataSource() {
-    getCustomerList(json => {
-      if (json.code === 200) {
-        let idList = json.data.map(v => v.id);
-        this.setState({
-          customerIDList: idList
         });
       }
     });

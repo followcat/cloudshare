@@ -1,4 +1,4 @@
-@csSearchResultPrefixCls: cs-search-result;
+@csSearchResultPrefixCls: cs-jd-search-result;
 
 .@{csSearchResultPrefixCls} {
   max-width: 1080px;
@@ -36,13 +36,18 @@
       text-overflow: ellipsis;
     }
 
+    .name {
+      text-align: left;
+      padding-left: 55px;
+      }
+
     .basic-info {
       text-align: center;
       padding-top: 12px;
       padding-bottom: 12px;
     }
     
-    .extend-info {
+    & .extend-info {
       background-color: #fff;
       padding: 10px 55px;
       border-top: 1px #c2c2c2 dashed;

@@ -99,17 +99,16 @@ yaml.SafeDumper = utils._yaml.SafeDumper
 
 import extractor.information_explorer
 
-def get_explorer_name(svc_cv, yamlname):
-    obj = svc_cv.getyaml(yamlname)
-    explorer_name = svc_cv.name
+def get_explorer_name(obj):
+    explorer_name = 'default'
     try:
-        if obj['origin'] == u'无忧精英爬取':
+        if obj['origin'] in [u'无忧精英爬取', u'51job', u'前程无忧', u'无忧精英']:
             explorer_name = 'jingying'
-        elif obj['origin'] == u'智联卓聘爬取':
+        elif obj['origin'] in [u'智联卓聘爬取', u'智联卓聘', u'智联招聘']:
             explorer_name = 'zhilian'
-        elif obj['origin'] == u'中华英才爬取':
+        elif obj['origin'] in [u'中华英才爬取', u'英才网',]:
             explorer_name = 'yingcai'
-        elif obj['origin'] == u'猎聘爬取':
+        elif obj['origin'] in [u'猎聘爬取', u'猎聘网', u'猎聘']:
             explorer_name = 'liepin'
     except TypeError:
         pass
@@ -120,7 +119,7 @@ def get_explorer_name(svc_cv, yamlname):
 def update_selected(svc_cv, yamlname, selected, as_date=None, timing=False):
     obj = svc_cv.getyaml(yamlname)
     yamlpathfile = os.path.join(svc_cv.path, core.outputstorage.ConvertName(yamlname).yaml)
-    explorer_name = get_explorer_name(svc_cv, yamlname)
+    explorer_name = get_explorer_name(obj)
 
     info = extractor.information_explorer.catch_selected(svc_cv.getmd(yamlname),
                                                          selected,

@@ -268,48 +268,11 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
 
-    def fromcache(self, project, filterdict, threshold, numbers, cache=True):
-        date = int(time.strftime('%Y%m%d',time.localtime(time.time())))
-        projectname = project.name
-        if cache is True:
-            if projectname not in self.cache:
-                bestjds = self.findbest(project, threshold)
-                self.cache[projectname] = (date, bestjds)
-            elif self.cache[projectname][0] < date:
-                bestjds = self.findbest(project, threshold)
-                self.cache[projectname] = (date, bestjds)
-            else:
-                bestjds = self.cache[projectname][1]
-        else:
-            bestjds = self.findbest(project, threshold)
+    def findbest(self, project, filterdict, threshold, numbers):
         results = dict()
         index = self.svc_index.config['CV_MEM']
-        for jdid in bestjds:
-            output = {}
-            output['CV'] = list()
-            bestids = [cv[0] for cv in bestjds[jdid]]
-            searchids = self.svc_index.search(index=index, doctype=[project.id],
-                                              filterdict=filterdict, ids=bestids,
-                                              size=numbers, onlyid=True)
-            for cv in bestjds[jdid]:
-                if cv[0] in searchids:
-                    cvinfo = project.cv_getyaml(cv[0])
-                    cvinfo['CVvalue'] = cv[1]
-                    output['CV'].append(cvinfo)
-            if not output['CV']:
-                continue
-            jd = project.jd_get(jdid)
-            output['id'] = jdid
-            output['name'] = jd['name']
-            output['description'] = jd['description']
-            output['company'] = project.company_get(jd['company'])['name']
-            results[jdid] = output
-        return results
-
-    def findbest(self, project, threshold=None):
-        if threshold is None:
-            threshold = 0.8
-        results = {}
+        searchids = self.svc_index.search(index=index, doctype=[project.id],
+                                          filterdict=filterdict, onlyid=True)
         for jd_id, jd in project.jobdescription.datas():
             try:
                 if jd['status'] == 'Closed':
@@ -318,25 +281,32 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 continue
             doc = jd['description']
             doc += jd['commentary']
-            result = self.miner.probability(project.modelname, doc,
-                                            top=0.01, minimum=3000)
-            if result:
-                candidates = filter(lambda x: float(x[1])>float(threshold), result)
-                results[jd['id']] = candidates
+            result = self.miner.probability_by_ids(project.modelname, doc, searchids, top=numbers)
+            output = { 'CV': list() }
+            for each in result:
+                if each[1] > threshold:
+                    cvinfo = project.cv_getyaml(each[0])
+                    cvinfo['CVvalue'] = each[1]
+                    output['CV'].append(cvinfo)
+            if output['CV']:
+                output['id'] = jd_id
+                output['name'] = jd['name']
+                output['description'] = jd['description']
+                output['company'] = project.company_get(jd['company'])['name']
+                results[jd_id] = output
         return results
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         threshold = args['threshold']
-        fromcache = args['fromcache']
         projectname = args['project']
         filterdict = args['filterdict']
         numbers = args['numbers']
         results = list()
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        alls = self.fromcache(project, filterdict, threshold, numbers, cache=fromcache)
+        alls = self.findbest(project, filterdict, threshold, numbers)
         for jdid in alls:
             results.append({'ID': jdid, 'name': alls[jdid]['name'],
                             'company': alls[jdid]['company'],

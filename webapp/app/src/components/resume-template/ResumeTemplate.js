@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react';
 
 import { Icon } from 'antd';
 
+import HighLight from 'components/highlight';
+
 import websiteText from 'config/website-text';
 
 import { generateWorkExperience,
@@ -68,12 +70,12 @@ class ResumeTemplate extends Component {
     const { name, current, expectation, gender, age, education, marital_status,
             email, phone, experience, education_history, self_assessment
             } = this.props.dataSource
+    const { highlight } = this.props;
     let c_current = this.combines(current),
         c_combine = this.combine(current,gender,age,education,marital_status),
         c_expectation = this.combines(expectation),
         c_education_history = parseEducation(education_history),
         c_experience = parseExperience(experience);
-        console.log(c_experience);
     return (
       <div className={`${this.props.prefixCls}-wrapper`}>
         <div className={`${this.props.prefixCls}`}>
@@ -147,7 +149,9 @@ class ResumeTemplate extends Component {
                       </p>
                       <p>{[valueItem[1],valueItem[4]].join('  |  ')}</p>
                       <p>{language.POSITION_DESCRIPTION}：</p>
-                      <pre>{experience.position[index].description}</pre>
+                        <HighLight highlight={highlight}>
+                          {experience.position[index].description}
+                        </HighLight>
                       </div>
                     );
                   else
@@ -183,19 +187,25 @@ class ResumeTemplate extends Component {
                       <div className={`${this.props.prefixCls}-project-content`}>
                       <span>{valueItem.date_from} - {valueItem.date_to}</span>
                       <span className="project-company-name"><strong>{valueItem.name}</strong></span>
-                      { valueItem.company ?
+                      { valueItem.company &&
                       <p>{`${language.FROM_COMPANY}：${valueItem.company}`}</p>
-                        :null
                       }
-                      { valueItem.description ?
+                      { valueItem.description &&
                       <p>{language.PROJECT_DESCRIPTION}：
-                      <pre className="project-description">{valueItem.description}</pre></p>
-                      :null
+                      <div className="project-description">
+                        <HighLight highlight={highlight}>
+                          {valueItem.description}
+                        </HighLight>
+                      </div></p>
                       }
-                      { valueItem.responsibility ?
+                      { valueItem.responsibility &&
                       <span>{language.RESPONSIBILITY_DESCRIPTION}：
-                      <pre className="project-description">{valueItem.responsibility}</pre></span>
-                      :null
+                          <div className="project-description">
+                            <HighLight highlight={highlight}>
+                              {valueItem.responsibility}
+                            </HighLight>
+                          </div>
+                        </span>
                       }
                       </div>
                     );
@@ -207,18 +217,20 @@ class ResumeTemplate extends Component {
             </div>
           </div>
           : null }
-          {self_assessment?
+          {self_assessment &&
           <div className={`${this.props.prefixCls}-assessment`}>
             <Icon type="file-text" style={{ fontSize:'25px'}}/>
             <h2>{language.SELF_ASSESSMENT}</h2>
             <div className={`${this.props.prefixCls}-content`}>
-            <pre>{self_assessment}</pre>
+                <HighLight highlight={highlight}>
+                {self_assessment}
+                </HighLight>
             </div>
             <div className={`${this.props.prefixCls}-hr`}>
               <hr />
             </div>
           </div>
-          : null }
+          }
         </div>
       </div>
     );

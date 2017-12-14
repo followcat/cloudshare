@@ -22,7 +22,7 @@ class UploadOriginsAPI(Resource):
         results = [
                   { "id" : 1, "name" : u"前程无忧", "origin": "default"},
                   { "id" : 2, "name" : u"无忧精英", "origin": "jingying"},
-                  { "id" : 3, "name" : u"智联招聘", "origin": "default"},
+                  { "id" : 3, "name" : u"智联招聘", "origin": "zhilian"},
                   { "id" : 4, "name" : u"智联卓聘", "origin": "zhilian"},
                   { "id" : 5, "name" : u"猎聘", "origin": "liepin"},
                   { "id" : 6, "name" : u"领英", "origin": "default"},

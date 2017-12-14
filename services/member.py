@@ -133,7 +133,7 @@ class Member(services.base.service.Service):
             if os.path.isdir(path):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
-                tmp_project = services.project.Project(path, [self.companies],
+                tmp_project = services.project.Project(unicode(path, 'utf-8'), [self.companies],
                                                        [self.curriculumvitaes],
                                                        [self.jobdescriptions],
                                                        self.mult_peo, name)

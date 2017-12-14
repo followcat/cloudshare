@@ -46,12 +46,13 @@ class SearchResultItem extends Component {
       type,
       selection,
       cv_id,
+      searchText,
+      jdid,
       workExperienceText,
       educationExperienceText,
       foldText,
       unfoldText
     } = this.props;
-
     const education = yaml_info.education_history || [];
     const experience = yaml_info.experience;
 
@@ -62,9 +63,10 @@ class SearchResultItem extends Component {
     const expectation = yaml_info.expectation ? yaml_info.expectation : {},
           expectationMoney = expectation.salary ? expectation.salary.yearly : '',
           expectationPlacesList = expectation.places ? expectation.places : [];
-
     const linkColor = gradient ? { color: gradient[parseInt(info.match*100)] } : {};
 
+    const href = jdid ? `/resume?cv_id=${cv_id}&&jd_id=${jdid}`:`/resume?cv_id=${cv_id}`,
+         hrefs = searchText? href+`&&search_text=${searchText}` : href ; 
     return (
       <Card className="cs-ls-i">
         <div className="basic-info">
@@ -80,16 +82,21 @@ class SearchResultItem extends Component {
                 />
               </Col>
             }
-            <Col span={type === 'default' ? 4 : 3} className="omit">
+            { info.match ?
+            <Col span={1} className="omit-match" style={linkColor}>{Math.floor(info.match * 100)}%</Col>
+            :
+            <Col span={1} className="omit"/>
+            }
+            <Col span={type === 'default' ? 3 : 1} className="omit">
               <a
-                href={`/resume/${cv_id}`}
+                href={hrefs}
                 style={linkColor}
                 target="_blank"
               >
                 {this.getNameTextRender()}
               </a>
             </Col>
-            <Col span={1} className="omit">{yaml_info.gender}</Col>
+            <Col span={1} offset={type === 'default' ? 0 : 1}  className="omit">{yaml_info.gender}</Col>
             <Col span={1} className="omit">{yaml_info.age}</Col>
             <Col span={2} className="omit">{yaml_info.marital_status}</Col>
             <Col span={3} className="omit">{yaml_info.education}</Col>

@@ -166,7 +166,7 @@ class LSIsimilarity(object):
         """
         self.num_best = None
         p = self.base_probability(doc, top=top, minimum=minimum)
-        results = map(lambda x: (self.names[x[0]], str(x[1])), p)
+        results = map(lambda x: (self.names[x[0]], round(x[1], 5)), p)
         return results
 
     def probability_by_ids(self, doc, ids, top=10000):
@@ -176,16 +176,13 @@ class LSIsimilarity(object):
         ms.num_best = top
         vec_lsi = self.lsi_model.probability(doc)
         probability = ms[vec_lsi]
-        results = map(lambda x: (self.names[indexs[x[0]]], str(x[1])), probability)
+        results = map(lambda x: (self.names[indexs[x[0]]], round(x[1], 5)), probability)
         return results
 
     def probability_by_id(self, doc, id):
         if self.exists(id) is False:
             return None
-        index = self.names.index(id)
-        vec_lsi = self.lsi_model.probability(doc)
-        result = abs(self.index[vec_lsi][index])
-        return (os.path.splitext(id)[0], str(result))
+        return self.probability_by_ids(doc, [id], top=1)[0]
 
     def base_probability(self, doc, top=None, minimum=0):
         if top is None:

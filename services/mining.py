@@ -290,20 +290,8 @@ class Mining(object):
                     break
         return results
 
-    def minetop(self, doc, basemodel, top=None, uses=None):
-        results = self.probability(basemodel, doc, top=top, uses=uses)
-        return results
-
-    def minelist(self, doc, lists, basemodel, uses=None):
-        result = list()
-        for name in lists:
-            uses = list()
-            for sim in self.sim[basemodel].values():
-                if sim.exists(name):
-                    uses.append(sim.name)
-                    break
-            result.append(self.probability_by_id(basemodel, doc, name, uses=uses))
-        return result
+    def minelist(self, doc, ids, basemodel, uses=None):
+        return self.probability_by_ids(basemodel, doc, ids, uses=uses)
 
     def minelistrank(self, doc, lists, basemodel, uses=None, top=None, minimum=None):
         if uses is None:

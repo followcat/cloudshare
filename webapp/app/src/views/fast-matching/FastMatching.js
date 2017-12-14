@@ -28,6 +28,8 @@ class FastMatching extends Component {
       current: 1,
       id: '',
       postAPI: '',
+      startColor: '#00ff0a',
+      endColor: '#000000',
       searchText: props.location.query.search_text,
       classify: [],
       projects: [],
@@ -163,7 +165,7 @@ class FastMatching extends Component {
                     },
                 ]
 
-      }).start()
+      }).startColor()
     }
   }
 
@@ -311,6 +313,7 @@ class FastMatching extends Component {
 
   render() {
     const {
+      id,
       textarea,
       classify,
       projects,
@@ -320,6 +323,8 @@ class FastMatching extends Component {
       spinning,
       current,
       total,
+      startColor,
+      endColor,
       searchText,
       dataSource,
       selection,
@@ -346,6 +351,10 @@ class FastMatching extends Component {
           spinning={spinning}
           current={current}
           total={total}
+          startColor={startColor}
+          endColor={endColor}
+          jdid={id}
+          searchText={searchText}
           dataSource={dataSource}
           selection={selection}
           educationExperienceText="教育经历"

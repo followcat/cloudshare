@@ -54,13 +54,14 @@ class LsiSustain(Resource):
             modelvec = sorted(modelvec, key=lambda x: abs(x[1]), reverse=reverse)
         return modelvec
 
-    def crosstopics(self, model, origin, correlation, top=None):
+    def crosstopics(self, model, origin, correlation, top=None, minimum=0.4):
         if top is None:
             top = self.top
         origin_words = set(model.slicer(origin))
         origin_vec = self.getvec(model, origin)
         correlation_vec = self.getvec(model, correlation)
 
+        return_dict = dict()
         near_topics = list()
         results_dict = collections.defaultdict(float)
         for i in range(model.lsi.num_topics):
@@ -74,10 +75,11 @@ class LsiSustain(Resource):
                         results_dict[word] += each[1]*result
         results_range = (max(results_dict.values()), min(results_dict.values()))
         for each in results_dict:
-            results_dict[each] = (results_dict[each]+abs(results_range[1]))/sum(
-                                 [abs(results_range[0]), abs(results_range[1])])
+            results_dict[each] = ((results_dict[each]+abs(results_range[1]))/sum(
+                                 [abs(results_range[0]), abs(results_range[1])]))**3
         sort = sorted(results_dict.items(), key=lambda r: r[1], reverse=True)
-        return sort[:top]
+        return dict(sort[:top])
+
 
 
 class LsiSustainCVByJDAPI(LsiSustain):

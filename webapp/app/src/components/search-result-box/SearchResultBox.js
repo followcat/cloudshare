@@ -21,9 +21,10 @@ class SearchResultBox extends Component {
   }
 
   componentDidMount() {
-    const colorGrad = new ColorGrad();
+    const { startColor, endColor } = this.props,
+          colorGrad = new ColorGrad();
     this.setState({
-      gradient: colorGrad.gradient(),
+      gradient: startColor && endColor ? colorGrad.gradient(startColor,endColor) : colorGrad.gradient(),
     });
   }
 
@@ -33,10 +34,11 @@ class SearchResultBox extends Component {
       workExperienceText,
       dataSource,
       selection,
+      searchText,
       foldText,
+      jdid,
       unfoldText
     } = this.props;
-
     const type = this.props.type || 'default';
     if (type === 'default') {
       return dataSource.map((item, index) => {
@@ -45,6 +47,8 @@ class SearchResultBox extends Component {
             {...item}
             key={index}
             type={type}
+            jdid={jdid}
+            searchText={searchText}
             educationExperienceText={educationExperienceText}
             workExperienceText={workExperienceText}
             foldText={foldText}
@@ -58,6 +62,8 @@ class SearchResultBox extends Component {
           <SearchResultItem
             {...item}
             key={index}
+            jdid={jdid}
+            searchText={searchText}
             educationExperienceText={educationExperienceText}
             workExperienceText={workExperienceText}
             foldText={foldText}
@@ -109,6 +115,8 @@ class SearchResultBox extends Component {
 
 SearchResultBox.defaultProps = {
   prefixCls: 'cs-search-result',
+  jdid: null,
+  searchText: null,
   showPagination: true
 };
 

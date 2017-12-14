@@ -20,9 +20,10 @@ class SearchResultBox extends Component {
   }
 
   componentDidMount() {
-    const colorGrad = new ColorGrad();
+    const { startColor, endColor } = this.props,
+          colorGrad = new ColorGrad();
     this.setState({
-      gradient: colorGrad.gradient(),
+      gradient: startColor && endColor ? colorGrad.gradient(startColor,endColor) : colorGrad.gradient(),
     });
   }
 
@@ -30,6 +31,7 @@ class SearchResultBox extends Component {
     const {
       educationExperienceText,
       workExperienceText,
+      searchText,
       dataSource,
       selection,
       foldText,
@@ -43,6 +45,7 @@ class SearchResultBox extends Component {
             dataSource={item}
             key={index}
             type={type}
+            searchText={searchText}
             foldText={foldText}
             unfoldText={unfoldText}
             gradient={this.state.gradient}
@@ -54,6 +57,7 @@ class SearchResultBox extends Component {
         return (
           <SearchResultItem
             dataSource={item}
+            searchText={searchText}
             key={index}
             educationExperienceText={educationExperienceText}
             workExperienceText={workExperienceText}

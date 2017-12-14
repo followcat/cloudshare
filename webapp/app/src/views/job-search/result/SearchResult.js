@@ -15,6 +15,8 @@ class SearchResult extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      startColor: '#00ff0a',
+      endColor: '#000000',
       pageSize: 10,
       searchText: props.location.query.search_text,
       dataSource: [],
@@ -204,7 +206,9 @@ class SearchResult extends Component {
 
   render() {
     const { prefixCls, location } = this.props,
-          { totals,
+          { startColor,
+            endColor,
+            totals,
             pageSize,
             searchText,
             current,
@@ -248,6 +252,9 @@ class SearchResult extends Component {
             current={current}
             total={totals}
             spinning={spinning}
+            startColor={startColor}
+            endColor={endColor}
+            searchText={searchText}
             dataSource={dataSource}
             educationExperienceText="教育经历"
             workExperienceText="工作经历"

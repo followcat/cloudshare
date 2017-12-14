@@ -12,6 +12,7 @@ class JobDescription(services.base.kv_storage.KeyValueStorage):
 
     commitinfo = 'JobDescription'
 
+    YAML_DIR = '.'
     YAML_TEMPLATE = (
         ("name",            unicode),
         ("id",              str),

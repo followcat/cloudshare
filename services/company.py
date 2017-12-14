@@ -5,11 +5,11 @@ import yaml
 import utils._yaml
 import utils.companyexcel
 import core.basedata
-import services.base.storage
+import services.base.kv_storage
 import extractor.information_explorer
 
 
-class Company(services.base.storage.BaseStorage):
+class Company(services.base.kv_storage.KeyValueStorage):
     """
         >>> import shutil
         >>> import services.company

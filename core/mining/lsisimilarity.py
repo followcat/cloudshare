@@ -12,7 +12,7 @@ class LSIsimilarity(object):
     matrix_save_name = 'lsi.matrix'
 
     def __init__(self, name, savepath, lsi_model):
-        self._ids = set()
+        self._namesindex = dict()
         self.name = name
         self.path = savepath
         self.names = []
@@ -169,6 +169,16 @@ class LSIsimilarity(object):
         results = map(lambda x: (self.names[x[0]], str(x[1])), p)
         return results
 
+    def probability_by_ids(self, doc, ids, top=10000):
+        indexs = [self.namesindex[id] for id in ids if id in self.namesindex]
+        vectors = [self.index.vector_by_id(pos) for pos in indexs]
+        ms = similarities.MatrixSimilarity(vectors, num_features=self.index.num_features)
+        ms.num_best = top
+        vec_lsi = self.lsi_model.probability(doc)
+        probability = ms[vec_lsi]
+        results = map(lambda x: (self.names[indexs[x[0]]], str(x[1])), probability)
+        return results
+
     def probability_by_id(self, doc, id):
         if self.exists(id) is False:
             return None
@@ -191,6 +201,13 @@ class LSIsimilarity(object):
         return result
 
     @property
+    def namesindex(self):
+        if len(self._namesindex) != len(self.names):
+            self._namesindex.update(dict([(self.names[index], index)
+                                    for index in xrange(len(self._namesindex), len(self.names))]))
+        return self._namesindex
+
+    @property
     def num_best(self):
         return self.index.num_best
 
@@ -200,10 +217,4 @@ class LSIsimilarity(object):
 
     @property
     def ids(self):
-        if not self._ids:
-            self._ids = set(self.names)
-        return self._ids
-
-    @ids.setter
-    def ids(self, value):
-        self._ids.update(set(value))
+        return self.namesindex.keys()

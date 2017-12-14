@@ -3,6 +3,9 @@
 @borderColor: #c2c2c2;
 
 .@{resumePrefixCls}-wrapper {
+  font-size: 14px;
+  font-family: "Microsoft YaHei";
+
   & h2 {
     display: inline-block;
     font-size: 20px;
@@ -12,6 +15,7 @@
   & pre {
     white-space: pre-wrap;
     word-wrap: break-word;
+    padding-left: 55px;
   }
 
   & p {
@@ -50,13 +54,21 @@
 
   .@{resumePrefixCls}-position {
     .position-item {
-      padding-top: 15px;
+      padding: 20px 0;
+
+      & > .position-item-title {
+        display: -webkit-flex;
+        & > span{
+          width: 33.3%;
+          margin-right: 15px;
+        }
+      }
     }
   }
 
   .@{resumePrefixCls}-project {
     &-content {
-      padding-top: 20px;
+      padding: 20px 0;
     }
     .project-company-name {
       position: absolute;
@@ -68,6 +80,16 @@
   }
 
   .@{resumePrefixCls}-education {
+      & .education-item-title {
+        display: flex;
+
+        & > span{
+          text-align: center;
+          display:inline-block;
+          width: 25%;
+          margin-right: 15px;
+        }
+      }    
   }
 
   .@{resumePrefixCls}-assessment {

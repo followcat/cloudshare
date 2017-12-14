@@ -54,7 +54,7 @@ class LsiSustain(Resource):
             modelvec = sorted(modelvec, key=lambda x: abs(x[1]), reverse=reverse)
         return modelvec
 
-    def crosstopics(self, model, origin, correlation, top=None, minimum=0.3):
+    def crosstopics(self, model, origin, correlation, top=None, minimum=0.4):
         if top is None:
             top = self.top
         origin_words = set(model.slicer(origin))
@@ -75,8 +75,8 @@ class LsiSustain(Resource):
                         results_dict[word] += each[1]*result
         results_range = (max(results_dict.values()), min(results_dict.values()))
         for each in results_dict:
-            result = ((results_dict[each]+abs(results_range[1]))/sum(
-                      [abs(results_range[0]), abs(results_range[1])]))**1.5
+            result = (results_dict[each]+abs(results_range[1]))/sum(
+                      [abs(results_range[0]), abs(results_range[1])])
             if result > minimum:
                 return_dict[each] = result
         sort = sorted(return_dict.items(), key=lambda r: r[1], reverse=True)

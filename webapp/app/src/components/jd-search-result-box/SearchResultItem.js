@@ -73,7 +73,7 @@ class SearchResultItem extends Component {
                 />
               </Col>
             }
-            <Col span={5} className="omit" >
+            <Col span={5} className="omit name" >
               <a
                 href={`/jd/${dataSource.id}`}
                 style={linkColor}

@@ -183,9 +183,11 @@ class LSIbaseAPI(Resource):
                 iduses.append(use)
                 index.add(self.svc_index.config['CV_STO'])
                 doctype.append(self.svc_index.config['CV_STO'])
-        result = self.miner.probability(project.modelname, doc, uses=iduses,
-                                        top=self.top, minimum=500)
-        ids = [cv[0] for cv in result]
+        totals, searchs = self.svc_index.search(index=list(index), doctype=doctype,
+                                                filterdict=filterdict, size=5000, source=False)
+        ids = [item['_id'] for item in searchs]
+        results = self.miner.probability_by_ids(project.modelname, doc, ids, uses=iduses)
+        """
         sort = {
                 "_script" : {
                       "type" : "number",
@@ -205,17 +207,15 @@ class LSIbaseAPI(Resource):
                                                        '_source_exclude': ['content']},
                                                start=(cur_page-1)*size, size=size,
                                                source=True)
+        """
         pages = int(math.ceil(float(totals)/size))
-        result_dict = dict(result)
         datas = list()
-        for item in searchs:
-            yaml_info = item['_source']
-            project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
+        for result in results[(cur_page-1)*size: cur_page*size]:
+            yaml_info = project.cv_getyaml(result[0])
             info = {
                 'author': yaml_info['committer'],
-                'time': datetime.datetime.strptime(yaml_info['date'], 
-                                                   '%Y%m%d').strftime('%Y-%m-%d'),
-                'match': result_dict[yaml_info['id']]
+                'time': utils.builtin.strftime(yaml_info['date']),
+                'match': str(result[1])
             }
             datas.append({ 'cv_id': yaml_info['id'],
                            'yaml_info': yaml_info,

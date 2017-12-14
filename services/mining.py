@@ -274,6 +274,13 @@ class Mining(object):
                 break
         return result
 
+    def probability_by_ids(self, basemodel, doc, ids, uses=None):
+        result = []
+        sims = self.getsims(basemodel, uses=uses)
+        for sim in sims:
+            result.extend(sim.probability_by_ids(doc, ids))
+        return sorted(result, key=lambda x: x[1], reverse=True)
+
     def idsims(self, modelname, ids):
         results = list()
         for id in ids:

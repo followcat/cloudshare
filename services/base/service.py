@@ -3,6 +3,8 @@ import core.outputstorage
 
 class Service(object):
 
+    _nums = 0
+
     def get_id(self, name):
         return core.outputstorage.ConvertName(name).base
 
@@ -11,6 +13,12 @@ class Service(object):
         if not hasattr(self, '_ids'):
             self._ids = set()
         return self._ids
+
+    @property
+    def NUMS(self):
+        if not self._nums:
+            self._nums = len(self.ids)
+        return self._nums
 
     def names(self):
         for id in self.ids:
@@ -28,12 +36,22 @@ class Service(object):
         return not self.exists(id)
 
     def _add(self, name):
-        id = self.get_id(name)
-        self.ids.add(id)
-        return True
+        result = False
+        if not self.exists(name):
+            id = self.get_id(name)
+            self.ids.add(id)
+            self._nums += 1
+            result = True
+        return result
 
     def _remove(self, name):
-        id = self.get_id(name)
-        self.ids.remove(id)
-        return True
+        result = False
+        try:
+            id = self.get_id(name)
+            self.ids.remove(id)
+            self._nums -= 1
+            result = True
+        except KeyError:
+            pass
+        return result
 

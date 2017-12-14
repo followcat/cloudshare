@@ -20,7 +20,6 @@ class BaseStorage(services.base.service.Service):
         super(BaseStorage, self).__init__()
         self.unique_checker = None
         self.info = ""
-        self._nums = 0
 
         if name is None:
             self.name = path.split('/')[-1]
@@ -77,13 +76,12 @@ class BaseStorage(services.base.service.Service):
         """
         return super(BaseStorage, self).unique(bsobj)
 
-    def modify(self, filename, stream, message=None, committer=None, do_commit=True):
-        self.interface.modify(filename, stream, message, committer, do_commit=do_commit)
-        return True
-
     def add(self, filename, stream, message=None, committer=None, do_commit=True):
         self.interface.add(filename, stream, message, committer, do_commit=do_commit)
-        self._nums += 1
+        return self._add(filename)
+
+    def modify(self, filename, stream, message=None, committer=None, do_commit=True):
+        self.interface.modify(filename, stream, message, committer, do_commit=do_commit)
         return True
 
     def history(self, author=None, entries=10, skip=0):
@@ -91,10 +89,4 @@ class BaseStorage(services.base.service.Service):
 
     def backup(self, path, **kwargs):
         self.interface.backup(path, **kwargs)
-
-    @property
-    def NUMS(self):
-        if not self._nums:
-            self._nums = len(self.ids)
-        return self._nums
 

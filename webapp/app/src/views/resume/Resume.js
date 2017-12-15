@@ -32,6 +32,7 @@ import {
 } from 'request/resume';
 import { addBookmark, deleteBookmark } from 'request/bookmark';
 import { confirmUpload } from 'request/upload';
+import { getHlighLight, getHlighLightKeyWord } from 'request/highlight';
 
 import { API } from 'API';
 import { URL } from 'URL';
@@ -41,11 +42,13 @@ import History from 'utils/history';
 import StorageUtil from 'utils/storage';
 
 class Resume extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       uniqueId: '',
       resumeId: '',
+      jd: '',
+      searchText: '',
       resumeList: [],
       fileList: [],
       dataSource: null,
@@ -55,6 +58,7 @@ class Resume extends Component {
       collected: false,
       panelLoading: false,
       confirmLoading: false,
+      highlight: [],
       tag: [],
       tracking: [],
       comment: [],
@@ -70,19 +74,28 @@ class Resume extends Component {
     this.handleUploadModalOk = this.handleUploadModalOk.bind(this);
     this.getResumeDataSource = this.getResumeDataSource.bind(this);
     this.getResumeIDList = this.getResumeIDList.bind(this);
+    this.getHlighLightData = this.getHlighLightData.bind(this);
+    this.getHlighLightKeyWord = this.getHlighLightKeyWord.bind(this);
     this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
     this.handSelectProject = this.handSelectProject.bind(this);
   }
 
   componentWillMount() {
-    const id = this.props.params.resumeId;
-
+    const id = this.props.location.query.cv_id,
+        jdid = this.props.location.query.jd_id,
+  searchText = this.props.location.query.search_text ;
     this.setState({
-      resumeId: id
+      resumeId: id,
+            jd: jdid,
+    searchText: searchText
     });
 
     this.getResumeDataSource(id);
     this.getResumeIDList(id);
+    if(jdid)
+    this.getHlighLightData(jdid,id,30);
+    if(searchText)
+    this.getHlighLightKeyWord(searchText);
     this.getSimilarDataSource(id);
   }
 
@@ -320,10 +333,51 @@ class Resume extends Component {
     });
   }
 
+    /**
+   * 获取jd和cv之间支撑词
+   * 
+   * @param {string} jd ,{string} cv ,{int} top
+   * 
+   * @memberOf Resume
+   */
+  getHlighLightData(jd,cv,top) {
+    getHlighLight({
+      jd: jd,
+      cv: cv,
+     top: top,
+    }, json => {
+      if (json.code === 200) {
+        this.setState({
+          highlight: json.data,
+        });
+      }
+    });
+   }
+
+    /**
+   * 获取jd和cv之间支撑词
+   * 
+   * @param {string} jd ,{string} cv ,{int} top
+   * 
+   * @memberOf Resume
+   */
+  getHlighLightKeyWord(searchText) {
+    getHlighLightKeyWord({
+      keyword: searchText
+    }, json => {
+      if (json.code === 200) {
+        this.setState({
+          highlight: json.data,
+        });
+      }
+    });
+   }
+
   /**
    * 获取候选人所有简历版本列表
    * 
-   * @param {string} id 
+   * @param {string} id  
+   *         
    * 
    * @memberOf Resume
    */
@@ -363,7 +417,6 @@ class Resume extends Component {
       }
     });
   }
-
   render() {
     const {
       resumeId,
@@ -372,6 +425,7 @@ class Resume extends Component {
       resumeList,
       fileList,
       panelLoading,
+      highlight,
       html,
       enHTML,
       tag,
@@ -419,9 +473,8 @@ class Resume extends Component {
                           <Summary dataSource={generateSummary(dataSource)} />
                           <Tabs defaultActiveKey="chinese">
                             <Tabs.TabPane tab="中文" key="chinese">
-                            { dataSource?
-                              <ResumeTemplate dataSource={dataSource} />
-                               : null
+                            { dataSource &&
+                              <ResumeTemplate dataSource={dataSource} highlight={highlight}/>
                             }
                             </Tabs.TabPane>
                             <Tabs.TabPane tab="原文" key="html">

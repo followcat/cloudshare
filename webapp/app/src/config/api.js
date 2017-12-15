@@ -106,6 +106,10 @@ export const API = {
 
   RESUME_INFO_API: `${HOST}/api/resume`,
 
+  HIGHLIGHT_KEYWORD_API: `${HOST}/api/highlight/search`,
+
+  HIGHLIGHT_API: `${HOST}/api/highlight/lsicvjd`,
+
   SIMILAR_API: `${HOST}/api/mining/similar`,
 
   RESUME_LIST_API: `${HOST}/api/peoplebycv`,

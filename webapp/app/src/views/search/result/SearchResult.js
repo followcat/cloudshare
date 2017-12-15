@@ -165,6 +165,7 @@ class SearchResult extends Component {
             current={current}
             total={totals}
             spinning={spinning}
+            searchText={searchText}
             dataSource={dataSource}
             educationExperienceText="教育经历"
             workExperienceText="工作经历"

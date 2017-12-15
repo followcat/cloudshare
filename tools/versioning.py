@@ -164,7 +164,7 @@ def backup_old_template(from_t, to_t):
             print(' '.join([from_t[item]+'.bak', 'backup created']))
 
 
-def update_to_version(version, backward_compatible=True):
+def update_to_version(version, backward_compatible=True, current_version=''):
     """Make change in directory structure and data to reach a version.
 
     The given $version is expected to be a future version. Nothing done otherwise.
@@ -186,7 +186,10 @@ def update_to_version(version, backward_compatible=True):
         >>> tools.versioning.remove_template(tools.versioning.get_template('1.2'))
     """
     known_versions = get_ordered_versions()
-    current_version = get_data_version()
+    if current_version:
+        assert_data_version(current_version)
+    else:
+        current_version = get_data_version()
     if not current_version:
         return
     assert_valid_version(version)

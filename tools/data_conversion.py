@@ -220,6 +220,27 @@ def convert_member(current_template, next_template, version):
                                             os.renames(f, os.path.join(next_template['_'.join((data, 'REPO'))], os.path.basename(f)))
                                         except IOError:
                                             pass
+    elif version == '1.6':
+        for member in [os.path.basename(_) for _ in path.Path(os.path.join(next_template['MEMBERS'])).dirs()]:
+            if member:
+                for subdir in ('curriculumvitaes', 'jobdescriptions', 'projects', 'companies', 'people'):
+                    if subdir in ('curriculumvitaes', 'people',):
+                        try:
+                            os.makedirs(os.path.join(next_template['MEMBERS'], member, subdir, 'YAML'))
+                        except OSError:
+                            pass
+                        for data in ('CO', 'CV', 'PEO', 'JD'):
+                            if (subdir, data) in (('curriculumvitaes', 'CV'), ('people', 'PEO'), ):
+                                list_all_files = set()
+                                for project in path.Path(os.path.join(next_template['MEMBERS'], member, 'projects')).dirs():
+                                    files = path.Path(os.path.join(project, data, 'YAML')).files()
+                                    for f in files:
+                                        os.renames(f, os.path.join(next_template['MEMBERS'], member, subdir, 'YAML', os.path.basename(f)))
+                                    list_all_files.update([os.path.basename(_).split(os.extsep)[0] for _ in files])
+                                with open(os.path.join(next_template['MEMBERS'], member, subdir, 'names.json'), 'r') as out:
+                                    list_all_files.update(list(json.loads(out.read())))
+                                with open(os.path.join(next_template['MEMBERS'], member, subdir, 'names.json'), 'w') as out:
+                                    json.dump(list(list_all_files), out)
 
 def convert_password(current_template, next_template, version):
     if version == '1.1':
@@ -273,6 +294,9 @@ conversion_rules = {
     ('1.2', '1.5'): collections.OrderedDict({
         'MEMBERS': functools.partial(convert_member, version='1.5'),
         'LSI': functools.partial(convert_model, version='1.5'),
+        }),
+    ('1.5', '1.6'): collections.OrderedDict({
+        'MEMBERS': functools.partial(convert_member, version='1.6'),
         }),
     }
 

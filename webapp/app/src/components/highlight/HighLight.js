@@ -17,7 +17,7 @@ class HighLight extends Component {
     const colorGrad = new ColorGrad()
     const gradient = colorGrad.gradient();
   let value = children;
-  Object.keys(highlight).map((item) =>{
+  highlight && Object.keys(highlight).map((item) =>{
     let Color = gradient ? gradient[parseInt(highlight[item]*100)] : {};
     let invalue = '<span class="cs-highlight-item"'+'style="font-weight: bolder;'+
     'padding: 3px 2px 1px;'+
@@ -35,7 +35,7 @@ class HighLight extends Component {
 
 HighLight.defaultProps = {
   prefixCls: 'cs-highlight',
-  dataSource: [],
+  highlight: [],
   position: 'center'
 };
 

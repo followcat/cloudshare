@@ -78,7 +78,7 @@ class BaseStorage(services.base.service.Service):
 
     def add(self, filename, stream, message=None, committer=None, do_commit=True):
         self.interface.add(filename, stream, message, committer, do_commit=do_commit)
-        return self._add(filename)
+        return True
 
     def modify(self, filename, stream, message=None, committer=None, do_commit=True):
         self.interface.modify(filename, stream, message, committer, do_commit=do_commit)

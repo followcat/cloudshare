@@ -35,6 +35,7 @@ class SearchResultBox extends Component {
       dataSource,
       selection,
       searchText,
+      matchDoc,
       foldText,
       jdid,
       unfoldText
@@ -64,6 +65,7 @@ class SearchResultBox extends Component {
             key={index}
             jdid={jdid}
             searchText={searchText}
+            matchDoc={matchDoc}
             educationExperienceText={educationExperienceText}
             workExperienceText={workExperienceText}
             foldText={foldText}

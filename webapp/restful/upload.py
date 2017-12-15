@@ -74,13 +74,10 @@ class UploadCVAPI(Resource):
                     if key is not u'id':
                         cvobj.metadata[key] = value
                 try:
-                    result = self.project.cv_add(cvobj, self.user.name, unique=True)
-                    if result['project_cv_result']:
-                        result['member_cv_result'] = self.member.cv_add(cvobj,
-                                                                        self.user.name,
-                                                                        unique=True)
-                        md = self.member.curriculumvitaes.getmd(id)
-                        info = self.member.curriculumvitaes.getyaml(id)
+                    result = self.member.cv_add(cvobj, self.user.name, unique=True)
+                    if result['member_cv_result']:
+                        md = self.member.cv_getmd(id)
+                        info = self.member.cv_getyaml(id)
                         self.svc_index.add(self.svc_index.config['CV_MEM'],
                                            self.project.id, id, md, info)
 
@@ -89,9 +86,6 @@ class UploadCVAPI(Resource):
                         message = '200'
                         names.append(cvobj.ID)
                         documents.append(cvobj.data)
-                        if not result['repo_cv_result']:
-                            # Existed in other project
-                            message = '201'
                     else:
                         status = 'success'
                         # Resume existed in database and project
@@ -210,9 +204,9 @@ class UploadEnglishCVAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         dataobj = uploadeng[user.name]['CV']
-        result = project.cv_add_eng(id, dataobj, user.name)
+        result = member.cv_add_eng(id, dataobj, user.name)
         uploadeng[user.name] = None
-        en_html = member.curriculumvitaes.getmd_en(id)
+        en_html = member.cv_getmd_en(id)
         return { 'code': 200, 'data': { 'status': result, 'en_html': en_html } }
 
     def post(self):

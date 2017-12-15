@@ -5,7 +5,7 @@ import services.base.service
 
 class Multiple(services.base.service.Service):
     """"""
-    combine_all = ()
+    combine_all = ('names', 'yamls')
     match_any = ('exists', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys', 'add')
 
     def __init__(self, services):

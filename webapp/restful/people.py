@@ -21,22 +21,18 @@ class PeopleAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         unique_id = args['unique_id']
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
-        peopleinfo = project.peo_getyaml(unique_id)
+        peopleinfo = member.peo_getyaml(unique_id)
         return { 'code': 200, 'data': peopleinfo }
 
     def put(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         unique_id = args['unique_id']
-        projectname = args['project']
         update_info = args['update_info']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         for key, value in update_info.iteritems():
-            data = project.peo_updateyaml(unique_id, key, value, user.name)
+            data = member.peo_updateyaml(unique_id, key, value, user.name)
             if data is not None:
                 response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
             else:
@@ -49,12 +45,10 @@ class PeopleAPI(Resource):
         args = self.reqparse.parse_args()
         unique_id = args['unique_id']
         date = args['date']
-        projectname = args['project']
         update_info = args['update_info']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         for key, value in update_info.iteritems():
-            data = project.peo_deleteyaml(unique_id, key, value, user.name, date)
+            data = member.peo_deleteyaml(unique_id, key, value, user.name, date)
             if data is not None:
                 response = { 'code': 200, 'data': data, 'message': 'Delete information success.' }
             else:
@@ -78,13 +72,11 @@ class PeopleByCVAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         cv_id = args['cv_id']
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
-        yamlinfo = member.curriculumvitaes.getyaml(cv_id)
+        yamlinfo = member.cv_getyaml(cv_id)
         try:
             unique_id = yamlinfo['unique_id']
         except KeyError:
             unique_id = yamlinfo['id']
-        peopleinfo = project.peo_getyaml(unique_id)
+        peopleinfo = member.peo_getyaml(unique_id)
         return { 'code': 200, 'data': peopleinfo }

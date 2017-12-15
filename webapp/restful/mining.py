@@ -42,9 +42,7 @@ class PositionAPI(BaseAPI):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         text = args['search_text']
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
@@ -58,7 +56,7 @@ class PositionAPI(BaseAPI):
         for id in searches[:self.numbers]:
             positions = []
             try:
-                yaml_data = member.curriculumvitaes.getyaml(id)
+                yaml_data = member.cv_getyaml(id)
             except IOError:
                 continue
             if 'position' in yaml_data['experience']:
@@ -86,7 +84,7 @@ class RegionAPI(BaseAPI):
         member = user.getmember(self.svc_members)
         result = []
         for id in args['md_ids'][:self.numbers]:
-            stream = member.curriculumvitaes.getmd(id)
+            stream = member.cv_getmd(id)
             result.append(core.mining.info.region(stream))
         return { 'result': result }
 
@@ -99,7 +97,7 @@ class CapacityAPI(BaseAPI):
         member = user.getmember(self.svc_members)
         result = []
         for id in args['md_ids'][:self.numbers]:
-            stream = member.curriculumvitaes.getmd(id)
+            stream = member.cv_getmd(id)
             result.append({'md':id, 'capacity': core.mining.info.capacity(stream)})
         return { 'result': result }
 
@@ -115,7 +113,7 @@ class AbilityAPI(BaseAPI):
             month = 0
             doclen = 0
             actpoint = 0
-            stream = member.curriculumvitaes.getmd(id)
+            stream = member.cv_getmd(id)
             capacitys = core.mining.info.capacity(stream)
             if not capacitys:
                 doclen = 100000
@@ -136,7 +134,7 @@ class ExperienceAPI(BaseAPI):
         member = user.getmember(self.svc_members)
         result = []
         for id in args['md_ids']:
-            stream = member.curriculumvitaes.getmd(id)
+            stream = member.cv_getmd(id)
             capacitys = core.mining.info.capacity(stream)
             month = 0
             actpoint = 0
@@ -202,7 +200,7 @@ class LSIbaseAPI(Resource):
         datas = list()
         for item in searchs:
             id = item['_id']
-            yaml_info = member.curriculumvitaes.getyaml(id)
+            yaml_info = member.cv_getyaml(id)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),
@@ -284,7 +282,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                                               size=numbers, onlyid=True)
             for cv in bestjds[jdid]:
                 if cv[0] in searchids:
-                    cvinfo = member.curriculumvitaes.getyaml(cv[0])
+                    cvinfo = member.cv_getyaml(cv[0])
                     cvinfo['CVvalue'] = cv[1]
                     output['CV'].append(cvinfo)
             if not output['CV']:
@@ -354,7 +352,7 @@ class LSIbyCVidAPI(LSIbaseAPI):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        doc = member.curriculumvitaes.getmd(id)
+        doc = member.cv_getmd(id)
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         cur_page = args['page']
@@ -405,7 +403,7 @@ class SimilarAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        doc = member.curriculumvitaes.getmd(id)
+        doc = member.cv_getmd(id)
         top = 0
         datas = []
         for name, score in self.miner.probability(project.modelname, doc,
@@ -414,7 +412,7 @@ class SimilarAPI(Resource):
                 continue
             if float(score) < 0.8 or top==5:
                 break
-            yaml_info = member.curriculumvitaes.getyaml(name)
+            yaml_info = member.cv_getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
             top += 1
         return { 'code': 200, 'data': datas }
@@ -446,7 +444,7 @@ class ValuablebaseAPI(Resource):
             values = []
             for match_item in index[1]:
                 name = match_item[0]
-                yaml_data = member.curriculumvitaes.getyaml(name+'.yaml')
+                yaml_data = member.cv_getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
                 values.append({ 'match': match_item[1],
                                 'id': yaml_data['id'],

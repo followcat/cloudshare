@@ -8,7 +8,7 @@ import extractor.information_explorer
 
 class SelectionCO(services.base.name_storage.NameStorage):
 
-    ids_file = 'customer.json'
+    ids_file = 'names.json'
 
     #addcustomer = services.base.name_storage.NameStorage.add
     #deletecustomer = services.base.name_storage.NameStorage.delete

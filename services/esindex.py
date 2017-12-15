@@ -176,7 +176,6 @@ class ElasticsearchIndexing(object):
         return action
 
     def updatesvc(self, index, doctype, svc, content=True, numbers=5000):
-        assert svc.name
         total, searchs = self.ESsearch(index=index, doctype=doctype, size=10000, scroll='1m')
         update_ids = set([item['_id'] for item in searchs])
         ACTIONS = list()
@@ -216,7 +215,6 @@ class ElasticsearchIndexing(object):
             self.upgradesvc(index, doctype, svc, ids=ids)
 
     def upgradesvc(self, index, doctype, svc, ids=None, content=True, numbers=5000):
-        assert svc.name
         if ids is None:
             ids = svc.ids
         else:

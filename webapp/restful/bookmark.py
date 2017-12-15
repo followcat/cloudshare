@@ -22,7 +22,7 @@ class BookmarkAPI(Resource):
         member = user.getmember(self.svc_members)
         bookmark_list = list(user.getbookmark())
         for bookmark_item in bookmark_list:
-            yaml_info = member.curriculumvitaes.getyaml(bookmark_item)
+            yaml_info = member.cv_getyaml(bookmark_item)
             data.append(yaml_info)
         if name == user.name:
             result = { 'code': 200, 'data': data }

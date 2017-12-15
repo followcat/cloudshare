@@ -6,54 +6,53 @@ import sources.industry_id
 import services.base.service
 import services.base.kv_storage
 import services.operator.split
+import services.operator.facade
 import services.operator.checker
 import services.operator.multiple
-import services.simulationco
-import services.simulationcv
-import services.simulationpeo
-import services.multipeople
-import extractor.information_explorer
+import services.simulationcustomer
 
-class Project(services.base.service.Service):
 
-    CV_PATH = 'CV'
-    CO_PATH = 'CO'
-    JD_PATH = 'JD'
-    PEO_PATH = 'PEO'
+class SimulationProject(services.base.kv_storage.KeyValueStorage):
+
+    commitinfo = 'Project'
     config_file = 'config.yaml'
 
-    def __init__(self, path, corepos, cvrepos, jdrepos, svcpeos, name, iotype=None):
-        super(Project, self).__init__()
-        self.name = name
-        self.path = path
-        self.corepos = corepos
-        self.jdrepos = jdrepos
-        self.cvrepos = cvrepos
-        self.svcpeos = svcpeos
-        cvpath = os.path.join(path, self.CV_PATH)
-        copath = os.path.join(path, self.CO_PATH)
-        jdpath = os.path.join(path, self.JD_PATH)
-        peopath = os.path.join(path, self.PEO_PATH)
+    YAML_TEMPLATE = (
+        ('id',                  str),
+        ('autosetup',           bool),
+        ('autoupdate',          bool),
+        ('storageCO',           str),
+        ('storageJD',           str),
+    )
+
+    def setup(self, info):
+        return self.saveinfo(self.config_file, info, commitinfo, committer=commitinfo, do_commit=True)
+
+
+class Project(services.operator.facade.Facade):
+
+    CO_PATH = 'CO'
+    JD_PATH = 'JD'
+
+    def __init__(self, data_service, co_repos, jd_repos):
+        super(Project, self).__init__(data_service)
+        self.name = data_service.name
+        self.path = data_service.path
+        self.config_file = data_service.config_file
+        self.co_repos = co_repos
+        self.jd_repos = jd_repos
+        copath = os.path.join(self.path, self.CO_PATH)
+        jdpath = os.path.join(self.path, self.JD_PATH)
 
         self.company = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(corepos),
-                    operator_service=services.simulationco.SimulationCO(copath, name, iotype=iotype)),
-                operator_service=services.simulationco.SelectionCO(copath, name, iotype=iotype))
-        self.curriculumvitae = services.operator.checker.Filter(
-                data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(cvrepos),
-                    operator_service=services.simulationcv.SimulationCV(cvpath, name, iotype=iotype)),
-                operator_service=services.simulationcv.SelectionCV(cvpath, name, iotype=iotype))
+                    data_service=services.operator.multiple.Multiple(co_repos),
+                    operator_service=services.simulationcustomer.SimulationCustomer(copath, self.name)),
+                operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
         self.jobdescription = services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(jdrepos),
-                operator_service=services.base.name_storage.NameStorage(jdpath, name, iotype=iotype))
-        self.people = services.operator.checker.Filter(
-                data_service=services.operator.split.SplitData(
-                    data_service=services.multipeople.MultiPeople(svcpeos),
-                    operator_service=services.simulationpeo.SimulationPEO(peopath, name, iotype=iotype)),
-                operator_service=services.base.name_storage.NameStorage(peopath, name, iotype=iotype))
-        self.config_service = services.base.kv_storage.KeyValueStorage(path, name, iotype=iotype)
+                data_service=services.operator.multiple.Multiple(jd_repos),
+                operator_service=services.base.name_storage.NameStorage(jdpath, self.name))
+        self.config_service = self.data_service
         self.config = dict()
         try:
             self.load()
@@ -89,30 +88,14 @@ class Project(services.base.service.Service):
     def storageCO(self):
         result = None
         servicename = self.config['storageCO']
-        for corepo in self.corepos:
+        for corepo in self.co_repos:
             if isinstance(corepo, services.simulationco.SimulationCO):
                 for each in corepo.storages:
                     if each.name == servicename:
                         result = each
                         break
             elif corepo.name == servicename:
-                result = each
-            if result is not None:
-                break
-        return result
-
-    @property
-    def storageCV(self):
-        result = None
-        servicename = self.config['storageCV']
-        for cvrepo in self.cvrepos:
-            if isinstance(cvrepo, services.simulationcv.SimulationCV):
-                for each in cvrepo.storages:
-                    if each.name == servicename:
-                        result = each
-                        break
-            elif cvrepo.name == servicename:
-                result = cvrepo
+                result = corepo
             if result is not None:
                 break
         return result
@@ -121,7 +104,7 @@ class Project(services.base.service.Service):
     def storageJD(self):
         result = None
         servicename = self.config['storageJD']
-        for jdrepo in self.jdrepos:
+        for jdrepo in self.jd_repos:
             if isinstance(jdrepo, services.simulationjd.SimulationJD):
                 for each in jdrepo.storages:
                     if each.name == servicename:
@@ -134,116 +117,12 @@ class Project(services.base.service.Service):
         return result
 
     @property
-    def storagePEO(self):
-        result = None
-        servicename = self.config['storagePEO']
-        for each in self.svcpeos[0].peoples:
-            if each.name == servicename:
-                result = each
-                break
-        return result
-
-    @property
-    def limitPEO(self):
-        result = None
-        servicename = self.config['limitPEO']
-        for each in self.svcpeos[0].peoples:
-            if each.name == servicename:
-                result = each
-                break
-        return result
-
-    @property
     def modelname(self):
         return self.config['model']
 
     @property
     def id(self):
         return self.config['id']
-
-    @property
-    def cv_secrecy(self):
-        return self.curriculumvitae.secrecy_default
-
-    @property
-    def cv_private(self):
-        return self.curriculumvitae.private_default
-
-    @cv_secrecy.setter
-    def cv_secrecy(self, value):
-        self.curriculumvitae.secrecy_default = value
-
-    @cv_private.setter
-    def cv_private(self, value):
-        self.curriculumvitae.private_default = value
-
-    def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
-        result = {
-            'repo_cv_result' : False,
-            'repo_peo_result' : False,
-            'project_cv_result' : False,
-            'project_peo_result' : False
-        }
-        peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
-        peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-        result['repo_cv_result'] = self.storageCV.add(cvobj, committer, unique=unique,
-                                                      do_commit=do_commit)
-        result['project_cv_result'] = self.curriculumvitae.add(cvobj, committer, unique=unique,
-                                                               do_commit=do_commit)
-        if result['repo_cv_result']:
-            peoresult = self.peo_add(peopobj, committer, unique=unique, do_commit=do_commit)
-            result.update(peoresult)
-        return result
-
-    def cv_add_eng(self, id, cvobj, committer):
-        yaml_data = self.storageCV.getyaml(id)
-        result = self.storageCV.add_md(cvobj, committer)
-        yaml_data['enversion'] = cvobj.ID.md
-        self.storageCV.modify(id+'.yaml', utils.builtin.dump_yaml(yaml_data), committer=committer)
-        return result
-
-    def cv_yamls(self):
-        return self.curriculumvitae.yamls()
-
-    def cv_names(self):
-        return self.curriculumvitae.names()
-
-    def cv_datas(self):
-        return self.curriculumvitae.datas()
-
-    def cv_gethtml(self, id):
-        return self.curriculumvitae.gethtml(id)
-
-    def cv_getmd(self, id):
-        return self.curriculumvitae.getmd(id)
-
-    def cv_getmd_en(self, id):
-        return self.curriculumvitae.getmd_en(id)
-
-    def cv_getyaml(self, id):
-        return self.curriculumvitae.getyaml(id)
-
-    def cv_numbers(self):
-        return self.curriculumvitae.NUMS
-
-    def cv_history(self, author=None, entries=10, skip=0):
-        return self.curriculumvitae.history(author, entries, skip)
-
-    def cv_updateyaml(self, id, key, value, username):
-        result = None
-        if key in dict(self.curriculumvitae.YAML_TEMPLATE):
-            try:
-                result = self.curriculumvitae.updateinfo(id, key, value, username)
-            except AssertionError:
-                pass
-        return result
-
-    def cv_ids(self):
-        return self.curriculumvitae.ids
-
-    def cv_timerange(self, start_y, start_m, start_d, end_y, end_m, end_d):
-        return self.curriculumvitae.timerange(start_y, start_m, start_d,
-                                              end_y, end_m, end_d)
 
     def company_update_info(self, id, info, committer):
         result = False
@@ -349,60 +228,14 @@ class Project(services.base.service.Service):
     def jd_datas(self):
         return self.jobdescription.datas()
 
-    def peo_add(self, peopobj, committer=None, unique=True, do_commit=True):
-        result = {
-            'repo_peo_result' : False,
-            'project_peo_result' :False,
-        }
-        storage = self.storagePEO
-        if peopobj.ID == peopobj.metadata['cv'][0]:
-            storage = self.limitPEO
-        result['repo_peo_result'] = storage.add(peopobj, committer,
-                                                unique=unique, do_commit=do_commit)
-        result['project_peo_result'] = self.people.add(peopobj, committer,
-                                                       unique=unique, do_commit=do_commit)
-        return result
-
-    def peo_getinfo(self, id):
-        info = self.people.getyaml(id)
-        for id in info['cv']:
-            if self.curriculumvitae.exists(id):
-                yield self.curriculumvitae.getinfo(id)
-
-    def peo_getmd(self, id):
-        info = self.people.getyaml(id)
-        for id in info['cv']:
-            if self.curriculumvitae.exists(id):
-                yield self.curriculumvitae.getmd(id)
-
-    def peo_getyaml(self, id):
-        return self.people.getyaml(id)
-
-    def peo_updateyaml(self, id, key, value, username):
-        result = None
-        try:
-            result = self.people.updateinfo(id, key, value, username)
-        except AssertionError:
-            pass
-        return result
-
-    def peo_deleteyaml(self, id, key, value, username, date):
-        return self.people.deleteinfo(id, key, value, username, date)
-
     def backup(self, path):
         backup_path = os.path.join(path, self.name)
         project_path = os.path.join(backup_path, 'project')
-        cv_path = os.path.join(backup_path, 'curriculumvitae')
         jd_path = os.path.join(backup_path, 'jobdescription')
         co_path = os.path.join(backup_path, 'company')
-        peo_path = os.path.join(backup_path, 'people')
         utils.builtin.assure_path_exists(project_path)
-        utils.builtin.assure_path_exists(cv_path)
         utils.builtin.assure_path_exists(jd_path)
         utils.builtin.assure_path_exists(co_path)
-        utils.builtin.assure_path_exists(peo_path)
-        self.interface.backup(project_path, bare=True)
-        self.curriculumvitae.backup(cv_path, bare=True)
+        self.config_service.backup(project_path, bare=True)
         self.jobdescription.backup(jd_path, bare=True)
         self.company.backup(co_path, bare=True)
-        self.people.backup(peo_path, bare=True)

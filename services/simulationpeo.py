@@ -42,4 +42,6 @@ class SimulationPEO(services.base.kv_storage.KeyValueStorage):
         info = super(SimulationPEO, self).getyaml(id)
         if not info:
             info = {'id': id, 'cv': [id]}
+        if 'id' not in info:
+            info['id'] = id
         return info

@@ -25,11 +25,9 @@ class CurrivulumvitaeAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         result = user.getbookmark()
-        yaml = project.cv_getyaml(id)
+        yaml = member.cv_getyaml(id)
         if yaml['id'] in result:
             yaml['collected'] = True
         else:
@@ -37,9 +35,9 @@ class CurrivulumvitaeAPI(Resource):
         yaml['date'] = utils.builtin.strftime(yaml['date'])
         cv_projects = member.cv_projects(id)
         en_html = ''
-        html = member.curriculumvitaes.gethtml(id)
+        html = member.cv_gethtml(id)
         if 'enversion' in yaml:
-            en_html = member.curriculumvitaes.getmd_en(id)
+            en_html = member.cv_getmd_en(id)
         return { 'code': 200, 'data': { 'html': html, 'en_html': en_html,
                                         'yaml_info': yaml, 'projects': cv_projects } }
 
@@ -59,13 +57,11 @@ class UpdateCurrivulumvitaeInformation(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         update_info = args['update_info']
 
         for key, value in update_info.iteritems():
-            data = project.cv_updateyaml(id, key,
+            data = member.cv_updateyaml(id, key,
                                                                       value, user.name)
             if data is not None:
                 response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
@@ -96,9 +92,7 @@ class SearchCVbyTextAPI(Resource):
         text = args['search_text']
         cur_page = args['page'] if args['page'] else 1
         filterdict = args['filterdict'] if args['filterdict'] else {}
-        projectname = args['project']
         member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         index = self.svc_index.config['CV_MEM']
         doctype = [p.id for p in member.projects.values()]
         filterdict['content'] = text
@@ -110,7 +104,7 @@ class SearchCVbyTextAPI(Resource):
         datas = list()
         for item in searchs:
             id = item['_id']
-            yaml_info = member.curriculumvitaes.getyaml(id)
+            yaml_info = member.cv_getyaml(id)
             info = {
                 'author': yaml_info['committer'],
                 'time': utils.builtin.strftime(yaml_info['date']),

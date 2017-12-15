@@ -171,11 +171,11 @@ class AccountHistoryAPI(Resource):
     def get(self, project):
         user = flask.ext.login.current_user
         member = user.getmember(self.svc_members)
-        info_list = member.getproject(project).cv_history(user.name, entries=10)
+        info_list = member.cv_history(user.name, entries=10)
         for info in info_list:
             for md5 in info['filenames']:
                 try:
-                    info['information'] = member.curriculumvitaes.getyaml(id)
+                    info['information'] = member.cv_getyaml(id)
                 except IOError:
                     info['information'] = md5
                 info['name'] = md5

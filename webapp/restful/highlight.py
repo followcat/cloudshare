@@ -103,7 +103,7 @@ class LsiSustainCVByJDAPI(LsiSustain):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         model = self.svc_min.lsi_model[project.modelname]
-        md = project.cv_getmd(cvid)
+        md = member.cv_getmd(cvid)
         jdinfo = project.jd_get(jdid)
         datas = self.crosstopics(model, md, jdinfo['description'], top=top)
 

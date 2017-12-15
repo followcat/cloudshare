@@ -75,9 +75,11 @@ class LsiSustain(Resource):
                         results_dict[word] += each[1]*result
         results_range = (max(results_dict.values()), min(results_dict.values()))
         for each in results_dict:
-            results_dict[each] = ((results_dict[each]+abs(results_range[1]))/sum(
-                                 [abs(results_range[0]), abs(results_range[1])]))**3
-        sort = sorted(results_dict.items(), key=lambda r: r[1], reverse=True)
+            result = (results_dict[each]+abs(results_range[1]))/sum(
+                      [abs(results_range[0]), abs(results_range[1])])
+            if result > minimum:
+                return_dict[each] = result
+        sort = sorted(return_dict.items(), key=lambda r: r[1], reverse=True)
         return dict(sort[:top])
 
 

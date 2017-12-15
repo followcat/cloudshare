@@ -208,7 +208,7 @@ class LSIbaseAPI(Resource):
                                                start=(cur_page-1)*size, size=size,
                                                source=True)
         """
-        pages = int(math.ceil(float(totals)/size))
+        pages = int(math.ceil(float(len(searchs))/size))
         datas = list()
         for result in results[(cur_page-1)*size: cur_page*size]:
             yaml_info = project.cv_getyaml(result[0])

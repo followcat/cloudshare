@@ -97,6 +97,7 @@ def initialize(app):
 
     api.add_resource(SearchKeywordAPI, '/api/highlight/search', endpoint = 'searchkeyword')
     api.add_resource(LsiSustainCVByJDAPI, '/api/highlight/lsicvjd', endpoint = 'lsisustaincvbyjd')
+    api.add_resource(LsiSustainCVByDocAPI, '/api/highlight/lsicvdoc', endpoint = 'lsisustaincvbydoc')
 
     api.add_resource(FeatureAPI, '/api/feature', endpoint = 'feature')
 

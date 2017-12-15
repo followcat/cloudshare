@@ -51,8 +51,6 @@ def initialize(app):
                      endpoint = 'jobdescriptionupload')
     api.add_resource(JobDescriptionAPI, '/api/jd',
                      endpoint = 'jobdescription')
-    api.add_resource(JobDescriptionListAPI, '/api/jdlist',
-                     endpoint = 'jobdescriptionlist')
     api.add_resource(JobDescriptionSearchAPI, '/api/jdsearch',
                      endpoint = 'jobdescriptionsearch')
 

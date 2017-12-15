@@ -83,6 +83,32 @@ class LsiSustain(Resource):
         return dict(sort[:top])
 
 
+class LsiSustainCVByDocAPI(LsiSustain):
+
+    def __init__(self):
+        super(LsiSustainCVByDocAPI, self).__init__()
+        self.reqparse.add_argument('cv', location='json')
+        self.reqparse.add_argument('doc', location='json')
+        self.reqparse.add_argument('top', type=int, location='json')
+        self.reqparse.add_argument('project', location='json')
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        doc = args['doc']
+        top = args['top']
+        cvid = args['cv']
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        model = self.svc_min.lsi_model[project.modelname]
+        md = project.cv_getmd(cvid)
+        datas = self.crosstopics(model, md, doc, top=top)
+        return {
+            'code': 200,
+            'data': datas,
+        }
+
 
 class LsiSustainCVByJDAPI(LsiSustain):
 
@@ -106,7 +132,6 @@ class LsiSustainCVByJDAPI(LsiSustain):
         md = project.cv_getmd(cvid)
         jdinfo = project.jd_get(jdid)
         datas = self.crosstopics(model, md, jdinfo['description'], top=top)
-
         return {
             'code': 200,
             'data': datas,

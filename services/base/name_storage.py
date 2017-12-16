@@ -33,11 +33,11 @@ class NameStorage(services.base.storage.BaseStorage):
         result = False
         if (unique and self.unique(bsobj)) or not unique:
             id = bsobj.ID
-            result = self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4),
+            result = self._add(id)
+            if result:
+                result = self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4),
                                      message='Add new data %s.'%id,
                                      committer=committer, do_commit=do_commit)
-            if result:
-                return self._add(id)
         return result
 
     def remove(self, bsobj, committer=None, unique=True,
@@ -45,12 +45,12 @@ class NameStorage(services.base.storage.BaseStorage):
         result = False
         id = bsobj.ID
         if self.exists(id):
-            result = self.interface.modify(self.ids_file,
+            result = self._remove(id)
+            if result:
+                result = self.interface.modify(self.ids_file,
                               ujson.dumps(sorted(self.ids), indent=4),
                               message="Delete id: " + id,
                               committer=committer, do_commit=do_commit)
-            if result:
-                return self._remove(id)
         else:
             result = True
         return result

@@ -37,11 +37,17 @@ class Filter(services.operator.facade.Application):
             res = self.operator_service.add(*args, **kwargs)
         return res
 
+    def remove(self, *args, **kwargs):
+        res = self.data_service.remove(*args, **kwargs)
+        if res:
+            res = self.operator_service.remove(*args, **kwargs)
+        return res
+
 
 class Selector(Filter):
     """"""
     def selection(self, x):
-        return x
+        return tuple([x])
 
     def apply_filter(self, *args, **kwargs):
         id = args[0]
@@ -52,7 +58,17 @@ class Selector(Filter):
             for selected_id in self.selection(id):
                 copied_args.pop(0)
                 copied_args.insert(0, selected_id)
-                yield super(Filter, self).__getattr__(attr)(*copied_args, **kwargs)
+                yield super(Selector, self).__getattr__(attr)(*copied_args, **kwargs)
+
+    def add(self, *args, **kwargs):
+        try:
+            assert self.data_service.exists(args[0].ID)
+            return self.operator_service.add(*args, **kwargs)
+        except AssertionError:
+            return False
+
+    def remove(self, *args, **kwargs):
+        return self.operator_service.remove(*args, **kwargs)
 
 
 class Checker(Filter):

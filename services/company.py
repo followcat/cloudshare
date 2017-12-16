@@ -1,10 +1,5 @@
-import os
-import time
-import yaml
-
-import utils._yaml
-import utils.companyexcel
 import core.basedata
+import utils.companyexcel
 import services.base.kv_storage
 import extractor.information_explorer
 
@@ -38,11 +33,10 @@ class Company(services.base.kv_storage.KeyValueStorage):
         IOError...
         >>> shutil.rmtree(path)
     """
-    commitinfo = 'Company'
+    YAML_DIR = 'YAML'
+    YAML_TEMPLATE = extractor.information_explorer.co_template
 
-    def datas(self):
-        for id in self.ids:
-            yield id, self.getyaml(id)
+    commitinfo = 'Company'
 
     def compare_excel(self, stream, committer):
         output = list()

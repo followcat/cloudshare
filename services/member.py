@@ -67,9 +67,7 @@ class Member(services.operator.facade.Facade):
         self.projects_path = os.path.join(self.path, self.PRJ_PATH)
         self.accounts_path = os.path.join(self.path, self.ACC_PATH)
         self.company = services.operator.checker.Filter(
-                data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(co_repos),
-                    operator_service=services.simulationco.SimulationCO(self.co_path, self.name)),
+                data_service=services.operator.multiple.Multiple(co_repos),
                 operator_service=services.simulationco.SelectionCO(self.co_path, self.name))
         self.curriculumvitae = services.secret.Private(
                 data_service=services.operator.split.SplitData(

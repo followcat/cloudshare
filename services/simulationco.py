@@ -1,5 +1,3 @@
-import collections
-
 import utils.companyexcel
 import services.base.kv_storage
 import services.base.name_storage
@@ -7,21 +5,7 @@ import extractor.information_explorer
 
 
 class SelectionCO(services.base.name_storage.NameStorage):
-
-    ids_file = 'names.json'
-
-    #addcustomer = services.base.name_storage.NameStorage.add
-    #deletecustomer = services.base.name_storage.NameStorage.delete
-
-    def addcustomer(self, id, user, do_commit=True):
-        FakeObj = collections.namedtuple('FakeObj', ['id'])
-        return super(Customer, self).add(bsobj=FakeObj(id), committer=user, do_commit=do_commit)
-
-    def deletecustomer(self, id, user, do_commit=True):
-        FakeObj = collections.namedtuple('FakeObj', ['id'])
-        return super(Customer, self).delete(bsobj=FakeObj(id), committer=user, do_commit=do_commit)
-
-    customers = services.base.name_storage.NameStorage.ids
+    """"""
 
 
 class SimulationCO(services.base.kv_storage.KeyValueStorage):

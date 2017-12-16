@@ -130,7 +130,7 @@ class AddedCompanyListAPI(Resource):
         for company_id in company_ids:
             if company_id in customer_ids:
                 continue
-            yaml = project.company.getyaml(company_id)
+            yaml = project.company_getyaml(company_id)
             data.append({
                 'id': yaml['id'],
                 'company_name': yaml['name']
@@ -186,7 +186,8 @@ class CompanyCustomerAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = project.company.addcustomer(id, user.name)
+        coobj = core.basedata.DataObject(metadata, data='')
+        result = project.addcustomer(coobj, user.name)
         if result:
             response = { 'code': 200, 'message': 'Add customer success.' }
         else:
@@ -200,7 +201,8 @@ class CompanyCustomerAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = project.company.deletecustomer(id, user.name)
+        coobj = core.basedata.DataObject(metadata, data='')
+        result = project.deletecustomer(coobj, user.name)
         if result:
             response = { 'code': 200, 'message': 'Delete customer success.' }
         else:

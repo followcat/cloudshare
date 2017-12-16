@@ -9,6 +9,7 @@ import services.operator.split
 import services.operator.facade
 import services.operator.checker
 import services.operator.multiple
+import services.simulationco
 import services.simulationcustomer
 
 
@@ -47,7 +48,10 @@ class Project(services.operator.facade.Facade):
         self.company = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
                     data_service=services.operator.multiple.Multiple(co_repos),
-                    operator_service=services.simulationcustomer.SimulationCustomer(copath, self.name)),
+                    operator_service=services.simulationco.SimulationCO(copath, self.name)),
+                operator_service=services.simulationco.SelectionCO(copath, self.name))
+        self.customer = services.operator.checker.Selector(
+                data_service=self.company,
                 operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
         self.jobdescription = services.operator.checker.Filter(
                 data_service=services.operator.multiple.Multiple(jd_repos),
@@ -195,11 +199,17 @@ class Project(services.operator.facade.Facade):
     def company_get(self, name):
         return self.company.getyaml(name)
 
-    def company_customers(self):
-        return self.company.customers
-
     def company_names(self):
         return self.company.ids
+
+    def company_customers(self):
+        return self.customer.ids
+
+    def addcustomer(self, coobj, user=None, do_commit=True):
+        return self.customer.add(coobj, committer=user, do_commit=do_commit)
+
+    def deletecustomer(self, coobj, user=None, do_commit=True):
+        return self.customer.remove(coobj, committer=user, do_commit=do_commit)
 
     def jd_get(self, id):
         return self.jobdescription.getyaml(id)

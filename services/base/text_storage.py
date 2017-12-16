@@ -29,7 +29,7 @@ class PlainTextStorage(services.base.storage.BaseStorage):
             result = unicode(str(markdown), 'utf-8')
         return result
 
-    get = getmd
+    gettext = getmd
 
     def search(self, keyword, selected=None):
         results = set()
@@ -42,9 +42,7 @@ class PlainTextStorage(services.base.storage.BaseStorage):
 
     def datas(self):
         for id in self.ids:
-            name = core.outputstorage.ConvertName(id).md
-            text = self.getmd(id)
-            yield name, text
+            yield core.outputstorage.ConvertName(id).md, self.gettext(id)
 
     @property
     def ids(self):

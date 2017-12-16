@@ -146,6 +146,8 @@ class KeyValueStorage(services.base.storage.BaseStorage):
         yaml_str = self.interface.get(name)
         return yaml.load(yaml_str, Loader=utils._yaml.SafeLoader)
 
+    getkv = getyaml
+
     def search_yaml(self, keyword, selected=None):
         results = set()
         if selected and self.name in selected:
@@ -154,6 +156,10 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                 id = core.outputstorage.ConvertName(result[0]).base
                 results.add((id, result[1]))
         return results
+
+    def datas(self):
+        for id in self.ids:
+            yield id, self.getkv(id)
 
     @property
     def ids(self):

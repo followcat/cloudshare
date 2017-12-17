@@ -43,7 +43,7 @@ class CompanyList extends Component {
       customerIDList: [],
       loading: false,
       visible: false,
-      filterData: []
+      filterData: [{data:['name'],index:0}]
     };
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
@@ -315,7 +315,6 @@ class CompanyList extends Component {
       text: language.VISITING_SITUATION,
       span: 6
     }];
-
     return (
       <div className="cs-card-inner">
         <div className="cs-card-inner-top">

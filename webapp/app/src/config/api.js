@@ -108,6 +108,8 @@ export const API = {
 
   HIGHLIGHT_KEYWORD_API: `${HOST}/api/highlight/search`,
 
+  HIGHLIGHT_DOC_API: `${HOST}/api/highlight/lsicvdoc`,
+
   HIGHLIGHT_API: `${HOST}/api/highlight/lsicvjd`,
 
   SIMILAR_API: `${HOST}/api/mining/similar`,

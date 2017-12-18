@@ -35,7 +35,7 @@ class HighLight extends Component {
 
 HighLight.defaultProps = {
   prefixCls: 'cs-highlight',
-  dataSource: [],
+  highlight: [],
   position: 'center'
 };
 

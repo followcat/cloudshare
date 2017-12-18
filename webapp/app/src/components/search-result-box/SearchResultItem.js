@@ -47,6 +47,7 @@ class SearchResultItem extends Component {
       selection,
       cv_id,
       searchText,
+      matchDoc,
       jdid,
       workExperienceText,
       educationExperienceText,
@@ -66,7 +67,8 @@ class SearchResultItem extends Component {
     const linkColor = gradient ? { color: gradient[parseInt(info.match*100)] } : {};
 
     const href = jdid ? `/resume?cv_id=${cv_id}&&jd_id=${jdid}`:`/resume?cv_id=${cv_id}`,
-         hrefs = searchText? href+`&&search_text=${searchText}` : href ; 
+          hrefs = searchText? href+`&&search_text=${searchText}` : href,
+          hreff = matchDoc? href+`&&match_doc=${matchDoc}` : hrefs;
     return (
       <Card className="cs-ls-i">
         <div className="basic-info">
@@ -89,7 +91,7 @@ class SearchResultItem extends Component {
             }
             <Col span={type === 'default' ? 3 : 1} className="omit">
               <a
-                href={hrefs}
+                href={hreff}
                 style={linkColor}
                 target="_blank"
               >

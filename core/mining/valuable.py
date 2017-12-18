@@ -44,7 +44,7 @@ def rate(name_list, miner, project, doc, top, uses=None, education_req=True):
 def extract(datas):
     result = []
     for i, d in enumerate(datas):
-        result.append((i, d[0].split('.')[0], d[1]))
+        result.append((i, d[0], d[1]))
     return result
 
 def next(name_list, miner, project, doc, top, basemodel, minimum=10000,

@@ -4,6 +4,7 @@ import time
 import string
 import os.path
 import functools
+import collections
 
 import utils.chsname
 import utils.timeout.process
@@ -56,6 +57,21 @@ co_template = (
     ("email",               str),
     ("date",                time.time),
 )
+
+newco_template = (
+    ("id",                  str),
+    ("name",                str),
+    ('business',            list),
+    ('description',         list),
+    ('website',             str),
+    ('project',             list),
+    ('type',                str),
+    ('total_employees',     str),
+    ('place',               list),
+    ("date",                time.time),
+)
+newco_project = collections.namedtuple('ProjectCO', ['name', 'date_from', 'date_to', 'description'])
+newco_project_key_filter = lambda x: dict([(k,v) for (k,v) in x.items() if k in newco_project._fields])
 
 peo_template = (
     ("id",                  str),
@@ -386,6 +402,30 @@ def catch_coinfo(stream):
             pass
     info['id'] = extractor.unique_id.company_id(info['name'])
     return info
+
+
+def catch_newcoinfo(co, cv):
+    """"""
+    company = generate_info_template(newco_template)
+    for key in company:
+        if key in co and co[key]:
+            company[key] = co[key]
+    company['id'] = extractor.unique_id.company_id(co['name'])
+    try:
+        projects = cv['experience']['project']
+        for prj in projects:
+            if (('company' in prj and company['name'] == prj['company']) or
+                ('company' not in prj and extractor.utils_parsing.period_overlaps(
+                                            (co['date_from'], co['date_to']),
+                                            (prj['date_from'], prj['date_to'])))):
+                try:
+                    company['project'].append(dict(newco_project(**newco_project_key_filter(prj))._asdict()))
+                except KeyError:
+                    company['project'] = [dict(newco_project(**newco_project_key_filter(prj))._asdict())]
+        return company
+    except KeyError:
+        pass
+
 
 def catch_peopinfo(stream):
     """

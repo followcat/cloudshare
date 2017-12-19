@@ -11,8 +11,6 @@ class SimulationPEO(services.base.kv_storage.KeyValueStorage):
         ("tracking",            list),
     )
 
-    list_item = {"tag", "comment", "tracking"}
-
     def __init__(self, path, name, iotype=None):
         """
             >>> from tests.settings import *

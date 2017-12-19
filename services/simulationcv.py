@@ -14,5 +14,3 @@ class SimulationCV(services.base.kv_storage.KeyValueStorage):
         ("committer",           str),
     )
 
-    list_item = {}
-

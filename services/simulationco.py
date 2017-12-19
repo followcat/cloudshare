@@ -22,8 +22,6 @@ class SimulationCO(services.base.kv_storage.KeyValueStorage):
         ("responsible",        str),
     )
 
-    list_item = {"relatedcompany", "position", "clientcontact",
-                 "progress", "updatednumber", "reminder"}
     fix_item  = {"id", "name"}
 
     def _templateinfo(self, committer):

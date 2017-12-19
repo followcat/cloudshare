@@ -391,6 +391,30 @@ def compute_duration(date_from, date_to, as_date=None):
             duration = u'%d年%d个月' % (period_year, period_month)
     return duration
 
+def period_overlaps(period, another_period):
+    u"""
+        >>> from extractor.utils_parsing import period_overlaps
+        >>> assert period_overlaps(('2016.11','2017.11'), ('2017.02','2017.10'))
+        >>> assert period_overlaps(('2016.11',u'至今'), ('2017.02','2017.06'))
+        >>> assert period_overlaps(('2016.11',u'至今'), ('2017.02',u'至今'))
+        >>> assert not period_overlaps(('2017.11',u'至今'), ('2017.02','2017.06'))
+        >>> assert not period_overlaps(('2017.11',u'至今'), ('2017.02','2017.12'))
+        >>> assert not period_overlaps(('2016.11','2017.11'), ('2017.02',u'至今'))
+        >>> assert not period_overlaps(('2016.11','2017.11'), ('2017.02','2017.12'))
+        >>> assert not period_overlaps(('2016.11','2017.11'), ('2017.12','2018.01'))
+    """
+    (fdate_from, fdate_to) = period
+    (adate_from, adate_to) = another_period
+    if ((not is_now(adate_to) and adate_to <= fdate_from) or
+            (not is_now(fdate_to) and fdate_to <= adate_from)):
+        return False
+    elif adate_from < fdate_from:
+        return False
+    elif ((not is_now(fdate_to) and (not is_now(adate_to) and adate_to <= fdate_to)) or
+            is_now(fdate_to)):
+        return True
+    return False
+
 def add_months(date, increment):
     u"""
         >>> assert u'至今' == add_months(u'至今', 3)

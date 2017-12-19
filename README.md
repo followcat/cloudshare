@@ -28,8 +28,7 @@ share，edit your doc，pdf，md and so on...
 
 ### Draw && View router graph
 
-    xdot 0.4
-    networkx==1.10
+    anytree==2.4.3
     pygraphviz==1.4.dev
 
 ### Test

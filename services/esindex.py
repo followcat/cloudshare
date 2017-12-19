@@ -250,7 +250,7 @@ class ElasticsearchIndexing(object):
         return result
 
     def count(self, index=None, doctype=None, filterdict=None,
-              ids=None, kwargs=None, slop=50):
+              ids=None, kwargs=None, slop=0):
         result = 0
         querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
                                               filterdict=filterdict, ids=ids, slop=slop)
@@ -261,7 +261,7 @@ class ElasticsearchIndexing(object):
         return result
 
     def search(self, index=None, doctype=None, filterdict=None, ids=None, source=False,
-               start=0, size=None, kwargs=None, onlyid=False, slop=50, scroll=None):
+               start=0, size=None, kwargs=None, onlyid=False, slop=0, scroll=None):
         results = (0, list())
         querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
                                               filterdict=filterdict, ids=ids, slop=slop)

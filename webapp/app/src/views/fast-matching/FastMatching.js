@@ -31,6 +31,7 @@ class FastMatching extends Component {
       startColor: '#00ff0a',
       endColor: '#000000',
       searchText: props.location.query.search_text,
+      matchDoc: props.location.query.match_doc,
       classify: [],
       projects: [],
       industry: {},
@@ -123,10 +124,10 @@ class FastMatching extends Component {
       });
     }
 
-    if(this.state.searchText){
+    if(this.state.searchText || this.state.matchDoc){
       promise.then((uses) => {
         this.setState({
-          postData: Object.assign({uses}, {filterdict: {}},{doc:this.state.searchText}),
+          postData: Object.assign({uses}, {filterdict: {}},{doc:this.state.searchText || this.state.matchDoc}),
           postAPI: API.LSI_BY_DOC_API,
           siderbarVisible: true
         },() => {
@@ -326,6 +327,7 @@ class FastMatching extends Component {
       startColor,
       endColor,
       searchText,
+      matchDoc,
       dataSource,
       selection,
       siderbarClosable,
@@ -336,7 +338,7 @@ class FastMatching extends Component {
         <Guide />
         <FilterCard
           textarea={textarea}
-          searchText={searchText}
+          searchText={searchText || matchDoc}
           classify={classify}
           projects={projects}
           industry={industry}
@@ -355,6 +357,7 @@ class FastMatching extends Component {
           endColor={endColor}
           jdid={id}
           searchText={searchText}
+          matchDoc={matchDoc}
           dataSource={dataSource}
           selection={selection}
           educationExperienceText="教育经历"

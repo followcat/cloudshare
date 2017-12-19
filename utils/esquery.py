@@ -1,7 +1,7 @@
 import re
 
 
-def match_gen(key, keywords, must=True, slop=50):
+def match_gen(key, keywords, must=True, slop=0):
     result = {'must': [], 'should': [], 'filter': []}
     match_str = re.sub('"(.*?)"', '', keywords)
     match_phrase_list = re.findall('"(.*?)"', keywords)
@@ -72,7 +72,7 @@ def getmappings(esconn, fields, index=None, doctype=None):
     return results
 
 
-def request_gen(esconn, index=None, doctype=None, filterdict=None, ids=None, slop=50):
+def request_gen(esconn, index=None, doctype=None, filterdict=None, ids=None, slop=0):
     querydict = dict()
     if filterdict is None:
         filterdict = dict()

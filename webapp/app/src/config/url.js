@@ -35,7 +35,7 @@ export const URL = {
   },
 
   getResumeURL: (id) => {
-    return `/resume/${id}`; 
+    return `/resume?cv_id=${id}`; 
   },
 
   getSearchURL: () => {

@@ -82,7 +82,7 @@ export const API = {
 
   FEATURE_API: `${HOST}/api/feature`,
 
-  JOBDESCRIPTION_LIST_API: `${HOST}/api/jdlist`,
+  JOBDESCRIPTION_SEARCH_API: `${HOST}/api/jdsearch`,
 
   JOBDESCRIPTION_API: `${HOST}/api/jd`,
 

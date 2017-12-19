@@ -15,7 +15,7 @@ const rgbToHex = (r, g, b) => {
 
 class ColorGrad {
   constructor() {
-    this.startColor = '#ffe400';
+    this.startColor = '#7ab733';
     this.endColor = '#ffffff';
     this.step = 100;
   }

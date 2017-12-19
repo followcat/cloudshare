@@ -141,7 +141,6 @@ class JobDescriptionSearchAPI(Resource):
             co_ids = self.svc_index.search(index=co_index, doctype=[project.id],
                                           filterdict={ 'name': search_ditems['company'] }, onlyid=True)
             search_ditems['company'] = co_ids
-            print co_ids
         total, searches = self.svc_index.search(index=jd_index,
                                                 doctype=[project.id],
                                                 filterdict=search_ditems,

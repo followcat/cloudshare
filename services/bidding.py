@@ -33,7 +33,6 @@ class Bidding(services.base.kv_storage.KeyValueStorage):
         IOError...
         >>> shutil.rmtree(path)
     """
-    YAML_DIR = 'YAML'
     YAML_TEMPLATE = extractor.information_explorer.bidding_template
 
     commitinfo = 'Bidding'

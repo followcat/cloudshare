@@ -9,7 +9,7 @@ import services.operator.split
 import services.operator.facade
 import services.operator.checker
 import services.operator.multiple
-import services.simulationco
+import services.simulationbd
 import services.simulationcustomer
 
 
@@ -35,21 +35,21 @@ class Project(services.operator.facade.Facade):
     CO_PATH = 'CO'
     JD_PATH = 'JD'
 
-    def __init__(self, data_service, co_repos, jd_repos):
+    def __init__(self, data_service, bd_repos, jd_repos):
         super(Project, self).__init__(data_service)
         self.name = data_service.name
         self.path = data_service.path
         self.config_file = data_service.config_file
-        self.co_repos = co_repos
+        self.bd_repos = bd_repos
         self.jd_repos = jd_repos
         copath = os.path.join(self.path, self.CO_PATH)
         jdpath = os.path.join(self.path, self.JD_PATH)
 
         self.company = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(co_repos),
-                    operator_service=services.simulationco.SimulationCO(copath, self.name)),
-                operator_service=services.simulationco.SelectionCO(copath, self.name))
+                    data_service=services.operator.multiple.Multiple(bd_repos),
+                    operator_service=services.simulationbd.SimulationBD(copath, self.name)),
+                operator_service=services.simulationbd.SelectionBD(copath, self.name))
         self.customer = services.operator.checker.Selector(
                 data_service=self.company,
                 operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
@@ -92,14 +92,14 @@ class Project(services.operator.facade.Facade):
     def storageCO(self):
         result = None
         servicename = self.config['storageCO']
-        for corepo in self.co_repos:
-            if isinstance(corepo, services.simulationco.SimulationCO):
-                for each in corepo.storages:
+        for repo in self.bd_repos:
+            if isinstance(repo, services.simulationbd.SimulationBD):
+                for each in repo.storages:
                     if each.name == servicename:
                         result = each
                         break
-            elif corepo.name == servicename:
-                result = corepo
+            elif repo.name == servicename:
+                result = repo
             if result is not None:
                 break
         return result
@@ -108,14 +108,14 @@ class Project(services.operator.facade.Facade):
     def storageJD(self):
         result = None
         servicename = self.config['storageJD']
-        for jdrepo in self.jd_repos:
-            if isinstance(jdrepo, services.simulationjd.SimulationJD):
-                for each in jdrepo.storages:
+        for repo in self.jd_repos:
+            if isinstance(repo, services.simulationjd.SimulationJD):
+                for each in repo.storages:
                     if each.name == servicename:
                         result = each
                         break
-            elif jdrepo.name == servicename:
-                result = jdrepo
+            elif repo.name == servicename:
+                result = repo
             if result is not None:
                 break
         return result

@@ -8,7 +8,6 @@ import utils.builtin
 import utils.chsname
 import core.exception
 import core.outputstorage
-import utils.docprocessor.libreoffice
 import extractor.information_explorer
 
 
@@ -50,44 +49,6 @@ def filter(processer, yamlinfo, origin_path, filename):
     else:
         path = "NoneConnection"
         move_file(path, origin_path, filename)
-
-
-def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origin=None):
-    import core.basedata
-    if not os.path.exists(temp_output):
-        os.makedirs(temp_output)
-    for root, dirs, files in os.walk(path):
-        for filename in files:
-            f = open(os.path.join(root, filename), 'r')
-            filepro = utils.docprocessor.libreoffice.LibreOfficeProcessor(filename, f, temp_output)
-            yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                        stream=filepro.markdown_stream.decode('utf8'),
-                                        filename=filepro.base.base)
-            cvobj = core.basedata.DataObject(data=filepro.markdown_stream,
-                                             metadata=yamlinfo)
-            if origin is not None:
-                cvobj.metadata['origin'] = origin
-            if not cvobj.metadata['name']:
-                name = '' # name_from_51job(processfile.markdown_stream)
-                cvobj.metadata['name'] = name
-                if not cvobj.metadata['name']:
-                    cvobj.metadata['name'] = '' # name_from_filename(filename)
-            try:
-                result = svc_cv.add(cvobj, unique=False, projectname=projectname)
-            except core.exception.DuplicateException as error:
-                continue
-
-
-def classify(path, temp_output):
-    if not os.path.exists(temp_output):
-        os.makedirs(temp_output)
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            filepro = utils.docprocessor.libreoffice.LibreOfficeProcessor(root, name, temp_output)
-            yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                        stream=filepro.markdown_stream.decode('utf8'),
-                                        filename=filepro.base.base)
-            filter(filepro, yamlinfo, root, name)
 
 
 import yaml
@@ -301,7 +262,7 @@ def company_knowledge(SVC_CV, SVC_CO):
         cv = SVC_CV.getyaml(y)
         try:
             for co in [co for co in cv['experience']['company'] if co['name']]:
-                company = extractor.information_explorer.catch_newcoinfo(co, cv)
+                company = extractor.information_explorer.catch_coinfo(co, cv)
                 name = core.outputstorage.ConvertName(company['id'])
                 coinfo = core.basedata.DataObject(company, data='')
 
@@ -440,8 +401,8 @@ def init_esindex_mem(SVC_INDEX, SVC_MEMBERS):
         for prjname, prj in mem.projects.items():
             SVC_INDEX.updatesvc(SVC_INDEX.config['CO_MEM'], prj.id,
                                 prj.company, numbers=1000)
-            SVC_INDEX.updatesvc(SVC_INDEX.config['JD_MEM'], prj.id,
-                                prj.jobdescription, numbers=1000)
+            #SVC_INDEX.updatesvc(SVC_INDEX.config['JD_MEM'], prj.id,
+            #                    prj.jobdescription, numbers=1000)
             SVC_INDEX.updatesvc(SVC_INDEX.config['CV_MEM'], prj.id,
                                 prj.curriculumvitae, numbers=1000)
 

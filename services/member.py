@@ -49,7 +49,7 @@ class Member(services.operator.facade.Facade):
     default_model = 'default'
     max_project_nums = 3
 
-    def __init__(self, data_service, acc_repos, co_repos, cv_repos, jd_repos,
+    def __init__(self, data_service, acc_repos, bd_repos, co_repos, cv_repos, jd_repos,
                  mult_peo):
         super(Member, self).__init__(data_service)
         self.name = data_service.name
@@ -59,6 +59,7 @@ class Member(services.operator.facade.Facade):
         self.jd_path = os.path.join(self.path, self.JD_PATH)
         self.co_path = os.path.join(self.path, self.CO_PATH)
         self.peo_path = os.path.join(self.path, self.PEO_PATH)
+        self.bd_repos = bd_repos
         self.co_repos = co_repos
         self.cv_repos = cv_repos
         self.jd_repos = jd_repos
@@ -182,7 +183,7 @@ class Member(services.operator.facade.Facade):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
                 tmp_project = services.project.Project(services.project.SimulationProject(unicode(path, 'utf-8'), name),
-                                                       self.co_repos, [self.jobdescriptions])
+                                                       self.bd_repos, [self.jobdescriptions])
                 tmp_project.setup(config={'id':         utils.builtin.hash(self.name+name),
                                           'autosetup':  False,
                                           'autoupdate': False,
@@ -208,7 +209,7 @@ class Member(services.operator.facade.Facade):
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
             tmp_project = services.project.Project(services.project.SimulationProject(path, name),
-                                                   self.co_repos, [self.jobdescriptions])
+                                                   self.bd_repos, [self.jobdescriptions])
             tmp_project.setup(config={'id':           utils.builtin.hash(self.name+name),
                                       'autosetup':    autosetup,
                                       'autoupdate':   autoupdate,
@@ -348,20 +349,6 @@ class Member(services.operator.facade.Facade):
     def company_add(self, coobj, committer=None, unique=True, do_commit=True):
         result = self.company.add(coobj, committer, unique=unique, do_commit=do_commit)
         return result
-
-    def company_add_excel(self, items, committer=None):
-        results = dict()
-        member_result = set()
-        for item in items:
-            if item[0] == 'projectadd':
-                yamlname = core.outputstorage.ConvertName(item[1]).yaml
-                coobj = core.basedata.DataObject(*item[2][:2])
-                member_result.add(self.company.ids_file)
-                member_result.add(os.path.join(self.company.YAML_DIR, yamlname))
-                result = self.company.add(coobj, committer=item[2][-1], do_commit=False)
-                results[item[1]] = result
-        self.company.interface.do_commit(list(member_result), committer=committer)
-        return results
 
     def getproject(self, projectname):
         return self.projects[projectname]

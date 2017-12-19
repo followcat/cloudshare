@@ -45,7 +45,7 @@ cv_template = (
     ("date",                time.time),
 )
 
-co_template = (
+bidding_template = (
     ("id",                  str),
     ("name",                str),
     ("district",            str),
@@ -58,7 +58,7 @@ co_template = (
     ("date",                time.time),
 )
 
-newco_template = (
+co_template = (
     ("id",                  str),
     ("name",                str),
     ('business',            list),
@@ -70,8 +70,8 @@ newco_template = (
     ('place',               list),
     ("date",                time.time),
 )
-newco_project = collections.namedtuple('ProjectCO', ['name', 'date_from', 'date_to', 'description'])
-newco_project_key_filter = lambda x: dict([(k,v) for (k,v) in x.items() if k in newco_project._fields])
+co_project = collections.namedtuple('ProjectCO', ['name', 'date_from', 'date_to', 'description'])
+co_project_key_filter = lambda x: dict([(k,v) for (k,v) in x.items() if k in co_project._fields])
 
 peo_template = (
     ("id",                  str),
@@ -99,6 +99,8 @@ def get_tagfromstring(tag, stream, rule=None):
         >>> get_tagfromstring(u'姓名', u'  姓    名:    followcat ')
         u'followcat'
     """
+    if not stream:
+        return ""
     if rule is None:
         rule = '\S'
     name = ""
@@ -129,6 +131,8 @@ def get_infofromrestr(stream, restring):
 
 
 def info_by_re_iter(stream, restr):
+    if not stream:
+        return ''
     result_iter = iter(get_infofromrestr(stream, restr))
     try:
         result = ''.join(result_iter.next())
@@ -381,12 +385,12 @@ def catch_cvinfo(stream, filename, selected=None, fix_func=None, catch_info=True
     return info
 
 
-def catch_coinfo(stream):
+def catch_biddinginfo(stream):
     """
         >>> intro = {'name': 'sgwgewtgqe', 'introduction': 'introduction'}
-        >>> assert catch_coinfo(stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
+        >>> assert catch_biddinginfo(stream=intro)['id'] == '114efe82f552167a1ebdd98e65f3e66750ffe720'
     """
-    info = generate_info_template(co_template)
+    info = generate_info_template(bidding_template)
     if isinstance(stream, dict):
         for key in info:
             if key in stream and stream[key]:
@@ -404,9 +408,9 @@ def catch_coinfo(stream):
     return info
 
 
-def catch_newcoinfo(co, cv):
+def catch_coinfo(co, cv):
     """"""
-    company = generate_info_template(newco_template)
+    company = generate_info_template(co_template)
     for key in company:
         if key in co and co[key]:
             company[key] = co[key]
@@ -419,9 +423,9 @@ def catch_newcoinfo(co, cv):
                                             (co['date_from'], co['date_to']),
                                             (prj['date_from'], prj['date_to'])))):
                 try:
-                    company['project'].append(dict(newco_project(**newco_project_key_filter(prj))._asdict()))
+                    company['project'].append(dict(co_project(**co_project_key_filter(prj))._asdict()))
                 except KeyError:
-                    company['project'] = [dict(newco_project(**newco_project_key_filter(prj))._asdict())]
+                    company['project'] = [dict(co_project(**co_project_key_filter(prj))._asdict())]
         return company
     except KeyError:
         pass

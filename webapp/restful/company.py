@@ -350,7 +350,6 @@ class CompanyConfirmExcelAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        meb_results = member.company_add_excel(datas, committer=user.name)
         prj_results = project.company_add_excel(datas, committer=user.name)
         infos = dict()
         results = { 'success': dict(), 'failed': dict() }

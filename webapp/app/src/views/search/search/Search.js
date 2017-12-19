@@ -33,7 +33,7 @@ class Search extends Component {
   handleJDSearch(value) {
     browserHistory.push({
       pathname: '/fastmatching',
-      query: { search_text: value }
+      query: { match_doc: value }
     });
   }
 

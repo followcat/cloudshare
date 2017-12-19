@@ -1,0 +1,27 @@
+@filterCardPrefixCls: cs-filter-condition;
+
+.@{filterCardPrefixCls} {
+  display: inline-block;
+  margin-left: 8px;
+
+  .filter-condition {
+    position: relative;
+    display: inline-block;
+    padding: 8px 16px;
+    border: 1px solid #c2c2c2;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    margin-right: 4px;
+
+    & > input {
+      width: 100px
+    }
+
+    .close-icon {
+        position: absolute;
+        top: 0;
+        right: 2px;
+        cursor: pointer;
+    }
+  }
+}

@@ -82,7 +82,7 @@ export const API = {
 
   FEATURE_API: `${HOST}/api/feature`,
 
-  JOBDESCRIPTION_LIST_API: `${HOST}/api/jdlist`,
+  JOBDESCRIPTION_SEARCH_API: `${HOST}/api/jdsearch`,
 
   JOBDESCRIPTION_API: `${HOST}/api/jd`,
 
@@ -107,6 +107,8 @@ export const API = {
   RESUME_INFO_API: `${HOST}/api/resume`,
 
   HIGHLIGHT_KEYWORD_API: `${HOST}/api/highlight/search`,
+
+  HIGHLIGHT_DOC_API: `${HOST}/api/highlight/lsicvdoc`,
 
   HIGHLIGHT_API: `${HOST}/api/highlight/lsicvjd`,
 

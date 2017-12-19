@@ -6,6 +6,7 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
+import utils.builtin
 import core.basedata
 import core.exception
 import utils.timeout.thread
@@ -127,6 +128,8 @@ class UploadCVAPI(Resource):
         yamlinfo = extractor.information_explorer.catch_cvinfo(
                                             filepro.markdown_stream.decode('utf8'),
                                             filename, fix_func=origin, timing=True)
+        convertname = core.outputstorage.ConvertName(yamlinfo['id'])
+        utils.builtin.save_yaml(yamlinfo, filepro.output_path.yaml, convertname.yaml)
         filepro.renameconvert(yamlinfo['id'])
         dataobj = core.basedata.DataObject(metadata=yamlinfo,
                                            data=filepro.markdown_stream,)

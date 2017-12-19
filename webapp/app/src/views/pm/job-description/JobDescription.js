@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
 import TablePlus from 'components/table-plus';
+import FilterCondition from 'components/filter-condition';
 import EditJobDescriptionForm from './EditJobDescriptionForm';
 import CreateNewJobDescription from './CreateNewJobDescription';
 import Status from './Status';
@@ -10,12 +11,12 @@ import Operation from './Operation';
 
 import { introJs } from 'intro.js';
 
-import { message, Pagination, } from 'antd';
+import { message, Pagination, Button } from 'antd';
 
 import findIndex from 'lodash/findIndex';
 
 import {
-  getJobDescriptionList,
+  getJobDescriptionSearch,
   getJobDescription,
   updateJobDescription,
   createJobDescription
@@ -33,9 +34,12 @@ class JobDescription extends Component {
       current: 1,
       totals: 0,
       pageSize: 10,
+      option: [],
       dataSource: [],
+      searchItems: [],
       filterDataSource: [],
       customerDataSource: [],
+      filterData: [],
       statusValue: 'Opening',
       record: {},
       loading: false,
@@ -57,6 +61,8 @@ class JobDescription extends Component {
     this.getJobDescriptionElements = this.getJobDescriptionElements.bind(this);
     this.handleShowSizeChange = this.handleShowSizeChange.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
+    this.handleOption = this.handleOption.bind(this);
+    this.handleFilterClick = this.handleFilterClick.bind(this);
   }
 
   handleEditClick(record) {
@@ -64,6 +70,12 @@ class JobDescription extends Component {
     this.setState({
       editVisible: true
     });
+  }
+
+  handleOption(option) {
+    this.setState({
+      option: option
+    })
   }
 
   // 编辑职位Modal关闭事件
@@ -173,32 +185,50 @@ class JobDescription extends Component {
       },() => {this.getjobDescriptionDataSource()});
   }
 
-  // 获取所有JD列表
-  getjobDescriptionDataSource() {
+  handleFilterClick() {
+    this.setState({ current: 1 });
+
+    this.getjobDescriptionDataSource();
+  }
+
+  // 获取JD列表
+  getjobDescriptionDataSource(filter) {
     const { dataSource,
             filterDataSource,
+            option,
             current,
             pageSize,
+            filterData,
+            searchItems,
             statusValue } = this.state;
-    
     this.setState({
-      loading: true
+      loading: true,
     });
-    
-    getJobDescriptionList({
-      status: statusValue,
-      current_page: current,
-      page_size: pageSize,
-    },(json) => {
-      if (json.code === 200) {
+      if(typeof(filter) !== "undefined") {
         this.setState({
-          dataSource: json.data,
-          filterDataSource: json.data.filter(item => item.status === statusValue),
-          loading: false,
-          totals: json.totals
+          filterData: filter
         });
+        filter && filter.map((item) => {searchItems.push(item.data)});
       }
-    });
+      else {
+        filterData && filterData.map((item) => {searchItems.push(item.data)});
+      }
+      searchItems.push(["status",statusValue]);
+      getJobDescriptionSearch({
+          current_page: current,
+          page_size: pageSize,
+          search_items: searchItems,
+        },(json) => {
+          if (json.code === 200) {
+            this.setState({
+              dataSource: json.data,
+              filterDataSource: json.data.filter(item => item.status === statusValue),
+              loading: false,
+              totals: json.totals,
+              searchItems: []
+            });
+          }
+        });
   }
 
   // 根据id获取最新数据
@@ -416,19 +446,34 @@ class JobDescription extends Component {
       onChange: this.handlePaginationChange
     };
 
-    const state = this.state;
+    const options = [{
+      key: 'company',
+      text: language.COMPANY_NAME,
+    },{
+      key: 'name',
+      text: language.POSITION,
+    },{
+      key: 'committer',
+      text: language.RESPONSIBLE,
+    }];
 
+    const state = this.state;
     return (
       <div className="cs-job-description">
+        <FilterCondition
+          options={options}
+          handleOption={this.handleOption}
+          getDataSource={this.getjobDescriptionDataSource}
+        />
         <TablePlus
           isToolbarShowed={true}
-          isSearched={true}
+          isSearched={false}
           loading={this.state.loading}
           elements={this.getJobDescriptionElements()}
           columns={columns}
           rowKey={record => record.id}
           expandedRowRender={record => this.getExpandedRowRender(record)}
-          dataSource={state.filterDataSource.length > 0 ? state.filterDataSource : state.dataSource}
+          dataSource={state.dataSource}
         />
         <div className='cs-job-description-result'>
         <EditJobDescriptionForm

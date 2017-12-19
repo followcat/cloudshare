@@ -32,7 +32,7 @@ import {
 } from 'request/resume';
 import { addBookmark, deleteBookmark } from 'request/bookmark';
 import { confirmUpload } from 'request/upload';
-import { getHlighLight, getHlighLightKeyWord } from 'request/highlight';
+import { getHlighLight, getHlighLightKeyWord, getHlighLightDoc } from 'request/highlight';
 
 import { API } from 'API';
 import { URL } from 'URL';
@@ -49,6 +49,7 @@ class Resume extends Component {
       resumeId: '',
       jd: '',
       searchText: '',
+      matchDoc: '',
       resumeList: [],
       fileList: [],
       dataSource: null,
@@ -76,18 +77,24 @@ class Resume extends Component {
     this.getResumeIDList = this.getResumeIDList.bind(this);
     this.getHlighLightData = this.getHlighLightData.bind(this);
     this.getHlighLightKeyWord = this.getHlighLightKeyWord.bind(this);
+    this.getHlighLightByDoc = this.getHlighLightByDoc.bind(this);
     this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
     this.handSelectProject = this.handSelectProject.bind(this);
   }
 
   componentWillMount() {
-    const id = this.props.location.query.cv_id,
-        jdid = this.props.location.query.jd_id,
-  searchText = this.props.location.query.search_text ;
+    const { cv_id, jd_id, search_text, match_doc } 
+          = this.props.location.query;
+    const id = cv_id,
+        jdid = jd_id,
+  searchText = search_text,
+    matchDoc = match_doc;
+
     this.setState({
       resumeId: id,
             jd: jdid,
-    searchText: searchText
+    searchText: searchText,
+      matchDoc: matchDoc
     });
 
     this.getResumeDataSource(id);
@@ -96,6 +103,7 @@ class Resume extends Component {
     this.getHlighLightData(jdid,id,30);
     if(searchText)
     this.getHlighLightKeyWord(searchText);
+    matchDoc && this.getHlighLightByDoc(matchDoc,id,30);
     this.getSimilarDataSource(id);
   }
 
@@ -355,15 +363,36 @@ class Resume extends Component {
    }
 
     /**
-   * 获取jd和cv之间支撑词
+   * 获取keyword highlight
    * 
-   * @param {string} jd ,{string} cv ,{int} top
+   * @param {string} keyword
    * 
    * @memberOf Resume
    */
   getHlighLightKeyWord(searchText) {
     getHlighLightKeyWord({
       keyword: searchText
+    }, json => {
+      if (json.code === 200) {
+        this.setState({
+          highlight: json.data,
+        });
+      }
+    });
+   }
+
+    /**
+   * 获取doc match highlight
+   * 
+   * @param {string} doc ,{string} cv ,{int} top
+   * 
+   * @memberOf Resume
+   */
+  getHlighLightByDoc(doc,cv,top) {
+    getHlighLightDoc({
+      cv: cv,
+      top: top,
+      doc: doc
     }, json => {
       if (json.code === 200) {
         this.setState({

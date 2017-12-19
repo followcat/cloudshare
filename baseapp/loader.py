@@ -11,20 +11,6 @@ import services.multiclsify
 import services.analysis.cutword
 
 
-SUPPORT_DOCPROCESSOR = {}
-try:
-    import utils.docprocessor.pandoc
-    SUPPORT_DOCPROCESSOR['pandoc'] = utils.docprocessor.pandoc.PandocProcessor
-except ImportError:
-    pass
-
-#try:
-#    import utils.docprocessor.libreoffice
-#    SUPPORT_DOCPROCESSOR['libreoffice'] = utils.docprocessor.libreoffice.LibreOfficeProcessor
-#except ImportError:
-#    pass
-
-
 class Config(object):
 
     es_config_file = 'es.yaml'
@@ -248,8 +234,12 @@ def load_co_mining(SVC_MIN, SVC_CVS):
 
 
 def load_doc_processor(name):
-    global SUPPORT_DOCPROCESSOR
-    return SUPPORT_DOCPROCESSOR[name]
+    if name == 'libreoffice':
+        import utils.docprocessor.libreoffice
+        return utils.docprocessor.libreoffice.LibreOfficeProcessor
+    else:
+        import utils.docprocessor.pandoc
+        return utils.docprocessor.pandoc.PandocProcessor
 
 
 def load_esindex(es_conn):

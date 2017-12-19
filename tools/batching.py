@@ -401,8 +401,8 @@ def init_esindex_mem(SVC_INDEX, SVC_MEMBERS):
         for prjname, prj in mem.projects.items():
             SVC_INDEX.updatesvc(SVC_INDEX.config['CO_MEM'], prj.id,
                                 prj.company, numbers=1000)
-            #SVC_INDEX.updatesvc(SVC_INDEX.config['JD_MEM'], prj.id,
-            #                    prj.jobdescription, numbers=1000)
+            SVC_INDEX.updatesvc(SVC_INDEX.config['JD_MEM'], prj.id,
+                                prj.jobdescription, numbers=1000)
             SVC_INDEX.updatesvc(SVC_INDEX.config['CV_MEM'], prj.id,
                                 prj.curriculumvitae, numbers=1000)
 

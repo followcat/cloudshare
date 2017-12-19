@@ -99,8 +99,6 @@ def get_tagfromstring(tag, stream, rule=None):
         >>> get_tagfromstring(u'姓名', u'  姓    名:    followcat ')
         u'followcat'
     """
-    if not stream:
-        return ""
     if rule is None:
         rule = '\S'
     name = ""
@@ -131,8 +129,6 @@ def get_infofromrestr(stream, restring):
 
 
 def info_by_re_iter(stream, restr):
-    if not stream:
-        return ''
     result_iter = iter(get_infofromrestr(stream, restr))
     try:
         result = ''.join(result_iter.next())

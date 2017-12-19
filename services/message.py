@@ -74,8 +74,6 @@ class Message(services.base.kv_storage.KeyValueStorage):
     )
 
     MUST_KEY = ['id']
-    list_item = {"invited_member", "inviter_member", "processed_member",
-                 "sent_chat", "read_chat", "unread_chat"}
     fix_item  = {"id"}
 
     def __init__(self, svc_account, path, name=None, iotype='git'):

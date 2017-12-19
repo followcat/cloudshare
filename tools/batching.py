@@ -8,7 +8,6 @@ import utils.builtin
 import utils.chsname
 import core.exception
 import core.outputstorage
-import utils.docprocessor.libreoffice
 import extractor.information_explorer
 
 
@@ -50,44 +49,6 @@ def filter(processer, yamlinfo, origin_path, filename):
     else:
         path = "NoneConnection"
         move_file(path, origin_path, filename)
-
-
-def convert_folder(path, svc_cv, projectname, temp_output, committer=None, origin=None):
-    import core.basedata
-    if not os.path.exists(temp_output):
-        os.makedirs(temp_output)
-    for root, dirs, files in os.walk(path):
-        for filename in files:
-            f = open(os.path.join(root, filename), 'r')
-            filepro = utils.docprocessor.libreoffice.LibreOfficeProcessor(filename, f, temp_output)
-            yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                        stream=filepro.markdown_stream.decode('utf8'),
-                                        filename=filepro.base.base)
-            cvobj = core.basedata.DataObject(data=filepro.markdown_stream,
-                                             metadata=yamlinfo)
-            if origin is not None:
-                cvobj.metadata['origin'] = origin
-            if not cvobj.metadata['name']:
-                name = '' # name_from_51job(processfile.markdown_stream)
-                cvobj.metadata['name'] = name
-                if not cvobj.metadata['name']:
-                    cvobj.metadata['name'] = '' # name_from_filename(filename)
-            try:
-                result = svc_cv.add(cvobj, unique=False, projectname=projectname)
-            except core.exception.DuplicateException as error:
-                continue
-
-
-def classify(path, temp_output):
-    if not os.path.exists(temp_output):
-        os.makedirs(temp_output)
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            filepro = utils.docprocessor.libreoffice.LibreOfficeProcessor(root, name, temp_output)
-            yamlinfo = extractor.information_explorer.catch_cvinfo(
-                                        stream=filepro.markdown_stream.decode('utf8'),
-                                        filename=filepro.base.base)
-            filter(filepro, yamlinfo, root, name)
 
 
 import yaml
@@ -296,27 +257,19 @@ def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
                 with open(path_filename, 'w') as fp:
                     fp.write(yaml.safe_dump(yaml_info, allow_unicode=True))
 
-
 def company_knowledge(SVC_CV, SVC_CO):
-    import core.basedata
-    import core.outputstorage
-    import services.exception
-
     for y in SVC_CV.yamls():
-        info = SVC_CV.getyaml(y)
+        cv = SVC_CV.getyaml(y)
         try:
-            for c in [c for c in info['experience']['company'] if c['name']]:
-                company = extractor.information_explorer.catch_coinfo(stream=c)
-                coobj = core.basedata.DataObject(company, data='')
-                try:
-                    result = SVC_CO.add(coobj)
-                except services.exception.ExistsCompany:
-                    name = core.outputstorage.ConvertName(coobj.metadata['id'])
-                    coinfo = SVC_CO.getyaml(name)
-                    coinfo['business'] = sorted(set(coinfo['business']).union(set(coobj.metadata['business'])))
-                    if 'total_employees' in coobj.metadata and coobj.metadata['total_employees']:
-                        coinfo['total_employees'] = coobj.metadata['total_employees']
-                    utils.builtin.save_yaml(coinfo, SVC_CO.path , name.yaml)
+            for co in [co for co in cv['experience']['company'] if co['name']]:
+                company = extractor.information_explorer.catch_coinfo(co, cv)
+                name = core.outputstorage.ConvertName(company['id'])
+                coinfo = core.basedata.DataObject(company, data='')
+
+                if SVC_CO.exists(name):
+                    SVC_CO.modify(coinfo)
+                else:
+                    SVC_CO.add(coinfo)
         except KeyError:
             continue
         except TypeError:

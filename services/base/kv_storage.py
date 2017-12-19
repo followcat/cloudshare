@@ -15,13 +15,16 @@ class KeyValueStorage(services.base.storage.BaseStorage):
     YAML_TEMPLATE = ()
 
     fix_item = {}
-    list_item = {}
 
     yaml_private_key = {}
 
     def __init__(self, path, name=None, iotype=None):
         self.yamlpath = self.YAML_DIR
         super(KeyValueStorage, self).__init__(os.path.join(path, self.yamlpath), name, iotype=iotype)
+
+    @property
+    def list_item(self):
+        return set([k for k,v in filter(lambda x: x[1] is list, self.YAML_TEMPLATE)])
 
     def _listframe(self, value, username, date=None):
         if date is None:
@@ -123,6 +126,38 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
             result = self.interface.add(name, dumpinfo,
+                            message, committer, do_commit=do_commit)
+        return result
+
+    def modify(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
+        result = False
+        name = core.outputstorage.ConvertName(bsobj.name)
+        info = self.getinfo(name)
+        if kv_file is True:
+            for key in self.generate_info_template():
+                if key in self.list_item:
+                    try:
+                        if not bsobj.metadata[key]:
+                            continue
+                        elif isinstance(bsobj.metadata[key], list, set, tuple, dict):
+                            info[key].extend(bsobj.metadata[key])
+                        else:
+                            info[key].append(bsobj.metadata[key])
+                    except KeyError:
+                        pass
+                else:
+                    try:
+                        info[key] = bsobj.metadata[key]
+                    except KeyError:
+                        pass
+            if committer is not None:
+                info['committer'] = committer
+            message = "Add %s: %s metadata." % (self.commitinfo, name)
+            saveinfo = {'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}
+            saveinfo.update(info)
+            dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
+                                 allow_unicode=True, default_flow_style=False)
+            result = self.interface.modify(name.yaml, dumpinfo,
                             message, committer, do_commit=do_commit)
         return result
 

@@ -11,20 +11,6 @@ import services.multiclsify
 import services.analysis.cutword
 
 
-SUPPORT_DOCPROCESSOR = {}
-try:
-    import utils.docprocessor.pandoc
-    SUPPORT_DOCPROCESSOR['pandoc'] = utils.docprocessor.pandoc.PandocProcessor
-except ImportError:
-    pass
-
-try:
-    import utils.docprocessor.libreoffice
-    SUPPORT_DOCPROCESSOR['libreoffice'] = utils.docprocessor.libreoffice.LibreOfficeProcessor
-except ImportError:
-    pass
-
-
 class Config(object):
 
     es_config_file = 'es.yaml'
@@ -36,6 +22,7 @@ class Config(object):
         '1.5': 'datas',
         }
     default_storage_path['1.6'] = default_storage_path['1.5']
+    default_storage_path['1.7'] = default_storage_path['1.6']
 
     storage_template = {'1.1': (
         ("RAW",             "raw"),
@@ -81,6 +68,26 @@ class Config(object):
         ("CO_REPO",         "CO/repo"),
         ("CV_REPO",         "CV/repo"),
         ("CV_INDIV",        "CV/indiv"),
+        ("CV_STO",          "CV/storage"),
+        ("PEO_REPO",        "PEO/repo"),
+        ("PEO_INDIV",       "PEO/indiv"),
+        ("PEO_STO",         "PEO/storage"),
+        ("PEO_LIMIT",       "PEO/limit"),
+        ("MEMBERS",         "members"),
+        ("UPLOAD_TEMP",     "output"),
+        ("RAW",             "raw")
+    ),
+    '1.7': (
+        ("LSI",             "model/lsimodel"),
+        ("CUTWORD",         "cache/cutwords"),
+        ("ACCOUNT",         "account/account"),
+        ("PASSWORD",        "account/password"),
+        ("MESSAGE",         "account/message"),
+        ("JD_REPO",         "JD/repo"),
+        ("BD_REPO",         "BD/repo"),
+        ("CV_REPO",         "CV/repo"),
+        ("CV_INDIV",        "CV/indiv"),
+        ("CO_STO",          "CO/storage"),
         ("CV_STO",          "CV/storage"),
         ("PEO_REPO",        "PEO/repo"),
         ("PEO_INDIV",       "PEO/indiv"),
@@ -173,7 +180,7 @@ class Config(object):
  
 
 CONFIG_PATH = 'config'
-config = Config(CONFIG_PATH, version='1.6')
+config = Config(CONFIG_PATH, version='1.7')
 
 def load_mult_classify(svc_storages):
     global config
@@ -227,8 +234,12 @@ def load_co_mining(SVC_MIN, SVC_CVS):
 
 
 def load_doc_processor(name):
-    global SUPPORT_DOCPROCESSOR
-    return SUPPORT_DOCPROCESSOR[name]
+    if name == 'libreoffice':
+        import utils.docprocessor.libreoffice
+        return utils.docprocessor.libreoffice.LibreOfficeProcessor
+    else:
+        import utils.docprocessor.pandoc
+        return utils.docprocessor.pandoc.PandocProcessor
 
 
 def load_esindex(es_conn):

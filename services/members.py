@@ -8,11 +8,12 @@ class Members(object):
 
     default_member_name = 'default'
 
-    def __init__(self, path, acc_repos, co_repos, cv_repos, jd_repos, mult_peo):
+    def __init__(self, path, acc_repos, bd_repos, co_repos, cv_repos, jd_repos, mult_peo):
         self.path = path
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         self.acc_repos = acc_repos
+        self.bd_repos = bd_repos
         self.co_repos = co_repos
         self.cv_repos = cv_repos
         self.jd_repos = jd_repos
@@ -23,7 +24,7 @@ class Members(object):
                 str_name = os.path.split(member_path)[1]
                 name = unicode(str_name, 'utf-8')
                 member = services.member.Member(services.member.SimulationMember(member_path, name),
-                                                acc_repos, co_repos, cv_repos, jd_repos, mult_peo)
+                                                acc_repos, bd_repos, co_repos, cv_repos, jd_repos, mult_peo)
                 member.setup({'storageCV':  'cloudshare',
                               'storagePEO': 'peostorage',
                               'limitPEO':   'peolimit',
@@ -36,7 +37,7 @@ class Members(object):
     def load_default_member(self):
         path = os.path.join(self.path, self.default_member_name)
         member = services.member.DefaultMember(services.member.SimulationMember(path, self.default_member_name),
-                                               self.acc_repos, self.co_repos, self.cv_repos, self.jd_repos, self.mult_peo)
+                                               self.acc_repos, self.bd_repos, self.co_repos, self.cv_repos, self.jd_repos, self.mult_peo)
         member.setup({'storageCV':  'cvindividual',
                       'storagePEO': 'peoindividual',
                       'limitPEO':   'peolimit',
@@ -51,7 +52,7 @@ class Members(object):
         assert not self.exists(name)
         path = os.path.join(self.path, name)
         member = services.member.Member(services.member.SimulationMember(path, name),
-                                        self.acc_repos, self.co_repos, self.cv_repos, self.jd_repos, self.mult_peo)
+                                        self.acc_repos, self.bd_repos, self.co_repos, self.cv_repos, self.jd_repos, self.mult_peo)
         member.setup({'storageCV':  'cloudshare',
                       'storagePEO': 'peostorage',
                       'limitPEO':   'peolimit',

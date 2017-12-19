@@ -279,6 +279,13 @@ def convert_model(current_template, next_template, version):
                 except OSError:
                     pass
 
+def convert_repo(current_template, next_template, version):
+    if version == '1.7':
+        for repo in ('CO_REPO', ):
+            if repo == 'CO_REPO':
+                for f in path.Path(current_template[repo]).files:
+                    os.renames(f, os.path.join(next_template['BD_REPO'], os.path.basename(f)))
+
 conversion_rules = {
     # Backward conversions
     ('1.2', '1.1'): collections.OrderedDict({
@@ -297,6 +304,9 @@ conversion_rules = {
         }),
     ('1.5', '1.6'): collections.OrderedDict({
         'MEMBERS': functools.partial(convert_member, version='1.6'),
+        }),
+    ('1.6', '1.7'): collections.OrderedDict({
+        'REPO': functools.partial(convert_repo, version='1.7'),
         }),
     }
 

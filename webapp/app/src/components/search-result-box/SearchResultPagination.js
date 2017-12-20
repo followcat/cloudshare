@@ -18,8 +18,8 @@ class SearchResultPagination extends Component {
   }
 
   render() {
-    const { current, total } = this.props;
-
+    const { current, pages, total } = this.props;
+    const pageSize = 20;
     return (
       <Row className="cs-search-result-bottom">
         <Col span={12} offset={12}>
@@ -27,9 +27,9 @@ class SearchResultPagination extends Component {
             showQuickJumper
             current={current}
             defaultCurrent={1}
-            total={total}
-            defaultPageSize={20}
-            pageSize={20}
+            total={pages*pageSize}
+            defaultPageSize={pageSize}
+            pageSize={pageSize}
             onChange={this.handleChange}
           />
         </Col>

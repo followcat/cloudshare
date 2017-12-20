@@ -86,6 +86,7 @@ class SearchResultBox extends Component {
       visible,
       spinning,
       current,
+      pages,
       total,
       showPagination
     } = this.props;
@@ -105,6 +106,7 @@ class SearchResultBox extends Component {
         { showPagination ?
         <SearchResultPagination
           current={current}
+          pages={pages}
           total={total}
           onSwitchPage={this.props.onSwitchPage}
         />

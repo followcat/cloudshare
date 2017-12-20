@@ -24,7 +24,10 @@ class Members(object):
                 str_name = os.path.split(member_path)[1]
                 name = unicode(str_name, 'utf-8')
                 member = services.member.Member(services.member.SimulationMember(member_path, name),
-                                                acc_repos, bd_repos, co_repos, cv_repos, jd_repos, mult_peo)
+                                                account={'acc': acc_repos}, bidding={'bd': bd_repos},
+                                                company={'co': co_repos}, curriculumvitae={'cv': cv_repos,
+                                                'repo': self.cv_repos[0], 'storage': self.cv_repos[1:]},
+                                                jobdescriptions={'jd': jd_repos}, people={'peo': mult_peo})
                 member.setup({'storageCV':  'cloudshare',
                               'storagePEO': 'peostorage',
                               'limitPEO':   'peolimit',
@@ -37,7 +40,10 @@ class Members(object):
     def load_default_member(self):
         path = os.path.join(self.path, self.default_member_name)
         member = services.member.DefaultMember(services.member.SimulationMember(path, self.default_member_name),
-                                               self.acc_repos, self.bd_repos, self.co_repos, self.cv_repos, self.jd_repos, self.mult_peo)
+                                                account={'acc': self.acc_repos}, bidding={'bd': self.bd_repos},
+                                                company={'co': self.co_repos}, curriculumvitae={'cv': self.cv_repos,
+                                                'repo': self.cv_repos[0], 'storage': self.cv_repos[1:]},
+                                                jobdescriptions={'jd': self.jd_repos}, people={'peo': self.mult_peo})
         member.setup({'storageCV':  'cvindividual',
                       'storagePEO': 'peoindividual',
                       'limitPEO':   'peolimit',
@@ -52,7 +58,10 @@ class Members(object):
         assert not self.exists(name)
         path = os.path.join(self.path, name)
         member = services.member.Member(services.member.SimulationMember(path, name),
-                                        self.acc_repos, self.bd_repos, self.co_repos, self.cv_repos, self.jd_repos, self.mult_peo)
+                                                account={'acc': self.acc_repos}, bidding={'bd': self.bd_repos},
+                                                company={'co': self.co_repos}, curriculumvitae={'cv': self.cv_repos,
+                                                'repo': self.cv_repos[0], 'storage': self.cv_repos[1:]},
+                                                jobdescriptions={'jd': self.jd_repos}, people={'peo': self.mult_peo})
         member.setup({'storageCV':  'cloudshare',
                       'storagePEO': 'peostorage',
                       'limitPEO':   'peolimit',

@@ -45,7 +45,8 @@ class Multiple(services.base.service.Service):
         for service in self.services:
             try:
                 res = getattr(service, attr)(*args, **kwargs)
-                break
+                if res:
+                    break
             except IOError:
                 continue
             except AttributeError:

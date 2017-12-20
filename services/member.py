@@ -12,8 +12,8 @@ import services.simulationacc
 import services.simulationpeo
 import services.multipeople
 import services.base.kv_storage
-import services.operator.facade
 import services.operator.checker
+import services.operator.combine
 import services.operator.multiple
 
 import sources.industry_id
@@ -37,7 +37,7 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
         return self.saveinfo(self.config_file, info, commitinfo, committer=commitinfo, do_commit=True)
 
 
-class Member(services.operator.facade.Facade):
+class Member(services.operator.combine.Combine):
 
     PEO_PATH = 'people'
     PRJ_PATH = 'projects'
@@ -49,9 +49,15 @@ class Member(services.operator.facade.Facade):
     default_model = 'default'
     max_project_nums = 3
 
-    def __init__(self, data_service, acc_repos, bd_repos, co_repos, cv_repos, jd_repos,
-                 mult_peo):
-        super(Member, self).__init__(data_service)
+    def __init__(self, data_service, **kwargs):
+        """"""
+        super(Member, self).__init__(data_service, **kwargs)
+        assert 'people' in kwargs
+        assert 'company' in kwargs
+        assert 'account' in kwargs
+        assert 'bidding' in kwargs
+        assert 'jobdescriptions' in kwargs
+        assert 'curriculumvitae' in kwargs
         self.name = data_service.name
         self.path = data_service.path
         self.config_file = data_service.config_file
@@ -59,30 +65,34 @@ class Member(services.operator.facade.Facade):
         self.jd_path = os.path.join(self.path, self.JD_PATH)
         self.co_path = os.path.join(self.path, self.CO_PATH)
         self.peo_path = os.path.join(self.path, self.PEO_PATH)
-        self.bd_repos = bd_repos
-        self.co_repos = co_repos
-        self.cv_repos = cv_repos
-        self.jd_repos = jd_repos
-        self.mult_peo = mult_peo
-        self.acc_repos = acc_repos
+        self.bd_repos = kwargs['bidding']['bd']
+        self.co_repos = kwargs['company']['co']
+        self.cv_repos = kwargs['curriculumvitae']['cv']
+        self.jd_repos = kwargs['jobdescriptions']['jd']
+        self.mult_peo = kwargs['people']['peo']
+        self.acc_repos = kwargs['account']['acc']
         self.projects_path = os.path.join(self.path, self.PRJ_PATH)
         self.accounts_path = os.path.join(self.path, self.ACC_PATH)
         self.company = services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(co_repos),
+                data_service=services.operator.multiple.Multiple(kwargs['company']['co']),
                 operator_service=services.simulationco.SelectionCO(self.co_path, self.name))
-        self.curriculumvitae = services.secret.Private(
-                data_service=services.operator.split.SplitData(
-                        data_service=services.operator.multiple.Multiple(cv_repos),
+        self.curriculumvitae = services.operator.multiple.Multiple(
+                [services.secret.Private(
+                    data_service=services.operator.split.SplitData(
+                        data_service=kwargs['curriculumvitae']['repo'],
                         operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
-                operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)
-                )
+                    operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
+                services.operator.split.SplitData(
+                        data_service=services.secret.Secret(services.operator.multiple.Multiple(kwargs['curriculumvitae']['storage'])),
+                        operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name))
+                ])
         self.people = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    data_service=services.multipeople.MultiPeople(mult_peo),
+                    data_service=services.multipeople.MultiPeople(kwargs['people']['peo']),
                     operator_service=services.simulationpeo.SimulationPEO(self.peo_path, self.name)),
                 operator_service=services.base.name_storage.NameStorage(self.peo_path, self.name))
         self.jobdescriptions = services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(jd_repos),
+                data_service=services.operator.multiple.Multiple(kwargs['jobdescriptions']['jd']),
                 operator_service=services.base.name_storage.NameStorage(self.jd_path, self.name))
         self.config_service = self.data_service
         self.config = dict()
@@ -260,39 +270,8 @@ class Member(services.operator.facade.Facade):
         self.curriculumvitae.modify(id+'.yaml', utils.builtin.dump_yaml(yaml_data), committer=committer)
         return result
 
-    def cv_yamls(self):
-        return self.curriculumvitae.yamls()
-
-    def cv_names(self):
-        return self.curriculumvitae.names()
-
-    def cv_datas(self):
-        return self.curriculumvitae.datas()
-
-    def cv_gethtml(self, id):
-        return self.curriculumvitae.gethtml(id)
-
-    def cv_getmd(self, id):
-        return self.curriculumvitae.getmd(id)
-
-    def cv_getmd_en(self, id):
-        return self.curriculumvitae.getmd_en(id)
-
     def cv_numbers(self):
         return self.curriculumvitae.NUMS
-
-    def cv_ids(self):
-        return self.curriculumvitae.ids
-
-    def cv_timerange(self, start_y, start_m, start_d, end_y, end_m, end_d):
-        return self.curriculumvitae.timerange(start_y, start_m, start_d,
-                                              end_y, end_m, end_d)
-
-    def cv_history(self, author=None, entries=10, skip=0):
-        return self.curriculumvitae.history(author, entries, skip)
-
-    def cv_getyaml(self, id):
-        return self.curriculumvitae.getyaml(id)
 
     def cv_updateyaml(self, id, key, value, username):
         result = None
@@ -327,9 +306,6 @@ class Member(services.operator.facade.Facade):
             if self.curriculumvitae.exists(id):
                 yield self.curriculumvitae.getmd(id)
 
-    def peo_getyaml(self, id):
-        return self.people.getyaml(id)
-
     def peo_updateyaml(self, id, key, value, username):
         result = None
         try:
@@ -340,11 +316,6 @@ class Member(services.operator.facade.Facade):
 
     def peo_deleteyaml(self, id, key, value, username, date):
         return self.people.deleteinfo(id, key, value, username, date)
-
-    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True):
-        result = self.jobdescriptions.add(jdobj, committer,
-                                          unique=unique, do_commit=do_commit)
-        return result
 
     def company_add(self, coobj, committer=None, unique=True, do_commit=True):
         result = self.company.add(coobj, committer, unique=unique, do_commit=do_commit)

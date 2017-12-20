@@ -77,14 +77,16 @@ class Member(services.operator.combine.Combine):
                 data_service=services.operator.multiple.Multiple(kwargs['company']['co']),
                 operator_service=services.simulationco.SelectionCO(self.co_path, self.name))
         self.curriculumvitae = services.operator.multiple.Multiple(
-                [services.secret.Private(
+                [services.operator.checker.Filter(
                     data_service=services.operator.split.SplitData(
                         data_service=kwargs['curriculumvitae']['repo'],
                         operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                 services.operator.split.SplitData(
-                        data_service=services.secret.Secret(services.operator.multiple.Multiple(kwargs['curriculumvitae']['storage'])),
-                        operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name))
+                    data_service=services.secret.Private(
+                        data_service=services.operator.multiple.Multiple(kwargs['curriculumvitae']['storage']),
+                        operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
+                    operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
         self.people = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(

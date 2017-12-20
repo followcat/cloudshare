@@ -6,8 +6,6 @@ import extractor.information_explorer
 
 class Secret(services.operator.facade.Facade):
 
-    secrecy_default = True
-
     def clean_plaintext(self, id, source):
         if not source:
             return source
@@ -37,21 +35,21 @@ class Secret(services.operator.facade.Facade):
 
     def gethtml(self, id, secrecy=True):
         result = self.service.gethtml(id)
-        if secrecy is True and self.secrecy_default:
+        if secrecy is True:
             result = self.clean_plaintext(id, result)
         return result
 
     def getmd(self, id, secrecy=True):
         result = self.service.getmd(id)
-        if secrecy is True and self.secrecy_default:
+        if secrecy is True:
             result = self.clean_plaintext(id, result)
         return result
 
     def getyaml(self, id, secrecy=True):
         result = self.service.getyaml(id)
         if result and 'secrecy' not in result:
-            result['secrecy'] = False
-        if secrecy is True and self.secrecy_default:
+            result['secrecy'] = secrecy
+        if secrecy is True:
             result = self.clean_keyvalue(id, result)
         return result
 

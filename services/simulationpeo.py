@@ -36,10 +36,3 @@ class SimulationPEO(services.base.kv_storage.KeyValueStorage):
         """
         super(SimulationPEO, self).__init__(path, name, iotype=iotype)
 
-    def getyaml(self, id):
-        info = super(SimulationPEO, self).getyaml(id)
-        if not info:
-            info = {'id': id, 'cv': [id]}
-        if 'id' not in info:
-            info['id'] = id
-        return info

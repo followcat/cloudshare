@@ -78,7 +78,6 @@ class LSIsimilarity(object):
             modelcorpus = self.lsi_model.lsi[corpus]
             self.index.add_documents(modelcorpus)
             self.names.extend(names)
-            self.ids = self.names
 
     def set_index(self, modelcorpus):
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),

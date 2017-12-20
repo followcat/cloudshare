@@ -13,6 +13,7 @@ import {
 
 import findIndex from 'lodash/findIndex';
 import { generateWorkExperience } from 'utils/summary-generator';
+import { URL } from 'config/url';
 
 class SearchResultItem extends Component {
   constructor() {
@@ -66,9 +67,9 @@ class SearchResultItem extends Component {
           expectationPlacesList = expectation.places ? expectation.places : [];
     const linkColor = gradient ? { color: gradient[parseInt(info.match*100)] } : {};
 
-    const href = jdid ? `/resume?cv_id=${cv_id}&&jd_id=${jdid}`:`/resume?cv_id=${cv_id}`,
-          hrefs = searchText? href+`&&search_text=${searchText}` : href,
-          hreff = matchDoc? href+`&&match_doc=${matchDoc}` : hrefs;
+    const href = jdid ? `${URL.getResumeURL(cv_id)}?jd_id=${jdid}`: URL.getResumeURL(cv_id),
+          hrefs = searchText? href+`?search_text=${searchText}` : href,
+          hreff = matchDoc? href+`?match_doc=${matchDoc}` : hrefs;
     return (
       <Card className="cs-ls-i">
         <div className="basic-info">

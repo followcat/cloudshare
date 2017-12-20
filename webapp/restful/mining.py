@@ -165,8 +165,8 @@ class LSIbaseAPI(Resource):
         index = set([self.svc_index.config['CV_MEM']])
         doctype = [member.id]
         for use in uses:
-            if use in member.projects:
-                iduses.append(member.projects[use].id)
+            if use == member.name:
+                iduses.append(member.id)
             else:
                 iduses.append(use)
                 index.add(self.svc_index.config['CV_STO'])
@@ -376,7 +376,7 @@ class SimilarAPI(Resource):
         top = 0
         datas = []
         for name, score in self.miner.probability(project.modelname, doc,
-                                                  top=100):
+                                                  top=100, uses=[member.id]):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
             if float(score) < 0.8 or top==5:

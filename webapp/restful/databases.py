@@ -57,7 +57,7 @@ class AllSIMSAPI(flask.views.MethodView):
         user = flask.ext.login.current_user
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        return { 'code': 200, 'projects': member.projects.keys(),
+        return { 'code': 200, 'projects': [member.name],
                  'classify': self.min_additionals.keys() }
 
 

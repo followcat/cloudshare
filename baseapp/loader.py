@@ -204,8 +204,7 @@ def load_cv_mining(SVC_MIN, SVC_MEMBERS):
     for member in SVC_MEMBERS.members.values():
         for project in member.projects.values():
             modelname = project.modelname
-            simnames = [prj.id for prj in member.projects.values()]
-            result = SVC_MIN.setup(modelname, simnames)
+            result = SVC_MIN.setup(modelname, [member.id])
 
 
 def load_addedcv_mining(SVC_MIN, SVC_MEMBERS, additions):

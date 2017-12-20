@@ -107,6 +107,8 @@ class Member(services.operator.combine.Combine):
 
     def load(self):
         config = self.config_service.getyaml(self.config_file)
+        if 'id' not in self.config:
+            self.config['id'] = utils.builtin.hash(self.name)
         if config:
             self.config.update(config)
 
@@ -160,6 +162,10 @@ class Member(services.operator.combine.Combine):
                     self.save()
                     result = True
         return result
+
+    @property
+    def id(self):
+        return self.config['id']
 
     @property
     def storagePEO(self):
@@ -285,7 +291,7 @@ class Member(services.operator.combine.Combine):
         return result
 
     def cv_projects(self, id):
-        return [p.name for p in self.projects.values()]
+        return [p.name for p in self.projects.values() if p.exists(id)]
 
     def peo_add(self, peopobj, committer=None, unique=True, do_commit=True):
         result = {

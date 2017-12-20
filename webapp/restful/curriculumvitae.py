@@ -94,9 +94,8 @@ class SearchCVbyTextAPI(Resource):
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember(self.svc_members)
         index = self.svc_index.config['CV_MEM']
-        doctype = [p.id for p in member.projects.values()]
         filterdict['content'] = text
-        total, searchs = self.svc_index.search(index=index, doctype=doctype,
+        total, searchs = self.svc_index.search(index=index, doctype=[member.id],
                                         filterdict=filterdict, source=False,
                                         kwargs={'_source_exclude': ['content']},
                                         start=(cur_page-1)*count, size=count)

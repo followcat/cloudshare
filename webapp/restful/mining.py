@@ -48,8 +48,7 @@ class PositionAPI(BaseAPI):
             searches = args['md_ids']
         else:
             index = self.svc_index.config['CV_MEM']
-            doctype = [p.id for p in member.projects.values()]
-            searches = self.svc_index.search(index=index, doctype=doctype,
+            searches = self.svc_index.search(index=index, doctype=[member.id],
                                      filterdict={'name': text},
                                      size=self.numbers, onlyid=True)
         result = []
@@ -164,11 +163,10 @@ class LSIbaseAPI(Resource):
         datas = list()
         iduses = list()
         index = set([self.svc_index.config['CV_MEM']])
-        doctype = list()
+        doctype = [member.id]
         for use in uses:
             if use in member.projects:
                 iduses.append(member.projects[use].id)
-                doctype.append(member.projects[use].id)
             else:
                 iduses.append(use)
                 index.add(self.svc_index.config['CV_STO'])
@@ -261,7 +259,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
     def findbest(self, member, project, filterdict, threshold, numbers):
         results = dict()
         index = self.svc_index.config['CV_MEM']
-        searchids = self.svc_index.search(index=index, doctype=[project.id],
+        searchids = self.svc_index.search(index=index, doctype=[member.id],
                                           filterdict=filterdict, onlyid=True)
         for jd_id, jd in project.jobdescription.datas():
             try:

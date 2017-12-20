@@ -283,7 +283,7 @@ def convert_repo(current_template, next_template, version):
     if version == '1.7':
         for repo in ('CO_REPO', ):
             if repo == 'CO_REPO':
-                for f in path.Path(current_template[repo]).files:
+                for f in path.Path(current_template[repo]).files():
                     os.renames(f, os.path.join(next_template['BD_REPO'], os.path.basename(f)))
 
 conversion_rules = {

@@ -24,7 +24,9 @@ class Secret(services.operator.facade.Facade):
         return result
 
     def clean_keyvalue(self, id, source):
-        source.update(self.service.private_keys())
+        masks = self.service.private_keys()
+        for key in [_ for _ in masks if _ in source]:
+            source[key] = masks[key]
         return source
 
     def cleanprivate(self, id, source):
@@ -47,7 +49,7 @@ class Secret(services.operator.facade.Facade):
 
     def getyaml(self, id, secrecy=True):
         result = self.service.getyaml(id)
-        if 'secrecy' not in result:
+        if result and 'secrecy' not in result:
             result['secrecy'] = False
         if secrecy is True and self.secrecy_default:
             result = self.clean_keyvalue(id, result)

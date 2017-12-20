@@ -33,7 +33,8 @@ class SplitData(services.operator.facade.Application):
             # assert type(self.operator_service) == services.base.text_storage.PlainTextStorage
             templateinfo = {}
         templateinfo.update(baseinfo)
-        templateinfo['modifytime'] = max(basetime, templatetime, 0)
+        if templateinfo:
+            templateinfo['modifytime'] = max(basetime, templatetime, 0)
         return templateinfo
 
     def datas(self):

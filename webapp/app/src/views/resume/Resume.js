@@ -83,10 +83,10 @@ class Resume extends Component {
   }
 
   componentWillMount() {
-    const { cv_id, jd_id, search_text, match_doc } 
+    const { jd_id, search_text, match_doc } 
           = this.props.location.query;
-    const id = cv_id,
-        jdid = jd_id,
+    const id = this.props.params.resumeId;
+    const jdid = jd_id,
   searchText = search_text,
     matchDoc = match_doc;
 

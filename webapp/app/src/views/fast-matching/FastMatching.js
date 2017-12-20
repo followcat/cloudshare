@@ -323,6 +323,7 @@ class FastMatching extends Component {
       visible,
       spinning,
       current,
+      pages,
       total,
       startColor,
       endColor,
@@ -352,6 +353,7 @@ class FastMatching extends Component {
           visible={visible}
           spinning={spinning}
           current={current}
+          pages={pages}
           total={total}
           startColor={startColor}
           endColor={endColor}

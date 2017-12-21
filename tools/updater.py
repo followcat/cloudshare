@@ -41,8 +41,7 @@ def update_cv_sim(SVC_MIN, svc, modelname, simname):
 def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
     modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
     svcdict = dict([(mem.id, mem.curriculumvitae.services[0])
-                     for mem in SVC_MEMBERS.members.values()
-                     if not mem == SVC_MEMBERS.defaultmember ])
+                     for mem in SVC_MEMBERS.members.values()])
     if additionals is not None:
         assert isinstance(additionals, dict)
         svcdict = additionals

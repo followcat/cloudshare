@@ -42,7 +42,7 @@ class Members(object):
         member = services.member.DefaultMember(services.member.SimulationMember(path, self.default_member_name),
                                                 account={'acc': self.acc_repos}, bidding={'bd': self.bd_repos},
                                                 company={'co': self.co_repos}, curriculumvitae={'cv': self.cv_repos,
-                                                'repo': self.cv_repos[0], 'storage': self.cv_repos[1:]},
+                                                'repo': self.cv_repos[-1], 'storage': self.cv_repos[:-1]},
                                                 jobdescriptions={'jd': self.jd_repos}, people={'peo': self.mult_peo})
         member.setup({'storageCV':  'cvindividual',
                       'storagePEO': 'peoindividual',

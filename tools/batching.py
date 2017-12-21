@@ -399,8 +399,6 @@ def init_people(SVC_CV, SVC_PEO):
 
 def init_esindex_mem(SVC_INDEX, SVC_MEMBERS):
     for memname, mem in SVC_MEMBERS.members.items():
-        if mem == SVC_MEMBERS.defaultmember:
-            continue
         SVC_INDEX.updatesvc(SVC_INDEX.config['CV_MEM'], mem.id,
                             mem.curriculumvitae.services[0], numbers=1000)
         for prjname, prj in mem.projects.items():

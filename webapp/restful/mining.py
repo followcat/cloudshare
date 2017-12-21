@@ -258,8 +258,9 @@ class LSIbyAllJDAPI(LSIbaseAPI):
 
     def findbest(self, member, project, filterdict, threshold, numbers):
         results = dict()
-        index = self.svc_index.config['CV_MEM']
-        searchids = self.svc_index.search(index=index, doctype=[member.id],
+        index = [self.svc_index.config['CV_MEM'], self.svc_index.config['CV_STO']]
+        doctype = [member.id, 'cvstorage']
+        searchids = self.svc_index.search(index=index, doctype=doctype,
                                           filterdict=filterdict, onlyid=True)
         for jd_id, jd in project.jobdescription.datas():
             try:

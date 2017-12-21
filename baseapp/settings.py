@@ -14,7 +14,7 @@ def sync_reload():
             self.SVC_INDEX = SVC_INDEX
     SVC_MIN = baseapp.loader.load_mining(services.mining.silencer)
     baseapp.loader.load_cv_mining(SVC_MIN, SVC_MEMBERS)
-    baseapp.loader.load_addedcv_mining(SVC_MIN, SVC_MEMBERS, {'*': [u'综合']})
+    baseapp.loader.load_addedcv_mining(SVC_MIN, SVC_MEMBERS, {'*': MIN_ADDITIONALS.keys()})
     baseapp.loader.load_jd_mining(SVC_MIN, [SVC_JD_REPO])
     baseapp.loader.load_co_mining(SVC_MIN, [SVC_CV_REPO])
     SVC_INDEX = baseapp.loader.load_esindex(ES)

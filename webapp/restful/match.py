@@ -31,7 +31,6 @@ class JDmathAPI(MatchbaseAPI):
         super(JDmathAPI, self).__init__()
         self.jd_repo = flask.current_app.config['SVC_JD_REPO']
         self.co_repo = flask.current_app.config['SVC_BD_REPO']
-        self.peo_mult = flask.current_app.config['SVC_PEO_CV']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
 
     def post(self):
@@ -49,12 +48,13 @@ class JDmathAPI(MatchbaseAPI):
         self.page = int(args['page'])
         self.numbers = int(args['numbers'])
         user = flask.ext.login.current_user
+        member = user.getmember(self.svc_members)
         total = 0
         result = list()
         code = 204
         if user.peopleID:
             code = 200
-            doc = self.peo_mult.getmd(user.peopleID).next()
+            doc = member.peo_getmd(user.peopleID).next()
             total, result = core.mining.correlation.jobdescription_correlation(self.miner,
                         [self.jd_repo], doc=doc, page=self.page, numbers=self.numbers)
             for each in result:

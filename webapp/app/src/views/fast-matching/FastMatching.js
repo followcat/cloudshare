@@ -72,7 +72,6 @@ class FastMatching extends Component {
     var promise = new Promise((resolve, reject) => {
       this.getLSIAllSIMSDataSource(resolve);
     });
-    console.log(projects);
     const date = new Date();
     const defFilterData = {date: [moment(date).add(-180, 'days').format('YYYY-MM-DD'),
                                   moment(date).format('YYYY-MM-DD')]};

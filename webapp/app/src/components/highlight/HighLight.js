@@ -23,7 +23,8 @@ class HighLight extends Component {
     'padding: 3px 2px 1px;'+
     'border-radius: 5px;'+
     'background-color:'+Color+'">'+item+'</span>',
-          regex = new RegExp("(" + item + ")", "i");
+          items = item.replace(/\+|\-|\\|\/|\*\[|\|/g,"\\$&"),  
+          regex = new RegExp(items, "i");
           value = value.replace(regex,invalue);
   });
     return (

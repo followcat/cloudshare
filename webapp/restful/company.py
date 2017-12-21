@@ -18,7 +18,7 @@ class CompanyAPI(Resource):
     def __init__(self):
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.svc_co_repo = flask.current_app.config['SVC_CO_REPO']
+        self.svc_bd_repo = flask.current_app.config['SVC_BD_REPO']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -28,7 +28,7 @@ class CompanyAPI(Resource):
     def get(self):
         args = request.args
         user = flask.ext.login.current_user
-        result = self.svc_co_repo.getyaml(args['id'])
+        result = self.svc_bd_repo.getyaml(args['id'])
         return { 'code': 200,'result': result }
 
     def post(self):

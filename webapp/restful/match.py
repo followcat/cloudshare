@@ -30,7 +30,7 @@ class JDmathAPI(MatchbaseAPI):
     def __init__(self):
         super(JDmathAPI, self).__init__()
         self.jd_repo = flask.current_app.config['SVC_JD_REPO']
-        self.co_repo = flask.current_app.config['SVC_CO_REPO']
+        self.co_repo = flask.current_app.config['SVC_BD_REPO']
         self.peo_mult = flask.current_app.config['SVC_PEO_CV']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
 

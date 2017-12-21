@@ -181,9 +181,7 @@ class FilterForm extends Component {
               >
                 {getFieldDecorator('uses', {
                   // textarea ? [] : 默认数据库
-                  initialValue: projects.concat(classify).filter(
-                    (item) => { if(item === StorageUtil.get('_pj')) return item}
-                    ),
+                  initialValue: projects,
                   rules: [{ type: 'array' }]
                 })(<Select multiple={true}>
                     <OptGroup key='projects' label="项目数据库">

@@ -6,7 +6,8 @@ import services.base.service
 class Multiple(services.base.service.Service):
     """"""
     combine_all = ('names', 'yamls')
-    match_any = ('exists', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys', 'add',
+    match_any = ('exists', 'unique', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys',
+                 'add', 'modify', 'updateinfo',
                  'search', 'setup', 'indexadd', 'updatesvc', 'upgradesvc',
                 )
 

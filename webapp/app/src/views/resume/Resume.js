@@ -542,7 +542,7 @@ class Resume extends Component {
             <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
             <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />
-            <ResumeSimilar dataSource={similar} />
+            <ResumeSimilar dataSource={similar} id={resumeId}/>
           </div>
         </div>
       </Layout>

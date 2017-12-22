@@ -71,12 +71,6 @@ class ResumeToolMenu extends Component {
             onUploadModalOk={this.props.onUploadModalOk}
           />
           <DrawChart resumeId={resumeId} />
-          <a
-            style={{ display: 'inline-block', marginLeft: 4 }}
-            href={URL.getFastMatchingByCV(this.props.dataSource.id)}
-          >
-            快速匹配
-          </a>
         </div>
         <Form className="title-form pd-lr-8" style={style}>
           <Row>

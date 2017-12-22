@@ -8,7 +8,7 @@ class Members(object):
 
     default_member_name = 'default'
 
-    def __init__(self, path, acc_repos, bd_repos, co_repos, cv_repos, jd_repos, mult_peo):
+    def __init__(self, path, acc_repos, bd_repos, co_repos, cv_repos, jd_repos, mult_peo, search_engine, es_config):
         self.path = path
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -18,6 +18,8 @@ class Members(object):
         self.cv_repos = cv_repos
         self.jd_repos = jd_repos
         self.mult_peo = mult_peo
+        self.search_engine = search_engine
+        self.es_config = es_config
         self.members = dict()
         for member_path in glob.glob(os.path.join(self.path, '*')):
             if os.path.isdir(member_path):
@@ -27,7 +29,8 @@ class Members(object):
                                                 account={'acc': acc_repos}, bidding={'bd': bd_repos},
                                                 company={'co': co_repos}, curriculumvitae={'cv': cv_repos,
                                                 'repo': self.cv_repos[0], 'storage': self.cv_repos[1:]},
-                                                jobdescriptions={'jd': jd_repos}, people={'peo': mult_peo})
+                                                search_engine={'idx': search_engine, 'config': es_config},
+                                                jobdescription={'jd': jd_repos}, people={'peo': mult_peo})
                 member.setup({'storageCV':  'cloudshare',
                               'storagePEO': 'peostorage',
                               'limitPEO':   'peolimit',
@@ -43,7 +46,8 @@ class Members(object):
                                                 account={'acc': self.acc_repos}, bidding={'bd': self.bd_repos},
                                                 company={'co': self.co_repos}, curriculumvitae={'cv': self.cv_repos,
                                                 'repo': self.cv_repos[-1], 'storage': self.cv_repos[:-1]},
-                                                jobdescriptions={'jd': self.jd_repos}, people={'peo': self.mult_peo})
+                                                search_engine={'idx': self.search_engine, 'config': self.es_config},
+                                                jobdescription={'jd': self.jd_repos}, people={'peo': self.mult_peo})
         member.setup({'storageCV':  'cvindividual',
                       'storagePEO': 'peoindividual',
                       'limitPEO':   'peolimit',
@@ -61,7 +65,8 @@ class Members(object):
                                                 account={'acc': self.acc_repos}, bidding={'bd': self.bd_repos},
                                                 company={'co': self.co_repos}, curriculumvitae={'cv': self.cv_repos,
                                                 'repo': self.cv_repos[0], 'storage': self.cv_repos[1:]},
-                                                jobdescriptions={'jd': self.jd_repos}, people={'peo': self.mult_peo})
+                                                search_engine={'idx': self.search_engine, 'config': self.es_config},
+                                                jobdescription={'jd': self.jd_repos}, people={'peo': self.mult_peo})
         member.setup({'storageCV':  'cloudshare',
                       'storagePEO': 'peostorage',
                       'limitPEO':   'peolimit',

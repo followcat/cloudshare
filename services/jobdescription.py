@@ -5,6 +5,7 @@ import yaml
 
 import utils.builtin
 import core.outputstorage
+import services.operator.search
 import services.base.kv_storage
 
 
@@ -96,3 +97,60 @@ class JobDescription(services.base.kv_storage.KeyValueStorage):
         for id in self.ids:
             result = self.getyaml(id)
             yield id, result
+
+
+class SearchIndex(services.operator.search.SearchIndex):
+    """"""
+    doctype = 'index'
+    index_config = {
+        "template": doctype,
+        "mappings": {
+            "_default_": {
+                "dynamic_templates": [
+                    {
+                        "name": {
+                            "match":              "name",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "description": {
+                            "match":              "description",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "followup": {
+                            "match":              "followup",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "commentary": {
+                            "match":              "commentary",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":       "keyword"
+                            }
+                    }}
+                ]
+            }
+        }
+    }

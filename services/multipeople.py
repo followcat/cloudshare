@@ -4,7 +4,7 @@ import services.operator.multiple
 class MultiPeople(services.operator.multiple.Multiple):
     """"""
     combine_all = ('names', 'yamls', 'getmd', 'getinfo')
-    match_any = ('exists', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys', 'add')
+    match_any = ('search', 'exists', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys', 'add')
 
     def getyaml(self, id):
         result = None

@@ -3,10 +3,12 @@ import os
 import utils.builtin
 import core.outputstorage
 import sources.industry_id
+import services.bidding
+import services.jobdescription
 import services.base.service
 import services.base.kv_storage
 import services.operator.split
-import services.operator.facade
+import services.operator.combine
 import services.operator.checker
 import services.operator.multiple
 import services.simulationbd
@@ -30,38 +32,52 @@ class SimulationProject(services.base.kv_storage.KeyValueStorage):
         return self.saveinfo(self.config_file, info, commitinfo, committer=commitinfo, do_commit=True)
 
 
-class Project(services.operator.facade.Facade):
+class Project(services.operator.combine.Combine):
 
     CO_PATH = 'CO'
     JD_PATH = 'JD'
 
-    def __init__(self, data_service, bd_repos, jd_repos):
-        super(Project, self).__init__(data_service)
+    def __init__(self, data_service, **kwargs):
+        super(Project, self).__init__(data_service, **kwargs)
+        assert 'company' in kwargs
+        assert 'search_engine' in kwargs
+        assert 'jobdescription' in kwargs
         self.name = data_service.name
         self.path = data_service.path
         self.config_file = data_service.config_file
-        self.bd_repos = bd_repos
-        self.jd_repos = jd_repos
+        self.bd_repos = kwargs['company']['company']
+        self.jd_repos = kwargs['jobdescription']['jd']
+        self.search_engine = kwargs['search_engine']['idx']
+        self.es_config = kwargs['search_engine']['config']
         copath = os.path.join(self.path, self.CO_PATH)
         jdpath = os.path.join(self.path, self.JD_PATH)
 
-        self.company = services.operator.checker.Filter(
+        self.company = services.bidding.SearchIndex(services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(bd_repos),
+                    data_service=services.operator.multiple.Multiple(self.bd_repos),
                     operator_service=services.simulationbd.SimulationBD(copath, self.name)),
-                operator_service=services.simulationbd.SelectionBD(copath, self.name))
+                operator_service=services.simulationbd.SelectionBD(copath, self.name)))
         self.customer = services.operator.checker.Selector(
                 data_service=self.company,
                 operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
-        self.jobdescription = services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(jd_repos),
-                operator_service=services.base.name_storage.NameStorage(jdpath, self.name))
+        self.jobdescription = services.jobdescription.SearchIndex(services.operator.checker.Filter(
+                data_service=services.operator.multiple.Multiple(self.jd_repos),
+                operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
         self.config_service = self.data_service
         self.config = dict()
         try:
             self.load()
         except IOError:
             pass
+        self.idx_setup()
+
+    def idx_setup(self):
+        self.company.setup(self.search_engine, self.es_config['CV_MEM'])
+        self.jobdescription.setup(self.search_engine, self.es_config['CV_MEM'])
+
+    def idx_updatesvc(self):
+        self.company.updatesvc(self.es_config['CO_MEM'], self.id, numbers=1000)
+        self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
 
     def load(self):
         self.config = self.config_service.getyaml(self.config_file)

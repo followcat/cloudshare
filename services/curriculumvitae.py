@@ -5,6 +5,7 @@ import core.exception
 import core.outputstorage
 import utils.pandocconverter
 import services.operator.split
+import services.operator.search
 import services.base.kv_storage
 import services.base.text_storage
 
@@ -89,3 +90,32 @@ class CurriculumVitae(services.operator.split.SplitData):
             if rawdata is not None:
                 self.interface.add(cn_id.html, rawdata, do_commit=do_commit)
         return result
+
+class SearchIndex(services.operator.search.SearchIndex):
+    """"""
+    doctype = 'index'
+    index_config = {
+        "template": doctype,
+        "mappings": {
+            "_default_": {
+                "dynamic_templates": [
+                    {
+                        "content": {
+                            "match":              "content",
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":       "keyword"
+                            }
+                    }}
+                ]
+            }
+        }
+    }

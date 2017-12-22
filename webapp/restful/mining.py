@@ -36,7 +36,6 @@ class PositionAPI(BaseAPI):
 
     def __init__(self):
         super(PositionAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.reqparse.add_argument('search_text', location = 'json')
 
     def post(self):
@@ -47,8 +46,8 @@ class PositionAPI(BaseAPI):
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            index = self.svc_index.config['CV_MEM']
-            searches = self.svc_index.search(index=index, doctype=[member.id],
+            index = member.es_config['CV_MEM']
+            searches = member.cv_search(index=index, doctype=[member.id],
                                      filterdict={'name': text},
                                      size=self.numbers, onlyid=True)
         result = []
@@ -154,7 +153,6 @@ class LSIbaseAPI(Resource):
         super(LSIbaseAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
 
     def process(self, member, project, doc, uses, filterdict, cur_page, size=20):
@@ -162,16 +160,16 @@ class LSIbaseAPI(Resource):
             cur_page = 1
         datas = list()
         iduses = list()
-        index = set([self.svc_index.config['CV_MEM']])
+        index = set([member.es_config['CV_MEM']])
         doctype = [member.id]
         for use in uses:
             if use == member.name:
                 iduses.append(member.id)
             else:
                 iduses.append(use)
-                index.add(self.svc_index.config['CV_STO'])
-                doctype.append(self.svc_index.config['CV_STO'])
-        totals, searchs = self.svc_index.search(index=list(index), doctype=doctype,
+                index.add(member.es_config['CV_STO'])
+                doctype.append(member.es_config['CV_STO'])
+        totals, searchs = member.cv_search(index=list(index), doctype=doctype,
                                                 filterdict=filterdict, size=5000, source=False)
         ids = [item['_id'] for item in searchs]
         results = self.miner.probability_by_ids(project.modelname, doc, ids, uses=iduses)
@@ -188,7 +186,7 @@ class LSIbaseAPI(Resource):
                       "order" : "asc"
                   }
                 }
-        totals, searchs = self.svc_index.search(index=list(index), doctype=doctype,
+        totals, searchs = member.cv_search(index=list(index), doctype=doctype,
                                                filterdict=filterdict,
                                                ids=ids,
                                                kwargs={'sort': sort,
@@ -248,7 +246,6 @@ class LSIbyAllJDAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIbyAllJDAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('fromcache', type=bool, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -258,8 +255,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
 
     def findbest(self, member, project, filterdict, threshold, numbers):
         results = dict()
-        index = self.svc_index.config['CV_MEM']
-        searchids = self.svc_index.search(index=index, doctype=[member.id],
+        index = member.es_config['CV_MEM']
+        searchids = member.cv_search(index=index, doctype=[member.id],
                                           filterdict=filterdict, onlyid=True)
         for jd_id, jd in project.jobdescription.datas():
             try:

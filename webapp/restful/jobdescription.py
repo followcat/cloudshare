@@ -11,7 +11,6 @@ class JobDescriptionAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_id', location = 'json')
@@ -51,7 +50,7 @@ class JobDescriptionAPI(Resource):
                                    commentary, followup, user.name)
         if result is True:
             jd_info = project.jd_get(jd_id)
-            self.svc_index.add(self.svc_index.config['JD_MEM'], project.id,
+            project.jd_indexadd(project.es_config['JD_MEM'], project.id,
                                jd_id, None, jd_info)
         if result: 
             response = { 'code': 200, 'data': result,
@@ -67,7 +66,6 @@ class JobDescriptionUploadAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_name', location = 'json')
@@ -99,7 +97,7 @@ class JobDescriptionUploadAPI(Resource):
             result = project.jd_add(jdobj, committer=user.name)
         if result is True:
             id = jdobj.metadata['id']
-            self.svc_index.add(self.svc_index.config['JD_MEM'], project.id,
+            project.jd_indexadd(project.es_config['JD_MEM'], project.id,
                                id, None, jdobj.metadata)
         if result:
             response = { 'code': 200, 'data': {'result': result, 'info': jdobj.metadata},
@@ -117,7 +115,6 @@ class JobDescriptionSearchAPI(Resource):
     
     def __init__(self):
         super(Resource, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
@@ -134,14 +131,14 @@ class JobDescriptionSearchAPI(Resource):
         search_items = args['search_items']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        jd_index = self.svc_index.config['JD_MEM']
-        co_index = self.svc_index.config['CO_MEM']
+        jd_index = project.es_config['JD_MEM']
+        co_index = project.es_config['CO_MEM']
         search_ditems = dict(search_items)
         if 'company' in search_ditems:
-            co_ids = self.svc_index.search(index=co_index, doctype=[project.id],
+            co_ids = project.company_search(index=co_index, doctype=[project.id],
                                           filterdict={ 'name': search_ditems['company'] }, onlyid=True)
             search_ditems['company'] = co_ids
-        total, searches = self.svc_index.search(index=jd_index,
+        total, searches = project.jd_search(index=jd_index,
                                                 doctype=[project.id],
                                                 filterdict=search_ditems,
                                                 start=(cur_page-1)*page_size,

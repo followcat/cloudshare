@@ -77,7 +77,6 @@ class SearchCVbyTextAPI(Resource):
 
     def __init__(self):
         super(SearchCVbyTextAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
@@ -89,13 +88,14 @@ class SearchCVbyTextAPI(Resource):
         count = 20
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
+        member = user.getmember(self.svc_members)
         text = args['search_text']
         cur_page = args['page'] if args['page'] else 1
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember(self.svc_members)
-        index = self.svc_index.config['CV_MEM']
+        index = member.es_config['CV_MEM']
         filterdict['content'] = text
-        total, searchs = self.svc_index.search(index=index, doctype=[member.id],
+        total, searchs = member.cv_search(index=index, doctype=[member.id],
                                         filterdict=filterdict, source=False,
                                         kwargs={'_source_exclude': ['content']},
                                         start=(cur_page-1)*count, size=count)

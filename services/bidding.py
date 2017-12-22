@@ -1,5 +1,6 @@
 import core.basedata
 import utils.companyexcel
+import services.operator.search
 import services.base.kv_storage
 import extractor.information_explorer
 
@@ -47,3 +48,62 @@ class Bidding(services.base.kv_storage.KeyValueStorage):
                 output.append(('companyadd', metadata['id'], (metadata, excel, committer)))
         return output
 
+
+class SearchIndex(services.operator.search.SearchIndex):
+    """"""
+    doctype = 'index'
+    index_config = {
+        "template": doctype,
+        "mappings": {
+            "_default_": {
+                "dynamic_templates": [
+                    {
+                        "name": {
+                            "match":              "name",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_smart"
+                            }
+                    }},
+                    {
+                        "introduction": {
+                            "match":              "introduction",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "clientcontact": {
+                            "match":              "clientcontact",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "reminder": {
+                            "match":              "reminder",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "id": {
+                            "match":              "id",
+                            "mapping": {
+                                "type":           "keyword"
+                            }
+                    }},
+                    {
+                        "modifytime": {
+                            "match":              "modifytime",
+                            "mapping": {
+                                "type":           "keyword"
+                            }
+                    }}
+                ]
+            }
+        }
+    }

@@ -454,6 +454,7 @@ class Resume extends Component {
       resumeList,
       fileList,
       panelLoading,
+      searchText,
       highlight,
       html,
       enHTML,
@@ -503,7 +504,11 @@ class Resume extends Component {
                           <Tabs defaultActiveKey="chinese">
                             <Tabs.TabPane tab="中文" key="chinese">
                             { dataSource &&
-                              <ResumeTemplate dataSource={dataSource} highlight={highlight}/>
+                              <ResumeTemplate 
+                                dataSource={dataSource}
+                                searchText={searchText}
+                                highlight={highlight}
+                              />
                             }
                             </Tabs.TabPane>
                             <Tabs.TabPane tab="原文" key="html">

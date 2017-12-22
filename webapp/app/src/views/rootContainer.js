@@ -41,7 +41,6 @@ const rootRoute = {
   });
       if(pathname == '/')
         promise.then((data) => {
-          console.log(data);
           if(data){
             browserHistory.replace("/search");
             replace({ pathname: 'search' });

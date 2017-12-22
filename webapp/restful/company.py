@@ -45,7 +45,7 @@ class CompanyAPI(Resource):
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         mbr_result = member.company_add(coobj, committer=user.name)
         if mbr_result is True:
-            result = project.company_add(coobj, committer=user.name)
+            result = project.bd_add(coobj, committer=user.name)
         if result is True:
             self.svc_index.add(self.svc_index.config['CO_MEM'], coobj.metadata['id'],
                                coobj.metadata)
@@ -93,7 +93,7 @@ class CompanyAllAPI(Resource):
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:
-            datas.append(project.company_get(item['_id']))
+            datas.append(project.bd_get(item['_id']))
         return {
             'code': 200,
             'data': datas,
@@ -119,7 +119,7 @@ class AddedCompanyListAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        customer_ids = project.company_customers()
+        customer_ids = project.bd_customers()
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         index = self.svc_index.config['CO_MEM']
@@ -130,7 +130,7 @@ class AddedCompanyListAPI(Resource):
         for company_id in company_ids:
             if company_id in customer_ids:
                 continue
-            yaml = project.company_getyaml(company_id)
+            yaml = project.bd_getyaml(company_id)
             data.append({
                 'id': yaml['id'],
                 'company_name': yaml['name']
@@ -158,12 +158,12 @@ class CompanyCustomerListAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = list(project.company_customers())
+        result = list(project.bd_customers())
         total = len(result)
         pages = int(math.ceil(float(total)/page_size))
         data = list()
         for coname in result[(cur_page-1)*page_size:cur_page*page_size]:
-            co = project.company_get(coname)
+            co = project.bd_get(coname)
             data.append(co)
         return { 'code': 200, 'data': data, 'pages': pages, 'totals': total}
     
@@ -231,7 +231,7 @@ class CompanyInfoUpdateAPI(Resource):
         update_info = args['update_info']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        origin_info = project.company_get(id)
+        origin_info = project.bd_get(id)
         for each in update_info:
             key = each['key']
             vtype = each['type']
@@ -245,9 +245,9 @@ class CompanyInfoUpdateAPI(Resource):
             elif vtype == 'DELETE':
                 data = project.company._listframe(content, value['author'], value['date'])
                 origin_info[key].remove(data)
-        result = project.company_update_info(id, origin_info, user.name)
+        result = project.bd_update_info(id, origin_info, user.name)
         if result:
-            co_info = project.company_get(id)
+            co_info = project.bd_get(id)
             self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
                                id, None, co_info)
         if result:
@@ -287,7 +287,7 @@ class SearchCObyKeyAPI(Resource):
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:
-            datas.append(project.company_get(item['_id']))
+            datas.append(project.bd_get(item['_id']))
         return {
             'code': 200,
             'data': datas,
@@ -314,14 +314,14 @@ class CompanyUploadExcelAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         network_file = flask.request.files['files']
-        compare_result = project.company_compare_excel(network_file.read(),
+        compare_result = project.bd_compare_excel(network_file.read(),
                                                        committer=user.name)
         infos = dict()
         for item in compare_result:
             coid = item[1]
             if coid not in infos:
                 if project.company.exists(coid):
-                    infos[coid] = project.company_get(coid)
+                    infos[coid] = project.bd_get(coid)
                 else:
                     infos[coid] = item[2][0]
         return {
@@ -350,19 +350,19 @@ class CompanyConfirmExcelAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        prj_results = project.company_add_excel(datas, committer=user.name)
+        prj_results = project.bd_add_excel(datas, committer=user.name)
         infos = dict()
         results = { 'success': dict(), 'failed': dict() }
         for coid in prj_results:
             if project.company.exists(coid):
-                result_info = project.company_get(coid)
+                result_info = project.bd_get(coid)
             else:
                 result_info = prj_results[coid][data][0]
             infos[coid] = result_info
             result_key = 'success' if prj_results[coid]['success'] is True else 'failed'
             results[result_key][coid] = prj_results[coid]
             if prj_results[coid]['success'] is True:
-                co_info = project.company_get(coid)
+                co_info = project.bd_get(coid)
                 self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
                                    coid, None, co_info)
         return {

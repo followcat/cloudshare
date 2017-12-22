@@ -31,7 +31,7 @@ class JobDescriptionAPI(Resource):
         project = member.getproject(projectname)
         result = project.jd_get(jd_id)
         co_id = result['company']
-        co_name = project.company_get(co_id)['name']
+        co_name = project.bd_get(co_id)['name']
         result['company_name'] = co_name
         return { 'code': 200, 'data': result }
 
@@ -135,7 +135,7 @@ class JobDescriptionSearchAPI(Resource):
         co_index = project.es_config['CO_MEM']
         search_ditems = dict(search_items)
         if 'company' in search_ditems:
-            co_ids = project.company_search(index=co_index, doctype=[project.id],
+            co_ids = project.bd_search(index=co_index, doctype=[project.id],
                                           filterdict={ 'name': search_ditems['company'] }, onlyid=True)
             search_ditems['company'] = co_ids
         total, searches = project.jd_search(index=jd_index,
@@ -148,7 +148,7 @@ class JobDescriptionSearchAPI(Resource):
         for item in searches:
             jd = item['_source']
             co_id = jd['company']
-            co_name = project.company_get(co_id)['name']
+            co_name = project.bd_get(co_id)['name']
             jd['company_name'] = co_name
             datas.append(jd)
         return {

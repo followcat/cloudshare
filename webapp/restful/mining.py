@@ -255,9 +255,10 @@ class LSIbyAllJDAPI(LSIbaseAPI):
 
     def findbest(self, member, project, filterdict, threshold, numbers):
         results = dict()
-        index = member.es_config['CV_MEM']
-        searchids = member.cv_search(index=index, doctype=[member.id],
-                                          filterdict=filterdict, onlyid=True)
+        index = [self.svc_index.config['CV_MEM'], self.svc_index.config['CV_STO']]
+        doctype = [member.id, 'cvstorage']
+        searchids = member.cv_search(index=index, doctype=doctype,
+                                     filterdict=filterdict, onlyid=True)
         for jd_id, jd in project.jobdescription.datas():
             try:
                 if jd['status'] == 'Closed':

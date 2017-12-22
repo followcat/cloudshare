@@ -11,9 +11,10 @@ class MultiPeople(services.operator.multiple.Multiple):
     def getyaml(self, id):
         result = None
         for people in self.services:
-            if not people.exists(id):
+            try:
+                info = people.getyaml(id)
+            except IOError:
                 continue
-            info = people.getyaml(id)
             if result is None:
                 result = info
             else:

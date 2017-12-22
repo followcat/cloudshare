@@ -68,16 +68,10 @@ class FastMatching extends Component {
           { location } = this.props;
     let postAPI;
 
-    function usesdata(item) { 
-      if(item === StorageUtil.get('_pj')) 
-        return item
-    }
-
     this.getIndustryDataSource();
     var promise = new Promise((resolve, reject) => {
       this.getLSIAllSIMSDataSource(resolve);
     });
-
     const date = new Date();
     const defFilterData = {date: [moment(date).add(-180, 'days').format('YYYY-MM-DD'),
                                   moment(date).format('YYYY-MM-DD')]};
@@ -95,7 +89,7 @@ class FastMatching extends Component {
       promise.then((data) => {
         this.getResultDataSource(postAPI, {
           id: location.query.jd_id,
-          uses: data.filter(usesdata),
+          uses: data,
           filterdict: defFilterData,
         });
       });
@@ -110,7 +104,7 @@ class FastMatching extends Component {
       promise.then((data) => {
         this.getResultDataSource(postAPI, {
           id: location.query.cv_id,
-          uses: data.filter(usesdata),
+          uses: data,
           filterdict: defFilterData,
         });
       });
@@ -277,8 +271,9 @@ class FastMatching extends Component {
         this.setState({
           classify: json.classify,
           projects: json.projects
+        },() =>{
+          resolve(json.projects);
         });
-        resolve(json.projects.concat(json.classify));
       }
     });
   }

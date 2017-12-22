@@ -139,7 +139,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                     try:
                         if not bsobj.metadata[key]:
                             continue
-                        elif isinstance(bsobj.metadata[key], list, set, tuple, dict):
+                        elif isinstance(bsobj.metadata[key], (list, set, tuple, dict)):
                             info[key].extend(bsobj.metadata[key])
                         else:
                             info[key].append(bsobj.metadata[key])
@@ -195,6 +195,8 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             >>> SVC_BSSTO = services.base.kv_storage.KeyValueStorage(DIR)
             >>> assert SVC_BSSTO.interface.lsfiles('.', 'blr6dter.yaml')
         """
-        return set([os.path.splitext(f)[0]
-                    for f in self.interface.lsfiles('.', '*.yaml')])
+        if not hasattr(self, '_ids'):
+            self._ids = set([os.path.splitext(f)[0]
+                        for f in self.interface.lsfiles('.', '*.yaml')])
+        return self._ids
 

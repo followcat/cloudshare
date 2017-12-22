@@ -39,26 +39,26 @@ class Project(services.operator.combine.Combine):
 
     def __init__(self, data_service, **kwargs):
         super(Project, self).__init__(data_service, **kwargs)
-        assert 'company' in kwargs
+        assert 'bidding' in kwargs
         assert 'search_engine' in kwargs
         assert 'jobdescription' in kwargs
         self.name = data_service.name
         self.path = data_service.path
         self.config_file = data_service.config_file
-        self.bd_repos = kwargs['company']['company']
+        self.bd_repos = kwargs['bidding']['bd']
         self.jd_repos = kwargs['jobdescription']['jd']
         self.search_engine = kwargs['search_engine']['idx']
         self.es_config = kwargs['search_engine']['config']
         copath = os.path.join(self.path, self.CO_PATH)
         jdpath = os.path.join(self.path, self.JD_PATH)
 
-        self.company = services.bidding.SearchIndex(services.operator.checker.Filter(
+        self.bidding = services.bidding.SearchIndex(services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
                     data_service=services.operator.multiple.Multiple(self.bd_repos),
                     operator_service=services.simulationbd.SimulationBD(copath, self.name)),
                 operator_service=services.simulationbd.SelectionBD(copath, self.name)))
         self.customer = services.operator.checker.Selector(
-                data_service=self.company,
+                data_service=self.bidding,
                 operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
         self.jobdescription = services.jobdescription.SearchIndex(services.operator.checker.Filter(
                 data_service=services.operator.multiple.Multiple(self.jd_repos),
@@ -72,11 +72,11 @@ class Project(services.operator.combine.Combine):
         self.idx_setup()
 
     def idx_setup(self):
-        self.company.setup(self.search_engine, self.es_config['CV_MEM'])
+        self.bidding.setup(self.search_engine, self.es_config['CV_MEM'])
         self.jobdescription.setup(self.search_engine, self.es_config['CV_MEM'])
 
     def idx_updatesvc(self):
-        self.company.updatesvc(self.es_config['CO_MEM'], self.id, numbers=1000)
+        self.bidding.updatesvc(self.es_config['CO_MEM'], self.id, numbers=1000)
         self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
 
     def load(self):
@@ -144,22 +144,22 @@ class Project(services.operator.combine.Combine):
     def id(self):
         return self.config['id']
 
-    def company_update_info(self, id, info, committer):
+    def bd_update_info(self, id, info, committer):
         result = False
-        if self.company.exists(id):
+        if self.bidding.exists(id):
             repo_result = self.storageCO.saveinfo(id, info, "Update %s information."%id,
                                                   committer)
-            project_result = self.company.update_info(id, info, committer)
+            project_result = self.bidding.update_info(id, info, committer)
             result = repo_result or project_result
         return result
 
-    def company_compare_excel(self, stream, committer):
+    def bd_compare_excel(self, stream, committer):
         outputs = list()
         outputs.extend(self.storageCO.compare_excel(stream, committer))
-        outputs.extend(self.company.compare_excel(stream, committer))
+        outputs.extend(self.bidding.compare_excel(stream, committer))
         return outputs
 
-    def company_add_excel(self, items, committer):
+    def bd_add_excel(self, items, committer):
         results = dict()
         repo_result = set()
         project_result = set()
@@ -179,46 +179,46 @@ class Project(services.operator.combine.Combine):
             elif item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 try:
-                    result = self.company.add(baseobj, committer=item[2][-1], do_commit=False)
+                    result = self.bidding.add(baseobj, committer=item[2][-1], do_commit=False)
                     success = True
                 except Exception:
                     success = False
                 if success is True:
-                    project_result.add(self.company.ids_file)
-                    project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+                    project_result.add(self.bidding.ids_file)
+                    project_result.add(os.path.join(self.bidding.YAML_DIR, yamlname))
             elif item[0] == 'listadd':
                 try:
-                    result = self.company.updateinfo(*item[2], do_commit=False)
+                    result = self.bidding.updateinfo(*item[2], do_commit=False)
                     success = True
                 except Exception:
                     success = False
                 if success is True:
-                    project_result.add(os.path.join(self.company.YAML_DIR, yamlname))
+                    project_result.add(os.path.join(self.bidding.YAML_DIR, yamlname))
             else:
                 success = False
             results[item[1]] = {'data': item, 'success': success, 'result': result}
         self.storageCO.interface.do_commit(list(repo_result), committer=committer)
-        self.company.interface.do_commit(list(project_result), committer=committer)
+        self.bidding.interface.do_commit(list(project_result), committer=committer)
         return results
 
-    def company_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
+    def bd_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
         result = {
             'repo_result' : False,
             'project_result' : False
         }
         result['repo_result'] = self.storageCO.add(coobj, committer, unique, yamlfile, mdfile)
         if result['repo_result']:
-            result['project_result'] = self.company.add(coobj, committer, unique,
+            result['project_result'] = self.bidding.add(coobj, committer, unique,
                                                         yamlfile, mdfile)
         return result
 
-    def company_get(self, name):
-        return self.company.getyaml(name)
+    def bd_get(self, name):
+        return self.bidding.getyaml(name)
 
-    def company_names(self):
-        return self.company.ids
+    def bd_names(self):
+        return self.bidding.ids
 
-    def company_customers(self):
+    def bd_customers(self):
         return self.customer.ids
 
     def addcustomer(self, coobj, user=None, do_commit=True):
@@ -235,7 +235,7 @@ class Project(services.operator.combine.Combine):
             'repo_result' : False,
             'project_result' : False
         }
-        if jdobj.metadata['company'] in self.company.customers:
+        if jdobj.metadata['company'] in self.bidding.customers:
             result['repo_result'] = self.storageJD.add(jdobj, committer,
                                                        unique=unique, do_commit=do_commit)
             if result['repo_result']:
@@ -264,4 +264,4 @@ class Project(services.operator.combine.Combine):
         utils.builtin.assure_path_exists(co_path)
         self.config_service.backup(project_path, bare=True)
         self.jobdescription.backup(jd_path, bare=True)
-        self.company.backup(co_path, bare=True)
+        self.bidding.backup(co_path, bare=True)

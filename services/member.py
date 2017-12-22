@@ -215,7 +215,7 @@ class Member(services.operator.combine.Combine):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
                 tmp_project = services.project.Project(services.project.SimulationProject(unicode(path, 'utf-8'), name),
-                                                company={'company': self.bd_repos}, jobdescription={'jd': self.jobdescription}, 
+                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jobdescription}, 
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
                 tmp_project.setup(config={'id':         utils.builtin.hash(self.name+name),
                                           'autosetup':  False,
@@ -242,7 +242,7 @@ class Member(services.operator.combine.Combine):
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
             tmp_project = services.project.Project(services.project.SimulationProject(path, name),
-                                                company={'bd': self.bd_repos}, jobdescription={'jd': self.jobdescription}, 
+                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jobdescription}, 
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
             tmp_project.setup(config={'id':           utils.builtin.hash(self.name+name),
                                       'autosetup':    autosetup,

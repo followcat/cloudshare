@@ -98,7 +98,7 @@ class AccountAPI(webapp.restful.captchaverify.SMSAPI):
             result = { 'code': 400, 'message': 'This username is existed.'}
             bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
             addresult = self.svc_account.add(bsobj, password)
-            if addresult is True:
+            if addresult:
                 msgobj = self.svc_msg.baseobj({'id': bsobj.ID.base})
                 msgresult = self.svc_msg.add(msgobj, committer=name)
                 if msgresult:

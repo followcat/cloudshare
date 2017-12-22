@@ -130,11 +130,10 @@ class Account(services.base.kv_storage.KeyValueStorage):
 
     def add(self, bsobj, password, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
-        result = False
         pwd_result = False
         result = super(Account, self).add(bsobj, committer, unique,
                                           yamlfile, mdfile, do_commit=do_commit)
-        if result is True:
+        if result:
             pwdobj = self.svc_password.baseobj({'id': str(bsobj.ID), 'password': password})
             pwd_result = self.svc_password.add(pwdobj)
         return result and pwd_result

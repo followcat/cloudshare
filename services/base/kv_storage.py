@@ -139,7 +139,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                     try:
                         if not bsobj.metadata[key]:
                             continue
-                        elif isinstance(bsobj.metadata[key], list, set, tuple, dict):
+                        elif isinstance(bsobj.metadata[key], (list, set, tuple, dict)):
                             info[key].extend(bsobj.metadata[key])
                         else:
                             info[key].append(bsobj.metadata[key])

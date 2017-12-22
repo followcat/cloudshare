@@ -46,7 +46,7 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> commit_id = interface.add('test_file', 'text',
+            >>> result = interface.add('test_file', 'text',
             ... 'Test commit', 'test<test@test.com>')
             >>> interface.get('test_file')
             'text'
@@ -77,9 +77,7 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> commit_id = interface.add('test_file', 'text',
-            ... 'Test commit', 'test<test@test.com>')
-            >>> commit_id == interface.repo.head()
+            >>> interface.add('test_file', 'text', 'Test commit', 'test<test@test.com>')
             True
             >>> shutil.rmtree(repo_name)
         """
@@ -96,7 +94,7 @@ class GitInterface(interface.base.Interface):
         if do_commit is True:
             self.repo.stage(filename)
             commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
-        return commit_id
+        return True if commit_id else False
 
     def add_files(self, filenames, filedatas, message=None, committer=None, do_commit=True):
         """
@@ -104,9 +102,8 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> commit_id = interface.add_files(['test_file'], ['test'],
+            >>> interface.add_files(['test_file'], ['test'],
             ... 'Test commit', 'test<test@test.com>')
-            >>> commit_id == interface.repo.head()
             True
             >>> shutil.rmtree(repo_name)
         """
@@ -128,7 +125,7 @@ class GitInterface(interface.base.Interface):
                 self.repo.stage(filename)
         if do_commit is True:
             commit_id = self.repo.do_commit(bytes(message), committer=bytes(committer))
-        return commit_id
+        return True if commit_id else False
 
     def modify(self, filename, stream, message=None, committer=None, do_commit=True):
         """
@@ -136,9 +133,11 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> commit_id = interface.add('test_file', 'test',
+            >>> interface.add('test_file', 'test',
             ... b'Test commit', b'test<test@test.com>')
-            >>> commit_id = interface.modify('test_file', b'Modify test')
+            True
+            >>> interface.modify('test_file', b'Modify test')
+            True
             >>> with open('interface/test_repo/test_file') as file:
             ...     data = file.read()
             >>> data
@@ -156,7 +155,7 @@ class GitInterface(interface.base.Interface):
         if do_commit is True:
             self.repo.stage([bytes(filename)])
             commit_id = self.repo.do_commit(message, committer=bytes(committer))
-        return commit_id
+        return True if commit_id else False
 
     def delete(self, filename, message=None, committer=None, do_commit=True):
         """
@@ -164,10 +163,10 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> commit_id = interface.add_files(['test_file'], ['test'],
+            >>> interface.add_files(['test_file'], ['test'],
             ... 'Test commit', 'test<test@test.com>')
-            >>> commit_id = interface.delete('test_file')
-            >>> commit_id == interface.repo.head()
+            True
+            >>> interface.delete('test_file')
             True
             >>> shutil.rmtree(repo_name)
         """
@@ -181,7 +180,7 @@ class GitInterface(interface.base.Interface):
         if do_commit is True:
             self.repo.stage([bytes(filename)])
             commit_id = self.repo.do_commit(message, committer=bytes(committer))
-        return commit_id
+        return True if commit_id else False
 
     def grep(self, restrings, path='', files=None):
         if files is None:
@@ -198,11 +197,12 @@ class GitInterface(interface.base.Interface):
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
             >>> data = {'name': u'中文名字'}
-            >>> commit_id = interface.add('test_file.yaml',
+            >>> interface.add('test_file.yaml',
             ... yaml.safe_dump(data, allow_unicode=True),
             ... b'Test commit', b'test<test@test.com>')
+            True
             >>> interface.grep_yaml('name', '.')
-            ['test_file.yaml']
+            [('test_file.yaml', 1)]
             >>> shutil.rmtree(repo_name)
         """
         if files is None:
@@ -247,8 +247,9 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> commit_id = interface.add('test_file', 'test',
+            >>> interface.add('test_file', 'test',
             ... b'Test commit', b'test<test@test.com>')
+            True
             >>> info = interface.get_file_create_info('test_file')
             >>> info['author']
             'test<test@test.com>'
@@ -297,8 +298,9 @@ class GitInterface(interface.base.Interface):
             >>> import interface.gitinterface
             >>> repo_name = 'interface/test_repo'
             >>> interface = interface.gitinterface.GitInterface(repo_name)
-            >>> commit_id = interface.add('test_file', 'test',
+            >>> interface.add('test_file', 'test',
             ... b'Test commit', 'followcat')
+            True
             >>> info = interface.get_file_create_info('test_file')
             >>> info['author']
             'followcat<followcat@email.com>'

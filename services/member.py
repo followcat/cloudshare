@@ -6,6 +6,7 @@ import utils.builtin
 import services.company
 import services.project
 import services.secret
+import services.curriculumvitae
 import services.simulationcv
 import services.simulationco
 import services.simulationacc
@@ -56,7 +57,8 @@ class Member(services.operator.combine.Combine):
         assert 'company' in kwargs
         assert 'account' in kwargs
         assert 'bidding' in kwargs
-        assert 'jobdescriptions' in kwargs
+        assert 'search_engine' in kwargs
+        assert 'jobdescription' in kwargs
         assert 'curriculumvitae' in kwargs
         self.name = data_service.name
         self.path = data_service.path
@@ -68,20 +70,22 @@ class Member(services.operator.combine.Combine):
         self.bd_repos = kwargs['bidding']['bd']
         self.co_repos = kwargs['company']['co']
         self.cv_repos = kwargs['curriculumvitae']['cv']
-        self.jd_repos = kwargs['jobdescriptions']['jd']
+        self.jd_repos = kwargs['jobdescription']['jd']
         self.mult_peo = kwargs['people']['peo']
         self.acc_repos = kwargs['account']['acc']
+        self.search_engine = kwargs['search_engine']['idx']
+        self.es_config = kwargs['search_engine']['config']
         self.projects_path = os.path.join(self.path, self.PRJ_PATH)
         self.accounts_path = os.path.join(self.path, self.ACC_PATH)
         self.company = services.operator.checker.Filter(
                 data_service=services.operator.multiple.Multiple(kwargs['company']['co']),
                 operator_service=services.simulationco.SelectionCO(self.co_path, self.name))
         self.curriculumvitae = services.operator.multiple.Multiple(
-                [services.operator.checker.Filter(
+                [services.curriculumvitae.SearchIndex(services.operator.checker.Filter(
                     data_service=services.operator.split.SplitData(
                         data_service=kwargs['curriculumvitae']['repo'],
                         operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
-                    operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
+                    operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
                 services.operator.split.SplitData(
                     data_service=services.secret.Private(
                         data_service=services.operator.multiple.Multiple(kwargs['curriculumvitae']['storage']),
@@ -93,8 +97,8 @@ class Member(services.operator.combine.Combine):
                     data_service=services.multipeople.MultiPeople(kwargs['people']['peo']),
                     operator_service=services.simulationpeo.SimulationPEO(self.peo_path, self.name)),
                 operator_service=services.base.name_storage.NameStorage(self.peo_path, self.name))
-        self.jobdescriptions = services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(kwargs['jobdescriptions']['jd']),
+        self.jobdescription = services.operator.checker.Filter(
+                data_service=services.operator.multiple.Multiple(kwargs['jobdescription']['jd']),
                 operator_service=services.base.name_storage.NameStorage(self.jd_path, self.name))
         self.config_service = self.data_service
         self.config = dict()
@@ -104,6 +108,16 @@ class Member(services.operator.combine.Combine):
             pass
         if not os.path.exists(self.projects_path):
             os.makedirs(self.projects_path)
+        self.index = services.curriculumvitae.SearchIndex(kwargs['curriculumvitae']['storage'][0])
+        self.idx_setup()
+
+    def idx_setup(self):
+        self.index.setup(self.search_engine, self.es_config['CV_STO'])
+        self.curriculumvitae.setup(self.search_engine, self.es_config['CV_MEM'])
+
+    def idx_updatesvc(self):
+        self.index.updatesvc(self.es_config['CV_STO'], self.index.data_service.name, numbers=1000)
+        self.curriculumvitae.updatesvc(self.es_config['CV_MEM'], self.id, numbers=1000)
 
     def load(self):
         config = self.config_service.getyaml(self.config_file)
@@ -201,7 +215,8 @@ class Member(services.operator.combine.Combine):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
                 tmp_project = services.project.Project(services.project.SimulationProject(unicode(path, 'utf-8'), name),
-                                                       self.bd_repos, [self.jobdescriptions])
+                                                company={'company': self.bd_repos}, jobdescription={'jd': self.jobdescription}, 
+                                                search_engine={'idx': self.search_engine, 'config': self.es_config})
                 tmp_project.setup(config={'id':         utils.builtin.hash(self.name+name),
                                           'autosetup':  False,
                                           'autoupdate': False,
@@ -227,7 +242,8 @@ class Member(services.operator.combine.Combine):
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
             tmp_project = services.project.Project(services.project.SimulationProject(path, name),
-                                                   self.bd_repos, [self.jobdescriptions])
+                                                company={'bd': self.bd_repos}, jobdescription={'jd': self.jobdescription}, 
+                                                search_engine={'idx': self.search_engine, 'config': self.es_config})
             tmp_project.setup(config={'id':           utils.builtin.hash(self.name+name),
                                       'autosetup':    autosetup,
                                       'autoupdate':   autoupdate,
@@ -357,7 +373,7 @@ class Member(services.operator.combine.Combine):
             project = self.projects[name]
             project.backup(projects_path)
         self.accounts.backup(accounts_path)
-        self.jobdescriptions.backup(jobdescriptions_path)
+        self.jobdescription.backup(jobdescriptions_path)
         self.curriculumvitae.backup(curriculumvitaes_path)
 
 

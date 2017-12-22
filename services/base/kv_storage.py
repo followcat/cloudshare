@@ -183,15 +183,6 @@ class KeyValueStorage(services.base.storage.BaseStorage):
 
     getkv = getyaml
 
-    def search_yaml(self, keyword, selected=None):
-        results = set()
-        if selected and self.name in selected:
-            allfile = self.interface.search_yaml(keyword)
-            for result in allfile:
-                id = core.outputstorage.ConvertName(result[0]).base
-                results.add((id, result[1]))
-        return results
-
     def datas(self):
         for id in self.ids:
             yield id, self.getkv(id)

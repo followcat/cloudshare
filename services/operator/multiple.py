@@ -6,13 +6,18 @@ import services.base.service
 class Multiple(services.base.service.Service):
     """"""
     combine_all = ('names', 'yamls')
-    match_any = ('exists', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys', 'add')
+    match_any = ('exists', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys', 'add',
+                 'search', 'setup', 'indexadd', 'updatesvc', 'upgradesvc',
+                )
 
     def __init__(self, services):
         assert services
         super(Multiple, self).__init__()
-        self.services = services
-        self.service_type = type(services[0])
+        if isinstance(services, list):
+            self.services = services
+        else:
+            self.services = [services]
+        self.service_type = type(self.services[0])
         self.match_any_partial = {}
         for attr in self.match_any:
             self.match_any_partial[attr] = functools.partial(self.do_match_any, attr=attr)
@@ -37,7 +42,7 @@ class Multiple(services.base.service.Service):
             return self.match_any_partial[attr]
         elif attr in self.combine_all_partial:
             return self.combine_all_partial[attr]
-        raise AttributeError()
+        raise AttributeError(attr)
 
     def do_match_any(self, *args, **kwargs):
         res = False
@@ -67,30 +72,4 @@ class Multiple(services.base.service.Service):
                 results.append(md)
                 yield md
         yield None
-
-    def search(self, keyword, selected=None):
-        if selected is None:
-            selected = [service.name for service in self.services]
-        results = set()
-        allfile = set()
-        for service in self.services:
-            allfile.update(service.search(keyword, selected=selected))
-        for result in allfile:
-            id = self.get_id(result[0])
-            if id in self.ids:
-                results.add((id, result[1]))
-        return results
-
-    def search_yaml(self, keyword, selected=None):
-        if selected is None:
-            selected = [service.name for service in self.services]
-        results = set()
-        allfile = set()
-        for service in self.services:
-            allfile.update(service.search_yaml(keyword, selected=selected))
-        for result in allfile:
-            id = self.get_id(result[0])
-            if id in self.ids:
-                results.add((id, result[1]))
-        return results
 

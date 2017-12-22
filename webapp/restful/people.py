@@ -80,5 +80,5 @@ class PeopleByCVAPI(Resource):
             unique_id = yamlinfo['id']
         peopleinfo = member.peo_getyaml(unique_id)
         if not peopleinfo:
-            peopleinfo = {'id': unique_id, 'cv': [unique_id]}
+            peopleinfo = {'id': unique_id, 'cv': [cv_id]}
         return { 'code': 200, 'data': peopleinfo }

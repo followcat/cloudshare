@@ -272,19 +272,17 @@ class Member(services.operator.combine.Combine):
         return result
 
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
-        result = {
-            'repo_cv_result' : False,
-            'repo_peo_result' : False,
-            'member_cv_result' : False,
-            'member_peo_result' : False
-        }
-        result['member_cv_result'] = self.curriculumvitae.add(cvobj, committer, unique=unique,
+        result = self.curriculumvitae.add(cvobj, committer, unique=unique,
                                                                do_commit=do_commit)
-        if result['member_cv_result']:
+        if result:
             peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
             peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
-            peoresult = self.peo_add(peopobj, committer, unique=unique, do_commit=do_commit)
-            result.update(peoresult)
+            name = core.outputstorage.ConvertName(peopobj.name)
+            import pdb; pdb.set_trace()
+            if unique is True and self.peo_unique(peopobj) is False:
+                result = self.peo_modify(peopobj, committer, unique=unique, do_commit=do_commit)
+            else:
+                result = self.peo_add(peopobj, committer, unique=unique, do_commit=do_commit)
         return result
 
     def cv_add_eng(self, id, cvobj, committer):
@@ -309,14 +307,12 @@ class Member(services.operator.combine.Combine):
     def cv_projects(self, id):
         return [p.name for p in self.projects.values() if p.exists(id)]
 
-    def peo_add(self, peopobj, committer=None, unique=True, do_commit=True):
-        result = {
-            'repo_peo_result' : False,
-            'project_peo_result' :False,
-        }
-        result['project_peo_result'] = self.people.add(peopobj, committer,
-                                                       unique=unique, do_commit=do_commit)
-        return result
+    def peo_getyaml(self, id):
+        yaml = self.people.getyaml(id)
+        for cv_id in yaml['cv']:
+            if not self.curriculumvitae.exists(cv_id):
+                yaml['cv'].remove(cv_id)
+        return yaml
 
     def peo_getinfo(self, id):
         info = self.people.getyaml(id)

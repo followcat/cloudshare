@@ -76,7 +76,7 @@ class UploadCVAPI(Resource):
                         cvobj.metadata[key] = value
                 try:
                     result = self.member.cv_add(cvobj, self.user.name, unique=True)
-                    if result['member_cv_result']:
+                    if result:
                         md = self.member.cv_getmd(id)
                         info = self.member.cv_getyaml(id)
                         self.member.cv_indexadd(self.member.es_config['CV_MEM'],

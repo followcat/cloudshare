@@ -52,6 +52,7 @@ const websiteText = {
     FAIL: '失败',
     ACTION_SUCCESS: '操作成功！',
     ACTION_FAIL: '操作失败！',
+    MORE: '更多',
 
     ADMIN_MANAGEMENT: '权限管理',
     MEMBER_MANAGEMENT: '成员管理',

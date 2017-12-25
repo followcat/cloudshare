@@ -58,6 +58,7 @@ class Home extends Component {
       password: feildValue.password,
     }, (json) => {
       if (json.code === 200) {
+        localStorage.clear();
         StorageUtil.setAll({
           token: json.token,
           user: json.user

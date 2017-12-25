@@ -160,7 +160,7 @@ class ResumeTemplate extends Component {
                         <div>
                           <p>{language.POSITION_DESCRIPTION}：</p>
                           <HighLight highlight={highlight}>
-                            experience.position[index].description}
+                            {experience.position[index].description}
                           </HighLight>
                         </div>
                         : null

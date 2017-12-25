@@ -8,18 +8,6 @@ import 'components/global.less';
 
 import { isMember } from 'request/member';
 
-const promise = new Promise((resolve, reject) => {
-      isMember((json) => {
-        if (json.result === true) {
-          global.ismember = true
-        }else{
-          global.ismember = false
-        }
-        sessionStorage.setItem("ismember", global.ismember);
-        resolve(global.ismember);
-      });
-  });
-
 const rootRoute = {
   path: '/',
   // indexRoute: {
@@ -40,7 +28,18 @@ const rootRoute = {
         user = StorageUtil.get('user'),
         token = StorageUtil.get('token');
     if (user && token) {
-      if(pathname === '/')
+      const promise = new Promise((resolve, reject) => {
+      isMember((json) => {
+        if (json.result === true) {
+          global.ismember = true
+        }else{
+          global.ismember = false
+        }
+        sessionStorage.setItem("ismember", global.ismember);
+        resolve(global.ismember);
+      });
+  });
+      if(pathname == '/')
         promise.then((data) => {
           if(data){
             browserHistory.replace("/search");

@@ -29,7 +29,7 @@ def generate_md(raw_html):
 
 def generate_yaml(md, yamlobj, selected=extractor.information_explorer.all_selected,
                   fix_func=None):
-    catchinfo = extractor.information_explorer.catch_selected(md, selected, fix_func=name)
+    catchinfo = extractor.information_explorer.catch_selected(md, selected, fix_func=fix_func)
     for key in catchinfo:
         if catchinfo[key] or (selected is not None and key in selected):
             yamlobj[key] = catchinfo[key]

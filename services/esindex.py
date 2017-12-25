@@ -133,6 +133,13 @@ class ElasticsearchIndexing(object):
                             }
                     }},
                     {
+                        "modifytime": {
+                            "match":              "modifytime",
+                            "mapping": {
+                                "type":           "keyword"
+                            }
+                    }},
+                    {
                         "strings": {
                             "match_mapping_type": "string",
                             "mapping": {

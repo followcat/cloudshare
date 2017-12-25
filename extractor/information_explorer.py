@@ -404,26 +404,32 @@ def catch_biddinginfo(stream):
     return info
 
 
-def catch_coinfo(co, cv):
+def catch_coinfo(cv):
     """"""
-    company = generate_info_template(co_template)
-    for key in company:
-        if key in co and co[key]:
-            company[key] = co[key]
-    company['id'] = extractor.unique_id.company_id(co['name'])
     try:
-        projects = cv['experience']['project']
-        for prj in projects:
-            if (('company' in prj and company['name'] == prj['company']) or
-                ('company' not in prj and extractor.utils_parsing.period_overlaps(
-                                            (co['date_from'], co['date_to']),
-                                            (prj['date_from'], prj['date_to'])))):
-                try:
-                    company['project'].append(dict(co_project(**co_project_key_filter(prj))._asdict()))
-                except KeyError:
-                    company['project'] = [dict(co_project(**co_project_key_filter(prj))._asdict())]
-        return company
+        for co in [co for co in cv['experience']['company'] if co['name']]:
+            company = generate_info_template(co_template)
+            for key in company:
+                if key in co and co[key]:
+                    company[key] = co[key]
+            company['id'] = extractor.unique_id.company_id(co['name'])
+            try:
+                projects = cv['experience']['project']
+                for prj in projects:
+                    if (('company' in prj and company['name'] == prj['company']) or
+                        ('company' not in prj and extractor.utils_parsing.period_overlaps(
+                                                    (co['date_from'], co['date_to']),
+                                                    (prj['date_from'], prj['date_to'])))):
+                        try:
+                            company['project'].append(dict(co_project(**co_project_key_filter(prj))._asdict()))
+                        except KeyError:
+                            company['project'] = [dict(co_project(**co_project_key_filter(prj))._asdict())]
+                yield company
+            except KeyError:
+                pass
     except KeyError:
+        pass
+    except TypeError:
         pass
 
 

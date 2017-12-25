@@ -278,11 +278,20 @@ class Member(services.operator.combine.Combine):
             peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
             peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
             name = core.outputstorage.ConvertName(peopobj.name)
-            import pdb; pdb.set_trace()
             if unique is True and self.peo_unique(peopobj) is False:
                 result = self.peo_modify(peopobj, committer, unique=unique, do_commit=do_commit)
             else:
                 result = self.peo_add(peopobj, committer, unique=unique, do_commit=do_commit)
+        if result:
+            for meta in extractor.information_explorer.catch_coinfo(cvobj.metadata):
+                coobj = core.basedata.DataObject(data='', metadata=meta)
+                name = core.outputstorage.ConvertName(coobj.name)
+                if unique is True and self.co_unique(coobj) is False:
+                    co_result = self.co_modify(coobj, committer, unique=unique, do_commit=do_commit)
+                else:
+                    co_result = self.co_add(coobj, committer, unique=unique, do_commit=do_commit)
+                if result:
+                    result = co_result
         return result
 
     def cv_add_eng(self, id, cvobj, committer):

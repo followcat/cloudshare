@@ -259,21 +259,14 @@ def tracking_and_command(SVC_CV_REPO, attribute, fix=False, filltime=False):
 
 def company_knowledge(SVC_CV, SVC_CO):
     for y in SVC_CV.yamls():
-        cv = SVC_CV.getyaml(y)
-        try:
-            for co in [co for co in cv['experience']['company'] if co['name']]:
-                company = extractor.information_explorer.catch_coinfo(co, cv)
-                name = core.outputstorage.ConvertName(company['id'])
-                coinfo = core.basedata.DataObject(company, data='')
+        for company in extractor.information_explorer.catch_coinfo(SVC_CV.getyaml(y)):
+            name = core.outputstorage.ConvertName(company['id'])
+            coinfo = core.basedata.DataObject(company, data='')
+            if SVC_CO.exists(name):
+                SVC_CO.modify(coinfo)
+            else:
+                SVC_CO.add(coinfo)
 
-                if SVC_CO.exists(name):
-                    SVC_CO.modify(coinfo)
-                else:
-                    SVC_CO.add(coinfo)
-        except KeyError:
-            continue
-        except TypeError:
-            pass
 
 def initclassify(SVC_CV, SVC_CO=None):
     import collections

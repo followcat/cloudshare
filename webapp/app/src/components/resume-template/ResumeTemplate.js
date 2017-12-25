@@ -65,17 +65,18 @@ class ResumeTemplate extends Component {
       return null
     }
   }
-
   render() {
     const { name, current, expectation, gender, age, education, marital_status,
             email, phone, experience, education_history, self_assessment
             } = this.props.dataSource
-    const { highlight } = this.props;
+    const { highlight, searchText } = this.props;
     let c_current = this.combines(current),
         c_combine = this.combine(current,gender,age,education,marital_status),
         c_expectation = this.combines(expectation),
         c_education_history = parseEducation(education_history),
-        c_experience = parseExperience(experience);
+        c_experience = parseExperience(experience),
+        highlightKW = searchText? highlight : null;
+        console.log(highlightKW);
     return (
       <div className={`${this.props.prefixCls}-wrapper`}>
         <div className={`${this.props.prefixCls}`}>
@@ -134,39 +135,36 @@ class ResumeTemplate extends Component {
             <h2>{language.EXPERIENCE}</h2>
             <div className={`${this.props.prefixCls}-content`}>
                   {c_experience.reverse().map((valueItem, index) => {
-                    if(experience.position.length > 0 && 
-                      typeof(experience.position[index].description) != 'undefined')
                     return (
                       <div className='position-item'>
                       <p key={index} className='position-item-title'>
                         <span>{valueItem[0]}</span>
                         <span className='position-item-name'>
-                          <strong>{valueItem[2]}</strong>
+                          <strong>
+                            <HighLight highlight={highlightKW}>
+                              {valueItem[2]}
+                            </HighLight>
+                          </strong>
                         </span>
                         <span>
-                        <strong>{valueItem[3]}</strong>
+                        <strong>                            
+                            <HighLight highlight={highlightKW}>
+                              {valueItem[3]}
+                            </HighLight>
+                        </strong>
                         </span>
                       </p>
                       <p>{[valueItem[1],valueItem[4]].join('  |  ')}</p>
-                      <p>{language.POSITION_DESCRIPTION}：</p>
-                        <HighLight highlight={highlight}>
-                          {experience.position[index].description}
-                        </HighLight>
-                      </div>
-                    );
-                  else
-                    return (
-                      <div className='position-item'>
-                      <p key={index} className='position-item-title'>
-                        <span>{valueItem[0]}</span>
-                        <span className='position-item-name'>
-                          <strong>{valueItem[2]}</strong>
-                        </span>
-                        <span>
-                        <strong>{valueItem[3]}</strong>
-                        </span>
-                      </p>
-                      <p>{[valueItem[1],valueItem[4]].join('  |  ')}</p>
+                      { (experience.position.length > 0 && 
+                        typeof(experience.position[index].description) != 'undefined') ?
+                        <div>
+                          <p>{language.POSITION_DESCRIPTION}：</p>
+                          <HighLight highlight={highlight}>
+                            experience.position[index].description}
+                          </HighLight>
+                        </div>
+                        : null
+                      }
                       </div>
                     );
                   })}
@@ -186,9 +184,19 @@ class ResumeTemplate extends Component {
                     return (
                       <div className={`${this.props.prefixCls}-project-content`}>
                       <span>{valueItem.date_from} - {valueItem.date_to}</span>
-                      <span className="project-company-name"><strong>{valueItem.name}</strong></span>
+                      <span className="project-company-name">
+                        <strong>
+                          <HighLight highlight={highlightKW}>
+                            {valueItem.name}
+                          </HighLight>
+                        </strong>
+                      </span>
                       { valueItem.company &&
-                      <p>{`${language.FROM_COMPANY}：${valueItem.company}`}</p>
+                      <p>${language.FROM_COMPANY}：
+                        <HighLight highlight={highlightKW}>
+                          ${valueItem.company}
+                        </HighLight>
+                      </p>
                       }
                       { valueItem.description &&
                       <p>{language.PROJECT_DESCRIPTION}：

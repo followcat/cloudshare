@@ -51,6 +51,7 @@ class Search extends Component {
         <div className="card-container">
           <div className="cs-search">
             <Tabs type="card">
+            {global.ismember &&
             <TabPane tab={language.JD_SEARCH} key="1">
                 <KeywordSearch
                   btnText={language.JD_SEARCH}
@@ -58,6 +59,7 @@ class Search extends Component {
                   onSearch={this.handleSearch}
                 />
               </TabPane>
+            }
               <TabPane tab={language.JOBSEARCH} key="2">
                 <KeywordSearch
                   btnText={language.JOBSEARCH}

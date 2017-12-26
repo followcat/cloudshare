@@ -369,6 +369,7 @@ class LSIbydocAPI(LSIbaseAPI):
 class SimilarAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
+    HALF_YEAR_SECOENDS = 180*24*3600
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
@@ -391,7 +392,8 @@ class SimilarAPI(Resource):
         index = [self.svc_index.config['CV_MEM']]
         doctype = [project.id]
         totals, searchs = self.svc_index.search(index=index, doctype=doctype,
-            filterdict={'date': [time.strftime('%Y%m%d', time.localtime(time.time()-180*24*3600)),
+            filterdict={'date': [time.strftime('%Y%m%d', time.localtime(time.time()-
+                                                         self.HALF_YEAR_SECOENDS)),
                                  time.strftime('%Y%m%d', time.localtime(time.time()))]},
             source=False)
         ids = [item['_id'] for item in searchs]

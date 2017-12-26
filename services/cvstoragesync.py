@@ -8,6 +8,7 @@ import pypandoc
 
 import utils._yaml
 import core.basedata
+import utils.timeout.inprocess
 import extractor.information_explorer
 
 
@@ -29,7 +30,13 @@ def generate_md(raw_html):
 
 def generate_yaml(md, yamlobj, selected=extractor.information_explorer.all_selected,
                   fix_func=None):
-    catchinfo = extractor.information_explorer.catch_selected(md, selected, fix_func=name)
+    try:
+       catchinfo = utils.timeout.inprocess.timeout_call(
+                            extractor.information_explorer.catch_selected,
+                            8, args=tuple([md, selected]),
+                            kwargs={'fix_func': fix_func})
+    except Exception as e:
+       raise e
     for key in catchinfo:
         if catchinfo[key] or (selected is not None and key in selected):
             yamlobj[key] = catchinfo[key]

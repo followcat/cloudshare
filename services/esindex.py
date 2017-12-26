@@ -58,19 +58,19 @@ class ElasticsearchIndexing(object):
                             }
                     }},
                     {
-                        "clientcontact": {
-                            "match":              "clientcontact",
+                        "conumber": {
+                            "match":              "conumber",
                             "mapping": {
                                 "type":           "text",
-                                "analyzer":       "ik_max_word"
+                                "analyzer":       "ik_smart"
                             }
                     }},
                     {
-                        "reminder": {
-                            "match":              "reminder",
+                        "content": {
+                            "path_match":         "*.content",
                             "mapping": {
                                 "type":           "text",
-                                "analyzer":       "ik_max_word"
+                                "analyzer":       "ik_smart"
                             }
                     }},
                     {
@@ -130,6 +130,13 @@ class ElasticsearchIndexing(object):
                             "mapping": {
                                 "type":           "text",
                                 "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "modifytime": {
+                            "match":              "modifytime",
+                            "mapping": {
+                                "type":           "keyword"
                             }
                     }},
                     {

@@ -191,9 +191,9 @@ class ResumeTemplate extends Component {
                         </strong>
                       </span>
                       { valueItem.company &&
-                      <p>${language.FROM_COMPANY}：
+                      <p>{language.FROM_COMPANY}：
                         <HighLight highlight={highlightKW}>
-                          ${valueItem.company}
+                          {valueItem.company}
                         </HighLight>
                       </p>
                       }

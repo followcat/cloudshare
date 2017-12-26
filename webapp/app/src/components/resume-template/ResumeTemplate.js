@@ -76,7 +76,6 @@ class ResumeTemplate extends Component {
         c_education_history = parseEducation(education_history),
         c_experience = parseExperience(experience),
         highlightKW = searchText? highlight : null;
-        console.log(highlightKW);
     return (
       <div className={`${this.props.prefixCls}-wrapper`}>
         <div className={`${this.props.prefixCls}`}>
@@ -160,7 +159,7 @@ class ResumeTemplate extends Component {
                         <div>
                           <p>{language.POSITION_DESCRIPTION}：</p>
                           <HighLight highlight={highlight}>
-                            experience.position[index].description}
+                            {experience.position[index].description}
                           </HighLight>
                         </div>
                         : null

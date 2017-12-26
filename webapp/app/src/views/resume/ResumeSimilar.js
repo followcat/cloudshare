@@ -16,7 +16,6 @@ class ResumeSimilar extends Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <Card
         title="相似简历"

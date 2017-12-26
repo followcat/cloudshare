@@ -76,7 +76,6 @@ class ResumeTemplate extends Component {
         c_education_history = parseEducation(education_history),
         c_experience = parseExperience(experience),
         highlightKW = searchText? highlight : null;
-        console.log(highlightKW);
     return (
       <div className={`${this.props.prefixCls}-wrapper`}>
         <div className={`${this.props.prefixCls}`}>

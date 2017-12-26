@@ -10,6 +10,10 @@ class People(services.base.kv_storage.KeyValueStorage):
 
     commitinfo = 'People'
 
+    def remove(self, *args, **kwargs):
+        """ Do not remove a People """
+        return True
+
 class CVSelector(services.operator.checker.Selector):
     def selection(self, x):
         return self.operator_service.getyaml(x)['cv']

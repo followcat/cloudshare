@@ -28,3 +28,29 @@ class Application(Facade):
         super(Application, self).__init__(data_service)
         self.operator_service = operator_service
 
+    @property
+    def ids(self):
+        return self.operator_service.ids
+
+    @property
+    def NUMS(self):
+        return self.operator_service.NUMS
+
+    def add(self, *args, **kwargs):
+        res = self.operator_service.add(*args, **kwargs)
+        if res:
+            res = self.data_service.add(*args, **kwargs)
+        return res
+
+    def modify(self, *args, **kwargs):
+        res = self.operator_service.modify(*args, **kwargs)
+        if res:
+            res = self.data_service.modify(*args, **kwargs)
+        return res
+
+    def remove(self, *args, **kwargs):
+        res = self.operator_service.add(*args, **kwargs)
+        if res:
+            res = self.data_service.add(*args, **kwargs)
+        return res
+

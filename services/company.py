@@ -10,3 +10,7 @@ class Company(services.base.kv_storage.KeyValueStorage):
 
     commitinfo = 'Company'
 
+    def remove(self, *args, **kwargs):
+        """ Do not remove a Company """
+        return True
+

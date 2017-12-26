@@ -8,6 +8,7 @@ from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
 import utils.builtin
+import core.basedata
 
 
 class CurrivulumvitaeAPI(Resource):
@@ -59,15 +60,14 @@ class UpdateCurrivulumvitaeInformation(Resource):
         id = args['id']
         member = user.getmember(self.svc_members)
         update_info = args['update_info']
+        update_info['id'] = id
+        obj = core.basedata.DataObject(update_info, data='')
 
-        for key, value in update_info.iteritems():
-            data = member.cv_updateyaml(id, key,
-                                                                      value, user.name)
-            if data is not None:
-                response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
-            else:
-                response = { 'code': 400, 'message': 'Update information error.'}
-                break
+        result = member.cv_modify(obj, user.name)
+        if result:
+            response = { 'code': 200, 'message': 'Update information success.' }
+        else:
+            response = { 'code': 400, 'message': 'Update information error.'}
         return response
 
 

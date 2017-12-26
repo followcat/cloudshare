@@ -7,14 +7,19 @@ import services.base.storage
 class PlainTextStorage(services.base.storage.BaseStorage):
 
     def add(self, bsobj, committer=None, unique=True, kv_file=True, text_file=True, do_commit=True):
+        result = False
         if unique is True and self.unique(bsobj) is False:
             self.info = "Exists File"
-            return False
+            return result
         name = core.outputstorage.ConvertName(bsobj.name)
         if text_file is True:
             message = "Add %s: %s data." % (self.commitinfo, name)
-            return super(PlainTextStorage, self).add(name.md, bsobj.data, message, committer, do_commit)
-        return True
+            result = self.interface.modify(name.md, bsobj.data,
+                            message, committer, do_commit=do_commit)
+        return result
+
+    def modify(self, *args, **kwargs):
+        return False
 
     def getmd(self, name):
         """"""

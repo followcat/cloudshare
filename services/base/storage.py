@@ -76,13 +76,25 @@ class BaseStorage(services.base.service.Service):
         """
         return super(BaseStorage, self).unique(bsobj)
 
-    def add(self, filename, stream, message=None, committer=None, do_commit=True):
-        self.interface.add(filename, stream, message, committer, do_commit=do_commit)
+    def add(self, bsobj, message=None, committer=None, do_commit=True):
+        name = core.outputstorage.ConvertName(bsobj.name)
+        dumpinfo = yaml.dump(bsobj.metadata, Dumper=utils._yaml.SafeDumper,
+                             allow_unicode=True, default_flow_style=False)
+        result = self.interface.add(name, dumpinfo,
+                        message, committer, do_commit=do_commit)
+        return result
+
+    def remove(self, filename, message=None, committer=None, do_commit=True):
+        self.interface.delete(filename, message, committer, do_commit=do_commit)
         return True
 
-    def modify(self, filename, stream, message=None, committer=None, do_commit=True):
-        self.interface.modify(filename, stream, message, committer, do_commit=do_commit)
-        return True
+    def modify(self, bsobj, message=None, committer=None, do_commit=True):
+        name = core.outputstorage.ConvertName(bsobj.name)
+        dumpinfo = yaml.dump(bsobj.metadata, Dumper=utils._yaml.SafeDumper,
+                             allow_unicode=True, default_flow_style=False)
+        result = self.interface.modify(name.yaml, dumpinfo,
+                        message, committer, do_commit=do_commit)
+        return result
 
     def history(self, author=None, entries=10, skip=0):
         return self.interface.history(author=author, max_commits=entries, skip=skip)

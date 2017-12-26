@@ -6,14 +6,6 @@ import services.operator.facade
 
 class Filter(services.operator.facade.Application):
     """"""
-    @property
-    def ids(self):
-        return self.operator_service.ids
-
-    @property
-    def NUMS(self):
-        return self.operator_service.NUMS
-
     def __getattr__(self, attr):
         if attr == 'get_id':
             return super(Filter, self).get_id
@@ -30,18 +22,6 @@ class Filter(services.operator.facade.Application):
         assert attr.startswith('get')
         if self.operator_service.exists(id):
             return super(Filter, self).__getattr__(attr)(*args, **kwargs)
-
-    def add(self, *args, **kwargs):
-        res = self.data_service.add(*args, **kwargs)
-        if res:
-            res = self.operator_service.add(*args, **kwargs)
-        return res
-
-    def remove(self, *args, **kwargs):
-        res = self.data_service.remove(*args, **kwargs)
-        if res:
-            res = self.operator_service.remove(*args, **kwargs)
-        return res
 
 
 class Selector(Filter):

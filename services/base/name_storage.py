@@ -40,6 +40,11 @@ class NameStorage(services.base.storage.BaseStorage):
                                      committer=committer, do_commit=do_commit)
         return result
 
+    def modify(self, bsobj, committer=None, unique=True,
+            kv_file=False, text_file=True, do_commit=True):
+        """"""
+        return self.exists(bsobj.ID)
+
     def remove(self, bsobj, committer=None, unique=True,
             kv_file=False, text_file=True, do_commit=True):
         result = False

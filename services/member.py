@@ -11,7 +11,6 @@ import services.simulationcv
 import services.simulationco
 import services.simulationacc
 import services.simulationpeo
-import services.multipeople
 import services.base.kv_storage
 import services.operator.checker
 import services.operator.combine
@@ -94,7 +93,7 @@ class Member(services.operator.combine.Combine):
                 ])
         self.people = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    data_service=services.multipeople.MultiPeople(kwargs['people']['peo']),
+                    data_service=services.operator.multiple.Multiple(kwargs['people']['peo']),
                     operator_service=services.simulationpeo.SimulationPEO(self.peo_path, self.name)),
                 operator_service=services.base.name_storage.NameStorage(self.peo_path, self.name))
         self.jobdescription = services.operator.checker.Filter(

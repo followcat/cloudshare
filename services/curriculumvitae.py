@@ -8,7 +8,20 @@ import services.operator.split
 import services.operator.search
 import services.base.kv_storage
 import services.base.text_storage
+import extractor.information_explorer
 
+
+class CV(services.base.kv_storage.KeyValueStorage):
+    """"""
+    YAML_TEMPLATE = extractor.information_explorer.cv_template
+
+    yaml_private_key = {
+        "phone":                '[*****]',
+        "email":                '[*****]',
+        "name":                 '[*****]',
+        "committer":            '[*****]',
+        "origin":               '[*****]'
+    }
 
 class CurriculumVitae(services.operator.split.SplitData):
     """ Backward compatible definition of curriculum service.
@@ -24,18 +37,9 @@ class CurriculumVitae(services.operator.split.SplitData):
 
     commitinfo = 'CurriculumVitae'
 
-    yaml_private_key = {
-        "phone":                '[*****]',
-        "email":                '[*****]',
-        "name":                 '[*****]',
-        "committer":            '[*****]',
-        "origin":               '[*****]'
-    }
-
     def __init__(self, path, name=None, iotype=None):
         data_service = services.base.text_storage.PlainTextStorage(path, name, iotype)
-        operator_service = services.base.kv_storage.KeyValueStorage(path, name, iotype)
-        setattr(operator_service, 'yaml_private_key', self.yaml_private_key)
+        operator_service = CV(path, name, iotype)
         super(CurriculumVitae, self).__init__(data_service, operator_service)
 
     def private_keys(self):
@@ -82,6 +86,14 @@ class CurriculumVitae(services.operator.split.SplitData):
             raise core.exception.NotExistsContactException
         return super(CurriculumVitae, self).add(bsobj, committer, unique,
                                 kv_file, text_file, do_commit=do_commit)
+
+    def modify(self, *args, **kwargs):
+        """ Plain text do not support modify() """
+        return self.operator_service.modify(*args, **kwargs)
+
+    def remove(self, *args, **kwargs):
+        """ Do not remove a CurriculumVitae """
+        return True
 
     def addcv(self, bsobj, rawdata=None, do_commit=True):
         result = self.add(bsobj, contacts=False)

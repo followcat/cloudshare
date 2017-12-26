@@ -61,6 +61,7 @@ class LSIsimilarity(object):
             self.names = ujson.load(f)
         self.index = similarities.Similarity.load(os.path.join(self.path,
                                                   self.matrix_save_name))
+        self.num_best = 5000
 
     def add_documents(self, ids, documents):
         assert(self.lsi_model.lsi.id2word)
@@ -82,6 +83,7 @@ class LSIsimilarity(object):
     def set_index(self, modelcorpus):
         self.index = similarities.Similarity(os.path.join(self.path, "similarity"),
                                              modelcorpus, self.lsi_model.topics)
+        self.num_best = 5000
 
     def probability(self, doc, top=None, minimum=0):
         """
@@ -163,7 +165,6 @@ class LSIsimilarity(object):
             >>> count_in[0] - origin
             60
         """
-        self.num_best = None
         p = self.base_probability(doc, top=top, minimum=minimum)
         results = map(lambda x: (self.names[x[0]], round(x[1], 5)), p)
         return results
@@ -193,7 +194,6 @@ class LSIsimilarity(object):
         self.num_best = top
         vec_lsi = self.lsi_model.probability(doc)
         result = self.index[vec_lsi]
-        self.num_best = None
         return result
 
     @property

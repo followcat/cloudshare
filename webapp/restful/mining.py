@@ -369,9 +369,11 @@ class LSIbydocAPI(LSIbaseAPI):
 class SimilarAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
+    HALF_YEAR_SECOENDS = 180*24*3600
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
@@ -386,17 +388,21 @@ class SimilarAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         doc = project.cv_getmd(id)
-        top = 0
         datas = []
-        for name, score in self.miner.probability(project.modelname, doc,
-                                                  top=100):
+        index = [self.svc_index.config['CV_MEM']]
+        doctype = [project.id]
+        totals, searchs = self.svc_index.search(index=index, doctype=doctype,
+            filterdict={'date': [time.strftime('%Y%m%d', time.localtime(time.time()-
+                                                         self.HALF_YEAR_SECOENDS)),
+                                 time.strftime('%Y%m%d', time.localtime(time.time()))]},
+            source=False)
+        ids = [item['_id'] for item in searchs]
+        for name, score in self.miner.probability_by_ids(project.modelname, doc, ids,
+                                                         uses=doctype, top=6):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
-            if float(score) < 0.8 or top==5:
-                break
             yaml_info = project.cv_getyaml(name)
             datas.append({ 'id': name, 'yaml_info': yaml_info })
-            top += 1
         return { 'code': 200, 'data': datas }
 
 

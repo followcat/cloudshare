@@ -3,6 +3,7 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
+import core.basedata
 import services.exception
 import webapp.restful.captchaverify
 
@@ -22,14 +23,6 @@ class UserAPI(Resource):
         user = flask.ext.login.current_user
         return { 'code': 200, 'result': user.info }
 
-    def put(self):
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        phone = args['phone']
-        email = args['email']
-        result = user.updateinfo({'phone': phone, 'email': email})
-        return { 'code': 200, 'result': result }
-
 
 class UserPeopleIDAPI(UserAPI):
 
@@ -43,6 +36,18 @@ class UserPeopleIDAPI(UserAPI):
         user = flask.ext.login.current_user
         peopinfo = self.svc_account.getyaml(user.peopleID)
         return { 'code': 200, 'result': peopinfo }
+
+    def put(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        phone = args['phone']
+        email = args['email']
+        update_info = {'phone': phone, 'email': email}
+        update_info['id'] = user.peopleID
+        obj = core.basedata.DataObject(update_info, data='')
+
+        result = self.svc_account.modify(obj, user.peopleID)
+        return { 'code': 200, 'result': result }
 
 
 class ExistsEmailAPI(Resource):

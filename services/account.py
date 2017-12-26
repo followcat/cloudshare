@@ -30,41 +30,19 @@ class Password(services.base.kv_storage.KeyValueStorage):
 
     MUST_KEY = ['id', 'password']
 
-    def __init__(self, path, name=None, iotype=None):
-        super(Password, self).__init__(path, name=name, iotype=iotype)
-
-    def baseobj(self, info):
-        metadata = self._metadata(info)
-        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
-        return bsobj
-
-    def _metadata(self, info):
-        assert set(self.MUST_KEY).issubset(set(info.keys()))
-        origin = self.generate_info_template()
-        for key, datatype in self.YAML_TEMPLATE:
-            if key in info and isinstance(info[key], datatype):
-                origin[key] = info[key]
-        origin['password'] = utils.builtin.hash(origin['password'])
-        return origin
-
-    def add(self, bsobj, committer=None, unique=True, yamlfile=True, mdfile=False, do_commit=True):
-        return super(Password, self).add(bsobj, committer, unique,
-                                         yamlfile, mdfile, do_commit=do_commit)
-
     def updatepwd(self, id, oldpassword, newpassword):
         assert self.exists(id)
         result = False
         info = self.getinfo(id)
-        md5_opwd = utils.builtin.hash(oldpassword)
-        if info['password'] == md5_opwd:
-            md5_npwd = utils.builtin.hash(newpassword)
-            self.updateinfo(id, 'password', md5_npwd, id)
-            result = True
+        if self.check(id, oldpassword):
+            metadata = {'id': id, 'password': newpassword}
+            bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+            result = self.modify(bsobj, committer=id)
         return result
 
-    def get(self, id):
+    def check(self, id, password):
         info = self.getinfo(id)
-        return info['password']
+        return info['password'] == password
 
 
 class Account(services.base.kv_storage.KeyValueStorage):
@@ -106,27 +84,12 @@ class Account(services.base.kv_storage.KeyValueStorage):
         super(Account, self).__init__(path, name=name, iotype=iotype)
 
     def unique(self, bsobj):
-        id = bsobj.ID
         email = bsobj.metadata['email']
         phone = bsobj.metadata['phone']
-        return id not in self.ids and email not in self.EMAILS and phone not in self.PHONES
+        return super(Account, self).unique(bsobj) and email not in self.EMAILS and phone not in self.PHONES
 
     def getinfo_byname(self, name):
         return self.USERS[name]
-
-    def baseobj(self, info):
-        metadata = self._metadata(info)
-        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
-        return bsobj
-
-    def _metadata(self, info):
-        assert set(self.MUST_KEY).issubset(set(info.keys()))
-        origin = self.generate_info_template()
-        for key, datatype in self.YAML_TEMPLATE:
-            if key in info and isinstance(info[key], datatype):
-                origin[key] = info[key]
-        origin['id'] = utils.builtin.hash(info['name'])
-        return origin
 
     def add(self, bsobj, password, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
@@ -134,21 +97,24 @@ class Account(services.base.kv_storage.KeyValueStorage):
         result = super(Account, self).add(bsobj, committer, unique,
                                           yamlfile, mdfile, do_commit=do_commit)
         if result:
-            pwdobj = self.svc_password.baseobj({'id': str(bsobj.ID), 'password': password})
+            metadata = {'id': str(bsobj.ID), 'password': utils.builtin.hash(password)}
+            pwdobj = core.basedata.DataObject(metadata=metadata, data=None)
             pwd_result = self.svc_password.add(pwdobj)
         return result and pwd_result
 
     def checkpwd(self, id, password):
-        return self.svc_password.get(id) == utils.builtin.hash(password)
+        return self.svc_password.check(id, utils.builtin.hash(password))
 
     def updatepwd(self, id, oldpassword, newpassword):
         result = False
         if self.exists(id):
-            result = self.svc_password.updatepwd(id, oldpassword, newpassword)
+            result = self.svc_password.updatepwd(id, utils.builtin.hash(oldpassword), utils.builtin.hash(newpassword))
         return result
 
     def setpeople(self, id, people, committer):
-        return self.updateinfo(id, 'people', people, committer)
+        metadata = {'id': id, 'people': people}
+        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+        return self.modify(bsobj, committer)
 
     def createmember(self, id, name, svc_members):
         """
@@ -172,8 +138,9 @@ class Account(services.base.kv_storage.KeyValueStorage):
             svc_members.create(name)
             member = svc_members.get(name)
             member.add_account(info['id'], info['id'], info['name'], creator=True)
-            self.updateinfo(id, 'member', name, info['name'])
-            result = True
+            metadata = {'id': id, 'member': name}
+            bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+            result = self.modify(bsobj, info['name'])
         return result
 
     def quitmember(self, inviter_id, invited_id, svc_members):
@@ -211,7 +178,9 @@ class Account(services.base.kv_storage.KeyValueStorage):
             if result is True:
                 if member.check_admin(invited_id) is True:
                     result = member.delete_admin(inviter_id, invited_id)
-                self.updateinfo(invited_id, 'member', '', info['name'])
+                metadata = {'id': invited_id, 'member': ''}
+                bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+                self.modify(bsobj, info['name'])
         return result
 
     def joinmember(self, inviter_id, invited_id, name, svc_members):
@@ -249,7 +218,9 @@ class Account(services.base.kv_storage.KeyValueStorage):
             member = svc_members.use(name, inviter_id)
             result = member.add_account(inviter_id, invited_id, inviter_info['name'])
             if result is True:
-                self.updateinfo(invited_id, 'member', name, invited_info['name'])
+                metadata = {'id': invited_id, 'member': name}
+                bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+                self.modify(bsobj, invited_info['name'])
         return result
 
     @property

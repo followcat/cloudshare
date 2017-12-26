@@ -16,6 +16,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
     YAML_TEMPLATE = ()
 
     fix_item = {}
+    MUST_KEYS = []
 
     yaml_private_key = {}
 
@@ -118,6 +119,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             return False
         name = core.outputstorage.ConvertName(bsobj.name)
         if kv_file is True:
+            assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
             if committer is not None:
                 bsobj.metadata['committer'] = committer
             message = "Add %s: %s metadata." % (self.commitinfo, name)
@@ -135,6 +137,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
         name = core.outputstorage.ConvertName(bsobj.name)
         info = self.getinfo(name)
         if kv_file is True:
+            assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
             for key in self.generate_info_template():
                 if key in self.list_item:
                     try:

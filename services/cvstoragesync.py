@@ -8,6 +8,7 @@ import pypandoc
 
 import utils._yaml
 import core.basedata
+import utils.timeout.exception
 import utils.timeout.inprocess
 import extractor.information_explorer
 
@@ -35,7 +36,7 @@ def generate_yaml(md, yamlobj, selected=extractor.information_explorer.all_selec
                             extractor.information_explorer.catch_selected,
                             8, args=tuple([md, selected]),
                             kwargs={'fix_func': fix_func})
-    except Exception as e:
+    except utils.timeout.exception.ExecTimeout as e:
        raise e
     for key in catchinfo:
         if catchinfo[key] or (selected is not None and key in selected):
@@ -122,6 +123,9 @@ class CVStorageSync(object):
             usetime = time.time() - t1
             self.logger.info((' ').join(["KeyboardInterrupt", logidname,
                                          "used", str(usetime)]))
+            return result
+        except utils.timeout.exception.ExecTimeout:
+            self.logger.info((' ').join(["Exec Timeout %s generate " % e, logidname]))
             return result
         except Exception as e:
             self.logger.info((' ').join(["Error %s generate " % e, logidname]))

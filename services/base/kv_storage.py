@@ -16,7 +16,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
     YAML_TEMPLATE = ()
 
     fix_item = {}
-    MUST_KEYS = []
+    MUST_KEY = []
 
     yaml_private_key = {}
 

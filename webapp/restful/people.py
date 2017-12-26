@@ -3,6 +3,8 @@ import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
+import core.basedata
+
 
 class PeopleAPI(Resource):
 
@@ -31,13 +33,14 @@ class PeopleAPI(Resource):
         unique_id = args['unique_id']
         update_info = args['update_info']
         member = user.getmember(self.svc_members)
-        for key, value in update_info.iteritems():
-            data = member.peo_updateyaml(unique_id, key, value, user.name)
-            if data is not None:
-                response = { 'code': 200, 'data': data, 'message': 'Update information success.' }
-            else:
-                response = { 'code': 400, 'message': 'Update information error.'}
-                break
+        update_info['id'] = unique_id
+        obj = core.basedata.DataObject(update_info, data='')
+
+        result = member.peo_modify(obj, user.name)
+        if result:
+            response = { 'code': 200, 'message': 'Update information success.' }
+        else:
+            response = { 'code': 400, 'message': 'Update information error.'}
         return response
 
     def delete(self):

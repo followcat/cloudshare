@@ -3,7 +3,7 @@
 const StorageUtil = {
   get: (name) => {
     let reg = /^\[.+\]$/g,
-        value = localStorage.getItem(name);
+        value = localStorage.getItem(name) || sessionStorage.getItem(name);
     return reg.test(value) ? JSON.parse(value) : value;
   },
 

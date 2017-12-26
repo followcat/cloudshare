@@ -15,7 +15,7 @@ import {
 } from 'antd';
 
 import { getValuableData } from 'request/analyse';
-import { getJobDescriptionList } from 'request/jobdescription';
+import { getJobDescriptionSearch } from 'request/jobdescription';
 
 import { getRadarOption } from 'utils/chart_option';
 
@@ -49,10 +49,10 @@ class DrawChart extends Component {
   }
 
   handleClick() {
-    getJobDescriptionList({
+    getJobDescriptionSearch({
       current_page: 1,
       page_size: 9999,
-      status: 'Opening'
+      search_items: [["status", "Opening"]]
     },json => {
       if (json.code === 200) {
         this.setState({

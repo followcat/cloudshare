@@ -112,19 +112,49 @@ class SearchIndex(services.operator.search.SearchIndex):
             "_default_": {
                 "dynamic_templates": [
                     {
-                        "content": {
-                            "match":              "content",
-                            "match_mapping_type": "string",
+                        "name": {
+                            "match":              "name",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_smart"
+                            }
+                    }},
+                    {
+                        "introduction": {
+                            "match":              "introduction",
                             "mapping": {
                                 "type":           "text",
                                 "analyzer":       "ik_max_word"
                             }
                     }},
                     {
-                        "strings": {
-                            "match_mapping_type": "string",
+                        "conumber": {
+                            "match":              "conumber",
                             "mapping": {
-                                "type":       "keyword"
+                                "type":           "text",
+                                "analyzer":       "ik_smart"
+                            }
+                    }},
+                    {
+                        "content": {
+                            "path_match":         "*.content",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_smart"
+                            }
+                    }},
+                    {
+                        "id": {
+                            "match":              "id",
+                            "mapping": {
+                                "type":           "keyword"
+                            }
+                    }},
+                    {
+                        "modifytime": {
+                            "match":              "modifytime",
+                            "mapping": {
+                                "type":           "keyword"
                             }
                     }}
                 ]

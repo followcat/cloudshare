@@ -12,6 +12,8 @@ import { introJs } from 'intro.js';
 import { Steps, Icon, Tabs } from 'antd';
 import websiteText from 'config/website-text';
 
+import StorageUtil from 'utils/storage'
+
 const language = websiteText.zhCN;
 const Step = Steps.Step;
 const TabPane = Tabs.TabPane;
@@ -19,6 +21,9 @@ const TabPane = Tabs.TabPane;
 class Search extends Component {
   constructor() {
     super();
+    this.state = {
+      ismember: StorageUtil.get('ismember')
+    }
     this.handleSearch = this.handleSearch.bind(this);
     this.handleJDSearch = this.handleJDSearch.bind(this);
   }
@@ -51,6 +56,7 @@ class Search extends Component {
         <div className="card-container">
           <div className="cs-search">
             <Tabs type="card">
+            {this.state.ismember &&
             <TabPane tab={language.JD_SEARCH} key="1">
                 <KeywordSearch
                   btnText={language.JD_SEARCH}
@@ -58,6 +64,7 @@ class Search extends Component {
                   onSearch={this.handleSearch}
                 />
               </TabPane>
+            }
               <TabPane tab={language.JOBSEARCH} key="2">
                 <KeywordSearch
                   btnText={language.JOBSEARCH}

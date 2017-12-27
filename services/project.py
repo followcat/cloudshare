@@ -29,7 +29,9 @@ class SimulationProject(services.base.kv_storage.KeyValueStorage):
     )
 
     def setup(self, info):
-        return self.saveinfo(self.config_file, info, commitinfo, committer=commitinfo, do_commit=True)
+        info['id'] = self.config_file
+        bsobj = core.basedata.DataObject(metadata=info, data=None)
+        return self.modify(bsobj, committer=self.commitinfo, do_commit=True)
 
 
 class Project(services.operator.combine.Combine):
@@ -88,7 +90,7 @@ class Project(services.operator.combine.Combine):
             self.config['model'] = 'default'
 
     def save(self):
-        return self.config_service.saveinfo(self.config_file, self.config, committer=None, message="Update config file.")
+        return self.config_service.setup(self.config_file)
 
     def setup(self, committer=None, config=None):
         self.setconfig(config)
@@ -147,9 +149,11 @@ class Project(services.operator.combine.Combine):
     def bd_update_info(self, id, info, committer):
         result = False
         if self.bidding.exists(id):
-            repo_result = self.storageCO.saveinfo(id, info, "Update %s information."%id,
+            info['id'] = id
+            bsobj = core.basedata.DataObject(metadata=info, data=None)
+            repo_result = self.storageCO.modify(bsobj, "Update %s information."%id,
                                                   committer)
-            project_result = self.bidding.update_info(id, info, committer)
+            project_result = self.bidding.modify(bsobj, committer)
             result = repo_result or project_result
         return result
 

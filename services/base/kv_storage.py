@@ -28,13 +28,8 @@ class KeyValueStorage(services.base.storage.BaseStorage):
     def list_item(self):
         return set([k for k,v in filter(lambda x: x[1] is list, self.YAML_TEMPLATE)])
 
-    def _listframe(self, value, username, date=None):
-        if date is None:
-            date = time.strftime('%Y-%m-%d %H:%M:%S')
-        data = {'author': username,
-                'content': value,
-                'date': date}
-        return data
+    def build_frame(self, **kwargs):
+        return kwargs
 
     def generate_info_template(self):
         info = {}
@@ -53,112 +48,61 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             pass
         return info
 
-    def _modifyinfo(self, id, key, value, committer, do_commit=True):
-        result = {}
-        projectinfo = self.getinfo(id)
-        if not projectinfo[key] == value:
-            projectinfo[key] = value
-            self.saveinfo(id, projectinfo,
-                          'Modify %s key %s.' % (id, key), committer, do_commit=do_commit)
-            result = {key: value}
-        return result
-
-    def _addinfo(self, id, key, value, committer, do_commit=True):
-        projectinfo = self.getinfo(id)
-        data = self._listframe(value, committer)
-        projectinfo[key].insert(0, data)
-        self.saveinfo(id, projectinfo,
-                      'Add %s key %s.' % (id, key), committer, do_commit=do_commit)
-        return data
-
-    def _deleteinfo(self, id, key, value, date, committer, do_commit=True):
-        projectinfo = self.getinfo(id)
-        data = self._listframe(value, committer, date)
-        if data in projectinfo[key]:
-            projectinfo[key].remove(data)
-            self.saveinfo(id, projectinfo,
-                          'Delete %s key %s.' % (id, key), committer, do_commit=do_commit)
-            return data
-
-    def updateinfo(self, id, key, value, committer, do_commit=True):
-        assert key not in self.fix_item
-        result = None
-        if key in [each[0] for each in self.YAML_TEMPLATE]:
+    def merge_info(self, info, bsobj):
+        assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
+        for key in self.generate_info_template():
             if key in self.list_item:
-                result = self._addinfo(id, key, value, relation,
-                                       committer, do_commit=do_commit)
+                try:
+                    if not bsobj.metadata[key]:
+                        continue
+                    elif isinstance(bsobj.metadata[key], (list, set, tuple)):
+                        info[key].extend(bsobj.metadata[key])
+                    elif isinstance(bsobj.metadata[key], dict):
+                        data = self.build_frame(**bsobj.metadata[key])
+                        if data not in info[key]:
+                            info[key].append(data)
+                    else:
+                        info[key].append(bsobj.metadata[key])
+                except KeyError:
+                    pass
             else:
-                result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
-        return result
+                try:
+                    info[key] = bsobj.metadata[key]
+                except KeyError:
+                    pass
 
-    def deleteinfo(self, id, msgid, committer, do_commit=True):
-        result = self._deleteinfo(id, msgid, committer, do_commit=do_commit)
-        return result
-
-    def saveinfo(self, id, info, message, committer, do_commit=True):
-        result = False
-        baseinfo = self.getinfo(id)
-        if not self.generate_info_template():
-            keys = baseinfo.keys()+info.keys()
-        else:
-            keys = self.generate_info_template().keys()
-        saveinfo = dict(filter(lambda k: k[0] in keys, info.items()))
-        if baseinfo != saveinfo:
-            name = core.outputstorage.ConvertName(id).yaml
-            saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
-                                 allow_unicode=True, default_flow_style=False)
-            result = self.interface.modify(name, dumpinfo,
-                                  message=message, committer=committer, do_commit=do_commit)
-        return result
 
     def add(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
         result = False
         if unique is True and self.unique(bsobj) is False:
             self.info = "Exists File"
             return False
-        name = core.outputstorage.ConvertName(bsobj.name)
         if kv_file is True:
-            assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
             if committer is not None:
                 bsobj.metadata['committer'] = committer
+            name = core.outputstorage.ConvertName(bsobj.name)
             message = "Add %s: %s metadata." % (self.commitinfo, name)
-            name = core.outputstorage.ConvertName(bsobj.name).yaml
             saveinfo = {'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}
-            saveinfo.update(bsobj.metadata)
+            info = self.generate_info_template()
+            saveinfo.update(info)
+            self.merge_info(saveinfo, bsobj)
             dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
-            result = self.interface.add(name, dumpinfo,
+            result = self.interface.add(name.yaml, dumpinfo,
                             message, committer, do_commit=do_commit)
         return result
 
     def modify(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
         result = False
-        name = core.outputstorage.ConvertName(bsobj.name)
-        info = self.getinfo(name)
         if kv_file is True:
-            assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
-            for key in self.generate_info_template():
-                if key in self.list_item:
-                    try:
-                        if not bsobj.metadata[key]:
-                            continue
-                        elif isinstance(bsobj.metadata[key], (list, set, tuple, dict)):
-                            info[key].extend(bsobj.metadata[key])
-                        else:
-                            info[key].append(bsobj.metadata[key])
-                    except KeyError:
-                        pass
-                else:
-                    try:
-                        info[key] = bsobj.metadata[key]
-                    except KeyError:
-                        pass
             if committer is not None:
-                info['committer'] = committer
+                bsobj.metadata['committer'] = committer
+            name = core.outputstorage.ConvertName(bsobj.name)
             message = "Add %s: %s metadata." % (self.commitinfo, name)
             saveinfo = {'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}
+            info = self.getinfo(name)
             saveinfo.update(info)
+            self.merge_info(saveinfo, bsobj)
             dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
             result = self.interface.modify(name.yaml, dumpinfo,

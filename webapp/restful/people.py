@@ -33,6 +33,11 @@ class PeopleAPI(Resource):
         unique_id = args['unique_id']
         update_info = args['update_info']
         member = user.getmember(self.svc_members)
+        for key in update_info:
+            data = {}
+            data['content'] = update_info[key]
+            data['author'] = user.name
+            update_info[key] = data
         update_info['id'] = unique_id
         obj = core.basedata.DataObject(update_info, data='')
 

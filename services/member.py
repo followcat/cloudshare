@@ -34,7 +34,9 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
     )
 
     def setup(self, info):
-        return self.saveinfo(self.config_file, info, commitinfo, committer=commitinfo, do_commit=True)
+        info['id'] = self.config_file
+        bsobj = core.basedata.DataObject(metadata=info, data=None)
+        return self.modify(bsobj, committer=self.commitinfo, do_commit=True)
 
 
 class Member(services.operator.combine.Combine):
@@ -126,7 +128,7 @@ class Member(services.operator.combine.Combine):
             self.config.update(config)
 
     def save(self):
-        return self.config_service.saveinfo(self.config_file, self.config, committer=None, message="Update config file.")
+        return self.config_service.setup(self.config)
 
     def setup(self, config=None, committer=None):
         if config is None:

@@ -449,6 +449,7 @@ class Resume extends Component {
   render() {
     const {
       resumeId,
+      uniqueId,
       dataSource,
       collected,
       resumeList,
@@ -539,7 +540,7 @@ class Resume extends Component {
               })
             }
             </Card>
-            <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
+            <ResumeTag dataSource={tag} uniqueId={uniqueId} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
             <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />
             <ResumeSimilar dataSource={similar} id={resumeId}/>

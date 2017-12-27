@@ -112,3 +112,19 @@ export const updateAdditionalInfo = (params, callback) => {
   .then(response => response.json())
   .then(json => callbackFunction(callback, json));
 };
+
+// 删除标签, 跟进, 评论信息
+export const deleteAdditionalInfo = (params, callback) => {
+  return fetch(API.ADDITIONAL_INFO_API, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};

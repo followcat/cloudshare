@@ -13,6 +13,7 @@ import ResumeToolMenu from './ResumeToolMenu';
 import ResumeTag from './ResumeTag';
 import ResumeFollowUp from './ResumeFollowUp';
 import ResumeComment from './ResumeComment';
+import ResumeJobRecommend from './ResumeJobRecommend';
 import ResumeSimilar from './ResumeSimilar';
 
 import {
@@ -513,7 +514,7 @@ class Resume extends Component {
                             }
                             </Tabs.TabPane>
                             <Tabs.TabPane tab="原文" key="html">
-                              <ResumeContent html={html} />
+                              <ResumeContent html={html} highlight={highlight}/>
                             </Tabs.TabPane>
                             <Tabs.TabPane
                               tab="English"
@@ -544,6 +545,7 @@ class Resume extends Component {
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
             <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />
             <ResumeSimilar dataSource={similar} id={resumeId}/>
+            <ResumeJobRecommend dataSource={similar} id={resumeId}/>
           </div>
         </div>
       </Layout>

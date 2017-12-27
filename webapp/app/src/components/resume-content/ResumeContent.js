@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import CVProcess from 'utils/cv-process';
 
+import HighLight from 'components/highlight';
+
 class ResumeContent extends Component {
   constructor() {
     super();
@@ -13,14 +15,17 @@ class ResumeContent extends Component {
   }
 
   render() {
+    const { highlight, html } = this.props;
     return (
-      <div className={`${this.props.prefixCls}-wrapper`}>
-        <div
-          className={`${this.props.prefixCls}`}
-          ref="cv"
-          dangerouslySetInnerHTML={{ __html: this.props.html }}
-        />
-      </div>
+       <div className={`${this.props.prefixCls}-wrapper`}>
+        <HighLight highlight={highlight} html={html}>
+         <div
+           className={`${this.props.prefixCls}`}
+           ref="cv"
+           dangerouslySetInnerHTML={{ __html: this.props.html }}
+         />
+        </HighLight>
+       </div>
     );
   }
 }

@@ -15,7 +15,7 @@ EDUCATION_REQUIREMENT = re.compile(ur'[\d .]*(?P<education>.{2})(?=[及或以上
 
 def rate(name_list, miner, modelname, member, doc, top, uses=None, education_req=True):
     result = []
-    rating = next(name_list, miner, member, doc, top, project.modelname,
+    rating = next(name_list, miner, member, doc, top, modelname,
                   uses=uses, education_req=education_req)
     blank, reference = rating.pop(0)
     candidate = [r[1] for r in reference]

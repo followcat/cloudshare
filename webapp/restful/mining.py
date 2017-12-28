@@ -255,6 +255,9 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         datas = list()
         for result in results[(cur_page-1)*size: cur_page*size]:
             yaml_info = project.jd_get(result[0])
+            co_id = yaml_info['company']
+            co_name = project.company_get(co_id)['name']
+            yaml_info['company_name'] = co_name
             datas.append({ 'id': yaml_info['id'],
                            'yaml_info': yaml_info,
                            'match': result[1] })

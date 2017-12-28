@@ -419,6 +419,11 @@ class ValuablebaseAPI(Resource):
                 name = match_item[0]
                 yaml_data = member.cv_getyaml(name+'.yaml')
                 yaml_data['match'] = match_item[1]
+                try:
+                    if yaml_data['secrecy'] is None:
+                        yaml_data['secrecy'] = False
+                except KeyError:
+                    yaml_data['secrecy'] = False
                 values.append({ 'match': match_item[1],
                                 'id': yaml_data['id'],
                                 'name': yaml_data['name'],

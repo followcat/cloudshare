@@ -8,6 +8,7 @@ import ColorGrad from 'utils/color-grad';
 class HighLight extends Component {
   render() {
     const {
+      html,
       children,
       prefixCls,
       dataSource,
@@ -16,7 +17,7 @@ class HighLight extends Component {
     } = this.props;
     const colorGrad = new ColorGrad()
     const gradient = colorGrad.gradient();
-  let value = children;
+  let value = html || children;
   highlight && Object.keys(highlight).map((item) =>{
     let Color = gradient ? gradient[parseInt(highlight[item]*100)] : {};
     let invalue = '<span class="cs-highlight-item"'+'style="font-weight: bolder;'+

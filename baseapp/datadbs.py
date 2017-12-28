@@ -17,7 +17,7 @@ PATHS = config.storage_config
 
 SVC_PWD = services.account.Password(PATHS['PASSWORD'], 'pwdrepo')
 SVC_ACCOUNT = services.account.Account(SVC_PWD, PATHS['ACCOUNT'], 'accrepo')
-SVC_MSG = services.message.Message(SVC_ACCOUNT, PATHS['MESSAGE'], 'msgrepo')
+SVC_MSG = services.message.Message(PATHS['MESSAGE'], 'msgrepo')
 
 SVC_BD_REPO = services.bidding.Bidding(PATHS['BD_REPO'], 'corepo')
 SVC_JD_REPO = services.jobdescription.JobDescription(PATHS['JD_REPO'], 'jdrepo')

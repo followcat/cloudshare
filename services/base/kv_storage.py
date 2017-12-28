@@ -51,6 +51,11 @@ class KeyValueStorage(services.base.storage.BaseStorage):
     def merge_info(self, info, bsobj):
         assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
         for key in self.generate_info_template():
+            if key in self.fix_item and info[key]:
+                try:
+                    assert info[key] == bsobj.metadata[key], 'Attempt at changing %s fixed key' %(key)
+                except KeyError:
+                    continue
             if key in self.list_item:
                 try:
                     if not bsobj.metadata[key]:
@@ -60,7 +65,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                     elif isinstance(bsobj.metadata[key], dict):
                         data = self.build_frame(**bsobj.metadata[key])
                         if data not in info[key]:
-                            info[key].append(data)
+                            info[key].insert(0, data)
                     else:
                         info[key].append(bsobj.metadata[key])
                 except KeyError:
@@ -72,6 +77,19 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                     pass
 
 
+    def save_info(self, info, bsobj):
+        assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
+        for key in self.generate_info_template():
+            if key in self.fix_item and info[key]:
+                try:
+                    assert info[key] == bsobj.metadata[key], 'Attempt at changing %s fixed key' %(key)
+                except KeyError:
+                    continue
+            try:
+                info[key] = bsobj.metadata[key]
+            except KeyError:
+                pass
+
     def add(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
         result = False
         if unique is True and self.unique(bsobj) is False:
@@ -82,11 +100,10 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                 bsobj.metadata['committer'] = committer
             name = core.outputstorage.ConvertName(bsobj.name)
             message = "Add %s: %s metadata." % (self.commitinfo, name)
-            saveinfo = {'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}
             info = self.generate_info_template()
-            saveinfo.update(info)
-            self.merge_info(saveinfo, bsobj)
-            dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
+            info.update({'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
+            self.merge_info(info, bsobj)
+            dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
             result = self.interface.add(name.yaml, dumpinfo,
                             message, committer, do_commit=do_commit)
@@ -99,11 +116,26 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                 bsobj.metadata['committer'] = committer
             name = core.outputstorage.ConvertName(bsobj.name)
             message = "Add %s: %s metadata." % (self.commitinfo, name)
-            saveinfo = {'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}
             info = self.getinfo(name)
-            saveinfo.update(info)
-            self.merge_info(saveinfo, bsobj)
-            dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
+            info.update({'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
+            self.merge_info(info, bsobj)
+            dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
+                                 allow_unicode=True, default_flow_style=False)
+            result = self.interface.modify(name.yaml, dumpinfo,
+                            message, committer, do_commit=do_commit)
+        return result
+
+    def save(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
+        result = False
+        if kv_file is True:
+            if committer is not None:
+                bsobj.metadata['committer'] = committer
+            name = core.outputstorage.ConvertName(bsobj.name)
+            message = "Add %s: %s metadata." % (self.commitinfo, name)
+            info = self.getinfo(name)
+            info.update({'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
+            self.save_info(info, bsobj)
+            dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
             result = self.interface.modify(name.yaml, dumpinfo,
                             message, committer, do_commit=do_commit)

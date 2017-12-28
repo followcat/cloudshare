@@ -2,10 +2,10 @@ import time
 
 import core.basedata
 import utils.builtin
-import services.base.kv_storage
+import services.base.frame_storage
 
 
-class Message(services.base.kv_storage.KeyValueStorage):
+class Message(services.base.frame_storage.ListFrameStorage):
     """
         >>> import shutil
         >>> import services.account
@@ -14,8 +14,8 @@ class Message(services.base.kv_storage.KeyValueStorage):
         >>> acc_path = 'services/test_acc'
         >>> msg_path = 'services/test_msg'
         >>> svc_password = services.account.Password(pwd_path)
-        >>> svc_account = services.account.Account(svc_password, acc_path)
-        >>> svc_message = services.message.Message(svc_account, msg_path)
+        >>> svc_account = services.account.Account(acc_path)
+        >>> svc_message = services.message.Message(msg_path)
         >>> acc1_info = svc_account.baseobj({'name': 'name1'})
         >>> acc2_info = svc_account.baseobj({'name': 'name2'})
         >>> ID1, ID2 = acc1_info.ID.base, acc2_info.ID.base
@@ -27,7 +27,7 @@ class Message(services.base.kv_storage.KeyValueStorage):
         True
         >>> svc_message.add(svc_message.baseobj({'id': ID2}))
         True
-        >>> sent, receive = svc_message.send_chat(ID1, ID2, 'hello world', 'name1')
+        >>> sent, receive = svc_message.send_chat(ID1, ID2, 'hello world', acc2_info.name, 'name1')
         >>> sent['relation'] == ID2
         True
         >>> receive['relation'] == ID1
@@ -45,7 +45,7 @@ class Message(services.base.kv_storage.KeyValueStorage):
         True
         >>> info2['read_chat'][0] == receive
         True
-        >>> invitation = svc_message.send_invitation(ID1, ID2, 'mock_member', 'name1')
+        >>> invitation = svc_message.send_invitation(ID1, ID2, 'mock_member', acc2_info.name, 'name1')
         >>> info1 = svc_message.getinfo(ID1)
         >>> info1['inviter_member'][0]['relation'] == ID2
         True
@@ -73,99 +73,59 @@ class Message(services.base.kv_storage.KeyValueStorage):
         ("unread_chat",         list),
     )
 
+    list_frame = {
+        'id':           str,
+        'relation':     str,
+        'name':         str,
+        'content':      str,
+        'date':         str,
+        }
+
     MUST_KEY = ['id']
     fix_item  = {"id"}
 
-    def __init__(self, svc_account, path, name=None, iotype='git'):
-        super(Message, self).__init__(path, name=name, iotype=iotype)
-        self.svc_account = svc_account
-
-    def baseobj(self, info):
-        metadata = self._metadata(info)
-        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
-        return bsobj
-
-    def _metadata(self, info):
-        assert set(self.MUST_KEY).issubset(set(info.keys()))
-        origin = self.generate_info_template()
-        for key, datatype in self.YAML_TEMPLATE:
-            if key in info and isinstance(info[key], datatype):
-                origin[key] = info[key]
-        return origin
-
-    def _listframe(self, value, userid, date=None):
-        if date is None:
-            date = time.strftime('%Y-%m-%d %H:%M:%S')
-        relation_info = self.svc_account.getinfo(userid)
-        name = relation_info['name']
-        data = {'id': utils.builtin.hash(' '.join([str(time.time()), userid])),
-                'relation': userid,
-                'name': name,
-                'content': value,
-                'date': date}
-        return data
-
-    def _addinfo(self, id, key, value, relation, committer, do_commit=True):
-        projectinfo = self.getinfo(id)
-        if key not in projectinfo:
-            projectinfo[key] = list()
-        data = self._listframe(value, relation)
-        projectinfo[key].insert(0, data)
-        self.saveinfo(id, projectinfo,
-                      'Add %s key %s.' % (id, key), committer, do_commit=do_commit)
-        return data
-
-    def _move(self, id, msgid, origin_key, des_key, committer, do_commit=True):
+    def moveinfo(self, id, msgid, origin_key, des_key, committer, do_commit=True):
         result = False
         projectinfo = self.getinfo(id)
+        info = {}
         for msg in projectinfo[origin_key]:
             if msg['id'] == msgid:
                 projectinfo[origin_key].remove(msg)
                 projectinfo[des_key].insert(0, msg)
-                self.saveinfo(id, projectinfo, 'Move %s message id %s from %s to %s.' %
-                              (id, msgid, origin_key, des_key),
-                              committer, do_commit=do_commit)
-                result =True
+                info[origin_key] = projectinfo[origin_key]
+                info[des_key] = projectinfo[des_key]
                 break
+        if info:
+            info['id'] = id
+            bsobj = core.basedata.DataObject(metadata=info, data=None)
+            result = self.save(bsobj, committer, do_commit=do_commit) 
         return result
 
-    def _deleteinfo(self, id, msgid, committer, do_commit=True):
+    def deleteinfo(self, id, msgid, committer, do_commit=True):
         result = None
         found = False
         messageinfo = self.getinfo(id)
+        info = {}
         for key in messageinfo:
             for msg in messageinfo[key]:
                 if msg['id'] == msgid:
                     messageinfo[key].remove(msg)
-                    self.saveinfo(id, messageinfo, 'Delete %s key %s %s.' % (id, key, msgid),
-                                  committer, do_commit=do_commit)
-                    result = msg
                     found = True
                     break
             if found:
-                 break
-        return result
-
-    def updateinfo(self, id, key, value, relation, committer, do_commit=True):
-        assert key not in self.fix_item
-        result = None
-        if key in [each[0] for each in self.YAML_TEMPLATE]:
-            if key in self.list_item:
-                result = self._addinfo(id, key, value, relation,
-                                       committer, do_commit=do_commit)
-            else:
-                result = self._modifyinfo(id, key, value, committer, do_commit=do_commit)
-        return result
-
-    def deleteinfo(self, id, msgid, committer, do_commit=True):
-        result = self._deleteinfo(id, msgid, committer, do_commit=do_commit)
+                info[key] = messageinfo[key]
+                break
+        if info:
+            info['id'] = id
+            bsobj = core.basedata.DataObject(metadata=info, data=None)
+            result = self.save(bsobj, committer, do_commit=do_commit) 
         return result
 
     def getinfo(self, id):
-        assert self.svc_account.exists(id)
         if not self.exists(id):
-            tmpobj = self.baseobj({'id': str(id)})
-            assert self.add(tmpobj)
+            info = self.generate_info_template()
+            info.update({'id': str(id)})
+            assert self.add(core.basedata.DataObject(metadata=info, data=None))
         return super(Message, self).getinfo(id)
 
     def getcontent(self, id, msgid):
@@ -208,24 +168,60 @@ class Message(services.base.kv_storage.KeyValueStorage):
                 sent_info = each
                 break
         if sent_info and receive_info:
-            sent_result = self._move(inviter_id, sent_info['id'], 'inviter_member',
+            sent_result = self.moveinfo(inviter_id, sent_info['id'], 'inviter_member',
                                      'processed_member', committer)
-            receive_result = self._move(invited_id, receive_info['id'], 'invited_member',
+            receive_result = self.moveinfo(invited_id, receive_info['id'], 'invited_member',
                                      'processed_member', committer)
             if sent_result and receive_result:
                 result = receive_info
         return result
 
     def read(self, id, msgid, committer):
-        return self._move(id, msgid, 'unread_chat', 'read_chat', committer)
+        return self.moveinfo(id, msgid, 'unread_chat', 'read_chat', committer)
 
-    def send_chat(self, ori_id, des_id, content, committer):
-        sent = self.updateinfo(ori_id, 'sent_chat', content, des_id, committer)
-        receive = self.updateinfo(des_id, 'unread_chat', content, ori_id, committer)
-        return sent, receive
+    def send_chat(self, ori_id, des_id, content, name, committer):
+        sent_info = {
+            'id': ori_id,
+            'sent_chat': {
+                    'id': utils.builtin.hash(' '.join([str(time.time()), ori_id])),
+                    'content': content,
+                    'relation': des_id,
+                    'name': name,
+                }
+        }
+        received_info = {
+            'id': des_id,
+            'unread_chat': {
+                    'id': utils.builtin.hash(' '.join([str(time.time()), des_id])),
+                    'content': content,
+                    'relation': ori_id,
+                    'name': name,
+            }
+        }
+        sent = self.modify(core.basedata.DataObject(metadata=sent_info, data=None), committer)
+        received = self.modify(core.basedata.DataObject(metadata=sent_info, data=None), committer)
+        return sent, received
 
-    def send_invitation(self, ori_id, des_id, member, committer):
-        sent_result = self.updateinfo(ori_id, 'inviter_member', member, des_id, committer)
-        receive_result = self.updateinfo(des_id, 'invited_member', member, ori_id, committer)
+    def send_invitation(self, ori_id, des_id, member, name, committer):
+        inviter_info = {
+            'id': ori_id,
+            'inviter_member': {
+                    'id': utils.builtin.hash(' '.join([str(time.time()), ori_id])),
+                    'content': member,
+                    'relation': des_id,
+                    'name': name,
+            }
+        }
+        invited_info = {
+            'id': des_id,
+            'invited_member': {
+                    'id': utils.builtin.hash(' '.join([str(time.time()), des_id])),
+                    'content': member,
+                    'relation': ori_id,
+                    'name': name,
+            }
+        }
+        sent_result = self.modify(core.basedata.DataObject(metadata=inviter_info, data=None), committer)
+        receive_result = self.modify(core.basedata.DataObject(metadata=invited_info, data=None), committer)
         return sent_result and receive_result
 

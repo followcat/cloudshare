@@ -84,7 +84,7 @@ class User(flask.ext.login.UserMixin):
     def sentmessage(self, des_name, content, svc_message):
         des_info = self.svc_account.getinfo_byname(des_name)
         des_id = des_info['id']
-        result = svc_message.send_chat(self.id, des_id, content, self.name)
+        result = svc_message.send_chat(self.id, des_id, content, des_name, self.name)
         return result
 
     def readmessage(self, msgid, svc_message):
@@ -97,7 +97,7 @@ class User(flask.ext.login.UserMixin):
             des_info = self.svc_account.getinfo_byname(des_name)
             des_id = des_info['id']
             result = svc_message.send_invitation(self.id, des_id,
-                                                 self.member, self.name)
+                                                 self.member, des_name, self.name)
         return result
 
     @property

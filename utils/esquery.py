@@ -64,10 +64,11 @@ def getmappings(esconn, fields, index=None, doctype=None):
     for index in mapping:
         for mapid in mapping[index]['mappings']:
             for name in mapping[index]['mappings'][mapid]:
+                fullname = mapping[index]['mappings'][mapid][name]['full_name']
                 for key in mapping[index]['mappings'][mapid][name]['mapping']:
-                    if key in results:
+                    if fullname in results:
                         continue
-                    results[key] = mapping[index]['mappings'][mapid]\
+                    results[fullname] = mapping[index]['mappings'][mapid]\
                                    [name]['mapping'][key]['type']
     return results
 

@@ -163,10 +163,13 @@ class LSIbaseAPI(Resource):
 
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
+        self.reqparse.add_argument('size', type=int, default=20, location = 'json')
 
     def process(self, member, project, doc, uses, filterdict, cur_page, size=20):
         if not cur_page:
@@ -223,6 +226,44 @@ class LSIbaseAPI(Resource):
         return { 'datas': datas, 'pages': pages, 'totals': totals }
 
 
+class LSIJDbyCVidAPI(LSIbaseAPI):
+
+    def __init__(self):
+        super(LSIJDbyCVidAPI, self).__init__()
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('page', type = int, location = 'json')
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        size = args['size']
+        cur_page = args['page']
+        projectname = args['project']
+        filterdict = args['filterdict'] if args['filterdict'] else {}
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        doc = project.cv_getmd(id)
+        totals, searchs = self.svc_index.search(index=[self.svc_index.config['JD_MEM']],
+                                                doctype=[project.id], filterdict=filterdict,
+                                                size=5000, source=False)
+        ids = [item['_id'] for item in searchs]
+        results = self.miner.probability_by_ids('jdmatch', doc, ids)
+        pages = int(math.ceil(float(len(searchs))/totals))
+        datas = list()
+        for result in results[(cur_page-1)*size: cur_page*size]:
+            yaml_info = project.jd_get(result[0])
+            co_id = yaml_info['company']
+            co_name = project.company_get(co_id)['name']
+            yaml_info['company_name'] = co_name
+            datas.append({ 'id': yaml_info['id'],
+                           'yaml_info': yaml_info,
+                           'match': result[1] })
+        return { 'code': 200, 'data': datas }
+
+
 class LSIbyJDidAPI(LSIbaseAPI):
 
     def __init__(self):
@@ -232,24 +273,22 @@ class LSIbyJDidAPI(LSIbaseAPI):
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('appendcomment', type = bool, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
-        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
+        cur_page = args['page']
         projectname = args['project']
+        uses = args['uses'] if args['uses'] else []
+        filterdict = args['filterdict'] if args['filterdict'] else {}
+        append_comment = args['appendcomment'] if args['appendcomment'] else False
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
-        append_comment = args['appendcomment'] if args['appendcomment'] else False
         if append_comment:
             doc += jd_yaml['commentary']
-        uses = args['uses'] if args['uses'] else []
-        filterdict = args['filterdict'] if args['filterdict'] else {}
-        cur_page = args['page']
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -324,20 +363,18 @@ class LSIbyCVidAPI(LSIbaseAPI):
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
-        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
+        cur_page = args['page']
         projectname = args['project']
+        uses = args['uses'] if args['uses'] else []
+        filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         doc = project.cv_getmd(id)
-        uses = args['uses'] if args['uses'] else []
-        filterdict = args['filterdict'] if args['filterdict'] else {}
-        cur_page = args['page']
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -349,19 +386,17 @@ class LSIbydocAPI(LSIbaseAPI):
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
-        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         doc = args['doc']
+        cur_page = args['page']
         projectname = args['project']
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
-        cur_page = args['page']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -402,7 +437,7 @@ class SimilarAPI(Resource):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
             yaml_info = project.cv_getyaml(name)
-            datas.append({ 'id': name, 'yaml_info': yaml_info })
+            datas.append({ 'id': name, 'yaml_info': yaml_info, 'match': score })
         return { 'code': 200, 'data': datas }
 
 

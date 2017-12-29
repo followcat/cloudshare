@@ -1,9 +1,12 @@
 import math
+import utils.builtin
 
 import flask
 import flask.ext.login
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
+
+import core.basedata
 
 
 class JobDescriptionAPI(Resource):
@@ -38,16 +41,17 @@ class JobDescriptionAPI(Resource):
     def put(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        jd_id = args['jd_id']
-        status = args['status']
-        projectname = args['project']
-        description = args['description']
-        commentary = args['commentary'] if args['commentary'] else ''
-        followup = args['followup'] if args['followup'] else ''
+        info = {
+            'id': args['jd_id'],
+            'status': args['status'],
+            'description': args['description'],
+            'commentary': args['commentary'] if args['commentary'] else '',
+            'followup': args['followup'] if args['followup'] else '',
+        }
+        jdobj = core.basedata.DataObject(info, data='')
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        result = project.jd_modify(jd_id, description, status,
-                                   commentary, followup, user.name)
+        result = project.jd_modify(jdobj, user.name)
         if result is True:
             jd_info = project.jd_get(jd_id)
             project.jd_indexadd(project.es_config['JD_MEM'], project.id,
@@ -84,6 +88,7 @@ class JobDescriptionUploadAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         info = {
+            'id': utils.builtin.genuuid(),
             'name': args['jd_name'],
             'company': args['co_id'],
             'description': args['jd_description'],
@@ -91,10 +96,8 @@ class JobDescriptionUploadAPI(Resource):
             'commentary': args['commentary'] if args['commentary'] else '',
             'followup': args['followup'] if args['followup'] else '',
         }
-        jdobj = project.storageJD.baseobj(info)
-        mbr_result = member.jd_add(jdobj, committer=user.name)
-        if mbr_result is True:
-            result = project.jd_add(jdobj, committer=user.name)
+        jdobj = core.basedata.DataObject(info, data='')
+        result = project.jd_add(jdobj, committer=user.name)
         if result is True:
             id = jdobj.metadata['id']
             project.jd_indexadd(project.es_config['JD_MEM'], project.id,

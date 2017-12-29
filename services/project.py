@@ -123,22 +123,6 @@ class Project(services.operator.combine.Combine):
         return result
 
     @property
-    def storageJD(self):
-        result = None
-        servicename = self.config['storageJD']
-        for repo in self.jd_repos:
-            if isinstance(repo, services.simulationjd.SimulationJD):
-                for each in repo.storages:
-                    if each.name == servicename:
-                        result = each
-                        break
-            elif repo.name == servicename:
-                result = repo
-            if result is not None:
-                break
-        return result
-
-    @property
     def modelname(self):
         return self.config['model']
 
@@ -235,23 +219,16 @@ class Project(services.operator.combine.Combine):
         return self.jobdescription.getyaml(id)
 
     def jd_add(self, jdobj, committer=None, unique=True, do_commit=True):
-        result = {
-            'repo_result' : False,
-            'project_result' : False
-        }
+        result = False
         if jdobj.metadata['company'] in self.bidding.customers:
-            result['repo_result'] = self.storageJD.add(jdobj, committer,
+            result = self.jobdescription.add(jdobj, committer,
                                                        unique=unique, do_commit=do_commit)
-            if result['repo_result']:
-                result['project_result'] = self.jobdescription.add(jdobj, committer,
-                                                                unique=unique,
-                                                                do_commit=do_commit)
         return result
 
     def jd_modify(self, id, description, status, commentary, followup, committer):
         result = False
         if self.jobdescription.exists(id):
-            result = self.storageJD.modify(id, description, status,
+            result = self.jobdescription.modify(id, description, status,
                                            commentary, followup, committer)
         return result
 

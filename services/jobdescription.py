@@ -1,5 +1,6 @@
 import glob
 import os.path
+import functools
 
 import yaml
 
@@ -16,13 +17,13 @@ class JobDescription(services.base.kv_storage.KeyValueStorage):
     YAML_DIR = '.'
     YAML_TEMPLATE = (
         ("name",            unicode),
-        ("id",              str),
+        ("id",              utils.builtin.genuuid),
         ("company",         unicode),
         ("description",     unicode),
         ("committer",       str),
         ("commentary",      unicode),
         ("followup",        unicode),
-        ("status",          str),
+        ("status",          functools.partial(str, object='Opening')),
     )
 
     def __init__(self, path, name=None, iotype=None):
@@ -63,35 +64,6 @@ class JobDescription(services.base.kv_storage.KeyValueStorage):
             >>> shutil.rmtree(path)
         """
         super(JobDescription, self).__init__(path, name=name, iotype=iotype)
-
-    def _metadata(self, info):
-        origin = self.generate_info_template()
-        for key, datatype in self.YAML_TEMPLATE:
-            if key in info and isinstance(info[key], datatype):
-                origin[key] = info[key]
-        origin['id'] = utils.builtin.genuuid()
-        origin['status'] = 'Opening' if not origin['status'] else origin['status']
-        return origin
-
-    def baseobj(self, info):
-        metadata = self._metadata(info)
-        bsobj = core.basedata.DataObject(metadata=metadata, data=None)
-        return bsobj
-
-    def modify(self, id, description, status, commentary, followup, committer):
-        data = self.getyaml(id)
-        if data['description'] != description and data['committer'] != committer:
-            return False
-        data['status'] = status
-        data['description'] = description
-        data['commentary'] = commentary
-        data['followup'] = followup
-        dump_data = yaml.safe_dump(data, allow_unicode=True)
-        name = core.outputstorage.ConvertName(id)
-        super(JobDescription, self).modify(name.yaml, dump_data,
-                                           message="Modify job description: " + name,
-                                           committer=committer)
-        return True
 
     def datas(self):
         for id in self.ids:

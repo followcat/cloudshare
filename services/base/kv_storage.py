@@ -49,7 +49,6 @@ class KeyValueStorage(services.base.storage.BaseStorage):
         return info
 
     def merge_info(self, info, bsobj):
-        assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
         for key in self.generate_info_template():
             if key in self.fix_item and info[key]:
                 try:
@@ -91,6 +90,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                 pass
 
     def add(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
+        assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
         result = False
         if unique is True and self.unique(bsobj) is False:
             self.info = "Exists File"

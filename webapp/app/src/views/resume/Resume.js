@@ -16,6 +16,7 @@ import ResumeComment from './ResumeComment';
 import ResumeJobRecommend from './ResumeJobRecommend';
 import ResumeSimilar from './ResumeSimilar';
 
+
 import {
   Tabs,
   Tag,
@@ -29,7 +30,8 @@ import {
   updateAdditionalInfo,
   getResumeInfo,
   getResumeList,
-  getSimilar
+  getSimilar,
+  jdByCvIDMatching
 } from 'request/resume';
 import { addBookmark, deleteBookmark } from 'request/bookmark';
 import { confirmUpload } from 'request/upload';
@@ -49,6 +51,7 @@ class Resume extends Component {
       uniqueId: '',
       resumeId: '',
       jd: '',
+      jdmatch: [],
       searchText: '',
       matchDoc: '',
       resumeList: [],
@@ -80,6 +83,7 @@ class Resume extends Component {
     this.getHlighLightKeyWord = this.getHlighLightKeyWord.bind(this);
     this.getHlighLightByDoc = this.getHlighLightByDoc.bind(this);
     this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
+    this.getJdMatchingResult = this.getJdMatchingResult.bind(this);
     this.handSelectProject = this.handSelectProject.bind(this);
   }
 
@@ -106,6 +110,7 @@ class Resume extends Component {
     this.getHlighLightKeyWord(searchText);
     matchDoc && this.getHlighLightByDoc(matchDoc,id,30);
     this.getSimilarDataSource(id);
+    this.getJdMatchingResult(id);
   }
 
   handSelectProject(e){
@@ -447,6 +452,27 @@ class Resume extends Component {
       }
     });
   }
+
+  /*
+   * 获取JdMatchingResult列表
+   * 
+   * @param {string} id, {int} size, {int} page, {string} project
+   * 
+   * @memberOf Resume
+   */
+  getJdMatchingResult(id) {
+    jdByCvIDMatching({
+      id: id,
+      size: 5,
+      page: 1,
+    }, json => {
+      if (json.code === 200) {
+        this.setState({
+          jdmatch: json.data,
+        });
+      }
+    });
+  }
   render() {
     const {
       resumeId,
@@ -464,6 +490,7 @@ class Resume extends Component {
       tracking,
       comment,
       similar,
+      jdmatch,
       project
     } = this.state;
     const uploadProps = {
@@ -545,7 +572,7 @@ class Resume extends Component {
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
             <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />
             <ResumeSimilar dataSource={similar} id={resumeId}/>
-            <ResumeJobRecommend dataSource={similar} id={resumeId}/>
+            <ResumeJobRecommend dataSource={jdmatch} id={resumeId}/>
           </div>
         </div>
       </Layout>

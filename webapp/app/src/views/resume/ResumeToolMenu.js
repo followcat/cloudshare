@@ -4,6 +4,10 @@ import React, { Component, PropTypes } from 'react';
 import EnglishResumeAddition from './EnglishResumeAddition';
 import DrawChart from './DrawChart';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 import {
   Row,
   Col,
@@ -70,7 +74,6 @@ class ResumeToolMenu extends Component {
             fileList={fileList}
             onUploadModalOk={this.props.onUploadModalOk}
           />
-          <DrawChart resumeId={resumeId} />
         </div>
         <Form className="title-form pd-lr-8" style={style}>
           <Row>

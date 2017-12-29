@@ -61,7 +61,7 @@ class ResumeTag extends Component {
       >
         {dataSource.map((item, index) => {
           return (<Tag key={index} color="blue-inverse" size="small"
-                    closable={true} onClose={() => this.handleTagClose(item)}
+                    closable onClose={() => this.handleTagClose(item)}
                   >{item.content}</Tag>);
         })}
         <a

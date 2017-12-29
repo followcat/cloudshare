@@ -16,7 +16,6 @@ class CompanyAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_bd_repo = flask.current_app.config['SVC_BD_REPO']
         self.reqparse = reqparse.RequestParser()
@@ -41,14 +40,12 @@ class CompanyAPI(Resource):
         user = flask.ext.login.current_user
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        metadata = extractor.information_explorer.catch_coinfo(stream=args)
+        metadata = extractor.information_explorer.catch_biddinginfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
-        mbr_result = member.company_add(coobj, committer=user.name)
-        if mbr_result is True:
-            result = project.bd_add(coobj, committer=user.name)
+        result = project.bd_add(coobj, committer=user.name)
         if result is True:
-            self.svc_index.add(self.svc_index.config['CO_MEM'], coobj.metadata['id'],
-                               coobj.metadata)
+            project.bd_indexadd(project.es_config['CO_MEM'], project.id, coobj.metadata['id'],
+                               None, coobj.metadata)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -61,7 +58,6 @@ class CompanyAllAPI(Resource):
 
     def __init__(self):
         super(CompanyAllAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
@@ -84,8 +80,8 @@ class CompanyAllAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        index = self.svc_index.config['CO_MEM']
-        total, searches = self.svc_index.search(index=index,
+        index = project.es_config['CO_MEM']
+        total, searches = project.bd_search(index=index,
                                             doctype=[project.id],
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
@@ -106,7 +102,6 @@ class AddedCompanyListAPI(Resource):
 
     def __init__(self):
         super(AddedCompanyListAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('text', location = 'json')
@@ -122,8 +117,8 @@ class AddedCompanyListAPI(Resource):
         customer_ids = project.bd_customers()
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        index = self.svc_index.config['CO_MEM']
-        company_ids = self.svc_index.search(index=index, filterdict={'name': text},
+        index = project.es_config['CO_MEM']
+        company_ids = project.bd_search(index=index, filterdict={'name': text},
                                             doctype=[project.id],
                                             size=5, onlyid=True)
         data = []
@@ -215,7 +210,6 @@ class CompanyInfoUpdateAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
@@ -248,7 +242,7 @@ class CompanyInfoUpdateAPI(Resource):
         result = project.bd_update_info(id, origin_info, user.name)
         if result:
             co_info = project.bd_get(id)
-            self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+            project.bd_indexadd(project.es_config['CO_MEM'], project.id,
                                id, None, co_info)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
@@ -261,7 +255,6 @@ class SearchCObyKeyAPI(Resource):
 
     def __init__(self):
         super(SearchCObyKeyAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('current_page', type = int, location = 'json')
@@ -278,8 +271,8 @@ class SearchCObyKeyAPI(Resource):
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        index = self.svc_index.config['CO_MEM']
-        total, searches = self.svc_index.search(index=index, filterdict=dict(search_items),
+        index = project.es_config['CO_MEM']
+        total, searches = project.bd_search(index=index, filterdict=dict(search_items),
                                             doctype=[project.id],
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
@@ -338,7 +331,6 @@ class CompanyConfirmExcelAPI(Resource):
     def __init__(self):
         super(CompanyConfirmExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse.add_argument('data', type = list, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -363,7 +355,7 @@ class CompanyConfirmExcelAPI(Resource):
             results[result_key][coid] = prj_results[coid]
             if prj_results[coid]['success'] is True:
                 co_info = project.bd_get(coid)
-                self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+                project.bd_indexadd(project.es_config['CO_MEM'], project.id,
                                    coid, None, co_info)
         return {
             'code': 200,

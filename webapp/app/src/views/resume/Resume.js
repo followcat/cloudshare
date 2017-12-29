@@ -463,6 +463,7 @@ class Resume extends Component {
   getJdMatchingResult(id) {
     jdByCvIDMatching({
       id: id,
+      filterdict: {status: "Opening"},
       size: 5,
       page: 1,
     }, json => {

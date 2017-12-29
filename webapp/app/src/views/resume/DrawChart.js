@@ -28,7 +28,7 @@ class DrawChart extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      jdId: '',
+      jdId: null,
       jdDoc: '',
       type: 'id',
       dataSource: [],
@@ -59,7 +59,8 @@ class DrawChart extends Component {
     },json => {
       if (json.code === 200) {
         this.setState({
-          dataSource: json.data
+          dataSource: typeof(this.state.jdId) == 'string'? 
+            json.data.filter(item => item.id === this.props.jdId) : json.data
         });
       }
     });
@@ -92,7 +93,6 @@ class DrawChart extends Component {
   handleSubmit() {
     const { type, jdId, jdDoc, anonymized } = this.state,
           { resumeId } = this.props;
-
     if (jdId === '' && jdDoc === '') {
       message.error('请选择一个职位描述.');
       return;
@@ -155,13 +155,18 @@ class DrawChart extends Component {
    });
   }
 
-  componentWillMount() {
-    // if (this.props.visible)
-    //   this.handleClick();
-  }
-
-  componentWillUpdate() {
-
+  getExpandedRowRender(record) {
+    return (
+      <div>
+        <div>
+          {record.description.split('\n').map((item, index) => { return (<p key={index}>{item}</p>); })}
+        </div>
+        <div className="commentary-box">
+          <label>{`${language.REMARKS}：`}</label>
+          <p>{record.followup}</p>
+        </div>
+      </div>
+    );
   }
 
   render() {
@@ -171,17 +176,38 @@ class DrawChart extends Component {
         title: '公司名称',
         dataIndex: 'company_name',
         key: 'company_name',
-        width: 120,
+        width: '20%',
       }, {
         title: '职位',
         dataIndex: 'name',
         key: 'position',
-        width: 360,
+        width: '25%',
       }, {
         title: '创建人',
         dataIndex: 'committer',
         key: 'creator',
+        width: '15%',
+      },{
+      title: language.CURRENT_STATUS,
+      dataIndex: 'status',
+      key: 'status',
+      width: '15%',
+      render: (text) => {
+        return text === 'Opening' ? 
+            <span style={{ color: 'green' }}>{language.OPENING}</span> :
+            <span style={{ color: 'red' }}>{language.CLOSED}</span>;
       }
+    },
+    , {
+      title: language.OPERATION,
+      key: 'operation',
+      width: '15%',
+      render: (record) => (
+        <a onClick={() => {
+          this.setState({jdId:record.id,type: 'id'},() => this.handleSubmit());
+          }}>{language.MATCH_ACTION}</a>
+      )
+    }
     ];
 
     const rowSelection = {
@@ -227,10 +253,12 @@ class DrawChart extends Component {
                 isToolbarShowed={true}
                 isSearched={true}
                 columns={columns}
+                loading={spinning}
                 dataSource={dataSource}
-                rowSelection={rowSelection}
                 pagination={pagination}
                 size="small"
+                rowKey={record => record.id}
+                expandedRowRender={record => this.getExpandedRowRender(record)}
               />
             </Collapse.Panel>
             <Collapse.Panel

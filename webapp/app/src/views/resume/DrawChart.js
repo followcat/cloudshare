@@ -4,6 +4,10 @@ import React, { Component, PropTypes } from 'react';
 import TablePlus from 'components/table-plus';
 import Charts from 'components/analyse-charts/Charts';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 import {
   Modal,
   Button,
@@ -21,9 +25,8 @@ import { getRadarOption } from 'utils/chart_option';
 
 
 class DrawChart extends Component {
-
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       jdId: '',
       jdDoc: '',
@@ -56,8 +59,7 @@ class DrawChart extends Component {
     },json => {
       if (json.code === 200) {
         this.setState({
-          visible: true,
-          dataSource: json.data.filter(item => item.status === 'Opening')
+          dataSource: json.data
         });
       }
     });
@@ -141,9 +143,29 @@ class DrawChart extends Component {
     });
   }
 
+  componentWillReceiveProps(nextProps) {
+   this.setState({
+     visible: nextProps.visible,
+     jdId: nextProps.jdId
+   },() => {
+    if (this.props.visible)
+      this.handleClick();
+    if (typeof(this.props.jdId) == 'string')
+      this.handleSubmit();
+   });
+  }
+
+  componentWillMount() {
+    // if (this.props.visible)
+    //   this.handleClick();
+  }
+
+  componentWillUpdate() {
+
+  }
+
   render() {
     const { dataSource, radarOption, spinning, chartVisible } = this.state;
-
     const columns = [
       {
         title: '公司名称',
@@ -183,14 +205,7 @@ class DrawChart extends Component {
     };
 
     return (
-      <div style={{ display: 'inline-block', marginLeft: 4 }}>
-        <Button
-          type="ghost"
-          size="small"
-          onClick={this.handleClick}
-        >
-          雷达图
-        </Button>
+      <div style={{  marginLeft: 4 }}>
         <Modal
           title="雷达图"
           visible={this.state.visible}
@@ -259,7 +274,7 @@ class DrawChart extends Component {
 }
 
 DrawChart.propTypes = {
-  resumeId: PropTypes.string
+  resumeId: PropTypes.string,
 };
 
 export default DrawChart;

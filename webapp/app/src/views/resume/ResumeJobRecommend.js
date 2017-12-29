@@ -7,12 +7,33 @@ import { URL } from 'URL';
 
 import websiteText from 'config/website-text';
 
+import DrawChart from './DrawChart';
+
 const language = websiteText.zhCN;
 
 class ResumeJobRecommend extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      visible: false,
+      jdId: null
+    }
+    this.handleClickMore = this.handleClickMore.bind(this);
+    this.getDomRader = this.getDomRader.bind(this);
+  }
+
+  handleClickMore(id) {
+    this.setState({
+      visible: true,
+      jdId: id
+    })
+  }
+
+  getDomRader() {
+    return (
+      <DrawChart resumeId={this.props.id} visible={this.state.visible} jdId={this.state.jdId}/>
+    )
   }
 
   render() {
@@ -22,16 +43,17 @@ class ResumeJobRecommend extends Component {
         className="mg-t-8"
         extra={
         <a
-          href={URL.getFastMatchingByCV(this.props.id)}
+          onClick={this.handleClickMore}
         >
-         {language.MORE}
-        </a>}
+          {language.MORE}
+        </a>
+        }
       >
         <div className="recommend">
           {this.props.dataSource.map((item, index) => {
             return (
               <div key={index} className="recommend-item">
-                <a href={`/jd/${item.id}`}>
+                <a onClick= {() =>{this.handleClickMore(item.id)}}>
                   {item.yaml_info.name ? item.yaml_info.name : item.id}
                   {item.yaml_info.company_name ? ' | ' + item.yaml_info.company_name: ''}
                 </a>
@@ -39,6 +61,7 @@ class ResumeJobRecommend extends Component {
             );
           })}
         </div>
+        {this.getDomRader()}
       </Card>
     );
   }

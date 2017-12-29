@@ -98,9 +98,6 @@ class Member(services.operator.combine.Combine):
                     data_service=services.operator.multiple.Multiple(kwargs['people']['peo']),
                     operator_service=services.simulationpeo.SimulationPEO(self.peo_path, self.name)),
                 operator_service=services.base.name_storage.NameStorage(self.peo_path, self.name))
-        self.jobdescription = services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(kwargs['jobdescription']['jd']),
-                operator_service=services.base.name_storage.NameStorage(self.jd_path, self.name))
         self.config_service = self.data_service
         self.config = dict()
         try:
@@ -216,7 +213,7 @@ class Member(services.operator.combine.Combine):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
                 tmp_project = services.project.Project(services.project.SimulationProject(unicode(path, 'utf-8'), name),
-                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jobdescription}, 
+                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos}, 
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
                 tmp_project.setup(config={'id':         utils.builtin.hash(self.name+name),
                                           'autosetup':  False,
@@ -243,7 +240,7 @@ class Member(services.operator.combine.Combine):
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
             tmp_project = services.project.Project(services.project.SimulationProject(path, name),
-                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jobdescription}, 
+                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos}, 
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
             tmp_project.setup(config={'id':           utils.builtin.hash(self.name+name),
                                       'autosetup':    autosetup,
@@ -379,7 +376,6 @@ class Member(services.operator.combine.Combine):
             project = self.projects[name]
             project.backup(projects_path)
         self.accounts.backup(accounts_path)
-        self.jobdescription.backup(jobdescriptions_path)
         self.curriculumvitae.backup(curriculumvitaes_path)
 
 

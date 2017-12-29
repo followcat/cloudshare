@@ -98,7 +98,7 @@ const generateSummary = (dataSource) => {
   let result = [];
 
   for (let i = 0, len = label.length; i < len; i++) {
-    if (label[i] in dataSource) {
+    if (dataSource && label[i] in dataSource) {
       let obj = {};
       obj.name = label[i];
 

@@ -13,7 +13,9 @@ import ResumeToolMenu from './ResumeToolMenu';
 import ResumeTag from './ResumeTag';
 import ResumeFollowUp from './ResumeFollowUp';
 import ResumeComment from './ResumeComment';
+import ResumeJobRecommend from './ResumeJobRecommend';
 import ResumeSimilar from './ResumeSimilar';
+
 
 import {
   Tabs,
@@ -28,7 +30,8 @@ import {
   updateAdditionalInfo,
   getResumeInfo,
   getResumeList,
-  getSimilar
+  getSimilar,
+  jdByCvIDMatching
 } from 'request/resume';
 import { addBookmark, deleteBookmark } from 'request/bookmark';
 import { confirmUpload } from 'request/upload';
@@ -48,6 +51,7 @@ class Resume extends Component {
       uniqueId: '',
       resumeId: '',
       jd: '',
+      jdmatch: [],
       searchText: '',
       matchDoc: '',
       resumeList: [],
@@ -79,6 +83,7 @@ class Resume extends Component {
     this.getHlighLightKeyWord = this.getHlighLightKeyWord.bind(this);
     this.getHlighLightByDoc = this.getHlighLightByDoc.bind(this);
     this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
+    this.getJdMatchingResult = this.getJdMatchingResult.bind(this);
     this.handSelectProject = this.handSelectProject.bind(this);
   }
 
@@ -105,6 +110,7 @@ class Resume extends Component {
     this.getHlighLightKeyWord(searchText);
     matchDoc && this.getHlighLightByDoc(matchDoc,id,30);
     this.getSimilarDataSource(id);
+    this.getJdMatchingResult(id);
   }
 
   handSelectProject(e){
@@ -446,9 +452,32 @@ class Resume extends Component {
       }
     });
   }
+
+  /*
+   * 获取JdMatchingResult列表
+   * 
+   * @param {string} id, {int} size, {int} page, {string} project
+   * 
+   * @memberOf Resume
+   */
+  getJdMatchingResult(id) {
+    jdByCvIDMatching({
+      id: id,
+      filterdict: {status: "Opening"},
+      size: 5,
+      page: 1,
+    }, json => {
+      if (json.code === 200) {
+        this.setState({
+          jdmatch: json.data,
+        });
+      }
+    });
+  }
   render() {
     const {
       resumeId,
+      uniqueId,
       dataSource,
       collected,
       resumeList,
@@ -462,6 +491,7 @@ class Resume extends Component {
       tracking,
       comment,
       similar,
+      jdmatch,
       project
     } = this.state;
     const uploadProps = {
@@ -512,7 +542,7 @@ class Resume extends Component {
                             }
                             </Tabs.TabPane>
                             <Tabs.TabPane tab="原文" key="html">
-                              <ResumeContent html={html} />
+                              <ResumeContent html={html} highlight={highlight}/>
                             </Tabs.TabPane>
                             <Tabs.TabPane
                               tab="English"
@@ -539,10 +569,11 @@ class Resume extends Component {
               })
             }
             </Card>
-            <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
+            <ResumeTag dataSource={tag} uniqueId={uniqueId} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
             <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />
             <ResumeSimilar dataSource={similar} id={resumeId}/>
+            <ResumeJobRecommend dataSource={jdmatch} id={resumeId}/>
           </div>
         </div>
       </Layout>

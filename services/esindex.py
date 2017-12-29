@@ -26,10 +26,18 @@ class ElasticsearchIndexing(object):
                             }
                     }},
                     {
+                        "companyname": {
+                            "path_match":         "experience.company.name",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
                         "strings": {
                             "match_mapping_type": "string",
                             "mapping": {
-                                "type":       "keyword"
+                                "type":           "keyword"
                             }
                     }}
                 ]

@@ -124,7 +124,7 @@ class CVStorageSync(object):
             self.logger.info((' ').join(["KeyboardInterrupt", logidname,
                                          "used", str(usetime)]))
             return result
-        except utils.timeout.exception.ExecTimeout:
+        except utils.timeout.exception.ExecTimeout as e:
             self.logger.info((' ').join(["Exec Timeout %s generate " % e, logidname]))
             return result
         except Exception as e:

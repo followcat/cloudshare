@@ -29,6 +29,8 @@ const websiteText = {
     EDUCATION_HISTORY: '教育经历',
     SELF_ASSESSMENT: '自我评价',
     CLASSIFY: '行业',
+    RESUME_SIMILAR: '相似简历',
+    RESUME_JOB_RECOMMEND: '职位雷达图',
 
     YES: '是',
     NO: '否',

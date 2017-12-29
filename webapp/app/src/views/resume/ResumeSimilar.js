@@ -18,7 +18,7 @@ class ResumeSimilar extends Component {
   render() {
     return (
       <Card
-        title="相似简历"
+        title={language.RESUME_SIMILAR}
         className="mg-t-8"
         extra={
         <a

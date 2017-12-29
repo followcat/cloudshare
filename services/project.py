@@ -74,8 +74,8 @@ class Project(services.operator.combine.Combine):
         self.idx_setup()
 
     def idx_setup(self):
-        self.bidding.setup(self.search_engine, self.es_config['CV_MEM'])
-        self.jobdescription.setup(self.search_engine, self.es_config['CV_MEM'])
+        self.bidding.setup(self.search_engine, self.es_config['CO_MEM'])
+        self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
 
     def idx_updatesvc(self):
         self.bidding.updatesvc(self.es_config['CO_MEM'], self.id, numbers=1000)

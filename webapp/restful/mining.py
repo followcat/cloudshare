@@ -317,7 +317,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 output['id'] = jd_id
                 output['name'] = jd['name']
                 output['description'] = jd['description']
-                output['company'] = project.bd_get(jd['company'])['name']
+                output['company'] = project.bd_getyaml(jd['company'])['name']
                 results[jd_id] = output
         return results
 

@@ -34,7 +34,7 @@ class JobDescriptionAPI(Resource):
         project = member.getproject(projectname)
         result = project.jd_get(jd_id)
         co_id = result['company']
-        co_name = project.bd_get(co_id)['name']
+        co_name = project.bd_getyaml(co_id)['name']
         result['company_name'] = co_name
         return { 'code': 200, 'data': result }
 
@@ -151,7 +151,7 @@ class JobDescriptionSearchAPI(Resource):
         for item in searches:
             jd = item['_source']
             co_id = jd['company']
-            co_name = project.bd_get(co_id)['name']
+            co_name = project.bd_getyaml(co_id)['name']
             jd['company_name'] = co_name
             datas.append(jd)
         return {

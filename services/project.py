@@ -189,20 +189,6 @@ class Project(services.operator.combine.Combine):
         self.bidding.interface.do_commit(list(project_result), committer=committer)
         return results
 
-    def bd_add(self, coobj, committer=None, unique=True, yamlfile=True, mdfile=False):
-        result = {
-            'repo_result' : False,
-            'project_result' : False
-        }
-        result['repo_result'] = self.storageCO.add(coobj, committer, unique, yamlfile, mdfile)
-        if result['repo_result']:
-            result['project_result'] = self.bidding.add(coobj, committer, unique,
-                                                        yamlfile, mdfile)
-        return result
-
-    def bd_get(self, name):
-        return self.bidding.getyaml(name)
-
     def bd_names(self):
         return self.bidding.ids
 

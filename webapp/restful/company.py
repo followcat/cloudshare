@@ -43,7 +43,7 @@ class CompanyAPI(Resource):
         metadata = extractor.information_explorer.catch_biddinginfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.bd_add(coobj, committer=user.name)
-        if result is True:
+        if result:
             project.bd_indexadd(project.es_config['CO_MEM'], project.id, coobj.metadata['id'],
                                None, coobj.metadata)
         if result:
@@ -89,7 +89,7 @@ class CompanyAllAPI(Resource):
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:
-            datas.append(project.bd_get(item['_id']))
+            datas.append(project.bd_getyaml(item['_id']))
         return {
             'code': 200,
             'data': datas,
@@ -158,7 +158,7 @@ class CompanyCustomerListAPI(Resource):
         pages = int(math.ceil(float(total)/page_size))
         data = list()
         for coname in result[(cur_page-1)*page_size:cur_page*page_size]:
-            co = project.bd_get(coname)
+            co = project.bd_getyaml(coname)
             data.append(co)
         return { 'code': 200, 'data': data, 'pages': pages, 'totals': total}
     
@@ -218,6 +218,7 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('project', location = 'json')
 
     def post(self):
+        raise NotImplementedError('Cannot use bidding _listframe')
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
@@ -225,7 +226,7 @@ class CompanyInfoUpdateAPI(Resource):
         update_info = args['update_info']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        origin_info = project.bd_get(id)
+        origin_info = project.bd_getyaml(id)
         for each in update_info:
             key = each['key']
             vtype = each['type']
@@ -234,14 +235,14 @@ class CompanyInfoUpdateAPI(Resource):
             if vtype == 'PUT':
                 origin_info[key] = content
             elif vtype == 'CREATE':
-                data = project.company._listframe(content, user.name)
+                data = project.bidding._listframe(content, user.name)
                 origin_info[key].insert(0, data)
             elif vtype == 'DELETE':
-                data = project.company._listframe(content, value['author'], value['date'])
+                data = project.bidding._listframe(content, value['author'], value['date'])
                 origin_info[key].remove(data)
         result = project.bd_update_info(id, origin_info, user.name)
         if result:
-            co_info = project.bd_get(id)
+            co_info = project.bd_getyaml(id)
             project.bd_indexadd(project.es_config['CO_MEM'], project.id,
                                id, None, co_info)
         if result:
@@ -280,7 +281,7 @@ class SearchCObyKeyAPI(Resource):
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:
-            datas.append(project.bd_get(item['_id']))
+            datas.append(project.bd_getyaml(item['_id']))
         return {
             'code': 200,
             'data': datas,
@@ -314,7 +315,7 @@ class CompanyUploadExcelAPI(Resource):
             coid = item[1]
             if coid not in infos:
                 if project.company.exists(coid):
-                    infos[coid] = project.bd_get(coid)
+                    infos[coid] = project.bd_getyaml(coid)
                 else:
                     infos[coid] = item[2][0]
         return {

@@ -19,9 +19,9 @@ class CompanyAPI(Resource):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_bd_repo = flask.current_app.config['SVC_BD_REPO']
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('name', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('introduction', location = 'json')
+        for key in extractor.information_explorer.catch_biddinginfo({}):
+            self.reqparse.add_argument(key, location = 'json')
         super(CompanyAPI, self).__init__()
 
     def get(self):

@@ -231,13 +231,14 @@ class UploadCVPreviewAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         super(UploadCVPreviewAPI, self).__init__()
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('filename', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
+        member = user.getmember(self.svc_members)
         args = self.reqparse.parse_args()
         filename = args['filename']
         uploaddata = upload[user.name][filename]
@@ -246,7 +247,7 @@ class UploadCVPreviewAPI(Resource):
         md = dataobj.preview_data()
         yaml_info = dataobj.metadata
         try:
-            people_info = self.svc_mult_peo.getyaml(unique_id)
+            people_info = member.peo_getyaml(unique_id)
             cvs = people_info['cv']
         except (TypeError, IOError, KeyError) as e:
             cvs = []

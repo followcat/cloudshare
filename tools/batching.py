@@ -398,6 +398,4 @@ def init_esindex_mem(SVC_MEMBERS):
 
 
 def init_esindex_cvsto(SVC_MEMBERS):
-    assert SVC_MEMBERS.members
-    mem = SVC_MEMBERS.members[0]
-    SVC_MEMBERS.members[mem].idx_updatesvc()
+    SVC_MEMBERS.idx_updatesvc()

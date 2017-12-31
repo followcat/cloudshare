@@ -12,6 +12,7 @@ import services.simulationco
 import services.simulationacc
 import services.simulationpeo
 import services.base.kv_storage
+import services.operator.search
 import services.operator.checker
 import services.operator.combine
 import services.operator.multiple
@@ -89,7 +90,7 @@ class Member(services.operator.combine.Combine):
                     operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
                 services.operator.split.SplitData(
                     data_service=services.secret.Private(
-                        data_service=services.operator.multiple.Multiple(kwargs['curriculumvitae']['storage']),
+                        data_service=kwargs['curriculumvitae']['storage'],
                         operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
@@ -106,16 +107,13 @@ class Member(services.operator.combine.Combine):
             pass
         if not os.path.exists(self.projects_path):
             os.makedirs(self.projects_path)
-        self.index = services.curriculumvitae.SearchIndex(kwargs['curriculumvitae']['storage'][0])
         self.idx_setup()
 
     def idx_setup(self):
-        self.index.setup(self.search_engine, self.es_config['CV_STO'])
-        self.curriculumvitae.setup(self.search_engine, self.es_config['CV_MEM'])
+        self.curriculumvitae.services[0].setup(self.search_engine, self.es_config['CV_MEM'])
 
     def idx_updatesvc(self):
-        self.index.updatesvc(self.es_config['CV_STO'], self.index.data_service.name, numbers=1000)
-        self.curriculumvitae.updatesvc(self.es_config['CV_MEM'], self.id, numbers=1000)
+        self.curriculumvitae.services[0].updatesvc(self.es_config['CV_MEM'], self.id, numbers=1000)
 
     def load(self):
         config = self.config_service.getyaml(self.config_file)
@@ -316,22 +314,31 @@ class Member(services.operator.combine.Combine):
 
     def peo_getyaml(self, id):
         yaml = self.people.getyaml(id)
-        for cv_id in yaml['cv']:
-            if not self.curriculumvitae.exists(cv_id):
-                yaml['cv'].remove(cv_id)
+        try:
+            for cv_id in yaml['cv']:
+                if not self.curriculumvitae.exists(cv_id):
+                    yaml['cv'].remove(cv_id)
+        except TypeError:
+            pass
         return yaml
 
     def peo_getinfo(self, id):
         info = self.people.getyaml(id)
-        for id in info['cv']:
-            if self.curriculumvitae.exists(id):
-                yield self.curriculumvitae.getinfo(id)
+        try:
+            for id in info['cv']:
+                if self.curriculumvitae.exists(id):
+                    yield self.curriculumvitae.getinfo(id)
+        except TypeError:
+            pass
 
     def peo_getmd(self, id):
         info = self.people.getyaml(id)
-        for id in info['cv']:
-            if self.curriculumvitae.exists(id):
-                yield self.curriculumvitae.getmd(id)
+        try:
+            for id in info['cv']:
+                if self.curriculumvitae.exists(id):
+                    yield self.curriculumvitae.getmd(id)
+        except TypeError:
+            pass
 
     def peo_updateyaml(self, id, key, value, username):
         result = None

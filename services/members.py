@@ -2,6 +2,8 @@ import os
 import glob
 
 import services.member
+import services.operator.search
+import services.operator.multiple
 
 
 class Members(object):
@@ -21,6 +23,8 @@ class Members(object):
         self.search_engine = search_engine
         self.es_config = es_config
         self.members = dict()
+        self.cv_storage = services.curriculumvitae.SearchIndex(
+                            services.operator.multiple.Multiple(self.cv_repos[1:]))
         for member_path in glob.glob(os.path.join(self.path, '*')):
             if os.path.isdir(member_path):
                 str_name = os.path.split(member_path)[1]
@@ -28,7 +32,7 @@ class Members(object):
                 member = services.member.Member(services.member.SimulationMember(member_path, name),
                                                 account={'acc': acc_repos}, bidding={'bd': bd_repos},
                                                 company={'co': co_repos}, curriculumvitae={'cv': cv_repos,
-                                                'repo': self.cv_repos[0], 'storage': self.cv_repos[1:]},
+                                                'repo': self.cv_repos[0], 'storage': self.cv_storage},
                                                 search_engine={'idx': search_engine, 'config': es_config},
                                                 jobdescription={'jd': jd_repos}, people={'peo': mult_peo})
                 member.setup({'storageCV':  'cloudshare',
@@ -39,6 +43,7 @@ class Members(object):
                 self.members[name] = member
         self.load_default_member()
         self._defaultmember = self.members[self.default_member_name]
+        self.idx_setup()
 
     def load_default_member(self):
         path = os.path.join(self.path, self.default_member_name)
@@ -64,7 +69,7 @@ class Members(object):
         member = services.member.Member(services.member.SimulationMember(path, name),
                                                 account={'acc': self.acc_repos}, bidding={'bd': self.bd_repos},
                                                 company={'co': self.co_repos}, curriculumvitae={'cv': self.cv_repos,
-                                                'repo': self.cv_repos[0], 'storage': self.cv_repos[1:]},
+                                                'repo': self.cv_repos[0], 'storage': self.cv_storage},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config},
                                                 jobdescription={'jd': self.jd_repos}, people={'peo': self.mult_peo})
         member.setup({'storageCV':  'cloudshare',
@@ -73,6 +78,12 @@ class Members(object):
                       'storageCO':  'corepo',
                       'storageJD':  'jdrepo'})
         self.members[name] = member
+
+    def idx_setup(self):
+        self.cv_storage.setup(self.search_engine, self.es_config['CV_STO'])
+
+    def idx_updatesvc(self):
+        self.cv_storage.updatesvc(self.es_config['CV_STO'], self.cv_storage.data_service.services[0].name, numbers=1000)
 
     def get(self, name):
         return self.members[name]

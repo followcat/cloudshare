@@ -109,7 +109,6 @@ class CompanyProjectAPI(MatchbaseAPI):
         super(CompanyProjectAPI, self).__init__()
         self.cv_repo = flask.current_app.config['SVC_CV_REPO']
         self.svc_index = flask.current_app.config['SVC_INDEX']
-        self.es_config = flask.current_app.config['ES_CONFIG']
 
     def post(self):
         super(CompanyProjectAPI, self).post()

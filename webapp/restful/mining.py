@@ -232,7 +232,7 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         doc = project.cv_getmd(id)
-        totals, searchs = self.svc_index.search(index=[self.svc_index.config['JD_MEM']],
+        totals, searchs = project.jd_search(index=[member.es_config['JD_MEM']],
                                                 doctype=[project.id], filterdict=filterdict,
                                                 size=5000, source=False)
         ids = [item['_id'] for item in searchs]
@@ -294,7 +294,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
 
     def findbest(self, member, project, filterdict, threshold, numbers):
         results = dict()
-        index = [self.svc_index.config['CV_MEM'], self.svc_index.config['CV_STO']]
+        index = [member.es_config['CV_MEM'], member.es_config['CV_STO']]
         doctype = [member.id, 'cvstorage']
         searchids = member.cv_search(index=index, doctype=doctype,
                                      filterdict=filterdict, onlyid=True)
@@ -393,7 +393,6 @@ class SimilarAPI(Resource):
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
@@ -409,9 +408,9 @@ class SimilarAPI(Resource):
         project = member.getproject(projectname)
         doc = member.cv_getmd(id)
         datas = []
-        index = [self.svc_index.config['CV_MEM']]
+        index = [member.es_config['CV_MEM']]
         doctype = [member.id]
-        totals, searchs = self.svc_index.search(index=index, doctype=doctype,
+        totals, searchs = member.cv_search(index=index, doctype=doctype,
             filterdict={'date': [time.strftime('%Y%m%d', time.localtime(time.time()-
                                                          self.HALF_YEAR_SECOENDS)),
                                  time.strftime('%Y%m%d', time.localtime(time.time()))]},

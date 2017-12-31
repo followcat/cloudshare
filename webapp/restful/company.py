@@ -17,7 +17,6 @@ class CompanyAPI(Resource):
     
     def __init__(self):
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.svc_bd_repo = flask.current_app.config['SVC_BD_REPO']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         for key in extractor.information_explorer.catch_biddinginfo({}):
@@ -26,8 +25,11 @@ class CompanyAPI(Resource):
 
     def get(self):
         args = request.args
+        projectname = args['project']
         user = flask.ext.login.current_user
-        result = self.svc_bd_repo.getyaml(args['id'])
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        result = project.bd_getyaml(args['id'])
         return { 'code': 200,'result': result }
 
     def post(self):

@@ -42,7 +42,6 @@ class UploadCVAPI(Resource):
     def __init__(self):
         super(UploadCVAPI, self).__init__()
         self.svc_min = flask.current_app.config['SVC_MIN']
-        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']

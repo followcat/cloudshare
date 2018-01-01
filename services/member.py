@@ -250,7 +250,7 @@ class Member(services.operator.combine.Combine):
             result = True
         return result
 
-    def add_account(self, inviter_id, invited_id, committer, creator=False):
+    def join(self, inviter_id, invited_id, committer, creator=False):
         result = False
         if creator is True or self.check_admin(inviter_id):
             bsobj = core.basedata.DataObject(metadata={'id': invited_id}, data=None)
@@ -259,12 +259,15 @@ class Member(services.operator.combine.Combine):
             self.add_admin(inviter_id, invited_id, creator=creator)
         return result
 
-    def rm_account(self, inviter_id, invited_id, committer):
+    def quit(self, inviter_id, invited_id, committer):
         result = False
         if self.accounts.exists(invited_id):
             if self.check_admin(inviter_id) or inviter_id == invited_id:
                 if len(self.accounts.ids) > 1:
                     result = self.accounts.remove(invited_id, committer=committer)
+            if result is True:
+                if member.check_admin(invited_id) is True:
+                    result = self.delete_admin(self.id, invited_id)
         return result
 
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):

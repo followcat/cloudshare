@@ -4,6 +4,9 @@ import flask.ext.login
 import services.exception
 from itsdangerous import JSONWebSignatureSerializer
 
+import core.basedata
+
+
 class User(flask.ext.login.UserMixin):
 
     def __init__(self, id, svc_account):
@@ -17,24 +20,52 @@ class User(flask.ext.login.UserMixin):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
 
+    def getmember(self, svc_members):
+        return svc_members.use(self.member, self.id)
+
     def createmember(self, name, svc_members):
-        result = self.svc_account.createmember(self.id, name, svc_members)
+        result = False
+        info = self.svc_account.getyaml(self.id)
+        if not info['member']:
+            svc_members.create(name)
+            member = svc_members.get(name)
+            member.join(info['id'], info['id'], info['name'], creator=True)
+            metadata = {'id': self.id, 'member': name}
+            bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+            result = self.svc_account.modify(bsobj, info['name'])
         return result
 
-    def quitmember(self, awayid, svc_members):
-        result = self.svc_account.quitmember(self.id, awayid, svc_members)
+    def quitmember(self, invited_id, svc_members):
+        result = False
+        info = self.svc_account.getyaml(self.id)
+        member = svc_members.use(info['member'], self.id)
+        if member:
+            result = member.quit(self.id, invited_id, info['name'])
+            if result is True:
+                metadata = {'id': invited_id, 'member': ''}
+                bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+                result = self.svc_account.modify(bsobj, info['name'])
         return result
 
     def joinmember(self, inviter_id, name, svc_members):
-        result = self.svc_account.joinmember(inviter_id, self.id, name, svc_members)
+        assert svc_members.exists(name)
+        result = False
+        inviter_info = self.svc_account.getyaml(inviter_id)
+        invited_info = self.svc_account.getyaml(self.id)
+        if inviter_info['member'] == name and not invited_info['member']:
+            member = svc_members.use(name, inviter_id)
+            result = member.join(inviter_id, self.id, inviter_info['name'])
+            if result is True:
+                metadata = {'id': self.id, 'member': name}
+                bsobj = core.basedata.DataObject(metadata=metadata, data=None)
+                result = self.svc_account.save(bsobj, committer=invited_info['name'])
         return result
 
     def updateinfo(self, info):
-        origininfo = self.svc_account.getinfo(self.id)
+        origininfo = self.svc_account.getyaml(self.id)
         origininfo.update(info)
-        return self.svc_account.saveinfo(self.id, origininfo,
-                                         'User %s update info.'%(self.id),
-                                         self.name)
+        bsobj = core.basedata.DataObject(metadata=origininfo, data=None)
+        return self.svc_account.modify(bsobj, committer=self.name)
 
     def checkpassword(self, password):
         return self.svc_account.checkpwd(self.id, password)
@@ -51,9 +82,6 @@ class User(flask.ext.login.UserMixin):
     def delbookmark(self, id):
         return self.svc_account.delbookmark(self.id, id)
 
-    def getmember(self, svc_members):
-        return svc_members.use(self.member, self.id)
-
     def getmessage(self, msgid, svc_message):
         return svc_message.getcontent(self.id, msgid)
 
@@ -64,22 +92,22 @@ class User(flask.ext.login.UserMixin):
         return svc_message.getinvitedcontent(self.id, msgid)
 
     def getreadmessages(self, svc_message):
-        return svc_message.getinfo(self.id)['read_chat']
+        return svc_message.getyaml(self.id)['read_chat']
 
     def getsentmessages(self, svc_message):
-        return svc_message.getinfo(self.id)['sent_chat']
+        return svc_message.getyaml(self.id)['sent_chat']
 
     def getunreadmessages(self, svc_message):
-        return svc_message.getinfo(self.id)['unread_chat']
+        return svc_message.getyaml(self.id)['unread_chat']
 
     def getinvitedmessages(self, svc_message):
-        return svc_message.getinfo(self.id)['invited_member']
+        return svc_message.getyaml(self.id)['invited_member']
 
     def getinvitermessages(self, svc_message):
-        return svc_message.getinfo(self.id)['inviter_member']
+        return svc_message.getyaml(self.id)['inviter_member']
 
     def getprocessedmessages(self, svc_message):
-        return svc_message.getinfo(self.id)['processed_member']
+        return svc_message.getyaml(self.id)['processed_member']
 
     def sentmessage(self, des_name, content, svc_message):
         des_info = self.svc_account.getinfo_byname(des_name)
@@ -124,7 +152,7 @@ class User(flask.ext.login.UserMixin):
 
     @property
     def info(self):
-        return self.svc_account.getinfo(self.id)
+        return self.svc_account.getyaml(self.id)
 
     @property
     def name(self):

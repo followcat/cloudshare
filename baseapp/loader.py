@@ -202,20 +202,26 @@ def load_mining(silencer):
 
 def load_cv_mining(SVC_MIN, SVC_MEMBERS):
     for member in SVC_MEMBERS.members.values():
-        for project in member.projects.values():
-            modelname = project.modelname
-            result = SVC_MIN.setup(modelname, [member.id])
+        try:
+            for project in member.projects.values():
+                modelname = project.modelname
+                result = SVC_MIN.setup(modelname, [member.id])
+        except AttributeError:
+            continue
 
 
 def load_addedcv_mining(SVC_MIN, SVC_MEMBERS, additions):
     for member in SVC_MEMBERS.members.values():
-        for project in member.projects.values():
-            modelname = project.modelname
-            if modelname in additions:
-                for added in additions[modelname]:
-                    result = SVC_MIN.setup(modelname, added)
-            if '*' in additions:
-                result = SVC_MIN.setup(modelname, additions['*'])
+        try:
+            for project in member.projects.values():
+                modelname = project.modelname
+                if modelname in additions:
+                    for added in additions[modelname]:
+                        result = SVC_MIN.setup(modelname, added)
+                if '*' in additions:
+                    result = SVC_MIN.setup(modelname, additions['*'])
+        except AttributeError:
+            continue
 
 
 def load_jd_mining(SVC_MIN, SVC_JDS):

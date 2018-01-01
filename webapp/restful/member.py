@@ -42,7 +42,7 @@ class IsMemberAPI(MemberAPI):
     def get(self):
         user = flask.ext.login.current_user
         member = user.getmember(self.svc_members)
-        result = not isinstance(member, services.member.DefaultMember)
+        result = type(member) is not services.member.DefaultMember
         return { 'code': 200, 'result': result }
 
 

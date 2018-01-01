@@ -47,7 +47,7 @@ class Members(object):
     def load_default_member(self):
         path = os.path.join(self.path, self.default_member_name)
         member = services.member.DefaultMember(services.member.SimulationMember(path, self.default_member_name),
-                                                bidding={'bd': self.bd_repos}, company={'co': self.co_repos},
+                                                company={'co': self.co_repos},
                                                 curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[-1],
                                                                  'storage': self.cv_repos[:-1]},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config},

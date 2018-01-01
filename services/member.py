@@ -387,24 +387,22 @@ class Member(services.operator.combine.Combine):
 
 class DefaultMember(Member):
 
-    default_name = 'default'
-
     def load_projects(self):
         super(DefaultMember, self).load_projects()
-        if self.default_name not in self.projects:
-            super(DefaultMember, self)._add_project(self.default_name)
-        self.projects[self.default_name]._modelname = self.default_model
+        if self.default_model not in self.projects:
+            super(DefaultMember, self)._add_project(self.default_model)
+        self.projects[self.default_model]._modelname = self.default_model
 
     def use(self, id):
         return self
 
     def getproject(self, projectname=None):
-        return self.projects[self.default_name]
+        return self.projects[self.default_model]
 
     def add_admin(self, **kwargs):
         return False
 
-    def add_account(self, **kwargs):
+    def join(self, **kwargs):
         return False
 
     def add_project(self, **kwargs):

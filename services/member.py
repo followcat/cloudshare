@@ -57,7 +57,6 @@ class Member(services.operator.combine.Combine):
         super(Member, self).__init__(data_service, **kwargs)
         assert 'people' in kwargs
         assert 'company' in kwargs
-        assert 'account' in kwargs
         assert 'bidding' in kwargs
         assert 'search_engine' in kwargs
         assert 'jobdescription' in kwargs
@@ -74,7 +73,6 @@ class Member(services.operator.combine.Combine):
         self.cv_repos = kwargs['curriculumvitae']['cv']
         self.jd_repos = kwargs['jobdescription']['jd']
         self.mult_peo = kwargs['people']['peo']
-        self.acc_repos = kwargs['account']['acc']
         self.search_engine = kwargs['search_engine']['idx']
         self.es_config = kwargs['search_engine']['config']
         self.projects_path = os.path.join(self.path, self.PRJ_PATH)
@@ -137,9 +135,7 @@ class Member(services.operator.combine.Combine):
             self.save()
         self.load_projects()
         self.accounts = services.operator.checker.Checker(
-                data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(self.acc_repos),
-                    operator_service=services.simulationacc.SimulationACC(self.accounts_path, self.name)),
+                data_service=services.simulationacc.SimulationACC(self.accounts_path, self.name),
                 operator_service=services.simulationacc.SelectionACC(self.accounts_path, self.name))
 
     def use(self, id):

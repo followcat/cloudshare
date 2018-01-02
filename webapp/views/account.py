@@ -14,15 +14,17 @@ class User(flask.ext.login.UserMixin):
             raise services.exception.UserNotFoundError()
         self.id = id
         self._name = None
+        self._member = None
         self.svc_account = svc_account
         self.svc_members = svc_members
+        self.svc_projects = None
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
 
     def getmember(self):
-        return self.svc_members.use(self.member, self.id)
+        return self.member
 
     def createmember(self, name):
         result = False
@@ -39,16 +41,17 @@ class User(flask.ext.login.UserMixin):
     def quitmember(self, invited_id):
         result = False
         info = self.svc_account.getyaml(self.id)
-        member = self.svc_members.use(info['member'], self.id)
-        if member:
-            result = member.quit(self.id, invited_id, info['name'])
+        if self.member:
+            result = self.member.quit(self.id, invited_id, info['name'])
             if result is True:
                 metadata = {'id': invited_id, 'member': ''}
                 bsobj = core.basedata.DataObject(metadata=metadata, data=None)
                 result = self.svc_account.modify(bsobj, info['name'])
+        self._member = None
         return result
 
     def joinmember(self, inviter_id, name):
+        assert not self.member
         assert self.svc_members.exists(name)
         result = False
         inviter_info = self.svc_account.getyaml(inviter_id)
@@ -60,6 +63,7 @@ class User(flask.ext.login.UserMixin):
                 metadata = {'id': self.id, 'member': name}
                 bsobj = core.basedata.DataObject(metadata=metadata, data=None)
                 result = self.svc_account.save(bsobj, committer=invited_info['name'])
+                assert self.member is member
         return result
 
     def updateinfo(self, info):
@@ -126,7 +130,7 @@ class User(flask.ext.login.UserMixin):
             des_info = self.svc_account.getinfo_byname(des_name)
             des_id = des_info['id']
             result = svc_message.send_invitation(self.id, des_id,
-                                                 self.member, des_name, self.name)
+                                                 self.member.name, des_name, self.name)
         return result
 
     @property
@@ -142,10 +146,13 @@ class User(flask.ext.login.UserMixin):
 
     @property
     def member(self):
-        result = ''
-        if 'member' in self.info:
-            result = self.info['member']
-        return result
+        if not self._member:
+            try:
+                name = self.info['member']
+                self._member = self.svc_members.use(name, self.id)
+            except KeyError:
+                pass
+        return self._member
 
     @property
     def defaultmember(self):

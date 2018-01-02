@@ -232,12 +232,6 @@ class DefaultMember(CommonMember):
     def use(self, id):
         return self
 
-    def add_admin(self, **kwargs):
-        return False
-
-    def use(self, id):
-        return self
-
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
         result = self.curriculumvitae.add(cvobj, committer, unique=unique,
                                                                do_commit=do_commit)

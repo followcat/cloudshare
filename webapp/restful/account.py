@@ -170,12 +170,11 @@ class AccountHistoryAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(AccountHistoryAPI, self).__init__()
 
     def get(self, project):
         user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         info_list = member.cv_history(user.name, entries=10)
         for info in info_list:
             for md5 in info['filenames']:

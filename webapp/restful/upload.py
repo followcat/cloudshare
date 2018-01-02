@@ -42,7 +42,6 @@ class UploadCVAPI(Resource):
     def __init__(self):
         super(UploadCVAPI, self).__init__()
         self.svc_min = flask.current_app.config['SVC_MIN']
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_mult_peo = flask.current_app.config['SVC_MULT_PEO']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         self.reqparse = reqparse.RequestParser()
@@ -53,7 +52,7 @@ class UploadCVAPI(Resource):
         self.user = flask.ext.login.current_user
         self.args = self.reqparse.parse_args()
         self.updates = self.args['updates']
-        self.member = self.svc_members.defaultmember
+        self.member = self.user.getmember()
         self.project = self.member.getproject()
         self.projectid = self.project.id
         self.modelname = self.project.modelname
@@ -173,7 +172,7 @@ class MemberUploadCVAPI(UploadCVAPI):
     def putparam(self):
         super(MemberUploadCVAPI, self).putparam()
         projectname = self.args['project']
-        self.member = self.user.getmember(self.svc_members)
+        self.member = self.user.getmember()
         self.project = self.member.getproject(projectname)
         self.projectid = self.project.id
         self.modelname = self.project.modelname
@@ -185,7 +184,6 @@ class UploadEnglishCVAPI(Resource):
 
     def __init__(self):
         super(UploadEnglishCVAPI, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_docpro = flask.current_app.config['SVC_DOCPROCESSOR']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('file', type = str, location = 'json')
@@ -203,7 +201,7 @@ class UploadEnglishCVAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         projectname = args['project']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         project = member.getproject(projectname)
         dataobj = uploadeng[user.name]['CV']
         result = member.cv_add_eng(id, dataobj, user.name)
@@ -232,13 +230,12 @@ class UploadCVPreviewAPI(Resource):
 
     def __init__(self):
         super(UploadCVPreviewAPI, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('filename', location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         args = self.reqparse.parse_args()
         filename = args['filename']
         uploaddata = upload[user.name][filename]

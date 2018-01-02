@@ -122,7 +122,6 @@ class InvitedMessageAPI(MessageAPI):
 
     def __init__(self):
         super(InvitedMessageAPI, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('reply', type = bool, location = 'json')
 
@@ -137,7 +136,7 @@ class InvitedMessageAPI(MessageAPI):
         message = self.svc_msg.process_invite(user.id, msgid, user.name)
         result = False
         if message is not None and reply is True:
-            result = user.joinmember(message['relation'], message['content'], self.svc_members)
+            result = user.joinmember(message['relation'], message['content'])
         return { 'code': 200, 'result': result }
 
 

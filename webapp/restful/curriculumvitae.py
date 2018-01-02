@@ -17,7 +17,6 @@ class CurrivulumvitaeAPI(Resource):
 
     def __init__(self):
         super(CurrivulumvitaeAPI, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -26,7 +25,7 @@ class CurrivulumvitaeAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         result = user.getbookmark()
         yaml = member.cv_getyaml(id)
         if yaml['id'] in result:
@@ -48,7 +47,6 @@ class UpdateCurrivulumvitaeInformation(Resource):
 
     def __init__(self):
         super(UpdateCurrivulumvitaeInformation, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -58,7 +56,7 @@ class UpdateCurrivulumvitaeInformation(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         update_info = args['update_info']
         update_info['id'] = id
         obj = core.basedata.DataObject(update_info, data='')
@@ -77,7 +75,6 @@ class SearchCVbyTextAPI(Resource):
 
     def __init__(self):
         super(SearchCVbyTextAPI, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('search_text', location = 'json')
@@ -88,11 +85,10 @@ class SearchCVbyTextAPI(Resource):
         count = 20
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        member = user.getmember(self.svc_members)
         text = args['search_text']
         cur_page = args['page'] if args['page'] else 1
         filterdict = args['filterdict'] if args['filterdict'] else {}
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         index = member.es_config['CV_MEM']
         filterdict['content'] = text
         total, searchs = member.cv_search(index=index, doctype=[member.id],

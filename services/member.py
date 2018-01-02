@@ -195,6 +195,8 @@ class DefaultMember(CommonMember):
     JD_PATH = 'jobdescriptions'
     CV_PATH = 'curriculumvitaes'
 
+    default_model = 'default'
+
     def __init__(self, data_service, **kwargs):
         """"""
         super(DefaultMember, self).__init__(data_service, **kwargs)
@@ -326,7 +328,6 @@ class Member(DefaultMember):
     PRJ_PATH = 'projects'
     ACC_PATH = 'accounts'
 
-    default_model = 'default'
     max_project_nums = 3
 
     def __init__(self, data_service, **kwargs):

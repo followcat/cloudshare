@@ -10,32 +10,27 @@ class ProjectNamesAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
     
-    def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        super(ProjectNamesAPI, self).__init__()
-
     def get(self):
         user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
-        return { 'code': 200, 'data': member.projects.keys() }
+        member = user.getmember()
+        try:
+            return { 'code': 200, 'data': member.projects.keys() }
+        except AttributeError:
+            return { 'code': 200, 'data': [member.default_model] }
 
 
 class DBNumbersAPI(flask.views.MethodView):
 
     decorators = [flask.ext.login.login_required]
 
-    def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        super(DBNumbersAPI, self).__init__()
-
     def get(self):
         user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         return { 'code': 200, 'data': member.getnums() }
 
     def post(self):
         user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         return { 'code': 200, 'data': member.getnums() }
 
 
@@ -44,19 +39,13 @@ class AllSIMSAPI(flask.views.MethodView):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_min = flask.current_app.config['SVC_MIN']
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        self.min_additionals = flask.current_app.config['MIN_ADDITIONALS']
         super(AllSIMSAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('project', location = 'json')
+        self.svc_min = flask.current_app.config['SVC_MIN']
+        self.min_additionals = flask.current_app.config['MIN_ADDITIONALS']
 
     def post(self):
-        args = self.reqparse.parse_args()
-        projectname = args['project']
         user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
+        member = user.getmember()
         return { 'code': 200, 'projects': [member.name],
                  'classify': self.min_additionals.keys() }
 

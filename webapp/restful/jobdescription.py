@@ -14,7 +14,6 @@ class JobDescriptionAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_id', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -30,7 +29,7 @@ class JobDescriptionAPI(Resource):
         args = self.reqparse.parse_args()
         jd_id = args['jd_id']
         projectname = args['project']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         project = member.getproject(projectname)
         result = project.jd_get(jd_id)
         co_id = result['company']
@@ -49,7 +48,7 @@ class JobDescriptionAPI(Resource):
             'followup': args['followup'] if args['followup'] else '',
         }
         jdobj = core.basedata.DataObject(info, data='')
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         project = member.getproject(projectname)
         result = project.jd_modify(jdobj, user.name)
         if result is True:
@@ -70,7 +69,6 @@ class JobDescriptionUploadAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('jd_name', location = 'json')
         self.reqparse.add_argument('co_id', location = 'json')
@@ -85,7 +83,7 @@ class JobDescriptionUploadAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         projectname = args['project']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         project = member.getproject(projectname)
         info = {
             'id': utils.builtin.genuuid(),
@@ -118,7 +116,6 @@ class JobDescriptionSearchAPI(Resource):
     
     def __init__(self):
         super(Resource, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('page_size', type = int, location = 'json')
@@ -132,7 +129,7 @@ class JobDescriptionSearchAPI(Resource):
         page_size = args['page_size']
         projectname = args['project']
         search_items = args['search_items']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         project = member.getproject(projectname)
         jd_index = project.es_config['JD_MEM']
         co_index = project.es_config['CO_MEM']

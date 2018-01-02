@@ -12,7 +12,6 @@ class PeopleAPI(Resource):
 
     def __init__(self):
         super(PeopleAPI, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('date', type = str, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -23,7 +22,7 @@ class PeopleAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         unique_id = args['unique_id']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         peopleinfo = member.peo_getyaml(unique_id)
         return { 'code': 200, 'data': peopleinfo }
 
@@ -32,7 +31,7 @@ class PeopleAPI(Resource):
         args = self.reqparse.parse_args()
         unique_id = args['unique_id']
         update_info = args['update_info']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         for key in update_info:
             data = {}
             data['content'] = update_info[key]
@@ -54,7 +53,7 @@ class PeopleAPI(Resource):
         unique_id = args['unique_id']
         date = args['date']
         update_info = args['update_info']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         for key, value in update_info.iteritems():
             data = member.peo_deleteyaml(unique_id, key, value, user.name, date)
             if data is not None:
@@ -71,7 +70,6 @@ class PeopleByCVAPI(Resource):
 
     def __init__(self):
         super(PeopleByCVAPI, self).__init__()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('cv_id', type = str, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -80,7 +78,7 @@ class PeopleByCVAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         cv_id = args['cv_id']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         yamlinfo = member.cv_getyaml(cv_id)
         try:
             unique_id = yamlinfo['unique_id']

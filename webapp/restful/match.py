@@ -31,7 +31,6 @@ class JDmathAPI(MatchbaseAPI):
         super(JDmathAPI, self).__init__()
         self.jd_repo = flask.current_app.config['SVC_JD_REPO']
         self.co_repo = flask.current_app.config['SVC_BD_REPO']
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
 
     def post(self):
         super(JDmathAPI, self).post()
@@ -48,7 +47,7 @@ class JDmathAPI(MatchbaseAPI):
         self.page = int(args['page'])
         self.numbers = int(args['numbers'])
         user = flask.ext.login.current_user
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         total = 0
         result = list()
         code = 204

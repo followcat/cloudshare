@@ -9,36 +9,37 @@ import core.basedata
 
 class User(flask.ext.login.UserMixin):
 
-    def __init__(self, id, svc_account):
+    def __init__(self, id, svc_account, svc_members=None):
         if not svc_account.exists(id):
             raise services.exception.UserNotFoundError()
         self.id = id
         self._name = None
         self.svc_account = svc_account
+        self.svc_members = svc_members
 
     def get_auth_token(self):
         s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
         return s.dumps({ 'id': self.id, 'name': self.name })
 
-    def getmember(self, svc_members):
-        return svc_members.use(self.member, self.id)
+    def getmember(self):
+        return self.svc_members.use(self.member, self.id)
 
-    def createmember(self, name, svc_members):
+    def createmember(self, name):
         result = False
         info = self.svc_account.getyaml(self.id)
         if not info['member']:
-            svc_members.create(name)
-            member = svc_members.get(name)
+            self.svc_members.create(name)
+            member = self.svc_members.get(name)
             member.join(info['id'], info['id'], info['name'], creator=True)
             metadata = {'id': self.id, 'member': name}
             bsobj = core.basedata.DataObject(metadata=metadata, data=None)
             result = self.svc_account.modify(bsobj, info['name'])
         return result
 
-    def quitmember(self, invited_id, svc_members):
+    def quitmember(self, invited_id):
         result = False
         info = self.svc_account.getyaml(self.id)
-        member = svc_members.use(info['member'], self.id)
+        member = self.svc_members.use(info['member'], self.id)
         if member:
             result = member.quit(self.id, invited_id, info['name'])
             if result is True:
@@ -47,13 +48,13 @@ class User(flask.ext.login.UserMixin):
                 result = self.svc_account.modify(bsobj, info['name'])
         return result
 
-    def joinmember(self, inviter_id, name, svc_members):
-        assert svc_members.exists(name)
+    def joinmember(self, inviter_id, name):
+        assert self.svc_members.exists(name)
         result = False
         inviter_info = self.svc_account.getyaml(inviter_id)
         invited_info = self.svc_account.getyaml(self.id)
         if inviter_info['member'] == name and not invited_info['member']:
-            member = svc_members.use(name, inviter_id)
+            member = self.svc_members.use(name, inviter_id)
             result = member.join(inviter_id, self.id, inviter_info['name'])
             if result is True:
                 metadata = {'id': self.id, 'member': name}
@@ -161,14 +162,14 @@ class User(flask.ext.login.UserMixin):
         return self._name
 
     @classmethod
-    def get(self_class, id, svc_account):
+    def get(self_class, id, svc_account, members=None):
         try:
-            return self_class(id, svc_account)
+            return self_class(id, svc_account, svc_members=members)
         except services.exception.UserNotFoundError:
             return None
 
     @classmethod
-    def get_fromname(self_class, name, svc_account):
+    def get_fromname(self_class, name, svc_account, members=None):
         """
             >>> import shutil
             >>> import services.account
@@ -194,13 +195,13 @@ class User(flask.ext.login.UserMixin):
             info = svc_account.getinfo_byname(name)
         except KeyError:
             return None
-        return self_class.get(info['id'], svc_account)
+        return self_class.get(info['id'], svc_account, members=members)
 
     @classmethod
-    def get_by_authorization(self_class, token, svc_account):
+    def get_by_authorization(self_class, token, svc_account, members=None):
         if token:
             token = token.replace('Basic ', '', 1)
             s = JSONWebSignatureSerializer(flask.current_app.config['SECRET_KEY'])
             data = s.loads(token)
-            return User.get_fromname(data['name'], svc_account)
+            return User.get_fromname(data['name'], svc_account, members=members)
         return None

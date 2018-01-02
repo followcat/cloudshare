@@ -11,7 +11,6 @@ class BookmarkAPI(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         super(BookmarkAPI, self).__init__()
         self.reqparse.add_argument('bookmark_id', type = str, required = True,
                                    help = 'No bookmark id provided', location = 'json')
@@ -19,7 +18,7 @@ class BookmarkAPI(Resource):
     def get(self, name):
         user = flask.ext.login.current_user
         data = []
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         bookmark_list = list(user.getbookmark())
         for bookmark_item in bookmark_list:
             yaml_info = member.cv_getyaml(bookmark_item)

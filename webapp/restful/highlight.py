@@ -15,7 +15,6 @@ class SearchKeywordAPI(Resource):
     def __init__(self):
         super(SearchKeywordAPI, self).__init__()
         self.svc_index = flask.current_app.config['SVC_INDEX']
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('keyword', location='json')
 
@@ -42,7 +41,6 @@ class LsiSustain(Resource):
     def __init__(self):
         super(LsiSustain, self).__init__()
         self.svc_min = flask.current_app.config['SVC_MIN']
-        self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
 
     def getvec(self, model, doc, sort=False, reverse=True):
@@ -100,7 +98,7 @@ class LsiSustainCVByDocAPI(LsiSustain):
         top = args['top']
         cvid = args['cv']
         projectname = args['project']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         project = member.getproject(projectname)
         model = self.svc_min.lsi_model[project.modelname]
         md = project.cv_getmd(cvid)
@@ -127,7 +125,7 @@ class LsiSustainCVByJDAPI(LsiSustain):
         cvid = args['cv']
         jdid = args['jd']
         projectname = args['project']
-        member = user.getmember(self.svc_members)
+        member = user.getmember()
         project = member.getproject(projectname)
         model = self.svc_min.lsi_model[project.modelname]
         md = member.cv_getmd(cvid)

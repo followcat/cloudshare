@@ -2,14 +2,16 @@ import core.outputstorage
 import utils.pandocconverter
 
 
-class DataObject(object):
+class DataObjectWithoutId(object):
 
     def __init__(self, metadata, data, raw=None):
-        assert 'id' in metadata
-        self.name = core.outputstorage.ConvertName(metadata['id'])
         self._raw = raw
         self._data = data
         self._metadata = metadata
+
+    def append_id(self, id):
+        assert 'id' not in self._metadata
+        self._metadata['id'] = id
 
     def __str__(self):
         try:
@@ -19,7 +21,14 @@ class DataObject(object):
 
     @property
     def ID(self):
-        return self.name
+        try:
+            return core.outputstorage.ConvertName(self._metadata['id'])
+        except KeyError:
+            return core.outputstorage.ConvertName(self._metadata['name'])
+
+    @property
+    def name(self):
+        return self.ID
 
     @property
     def raw(self):
@@ -36,3 +45,14 @@ class DataObject(object):
     def preview_data(self):
         output = utils.pandocconverter.md_to_html(self.data)
         return output
+
+
+class DataObject(DataObjectWithoutId):
+
+    def __init__(self, metadata, data, raw=None):
+        assert 'id' in metadata
+        super(DataObject, self).__init__(metadata, data, raw)
+
+    def append_id(self, id):
+        raise NotImplementedError()
+

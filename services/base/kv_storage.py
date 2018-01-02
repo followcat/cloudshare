@@ -107,6 +107,8 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                                  allow_unicode=True, default_flow_style=False)
             result = self.interface.add(name.yaml, dumpinfo,
                             message, committer, do_commit=do_commit)
+            if result:
+                super(KeyValueStorage, self)._add(bsobj.ID)
         return result
 
     def modify(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):

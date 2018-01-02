@@ -13,7 +13,8 @@ class Password(services.base.kv_storage.KeyValueStorage):
         >>> import services.account
         >>> repo_path = 'services/test_pwd'
         >>> svc_password = services.account.Password(repo_path)
-        >>> bsobj = svc_password.baseobj({'id': 'admin', 'password': 'pwd'})
+        >>> info = {'id': 'admin', 'password': 'pwd'}
+        >>> bsobj = core.basedata.DataObject(info, data='')
         >>> svc_password.add(bsobj)
         True
         >>> svc_password.add(bsobj)
@@ -48,12 +49,14 @@ class Password(services.base.kv_storage.KeyValueStorage):
 class Account(services.base.kv_storage.KeyValueStorage):
     """
         >>> import shutil
+        >>> import core.basedata
         >>> import services.account
         >>> acc_path = 'services/test_acc'
         >>> pwd_path = 'services/test_pwd'
         >>> svc_password = services.account.Password(pwd_path)
         >>> svc_account = services.account.Account(svc_password, acc_path)
-        >>> accobj = svc_account.baseobj({'name': u'admin'})
+        >>> info = {'name': u'admin', 'phone': '11111', 'email': 'admin@example.com'}
+        >>> accobj = core.basedata.DataObjectWithoutId(info, data='')
         >>> svc_account.add(accobj, 'password')
         True
         >>> svc_account.USERS.keys()
@@ -68,7 +71,7 @@ class Account(services.base.kv_storage.KeyValueStorage):
         >>> shutil.rmtree(pwd_path)
     """
 
-    MUST_KEY = ['name']
+    MUST_KEY = ['name', 'email', 'phone']
     YAML_TEMPLATE = (
         ("id",                  str),
         ("name",                unicode),
@@ -93,10 +96,16 @@ class Account(services.base.kv_storage.KeyValueStorage):
 
     def add(self, bsobj, password, committer=None, unique=True,
             yamlfile=True, mdfile=False, do_commit=True):
+        try:
+            assert isinstance(bsobj, core.basedata.DataObjectWithoutId)
+            bsobj.append_id(utils.builtin.hash(bsobj.ID))
+        except AssertionError:
+            return False
         pwd_result = False
         result = super(Account, self).add(bsobj, committer, unique,
                                           yamlfile, mdfile, do_commit=do_commit)
         if result:
+            super(Account, self)._add(bsobj.ID)
             metadata = {'id': str(bsobj.ID), 'password': utils.builtin.hash(password)}
             pwdobj = core.basedata.DataObject(metadata=metadata, data=None)
             pwd_result = self.svc_password.add(pwdobj)

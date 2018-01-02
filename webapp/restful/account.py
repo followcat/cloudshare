@@ -101,10 +101,11 @@ class AccountAPI(webapp.restful.captchaverify.SMSAPI):
         result = { 'code': 400, 'message': 'SMS code verify failed.'}
         if cachecode is not None and smscode.lower() == cachecode.lower():
             result = { 'code': 400, 'message': 'This username is existed.'}
-            bsobj = self.svc_account.baseobj({'name': name, 'phone': phone, 'email': email})
+            info = {'name': name, 'phone': phone, 'email': email}
+            bsobj = core.basedata.DataObjectWithoutId(info, data='')
             addresult = self.svc_account.add(bsobj, password)
             if addresult:
-                msgobj = self.svc_msg.baseobj({'id': bsobj.ID.base})
+                msgobj = core.basedata.DataObject({'id': bsobj.ID.base}, data='')
                 msgresult = self.svc_msg.add(msgobj, committer=name)
                 if msgresult:
                     self.deletecache(flask.session.sid, self.prefix)

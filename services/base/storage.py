@@ -78,9 +78,11 @@ class BaseStorage(services.base.service.Service):
 
     def add(self, bsobj, message=None, committer=None, do_commit=True):
         name = core.outputstorage.ConvertName(bsobj.name)
+        if not message:
+            message = "Add %s: %s metadata." % (self.commitinfo, name)
         dumpinfo = yaml.dump(bsobj.metadata, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
-        result = self.interface.add(name, dumpinfo,
+        result = self.interface.add(name.yaml, dumpinfo,
                         message, committer, do_commit=do_commit)
         return result
 
@@ -90,6 +92,8 @@ class BaseStorage(services.base.service.Service):
 
     def modify(self, bsobj, message=None, committer=None, do_commit=True):
         name = core.outputstorage.ConvertName(bsobj.name)
+        if not message:
+            message = "Add %s: %s metadata." % (self.commitinfo, name)
         dumpinfo = yaml.dump(bsobj.metadata, Dumper=utils._yaml.SafeDumper,
                              allow_unicode=True, default_flow_style=False)
         result = self.interface.modify(name.yaml, dumpinfo,

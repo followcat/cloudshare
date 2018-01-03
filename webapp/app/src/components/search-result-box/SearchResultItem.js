@@ -90,7 +90,7 @@ class SearchResultItem extends Component {
             :
             <Col span={1} className="omit"/>
             }
-            <Col span={type === 'default' ? 3 : 1} className="omit">
+            <Col span={type === 'default' ? 2 : 2} className="omit">
               <a
                 href={hreff}
                 style={linkColor}
@@ -99,7 +99,7 @@ class SearchResultItem extends Component {
                 {this.getNameTextRender()}
               </a>
             </Col>
-            <Col span={1} offset={type === 'default' ? 0 : 1}  className="omit">{yaml_info.gender}</Col>
+            <Col span={1} className="omit">{yaml_info.gender}</Col>
             <Col span={1} className="omit">{yaml_info.age}</Col>
             <Col span={2} className="omit">{yaml_info.marital_status}</Col>
             <Col span={3} className="omit">{yaml_info.education}</Col>

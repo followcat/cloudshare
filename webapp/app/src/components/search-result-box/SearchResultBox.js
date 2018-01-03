@@ -82,6 +82,7 @@ class SearchResultBox extends Component {
   
   render() {
     const {
+      type,
       prefixCls,
       visible,
       spinning,
@@ -96,11 +97,11 @@ class SearchResultBox extends Component {
       'showed': visible === true,
       'hidden': visible === false,
     });
-
+    const header = type || 'default'
     return (
       <div className={classSet}>
         <Spin spinning={spinning}>
-          <SearchResultHeader />
+          <SearchResultHeader header={(header !== 'default')}/>
           {this.getResultDOMRender()}
         </Spin>
         { showPagination ?

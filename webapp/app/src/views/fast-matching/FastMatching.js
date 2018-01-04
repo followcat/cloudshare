@@ -29,7 +29,9 @@ class FastMatching extends Component {
       id: '',
       postAPI: '',
       startColor: '#00ff0a',
+      bgStartColor: '#ffeb00',
       endColor: '#000000',
+      bgEndColor: '#ffffff',
       searchText: props.location.query.search_text,
       matchDoc: props.location.query.match_doc,
       classify: [],
@@ -321,7 +323,9 @@ class FastMatching extends Component {
       pages,
       total,
       startColor,
+      bgStartColor,
       endColor,
+      bgEndColor,
       searchText,
       matchDoc,
       dataSource,
@@ -350,8 +354,10 @@ class FastMatching extends Component {
           current={current}
           pages={pages}
           total={total}
+          bgStartColor={bgStartColor}
           startColor={startColor}
           endColor={endColor}
+          bgEndColor={bgEndColor}
           jdid={id}
           searchText={searchText}
           matchDoc={matchDoc}

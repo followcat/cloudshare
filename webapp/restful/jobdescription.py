@@ -97,11 +97,11 @@ class JobDescriptionUploadAPI(Resource):
         mbr_result = member.jd_add(jdobj, committer=user.name)
         if mbr_result is True:
             result = project.jd_add(jdobj, committer=user.name)
-        if result is True:
+        if result['project_result']:
             id = jdobj.metadata['id']
             self.svc_index.add(self.svc_index.config['JD_MEM'], project.id,
                                id, None, jdobj.metadata)
-        if result:
+        if result['project_result']:
             response = { 'code': 200, 'data': {'result': result, 'info': jdobj.metadata},
                          'message': 'Create job description successed.' }
         else:

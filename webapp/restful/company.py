@@ -16,14 +16,20 @@ class CompanyAPI(Resource):
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
+        super(CompanyAPI, self).__init__()
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.svc_co_repo = flask.current_app.config['SVC_CO_REPO']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', location = 'json')
+        self.reqparse.add_argument('email', location = 'json')
         self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('address', location = 'json')
+        self.reqparse.add_argument('product', location = 'json')
+        self.reqparse.add_argument('website', location = 'json')
+        self.reqparse.add_argument('conumber', location = 'json')
+        self.reqparse.add_argument('district', location = 'json')
         self.reqparse.add_argument('introduction', location = 'json')
-        super(CompanyAPI, self).__init__()
 
     def get(self):
         args = request.args
@@ -42,7 +48,8 @@ class CompanyAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         metadata = extractor.information_explorer.catch_coinfo(stream=args)
-        coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
+        coobj = core.basedata.DataObject(metadata=metadata,
+                                         data=args['introduction'].encode('utf-8'))
         mbr_result = member.company_add(coobj, committer=user.name)
         if mbr_result:
             result = project.company_add(coobj, committer=user.name)

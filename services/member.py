@@ -217,7 +217,7 @@ class DefaultMember(CommonMember):
                     operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
                 services.operator.split.SplitData(
                     data_service=services.secret.Private(
-                        data_service=kwargs['curriculumvitae']['storage'],
+                        data_service=services.operator.multiple.Multiple(kwargs['curriculumvitae']['storage']),
                         operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])

@@ -37,7 +37,6 @@ class Header extends Component {
 Header.defaultProps = {
   logoImg: '',
   navMenus: [],
-  profileMenu: null,
   profileText: '',
 };
 
@@ -48,7 +47,6 @@ Header.propTypes = {
     text: PropTypes.string,
   })),
   profileText: PropTypes.string,
-  profileMenu: PropTypes.element,
 };
 
 export default Header;

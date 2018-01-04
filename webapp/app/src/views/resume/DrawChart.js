@@ -161,10 +161,6 @@ class DrawChart extends Component {
         <div>
           {record.description.split('\n').map((item, index) => { return (<p key={index}>{item}</p>); })}
         </div>
-        <div className="commentary-box">
-          <label>{`${language.REMARKS}：`}</label>
-          <p>{record.followup}</p>
-        </div>
       </div>
     );
   }

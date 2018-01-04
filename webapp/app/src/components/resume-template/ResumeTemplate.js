@@ -173,7 +173,7 @@ class ResumeTemplate extends Component {
             </div>
           </div>
           : null }
-          {experience.project?
+          {experience && experience.hasOwnProperty('project')?
           <div className={`${this.props.prefixCls}-project`}>
             <Icon type="folder" style={{ fontSize:'25px'}}/>
             <h2>{language.PROJECT_EXPERIENCE}</h2>
@@ -246,7 +246,7 @@ class ResumeTemplate extends Component {
 
 ResumeTemplate.defaultProps = {
   prefixCls: 'cs-resume-template',
-  dataSource: null,
+  dataSource: {},
   html: '',
 };
 

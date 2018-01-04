@@ -15,16 +15,18 @@ class SearchResultBox extends Component {
   constructor() {
     super();
     this.state = {
-      gradient: []
+      gradient: [],
+      bgGradient: []
     };
     this.getResultDOMRender = this.getResultDOMRender.bind(this);
   }
 
   componentDidMount() {
-    const { startColor, endColor } = this.props,
+    const { startColor, endColor, bgStartColor, bgEndColor } = this.props,
           colorGrad = new ColorGrad();
     this.setState({
       gradient: startColor && endColor ? colorGrad.gradient(startColor,endColor) : colorGrad.gradient(),
+      bgGradient: bgStartColor && bgEndColor ? colorGrad.gradient(bgStartColor,bgEndColor) : colorGrad.gradient(),
     });
   }
 
@@ -73,6 +75,7 @@ class SearchResultBox extends Component {
             selection={selection}
             onToggleSelection={this.props.onToggleSelection}
             gradient={this.state.gradient}
+            bgGradient={this.state.bgGradient}
           />
         );
       });

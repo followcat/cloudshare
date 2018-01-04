@@ -45,10 +45,9 @@ class NameStorage(services.base.storage.BaseStorage):
         """"""
         return self.exists(bsobj.ID)
 
-    def remove(self, bsobj, committer=None, unique=True,
+    def remove(self, id, committer=None, unique=True,
             kv_file=False, text_file=True, do_commit=True):
         result = False
-        id = bsobj.ID
         if self.exists(id):
             result = self._remove(id)
             if result:

@@ -409,8 +409,8 @@ class Member(DefaultMember):
                 if len(self.accounts.ids) > 1:
                     result = self.accounts.remove(invited_id, committer=committer)
             if result is True:
-                if member.check_admin(invited_id) is True:
-                    result = self.delete_admin(self.id, invited_id)
+                if self.check_admin(invited_id) is True:
+                    result = self.delete_admin(inviter_id, invited_id)
         return result
 
     def cv_projects(self, id):

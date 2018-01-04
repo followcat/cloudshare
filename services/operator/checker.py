@@ -71,9 +71,7 @@ class Checker(Filter):
     def remove(self, id, committer=None, do_commit=True):
         result = False
         if self.exists(id):
-            self.data_service.remove(id, committer, do_commit)
-            self.operator_service.remove(id, committer, do_commit)
-            result = True
+            result = super(Checker, self).remove(id, committer, do_commit=do_commit)
         return result
 
 

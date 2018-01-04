@@ -49,8 +49,8 @@ class Application(Facade):
         return res
 
     def remove(self, *args, **kwargs):
-        res = self.operator_service.add(*args, **kwargs)
+        res = self.operator_service.remove(*args, **kwargs)
         if res:
-            res = self.data_service.add(*args, **kwargs)
+            res = self.data_service.remove(*args, **kwargs)
         return res
 

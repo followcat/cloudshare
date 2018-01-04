@@ -44,12 +44,13 @@ class CompanyAPI(Resource):
         metadata = extractor.information_explorer.catch_coinfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         mbr_result = member.company_add(coobj, committer=user.name)
-        if mbr_result is True:
+        if mbr_result:
             result = project.company_add(coobj, committer=user.name)
-        if result is True:
-            self.svc_index.add(self.svc_index.config['CO_MEM'], coobj.metadata['id'],
-                               coobj.metadata)
-        if result:
+        if result['project_result']:
+            info = project.company_get(coobj.metadata['id'])
+            self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
+                               coobj.metadata['id'], None, info)
+        if result['project_result']:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
             response = { 'code': 400, 'data': result, 'message': 'Create new company failed.' }

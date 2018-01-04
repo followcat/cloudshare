@@ -43,6 +43,7 @@ class SearchResultItem extends Component {
     const {
       yaml_info,
       gradient,
+      bgGradient,
       info,
       type,
       selection,
@@ -65,14 +66,15 @@ class SearchResultItem extends Component {
     const expectation = yaml_info.expectation ? yaml_info.expectation : {},
           expectationMoney = expectation.salary ? expectation.salary.yearly : '',
           expectationPlacesList = expectation.places ? expectation.places : [];
-    const linkColor = gradient ? { color: gradient[parseInt(info.match*100)] } : {};
+    const linkColor = gradient ? { color: gradient[parseInt(info.match*100)] } : {},
+          bgColor = bgGradient ? { backgroundColor: bgGradient[parseInt(info.match*100)] } : {};
 
     const href = jdid ? `${URL.getResumeURL(cv_id)}?jd_id=${jdid}`: URL.getResumeURL(cv_id),
           hrefs = searchText? href+`?search_text=${searchText}` : href,
           hreff = matchDoc? href+`?match_doc=${matchDoc}` : hrefs;
     return (
       <Card className="cs-ls-i">
-        <div className="basic-info">
+        <div className="basic-info" style={bgColor}>
           <Row>
             {type === 'default' ?
               null : 
@@ -90,7 +92,7 @@ class SearchResultItem extends Component {
             :
             <Col span={1} className="omit"/>
             }
-            <Col span={type === 'default' ? 3 : 1} className="omit">
+            <Col span={type === 'default' ? 2 : 2} className="omit">
               <a
                 href={hreff}
                 style={linkColor}
@@ -99,7 +101,7 @@ class SearchResultItem extends Component {
                 {this.getNameTextRender()}
               </a>
             </Col>
-            <Col span={1} offset={type === 'default' ? 0 : 1}  className="omit">{yaml_info.gender}</Col>
+            <Col span={1} className="omit">{yaml_info.gender}</Col>
             <Col span={1} className="omit">{yaml_info.age}</Col>
             <Col span={2} className="omit">{yaml_info.marital_status}</Col>
             <Col span={3} className="omit">{yaml_info.education}</Col>

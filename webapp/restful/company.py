@@ -45,8 +45,9 @@ class CompanyAPI(Resource):
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.bd_add(coobj, committer=user.name)
         if result:
+            info = project.company_get(coobj.metadata['id'])
             project.bd_indexadd(project.es_config['CO_MEM'], project.id, coobj.metadata['id'],
-                               None, coobj.metadata)
+                               None, info)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:

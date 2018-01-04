@@ -46,6 +46,7 @@ class AllSIMSAPI(flask.views.MethodView):
     def __init__(self):
         self.svc_min = flask.current_app.config['SVC_MIN']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.min_additionals = flask.current_app.config['MIN_ADDITIONALS']
         super(AllSIMSAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
@@ -57,8 +58,7 @@ class AllSIMSAPI(flask.views.MethodView):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         return { 'code': 200, 'projects': member.projects.keys(),
-                 'classify': list(set(self.svc_min.sim[project.modelname].keys())-
-                                  set([p.id for p in member.projects.values()])) }
+                 'classify': self.min_additionals.keys() }
 
 
 class ClassifyAPI(flask.views.MethodView):

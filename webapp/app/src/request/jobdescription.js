@@ -5,8 +5,8 @@ import { API } from 'config/api';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
-export const getJobDescriptionList = (params,callback) => {
-  return fetch(API.JOBDESCRIPTION_LIST_API, {
+export const getJobDescriptionSearch = (params,callback) => {
+  return fetch(API.JOBDESCRIPTION_SEARCH_API, {
     method: 'POST',
     credentials: 'include',
     headers: {

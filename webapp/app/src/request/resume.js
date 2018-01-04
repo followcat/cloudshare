@@ -49,6 +49,22 @@ export const getSimilar = (params, callback) => {
   .then(json => callbackFunction(callback, json));
 };
 
+// 获取推荐职位列表
+export const jdByCvIDMatching = (params,callback) => {
+  return fetch(API.LSI_JD_BY_CVID_API, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
 // 获取所有简历id列表
 export const getResumeList = (params, callback) => {
   return fetch(API.RESUME_LIST_API, {
@@ -101,6 +117,22 @@ export const updateResumeInfo = (params, callback) => {
 export const updateAdditionalInfo = (params, callback) => {
   return fetch(API.ADDITIONAL_INFO_API, {
     method: 'PUT',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+// 删除标签, 跟进, 评论信息
+export const deleteAdditionalInfo = (params, callback) => {
+  return fetch(API.ADDITIONAL_INFO_API, {
+    method: 'DELETE',
     credentials: 'include',
     headers: {
       'Authorization': `Basic ${StorageUtil.get('token')}`,

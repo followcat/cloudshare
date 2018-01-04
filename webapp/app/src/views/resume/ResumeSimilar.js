@@ -3,6 +3,12 @@ import React, { Component, PropTypes } from 'react';
 
 import { Card } from 'antd';
 
+import { URL } from 'URL';
+
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 class ResumeSimilar extends Component {
 
   constructor(props) {
@@ -12,8 +18,14 @@ class ResumeSimilar extends Component {
   render() {
     return (
       <Card
-        title="相似简历"
+        title={language.RESUME_SIMILAR}
         className="mg-t-8"
+        extra={
+        <a
+          href={URL.getFastMatchingByCV(this.props.id)}
+        >
+         {language.MORE}
+        </a>}
       >
         <div className="similar">
           {this.props.dataSource.map((item, index) => {

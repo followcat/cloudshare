@@ -82,7 +82,7 @@ export const API = {
 
   FEATURE_API: `${HOST}/api/feature`,
 
-  JOBDESCRIPTION_LIST_API: `${HOST}/api/jdlist`,
+  JOBDESCRIPTION_SEARCH_API: `${HOST}/api/jdsearch`,
 
   JOBDESCRIPTION_API: `${HOST}/api/jd`,
 
@@ -108,6 +108,8 @@ export const API = {
 
   HIGHLIGHT_KEYWORD_API: `${HOST}/api/highlight/search`,
 
+  HIGHLIGHT_DOC_API: `${HOST}/api/highlight/lsicvdoc`,
+
   HIGHLIGHT_API: `${HOST}/api/highlight/lsicvjd`,
 
   SIMILAR_API: `${HOST}/api/mining/similar`,
@@ -121,6 +123,8 @@ export const API = {
   BOOKMARK_API: `bookmark`,  // {host}/api/accounts/{id}/bookmark
 
   //UPDATE_JOBDESCRIPTION_API: `${HOST}/api/jd`,  // {host}/api/jd/{id}
+
+  LSI_JD_BY_CVID_API: `${HOST}/api/mining/lsijdbycvid`,
 
   LSI_BY_JD_ID_API: `${HOST}/api/mining/lsibyjdid`,
 

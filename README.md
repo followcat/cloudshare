@@ -114,3 +114,14 @@ there were generate two folders ```/static/dist/``` and ```/templates_dist/```
 python run.py
 ```
 
+## Issues
+
+In some BLAS versions, the numpy.dot will hangs in multithreading/processing.
+Upgrade your BLAS or use this before startup server.
+For ease of use the mining service in most environment.
+
+```
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+```

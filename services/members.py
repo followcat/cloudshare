@@ -88,9 +88,11 @@ class Members(object):
         return self.members[name]
 
     def use(self, name, id):
-        result = self.members[self.default_member_name]
+        result = None
         if name:
             result = self.members[name].use(id)
+        if not result:
+            result = self.members[self.default_member_name]
         return result
 
     def names(self):

@@ -51,7 +51,7 @@ class User(flask.ext.login.UserMixin):
         return result
 
     def joinmember(self, inviter_id, name):
-        assert not self.member
+        assert self.defaultmember
         assert self.svc_members.exists(name)
         result = False
         inviter_info = self.svc_account.getyaml(inviter_id)
@@ -156,7 +156,8 @@ class User(flask.ext.login.UserMixin):
 
     @property
     def defaultmember(self):
-        return not self.member
+        return self.member is self.svc_members.use(
+                                self.svc_members.default_member_name, self.id)
 
     @property
     def info(self):

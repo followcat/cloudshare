@@ -60,17 +60,13 @@ class User(flask.ext.login.UserMixin):
             member = self.svc_members.use(name, inviter_id)
             result = member.join(inviter_id, self.id, inviter_info['name'])
             if result is True:
-                metadata = {'id': self.id, 'member': name}
+                metadata = invited_info
+                metadata.update({'member': name})
                 bsobj = core.basedata.DataObject(metadata=metadata, data=None)
-                result = self.svc_account.save(bsobj, committer=invited_info['name'])
+                result = self.svc_account.modify(bsobj, committer=invited_info['name'])
+                self._member = None
                 assert self.member is member
         return result
-
-    def updateinfo(self, info):
-        origininfo = self.svc_account.getyaml(self.id)
-        origininfo.update(info)
-        bsobj = core.basedata.DataObject(metadata=origininfo, data=None)
-        return self.svc_account.modify(bsobj, committer=self.name)
 
     def checkpassword(self, password):
         return self.svc_account.checkpwd(self.id, password)

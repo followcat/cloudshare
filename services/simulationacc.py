@@ -19,6 +19,7 @@ class SimulationACC(services.base.kv_storage.KeyValueStorage):
     YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
         ("inviter",             str),
+        ("date",                float),
     )
 
     def _templateinfo(self, committer):

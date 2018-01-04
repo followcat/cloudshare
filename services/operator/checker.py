@@ -23,6 +23,12 @@ class Filter(services.operator.facade.Application):
         if self.operator_service.exists(id):
             return super(Filter, self).__getattr__(attr)(*args, **kwargs)
 
+    def add(self, *args, **kwargs):
+        res = self.data_service.add(*args, **kwargs)
+        if res or not self.data_service.unique(args[0]):
+            res = self.operator_service.add(*args, **kwargs)
+        return res
+
 
 class Selector(Filter):
     """"""
@@ -42,7 +48,7 @@ class Selector(Filter):
 
     def add(self, *args, **kwargs):
         try:
-            assert self.data_service.exists(args[0].ID)
+            assert not self.data_service.unique(args[0])
             return self.operator_service.add(*args, **kwargs)
         except AssertionError:
             return False

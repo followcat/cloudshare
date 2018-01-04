@@ -28,10 +28,10 @@ class CurrivulumvitaeAPI(Resource):
         member = user.getmember()
         result = user.getbookmark()
         yaml = member.cv_getyaml(id)
-        if yaml['id'] in result:
-            yaml['collected'] = True
-        else:
-            yaml['collected'] = False
+        try:
+            yaml['collected'] = yaml['id'] in result
+        except KeyError:
+            return { 'code': 400, 'message': 'Currivulumvitae information error.'}
         yaml['date'] = utils.builtin.strftime(yaml['date'])
         cv_projects = member.cv_projects(id)
         en_html = ''

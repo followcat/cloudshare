@@ -20,3 +20,4 @@ xlrd==1.0.0
 networkx==1.10
 elasticsearch==5.4.0
 regex==2017.6.7
+pyOpenSSL==17.3.0

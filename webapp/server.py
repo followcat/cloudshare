@@ -16,7 +16,9 @@ import webapp.jsonencoder
 app = flask.Flask(__name__, template_folder="templates_dist")
 flask_compress.Compress(app)
 app.config.from_object('webapp.settings')
-app.config.update(app.config['SERVER_CONFIG'])
+app.config.from_pyfile('config/default.py')
+if os.path.exists(os.path.join(app.config['CONFIG_PATH'], 'additional.py')):
+    app.config.from_pyfile('config/additional.py')
 app.json_encoder = webapp.jsonencoder.CustomJSONEncoder
 app.jinja_env.add_extension(jinja2.ext.loopcontrols)
 

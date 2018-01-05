@@ -1,5 +1,3 @@
-import yaml
-
 import webapp.jsonencoder
 from baseapp.settings import *
 from baseapp.loader import config
@@ -34,6 +32,3 @@ def load_server_config(path):
 CONFIG_PATH = 'webapp/config'
 UPLOAD_TEMP = config.storage_config['UPLOAD_TEMP']
 RESTFUL_JSON = {'cls': webapp.jsonencoder.CustomJSONEncoder}
-
-SERVER_CONFIG = load_server_config(CONFIG_PATH)
-ACCESS = load_access_config(CONFIG_PATH)

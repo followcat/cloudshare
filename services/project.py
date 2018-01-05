@@ -90,7 +90,7 @@ class Project(services.operator.combine.Combine):
             self.config['model'] = 'default'
 
     def save(self):
-        return self.config_service.setup(self.config_file)
+        return self.config_service.setup(self.config)
 
     def setup(self, committer=None, config=None):
         self.setconfig(config)

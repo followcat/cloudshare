@@ -1,6 +1,6 @@
 DEBUG = True
 CACHE_TYPE = "simple"
-SECRET_KEY = "default" # Need to be modified in the publishing environment
+SECRET_KEY = "super secret key" # Need to be modified in the publishing environment
 SESSION_TYPE = "filesystem"
 
 ACCESS = {

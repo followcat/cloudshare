@@ -100,7 +100,7 @@ class JobDescriptionUploadAPI(Resource):
             id = jdobj.metadata['id']
             project.jd_indexadd(project.es_config['JD_MEM'], project.id,
                                id, None, jdobj.metadata)
-        if result:
+        if result['project_result']:
             response = { 'code': 200, 'data': {'result': result, 'info': jdobj.metadata},
                          'message': 'Create job description successed.' }
         else:

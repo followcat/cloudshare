@@ -27,6 +27,8 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
     config_file = 'config.yaml'
 
     YAML_TEMPLATE = (
+        ('id',                  str),
+        ('administrator',       list),
         ('storageCV',           str),
         ('storagePEO',          str),
         ('limitPEO',            str),

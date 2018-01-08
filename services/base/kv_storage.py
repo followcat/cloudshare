@@ -60,13 +60,19 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                     if not bsobj.metadata[key]:
                         continue
                     elif isinstance(bsobj.metadata[key], (list, set, tuple)):
-                        info[key].extend(bsobj.metadata[key])
+                        if isinstance(info[key], set):
+                            info[key].update(bsobj.metadata[key])
+                        else:
+                            info[key].extend(bsobj.metadata[key])
                     elif isinstance(bsobj.metadata[key], dict):
                         data = self.build_frame(**bsobj.metadata[key])
                         if data not in info[key]:
                             info[key].insert(0, data)
                     else:
-                        info[key].append(bsobj.metadata[key])
+                        if isinstance(info[key], set):
+                            info[key].add(bsobj.metadata[key])
+                        else:
+                            info[key].append(bsobj.metadata[key])
                 except KeyError:
                     pass
             else:

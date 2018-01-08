@@ -89,7 +89,11 @@ class CompanyAllAPI(Resource):
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:
-            datas.append(project.bd_getyaml(item['_id']))
+            info = project.bd_getyaml(item['_id'])
+            if info:
+                datas.append(info)
+            else:
+                total -= 1
         return {
             'code': 200,
             'data': datas,
@@ -154,8 +158,11 @@ class CompanyCustomerListAPI(Resource):
         pages = int(math.ceil(float(total)/page_size))
         data = list()
         for coname in result[(cur_page-1)*page_size:cur_page*page_size]:
-            co = project.bd_getyaml(coname)
-            data.append(co)
+            info = project.bd_getyaml(coname)
+            if info:
+                data.append(info)
+            else:
+                total -= 1
         return { 'code': 200, 'data': data, 'pages': pages, 'totals': total}
     
 #create, delete
@@ -274,7 +281,11 @@ class SearchCObyKeyAPI(Resource):
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:
-            datas.append(project.bd_getyaml(item['_id']))
+            info = project.bd_getyaml(item['_id'])
+            if info:
+                datas.append(info)
+            else:
+                total -= 1
         return {
             'code': 200,
             'data': datas,

@@ -198,8 +198,8 @@ class Project(services.operator.combine.Combine):
     def addcustomer(self, coobj, user=None, do_commit=True):
         return self.customer.add(coobj, committer=user, do_commit=do_commit)
 
-    def deletecustomer(self, coobj, user=None, do_commit=True):
-        return self.customer.remove(coobj, committer=user, do_commit=do_commit)
+    def deletecustomer(self, id, user=None, do_commit=True):
+        return self.customer.remove(id, committer=user, do_commit=do_commit)
 
     def jd_get(self, id):
         return self.jobdescription.getyaml(id)

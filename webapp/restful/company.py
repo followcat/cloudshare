@@ -176,7 +176,7 @@ class CompanyCustomerAPI(Resource):
         projectname = args['project']
         member = user.getmember()
         project = member.getproject(projectname)
-        coobj = core.basedata.DataObject(metadata, data='')
+        coobj = core.basedata.DataObject({'id': id}, data='')
         result = project.addcustomer(coobj, user.name)
         if result:
             response = { 'code': 200, 'message': 'Add customer success.' }
@@ -192,7 +192,7 @@ class CompanyCustomerAPI(Resource):
         member = user.getmember()
         project = member.getproject(projectname)
         coobj = core.basedata.DataObject(metadata, data='')
-        result = project.deletecustomer(coobj, user.name)
+        result = project.deletecustomer(id, user.name)
         if result:
             response = { 'code': 200, 'message': 'Delete customer success.' }
         else:

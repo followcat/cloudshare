@@ -18,11 +18,9 @@ import services.simulationcustomer
 
 class SimulationProject(services.base.kv_storage.KeyValueStorage):
 
-    commitinfo = 'Project'
-    config_file = 'config.yaml'
-
     YAML_TEMPLATE = (
         ('id',                  str),
+        ('name',                str),
         ('model',               functools.partial(str, object='default')),
         ('autosetup',           bool),
         ('autoupdate',          bool),
@@ -30,13 +28,10 @@ class SimulationProject(services.base.kv_storage.KeyValueStorage):
         ('storageJD',           str),
     )
 
-    def setup(self, info):
-        info['id'] = self.config_file
-        bsobj = core.basedata.DataObject(metadata=info, data=None)
-        if self.exists(info['id']):
-            return self.modify(bsobj, committer=self.commitinfo, do_commit=True)
-        else:
-            return self.add(bsobj, committer=self.commitinfo, do_commit=True)
+    def add(self, bsobj, *args, **kwargs):
+        if not isinstance(bsobj, core.basedata.DataObject):
+            bsobj.append_id(utils.builtin.genuuid())
+        return super(SimulationProject, self).add(bsobj, *args, **kwargs)
 
 
 class Project(services.operator.combine.Combine):
@@ -44,35 +39,20 @@ class Project(services.operator.combine.Combine):
     CO_PATH = 'CO'
     JD_PATH = 'JD'
 
+    commitinfo = 'Project'
+
     def __init__(self, data_service, **kwargs):
         super(Project, self).__init__(data_service, **kwargs)
         assert 'bidding' in kwargs
         assert 'search_engine' in kwargs
         assert 'jobdescription' in kwargs
-        self.name = data_service.name
-        self.path = data_service.path
-        self.config_file = data_service.config_file
         self.bd_repos = kwargs['bidding']['bd']
         self.jd_repos = kwargs['jobdescription']['jd']
         self.search_engine = kwargs['search_engine']['idx']
         self.es_config = kwargs['search_engine']['config']
-        copath = os.path.join(self.path, self.CO_PATH)
-        jdpath = os.path.join(self.path, self.JD_PATH)
 
-        self.bidding = services.bidding.SearchIndex(services.operator.checker.Filter(
-                data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(self.bd_repos),
-                    operator_service=services.simulationbd.SimulationBD(copath, self.name)),
-                operator_service=services.simulationbd.SelectionBD(copath, self.name)))
-        self.customer = services.operator.checker.Selector(
-                data_service=self.bidding,
-                operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
-        self.jobdescription = services.jobdescription.SearchIndex(services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(self.jd_repos),
-                operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
         self.config_service = self.data_service
-        self.config = self.config_service.getyaml(self.config_file)
-        self.idx_setup()
+        self.config = dict()
 
     def idx_setup(self):
         self.bidding.setup(self.search_engine, self.es_config['CO_MEM'])
@@ -105,6 +85,34 @@ class Project(services.operator.combine.Combine):
     @property
     def id(self):
         return self.config['id']
+
+    def setup(self, info):
+        import pdb; pdb.set_trace()
+        try:
+            bsobj = core.basedata.DataObject(metadata=info, data=None)
+            result = self.config_service.modify(bsobj, committer=self.commitinfo, do_commit=True)
+        except AssertionError:
+            bsobj = core.basedata.DataObjectWithoutId(metadata=info, data=None)
+            result = self.config_service.add(bsobj, committer=self.commitinfo, do_commit=True)
+        if result:
+            self.config = self.config_service.getyaml(bsobj.ID)
+        self.name = self.config['name']
+        self.path = os.path.join(self.config_service.path.replace('config/', ''), self.name)
+        copath = os.path.join(self.path, self.CO_PATH)
+        jdpath = os.path.join(self.path, self.JD_PATH)
+        self.bidding = services.bidding.SearchIndex(services.operator.checker.Filter(
+                data_service=services.operator.split.SplitData(
+                    data_service=services.operator.multiple.Multiple(self.bd_repos),
+                    operator_service=services.simulationbd.SimulationBD(copath, self.name)),
+                operator_service=services.simulationbd.SelectionBD(copath, self.name)))
+        self.customer = services.operator.checker.Selector(
+                data_service=self.bidding,
+                operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
+        self.jobdescription = services.jobdescription.SearchIndex(services.operator.checker.Filter(
+                data_service=services.operator.multiple.Multiple(self.jd_repos),
+                operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
+        self.idx_setup()
+        return result
 
     def bd_update_info(self, id, info, committer):
         result = False

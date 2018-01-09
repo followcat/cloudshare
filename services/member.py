@@ -13,6 +13,7 @@ import services.simulationco
 import services.simulationacc
 import services.simulationpeo
 import services.base.kv_storage
+import services.base.name_storage
 import services.operator.search
 import services.operator.checker
 import services.operator.combine
@@ -24,11 +25,9 @@ import extractor.information_explorer
 
 class SimulationMember(services.base.kv_storage.KeyValueStorage):
 
-    commitinfo = 'Member'
-    config_file = 'config.yaml'
-
     YAML_TEMPLATE = (
         ('id',                  str),
+        ('name',                str),
         ('administrator',       list),
         ('storageCV',           str),
         ('storagePEO',          str),
@@ -37,13 +36,10 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
         ('storageJD',           str),
     )
 
-    def setup(self, info):
-        info['id'] = self.config_file
-        bsobj = core.basedata.DataObject(metadata=info, data=None)
-        if self.exists(info['id']):
-            return self.modify(bsobj, committer=self.commitinfo, do_commit=True)
-        else:
-            return self.add(bsobj, committer=self.commitinfo, do_commit=True)
+    def add(self, bsobj, *args, **kwargs):
+        if not isinstance(bsobj, core.basedata.DataObject):
+            bsobj.append_id(utils.builtin.hash(bsobj.ID))
+        return super(SimulationMember, self).add(bsobj, *args, **kwargs)
 
 
 class CommonMember(services.operator.combine.Combine):
@@ -51,31 +47,20 @@ class CommonMember(services.operator.combine.Combine):
     PEO_PATH = 'people'
     CO_PATH = 'companies'
 
+    commitinfo = 'Member'
+
     def __init__(self, data_service, **kwargs):
         """"""
         super(CommonMember, self).__init__(data_service, **kwargs)
         assert 'people' in kwargs
         assert 'company' in kwargs
         assert 'search_engine' in kwargs
-        self.name = data_service.name
-        self.path = data_service.path
-        self.config_file = data_service.config_file
-        self.co_path = os.path.join(self.path, self.CO_PATH)
-        self.peo_path = os.path.join(self.path, self.PEO_PATH)
         self.co_repos = kwargs['company']['co']
         self.mult_peo = kwargs['people']['peo']
         self.search_engine = kwargs['search_engine']['idx']
         self.es_config = kwargs['search_engine']['config']
-        self.company = services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(kwargs['company']['co']),
-                operator_service=services.simulationco.SelectionCO(self.co_path, self.name))
-        self.people = services.operator.checker.Filter(
-                data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(kwargs['people']['peo']),
-                    operator_service=services.simulationpeo.SimulationPEO(self.peo_path, self.name)),
-                operator_service=services.base.name_storage.NameStorage(self.peo_path, self.name))
         self.config_service = self.data_service
-        self.config = self.config_service.getyaml(self.config_file)
+        self.config = dict()
 
     def use(self, id):
         pass
@@ -91,7 +76,7 @@ class CommonMember(services.operator.combine.Combine):
         if creator is True or (self.check_admin(inviter_id) and
                                self.check_admin(invited_id) is False):
             self.administrator.add(invited_id)
-            self.config_service.setup(self.config)
+            self.config_service.modify(core.basedata.DataObject(metadata=self.config, data=None))
             result = True
         return result
 
@@ -101,8 +86,31 @@ class CommonMember(services.operator.combine.Combine):
             if self.check_admin(inviter_id):
                 if self.check_admin(invited_id):
                     self.administrator.remove(invited_id)
-                    self.config_service.setup(self.config)
+                    self.config_service.modify(core.basedata.DataObject(metadata=self.config, data=None))
                     result = True
+        return result
+
+    def setup(self, info):
+        try:
+            bsobj = core.basedata.DataObject(metadata=info, data=None)
+            result = self.config_service.modify(bsobj, committer=self.commitinfo, do_commit=True)
+        except AssertionError:
+            bsobj = core.basedata.DataObjectWithoutId(metadata=info, data=None)
+            result = self.config_service.add(bsobj, committer=self.commitinfo, do_commit=True)
+        if result:
+            self.config = self.config_service.getyaml(bsobj.ID)
+        self.name = self.config['name']
+        self.path = os.path.join(self.config_service.path.replace('config/', ''), self.name)
+        self.co_path = os.path.join(self.path, self.CO_PATH)
+        self.peo_path = os.path.join(self.path, self.PEO_PATH)
+        self.company = services.operator.checker.Filter(
+                data_service=services.operator.multiple.Multiple(self.co_repos),
+                operator_service=services.simulationco.SelectionCO(self.co_path, self.name))
+        self.people = services.operator.checker.Filter(
+                data_service=services.operator.split.SplitData(
+                    data_service=services.operator.multiple.Multiple(self.mult_peo),
+                    operator_service=services.simulationpeo.SimulationPEO(self.peo_path, self.name)),
+                operator_service=services.base.name_storage.NameStorage(self.peo_path, self.name))
         return result
 
     @property
@@ -113,7 +121,7 @@ class CommonMember(services.operator.combine.Combine):
     def administrator(self):
         if 'administrator' not in self.config:
             self.config['administrator'] = set()
-            self.config_service.setup(self.config)
+            self.config_service.modify(core.basedata.DataObject(metadata=self.config, data=None))
         return self.config['administrator']
 
     @property
@@ -183,28 +191,10 @@ class DefaultMember(CommonMember):
         super(DefaultMember, self).__init__(data_service, **kwargs)
         assert 'jobdescription' in kwargs
         assert 'curriculumvitae' in kwargs
-        self.name = data_service.name
-        self.path = data_service.path
-        self.config_file = data_service.config_file
-        self.cv_path = os.path.join(self.path, self.CV_PATH)
-        self.jd_path = os.path.join(self.path, self.JD_PATH)
+        self.repo = kwargs['curriculumvitae']['repo']
+        self.storage = kwargs['curriculumvitae']['storage']
         self.cv_repos = kwargs['curriculumvitae']['cv']
         self.jd_repos = kwargs['jobdescription']['jd']
-        self.curriculumvitae = services.operator.multiple.Multiple(
-                [services.curriculumvitae.SearchIndex(services.operator.checker.Filter(
-                    data_service=services.operator.split.SplitData(
-                        data_service=kwargs['curriculumvitae']['repo'],
-                        operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
-                    operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
-                services.operator.split.SplitData(
-                    data_service=services.secret.Private(
-                        data_service=services.operator.multiple.Multiple(kwargs['curriculumvitae']['storage']),
-                        operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
-                    operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
-                ])
-        self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
-                services.operator.multiple.Multiple(self.jd_repos)))
-        self.idx_setup()
 
     def idx_setup(self):
         self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
@@ -216,6 +206,27 @@ class DefaultMember(CommonMember):
 
     def use(self, id):
         return self
+
+    def setup(self, config=None, committer=None):
+        result = super(DefaultMember, self).setup(config)
+        self.cv_path = os.path.join(self.path, self.CV_PATH)
+        self.jd_path = os.path.join(self.path, self.JD_PATH)
+        self.curriculumvitae = services.operator.multiple.Multiple(
+                [services.curriculumvitae.SearchIndex(services.operator.checker.Filter(
+                    data_service=services.operator.split.SplitData(
+                        data_service=self.repo,
+                        operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
+                    operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
+                services.operator.split.SplitData(
+                    data_service=services.secret.Private(
+                        data_service=services.operator.multiple.Multiple(self.storage),
+                        operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
+                    operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
+                ])
+        self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
+                services.operator.multiple.Multiple(self.jd_repos)))
+        self.idx_setup()
+        return result
 
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
         result = self.curriculumvitae.add(cvobj, committer, unique=unique,
@@ -314,17 +325,12 @@ class Member(DefaultMember):
         super(Member, self).__init__(data_service, **kwargs)
         assert 'bidding' in kwargs
         self.bd_repos = kwargs['bidding']['bd']
-        self.projects_path = os.path.join(self.path, self.PRJ_PATH)
-        self.accounts_path = os.path.join(self.path, self.ACC_PATH)
-        if not os.path.exists(self.projects_path):
-            os.makedirs(self.projects_path)
-        self.setup()
 
     def __getattr__(self, attr):
         for key in ['bd', 'jd']:
             if attr.startswith(key+'_'):
                 return functools.partial(self.call_project, attr=attr)
-        return super(Combine, self).__getattr__(attr)
+        return super(Member, self).__getattr__(attr)
 
     def call_project(self, *args, **kwargs):
         attr = kwargs.pop('attr')
@@ -349,10 +355,18 @@ class Member(DefaultMember):
         return getattr(project, attr)(*args, **kwargs)
 
     def setup(self, config=None, committer=None):
+        result = super(Member, self).setup(config)
+        self.projects_path = os.path.join(self.path, self.PRJ_PATH)
+        self.accounts_path = os.path.join(self.path, self.ACC_PATH)
+        self.active_projects = services.base.name_storage.NameStorage(os.path.join(self.path, 'projects'), 'prjlist')
+        self.project_details = services.project.SimulationProject(unicode(os.path.join(self.path, 'projects', 'config'), 'utf-8'), 'prjconfig')
+        if not os.path.exists(self.projects_path):
+            os.makedirs(self.projects_path)
         self.load_projects()
         self.accounts = services.operator.checker.Checker(
                 data_service=services.simulationacc.SimulationACC(self.accounts_path, self.name),
                 operator_service=services.simulationacc.SelectionACC(self.accounts_path, self.name))
+        return result
 
     def use(self, id):
         result = None
@@ -362,19 +376,21 @@ class Member(DefaultMember):
 
     def load_projects(self):
         self.projects = dict()
-        for path in glob.glob(os.path.join(self.projects_path, '*')):
-            if os.path.isdir(path):
-                str_name = os.path.split(path)[1]
+        for project_id in self.active_projects.ids:
+            project_info = self.project_details.getyaml(project_id)
+            project_path = os.path.join(self.path, 'projects', project_info['name'])
+            if os.path.isdir(project_path):
+                str_name = os.path.split(project_path)[1]
                 name = unicode(str_name, 'utf-8')
-                config = services.project.SimulationProject(unicode(path, 'utf-8'), name)
-                config.setup(info={'id':         utils.builtin.hash(self.name+name),
+                tmp_project = services.project.Project(self.project_details,
+                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
+                                                search_engine={'idx': self.search_engine, 'config': self.es_config})
+                tmp_project.setup(info={'id':      project_id,
+                                     'name':       project_info['name'],
                                      'autosetup':  False,
                                      'autoupdate': False,
                                      'storageCO':  self.config['storageCO'],
                                      'storageJD':  self.config['storageJD']})
-                tmp_project = services.project.Project(config,
-                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
-                                                search_engine={'idx': self.search_engine, 'config': self.es_config})
                 if not tmp_project.config['autosetup'] and not tmp_project.config['autoupdate']:
                     tmp_project._modelname = self.default_model
                 self.projects[name] = tmp_project
@@ -393,16 +409,15 @@ class Member(DefaultMember):
     def _add_project(self, name, autosetup=False, autoupdate=False):
         result = False
         if len(name)>0 and name not in self.projects:
-            path = os.path.join(self.projects_path, name)
-            config = services.project.SimulationProject(path, name)
-            config.setup(info={'id':           utils.builtin.hash(self.name+name),
+            tmp_project = services.project.Project(self.project_details,
+                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
+                                                search_engine={'idx': self.search_engine, 'config': self.es_config})
+            tmp_project.setup(info={'name':      name,
                                  'autosetup':    autosetup,
                                  'autoupdate':   autoupdate,
                                  'storageCO':    self.config['storageCO'],
                                  'storageJD':    self.config['storageJD']})
-            tmp_project = services.project.Project(config,
-                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
-                                                search_engine={'idx': self.search_engine, 'config': self.es_config})
+            self.active_projects.add(core.basedata.DataObject(metadata=tmp_project.config, data=''))
             self.projects[name] = tmp_project
             result = True
         return result

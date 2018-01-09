@@ -1,5 +1,6 @@
 import os
 import glob
+import functools
 
 import core.basedata
 import utils.builtin
@@ -27,6 +28,8 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
     config_file = 'config.yaml'
 
     YAML_TEMPLATE = (
+        ('id',                  str),
+        ('administrator',       list),
         ('storageCV',           str),
         ('storagePEO',          str),
         ('limitPEO',            str),
@@ -37,7 +40,10 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
     def setup(self, info):
         info['id'] = self.config_file
         bsobj = core.basedata.DataObject(metadata=info, data=None)
-        return self.modify(bsobj, committer=self.commitinfo, do_commit=True)
+        if self.exists(info['id']):
+            return self.modify(bsobj, committer=self.commitinfo, do_commit=True)
+        else:
+            return self.add(bsobj, committer=self.commitinfo, do_commit=True)
 
 
 class CommonMember(services.operator.combine.Combine):
@@ -69,32 +75,7 @@ class CommonMember(services.operator.combine.Combine):
                     operator_service=services.simulationpeo.SimulationPEO(self.peo_path, self.name)),
                 operator_service=services.base.name_storage.NameStorage(self.peo_path, self.name))
         self.config_service = self.data_service
-        self.config = dict()
-        try:
-            self.load()
-        except IOError:
-            pass
-
-    def load(self):
-        config = self.config_service.getyaml(self.config_file)
-        if 'id' not in self.config:
-            self.config['id'] = utils.builtin.hash(self.name)
-        if config:
-            self.config.update(config)
-
-    def save(self):
-        return self.config_service.setup(self.config)
-
-    def setup(self, config=None, committer=None):
-        if config is None:
-            config = {}
-        modified = False
-        for key in config:
-            if key not in self.config or self.config[key] != config[key]:
-                self.config[key] = config[key]
-                modified = True
-        if modified:
-            self.save()
+        self.config = self.config_service.getyaml(self.config_file)
 
     def use(self, id):
         pass
@@ -110,7 +91,7 @@ class CommonMember(services.operator.combine.Combine):
         if creator is True or (self.check_admin(inviter_id) and
                                self.check_admin(invited_id) is False):
             self.administrator.add(invited_id)
-            self.save()
+            self.config_service.setup(self.config)
             result = True
         return result
 
@@ -120,7 +101,7 @@ class CommonMember(services.operator.combine.Combine):
             if self.check_admin(inviter_id):
                 if self.check_admin(invited_id):
                     self.administrator.remove(invited_id)
-                    self.save()
+                    self.config_service.setup(self.config)
                     result = True
         return result
 
@@ -132,7 +113,7 @@ class CommonMember(services.operator.combine.Combine):
     def administrator(self):
         if 'administrator' not in self.config:
             self.config['administrator'] = set()
-            self.save()
+            self.config_service.setup(self.config)
         return self.config['administrator']
 
     @property
@@ -221,12 +202,16 @@ class DefaultMember(CommonMember):
                         operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
+        self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
+                services.operator.multiple.Multiple(self.jd_repos)))
         self.idx_setup()
 
     def idx_setup(self):
+        self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
         self.curriculumvitae.services[0].setup(self.search_engine, self.es_config['CV_MEM'])
 
     def idx_updatesvc(self):
+        self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
         self.curriculumvitae.services[0].updatesvc(self.es_config['CV_MEM'], self.id, numbers=1000)
 
     def use(self, id):
@@ -333,9 +318,37 @@ class Member(DefaultMember):
         self.accounts_path = os.path.join(self.path, self.ACC_PATH)
         if not os.path.exists(self.projects_path):
             os.makedirs(self.projects_path)
+        self.setup()
+
+    def __getattr__(self, attr):
+        for key in ['bd', 'jd']:
+            if attr.startswith(key+'_'):
+                return functools.partial(self.call_project, attr=attr)
+        return super(Combine, self).__getattr__(attr)
+
+    def call_project(self, *args, **kwargs):
+        attr = kwargs.pop('attr')
+        try:
+            project_name = kwargs.pop('project')
+        except KeyError:
+            raise KeyError('Missing project')
+        try:
+            project = self.projects[project_name]
+        except KeyError:
+            raise ValueError('Invalid project name: %s' %(project_name))
+        if attr.endswith('_search'):
+            try:
+                kwargs['doctype'] = [project.id]
+            except TypeError, AttributeError:
+                raise ValueError('Invalid project name: %s' %(project_name))
+        elif attr.endswith('_indexadd'):
+            try:
+                kwargs['doctype'] = project.id
+            except TypeError, AttributeError:
+                raise ValueError('Invalid project name: %s' %(project_name))
+        return getattr(project, attr)(*args, **kwargs)
 
     def setup(self, config=None, committer=None):
-        super(Member, self).setup(config, committer)
         self.load_projects()
         self.accounts = services.operator.checker.Checker(
                 data_service=services.simulationacc.SimulationACC(self.accounts_path, self.name),
@@ -353,14 +366,15 @@ class Member(DefaultMember):
             if os.path.isdir(path):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
-                tmp_project = services.project.Project(services.project.SimulationProject(unicode(path, 'utf-8'), name),
+                config = services.project.SimulationProject(unicode(path, 'utf-8'), name)
+                config.setup(info={'id':         utils.builtin.hash(self.name+name),
+                                     'autosetup':  False,
+                                     'autoupdate': False,
+                                     'storageCO':  self.config['storageCO'],
+                                     'storageJD':  self.config['storageJD']})
+                tmp_project = services.project.Project(config,
                                                 bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
-                tmp_project.setup(config={'id':         utils.builtin.hash(self.name+name),
-                                          'autosetup':  False,
-                                          'autoupdate': False,
-                                          'storageCO':  self.config['storageCO'],
-                                          'storageJD':  self.config['storageJD']})
                 if not tmp_project.config['autosetup'] and not tmp_project.config['autoupdate']:
                     tmp_project._modelname = self.default_model
                 self.projects[name] = tmp_project
@@ -380,15 +394,15 @@ class Member(DefaultMember):
         result = False
         if len(name)>0 and name not in self.projects:
             path = os.path.join(self.projects_path, name)
-            tmp_project = services.project.Project(services.project.SimulationProject(path, name),
+            config = services.project.SimulationProject(path, name)
+            config.setup(info={'id':           utils.builtin.hash(self.name+name),
+                                 'autosetup':    autosetup,
+                                 'autoupdate':   autoupdate,
+                                 'storageCO':    self.config['storageCO'],
+                                 'storageJD':    self.config['storageJD']})
+            tmp_project = services.project.Project(config,
                                                 bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
-            tmp_project.setup(config={'id':           utils.builtin.hash(self.name+name),
-                                      'autosetup':    autosetup,
-                                      'autoupdate':   autoupdate,
-                                      'storageCO':    self.config['storageCO'],
-                                      'storageJD':    self.config['storageJD']})
-            tmp_project._modelname = self.default_model
             self.projects[name] = tmp_project
             result = True
         return result

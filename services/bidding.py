@@ -107,3 +107,11 @@ class SearchIndex(services.operator.search.SearchIndex):
             }
         }
     }
+
+    def indexadd(self, *args, **kwargs):
+        kwargs['index'] = self.config
+        return super(SearchIndex, self).indexadd(*args, **kwargs)
+
+    def search(self, *args, **kwargs):
+        kwargs['index'] = self.config
+        return super(SearchIndex, self).search(*args, **kwargs)

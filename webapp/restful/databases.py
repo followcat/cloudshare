@@ -40,7 +40,6 @@ class AllSIMSAPI(flask.views.MethodView):
 
     def __init__(self):
         super(AllSIMSAPI, self).__init__()
-        self.svc_min = flask.current_app.config['SVC_MIN']
         self.min_additionals = flask.current_app.config['MIN_ADDITIONALS']
 
     def post(self):

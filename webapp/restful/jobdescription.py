@@ -53,8 +53,8 @@ class JobDescriptionAPI(Resource):
         result = project.jd_modify(jdobj, user.name)
         if result is True:
             jd_info = project.jd_get(jd_id)
-            project.jd_indexadd(project.es_config['JD_MEM'], project.id,
-                               jd_id, None, jd_info)
+            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+            member.jd_indexadd(id=jd_id, data=None, info=jd_info, **project)
         if result: 
             response = { 'code': 200, 'data': result,
                          'message': 'Update job description successed.' }
@@ -98,9 +98,9 @@ class JobDescriptionUploadAPI(Resource):
         result = project.jd_add(jdobj, committer=user.name)
         if result is True:
             id = jdobj.metadata['id']
-            project.jd_indexadd(project.es_config['JD_MEM'], project.id,
-                               id, None, jdobj.metadata)
-        if result['project_result']:
+            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+            member.jd_indexadd(id=id, data=None, info=jdobj.metadata, **project)
+        if result:
             response = { 'code': 200, 'data': {'result': result, 'info': jdobj.metadata},
                          'message': 'Create job description successed.' }
         else:
@@ -130,21 +130,18 @@ class JobDescriptionSearchAPI(Resource):
         projectname = args['project']
         search_items = args['search_items']
         member = user.getmember()
-        project = member.getproject(projectname)
-        jd_index = project.es_config['JD_MEM']
-        co_index = project.es_config['CO_MEM']
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         search_ditems = dict(search_items)
         if 'company' in search_ditems:
-            co_ids = project.bd_search(index=co_index, doctype=[project.id],
-                                          filterdict={ 'name': search_ditems['company'] }, onlyid=True)
+            co_ids = project.bd_search(filterdict={ 'name': search_ditems['company'] },
+                                          onlyid=True, **project)
             search_ditems['company'] = co_ids
-        total, searches = project.jd_search(index=jd_index,
-                                                doctype=[project.id],
-                                                filterdict=search_ditems,
+        total, searches = member.jd_search(filterdict=search_ditems,
                                                 start=(cur_page-1)*page_size,
-                                                size=page_size, source=True)
+                                                size=page_size, source=True, **project)
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
+        project = member.getproject(projectname)
         for item in searches:
             jd = item['_source']
             co_id = jd['company']

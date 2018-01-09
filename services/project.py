@@ -1,4 +1,5 @@
 import os
+import functools
 
 import utils.builtin
 import core.outputstorage
@@ -22,6 +23,7 @@ class SimulationProject(services.base.kv_storage.KeyValueStorage):
 
     YAML_TEMPLATE = (
         ('id',                  str),
+        ('model',               functools.partial(str, object='default')),
         ('autosetup',           bool),
         ('autoupdate',          bool),
         ('storageCO',           str),
@@ -31,7 +33,10 @@ class SimulationProject(services.base.kv_storage.KeyValueStorage):
     def setup(self, info):
         info['id'] = self.config_file
         bsobj = core.basedata.DataObject(metadata=info, data=None)
-        return self.modify(bsobj, committer=self.commitinfo, do_commit=True)
+        if self.exists(info['id']):
+            return self.modify(bsobj, committer=self.commitinfo, do_commit=True)
+        else:
+            return self.add(bsobj, committer=self.commitinfo, do_commit=True)
 
 
 class Project(services.operator.combine.Combine):
@@ -66,11 +71,7 @@ class Project(services.operator.combine.Combine):
                 data_service=services.operator.multiple.Multiple(self.jd_repos),
                 operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
         self.config_service = self.data_service
-        self.config = dict()
-        try:
-            self.load()
-        except IOError:
-            pass
+        self.config = self.config_service.getyaml(self.config_file)
         self.idx_setup()
 
     def idx_setup(self):
@@ -80,31 +81,6 @@ class Project(services.operator.combine.Combine):
     def idx_updatesvc(self):
         self.bidding.updatesvc(self.es_config['CO_MEM'], self.id, numbers=1000)
         self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
-
-    def load(self):
-        self.config = self.config_service.getyaml(self.config_file)
-        self.config['name'] = self.name
-        if 'id' not in self.config:
-            self.config['id'] = utils.builtin.genuuid()
-        if 'model' not in self.config:
-            self.config['model'] = 'default'
-
-    def save(self):
-        return self.config_service.setup(self.config)
-
-    def setup(self, committer=None, config=None):
-        self.setconfig(config)
-
-    def setconfig(self, config=None):
-        if config is None:
-            config = {}
-        modified = False
-        for key in config:
-            if key not in self.config or self.config[key] != config[key]:
-                self.config[key] = config[key]
-                modified = True
-        if modified:
-            self.save()
 
     @property
     def storageCO(self):
@@ -198,8 +174,8 @@ class Project(services.operator.combine.Combine):
     def addcustomer(self, coobj, user=None, do_commit=True):
         return self.customer.add(coobj, committer=user, do_commit=do_commit)
 
-    def deletecustomer(self, coobj, user=None, do_commit=True):
-        return self.customer.remove(coobj, committer=user, do_commit=do_commit)
+    def deletecustomer(self, id, user=None, do_commit=True):
+        return self.customer.remove(id, committer=user, do_commit=do_commit)
 
     def jd_get(self, id):
         return self.jobdescription.getyaml(id)

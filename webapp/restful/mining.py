@@ -229,8 +229,7 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         doc = member.cv_getmd(id)
-        totals, searchs = member.jd_search(index=[member.es_config['JD_MEM']],
-                                                filterdict=filterdict,
+        totals, searchs = member.jd_search(filterdict=filterdict,
                                                 size=5000, source=False, **project)
         ids = [item['_id'] for item in searchs]
         results = self.miner.probability_by_ids('jdmatch', doc, ids)

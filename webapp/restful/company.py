@@ -44,8 +44,8 @@ class CompanyAPI(Resource):
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.bd_add(coobj, committer=user.name)
         if result:
-            member.bd_indexadd(member.es_config['CO_MEM'], coobj.metadata['id'],
-                               None, coobj.metadata, **project)
+            member.bd_indexadd(id=coobj.metadata['id'],
+                               data=None, info=coobj.metadata, **project)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -79,9 +79,7 @@ class CompanyAllAPI(Resource):
         projectname = args['project']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-        index = member.es_config['CO_MEM']
-        total, searches = member.bd_search(index=index,
-                                            kwargs={'sort': {"modifytime": "desc"}},
+        total, searches = member.bd_search(kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
                                             size=page_size, **project)
         pages = int(math.ceil(float(total)/page_size))
@@ -116,8 +114,7 @@ class AddedCompanyListAPI(Resource):
         projectname = args['project']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-        index = member.es_config['CO_MEM']
-        company_ids = member.bd_search(index=index, filterdict={'name': text},
+        company_ids = member.bd_search(filterdict={'name': text},
                                             size=5, onlyid=True, **project)
         data = []
         project = member.getproject(projectname)
@@ -244,8 +241,7 @@ class CompanyInfoUpdateAPI(Resource):
         if result:
             co_info = project.bd_getyaml(id)
             project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.bd_indexadd(member.es_config['CO_MEM'], 
-                               id, None, co_info, **project)
+            member.bd_indexadd(id=id, data=None, info=co_info, **project)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
@@ -272,8 +268,7 @@ class SearchCObyKeyAPI(Resource):
         projectname = args['project']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-        index = member.es_config['CO_MEM']
-        total, searches = member.bd_search(index=index, filterdict=dict(search_items),
+        total, searches = member.bd_search(filterdict=dict(search_items),
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
                                             size=page_size, **project)
@@ -359,8 +354,7 @@ class CompanyConfirmExcelAPI(Resource):
             if prj_results[coid]['success'] is True:
                 co_info = project.bd_get(coid)
                 project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-                member.bd_indexadd(member.es_config['CO_MEM'],
-                                   coid, None, co_info, **project)
+                member.bd_indexadd(id=coid, data=None, info=co_info, **project)
         return {
             'code': 200,
             'data': results,

@@ -221,37 +221,18 @@ class CompanyInfoUpdateAPI(Resource):
     decorators = [flask.ext.login.login_required]
 
     def __init__(self):
+        super(CompanyInfoUpdateAPI, self).__init__()
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
-        super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('id', location = 'json')
-        self.reqparse.add_argument('update_info', type= list, location = 'json')
-        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('id', type=str, location='json')
+        self.reqparse.add_argument('key', type=str, location='json')
+        self.reqparse.add_argument('date', type=str, location='json')
+        self.reqparse.add_argument('project', type=str, location='json')
+        self.reqparse.add_argument('content', type=unicode, location='json')
 
-    def post(self):
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        id = args['id']
-        projectname = args['project']
-        update_info = args['update_info']
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
-        origin_info = project.company_get(id)
-        for each in update_info:
-            key = each['key']
-            vtype = each['type']
-            value = each['value']
-            content = value['content']
-            if vtype == 'PUT':
-                origin_info[key] = content
-            elif vtype == 'CREATE':
-                data = project.company._listframe(content, user.name)
-                origin_info[key].insert(0, data)
-            elif vtype == 'DELETE':
-                data = project.company._listframe(content, value['author'], value['date'])
-                origin_info[key].remove(data)
-        result = project.company_update_info(id, origin_info, user.name)
+    def _update(self, id, info, project, committer):
+        result = project.company_update_info(id, info, committer)
         if result:
             co_info = project.company_get(id)
             self.svc_index.add(self.svc_index.config['CO_MEM'], project.id,
@@ -260,6 +241,51 @@ class CompanyInfoUpdateAPI(Resource):
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
             response = { 'code': 400, 'message': 'Update information error.' }
+        return response
+
+    def put(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        key = args['key']
+        content = args['content']
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        origin_info = project.company_get(id)
+        data = project.company._listframe(content, user.name)
+        origin_info[key].insert(0, data)
+        response = self._update(id, origin_info, project, user.name)
+        return response
+
+    def delete(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        key = args['key']
+        date = args['date']
+        content = args['content']
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        origin_info = project.company_get(id)
+        data = project.company._listframe(content, user.name, date=date)
+        origin_info[key].remove(data)
+        response = self._update(id, origin_info, project, user.name)
+        return response
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        key = args['key']
+        content = args['content']
+        projectname = args['project']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        origin_info = project.company_get(id)
+        origin_info[key] = content
+        response = self._update(id, origin_info, project, user.name)
         return response
 
 

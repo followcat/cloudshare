@@ -45,7 +45,7 @@ class CompanyAPI(Resource):
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.bd_add(coobj, committer=user.name)
         if result:
-            info = project.company_get(coobj.metadata['id'])
+            info = project.bd_getyaml(coobj.metadata['id'])
             project = dict(filter(lambda x: x[0] in ('project',), args.items()))
             member.bd_indexadd(id=coobj.metadata['id'],
                                data=None, info=coobj.metadata, **project)

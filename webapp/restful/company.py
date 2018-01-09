@@ -243,7 +243,7 @@ class CompanyInfoUpdateAPI(Resource):
             response = { 'code': 400, 'message': 'Update information error.' }
         return response
 
-    def put(self):
+    def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
@@ -274,7 +274,7 @@ class CompanyInfoUpdateAPI(Resource):
         response = self._update(id, origin_info, project, user.name)
         return response
 
-    def post(self):
+    def put(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']

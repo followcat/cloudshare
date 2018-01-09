@@ -87,7 +87,6 @@ class Project(services.operator.combine.Combine):
         return self.config['id']
 
     def setup(self, info):
-        import pdb; pdb.set_trace()
         try:
             bsobj = core.basedata.DataObject(metadata=info, data=None)
             result = self.config_service.modify(bsobj, committer=self.commitinfo, do_commit=True)

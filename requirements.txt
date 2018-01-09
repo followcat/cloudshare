@@ -19,3 +19,4 @@ xlrd==1.0.0
 elasticsearch==5.4.0
 anytree==2.4.3
 regex==2017.6.7
+pyOpenSSL==17.3.0

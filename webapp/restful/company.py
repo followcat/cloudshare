@@ -35,15 +35,18 @@ class CompanyAPI(Resource):
         result = False
         args = self.reqparse.parse_args()
         coname = args['name']
+        projectname = args['project']
         if args['introduction'] is None:
             args['introduction'] = str()
         user = flask.ext.login.current_user
         member = user.getmember()
-        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        project = member.getproject(projectname)
         metadata = extractor.information_explorer.catch_biddinginfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.bd_add(coobj, committer=user.name)
         if result:
+            info = project.company_get(coobj.metadata['id'])
+            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
             member.bd_indexadd(id=coobj.metadata['id'],
                                data=None, info=coobj.metadata, **project)
         if result:

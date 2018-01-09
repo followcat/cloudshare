@@ -56,7 +56,7 @@ class Resume extends Component {
       matchDoc: '',
       resumeList: [],
       fileList: [],
-      dataSource: null,
+      dataSource: {},
       html: '',
       enHTML: '',
       project: [],

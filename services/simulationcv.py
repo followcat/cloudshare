@@ -9,6 +9,8 @@ class SimulationCV(services.base.simulation.Simulation,
                    services.curriculumvitae.CurriculumVitae):
 
     YAML_TEMPLATE = (
+        ("name",                str),
+        ("origin",              str),
         ("committer",           str),
     )
 

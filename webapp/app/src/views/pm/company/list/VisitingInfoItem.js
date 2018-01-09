@@ -87,7 +87,7 @@ class VisitingInfoItem extends Component {
           onClick={this.handleOmmitClick}
           onDoubleClick={this.handleDoubleClick}
         >
-          {datas.length > 0 ?
+          {datas && datas.length > 0 ?
             `${datas[0].author} | ${datas[0].date.split(' ')[0]} | ${datas[0].content}` :
             `暂无数据`}
           {editStatus && datas.length > 0 ?
@@ -103,7 +103,7 @@ class VisitingInfoItem extends Component {
         <div
           onDoubleClick={this.handleDoubleClick}
         >
-          {datas.length > 0 ? 
+          {datas && datas.length > 0 ? 
             datas.map((item, index) => {
               return (
                 <p key={index} className="visiting-list">

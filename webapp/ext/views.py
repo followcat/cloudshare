@@ -1,5 +1,6 @@
 import flask
 import flask.ext.login
+from itsdangerous import BadSignature
 
 import webapp.views.account
 
@@ -17,8 +18,11 @@ def init_login(app):
     def load_user_from_request(request):
         token = request.headers.get('Authorization')
         svc_account = app.config['SVC_ACCOUNT']
-        return webapp.views.account.User.get_by_authorization(token, svc_account)
-
+        try:
+            user = webapp.views.account.User.get_by_authorization(token, svc_account)
+        except BadSignature:
+            flask.abort(401)
+        return user
 
 def configure(app):
 

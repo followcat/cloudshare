@@ -130,28 +130,28 @@ class Customer extends Component {
 
   handleChange(value) {
     const { companyDataSource } = this.state;
-
     this.setState({ 
       value: value,
       fetching: true
     });
 
-    let object = find(companyDataSource, (item) => item.company_name === value);
-    if (object) {
+    if(value){
+      this.getCompanyDataSource(value);
+    } else {
       this.setState({
+        companyDataSource: []
+      });
+    }
+
+    if(companyDataSource.length>0) {
+    let object = find(companyDataSource, (item) => item.company_name === value);
+    object && this.setState({
         id: object.id
       });
     } else {
       this.setState({
         id: ''
       });
-    }
-    if(value){
-      this.getCompanyDataSource(value);
-    } else {
-      this.setState({
-            companyDataSource: []
-          });
     }
   }
 

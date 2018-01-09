@@ -137,6 +137,7 @@ class SearchResult extends Component {
           { totals,
             searchText,
             current,
+            pages,
             spinning,
             dataSource,
             industry
@@ -163,6 +164,7 @@ class SearchResult extends Component {
           <SearchResultBox
             visible={true}
             current={current}
+            pages={pages}
             total={totals}
             spinning={spinning}
             searchText={searchText}

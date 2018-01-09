@@ -13,7 +13,9 @@ import ResumeToolMenu from './ResumeToolMenu';
 import ResumeTag from './ResumeTag';
 import ResumeFollowUp from './ResumeFollowUp';
 import ResumeComment from './ResumeComment';
+import ResumeJobRecommend from './ResumeJobRecommend';
 import ResumeSimilar from './ResumeSimilar';
+
 
 import {
   Tabs,
@@ -28,11 +30,12 @@ import {
   updateAdditionalInfo,
   getResumeInfo,
   getResumeList,
-  getSimilar
+  getSimilar,
+  jdByCvIDMatching
 } from 'request/resume';
 import { addBookmark, deleteBookmark } from 'request/bookmark';
 import { confirmUpload } from 'request/upload';
-import { getHlighLight, getHlighLightKeyWord } from 'request/highlight';
+import { getHlighLight, getHlighLightKeyWord, getHlighLightDoc } from 'request/highlight';
 
 import { API } from 'API';
 import { URL } from 'URL';
@@ -48,10 +51,12 @@ class Resume extends Component {
       uniqueId: '',
       resumeId: '',
       jd: '',
+      jdmatch: [],
       searchText: '',
+      matchDoc: '',
       resumeList: [],
       fileList: [],
-      dataSource: null,
+      dataSource: {},
       html: '',
       enHTML: '',
       project: [],
@@ -76,18 +81,25 @@ class Resume extends Component {
     this.getResumeIDList = this.getResumeIDList.bind(this);
     this.getHlighLightData = this.getHlighLightData.bind(this);
     this.getHlighLightKeyWord = this.getHlighLightKeyWord.bind(this);
+    this.getHlighLightByDoc = this.getHlighLightByDoc.bind(this);
     this.getSimilarDataSource = this.getSimilarDataSource.bind(this);
+    this.getJdMatchingResult = this.getJdMatchingResult.bind(this);
     this.handSelectProject = this.handSelectProject.bind(this);
   }
 
   componentWillMount() {
-    const id = this.props.location.query.cv_id,
-        jdid = this.props.location.query.jd_id,
-  searchText = this.props.location.query.search_text ;
+    const { jd_id, search_text, match_doc } 
+          = this.props.location.query;
+    const id = this.props.params.resumeId;
+    const jdid = jd_id,
+  searchText = search_text,
+    matchDoc = match_doc;
+
     this.setState({
       resumeId: id,
             jd: jdid,
-    searchText: searchText
+    searchText: searchText,
+      matchDoc: matchDoc
     });
 
     this.getResumeDataSource(id);
@@ -96,7 +108,9 @@ class Resume extends Component {
     this.getHlighLightData(jdid,id,30);
     if(searchText)
     this.getHlighLightKeyWord(searchText);
+    matchDoc && this.getHlighLightByDoc(matchDoc,id,30);
     this.getSimilarDataSource(id);
+    this.getJdMatchingResult(id);
   }
 
   handSelectProject(e){
@@ -355,15 +369,36 @@ class Resume extends Component {
    }
 
     /**
-   * 获取jd和cv之间支撑词
+   * 获取keyword highlight
    * 
-   * @param {string} jd ,{string} cv ,{int} top
+   * @param {string} keyword
    * 
    * @memberOf Resume
    */
   getHlighLightKeyWord(searchText) {
     getHlighLightKeyWord({
       keyword: searchText
+    }, json => {
+      if (json.code === 200) {
+        this.setState({
+          highlight: json.data,
+        });
+      }
+    });
+   }
+
+    /**
+   * 获取doc match highlight
+   * 
+   * @param {string} doc ,{string} cv ,{int} top
+   * 
+   * @memberOf Resume
+   */
+  getHlighLightByDoc(doc,cv,top) {
+    getHlighLightDoc({
+      cv: cv,
+      top: top,
+      doc: doc
     }, json => {
       if (json.code === 200) {
         this.setState({
@@ -417,14 +452,38 @@ class Resume extends Component {
       }
     });
   }
+
+  /*
+   * 获取JdMatchingResult列表
+   * 
+   * @param {string} id, {int} size, {int} page, {string} project
+   * 
+   * @memberOf Resume
+   */
+  getJdMatchingResult(id) {
+    jdByCvIDMatching({
+      id: id,
+      filterdict: {status: "Opening"},
+      size: 5,
+      page: 1,
+    }, json => {
+      if (json.code === 200) {
+        this.setState({
+          jdmatch: json.data,
+        });
+      }
+    });
+  }
   render() {
     const {
       resumeId,
+      uniqueId,
       dataSource,
       collected,
       resumeList,
       fileList,
       panelLoading,
+      searchText,
       highlight,
       html,
       enHTML,
@@ -432,6 +491,7 @@ class Resume extends Component {
       tracking,
       comment,
       similar,
+      jdmatch,
       project
     } = this.state;
     const uploadProps = {
@@ -474,11 +534,15 @@ class Resume extends Component {
                           <Tabs defaultActiveKey="chinese">
                             <Tabs.TabPane tab="中文" key="chinese">
                             { dataSource &&
-                              <ResumeTemplate dataSource={dataSource} highlight={highlight}/>
+                              <ResumeTemplate 
+                                dataSource={dataSource}
+                                searchText={searchText}
+                                highlight={highlight}
+                              />
                             }
                             </Tabs.TabPane>
                             <Tabs.TabPane tab="原文" key="html">
-                              <ResumeContent html={html} />
+                              <ResumeContent html={html} highlight={highlight}/>
                             </Tabs.TabPane>
                             <Tabs.TabPane
                               tab="English"
@@ -505,10 +569,11 @@ class Resume extends Component {
               })
             }
             </Card>
-            <ResumeTag dataSource={tag} onSubmitTag={this.handleSubmitTag} />
+            <ResumeTag dataSource={tag} uniqueId={uniqueId} onSubmitTag={this.handleSubmitTag} />
             <ResumeFollowUp dataSource={tracking} onSubmitFollowUp={this.handleSubmitFollowUp} />
             <ResumeComment dataSource={comment} onSubmitComment={this.handleComment} />
-            <ResumeSimilar dataSource={similar} />
+            <ResumeSimilar dataSource={similar} id={resumeId}/>
+            <ResumeJobRecommend dataSource={jdmatch} id={resumeId}/>
           </div>
         </div>
       </Layout>

@@ -1,6 +1,6 @@
 import os
-import xml
 import shutil
+import xml.etree.ElementTree
 
 import mimetypes
 

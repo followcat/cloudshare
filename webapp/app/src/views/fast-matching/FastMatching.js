@@ -29,8 +29,11 @@ class FastMatching extends Component {
       id: '',
       postAPI: '',
       startColor: '#00ff0a',
+      bgStartColor: '#ffeb00',
       endColor: '#000000',
+      bgEndColor: '#ffffff',
       searchText: props.location.query.search_text,
+      matchDoc: props.location.query.match_doc,
       classify: [],
       projects: [],
       industry: {},
@@ -67,16 +70,10 @@ class FastMatching extends Component {
           { location } = this.props;
     let postAPI;
 
-    function usesdata(item) { 
-      if(item === StorageUtil.get('_pj')) 
-        return item
-    }
-
     this.getIndustryDataSource();
     var promise = new Promise((resolve, reject) => {
       this.getLSIAllSIMSDataSource(resolve);
     });
-
     const date = new Date();
     const defFilterData = {date: [moment(date).add(-180, 'days').format('YYYY-MM-DD'),
                                   moment(date).format('YYYY-MM-DD')]};
@@ -94,7 +91,7 @@ class FastMatching extends Component {
       promise.then((data) => {
         this.getResultDataSource(postAPI, {
           id: location.query.jd_id,
-          uses: data.filter(usesdata),
+          uses: data,
           filterdict: defFilterData,
         });
       });
@@ -109,7 +106,7 @@ class FastMatching extends Component {
       promise.then((data) => {
         this.getResultDataSource(postAPI, {
           id: location.query.cv_id,
-          uses: data.filter(usesdata),
+          uses: data,
           filterdict: defFilterData,
         });
       });
@@ -123,10 +120,10 @@ class FastMatching extends Component {
       });
     }
 
-    if(this.state.searchText){
+    if(this.state.searchText || this.state.matchDoc){
       promise.then((uses) => {
         this.setState({
-          postData: Object.assign({uses}, {filterdict: {}},{doc:this.state.searchText}),
+          postData: Object.assign({uses}, {filterdict: {}},{doc:this.state.searchText || this.state.matchDoc}),
           postAPI: API.LSI_BY_DOC_API,
           siderbarVisible: true
         },() => {
@@ -276,8 +273,9 @@ class FastMatching extends Component {
         this.setState({
           classify: json.classify,
           projects: json.projects
+        },() =>{
+          resolve(json.projects);
         });
-        resolve(json.projects.concat(json.classify));
       }
     });
   }
@@ -322,10 +320,14 @@ class FastMatching extends Component {
       visible,
       spinning,
       current,
+      pages,
       total,
       startColor,
+      bgStartColor,
       endColor,
+      bgEndColor,
       searchText,
+      matchDoc,
       dataSource,
       selection,
       siderbarClosable,
@@ -336,7 +338,7 @@ class FastMatching extends Component {
         <Guide />
         <FilterCard
           textarea={textarea}
-          searchText={searchText}
+          searchText={searchText || matchDoc}
           classify={classify}
           projects={projects}
           industry={industry}
@@ -350,11 +352,15 @@ class FastMatching extends Component {
           visible={visible}
           spinning={spinning}
           current={current}
+          pages={pages}
           total={total}
+          bgStartColor={bgStartColor}
           startColor={startColor}
           endColor={endColor}
+          bgEndColor={bgEndColor}
           jdid={id}
           searchText={searchText}
+          matchDoc={matchDoc}
           dataSource={dataSource}
           selection={selection}
           educationExperienceText="教育经历"

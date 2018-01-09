@@ -15,16 +15,18 @@ class SearchResultBox extends Component {
   constructor() {
     super();
     this.state = {
-      gradient: []
+      gradient: [],
+      bgGradient: []
     };
     this.getResultDOMRender = this.getResultDOMRender.bind(this);
   }
 
   componentDidMount() {
-    const { startColor, endColor } = this.props,
+    const { startColor, endColor, bgStartColor, bgEndColor } = this.props,
           colorGrad = new ColorGrad();
     this.setState({
       gradient: startColor && endColor ? colorGrad.gradient(startColor,endColor) : colorGrad.gradient(),
+      bgGradient: bgStartColor && bgEndColor ? colorGrad.gradient(bgStartColor,bgEndColor) : colorGrad.gradient(),
     });
   }
 
@@ -35,6 +37,7 @@ class SearchResultBox extends Component {
       dataSource,
       selection,
       searchText,
+      matchDoc,
       foldText,
       jdid,
       unfoldText
@@ -64,6 +67,7 @@ class SearchResultBox extends Component {
             key={index}
             jdid={jdid}
             searchText={searchText}
+            matchDoc={matchDoc}
             educationExperienceText={educationExperienceText}
             workExperienceText={workExperienceText}
             foldText={foldText}
@@ -71,6 +75,7 @@ class SearchResultBox extends Component {
             selection={selection}
             onToggleSelection={this.props.onToggleSelection}
             gradient={this.state.gradient}
+            bgGradient={this.state.bgGradient}
           />
         );
       });
@@ -80,10 +85,12 @@ class SearchResultBox extends Component {
   
   render() {
     const {
+      type,
       prefixCls,
       visible,
       spinning,
       current,
+      pages,
       total,
       showPagination
     } = this.props;
@@ -93,16 +100,17 @@ class SearchResultBox extends Component {
       'showed': visible === true,
       'hidden': visible === false,
     });
-
+    const header = type || 'default'
     return (
       <div className={classSet}>
         <Spin spinning={spinning}>
-          <SearchResultHeader />
+          <SearchResultHeader header={(header !== 'default')}/>
           {this.getResultDOMRender()}
         </Spin>
         { showPagination ?
         <SearchResultPagination
           current={current}
+          pages={pages}
           total={total}
           onSwitchPage={this.props.onSwitchPage}
         />

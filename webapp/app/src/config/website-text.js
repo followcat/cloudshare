@@ -29,6 +29,8 @@ const websiteText = {
     EDUCATION_HISTORY: '教育经历',
     SELF_ASSESSMENT: '自我评价',
     CLASSIFY: '行业',
+    RESUME_SIMILAR: '相似简历',
+    RESUME_JOB_RECOMMEND: '职位雷达图',
 
     YES: '是',
     NO: '否',
@@ -52,6 +54,7 @@ const websiteText = {
     FAIL: '失败',
     ACTION_SUCCESS: '操作成功！',
     ACTION_FAIL: '操作失败！',
+    MORE: '更多',
 
     ADMIN_MANAGEMENT: '权限管理',
     MEMBER_MANAGEMENT: '成员管理',

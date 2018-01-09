@@ -97,11 +97,11 @@ class JobDescriptionUploadAPI(Resource):
         mbr_result = member.jd_add(jdobj, committer=user.name)
         if mbr_result is True:
             result = project.jd_add(jdobj, committer=user.name)
-        if result is True:
+        if result['project_result']:
             id = jdobj.metadata['id']
             self.svc_index.add(self.svc_index.config['JD_MEM'], project.id,
                                id, None, jdobj.metadata)
-        if result:
+        if result['project_result']:
             response = { 'code': 200, 'data': {'result': result, 'info': jdobj.metadata},
                          'message': 'Create job description successed.' }
         else:
@@ -111,75 +111,41 @@ class JobDescriptionUploadAPI(Resource):
         return response
 
 
-class JobDescriptionListAPI(Resource):
+class JobDescriptionSearchAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
     
     def __init__(self):
-        super(JobDescriptionListAPI, self).__init__()
+        super(Resource, self).__init__()
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('project', location = 'json')
-        self.reqparse.add_argument('status', type = unicode, location = 'json')
         self.reqparse.add_argument('page_size', type = int, location = 'json')
         self.reqparse.add_argument('current_page', type = int, location = 'json')
+        self.reqparse.add_argument('search_items', type = list, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        status = args['status']
         cur_page = args['current_page']
         page_size = args['page_size']
         projectname = args['project']
+        search_items = args['search_items']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        index = self.svc_index.config['JD_MEM']
-        total, searches = self.svc_index.search(index=index,
-                                            doctype=[project.id],
-                                            filterdict={ 'status': status },
-                                            start=(cur_page-1)*page_size,
-                                            size=page_size, source=True)
-        pages = int(math.ceil(float(total)/page_size))
-        datas = list()
-        for item in searches:
-            jd = item['_source']
-            co_id = jd['company']
-            co_name = project.company_get(co_id)['name']
-            jd['company_name'] = co_name
-            datas.append(jd)
-        return {
-            'code': 200,
-            'data': datas,
-            'pages': pages,
-            'totals': total
-        }
-
-
-class JobDescriptionSearchAPI(JobDescriptionListAPI):
-
-    decorators = [flask.ext.login.login_required]
-
-    def __init__(self):
-        super(JobDescriptionSearchAPI, self).__init__()
-        self.reqparse.add_argument('keyword', location = 'json')
-
-    def post(self):
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        status = args['status']
-        keyword = args['keyword']
-        cur_page = args['current_page']
-        page_size = args['page_size']
-        projectname = args['project']
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
-        index = self.svc_index.config['JD_MEM']
-        total, searches = self.svc_index.search(index=index,
-                                            doctype=[project.id],
-                                            filterdict={ 'status': status, 'name': keyword},
-                                            start=(cur_page-1)*page_size,
-                                            size=page_size, source=True)
+        jd_index = self.svc_index.config['JD_MEM']
+        co_index = self.svc_index.config['CO_MEM']
+        search_ditems = dict(search_items)
+        if 'company' in search_ditems:
+            co_ids = self.svc_index.search(index=co_index, doctype=[project.id],
+                                          filterdict={ 'name': search_ditems['company'] }, onlyid=True)
+            search_ditems['company'] = co_ids
+        total, searches = self.svc_index.search(index=jd_index,
+                                                doctype=[project.id],
+                                                filterdict=search_ditems,
+                                                start=(cur_page-1)*page_size,
+                                                size=page_size, source=True)
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
         for item in searches:

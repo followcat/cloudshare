@@ -4,6 +4,10 @@ import React, { Component, PropTypes } from 'react';
 import TablePlus from 'components/table-plus';
 import Charts from 'components/analyse-charts/Charts';
 
+import websiteText from 'config/website-text';
+
+const language = websiteText.zhCN;
+
 import {
   Modal,
   Button,
@@ -15,17 +19,16 @@ import {
 } from 'antd';
 
 import { getValuableData } from 'request/analyse';
-import { getJobDescriptionList } from 'request/jobdescription';
+import { getJobDescriptionSearch } from 'request/jobdescription';
 
 import { getRadarOption } from 'utils/chart_option';
 
 
 class DrawChart extends Component {
-
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      jdId: '',
+      jdId: null,
       jdDoc: '',
       type: 'id',
       dataSource: [],
@@ -49,15 +52,15 @@ class DrawChart extends Component {
   }
 
   handleClick() {
-    getJobDescriptionList({
+    getJobDescriptionSearch({
       current_page: 1,
       page_size: 9999,
-      status: 'Opening'
+      search_items: [["status", "Opening"]]
     },json => {
       if (json.code === 200) {
         this.setState({
-          visible: true,
-          dataSource: json.data.filter(item => item.status === 'Opening')
+          dataSource: typeof(this.state.jdId) == 'string'? 
+            json.data.filter(item => item.id === this.props.jdId) : json.data
         });
       }
     });
@@ -90,7 +93,6 @@ class DrawChart extends Component {
   handleSubmit() {
     const { type, jdId, jdDoc, anonymized } = this.state,
           { resumeId } = this.props;
-
     if (jdId === '' && jdDoc === '') {
       message.error('请选择一个职位描述.');
       return;
@@ -141,25 +143,67 @@ class DrawChart extends Component {
     });
   }
 
+  componentWillReceiveProps(nextProps) {
+   this.setState({
+     visible: nextProps.visible,
+     jdId: nextProps.jdId
+   },() => {
+    if (this.props.visible)
+      this.handleClick();
+    if (typeof(this.props.jdId) == 'string')
+      this.handleSubmit();
+   });
+  }
+
+  getExpandedRowRender(record) {
+    return (
+      <div>
+        <div>
+          {record.description.split('\n').map((item, index) => { return (<p key={index}>{item}</p>); })}
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const { dataSource, radarOption, spinning, chartVisible } = this.state;
-
     const columns = [
       {
         title: '公司名称',
         dataIndex: 'company_name',
         key: 'company_name',
-        width: 120,
+        width: '20%',
       }, {
         title: '职位',
         dataIndex: 'name',
         key: 'position',
-        width: 360,
+        width: '25%',
       }, {
         title: '创建人',
         dataIndex: 'committer',
         key: 'creator',
+        width: '15%',
+      },{
+      title: language.CURRENT_STATUS,
+      dataIndex: 'status',
+      key: 'status',
+      width: '15%',
+      render: (text) => {
+        return text === 'Opening' ? 
+            <span style={{ color: 'green' }}>{language.OPENING}</span> :
+            <span style={{ color: 'red' }}>{language.CLOSED}</span>;
       }
+    },
+    , {
+      title: language.OPERATION,
+      key: 'operation',
+      width: '15%',
+      render: (record) => (
+        <a onClick={() => {
+          this.setState({jdId:record.id,type: 'id'},() => this.handleSubmit());
+          }}>{language.MATCH_ACTION}</a>
+      )
+    }
     ];
 
     const rowSelection = {
@@ -183,14 +227,7 @@ class DrawChart extends Component {
     };
 
     return (
-      <div style={{ display: 'inline-block', marginLeft: 4 }}>
-        <Button
-          type="ghost"
-          size="small"
-          onClick={this.handleClick}
-        >
-          雷达图
-        </Button>
+      <div style={{  marginLeft: 4 }}>
         <Modal
           title="雷达图"
           visible={this.state.visible}
@@ -212,10 +249,12 @@ class DrawChart extends Component {
                 isToolbarShowed={true}
                 isSearched={true}
                 columns={columns}
+                loading={spinning}
                 dataSource={dataSource}
-                rowSelection={rowSelection}
                 pagination={pagination}
                 size="small"
+                rowKey={record => record.id}
+                expandedRowRender={record => this.getExpandedRowRender(record)}
               />
             </Collapse.Panel>
             <Collapse.Panel
@@ -259,7 +298,7 @@ class DrawChart extends Component {
 }
 
 DrawChart.propTypes = {
-  resumeId: PropTypes.string
+  resumeId: PropTypes.string,
 };
 
 export default DrawChart;

@@ -26,10 +26,18 @@ class ElasticsearchIndexing(object):
                             }
                     }},
                     {
+                        "companyname": {
+                            "path_match":         "experience.company.name",
+                            "mapping": {
+                                "type":           "text",
+                                "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
                         "strings": {
                             "match_mapping_type": "string",
                             "mapping": {
-                                "type":       "keyword"
+                                "type":           "keyword"
                             }
                     }}
                 ]
@@ -58,19 +66,19 @@ class ElasticsearchIndexing(object):
                             }
                     }},
                     {
-                        "clientcontact": {
-                            "match":              "clientcontact",
+                        "conumber": {
+                            "match":              "conumber",
                             "mapping": {
                                 "type":           "text",
-                                "analyzer":       "ik_max_word"
+                                "analyzer":       "ik_smart"
                             }
                     }},
                     {
-                        "reminder": {
-                            "match":              "reminder",
+                        "content": {
+                            "path_match":         "*.content",
                             "mapping": {
                                 "type":           "text",
-                                "analyzer":       "ik_max_word"
+                                "analyzer":       "ik_smart"
                             }
                     }},
                     {
@@ -130,6 +138,13 @@ class ElasticsearchIndexing(object):
                             "mapping": {
                                 "type":           "text",
                                 "analyzer":       "ik_max_word"
+                            }
+                    }},
+                    {
+                        "modifytime": {
+                            "match":              "modifytime",
+                            "mapping": {
+                                "type":           "keyword"
                             }
                     }},
                     {
@@ -252,7 +267,7 @@ class ElasticsearchIndexing(object):
         return result
 
     def count(self, index=None, doctype=None, filterdict=None,
-              ids=None, kwargs=None, slop=50):
+              ids=None, kwargs=None, slop=0):
         result = 0
         querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
                                               filterdict=filterdict, ids=ids, slop=slop)
@@ -263,7 +278,7 @@ class ElasticsearchIndexing(object):
         return result
 
     def search(self, index=None, doctype=None, filterdict=None, ids=None, source=False,
-               start=0, size=None, kwargs=None, onlyid=False, slop=50, scroll=None):
+               start=0, size=None, kwargs=None, onlyid=False, slop=0, scroll=None):
         results = (0, list())
         querydict = utils.esquery.request_gen(self.es, index=index, doctype=doctype,
                                               filterdict=filterdict, ids=ids, slop=slop)

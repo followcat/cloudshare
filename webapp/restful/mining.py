@@ -163,10 +163,13 @@ class LSIbaseAPI(Resource):
 
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
-        self.reqparse = reqparse.RequestParser()
         self.miner = flask.current_app.config['SVC_MIN']
         self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type = int, location = 'json')
+        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
+        self.reqparse.add_argument('size', type=int, default=20, location = 'json')
 
     def process(self, member, project, doc, uses, filterdict, cur_page, size=20):
         if not cur_page:
@@ -183,9 +186,11 @@ class LSIbaseAPI(Resource):
                 iduses.append(use)
                 index.add(self.svc_index.config['CV_STO'])
                 doctype.append(self.svc_index.config['CV_STO'])
-        result = self.miner.probability(project.modelname, doc, uses=iduses,
-                                        top=self.top, minimum=500)
-        ids = [cv[0] for cv in result]
+        totals, searchs = self.svc_index.search(index=list(index), doctype=doctype,
+                                                filterdict=filterdict, size=5000, source=False)
+        ids = [item['_id'] for item in searchs]
+        results = self.miner.probability_by_ids(project.modelname, doc, ids, uses=iduses)
+        """
         sort = {
                 "_script" : {
                       "type" : "number",
@@ -205,22 +210,58 @@ class LSIbaseAPI(Resource):
                                                        '_source_exclude': ['content']},
                                                start=(cur_page-1)*size, size=size,
                                                source=True)
-        pages = int(math.ceil(float(totals)/size))
-        result_dict = dict(result)
+        """
+        pages = int(math.ceil(float(len(searchs))/size))
         datas = list()
-        for item in searchs:
-            yaml_info = item['_source']
-            project.curriculumvitae.secretsyaml(yaml_info['id'], yaml_info)
+        for result in results[(cur_page-1)*size: cur_page*size]:
+            yaml_info = project.cv_getyaml(result[0])
             info = {
                 'author': yaml_info['committer'],
-                'time': datetime.datetime.strptime(yaml_info['date'], 
-                                                   '%Y%m%d').strftime('%Y-%m-%d'),
-                'match': result_dict[yaml_info['id']]
+                'time': utils.builtin.strftime(yaml_info['date']),
+                'match': str(result[1])
             }
             datas.append({ 'cv_id': yaml_info['id'],
                            'yaml_info': yaml_info,
                            'info': info})
         return { 'datas': datas, 'pages': pages, 'totals': totals }
+
+
+class LSIJDbyCVidAPI(LSIbaseAPI):
+
+    def __init__(self):
+        super(LSIJDbyCVidAPI, self).__init__()
+        self.svc_members = flask.current_app.config['SVC_MEMBERS']
+        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('id', type = str, location = 'json')
+        self.reqparse.add_argument('page', type = int, location = 'json')
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        size = args['size']
+        cur_page = args['page']
+        projectname = args['project']
+        filterdict = args['filterdict'] if args['filterdict'] else {}
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
+        doc = project.cv_getmd(id)
+        totals, searchs = self.svc_index.search(index=[self.svc_index.config['JD_MEM']],
+                                                doctype=[project.id], filterdict=filterdict,
+                                                size=5000, source=False)
+        ids = [item['_id'] for item in searchs]
+        results = self.miner.probability_by_ids('jdmatch', doc, ids)
+        pages = int(math.ceil(float(len(searchs))/totals))
+        datas = list()
+        for result in results[(cur_page-1)*size: cur_page*size]:
+            yaml_info = project.jd_get(result[0])
+            co_id = yaml_info['company']
+            co_name = project.company_get(co_id)['name']
+            yaml_info['company_name'] = co_name
+            datas.append({ 'id': yaml_info['id'],
+                           'yaml_info': yaml_info,
+                           'match': result[1] })
+        return { 'code': 200, 'data': datas }
 
 
 class LSIbyJDidAPI(LSIbaseAPI):
@@ -232,24 +273,22 @@ class LSIbyJDidAPI(LSIbaseAPI):
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('appendcomment', type = bool, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
-        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
+        cur_page = args['page']
         projectname = args['project']
+        uses = args['uses'] if args['uses'] else []
+        filterdict = args['filterdict'] if args['filterdict'] else {}
+        append_comment = args['appendcomment'] if args['appendcomment'] else False
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         jd_yaml = project.jd_get(id)
         doc = jd_yaml['description']
-        append_comment = args['appendcomment'] if args['appendcomment'] else False
         if append_comment:
             doc += jd_yaml['commentary']
-        uses = args['uses'] if args['uses'] else []
-        filterdict = args['filterdict'] if args['filterdict'] else {}
-        cur_page = args['page']
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -268,48 +307,12 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
 
-    def fromcache(self, project, filterdict, threshold, numbers, cache=True):
-        date = int(time.strftime('%Y%m%d',time.localtime(time.time())))
-        projectname = project.name
-        if cache is True:
-            if projectname not in self.cache:
-                bestjds = self.findbest(project, threshold)
-                self.cache[projectname] = (date, bestjds)
-            elif self.cache[projectname][0] < date:
-                bestjds = self.findbest(project, threshold)
-                self.cache[projectname] = (date, bestjds)
-            else:
-                bestjds = self.cache[projectname][1]
-        else:
-            bestjds = self.findbest(project, threshold)
+    def findbest(self, project, filterdict, threshold, numbers):
         results = dict()
-        index = self.svc_index.config['CV_MEM']
-        for jdid in bestjds:
-            output = {}
-            output['CV'] = list()
-            bestids = [cv[0] for cv in bestjds[jdid]]
-            searchids = self.svc_index.search(index=index, doctype=[project.id],
-                                              filterdict=filterdict, ids=bestids,
-                                              size=numbers, onlyid=True)
-            for cv in bestjds[jdid]:
-                if cv[0] in searchids:
-                    cvinfo = project.cv_getyaml(cv[0])
-                    cvinfo['CVvalue'] = cv[1]
-                    output['CV'].append(cvinfo)
-            if not output['CV']:
-                continue
-            jd = project.jd_get(jdid)
-            output['id'] = jdid
-            output['name'] = jd['name']
-            output['description'] = jd['description']
-            output['company'] = project.company_get(jd['company'])['name']
-            results[jdid] = output
-        return results
-
-    def findbest(self, project, threshold=None):
-        if threshold is None:
-            threshold = 0.8
-        results = {}
+        index = [self.svc_index.config['CV_MEM'], self.svc_index.config['CV_STO']]
+        doctype = [project.id, 'cvstorage']
+        searchids = self.svc_index.search(index=index, doctype=doctype,
+                                          filterdict=filterdict, onlyid=True)
         for jd_id, jd in project.jobdescription.datas():
             try:
                 if jd['status'] == 'Closed':
@@ -318,25 +321,32 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 continue
             doc = jd['description']
             doc += jd['commentary']
-            result = self.miner.probability(project.modelname, doc,
-                                            top=0.01, minimum=3000)
-            if result:
-                candidates = filter(lambda x: float(x[1])>float(threshold), result)
-                results[jd['id']] = candidates
+            result = self.miner.probability_by_ids(project.modelname, doc, searchids, top=numbers)
+            output = { 'CV': list() }
+            for each in result:
+                if each[1] > threshold:
+                    cvinfo = project.cv_getyaml(each[0])
+                    cvinfo['CVvalue'] = each[1]
+                    output['CV'].append(cvinfo)
+            if output['CV']:
+                output['id'] = jd_id
+                output['name'] = jd['name']
+                output['description'] = jd['description']
+                output['company'] = project.company_get(jd['company'])['name']
+                results[jd_id] = output
         return results
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         threshold = args['threshold']
-        fromcache = args['fromcache']
         projectname = args['project']
         filterdict = args['filterdict']
         numbers = args['numbers']
         results = list()
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
-        alls = self.fromcache(project, filterdict, threshold, numbers, cache=fromcache)
+        alls = self.findbest(project, filterdict, threshold, numbers)
         for jdid in alls:
             results.append({'ID': jdid, 'name': alls[jdid]['name'],
                             'company': alls[jdid]['company'],
@@ -353,20 +363,18 @@ class LSIbyCVidAPI(LSIbaseAPI):
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
-        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
+        cur_page = args['page']
         projectname = args['project']
+        uses = args['uses'] if args['uses'] else []
+        filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         doc = project.cv_getmd(id)
-        uses = args['uses'] if args['uses'] else []
-        filterdict = args['filterdict'] if args['filterdict'] else {}
-        cur_page = args['page']
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -378,19 +386,17 @@ class LSIbydocAPI(LSIbaseAPI):
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('doc', location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
-        self.reqparse.add_argument('page', type = int, location = 'json')
-        self.reqparse.add_argument('filterdict', type=dict, location = 'json')
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         doc = args['doc']
+        cur_page = args['page']
         projectname = args['project']
-        member = user.getmember(self.svc_members)
-        project = member.getproject(projectname)
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
-        cur_page = args['page']
+        member = user.getmember(self.svc_members)
+        project = member.getproject(projectname)
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -398,9 +404,11 @@ class LSIbydocAPI(LSIbaseAPI):
 class SimilarAPI(Resource):
 
     decorators = [flask.ext.login.login_required]
+    HALF_YEAR_SECOENDS = 180*24*3600
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
+        self.svc_index = flask.current_app.config['SVC_INDEX']
         self.svc_members = flask.current_app.config['SVC_MEMBERS']
         self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
@@ -415,17 +423,21 @@ class SimilarAPI(Resource):
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         doc = project.cv_getmd(id)
-        top = 0
         datas = []
-        for name, score in self.miner.probability(project.modelname, doc,
-                                                  top=100):
+        index = [self.svc_index.config['CV_MEM']]
+        doctype = [project.id]
+        totals, searchs = self.svc_index.search(index=index, doctype=doctype,
+            filterdict={'date': [time.strftime('%Y%m%d', time.localtime(time.time()-
+                                                         self.HALF_YEAR_SECOENDS)),
+                                 time.strftime('%Y%m%d', time.localtime(time.time()))]},
+            source=False)
+        ids = [item['_id'] for item in searchs]
+        for name, score in self.miner.probability_by_ids(project.modelname, doc, ids,
+                                                         uses=doctype, top=6):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
-            if float(score) < 0.8 or top==5:
-                break
             yaml_info = project.cv_getyaml(name)
-            datas.append({ 'id': name, 'yaml_info': yaml_info })
-            top += 1
+            datas.append({ 'id': name, 'yaml_info': yaml_info, 'match': score })
         return { 'code': 200, 'data': datas }
 
 

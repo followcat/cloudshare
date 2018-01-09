@@ -8,6 +8,7 @@ import ColorGrad from 'utils/color-grad';
 class HighLight extends Component {
   render() {
     const {
+      html,
       children,
       prefixCls,
       dataSource,
@@ -16,14 +17,15 @@ class HighLight extends Component {
     } = this.props;
     const colorGrad = new ColorGrad()
     const gradient = colorGrad.gradient();
-  let value = children;
+  let value = html || children;
   highlight && Object.keys(highlight).map((item) =>{
     let Color = gradient ? gradient[parseInt(highlight[item]*100)] : {};
     let invalue = '<span class="cs-highlight-item"'+'style="font-weight: bolder;'+
     'padding: 3px 2px 1px;'+
     'border-radius: 5px;'+
     'background-color:'+Color+'">'+item+'</span>',
-          regex = new RegExp("(" + item + ")", "i");
+          items = item.replace(/\+|\-|\\|\/|\*\[|\|/g,"\\$&"),  
+          regex = new RegExp(items, "i");
           value = value.replace(regex,invalue);
   });
     return (
@@ -35,7 +37,7 @@ class HighLight extends Component {
 
 HighLight.defaultProps = {
   prefixCls: 'cs-highlight',
-  dataSource: [],
+  highlight: [],
   position: 'center'
 };
 

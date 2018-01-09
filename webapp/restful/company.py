@@ -35,18 +35,17 @@ class CompanyAPI(Resource):
         result = False
         args = self.reqparse.parse_args()
         coname = args['name']
-        projectname = args['project']
         if args['introduction'] is None:
             args['introduction'] = str()
         user = flask.ext.login.current_user
         member = user.getmember()
-        project = member.getproject(projectname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         metadata = extractor.information_explorer.catch_biddinginfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.bd_add(coobj, committer=user.name)
         if result:
-            project.bd_indexadd(project.es_config['CO_MEM'], project.id, coobj.metadata['id'],
-                               None, coobj.metadata)
+            member.bd_indexadd(member.es_config['CO_MEM'], coobj.metadata['id'],
+                               None, coobj.metadata, **project)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -79,15 +78,15 @@ class CompanyAllAPI(Resource):
         page_size = args['page_size']
         projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        index = project.es_config['CO_MEM']
-        total, searches = project.bd_search(index=index,
-                                            doctype=[project.id],
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        index = member.es_config['CO_MEM']
+        total, searches = member.bd_search(index=index,
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
-                                            size=page_size)
+                                            size=page_size, **project)
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
+        project = member.getproject(projectname)
         for item in searches:
             info = project.bd_getyaml(item['_id'])
             if info:
@@ -116,13 +115,13 @@ class AddedCompanyListAPI(Resource):
         text = args['text']
         projectname = args['project']
         member = user.getmember()
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        index = member.es_config['CO_MEM']
+        company_ids = member.bd_search(index=index, filterdict={'name': text},
+                                            size=5, onlyid=True, **project)
+        data = []
         project = member.getproject(projectname)
         customer_ids = project.bd_customers()
-        index = project.es_config['CO_MEM']
-        company_ids = project.bd_search(index=index, filterdict={'name': text},
-                                            doctype=[project.id],
-                                            size=5, onlyid=True)
-        data = []
         for company_id in company_ids:
             if company_id in customer_ids:
                 continue
@@ -244,8 +243,9 @@ class CompanyInfoUpdateAPI(Resource):
         result = project.bd_update_info(id, origin_info, user.name)
         if result:
             co_info = project.bd_getyaml(id)
-            project.bd_indexadd(project.es_config['CO_MEM'], project.id,
-                               id, None, co_info)
+            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+            member.bd_indexadd(member.es_config['CO_MEM'], 
+                               id, None, co_info, **project)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
@@ -271,15 +271,15 @@ class SearchCObyKeyAPI(Resource):
         search_items = args['search_items']
         projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        index = project.es_config['CO_MEM']
-        total, searches = project.bd_search(index=index, filterdict=dict(search_items),
-                                            doctype=[project.id],
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        index = member.es_config['CO_MEM']
+        total, searches = member.bd_search(index=index, filterdict=dict(search_items),
                                             kwargs={'sort': {"modifytime": "desc"}},
                                             start=(cur_page-1)*page_size,
-                                            size=page_size)
+                                            size=page_size, **project)
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
+        project = member.getproject(projectname)
         for item in searches:
             info = project.bd_getyaml(item['_id'])
             if info:
@@ -358,8 +358,9 @@ class CompanyConfirmExcelAPI(Resource):
             results[result_key][coid] = prj_results[coid]
             if prj_results[coid]['success'] is True:
                 co_info = project.bd_get(coid)
-                project.bd_indexadd(project.es_config['CO_MEM'], project.id,
-                                   coid, None, co_info)
+                project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+                member.bd_indexadd(member.es_config['CO_MEM'],
+                                   coid, None, co_info, **project)
         return {
             'code': 200,
             'data': results,

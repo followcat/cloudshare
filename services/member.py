@@ -1,5 +1,6 @@
 import os
 import glob
+import functools
 
 import core.basedata
 import utils.builtin
@@ -201,12 +202,16 @@ class DefaultMember(CommonMember):
                         operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
+        self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
+                services.operator.multiple.Multiple(self.jd_repos)))
         self.idx_setup()
 
     def idx_setup(self):
+        self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
         self.curriculumvitae.services[0].setup(self.search_engine, self.es_config['CV_MEM'])
 
     def idx_updatesvc(self):
+        self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
         self.curriculumvitae.services[0].updatesvc(self.es_config['CV_MEM'], self.id, numbers=1000)
 
     def use(self, id):
@@ -314,6 +319,34 @@ class Member(DefaultMember):
         if not os.path.exists(self.projects_path):
             os.makedirs(self.projects_path)
         self.setup()
+
+    def __getattr__(self, attr):
+        for key in ['bd', 'jd']:
+            if attr.startswith(key+'_'):
+                return functools.partial(self.call_project, attr=attr)
+        return super(Combine, self).__getattr__(attr)
+
+    def call_project(self, *args, **kwargs):
+        attr = kwargs.pop('attr')
+        try:
+            project_name = kwargs.pop('project')
+        except KeyError:
+            raise KeyError('Missing project')
+        try:
+            project = self.projects[project_name]
+        except KeyError:
+            raise ValueError('Invalid project name: %s' %(project_name))
+        if attr.endswith('_search'):
+            try:
+                kwargs['doctype'] = [project.id]
+            except TypeError, AttributeError:
+                raise ValueError('Invalid project name: %s' %(project_name))
+        elif attr.endswith('_indexadd'):
+            try:
+                kwargs['doctype'] = project.id
+            except TypeError, AttributeError:
+                raise ValueError('Invalid project name: %s' %(project_name))
+        return getattr(project, attr)(*args, **kwargs)
 
     def setup(self, config=None, committer=None):
         self.load_projects()

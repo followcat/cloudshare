@@ -227,15 +227,16 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         projectname = args['project']
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember()
-        project = member.getproject(projectname)
-        doc = project.cv_getmd(id)
-        totals, searchs = project.jd_search(index=[member.es_config['JD_MEM']],
-                                                doctype=[project.id], filterdict=filterdict,
-                                                size=5000, source=False)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        doc = member.cv_getmd(id)
+        totals, searchs = member.jd_search(index=[member.es_config['JD_MEM']],
+                                                filterdict=filterdict,
+                                                size=5000, source=False, **project)
         ids = [item['_id'] for item in searchs]
         results = self.miner.probability_by_ids('jdmatch', doc, ids)
         pages = int(math.ceil(float(len(searchs))/totals))
         datas = list()
+        project = member.getproject(projectname)
         for result in results[(cur_page-1)*size: cur_page*size]:
             yaml_info = project.jd_get(result[0])
             co_id = yaml_info['company']

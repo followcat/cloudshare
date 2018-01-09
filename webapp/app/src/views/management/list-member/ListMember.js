@@ -87,6 +87,7 @@ class ListMember extends Component {
       userid: record.id,
     }, (json) => {
       if  (json.result === true) {
+      this.getListMemberData();
       message.success(language.ELEVATE_SUCCESS);
       } else {
         message.error(language.ELEVATE_FAIL);
@@ -99,6 +100,7 @@ class ListMember extends Component {
       userid: record.id,
     }, (json) => {
       if  (json.result === true) {
+      this.getListMemberData();
       message.success(language.REVOKE_SUCCESS);
       } else {
         message.error(language.REVOKE_FAIL);

@@ -12,7 +12,7 @@ flask_session/
 *.bak
 celerybeat-schedule
 config/
-webapp/config/
+webapp/config/additional.py
 tags/
 webapp/app/dist
 webapp/static/node_modules/

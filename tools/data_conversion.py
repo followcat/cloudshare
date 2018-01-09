@@ -241,6 +241,44 @@ def convert_member(current_template, next_template, version):
                                     list_all_files.update(list(json.loads(out.read())))
                                 with open(os.path.join(next_template['MEMBERS'], member, subdir, 'names.json'), 'w') as out:
                                     json.dump(list(list_all_files), out)
+    elif version == '1.8':
+        try:
+            os.makedirs(os.path.join(next_template['MEMBERS'], 'config'))
+        except OSError:
+            pass
+        member_list = []
+        for member in [os.path.basename(_) for _ in path.Path(os.path.join(current_template['MEMBERS'])).dirs()
+                    if not _.endswith('config')]:
+            config_file = os.path.join(current_template['MEMBERS'], member, 'config.yaml')
+            with open(config_file) as f:
+                info = yaml.load(f.read())
+                info['id'] = utils.builtin.hash(member)
+                info['name'] = member
+                with open(os.path.join(next_template['MEMBERS'], 'config', info['id']+'.yaml'), 'w') as out:
+                    out.write(yaml.dump(info, Dumper=utils._yaml.SafeDumper, default_flow_style=False))
+            member_list.append(info['id'])
+
+            try:
+                os.makedirs(os.path.join(next_template['MEMBERS'], member, 'projects', 'config'))
+            except OSError:
+                pass
+            project_list = []
+            for project in [os.path.basename(_) for _ in path.Path(os.path.join(next_template['MEMBERS'], member, 'projects')).dirs()
+                        if not _.endswith('config')]:
+                config_file = os.path.join(current_template['MEMBERS'], member, 'projects', project, 'config.yaml')
+                with open(config_file) as f:
+                    info = yaml.load(f.read())
+                    if info['id'] == 'config.yaml':
+                        info['id'] = utils.builtin.genuuid()
+                    info['name'] = project
+                    with open(os.path.join(next_template['MEMBERS'], member, 'projects', 'config', info['id']+'.yaml'), 'w') as out:
+                        out.write(yaml.dump(info, Dumper=utils._yaml.SafeDumper, default_flow_style=False))
+                project_list.append(info['id'])
+            with open(os.path.join(next_template['MEMBERS'], member, 'projects', 'names.json'), 'w') as out:
+                json.dump(list(project_list), out)
+
+        with open(os.path.join(next_template['MEMBERS'], 'names.json'), 'w') as out:
+            json.dump(list(member_list), out)
 
 def convert_password(current_template, next_template, version):
     if version == '1.1':
@@ -307,6 +345,9 @@ conversion_rules = {
         }),
     ('1.6', '1.7'): collections.OrderedDict({
         'REPO': functools.partial(convert_repo, version='1.7'),
+        }),
+    ('1.7', '1.8'): collections.OrderedDict({
+        'MEMBERS': functools.partial(convert_member, version='1.8'),
         }),
     }
 

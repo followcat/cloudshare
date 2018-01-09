@@ -229,6 +229,7 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('key', type=str, location='json')
         self.reqparse.add_argument('date', type=str, location='json')
         self.reqparse.add_argument('project', type=str, location='json')
+        self.reqparse.add_argument('author', type=unicode, location='json')
         self.reqparse.add_argument('content', type=unicode, location='json')
 
     def _update(self, id, info, project, committer):
@@ -248,12 +249,13 @@ class CompanyInfoUpdateAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         key = args['key']
+        author = args['author']
         content = args['content']
         projectname = args['project']
         member = user.getmember(self.svc_members)
         project = member.getproject(projectname)
         origin_info = project.company_get(id)
-        data = project.company._listframe(content, user.name)
+        data = project.company._listframe(content, author)
         origin_info[key].insert(0, data)
         response = self._update(id, origin_info, project, user.name)
         return response

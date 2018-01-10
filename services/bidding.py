@@ -1,11 +1,11 @@
 import core.basedata
 import utils.companyexcel
 import services.operator.search
-import services.base.kv_storage
+import services.base.frame_storage
 import extractor.information_explorer
 
 
-class Bidding(services.base.kv_storage.KeyValueStorage):
+class Bidding(services.base.frame_storage.ListFrameStorage):
     """
         >>> import shutil
         >>> import services.company

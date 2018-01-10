@@ -45,7 +45,7 @@ class CompanyAPI(Resource):
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.bd_add(coobj, committer=user.name)
         if result:
-            info = project.company_get(coobj.metadata['id'])
+            info = project.bd_getyaml(coobj.metadata['id'])
             project.bd_indexadd(project.es_config['CO_MEM'], project.id, coobj.metadata['id'],
                                None, info)
         if result:
@@ -228,7 +228,6 @@ class CompanyInfoUpdateAPI(Resource):
         return response
 
     def post(self):
-        raise NotImplementedError('Cannot use bidding _listframe')
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']

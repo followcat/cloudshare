@@ -393,8 +393,6 @@ def init_people(SVC_CV, SVC_PEO):
 def init_esindex_mem(SVC_MEMBERS):
     for memname, mem in SVC_MEMBERS.members.items():
         mem.idx_updatesvc()
-        for prjname, prj in mem.projects.items():
-            prj.idx_updatesvc()
 
 
 def init_esindex_cvsto(SVC_MEMBERS):

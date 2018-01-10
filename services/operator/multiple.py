@@ -7,7 +7,7 @@ class Multiple(services.base.service.Service):
     """"""
     combine_all = ('names', 'yamls')
     match_any = ('exists', 'unique', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys',
-                 'add', 'modify', 'remove', 'updateinfo',
+                 'add', 'modify', 'remove', 'updateinfo', 'kick',
                  'search', 'setup', 'indexadd', 'updatesvc', 'upgradesvc',
                 )
 

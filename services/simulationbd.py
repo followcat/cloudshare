@@ -1,5 +1,5 @@
 import utils.companyexcel
-import services.base.kv_storage
+import services.base.frame_storage
 import services.base.name_storage
 import extractor.information_explorer
 
@@ -8,7 +8,7 @@ class SelectionBD(services.base.name_storage.NameStorage):
     """"""
 
 
-class SimulationBD(services.base.kv_storage.KeyValueStorage):
+class SimulationBD(services.base.frame_storage.ListFrameStorage):
 
     YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
@@ -28,25 +28,6 @@ class SimulationBD(services.base.kv_storage.KeyValueStorage):
         info = super(SimulationBD, self)._templateinfo(committer)
         info['responsible'] = committer
         return info
-
-    def update_info(self, id, info, committer):
-        bas_res = False
-        prj_res = False
-        baseinfo = dict()
-        projectinfo = dict()
-        for item in info:
-            if item in dict(self.YAML_TEMPLATE):
-                projectinfo[item] = info[item]
-            else:
-                baseinfo[item] = info[item]
-        prj_res = self.saveinfo(id, projectinfo,
-                                "Update %s information."%id, committer)
-        for storage in self.storages:
-            if storage.exists(id):
-                bas_res = storage.saveinfo(id, baseinfo,
-                                           "Update %s information."%id, committer)
-                break
-        return prj_res or bas_res
 
     def compare_excel(self, stream, committer):
         output = list()

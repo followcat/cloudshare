@@ -218,12 +218,17 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('date', type=str, location='json')
         self.reqparse.add_argument('project', type=str, location='json')
         self.reqparse.add_argument('author', type=unicode, location='json')
-        self.reqparse.add_argument('content', type=unicode, location='json')
+        self.reqparse.add_argument('content', type=dict, location='json')
 
-    def _update(self, id, info, project, committer, **args):
-        result = project.bd_update_info(id, info, committer)
+    def _update(self, bsobj, **args):
+        user = flask.ext.login.current_user
+        member = user.getmember()
+        projectname = args['project']
+        prj_service = member.getproject(projectname)
+        result = prj_service.bd_modify(bsobj, committer=user.name)
         if result:
-            co_info = project.bd_getyaml(id)
+            id = bsobj.ID
+            co_info = prj_service.bd_getyaml(id)
             project = dict(filter(lambda x: x[0] in ('project',), args.items()))
             member.bd_indexadd(id=id, data=None, info=co_info, **project)
         if result:
@@ -237,18 +242,15 @@ class CompanyInfoUpdateAPI(Resource):
         args = self.reqparse.parse_args()
         id = args['id']
         key = args['key']
-        author = args['author']
         content = args['content']
-        projectname = args['project']
-        member = user.getmember()
-        project = member.getproject(projectname)
-        origin_info = project.bd_getyaml(id)
-        data = project.bidding._listframe(content, author)
-        origin_info[key].insert(0, data)
-        response = self._update(id, origin_info, project, user.name, **args)
+        info = {'id': id}
+        info[key] = {'content': content['text'], 'date': content['date'], 'author': user.name}
+        bsobj = core.basedata.DataObject(info, data='')
+        response = self._update(bsobj, **args)
         return response
 
     def delete(self):
+        raise NotImplementedError('Delete list item in company details')
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
@@ -257,11 +259,12 @@ class CompanyInfoUpdateAPI(Resource):
         content = args['content']
         projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        origin_info = project.bd_getyaml(id)
-        data = project.bidding._listframe(content, user.name, date=date)
+        prj_service = member.getproject(projectname)
+        origin_info = prj_service.bd_getyaml(id)
+        data = prj_service.bidding._listframe(content, user.name, date=date)
         origin_info[key].remove(data)
-        response = self._update(id, origin_info, project, user.name, **args)
+        bsobj = core.basedata.DataObject(origin_info, data='')
+        response = self._update(bsobj, **args)
         return response
 
     def put(self):
@@ -270,12 +273,9 @@ class CompanyInfoUpdateAPI(Resource):
         id = args['id']
         key = args['key']
         content = args['content']
-        projectname = args['project']
-        member = user.getmember()
-        project = member.getproject(projectname)
-        origin_info = project.bd_getyaml(id)
-        origin_info[key] = content
-        response = self._update(id, origin_info, project, user.name, **args)
+        info = {'id': id, key: content}
+        bsobj = core.basedata.DataObject(info, data='')
+        response = self._update(bsobj, **args)
         return response
 
 

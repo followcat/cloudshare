@@ -132,7 +132,49 @@ export const getAllCompanyBySearch = (params, callback) => {
  */
 export const updateCompanyInfo = (params, callback) => {
   return fetch(API.UPDATE_COMPANY_INFO_API, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+/**
+ * 更新公司信息List
+ * @param  {object}   params   需要更新的字段参数
+ * @param  {function} callback 回调函数
+ * @return {function} fetch    异步请求方法
+ */
+export const updateCompanyInfoList = (params, callback) => {
+  return fetch(API.UPDATE_COMPANY_INFO_API, {
     method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: Generator.getPostData(params)
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+/**
+ * 更新公司信息List
+ * @param  {object}   params   需要更新的字段参数
+ * @param  {function} callback 回调函数
+ * @return {function} fetch    异步请求方法
+ */
+export const deleteCompanyInfoList = (params, callback) => {
+  return fetch(API.UPDATE_COMPANY_INFO_API, {
+    method: 'DELETE',
     credentials: 'include',
     headers: {
       'Authorization': `Basic ${StorageUtil.get('token')}`,

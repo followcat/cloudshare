@@ -2,6 +2,8 @@ import os
 import glob
 
 import services.member
+import services.base.kv_storage
+import services.base.name_storage
 import services.operator.search
 import services.operator.multiple
 
@@ -24,41 +26,49 @@ class Members(object):
         self.members = dict()
         self.cv_storage = services.curriculumvitae.SearchIndex(
                             services.operator.multiple.Multiple(self.cv_repos[1:]))
-        for member_path in glob.glob(os.path.join(self.path, '*')):
+        self.active_members = services.base.name_storage.NameStorage(self.path, 'memlist')
+        self.member_details = services.member.SimulationMember(os.path.join(self.path, 'config'), 'memconfig')
+        for member_id in self.active_members.ids:
+            member_info = self.member_details.getyaml(member_id)
+            if member_info['name'] == 'default':
+                self.load_default_member(member_id)
+                self._defaultmember = self.members[self.default_member_name]
+                continue
+            member_path = os.path.join(self.path, member_info['name'])
             if os.path.isdir(member_path):
-                str_name = os.path.split(member_path)[1]
-                name = unicode(str_name, 'utf-8')
-                config = services.member.SimulationMember(member_path, name)
-                config.setup({'storageCV':  'cloudshare',
-                              'storagePEO': 'peostorage',
-                              'limitPEO':   'peolimit',
-                              'storageCO':  'corepo',
-                              'storageJD':  'jdrepo'})
-                member = services.member.Member(config,
+                name = unicode(member_info['name'], 'utf-8')
+                member = services.member.Member(self.member_details,
                                                 bidding={'bd': bd_repos}, company={'co': co_repos},
                                                 curriculumvitae={'cv': cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},
                                                 search_engine={'idx': search_engine, 'config': es_config},
                                                 jobdescription={'jd': jd_repos}, people={'peo': mult_peo})
+                member.setup({'id':         member_id,
+                              'name':       name,
+                              'storageCV':  'cloudshare',
+                              'storagePEO': 'peostorage',
+                              'limitPEO':   'peolimit',
+                              'storageCO':  'corepo',
+                              'storageJD':  'jdrepo'})
                 self.members[name] = member
-        self.load_default_member()
-        self._defaultmember = self.members[self.default_member_name]
         self.idx_setup()
 
-    def load_default_member(self):
+    def load_default_member(self, member_id):
+        member_info = self.member_details.getyaml(member_id)
         path = os.path.join(self.path, self.default_member_name)
-        config = services.member.SimulationMember(path, self.default_member_name)
-        config.setup({'storageCV':  'cvindividual',
-                      'storagePEO': 'peoindividual',
-                      'limitPEO':   'peolimit',
-                      'storageCO':  'corepo',
-                      'storageJD':  'jdrepo'})
-        member = services.member.DefaultMember(config,
+        member = services.member.DefaultMember(self.member_details,
                                                 company={'co': self.co_repos},
                                                 curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config},
                                                 jobdescription={'jd': self.jd_repos}, people={'peo': self.mult_peo})
+        member.setup({'name':       self.default_member_name,
+                      'id':         member_id,
+                      'storageCV':  'cvindividual',
+                      'storagePEO': 'peoindividual',
+                      'limitPEO':   'peolimit',
+                      'storageCO':  'corepo',
+                      'storageJD':  'jdrepo'})
         self.members[self.default_member_name] = member
 
     def exists(self, name):
@@ -67,18 +77,19 @@ class Members(object):
     def create(self, name):
         assert not self.exists(name)
         path = os.path.join(self.path, name)
-        config = services.member.SimulationMember(path, name)
-        config.setup({'storageCV':  'cloudshare',
-                      'storagePEO': 'peostorage',
-                      'limitPEO':   'peolimit',
-                      'storageCO':  'corepo',
-                      'storageJD':  'jdrepo'})
-        member = services.member.Member(config,
+        member = services.member.Member(self.member_details,
                                                 bidding={'bd': self.bd_repos}, company={'co': self.co_repos},
                                                 curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config},
                                                 jobdescription={'jd': self.jd_repos}, people={'peo': self.mult_peo})
+        member.setup({'name':       name,
+                      'storageCV':  'cloudshare',
+                      'storagePEO': 'peostorage',
+                      'limitPEO':   'peolimit',
+                      'storageCO':  'corepo',
+                      'storageJD':  'jdrepo'})
+        self.active_members.add(core.basedata.DataObject(metadata=member.config, data=''))
         self.members[name] = member
 
     def idx_setup(self):

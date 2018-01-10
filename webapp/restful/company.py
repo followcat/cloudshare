@@ -45,10 +45,10 @@ class CompanyAPI(Resource):
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
         result = project.bd_add(coobj, committer=user.name)
         if result:
-            info = project.company_get(coobj.metadata['id'])
+            info = project.bd_getyaml(coobj.metadata['id'])
             project = dict(filter(lambda x: x[0] in ('project',), args.items()))
             member.bd_indexadd(id=coobj.metadata['id'],
-                               data=None, info=coobj.metadata, **project)
+                               data=None, info=info, **project)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -213,34 +213,15 @@ class CompanyInfoUpdateAPI(Resource):
     def __init__(self):
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('id', location = 'json')
-        self.reqparse.add_argument('update_info', type= list, location = 'json')
-        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('id', type=str, location='json')
+        self.reqparse.add_argument('key', type=str, location='json')
+        self.reqparse.add_argument('date', type=str, location='json')
+        self.reqparse.add_argument('project', type=str, location='json')
+        self.reqparse.add_argument('author', type=unicode, location='json')
+        self.reqparse.add_argument('content', type=unicode, location='json')
 
-    def post(self):
-        raise NotImplementedError('Cannot use bidding _listframe')
-        user = flask.ext.login.current_user
-        args = self.reqparse.parse_args()
-        id = args['id']
-        projectname = args['project']
-        update_info = args['update_info']
-        member = user.getmember()
-        project = member.getproject(projectname)
-        origin_info = project.bd_getyaml(id)
-        for each in update_info:
-            key = each['key']
-            vtype = each['type']
-            value = each['value']
-            content = value['content']
-            if vtype == 'PUT':
-                origin_info[key] = content
-            elif vtype == 'CREATE':
-                data = project.bidding._listframe(content, user.name)
-                origin_info[key].insert(0, data)
-            elif vtype == 'DELETE':
-                data = project.bidding._listframe(content, value['author'], value['date'])
-                origin_info[key].remove(data)
-        result = project.bd_update_info(id, origin_info, user.name)
+    def _update(self, id, info, project, committer, **args):
+        result = project.bd_update_info(id, info, committer)
         if result:
             co_info = project.bd_getyaml(id)
             project = dict(filter(lambda x: x[0] in ('project',), args.items()))
@@ -249,6 +230,52 @@ class CompanyInfoUpdateAPI(Resource):
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
             response = { 'code': 400, 'message': 'Update information error.' }
+        return response
+
+    def post(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        key = args['key']
+        author = args['author']
+        content = args['content']
+        projectname = args['project']
+        member = user.getmember()
+        project = member.getproject(projectname)
+        origin_info = project.bd_getyaml(id)
+        data = project.bidding._listframe(content, author)
+        origin_info[key].insert(0, data)
+        response = self._update(id, origin_info, project, user.name, **args)
+        return response
+
+    def delete(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        key = args['key']
+        date = args['date']
+        content = args['content']
+        projectname = args['project']
+        member = user.getmember()
+        project = member.getproject(projectname)
+        origin_info = project.bd_getyaml(id)
+        data = project.bidding._listframe(content, user.name, date=date)
+        origin_info[key].remove(data)
+        response = self._update(id, origin_info, project, user.name, **args)
+        return response
+
+    def put(self):
+        user = flask.ext.login.current_user
+        args = self.reqparse.parse_args()
+        id = args['id']
+        key = args['key']
+        content = args['content']
+        projectname = args['project']
+        member = user.getmember()
+        project = member.getproject(projectname)
+        origin_info = project.bd_getyaml(id)
+        origin_info[key] = content
+        response = self._update(id, origin_info, project, user.name, **args)
         return response
 
 

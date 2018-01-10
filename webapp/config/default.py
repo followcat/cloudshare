@@ -1,4 +1,3 @@
-DEBUG = True
 CACHE_TYPE = "simple"
 SECRET_KEY = "super secret key" # Need to be modified in the publishing environment
 SESSION_TYPE = "filesystem"
@@ -8,6 +7,7 @@ ACCESS = {
 }
 
 APP_CONFIG = {
+    "debug": True,
     "host": "localhost",
     "port": 4888,
     "threaded": True,

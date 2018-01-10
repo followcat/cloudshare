@@ -23,6 +23,7 @@ class Config(object):
         }
     default_storage_path['1.6'] = default_storage_path['1.5']
     default_storage_path['1.7'] = default_storage_path['1.6']
+    default_storage_path['1.8'] = default_storage_path['1.7']
 
     storage_template = {'1.1': (
         ("RAW",             "raw"),
@@ -99,6 +100,7 @@ class Config(object):
     ),
     }
     storage_template['1.6'] = storage_template['1.5']
+    storage_template['1.8'] = storage_template['1.7']
 
     es_template = (
         ("CV_STO",          "cvstorage"),    # SVC_CV_STO
@@ -180,7 +182,7 @@ class Config(object):
  
 
 CONFIG_PATH = 'config'
-config = Config(CONFIG_PATH, version='1.7')
+config = Config(CONFIG_PATH, version='1.8')
 
 def load_mult_classify(svc_storages):
     global config

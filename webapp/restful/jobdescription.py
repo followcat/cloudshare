@@ -133,7 +133,7 @@ class JobDescriptionSearchAPI(Resource):
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         search_ditems = dict(search_items)
         if 'company' in search_ditems:
-            co_ids = project.bd_search(filterdict={ 'name': search_ditems['company'] },
+            co_ids = member.bd_search(filterdict={ 'name': search_ditems['company'] },
                                           onlyid=True, **project)
             search_ditems['company'] = co_ids
         total, searches = member.jd_search(filterdict=search_ditems,

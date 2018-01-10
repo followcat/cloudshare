@@ -395,6 +395,11 @@ class Member(DefaultMember):
                     tmp_project._modelname = self.default_model
                 self.projects[name] = tmp_project
 
+    def idx_updatesvc(self):
+        self.curriculumvitae.services[0].updatesvc(self.es_config['CV_MEM'], self.id, numbers=1000)
+        for prjname, prj in self.projects.items():
+            prj.idx_updatesvc()
+
     def exists_project(self, name):
         return name in self.projects
 

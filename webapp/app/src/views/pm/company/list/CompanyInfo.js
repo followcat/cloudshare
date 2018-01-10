@@ -15,7 +15,7 @@ import {
   message
 } from 'antd';
 
-import { updateCompanyInfo } from 'request/company';
+import { updateCompanyInfo, updateCompanyInfoList, deleteCompanyInfoList } from 'request/company';
 
 import chunk from 'lodash/chunk';
 import websiteText from 'config/website-text';
@@ -77,50 +77,76 @@ class CompanyInfo extends Component {
           { formValues, deleteList } = this.state;
     const listItemKeys = ['position', 'updatednumber', 'relatedcompany', 'clientcontact', 'reminder', 'progress'];
 
-    let args = [];
+    let args = [],argslist = [],argslistdelete = [];
 
     for (let key in formValues) {
-      let obj = {};
+      let obj = {}, lbj = {};
       if (listItemKeys.indexOf(key) > -1) {
-        obj = {
+        lbj = {
           key: key,
-          type: 'CREATE',
-          value: formValues[key]
         };
+        lbj = Object.assign(lbj,formValues[key]);
+        argslist.push(lbj);
       } else {
         obj = {
           key: key,
-          type: 'PUT',
-          value: formValues[key]
         };
+        obj = Object.assign(obj,formValues[key]);
+        args.push(obj);
       }
-      args.push(obj);
     }
-
     for (let i = 0; i < deleteList.length; i++) {
-      args.push({
-        key: deleteList[i].dataIndex,
-        type: 'DELETE',
-        value: deleteList[i].value
-      });
+      let dlj = Object.assign({key: deleteList[i].dataIndex},deleteList[i].value);
+      argslistdelete.push(dlj);
     }
-
-    updateCompanyInfo({
-      id: dataSource.id,
-      update_info: args
-    }, (json) => {
-      if (json.code === 200) {
-        message.success('更新成功!');
-        this.setState({
-          formValues: [],
-          deleteList: [],
-          editStatus: false
-        });
-        this.props.updateDataSource();
-      } else {
-        message.error('更新失败!');
-      }
-    });
+    args.map( item => {
+      let pram = Object.assign({id: dataSource.id},item)
+      updateCompanyInfo(pram, (json) => {
+        if (json.code === 200) {
+          message.success('更新成功!');
+          this.setState({
+            formValues: [],
+            deleteList: [],
+            editStatus: false
+          });
+          this.props.updateDataSource();
+        } else {
+          message.error('更新失败!');
+        }
+      });
+    })
+    argslist.map( item => {
+      let pram = Object.assign({id: dataSource.id},item)
+      updateCompanyInfoList(pram, (json) => {
+        if (json.code === 200) {
+          message.success('更新成功!');
+          this.setState({
+            formValues: [],
+            deleteList: [],
+            editStatus: false
+          });
+          this.props.updateDataSource();
+        } else {
+          message.error('更新失败!');
+        }
+      });
+    })
+    argslistdelete.map( item => {
+      let pram = Object.assign({id: dataSource.id},item)
+      deleteCompanyInfoList(pram, (json) => {
+        if (json.code === 200) {
+          message.success('更新成功!');
+          this.setState({
+            formValues: [],
+            deleteList: [],
+            editStatus: false
+          });
+          this.props.updateDataSource();
+        } else {
+          message.error('更新失败!');
+        }
+      });
+    })
   }
 
   handleCancelClick() {

@@ -11,6 +11,8 @@ class SimulationCV(services.base.kv_storage.KeyValueStorage):
 
     YAML_DIR = 'YAML'
     YAML_TEMPLATE = (
+        ("name",                str),
+        ("origin",              str),
         ("committer",           str),
     )
 

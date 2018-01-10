@@ -108,7 +108,6 @@ class Customer extends Component {
 
   handleOkClick() {
     const { id } = this.state;
-
     updateCustomer('POST', {
       id: id
     }, (json) => {
@@ -128,30 +127,19 @@ class Customer extends Component {
     });
   }
 
-  handleChange(value) {
+  handleChange = (value) => {
     const { companyDataSource } = this.state;
-
     this.setState({ 
       value: value,
       fetching: true
     });
-
-    let object = find(companyDataSource, (item) => item.company_name === value);
-    if (object) {
-      this.setState({
-        id: object.id
-      });
+    if(value.length > 0){
+      this.getCompanyDataSource();
     } else {
       this.setState({
+        companyDataSource: [],
         id: ''
       });
-    }
-    if(value){
-      this.getCompanyDataSource(value);
-    } else {
-      this.setState({
-            companyDataSource: []
-          });
     }
   }
 
@@ -189,19 +177,23 @@ class Customer extends Component {
     });
   }
 
-  getCompanyDataSource(text) {
+  getCompanyDataSource() {
     if (timer) {
       clearTimeout(timer);
       timer = null;
     }
     timer = setTimeout(() => {
       getAddedCompanyList({
-        text: text
+        text: this.state.value
       }, json => {
         if (json.code === 200) {
           this.setState({
             companyDataSource: json.data,
             fetching: false
+          });
+          let object = find(json.data,(item) => item.company_name === this.state.value);
+          object && this.setState({
+              id: object.id
           });
         }
       });

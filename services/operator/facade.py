@@ -42,6 +42,17 @@ class Application(Facade):
             res = self.data_service.add(*args, **kwargs)
         return res
 
+    def kick(self, *args, **kwargs):
+        try:
+            op_res = self.operator_service.kick(*args, **kwargs)
+        except AttributeError:
+            op_res = False
+        try:
+            data_res = self.data_service.kick(*args, **kwargs)
+        except AttributeError:
+            data_res = False
+        return op_res or data_res
+
     def modify(self, *args, **kwargs):
         res = self.operator_service.modify(*args, **kwargs)
         if res:

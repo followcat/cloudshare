@@ -218,7 +218,8 @@ class CompanyInfoUpdateAPI(Resource):
         self.reqparse.add_argument('date', type=str, location='json')
         self.reqparse.add_argument('project', type=str, location='json')
         self.reqparse.add_argument('author', type=unicode, location='json')
-        self.reqparse.add_argument('content', type=dict, location='json')
+        #self.reqparse.add_argument('content', type=str, location='json')
+        self.reqparse.add_argument('content', location='json')
 
     def _update(self, bsobj, **args):
         user = flask.ext.login.current_user
@@ -250,21 +251,29 @@ class CompanyInfoUpdateAPI(Resource):
         return response
 
     def delete(self):
-        raise NotImplementedError('Delete list item in company details')
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
         key = args['key']
         date = args['date']
+        author = args['author']
         content = args['content']
         projectname = args['project']
         member = user.getmember()
         prj_service = member.getproject(projectname)
-        origin_info = prj_service.bd_getyaml(id)
-        data = prj_service.bidding._listframe(content, user.name, date=date)
-        origin_info[key].remove(data)
-        bsobj = core.basedata.DataObject(origin_info, data='')
-        response = self._update(bsobj, **args)
+        info = {'id': id}
+        info[key] = {'content': content, 'date': date, 'author': author}
+        bsobj = core.basedata.DataObject(info, data='')
+        result = prj_service.bd_kick(bsobj, committer=user.name)
+        if result:
+            id = bsobj.ID
+            co_info = prj_service.bd_getyaml(id)
+            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+            member.bd_indexadd(id=id, data=None, info=co_info, **project)
+        if result:
+            response = { 'code': 200, 'message': 'Update information success.' }
+        else:
+            response = { 'code': 400, 'message': 'Update information error.' }
         return response
 
     def put(self):

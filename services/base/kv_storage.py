@@ -81,6 +81,43 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                 except KeyError:
                     pass
 
+    def kick_info(self, info, bsobj):
+        result = False
+        for key in bsobj.metadata:
+            try:
+                if key in self.fix_item and info[key]:
+                    try:
+                        assert info[key] == bsobj.metadata[key], 'Attempt at changing %s fixed key' %(key)
+                    except KeyError:
+                        continue
+                if key in self.list_item:
+                    if not self.generate_info_template():
+                        pass
+                    elif isinstance(bsobj.metadata[key], (list, set, tuple)):
+                        if isinstance(info[key], set):
+                            info[key].difference_update(bsobj.metadata[key])
+                        else:
+                            s = set(info[key])
+                            s.difference_update(set(bsobj.metadata[key]))
+                            info[key] = type(info[key])(s)
+                        result = True
+                    elif isinstance(bsobj.metadata[key], dict):
+                        data = self.build_frame(**bsobj.metadata[key])
+                        try:
+                            info[key].remove(data)
+                            result = True
+                        except KeyError, ValueError:
+                            pass
+                    else:
+                        try:
+                            info[key].remove(bsobj.metadata[key])
+                            result = True
+                        except ValueError:
+                            pass
+            except KeyError:
+                pass
+        return result
+
 
     def save_info(self, info, bsobj):
         assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
@@ -115,6 +152,24 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                             message, committer, do_commit=do_commit)
             if result:
                 super(KeyValueStorage, self)._add(bsobj.ID)
+        return result
+
+    def kick(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
+        result = False
+        import pdb; pdb.set_trace()
+        if kv_file is True:
+            if committer is not None:
+                bsobj.metadata['committer'] = committer
+            name = core.outputstorage.ConvertName(bsobj.name)
+            message = "Add %s: %s metadata." % (self.commitinfo, name)
+            info = self.getinfo(name)
+            info.update({'modifytime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
+            if not self.kick_info(info, bsobj):
+                return False
+            dumpinfo = yaml.dump(info, Dumper=utils._yaml.SafeDumper,
+                                 allow_unicode=True, default_flow_style=False)
+            result = self.interface.modify(name.yaml, dumpinfo,
+                            message, committer, do_commit=do_commit)
         return result
 
     def modify(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):

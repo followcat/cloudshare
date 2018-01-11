@@ -169,8 +169,7 @@ class LSIbaseAPI(Resource):
                 iduses.append(use)
                 index.add(member.es_config['CV_STO'])
                 doctype.append(member.es_config['CV_STO'])
-        totals, searchs = member.cv_search(index=list(index), doctype=doctype,
-                                                filterdict=filterdict, size=5000, source=False)
+        totals, searchs = member.cv_search(filterdict=filterdict, size=5000, source=False)
         ids = [item['_id'] for item in searchs]
         results = self.miner.probability_by_ids(project.modelname, doc, ids, uses=iduses)
         """
@@ -290,8 +289,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         results = dict()
         index = [member.es_config['CV_MEM'], member.es_config['CV_STO']]
         doctype = [member.id, 'cvstorage']
-        searchids = member.cv_search(index=index, doctype=doctype,
-                                     filterdict=filterdict, onlyid=True)
+        searchids = member.cv_search(filterdict=filterdict, onlyid=True)
         for jd_id, jd in project.jobdescription.datas():
             try:
                 if jd['status'] == 'Closed':
@@ -402,7 +400,7 @@ class SimilarAPI(Resource):
         datas = []
         index = [member.es_config['CV_MEM']]
         doctype = [member.id]
-        totals, searchs = member.cv_search(index=index, doctype=doctype,
+        totals, searchs = member.cv_search(
             filterdict={'date': [time.strftime('%Y%m%d', time.localtime(time.time()-
                                                          self.HALF_YEAR_SECOENDS)),
                                  time.strftime('%Y%m%d', time.localtime(time.time()))]},

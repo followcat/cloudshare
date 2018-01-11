@@ -12,10 +12,11 @@ class Members(object):
 
     default_member_name = 'default'
 
-    def __init__(self, path, bd_repos, co_repos, cv_repos, jd_repos, mult_peo, search_engine, es_config):
+    def __init__(self, path, matching, bd_repos, co_repos, cv_repos, jd_repos, mult_peo, search_engine, es_config):
         self.path = path
         if not os.path.exists(self.path):
             os.makedirs(self.path)
+        self.matching = matching
         self.bd_repos = bd_repos
         self.co_repos = co_repos
         self.cv_repos = cv_repos
@@ -37,7 +38,7 @@ class Members(object):
             member_path = os.path.join(self.path, member_info['name'])
             if os.path.isdir(member_path):
                 name = unicode(member_info['name'], 'utf-8')
-                member = services.member.Member(self.member_details,
+                member = services.member.Member(self.member_details, matching={'mch': matching},
                                                 bidding={'bd': bd_repos}, company={'co': co_repos},
                                                 curriculumvitae={'cv': cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},
@@ -57,7 +58,7 @@ class Members(object):
         member_info = self.member_details.getyaml(member_id)
         path = os.path.join(self.path, self.default_member_name)
         member = services.member.DefaultMember(self.member_details,
-                                                company={'co': self.co_repos},
+                                                company={'co': self.co_repos}, matching={'mch': self.matching},
                                                 curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config},
@@ -77,7 +78,7 @@ class Members(object):
     def create(self, name):
         assert not self.exists(name)
         path = os.path.join(self.path, name)
-        member = services.member.Member(self.member_details,
+        member = services.member.Member(self.member_details, matching={'mch': self.matching},
                                                 bidding={'bd': self.bd_repos}, company={'co': self.co_repos},
                                                 curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},

@@ -93,12 +93,8 @@ class UploadCVAPI(Resource):
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
-        # FIXME: Does not work for member without project (User upload)
-        if self.projectid not in self.svc_min.sim[self.modelname]:
-            self.svc_min.init_sim(self.modelname, self.projectid)
-        else:
-            self.svc_min.sim[self.modelname][self.projectid].add_documents(names, documents)
-            self.svc_min.sim[self.modelname][self.projectid].save()
+        project = dict(filter(lambda x: x[0] in ('project',), self.args.items()))
+        member.mch_add_documents(names, documents, **project)
         return { 'code': 200, 'data': results }
 
     def post(self):

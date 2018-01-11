@@ -44,9 +44,7 @@ class PositionAPI(BaseAPI):
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            index = member.es_config['CV_MEM']
-            searches = member.cv_search(index=index, doctype=[member.id],
-                                     filterdict={'name': text},
+            searches = member.cv_search(filterdict={'name': text},
                                      size=self.numbers, onlyid=True)
         result = []
         for id in searches[:self.numbers]:
@@ -149,7 +147,6 @@ class LSIbaseAPI(Resource):
 
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
-        self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -171,7 +168,7 @@ class LSIbaseAPI(Resource):
                 doctype.append(member.es_config['CV_STO'])
         totals, searchs = member.cv_search(filterdict=filterdict, size=5000, source=False)
         ids = [item['_id'] for item in searchs]
-        results = self.miner.probability_by_ids(project.modelname, doc, ids, uses=iduses)
+        results = member.mch_probability_by_ids(doc, ids, uses=iduses, **project)
         """
         sort = {
                 "_script" : {
@@ -212,6 +209,7 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIJDbyCVidAPI, self).__init__()
+        self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
@@ -269,6 +267,7 @@ class LSIbyJDidAPI(LSIbaseAPI):
         doc = jd_yaml['description']
         if append_comment:
             doc += jd_yaml['commentary']
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -285,12 +284,12 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
 
-    def findbest(self, member, project, filterdict, threshold, numbers):
+    def findbest(self, member, project, filterdict, threshold, numbers, svc_project):
         results = dict()
         index = [member.es_config['CV_MEM'], member.es_config['CV_STO']]
         doctype = [member.id, 'cvstorage']
         searchids = member.cv_search(filterdict=filterdict, onlyid=True)
-        for jd_id, jd in project.jobdescription.datas():
+        for jd_id, jd in svc_project.jobdescription.datas():
             try:
                 if jd['status'] == 'Closed':
                     continue
@@ -298,7 +297,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 continue
             doc = jd['description']
             doc += jd['commentary']
-            result = self.miner.probability_by_ids(project.modelname, doc, searchids, top=numbers)
+            project = dict(filter(lambda x: x[0] in ('project',), kwargs.items()))
+            result = member.mch_probability_by_ids(doc, searchids, top=numbers, **project)
             output = { 'CV': list() }
             for each in result:
                 if each[1] > threshold:
@@ -309,21 +309,21 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 output['id'] = jd_id
                 output['name'] = jd['name']
                 output['description'] = jd['description']
-                output['company'] = project.bd_getyaml(jd['company'])['name']
+                output['company'] = svc_project.bd_getyaml(jd['company'])['name']
                 results[jd_id] = output
         return results
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        threshold = args['threshold']
         projectname = args['project']
+        threshold = args['threshold']
         filterdict = args['filterdict']
         numbers = args['numbers']
         results = list()
         member = user.getmember()
-        project = member.getproject(projectname)
-        alls = self.findbest(member, project, filterdict, threshold, numbers)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        alls = self.findbest(member, project, filterdict, threshold, numbers, svc_project=member.getproject(projectname))
         for jdid in alls:
             results.append({'ID': jdid, 'name': alls[jdid]['name'],
                             'company': alls[jdid]['company'],
@@ -345,12 +345,11 @@ class LSIbyCVidAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         cur_page = args['page']
-        projectname = args['project']
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember()
-        project = member.getproject(projectname)
         doc = member.cv_getmd(id)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -368,11 +367,10 @@ class LSIbydocAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         doc = args['doc']
         cur_page = args['page']
-        projectname = args['project']
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember()
-        project = member.getproject(projectname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -384,7 +382,6 @@ class SimilarAPI(Resource):
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
-        self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -406,8 +403,9 @@ class SimilarAPI(Resource):
                                  time.strftime('%Y%m%d', time.localtime(time.time()))]},
             source=False)
         ids = [item['_id'] for item in searchs]
-        for name, score in self.miner.probability_by_ids(project.modelname, doc, ids,
-                                                         uses=doctype, top=6):
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        for name, score in member.mch_probability_by_ids(doc, ids,
+                                                         uses=doctype, top=6, **project):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
             yaml_info = member.cv_getyaml(name)
@@ -422,7 +420,6 @@ class ValuablebaseAPI(Resource):
 
     def __init__(self):
         super(ValuablebaseAPI, self).__init__()
-        self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
@@ -432,7 +429,7 @@ class ValuablebaseAPI(Resource):
         args = self.reqparse.parse_args()
         uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
-        result = self.miner.valuable_rate(name_list, modelname, member, doc, self.top)
+        result = member.mch_valuable_rate(name_list, member, doc, self.top)
         response = dict()
         datas = []
         for index in result:

@@ -189,6 +189,7 @@ class DefaultMember(CommonMember):
     def __init__(self, data_service, **kwargs):
         """"""
         super(DefaultMember, self).__init__(data_service, **kwargs)
+        assert 'matching' in kwargs
         assert 'jobdescription' in kwargs
         assert 'curriculumvitae' in kwargs
         self.repo = kwargs['curriculumvitae']['repo']
@@ -344,7 +345,7 @@ class Member(DefaultMember):
         self.bd_repos = kwargs['bidding']['bd']
 
     def __getattr__(self, attr):
-        for key in ['bd', 'jd']:
+        for key in ['bd', 'jd', 'mch']:
             if attr.startswith(key+'_'):
                 return functools.partial(self.call_project, attr=attr)
         return super(Member, self).__getattr__(attr)
@@ -389,7 +390,7 @@ class Member(DefaultMember):
             if os.path.isdir(project_path):
                 str_name = os.path.split(project_path)[1]
                 name = unicode(str_name, 'utf-8')
-                tmp_project = services.project.Project(self.project_details,
+                tmp_project = services.project.Project(self.project_details, matching={'mch': self.matching},
                                                 bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
                 tmp_project.setup(info={'id':      project_id,
@@ -421,7 +422,7 @@ class Member(DefaultMember):
     def _add_project(self, name, autosetup=False, autoupdate=False):
         result = False
         if len(name)>0 and name not in self.projects:
-            tmp_project = services.project.Project(self.project_details,
+            tmp_project = services.project.Project(self.project_details, matching={'mch': self.matching},
                                                 bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
             tmp_project.setup(info={'name':      name,

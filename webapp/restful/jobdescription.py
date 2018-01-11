@@ -28,12 +28,11 @@ class JobDescriptionAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         jd_id = args['jd_id']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        result = project.jd_get(jd_id)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.jd_getyaml(jd_id, **project)
         co_id = result['company']
-        co_name = project.bd_getyaml(co_id)['name']
+        co_name = member.bd_getyaml(co_id, **project)['name']
         result['company_name'] = co_name
         return { 'code': 200, 'data': result }
 
@@ -78,7 +77,6 @@ class JobDescriptionUploadAPI(Resource):
         result = False
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember()
         info = {
             'id': utils.builtin.genuuid(),
@@ -119,7 +117,6 @@ class JobDescriptionSearchAPI(Resource):
         args = self.reqparse.parse_args()
         cur_page = args['current_page']
         page_size = args['page_size']
-        projectname = args['project']
         search_items = args['search_items']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
@@ -133,11 +130,10 @@ class JobDescriptionSearchAPI(Resource):
                                                 size=page_size, source=True, **project)
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
-        project = member.getproject(projectname)
         for item in searches:
             jd = item['_source']
             co_id = jd['company']
-            co_name = project.bd_getyaml(co_id)['name']
+            co_name = member.bd_getyaml(co_id, **project)['name']
             jd['company_name'] = co_name
             datas.append(jd)
         return {

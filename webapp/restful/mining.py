@@ -220,7 +220,6 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         id = args['id']
         size = args['size']
         cur_page = args['page']
-        projectname = args['project']
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
@@ -231,11 +230,10 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         results = self.miner.probability_by_ids('jdmatch', doc, ids)
         pages = int(math.ceil(float(len(searchs))/totals))
         datas = list()
-        project = member.getproject(projectname)
         for result in results[(cur_page-1)*size: cur_page*size]:
-            yaml_info = project.jd_get(result[0])
+            yaml_info = member.jd_getyaml(result[0], **project)
             co_id = yaml_info['company']
-            co_name = project.bd_getyaml(co_id)['name']
+            co_name = member.bd_getyaml(co_id, **project)['name']
             yaml_info['company_name'] = co_name
             datas.append({ 'id': yaml_info['id'],
                            'yaml_info': yaml_info,
@@ -262,12 +260,11 @@ class LSIbyJDidAPI(LSIbaseAPI):
         filterdict = args['filterdict'] if args['filterdict'] else {}
         append_comment = args['appendcomment'] if args['appendcomment'] else False
         member = user.getmember()
-        project = member.getproject(projectname)
-        jd_yaml = project.jd_get(id)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        jd_yaml = member.jd_getyaml(id, **project)
         doc = jd_yaml['description']
         if append_comment:
             doc += jd_yaml['commentary']
-        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -309,7 +306,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 output['id'] = jd_id
                 output['name'] = jd['name']
                 output['description'] = jd['description']
-                output['company'] = svc_project.bd_getyaml(jd['company'])['name']
+                output['company'] = member.bd_getyaml(jd['company'], **project)['name']
                 results[jd_id] = output
         return results
 
@@ -424,12 +421,13 @@ class ValuablebaseAPI(Resource):
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
 
-    def _get(self, doc, member, modelname):
+    def _get(self, doc, member, **kwargs):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
-        result = member.mch_valuable_rate(name_list, member, doc, self.top)
+        project = dict(filter(lambda x: x[0] in ('project',), kwargs.items()))
+        result = member.mch_valuable_rate(name_list, member, doc, self.top, **project)
         response = dict()
         datas = []
         for index in result:
@@ -467,12 +465,11 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        jd_yaml = project.jd_get(id)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        jd_yaml = member.jd_getyaml(id, **project)
         doc = jd_yaml['description']
-        result = self._get(doc, member, project.modelname)
+        result = self._get(doc, member, **project)
         return { 'code': 200, 'data': result }
 
 class ValuablebydocAPI(ValuablebaseAPI):
@@ -486,10 +483,9 @@ class ValuablebydocAPI(ValuablebaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         doc = args['doc']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        result = self._get(doc, member, project.modelname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = self._get(doc, member, **project)
         return { 'result': result }
 
 
@@ -504,14 +500,13 @@ class ValuableAPI(ValuablebaseAPI):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         doc = ''
         if args['id']:
-            jd_yaml = project.jd_get(args['id'])
+            jd_yaml = member.jd_getyaml(args['id'], **project)
             doc = jd_yaml['description']
         elif args['doc']:
             doc = args['doc']
-        result = self._get(doc, member, project.modelname)
+        result = self._get(doc, member, **project)
         return { 'code': 200, 'data': result }

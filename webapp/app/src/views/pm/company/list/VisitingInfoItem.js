@@ -6,6 +6,8 @@ import { Input } from 'antd';
 import cloneDeep from 'lodash/cloneDeep';
 import remove from 'lodash/remove';
 
+import moment from 'moment';
+
 import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
@@ -36,12 +38,15 @@ class VisitingInfoItem extends Component {
 
   handleChange(e) {
     const { dataIndex } = this.props;
-
+    const date = new Date();
+    const defFilterData = moment(date).format('YYYY-MM-DD');
+    let content = {
+      content:e.target.value, 
+    }
     this.setState({
       fieldValue: e.target.value
     });
-
-    this.props.onUpdateFieldValues(dataIndex, { content: e.target.value });
+    this.props.onUpdateFieldValues(dataIndex,content);
   }
 
   handleDeleteClick(item) {

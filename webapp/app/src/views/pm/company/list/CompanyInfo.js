@@ -18,6 +18,7 @@ import {
 import { updateCompanyInfo, updateCompanyInfoList, deleteCompanyInfoList } from 'request/company';
 
 import chunk from 'lodash/chunk';
+import Storage from 'utils/storage';
 import websiteText from 'config/website-text';
 
 const language = websiteText.zhCN;
@@ -26,6 +27,7 @@ class CompanyInfo extends Component {
   constructor() {
     super();
     this.state = {
+      user: Storage.get('user'),
       visible: false,
       editStatus: false,
       formValues: {},
@@ -57,9 +59,9 @@ class CompanyInfo extends Component {
 
   handleUpdateFieldValues(fieldProp, fieldValue) {
     const { formValues } = this.state;
-
     formValues[fieldProp] = fieldValue;
     this.setState({ formValues });
+    console.log(formValues);
   }
 
   handleUpdateDeleteList(dataIndex, value) {
@@ -74,34 +76,28 @@ class CompanyInfo extends Component {
 
   handleSaveClick() {
     const { dataSource } = this.props,
-          { formValues, deleteList } = this.state;
+          { formValues, deleteList, user } = this.state;
     const listItemKeys = ['position', 'updatednumber', 'relatedcompany', 'clientcontact', 'reminder', 'progress'];
 
-    let args = [],argslist = [],argslistdelete = [];
-
+    let args = {},argslist = [],argslistdelete = [];
     for (let key in formValues) {
       let obj = {}, lbj = {};
       if (listItemKeys.indexOf(key) > -1) {
-        lbj = {
-          key: key,
-        };
-        lbj = Object.assign(lbj,formValues[key]);
-        argslist.push(lbj);
+        obj[key] = Object.assign(formValues[key],{author: user});
+        argslist.push(obj);
       } else {
-        obj = {
-          key: key,
-        };
-        obj = Object.assign(obj,formValues[key]);
-        args.push(obj);
+        args[key] = formValues[key].content;
       }
     }
     for (let i = 0; i < deleteList.length; i++) {
-      let dlj = Object.assign({key: deleteList[i].dataIndex},deleteList[i].value);
+      let key = deleteList[i].dataIndex,
+          dlj = {[key]: deleteList[i].value};
       argslistdelete.push(dlj);
     }
-    args.map( item => {
-      let pram = Object.assign({id: dataSource.id},item)
-      updateCompanyInfo(pram, (json) => {
+
+    let params = {metadata:Object.assign({id: dataSource.id},args)};
+    console.log(args);
+    !args && updateCompanyInfo(params, (json) => {
         if (json.code === 200) {
           message.success('更新成功!');
           this.setState({
@@ -113,11 +109,10 @@ class CompanyInfo extends Component {
         } else {
           message.error('更新失败!');
         }
-      });
-    })
+    });
     argslist.map( item => {
-      let pram = Object.assign({id: dataSource.id},item)
-      updateCompanyInfoList(pram, (json) => {
+      let params = {metadata: Object.assign({id: dataSource.id},item)}
+      updateCompanyInfoList(params, (json) => {
         if (json.code === 200) {
           message.success('更新成功!');
           this.setState({
@@ -132,8 +127,8 @@ class CompanyInfo extends Component {
       });
     })
     argslistdelete.map( item => {
-      let pram = Object.assign({id: dataSource.id},item)
-      deleteCompanyInfoList(pram, (json) => {
+      let params = {metadata: Object.assign({id: dataSource.id},item)}
+      deleteCompanyInfoList(params, (json) => {
         if (json.code === 200) {
           message.success('更新成功!');
           this.setState({

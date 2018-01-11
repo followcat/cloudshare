@@ -198,13 +198,8 @@ class CompanyInfoUpdateAPI(Resource):
     def __init__(self):
         super(CompanyInfoUpdateAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('id', type=str, location='json')
-        self.reqparse.add_argument('key', type=str, location='json')
-        self.reqparse.add_argument('date', type=str, location='json')
         self.reqparse.add_argument('project', type=str, location='json')
-        self.reqparse.add_argument('author', type=unicode, location='json')
-        #self.reqparse.add_argument('content', type=str, location='json')
-        self.reqparse.add_argument('content', location='json')
+        self.reqparse.add_argument('metadata', type=dict, location='json')
 
     def _update(self, bsobj, **args):
         user = flask.ext.login.current_user
@@ -218,31 +213,19 @@ class CompanyInfoUpdateAPI(Resource):
         return response
 
     def post(self):
-        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        id = args['id']
-        key = args['key']
-        content = args['content']
-        info = {'id': id}
-        info[key] = {'content': content['text'], 'date': content['date'], 'author': user.name}
-        bsobj = core.basedata.DataObject(info, data='')
+        metadata = args['metadata']
+        bsobj = core.basedata.DataObject(metadata, data='')
         response = self._update(bsobj, **args)
         return response
 
     def delete(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        id = args['id']
-        key = args['key']
-        date = args['date']
-        author = args['author']
-        content = args['content']
-        projectname = args['project']
+        metadata = args['metadata']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-        info = {'id': id}
-        info[key] = {'content': content, 'date': date, 'author': author}
-        bsobj = core.basedata.DataObject(info, data='')
+        bsobj = core.basedata.DataObject(metadata, data='')
         result = member.bd_kick(bsobj, committer=user.name, **project)
         if result:
             id = bsobj.ID
@@ -255,13 +238,9 @@ class CompanyInfoUpdateAPI(Resource):
         return response
 
     def put(self):
-        user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        id = args['id']
-        key = args['key']
-        content = args['content']
-        info = {'id': id, key: content}
-        bsobj = core.basedata.DataObject(info, data='')
+        metadata = args['metadata']
+        bsobj = core.basedata.DataObject(metadata, data='')
         response = self._update(bsobj, **args)
         return response
 

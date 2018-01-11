@@ -67,7 +67,6 @@ class ReminderInfoItem extends Component {
 
     fieldValue.text = e.target.value;
     this.setState({ fieldValue });
-
     this.props.onUpdateFieldValues(dataIndex, { content: fieldValue });
   }
 

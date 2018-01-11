@@ -156,7 +156,6 @@ class KeyValueStorage(services.base.storage.BaseStorage):
 
     def kick(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
         result = False
-        import pdb; pdb.set_trace()
         if kv_file is True:
             if committer is not None:
                 bsobj.metadata['committer'] = committer

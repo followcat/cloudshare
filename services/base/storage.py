@@ -78,7 +78,7 @@ class BaseStorage(services.base.service.Service):
     def _modifyinfo(self, id, key, value, committer, do_commit=True):
         result = {}
         projectinfo = self.getinfo(id)
-        if not projectinfo[key] == value:
+        if key not in projectinfo or projectinfo[key] != value:
             projectinfo[key] = value
             self.saveinfo(id, projectinfo,
                           'Modify %s key %s.' % (id, key), committer, do_commit=do_commit)
@@ -121,8 +121,12 @@ class BaseStorage(services.base.service.Service):
             saveinfo['modifytime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             dumpinfo = yaml.dump(saveinfo, Dumper=utils._yaml.SafeDumper,
                                  allow_unicode=True, default_flow_style=False)
-            self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
-                                  message=message, committer=committer, do_commit=do_commit)
+            if self.interface.exists(os.path.join(self.yamlpath, name)):
+                self.interface.modify(os.path.join(self.yamlpath, name), dumpinfo,
+                                      message=message, committer=committer, do_commit=do_commit)
+            else:
+                self.interface.add(os.path.join(self.yamlpath, name), dumpinfo,
+                                   message=message, committer=committer, do_commit=do_commit)
             result = True
         return result
 

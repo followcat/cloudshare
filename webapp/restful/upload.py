@@ -47,13 +47,15 @@ class UploadCVAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('files', type=str, location='json')
         self.reqparse.add_argument('updates', type=list, location='json')
+        self.reqparse.add_argument('project', type=str, location = 'json')
 
     def putparam(self):
         self.user = flask.ext.login.current_user
         self.args = self.reqparse.parse_args()
         self.updates = self.args['updates']
+        projectname = self.args['project']
         self.member = self.user.getmember()
-        self.project = self.member.getproject()
+        self.project = self.member.getproject(projectname)
         self.projectid = self.project.id
         self.modelname = self.project.modelname
 
@@ -68,22 +70,17 @@ class UploadCVAPI(Resource):
             self.cvobj = self.uploaddata['CV']
             cvobj=self.cvobj
             if cvobj is not None:
-                id = cvobj.metadata['id']
+                id = cvobj.ID
                 for key, value in item.iteritems():
                     if key is not u'id':
                         cvobj.metadata[key] = value
                 try:
-                    result = self.member.cv_add(cvobj, self.user.name, unique=True)
+                    result = self.member.cv_add(cvobj, committer=self.user.name, unique=True)
                     if result:
-                        md = self.member.cv_getmd(id)
-                        info = self.member.cv_getyaml(id)
-                        self.member.cv_indexadd(self.member.es_config['CV_MEM'],
-                                           self.member.id, id, md, info)
-
                         status = 'success'
                         # Add to CV database and project
                         message = '200'
-                        names.append(cvobj.ID)
+                        names.append(id)
                         documents.append(cvobj.data)
                     else:
                         status = 'success'

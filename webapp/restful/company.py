@@ -35,20 +35,14 @@ class CompanyAPI(Resource):
         result = False
         args = self.reqparse.parse_args()
         coname = args['name']
-        projectname = args['project']
         if args['introduction'] is None:
             args['introduction'] = str()
         user = flask.ext.login.current_user
         member = user.getmember()
-        project = member.getproject(projectname)
         metadata = extractor.information_explorer.catch_biddinginfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
-        result = project.bd_add(coobj, committer=user.name)
-        if result:
-            info = project.bd_getyaml(coobj.metadata['id'])
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.bd_indexadd(id=coobj.metadata['id'],
-                               data=None, info=info, **project)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.bd_add(coobj, committer=user.name, **project)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -224,14 +218,8 @@ class CompanyInfoUpdateAPI(Resource):
     def _update(self, bsobj, **args):
         user = flask.ext.login.current_user
         member = user.getmember()
-        projectname = args['project']
-        prj_service = member.getproject(projectname)
-        result = prj_service.bd_modify(bsobj, committer=user.name)
-        if result:
-            id = bsobj.ID
-            co_info = prj_service.bd_getyaml(id)
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.bd_indexadd(id=id, data=None, info=co_info, **project)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.bd_modify(bsobj, committer=user.name, **project)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:

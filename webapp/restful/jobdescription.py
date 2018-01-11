@@ -49,12 +49,8 @@ class JobDescriptionAPI(Resource):
         }
         jdobj = core.basedata.DataObject(info, data='')
         member = user.getmember()
-        project = member.getproject(projectname)
-        result = project.jd_modify(jdobj, user.name)
-        if result is True:
-            jd_info = project.jd_get(jd_id)
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.jd_indexadd(id=jd_id, data=None, info=jd_info, **project)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.jd_modify(jdobj, committer=user.name, **project)
         if result: 
             response = { 'code': 200, 'data': result,
                          'message': 'Update job description successed.' }
@@ -84,7 +80,6 @@ class JobDescriptionUploadAPI(Resource):
         args = self.reqparse.parse_args()
         projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
         info = {
             'id': utils.builtin.genuuid(),
             'name': args['jd_name'],
@@ -95,11 +90,8 @@ class JobDescriptionUploadAPI(Resource):
             'followup': args['followup'] if args['followup'] else '',
         }
         jdobj = core.basedata.DataObject(info, data='')
-        result = project.jd_add(jdobj, committer=user.name)
-        if result is True:
-            id = jdobj.metadata['id']
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.jd_indexadd(id=id, data=None, info=jdobj.metadata, **project)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.jd_add(jdobj, committer=user.name, **project)
         if result:
             response = { 'code': 200, 'data': {'result': result, 'info': jdobj.metadata},
                          'message': 'Create job description successed.' }

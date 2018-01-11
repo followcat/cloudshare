@@ -196,6 +196,23 @@ class DefaultMember(CommonMember):
         self.cv_repos = kwargs['curriculumvitae']['cv']
         self.jd_repos = kwargs['jobdescription']['jd']
 
+    def __getattr__(self, attr):
+        method = super(DefaultMember, self).__getattr__(attr)
+        return functools.partial(self.set_doctype, doctype=self.id, method=method, attr=attr)
+
+    def set_doctype(self, *args, **kwargs):
+        attr = kwargs.pop('attr')
+        doctype = kwargs.pop('doctype')
+        method = kwargs.pop('method')
+        if attr.endswith('_search'):
+            kwargs['doctype'] = [doctype]
+        else:
+            for key in ('_indexadd', '_add', '_modify'):
+                if attr.endswith(key):
+                    kwargs['doctype'] = doctype
+                    break
+        return method(*args, **kwargs)
+
     def idx_setup(self):
         self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
         self.curriculumvitae.services[0].setup(self.search_engine, self.es_config['CV_MEM'])
@@ -228,9 +245,9 @@ class DefaultMember(CommonMember):
         self.idx_setup()
         return result
 
-    def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
+    def cv_add(self, cvobj, committer=None, unique=True, do_commit=True, **kwargs):
         result = self.curriculumvitae.add(cvobj, committer, unique=unique,
-                                                               do_commit=do_commit)
+                                          do_commit=do_commit, **kwargs)
         if result:
             peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
             peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
@@ -342,17 +359,7 @@ class Member(DefaultMember):
             project = self.projects[project_name]
         except KeyError:
             raise ValueError('Invalid project name: %s' %(project_name))
-        if attr.endswith('_search'):
-            try:
-                kwargs['doctype'] = [project.id]
-            except TypeError, AttributeError:
-                raise ValueError('Invalid project name: %s' %(project_name))
-        elif attr.endswith('_indexadd'):
-            try:
-                kwargs['doctype'] = project.id
-            except TypeError, AttributeError:
-                raise ValueError('Invalid project name: %s' %(project_name))
-        return getattr(project, attr)(*args, **kwargs)
+        return self.set_doctype(*args, attr=attr, doctype=project.id, method=getattr(project, attr), **kwargs)
 
     def setup(self, config=None, committer=None):
         result = super(Member, self).setup(config)

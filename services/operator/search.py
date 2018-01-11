@@ -19,6 +19,54 @@ class SearchIndex(services.operator.facade.Facade):
         }
     }
 
+    def add(self, bsobj, *args, **kwargs):
+        try:
+            doctype = kwargs.pop('doctype')
+        except KeyError:
+            return False
+        result = self.data_service.add(bsobj, *args, **kwargs)
+        if result:
+            id = bsobj.ID
+            try:
+                md = self.data_service.getmd(id)
+            except AttributeError:
+                md = None
+            yaml = self.data_service.getyaml(id)
+            self.indexadd(index=self.config, doctype=doctype, id=id, data=md, info=yaml)
+        return result
+
+    def modify(self, bsobj, *args, **kwargs):
+        try:
+            doctype = kwargs.pop('doctype')
+        except KeyError:
+            return False
+        result = self.data_service.modify(bsobj, *args, **kwargs)
+        if result:
+            id = bsobj.ID
+            try:
+                md = self.data_service.getmd(id)
+            except AttributeError:
+                md = None
+            yaml = self.data_service.getyaml(id)
+            self.indexadd(index=self.config, doctype=doctype, id=id, data=md, info=yaml)
+        return result
+
+    def kick(self, bsobj, *args, **kwargs):
+        try:
+            doctype = kwargs.pop('doctype')
+        except KeyError:
+            return False
+        result = self.data_service.kick(bsobj, *args, **kwargs)
+        if result:
+            id = bsobj.ID
+            try:
+                md = self.data_service.getmd(id)
+            except AttributeError:
+                md = None
+            yaml = self.data_service.getyaml(id)
+            self.indexadd(index=self.config, doctype=doctype, id=id, data=md, info=yaml)
+        return result
+
     def setup(self, esconn, config):
         self.config = config
         self.es = esconn

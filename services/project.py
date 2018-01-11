@@ -187,18 +187,18 @@ class Project(services.operator.combine.Combine):
     def jd_get(self, id):
         return self.jobdescription.getyaml(id)
 
-    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True):
+    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True, **kwargs):
         result = False
         if jdobj.metadata['company'] in self.bidding.customers:
             result = self.jobdescription.add(jdobj, committer,
-                                                       unique=unique, do_commit=do_commit)
+                                             unique=unique, do_commit=do_commit, **kwargs)
         return result
 
-    def jd_modify(self, id, description, status, commentary, followup, committer):
+    def jd_modify(self, id, description, status, commentary, followup, committer, **kwargs):
         result = False
         if self.jobdescription.exists(id):
             result = self.jobdescription.modify(id, description, status,
-                                           commentary, followup, committer)
+                                           commentary, followup, committer, **kwargs)
         return result
 
     def jd_datas(self):

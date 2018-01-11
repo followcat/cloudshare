@@ -9,7 +9,6 @@ from flask.ext.restful import Resource
 
 import utils.builtin
 import core.mining.info
-import core.mining.valuable
 import core.outputstorage
 
 
@@ -435,7 +434,7 @@ class ValuablebaseAPI(Resource):
         args = self.reqparse.parse_args()
         uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
-        result = core.mining.valuable.rate(name_list, self.miner, modelname, member, doc, self.top)
+        result = self.miner.valuable_rate(name_list, modelname, member, doc, self.top)
         response = dict()
         datas = []
         for index in result:

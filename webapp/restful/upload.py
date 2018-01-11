@@ -53,6 +53,9 @@ class UploadCVAPI(Resource):
         self.args = self.reqparse.parse_args()
         self.updates = self.args['updates']
         self.member = self.user.getmember()
+        self.project = self.member.getproject()
+        self.projectid = self.project.id
+        self.modelname = self.project.modelname
 
     def put(self):
         self.putparam()
@@ -93,6 +96,12 @@ class UploadCVAPI(Resource):
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
+        # FIXME: Does not work for member without project (User upload)
+        if self.projectid not in self.svc_min.sim[self.modelname]:
+            self.svc_min.init_sim(self.modelname, self.projectid)
+        else:
+            self.svc_min.sim[self.modelname][self.projectid].add_documents(names, documents)
+            self.svc_min.sim[self.modelname][self.projectid].save()
         return { 'code': 200, 'data': results }
 
     def post(self):
@@ -138,9 +147,9 @@ class UserUploadCVAPI(UploadCVAPI):
         self.reqparse.add_argument('setpeople', type=bool, location='json')
 
     def put(self):
-        result = super(UserUploadCVAPI, self).put()
         args = self.reqparse.parse_args()
         setpeople = args['setpeople']
+        result = super(UserUploadCVAPI, self).put()
         if result['data'][0]['status'] == 'success' and setpeople:
             self.user.peopleID = self.uploaddata['unique_id']
         return result
@@ -169,14 +178,6 @@ class MemberUploadCVAPI(UploadCVAPI):
         self.projectid = self.project.id
         self.modelname = self.project.modelname
 
-    def put(self):
-        result = super(UserUploadCVAPI, self).put()
-        if self.projectid not in self.svc_min.sim[self.modelname]:
-            self.svc_min.init_sim(self.modelname, self.projectid)
-        else:
-            self.svc_min.sim[self.modelname][self.projectid].add_documents(names, documents)
-            self.svc_min.sim[self.modelname][self.projectid].save()
-        return result
 
 class UploadEnglishCVAPI(Resource):
 

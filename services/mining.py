@@ -324,5 +324,5 @@ class Mining(object):
         return core.mining.correlation.project_correlation(self,
                     repos, doc=doc, page=page, numbers=numbers)
 
-    def valuable_rate(self, name_list, modelname, member, doc, top)
+    def valuable_rate(self, name_list, modelname, member, doc, top):
         return core.mining.valuable.rate(name_list, self, modelname, member, doc, top)

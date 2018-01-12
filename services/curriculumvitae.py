@@ -81,7 +81,7 @@ class CurriculumVitae(services.operator.split.SplitData):
                 yield id
 
     def add(self, bsobj, committer=None, unique=True,
-            kv_file=True, text_file=True, contacts=True, do_commit=True):
+            kv_file=True, text_file=True, contacts=True, do_commit=True, **kwargs):
         if contacts and not bsobj.metadata['email'] and not bsobj.metadata['phone']:
             raise core.exception.NotExistsContactException
         return super(CurriculumVitae, self).add(bsobj, committer, unique,

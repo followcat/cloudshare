@@ -189,12 +189,30 @@ class DefaultMember(CommonMember):
     def __init__(self, data_service, **kwargs):
         """"""
         super(DefaultMember, self).__init__(data_service, **kwargs)
+        assert 'matching' in kwargs
         assert 'jobdescription' in kwargs
         assert 'curriculumvitae' in kwargs
         self.repo = kwargs['curriculumvitae']['repo']
         self.storage = kwargs['curriculumvitae']['storage']
         self.cv_repos = kwargs['curriculumvitae']['cv']
         self.jd_repos = kwargs['jobdescription']['jd']
+
+    def __getattr__(self, attr):
+        method = super(DefaultMember, self).__getattr__(attr)
+        return functools.partial(self.set_doctype, doctype=self.id, method=method, attr=attr)
+
+    def set_doctype(self, *args, **kwargs):
+        attr = kwargs.pop('attr')
+        doctype = kwargs.pop('doctype')
+        method = kwargs.pop('method')
+        if attr.endswith('_search'):
+            kwargs['doctype'] = [doctype]
+        else:
+            for key in ('_indexadd', '_add', '_modify', '_kick'):
+                if attr.endswith(key):
+                    kwargs['doctype'] = doctype
+                    break
+        return method(*args, **kwargs)
 
     def idx_setup(self):
         self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
@@ -228,9 +246,9 @@ class DefaultMember(CommonMember):
         self.idx_setup()
         return result
 
-    def cv_add(self, cvobj, committer=None, unique=True, do_commit=True):
+    def cv_add(self, cvobj, committer=None, unique=True, do_commit=True, **kwargs):
         result = self.curriculumvitae.add(cvobj, committer, unique=unique,
-                                                               do_commit=do_commit)
+                                          do_commit=do_commit, **kwargs)
         if result:
             peopmeta = extractor.information_explorer.catch_peopinfo(cvobj.metadata)
             peopobj = core.basedata.DataObject(data='', metadata=peopmeta)
@@ -327,7 +345,7 @@ class Member(DefaultMember):
         self.bd_repos = kwargs['bidding']['bd']
 
     def __getattr__(self, attr):
-        for key in ['bd', 'jd']:
+        for key in ['bd', 'jd', 'mch']:
             if attr.startswith(key+'_'):
                 return functools.partial(self.call_project, attr=attr)
         return super(Member, self).__getattr__(attr)
@@ -342,17 +360,7 @@ class Member(DefaultMember):
             project = self.projects[project_name]
         except KeyError:
             raise ValueError('Invalid project name: %s' %(project_name))
-        if attr.endswith('_search'):
-            try:
-                kwargs['doctype'] = [project.id]
-            except TypeError, AttributeError:
-                raise ValueError('Invalid project name: %s' %(project_name))
-        elif attr.endswith('_indexadd'):
-            try:
-                kwargs['doctype'] = project.id
-            except TypeError, AttributeError:
-                raise ValueError('Invalid project name: %s' %(project_name))
-        return getattr(project, attr)(*args, **kwargs)
+        return self.set_doctype(*args, attr=attr, doctype=project.id, method=getattr(project, attr), **kwargs)
 
     def setup(self, config=None, committer=None):
         result = super(Member, self).setup(config)
@@ -382,7 +390,7 @@ class Member(DefaultMember):
             if os.path.isdir(project_path):
                 str_name = os.path.split(project_path)[1]
                 name = unicode(str_name, 'utf-8')
-                tmp_project = services.project.Project(self.project_details,
+                tmp_project = services.project.Project(self.project_details, matching={'mch': self.matching},
                                                 bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
                 tmp_project.setup(info={'id':      project_id,
@@ -414,7 +422,7 @@ class Member(DefaultMember):
     def _add_project(self, name, autosetup=False, autoupdate=False):
         result = False
         if len(name)>0 and name not in self.projects:
-            tmp_project = services.project.Project(self.project_details,
+            tmp_project = services.project.Project(self.project_details, matching={'mch': self.matching},
                                                 bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config})
             tmp_project.setup(info={'name':      name,

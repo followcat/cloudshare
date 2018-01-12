@@ -132,7 +132,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
             except KeyError:
                 pass
 
-    def add(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
+    def add(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True, **kwargs):
         assert set(self.MUST_KEY).issubset(set(bsobj.metadata.keys()))
         result = False
         if unique is True and self.unique(bsobj) is False:
@@ -154,7 +154,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                 super(KeyValueStorage, self)._add(bsobj.ID)
         return result
 
-    def kick(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
+    def kick(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True, **kwargs):
         result = False
         if kv_file is True:
             if committer is not None:
@@ -171,7 +171,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
                             message, committer, do_commit=do_commit)
         return result
 
-    def modify(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True):
+    def modify(self, bsobj, committer=None, unique=True, kv_file=True, text_file=False, do_commit=True, **kwargs):
         result = False
         if kv_file is True:
             if committer is not None:

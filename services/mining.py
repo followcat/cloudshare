@@ -5,6 +5,8 @@ import math
 
 import core.basedata
 import core.mining.lsimodel
+import core.mining.valuable
+import core.mining.correlation
 import core.mining.lsisimilarity
 
 from utils.builtin import jieba_cut, pos_extract, industrytopath
@@ -305,3 +307,22 @@ class Mining(object):
         probalist.update(set(lists))
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return len(ranklist), map(lambda x: (x[0], ranklist.index(x)), lists)
+
+    def jobdescription_correlation(self, repos, doc, page, numbers):
+        return core.mining.correlation.jobdescription_correlation(self,
+                    repos, doc=doc, page=page, numbers=numbers)
+
+    def company_correlation(self, repos, doc, page, numbers):
+        return core.mining.correlation.company_correlation(self,
+                    repos, doc=doc, page=page, numbers=numbers)
+
+    def position_correlation(self, repos, doc, page, numbers):
+        return core.mining.correlation.position_correlation(self,
+                    repos, doc=doc, page=page, numbers=numbers)
+
+    def project_correlation(self, repos, doc, page, numbers):
+        return core.mining.correlation.project_correlation(self,
+                    repos, doc=doc, page=page, numbers=numbers)
+
+    def valuable_rate(self, name_list, modelname, member, doc, top):
+        return core.mining.valuable.rate(name_list, self, modelname, member, doc, top)

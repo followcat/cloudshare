@@ -28,12 +28,11 @@ class JobDescriptionAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         jd_id = args['jd_id']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        result = project.jd_get(jd_id)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.jd_getyaml(jd_id, **project)
         co_id = result['company']
-        co_name = project.bd_getyaml(co_id)['name']
+        co_name = member.bd_getyaml(co_id, **project)['name']
         result['company_name'] = co_name
         return { 'code': 200, 'data': result }
 
@@ -49,12 +48,8 @@ class JobDescriptionAPI(Resource):
         }
         jdobj = core.basedata.DataObject(info, data='')
         member = user.getmember()
-        project = member.getproject(projectname)
-        result = project.jd_modify(jdobj, user.name)
-        if result is True:
-            jd_info = project.jd_get(jd_id)
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.jd_indexadd(id=jd_id, data=None, info=jd_info, **project)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.jd_modify(jdobj, committer=user.name, **project)
         if result: 
             response = { 'code': 200, 'data': result,
                          'message': 'Update job description successed.' }
@@ -82,9 +77,7 @@ class JobDescriptionUploadAPI(Resource):
         result = False
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
         info = {
             'id': utils.builtin.genuuid(),
             'name': args['jd_name'],
@@ -95,11 +88,8 @@ class JobDescriptionUploadAPI(Resource):
             'followup': args['followup'] if args['followup'] else '',
         }
         jdobj = core.basedata.DataObject(info, data='')
-        result = project.jd_add(jdobj, committer=user.name)
-        if result is True:
-            id = jdobj.metadata['id']
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.jd_indexadd(id=id, data=None, info=jdobj.metadata, **project)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.jd_add(jdobj, committer=user.name, **project)
         if result:
             response = { 'code': 200, 'data': {'result': result, 'info': jdobj.metadata},
                          'message': 'Create job description successed.' }
@@ -127,7 +117,6 @@ class JobDescriptionSearchAPI(Resource):
         args = self.reqparse.parse_args()
         cur_page = args['current_page']
         page_size = args['page_size']
-        projectname = args['project']
         search_items = args['search_items']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
@@ -141,11 +130,10 @@ class JobDescriptionSearchAPI(Resource):
                                                 size=page_size, source=True, **project)
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
-        project = member.getproject(projectname)
         for item in searches:
             jd = item['_source']
             co_id = jd['company']
-            co_name = project.bd_getyaml(co_id)['name']
+            co_name = member.bd_getyaml(co_id, **project)['name']
             jd['company_name'] = co_name
             datas.append(jd)
         return {

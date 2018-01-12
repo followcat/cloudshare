@@ -4,8 +4,6 @@ from flask import request
 from flask.ext.restful import reqparse
 from flask.ext.restful import Resource
 
-import core.mining.correlation
-
 
 class MatchbaseAPI(Resource):
 
@@ -25,16 +23,16 @@ class MatchbaseAPI(Resource):
         self.numbers = args['numbers']
 
 
-class JDmathAPI(MatchbaseAPI):
+class JDmatchAPI(MatchbaseAPI):
 
     def __init__(self):
-        super(JDmathAPI, self).__init__()
+        super(JDmatchAPI, self).__init__()
         self.jd_repo = flask.current_app.config['SVC_JD_REPO']
         self.co_repo = flask.current_app.config['SVC_BD_REPO']
 
     def post(self):
-        super(JDmathAPI, self).post()
-        total, result = core.mining.correlation.jobdescription_correlation(self.miner,
+        super(JDmatchAPI, self).post()
+        total, result = self.miner.jobdescription_correlation(
                     [self.jd_repo], doc=self.doc, page=self.page, numbers=self.numbers)
         for each in result:
             jdinfo = each['data']
@@ -54,7 +52,7 @@ class JDmathAPI(MatchbaseAPI):
         if user.peopleID:
             code = 200
             doc = member.peo_getmd(user.peopleID).next()
-            total, result = core.mining.correlation.jobdescription_correlation(self.miner,
+            total, result = self.miner.jobdescription_correlation(
                         [self.jd_repo], doc=doc, page=self.page, numbers=self.numbers)
             for each in result:
                 jdinfo = each['data']
@@ -63,41 +61,41 @@ class JDmathAPI(MatchbaseAPI):
         return { 'code': code, 'data': result, 'lenght': total }
 
 
-class COmathAPI(MatchbaseAPI):
+class COmatchAPI(MatchbaseAPI):
 
     def __init__(self):
-        super(COmathAPI, self).__init__()
+        super(COmatchAPI, self).__init__()
         self.cv_repo = flask.current_app.config['SVC_CV_REPO']
 
     def post(self):
-        super(COmathAPI, self).post()
-        total, result = core.mining.correlation.company_correlation(self.miner,
+        super(COmatchAPI, self).post()
+        total, result = self.miner.company_correlation(
                     [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
         return { 'code': 200, 'data': result, 'lenght': total }
 
 
-class POSmathAPI(MatchbaseAPI):
+class POSmatchAPI(MatchbaseAPI):
 
     def __init__(self):
-        super(POSmathAPI, self).__init__()
+        super(POSmatchAPI, self).__init__()
         self.cv_repo = flask.current_app.config['SVC_CV_REPO']
 
     def post(self):
-        super(POSmathAPI, self).post()
-        total, result = core.mining.correlation.position_correlation(self.miner,
+        super(POSmatchAPI, self).post()
+        total, result = self.miner.position_correlation(
                     [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
         return { 'code': 200, 'data': result, 'lenght': total }
 
 
-class PRJmathAPI(MatchbaseAPI):
+class PRJmatchAPI(MatchbaseAPI):
 
     def __init__(self):
-        super(PRJmathAPI, self).__init__()
+        super(PRJmatchAPI, self).__init__()
         self.cv_repo = flask.current_app.config['SVC_CV_REPO']
 
     def post(self):
-        super(PRJmathAPI, self).post()
-        total, result = core.mining.correlation.project_correlation(self.miner,
+        super(PRJmatchAPI, self).post()
+        total, result = self.miner.project_correlation(
                     [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
         return { 'code': 200, 'data': result, 'lenght': total }
 

@@ -44,6 +44,7 @@ class Project(services.operator.combine.Combine):
     def __init__(self, data_service, **kwargs):
         super(Project, self).__init__(data_service, **kwargs)
         assert 'bidding' in kwargs
+        assert 'matching' in kwargs
         assert 'search_engine' in kwargs
         assert 'jobdescription' in kwargs
         self.bd_repos = kwargs['bidding']['bd']
@@ -112,6 +113,23 @@ class Project(services.operator.combine.Combine):
                 operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
         self.idx_setup()
         return result
+
+    def mch_probability_by_id(self, doc, ids, uses=None, top=10000, **kwargs):
+        return self.matching.probability_by_id(self.modelname, doc, ids, uses=uses, top=top)
+
+    def mch_probability_by_ids(self, doc, ids, uses=None, top=10000, **kwargs):
+        return self.matching.probability_by_ids(self.modelname, doc, ids, uses=uses, top=top)
+
+    def mch_valuable_rate(self, name_list, member, doc, top, **kwargs):
+        return self.matching.valuable_rate(name_list, self.modelname, member, doc, top)
+
+    def mch_add_documents(self, names, documents, **kwargs):
+        # FIXME: Does not work for member without project (User upload)
+        if self.id not in self.matching.sim[self.modelname]:
+            self.matching.init_sim(self.modelname, self.id)
+        else:
+            self.matching.sim[self.modelname][self.id].add_documents(names, documents)
+            self.matching.sim[self.modelname][self.id].save()
 
     def bd_update_info(self, id, info, committer):
         result = False
@@ -187,18 +205,18 @@ class Project(services.operator.combine.Combine):
     def jd_get(self, id):
         return self.jobdescription.getyaml(id)
 
-    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True):
+    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True, **kwargs):
         result = False
         if jdobj.metadata['company'] in self.bidding.customers:
             result = self.jobdescription.add(jdobj, committer,
-                                                       unique=unique, do_commit=do_commit)
+                                             unique=unique, do_commit=do_commit, **kwargs)
         return result
 
-    def jd_modify(self, id, description, status, commentary, followup, committer):
+    def jd_modify(self, id, description, status, commentary, followup, committer, **kwargs):
         result = False
         if self.jobdescription.exists(id):
             result = self.jobdescription.modify(id, description, status,
-                                           commentary, followup, committer)
+                                           commentary, followup, committer, **kwargs)
         return result
 
     def jd_datas(self):

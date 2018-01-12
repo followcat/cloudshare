@@ -24,31 +24,24 @@ class CompanyAPI(Resource):
 
     def get(self):
         args = request.args
-        projectname = args['project']
         user = flask.ext.login.current_user
         member = user.getmember()
-        project = member.getproject(projectname)
-        result = project.bd_getyaml(args['id'])
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.bd_getyaml(args['id'], **project)
         return { 'code': 200,'result': result }
 
     def post(self):
         result = False
         args = self.reqparse.parse_args()
         coname = args['name']
-        projectname = args['project']
         if args['introduction'] is None:
             args['introduction'] = str()
         user = flask.ext.login.current_user
         member = user.getmember()
-        project = member.getproject(projectname)
         metadata = extractor.information_explorer.catch_biddinginfo(stream=args)
         coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
-        result = project.bd_add(coobj, committer=user.name)
-        if result:
-            info = project.bd_getyaml(coobj.metadata['id'])
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.bd_indexadd(id=coobj.metadata['id'],
-                               data=None, info=info, **project)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.bd_add(coobj, committer=user.name, **project)
         if result:
             response = { 'code': 200, 'data': result, 'message': 'Create new company successed.' }
         else:
@@ -79,7 +72,6 @@ class CompanyAllAPI(Resource):
         args = self.reqparse.parse_args()
         cur_page = args['current_page']
         page_size = args['page_size']
-        projectname = args['project']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         total, searches = member.bd_search(kwargs={'sort': {"modifytime": "desc"}},
@@ -87,9 +79,8 @@ class CompanyAllAPI(Resource):
                                             size=page_size, **project)
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
-        project = member.getproject(projectname)
         for item in searches:
-            info = project.bd_getyaml(item['_id'])
+            info = member.bd_getyaml(item['_id'], **project)
             if info:
                 datas.append(info)
             else:
@@ -114,18 +105,16 @@ class AddedCompanyListAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         text = args['text']
-        projectname = args['project']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         company_ids = member.bd_search(filterdict={'name': text},
                                             size=5, onlyid=True, **project)
         data = []
-        project = member.getproject(projectname)
-        customer_ids = project.bd_customers()
+        customer_ids = member.bd_customers(**project)
         for company_id in company_ids:
             if company_id in customer_ids:
                 continue
-            yaml = project.bd_getyaml(company_id)
+            yaml = member.bd_getyaml(company_id, **project)
             data.append({
                 'id': yaml['id'],
                 'company_name': yaml['name']
@@ -149,15 +138,14 @@ class CompanyCustomerListAPI(Resource):
         args = self.reqparse.parse_args()
         cur_page = args['current_page']
         page_size = args['page_size']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        result = list(project.bd_customers())
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = list(member.bd_customers(**project))
         total = len(result)
         pages = int(math.ceil(float(total)/page_size))
         data = list()
         for coname in result[(cur_page-1)*page_size:cur_page*page_size]:
-            info = project.bd_getyaml(coname)
+            info = member.bd_getyaml(coname, **project)
             if info:
                 data.append(info)
             else:
@@ -179,11 +167,10 @@ class CompanyCustomerAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         coobj = core.basedata.DataObject({'id': id}, data='')
-        result = project.addcustomer(coobj, user.name)
+        result = member.addcustomer(coobj, user.name, **project)
         if result:
             response = { 'code': 200, 'message': 'Add customer success.' }
         else:
@@ -194,11 +181,9 @@ class CompanyCustomerAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        coobj = core.basedata.DataObject(metadata, data='')
-        result = project.deletecustomer(id, user.name)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = project.deletecustomer(id, user.name, **project)
         if result:
             response = { 'code': 200, 'message': 'Delete customer success.' }
         else:
@@ -219,14 +204,8 @@ class CompanyInfoUpdateAPI(Resource):
     def _update(self, bsobj, **args):
         user = flask.ext.login.current_user
         member = user.getmember()
-        projectname = args['project']
-        prj_service = member.getproject(projectname)
-        result = prj_service.bd_modify(bsobj, committer=user.name)
-        if result:
-            id = bsobj.ID
-            co_info = prj_service.bd_getyaml(id)
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-            member.bd_indexadd(id=id, data=None, info=co_info, **project)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = member.bd_modify(bsobj, committer=user.name, **project)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
@@ -244,15 +223,13 @@ class CompanyInfoUpdateAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         metadata = args['metadata']
-        projectname = args['project']
         member = user.getmember()
-        prj_service = member.getproject(projectname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         bsobj = core.basedata.DataObject(metadata, data='')
-        result = prj_service.bd_kick(bsobj, committer=user.name)
+        result = member.bd_kick(bsobj, committer=user.name, **project)
         if result:
             id = bsobj.ID
-            co_info = prj_service.bd_getyaml(id)
-            project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+            co_info = member.bd_getyaml(id, **project)
             member.bd_indexadd(id=id, data=None, info=co_info, **project)
         if result:
             response = { 'code': 200, 'message': 'Update information success.' }
@@ -284,7 +261,6 @@ class SearchCObyKeyAPI(Resource):
         cur_page = args['current_page']
         page_size = args['page_size']
         search_items = args['search_items']
-        projectname = args['project']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         total, searches = member.bd_search(filterdict=dict(search_items),
@@ -293,9 +269,8 @@ class SearchCObyKeyAPI(Resource):
                                             size=page_size, **project)
         pages = int(math.ceil(float(total)/page_size))
         datas = list()
-        project = member.getproject(projectname)
         for item in searches:
-            info = project.bd_getyaml(item['_id'])
+            info = member.bd_getyaml(item['_id'], **project)
             if info:
                 datas.append(info)
             else:
@@ -321,18 +296,17 @@ class CompanyUploadExcelAPI(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user = flask.ext.login.current_user
-        projectname = flask.request.form['project']
         member = user.getmember()
-        project = member.getproject(projectname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         network_file = flask.request.files['files']
-        compare_result = project.bd_compare_excel(network_file.read(),
-                                                       committer=user.name)
+        compare_result = member.bd_compare_excel(network_file.read(),
+                                                       committer=user.name, **project)
         infos = dict()
         for item in compare_result:
             coid = item[1]
             if coid not in infos:
-                if project.bd_exists(coid):
-                    infos[coid] = project.bd_getyaml(coid)
+                if member.bd_exists(coid, **project):
+                    infos[coid] = member.bd_getyaml(coid, **project)
                 else:
                     infos[coid] = item[2][0]
         return {
@@ -358,21 +332,20 @@ class CompanyConfirmExcelAPI(Resource):
         datas = args['data']
         projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        prj_results = project.bd_add_excel(datas, committer=user.name)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        prj_results = member.bd_add_excel(datas, committer=user.name, **project)
         infos = dict()
         results = { 'success': dict(), 'failed': dict() }
         for coid in prj_results:
-            if project.bd_exists(coid):
-                result_info = project.bd_get(coid)
+            if member.bd_exists(coid, **project):
+                result_info = member.bd_get(coid, **project)
             else:
                 result_info = prj_results[coid][data][0]
             infos[coid] = result_info
             result_key = 'success' if prj_results[coid]['success'] is True else 'failed'
             results[result_key][coid] = prj_results[coid]
             if prj_results[coid]['success'] is True:
-                co_info = project.bd_get(coid)
-                project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+                co_info = member.bd_get(coid, **project)
                 member.bd_indexadd(id=coid, data=None, info=co_info, **project)
         return {
             'code': 200,

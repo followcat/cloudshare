@@ -99,6 +99,11 @@ class Members(object):
     def idx_updatesvc(self):
         self.cv_storage.updatesvc(self.es_config['CV_STO'], self.cv_storage.data_service.services[0].name, numbers=1000)
 
+    def idx_upgradesvc(self, ids=None):
+        self.cv_storage.upgradesvc(self.es_config['CV_STO'],
+                                   self.cv_storage.data_service.services[0].name,
+                                   ids=ids, content=True, numbers=5000)
+
     def get(self, name):
         return self.members[name]
 

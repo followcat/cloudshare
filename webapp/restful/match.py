@@ -105,16 +105,15 @@ class CompanyProjectAPI(MatchbaseAPI):
     def __init__(self):
         super(CompanyProjectAPI, self).__init__()
         self.cv_repo = flask.current_app.config['SVC_CV_REPO']
-        self.svc_index = flask.current_app.config['SVC_INDEX']
 
     def post(self):
         super(CompanyProjectAPI, self).post()
+        user = flask.ext.login.current_user
+        member = user.getmember()
         result = list()
-        index = [self.svc_index.config['CV_MEM'], self.svc_index.config['CV_STO']]
-        total, search = self.svc_index.search(index=index,
-                                       filterdict={'experience.project.company': self.doc},
-                                       start=(self.page-1)*self.numbers,
-                                       size=self.numbers, source=True)
+        total, search = member.cv_search(filterdict={'experience.project.company': self.doc},
+                                         start=(self.page-1)*self.numbers,
+                                         size=self.numbers, source=True)
         for each in search:
             for project in each['_source']['experience']['project']:
                 if 'company' in project and project['company'] == self.doc:

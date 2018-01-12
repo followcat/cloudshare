@@ -249,13 +249,6 @@ def load_doc_processor(name):
         return utils.docprocessor.pandoc.PandocProcessor
 
 
-def load_esindex(es_conn):
-    global config
-    SVC_INDEX = services.esindex.ElasticsearchIndexing()
-    SVC_INDEX.setup(es_conn, config.es_config)
-    return SVC_INDEX
-
-
 def load_es_searchengine():
     global config
     ES = Elasticsearch(**config.es_config)

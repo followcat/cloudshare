@@ -14,15 +14,14 @@ class SearchKeywordAPI(Resource):
     
     def __init__(self):
         super(SearchKeywordAPI, self).__init__()
-        self.svc_index = flask.current_app.config['SVC_INDEX']
+        self.es = flask.current_app.config['ES']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('keyword', location='json')
 
     def post(self):
         args = self.reqparse.parse_args()
         keyword = args['keyword']
-        tokens = self.svc_index.es.indices.analyze(self.svc_index.config['CV_MEM'],
-                                                   analyzer='ik_smart', text=keyword)
+        tokens = self.es.indices.analyze(analyzer='ik_smart', text=keyword)
         results = dict()
         for each in tokens['tokens']:
             results[each['token']] = 1

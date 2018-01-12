@@ -5,12 +5,9 @@ def update_cv_models(SVC_MIN, SVC_MEMBERS):
                 for name in set(svcdict[cv].ids).difference(set(lsimodel.ids)):
                     yield (name, svcdict[cv].getmd(name))
 
-    modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
     svcdict = dict([(mem.id, mem.curriculumvitae.services[0])
                      for mem in SVC_MEMBERS.members.values()])
-    for modelname in modelnames:
-        if modelname not in SVC_MIN.sim:
-            continue
+    for modelname in SVC_MIN.sim.keys():
         lsimodel = SVC_MIN.lsi_model[modelname]
         if lsimodel.getconfig('autoupdate') is True:
             trains = gen(lsimodel, lsimodel.getconfig('origin'))
@@ -39,15 +36,12 @@ def update_cv_sim(SVC_MIN, svc, modelname, simname):
 
 
 def update_cv_sims(SVC_MIN, SVC_MEMBERS, additionals=None):
-    modelnames = set([prj.modelname for prj in SVC_MEMBERS.allprojects().values()])
     svcdict = dict([(mem.id, mem.curriculumvitae.services[0])
                      for mem in SVC_MEMBERS.members.values()])
     if additionals is not None:
         assert isinstance(additionals, dict)
         svcdict = additionals
-    for modelname in modelnames:
-        if modelname not in SVC_MIN.sim:
-            continue
+    for modelname in SVC_MIN.sim.keys():
         for simname in SVC_MIN.sim[modelname]:
             if simname not in svcdict:
                 continue

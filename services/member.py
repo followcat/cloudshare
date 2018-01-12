@@ -208,7 +208,7 @@ class DefaultMember(CommonMember):
         if attr.endswith('_search'):
             kwargs['doctype'] = [doctype]
         else:
-            for key in ('_indexadd', '_add', '_modify'):
+            for key in ('_indexadd', '_add', '_modify', '_kick'):
                 if attr.endswith(key):
                     kwargs['doctype'] = doctype
                     break

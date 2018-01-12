@@ -115,7 +115,7 @@ class SearchIndex(services.operator.facade.Facade):
 
     update = updatesvc
 
-    def indexadd(self, index, doctype, id, data, info, content=True):
+    def indexadd(self, index, doctype, id, data, info, content=True, **kwargs):
         ACTIONS = list()
         geninfo = self.genindex(info)
         action = self.genaction(index, doctype, id, data, geninfo, content=content)

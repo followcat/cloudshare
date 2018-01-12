@@ -228,7 +228,7 @@ class Resume extends Component {
       }
     }, json => {
       if (json.code === 200) {
-        tracking.unshift(json.data);
+        this.getResumeIDList(this.state.resumeId);
         this.setState({ tracking });
 
         message.success('添加成功!');
@@ -253,9 +253,7 @@ class Resume extends Component {
       update_info: fieldValue
     }, json => {
       if (json.code === 200) {
-        comment.unshift(json.data);
-        this.setState({ comment });
-
+        this.getResumeIDList(this.state.resumeId);
         message.success('添加成功!');
       } else {
         message.error('添加失败!');

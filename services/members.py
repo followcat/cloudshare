@@ -2,6 +2,7 @@ import os
 import glob
 
 import services.member
+import services.company
 import services.base.kv_storage
 import services.base.name_storage
 import services.operator.search
@@ -27,6 +28,8 @@ class Members(object):
         self.members = dict()
         self.cv_storage = services.curriculumvitae.SearchIndex(
                             services.operator.multiple.Multiple(self.cv_repos[1:]))
+        self.co_storage = services.company.SearchIndex(
+                            services.operator.multiple.Multiple(self.co_repos))
         self.active_members = services.base.name_storage.NameStorage(self.path, 'memlist')
         self.member_details = services.member.SimulationMember(os.path.join(self.path, 'config'), 'memconfig')
         for member_id in self.active_members.ids:
@@ -95,14 +98,23 @@ class Members(object):
 
     def idx_setup(self):
         self.cv_storage.setup(self.search_engine, self.es_config['CV_STO'])
+        self.co_storage.setup(self.search_engine, self.es_config['CO_STO'])
 
     def idx_updatesvc(self):
-        self.cv_storage.updatesvc(self.es_config['CV_STO'], self.cv_storage.data_service.services[0].name, numbers=1000)
+        self.cv_storage.updatesvc(self.es_config['CV_STO'],
+                                  self.cv_storage.data_service.services[0].name,
+                                  numbers=1000)
+        self.co_storage.updatesvc(self.es_config['CO_STO'],
+                                  self.co_storage.data_service.services[0].name,
+                                  numbers=1000)
 
     def idx_upgradesvc(self, ids=None):
         self.cv_storage.upgradesvc(self.es_config['CV_STO'],
                                    self.cv_storage.data_service.services[0].name,
                                    ids=ids, content=True, numbers=5000)
+        self.co_storage.updatesvc(self.es_config['CO_STO'],
+                                  self.co_storage.data_service.services[0].name,
+                                  ids=ids, content=True, numbers=5000)
 
     def get(self, name):
         return self.members[name]

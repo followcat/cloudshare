@@ -104,9 +104,10 @@ class Config(object):
 
     es_template = (
         ("CV_STO",          "cvstorage"),    # SVC_CV_STO
+        ("CO_STO",          "costorage"),    # SVC_CO_STO
         ("CV_MEM",          "cvmembers"),    # SVC_CO_MEMBERS
         ("JD_MEM",          "jdmembers"),    # SVC_JD_MEMBERS
-        ("CO_MEM",          "comembers"),   # SVC_CO_MEMBERS
+        ("BD_MEM",          "bdmembers"),    # SVC_BD_MEMBERS
     )
 
     min_template = (

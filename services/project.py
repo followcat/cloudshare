@@ -56,11 +56,11 @@ class Project(services.operator.combine.Combine):
         self.config = dict()
 
     def idx_setup(self):
-        self.bidding.setup(self.search_engine, self.es_config['CO_MEM'])
+        self.bidding.setup(self.search_engine, self.es_config['BD_MEM'])
         self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
 
     def idx_updatesvc(self):
-        self.bidding.updatesvc(self.es_config['CO_MEM'], self.id, numbers=1000)
+        self.bidding.updatesvc(self.es_config['BD_MEM'], self.id, numbers=1000)
         self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
 
     @property

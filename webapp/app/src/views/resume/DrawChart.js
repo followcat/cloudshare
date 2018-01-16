@@ -274,16 +274,6 @@ class DrawChart extends Component {
                 expandedRowRender={record => this.getExpandedRowRender(record)}
               />
             </Collapse.Panel>
-            <Collapse.Panel
-              header={'职位描述内容'}
-              key="doc"
-            >
-              <Input
-                type="textarea"
-                rows="4"
-                onChange={this.handleInputChange}
-              />
-            </Collapse.Panel>
           </Collapse>
           <Button
             type="ghost"

@@ -42,7 +42,8 @@ class Members(object):
             if os.path.isdir(member_path):
                 name = unicode(member_info['name'], 'utf-8')
                 member = services.member.Member(self.member_details, matching={'mch': matching},
-                                                bidding={'bd': bd_repos}, company={'co': co_repos},
+                                                bidding={'bd': bd_repos},
+                                                company={'co': self.co_storage},
                                                 curriculumvitae={'cv': cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},
                                                 search_engine={'idx': search_engine, 'config': es_config},
@@ -61,7 +62,8 @@ class Members(object):
         member_info = self.member_details.getyaml(member_id)
         path = os.path.join(self.path, self.default_member_name)
         member = services.member.DefaultMember(self.member_details,
-                                                company={'co': self.co_repos}, matching={'mch': self.matching},
+                                                company={'co': self.co_storage},
+                                                matching={'mch': self.matching},
                                                 curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config},
@@ -82,7 +84,8 @@ class Members(object):
         assert not self.exists(name)
         path = os.path.join(self.path, name)
         member = services.member.Member(self.member_details, matching={'mch': self.matching},
-                                                bidding={'bd': self.bd_repos}, company={'co': self.co_repos},
+                                                bidding={'bd': self.bd_repos},
+                                                company={'co': self.co_storage},
                                                 curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[0],
                                                                  'storage': self.cv_storage},
                                                 search_engine={'idx': self.search_engine, 'config': self.es_config},

@@ -55,7 +55,6 @@ class CommonMember(services.operator.combine.Combine):
         assert 'people' in kwargs
         assert 'company' in kwargs
         assert 'search_engine' in kwargs
-        self.co_repos = kwargs['company']['co']
         self.mult_peo = kwargs['people']['peo']
         self.search_engine = kwargs['search_engine']['idx']
         self.es_config = kwargs['search_engine']['config']
@@ -103,9 +102,6 @@ class CommonMember(services.operator.combine.Combine):
         self.path = os.path.join(self.config_service.path.replace('config/', ''), self.name)
         self.co_path = os.path.join(self.path, self.CO_PATH)
         self.peo_path = os.path.join(self.path, self.PEO_PATH)
-        self.company = services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(self.co_repos),
-                operator_service=services.simulationco.SelectionCO(self.co_path, self.name))
         self.people = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
                     data_service=services.operator.multiple.Multiple(self.mult_peo),
@@ -192,6 +188,7 @@ class DefaultMember(CommonMember):
         assert 'matching' in kwargs
         assert 'jobdescription' in kwargs
         assert 'curriculumvitae' in kwargs
+        self.co_sto = kwargs['company']['co']
         self.repo = kwargs['curriculumvitae']['repo']
         self.storage = kwargs['curriculumvitae']['storage']
         self.cv_repos = kwargs['curriculumvitae']['cv']
@@ -241,6 +238,9 @@ class DefaultMember(CommonMember):
                         operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
+        self.company = services.operator.split.SplitData(
+                    data_service=self.co_sto,
+                    operator_service=services.simulationco.SimulationCO(self.co_path, self.name))
         self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
                 services.operator.multiple.Multiple(self.jd_repos)))
         self.idx_setup()

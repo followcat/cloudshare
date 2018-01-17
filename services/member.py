@@ -188,11 +188,10 @@ class DefaultMember(CommonMember):
         assert 'matching' in kwargs
         assert 'jobdescription' in kwargs
         assert 'curriculumvitae' in kwargs
-        self.co_sto = kwargs['company']['co']
-        self.repo = kwargs['curriculumvitae']['repo']
-        self.storage = kwargs['curriculumvitae']['storage']
-        self.cv_repos = kwargs['curriculumvitae']['cv']
-        self.jd_repos = kwargs['jobdescription']['jd']
+        self.cv_repo = kwargs['curriculumvitae']['cvrepo']
+        self.co_storage = kwargs['company']['costorage']
+        self.cv_storage = kwargs['curriculumvitae']['cvstorage']
+        self.jd_blocks = kwargs['jobdescription']['jd']
 
     def __getattr__(self, attr):
         method = super(DefaultMember, self).__getattr__(attr)
@@ -229,20 +228,20 @@ class DefaultMember(CommonMember):
         self.curriculumvitae = services.operator.multiple.Multiple(
                 [services.curriculumvitae.SearchIndex(services.operator.checker.Filter(
                     data_service=services.operator.split.SplitData(
-                        data_service=self.repo,
+                        data_service=self.cv_repo,
                         operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
                 services.operator.split.SplitData(
                     data_service=services.secret.Private(
-                        data_service=services.operator.multiple.Multiple(self.storage),
+                        data_service=services.operator.multiple.Multiple(self.cv_storage),
                         operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
         self.company = services.operator.split.SplitData(
-                    data_service=self.co_sto,
+                    data_service=self.co_storage,
                     operator_service=services.simulationco.SimulationCO(self.co_path, self.name))
         self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
-                services.operator.multiple.Multiple(self.jd_repos)))
+                services.operator.multiple.Multiple(self.jd_blocks)))
         self.idx_setup()
         return result
 
@@ -342,7 +341,7 @@ class Member(DefaultMember):
         """"""
         super(Member, self).__init__(data_service, **kwargs)
         assert 'bidding' in kwargs
-        self.bd_repos = kwargs['bidding']['bd']
+        self.bd_blocks = kwargs['bidding']['bd']
 
     def __getattr__(self, attr):
         for key in ['bd', 'jd', 'mch']:
@@ -390,9 +389,12 @@ class Member(DefaultMember):
             if os.path.isdir(project_path):
                 str_name = os.path.split(project_path)[1]
                 name = unicode(str_name, 'utf-8')
-                tmp_project = services.project.Project(self.project_details, matching={'mch': self.matching},
-                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
-                                                search_engine={'idx': self.search_engine, 'config': self.es_config})
+                tmp_project = services.project.Project(self.project_details,
+                                                matching={'mch': self.matching},
+                                                bidding={'bd': self.bd_blocks},
+                                                jobdescription={'jd': self.jd_blocks},
+                                                search_engine={'idx': self.search_engine,
+                                                               'config': self.es_config})
                 tmp_project.setup(info={'id':      project_id,
                                      'name':       project_info['name'],
                                      'autosetup':  False,
@@ -422,14 +424,17 @@ class Member(DefaultMember):
     def _add_project(self, name, autosetup=False, autoupdate=False):
         result = False
         if len(name)>0 and name not in self.projects:
-            tmp_project = services.project.Project(self.project_details, matching={'mch': self.matching},
-                                                bidding={'bd': self.bd_repos}, jobdescription={'jd': self.jd_repos},
-                                                search_engine={'idx': self.search_engine, 'config': self.es_config})
-            tmp_project.setup(info={'name':      name,
-                                 'autosetup':    autosetup,
-                                 'autoupdate':   autoupdate,
-                                 'storageCO':    self.config['storageCO'],
-                                 'storageJD':    self.config['storageJD']})
+            tmp_project = services.project.Project(self.project_details,
+                                                   matching={'mch': self.matching},
+                                                   bidding={'bd': self.bd_blocks},
+                                                   jobdescription={'jd': self.jd_blocks},
+                                                   search_engine={'idx': self.search_engine,
+                                                                  'config': self.es_config})
+            tmp_project.setup(info={'name':         name,
+                                    'autosetup':    autosetup,
+                                    'autoupdate':   autoupdate,
+                                    'storageCO':    self.config['storageCO'],
+                                    'storageJD':    self.config['storageJD']})
             self.active_projects.add(core.basedata.DataObject(metadata=tmp_project.config, data=''))
             self.projects[name] = tmp_project
             result = True

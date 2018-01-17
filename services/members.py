@@ -43,11 +43,16 @@ class Members(object):
                 name = unicode(member_info['name'], 'utf-8')
                 member = services.member.Member(self.member_details, matching={'mch': matching},
                                                 bidding={'bd': bd_repos},
-                                                company={'co': self.co_storage},
-                                                curriculumvitae={'cv': cv_repos, 'repo': self.cv_repos[0],
-                                                                 'storage': self.cv_storage},
-                                                search_engine={'idx': search_engine, 'config': es_config},
-                                                jobdescription={'jd': jd_repos}, people={'peo': mult_peo})
+                                                company={'co': self.co_repos,
+                                                         'corepo': self.co_repos[0],
+                                                         'costorage': self.co_storage},
+                                                curriculumvitae={'cv': cv_repos,
+                                                                 'cvrepo': self.cv_repos[0],
+                                                                 'cvstorage': self.cv_storage},
+                                                search_engine={'idx': search_engine,
+                                                               'config': es_config},
+                                                jobdescription={'jd': jd_repos},
+                                                people={'peo': mult_peo})
                 member.setup({'id':         member_id,
                               'name':       name,
                               'storageCV':  'cloudshare',
@@ -61,13 +66,17 @@ class Members(object):
     def load_default_member(self, member_id):
         member_info = self.member_details.getyaml(member_id)
         path = os.path.join(self.path, self.default_member_name)
-        member = services.member.DefaultMember(self.member_details,
-                                                company={'co': self.co_storage},
-                                                matching={'mch': self.matching},
-                                                curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[0],
-                                                                 'storage': self.cv_storage},
-                                                search_engine={'idx': self.search_engine, 'config': self.es_config},
-                                                jobdescription={'jd': self.jd_repos}, people={'peo': self.mult_peo})
+        member = services.member.DefaultMember(self.member_details, matching={'mch': self.matching},
+                                                company={'co': self.co_repos,
+                                                         'corepo': self.co_repos[0],
+                                                         'costorage': self.co_storage},
+                                                curriculumvitae={'cv': self.cv_repos,
+                                                                 'cvrepo': self.cv_repos[2],
+                                                                 'cvstorage': self.cv_storage},
+                                                search_engine={'idx': self.search_engine,
+                                                               'config': self.es_config},
+                                                jobdescription={'jd': self.jd_repos},
+                                                people={'peo': self.mult_peo})
         member.setup({'name':       self.default_member_name,
                       'id':         member_id,
                       'storageCV':  'cvindividual',
@@ -85,11 +94,16 @@ class Members(object):
         path = os.path.join(self.path, name)
         member = services.member.Member(self.member_details, matching={'mch': self.matching},
                                                 bidding={'bd': self.bd_repos},
-                                                company={'co': self.co_storage},
-                                                curriculumvitae={'cv': self.cv_repos, 'repo': self.cv_repos[0],
-                                                                 'storage': self.cv_storage},
-                                                search_engine={'idx': self.search_engine, 'config': self.es_config},
-                                                jobdescription={'jd': self.jd_repos}, people={'peo': self.mult_peo})
+                                                company={'co': self.co_repos,
+                                                         'corepo': self.co_repos[0],
+                                                         'costorage': self.co_storage},
+                                                curriculumvitae={'cv': self.cv_repos,
+                                                                 'cvrepo': self.cv_repos[0],
+                                                                 'cvstorage': self.cv_storage},
+                                                search_engine={'idx': self.search_engine,
+                                                               'config': self.es_config},
+                                                jobdescription={'jd': self.jd_repos},
+                                                people={'peo': self.mult_peo})
         member.setup({'name':       name,
                       'storageCV':  'cloudshare',
                       'storagePEO': 'peostorage',

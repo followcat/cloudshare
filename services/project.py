@@ -47,8 +47,8 @@ class Project(services.operator.combine.Combine):
         assert 'matching' in kwargs
         assert 'search_engine' in kwargs
         assert 'jobdescription' in kwargs
-        self.bd_repos = kwargs['bidding']['bd']
-        self.jd_repos = kwargs['jobdescription']['jd']
+        self.bd_blocks = kwargs['bidding']['bd']
+        self.jd_blocks = kwargs['jobdescription']['jd']
         self.search_engine = kwargs['search_engine']['idx']
         self.es_config = kwargs['search_engine']['config']
 
@@ -67,7 +67,7 @@ class Project(services.operator.combine.Combine):
     def storageCO(self):
         result = None
         servicename = self.config['storageCO']
-        for repo in self.bd_repos:
+        for repo in self.bd_blocks:
             if isinstance(repo, services.simulationbd.SimulationBD):
                 for each in repo.storages:
                     if each.name == servicename:
@@ -102,14 +102,14 @@ class Project(services.operator.combine.Combine):
         jdpath = os.path.join(self.path, self.JD_PATH)
         self.bidding = services.bidding.SearchIndex(services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
-                    data_service=services.operator.multiple.Multiple(self.bd_repos),
+                    data_service=services.operator.multiple.Multiple(self.bd_blocks),
                     operator_service=services.simulationbd.SimulationBD(copath, self.name)),
                 operator_service=services.simulationbd.SelectionBD(copath, self.name)))
         self.customer = services.operator.checker.Selector(
                 data_service=self.bidding,
                 operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
         self.jobdescription = services.jobdescription.SearchIndex(services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(self.jd_repos),
+                data_service=services.operator.multiple.Multiple(self.jd_blocks),
                 operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
         self.idx_setup()
         return result

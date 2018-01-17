@@ -208,7 +208,10 @@ class DefaultMember(CommonMember):
         doctype = kwargs.pop('doctype')
         method = kwargs.pop('method')
         if attr.endswith('_search'):
-            kwargs['doctype'] = [doctype]
+            if attr.startswith('co'):
+                kwargs['doctype'] = None
+            else:
+                kwargs['doctype'] = [doctype]
         else:
             for key in ('_indexadd', '_add', '_modify', '_kick'):
                 if attr.endswith(key):

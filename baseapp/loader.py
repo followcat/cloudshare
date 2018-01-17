@@ -24,6 +24,7 @@ class Config(object):
     default_storage_path['1.6'] = default_storage_path['1.5']
     default_storage_path['1.7'] = default_storage_path['1.6']
     default_storage_path['1.8'] = default_storage_path['1.7']
+    default_storage_path['1.9'] = default_storage_path['1.8']
 
     storage_template = {'1.1': (
         ("RAW",             "raw"),
@@ -90,6 +91,28 @@ class Config(object):
         ("CV_INDIV",        "CV/indiv"),
         ("CO_STO",          "CO/storage"),
         ("CV_STO",          "CV/storage"),
+        ("PEO_REPO",        "PEO/repo"),
+        ("PEO_INDIV",       "PEO/indiv"),
+        ("PEO_STO",         "PEO/storage"),
+        ("PEO_LIMIT",       "PEO/limit"),
+        ("MEMBERS",         "members"),
+        ("UPLOAD_TEMP",     "output"),
+        ("RAW",             "raw")
+    ),
+    '1.9': (
+        ("LSI",             "model/lsimodel"),
+        ("CUTWORD",         "cache/cutwords"),
+        ("ACCOUNT",         "account/account"),
+        ("PASSWORD",        "account/password"),
+        ("MESSAGE",         "account/message"),
+        ("JD_REPO",         "JD/repo"),
+        ("BD_REPO",         "BD/repo"),
+        ("CV_REPO",         "CV/repo"),
+        ("CO_REPO",         "CO/repo"),
+        ("CV_INDIV",        "CV/indiv"),
+        ("CO_INDIV",        "CO/indiv"),
+        ("CV_STO",          "CV/storage"),
+        ("CO_STO",          "CO/storage"),
         ("PEO_REPO",        "PEO/repo"),
         ("PEO_INDIV",       "PEO/indiv"),
         ("PEO_STO",         "PEO/storage"),
@@ -183,7 +206,7 @@ class Config(object):
  
 
 CONFIG_PATH = 'config'
-config = Config(CONFIG_PATH, version='1.8')
+config = Config(CONFIG_PATH, version='1.9')
 
 def load_mult_classify(svc_storages):
     global config

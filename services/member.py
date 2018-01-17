@@ -46,6 +46,7 @@ class CommonMember(services.operator.combine.Combine):
 
     PEO_PATH = 'people'
     CO_PATH = 'companies'
+    FIRM_PATH = 'firms'
 
     commitinfo = 'Member'
 
@@ -102,6 +103,7 @@ class CommonMember(services.operator.combine.Combine):
         self.path = os.path.join(self.config_service.path.replace('config/', ''), self.name)
         self.co_path = os.path.join(self.path, self.CO_PATH)
         self.peo_path = os.path.join(self.path, self.PEO_PATH)
+        self.firm_path = os.path.join(self.path, self.FIRM_PATH)
         self.people = services.operator.checker.Filter(
                 data_service=services.operator.split.SplitData(
                     data_service=services.operator.multiple.Multiple(self.mult_peo),
@@ -166,11 +168,14 @@ class CommonMember(services.operator.combine.Combine):
 
     def backup(self, path):
         member_path = os.path.join(path, self.name)
+        firms_path = os.path.join(member_path, self.FIRM_PATH)
         people_path = os.path.join(member_path, self.PEO_PATH)
         companies_path = os.path.join(member_path, self.CO_PATH)
+        utils.builtin.assure_path_exists(firms_path)
         utils.builtin.assure_path_exists(member_path)
         utils.builtin.assure_path_exists(people_path)
         utils.builtin.assure_path_exists(companies_path)
+        self.people.backup(firms_path)
         self.people.backup(people_path)
         self.company.backup(companies_path)
 
@@ -189,6 +194,7 @@ class DefaultMember(CommonMember):
         assert 'jobdescription' in kwargs
         assert 'curriculumvitae' in kwargs
         self.cv_repo = kwargs['curriculumvitae']['cvrepo']
+        self.co_repo = kwargs['company']['corepo']
         self.co_storage = kwargs['company']['costorage']
         self.cv_storage = kwargs['curriculumvitae']['cvstorage']
         self.jd_blocks = kwargs['jobdescription']['jd']
@@ -237,9 +243,16 @@ class DefaultMember(CommonMember):
                         operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                     operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
-        self.company = services.operator.split.SplitData(
+        self.company = services.operator.multiple.Multiple(
+                [services.company.SearchIndex(services.operator.checker.Filter(
+                    data_service=services.operator.split.SplitData(
+                        data_service=self.co_repo,
+                        operator_service=services.simulationco.SimulationCO(self.firm_path, self.name)),
+                    operator_service=services.simulationco.SelectionCO(self.firm_path, self.name))),
+                services.operator.split.SplitData(
                     data_service=self.co_storage,
-                    operator_service=services.simulationco.SimulationCO(self.co_path, self.name))
+                    operator_service=services.simulationco.SimulationCO(self.firm_path, self.name)),
+                ])
         self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
                 services.operator.multiple.Multiple(self.jd_blocks)))
         self.idx_setup()

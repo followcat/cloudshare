@@ -29,9 +29,10 @@ class Members(object):
         self.cv_storage = services.curriculumvitae.SearchIndex(
                             services.operator.multiple.Multiple(self.cv_repos[1:]))
         self.co_storage = services.company.SearchIndex(
-                            services.operator.multiple.Multiple(self.co_repos))
+                            services.operator.multiple.Multiple(self.co_repos[1:]))
         self.active_members = services.base.name_storage.NameStorage(self.path, 'memlist')
         self.member_details = services.member.SimulationMember(os.path.join(self.path, 'config'), 'memconfig')
+
         for member_id in self.active_members.ids:
             member_info = self.member_details.getyaml(member_id)
             if member_info['name'] == 'default':
@@ -68,7 +69,7 @@ class Members(object):
         path = os.path.join(self.path, self.default_member_name)
         member = services.member.DefaultMember(self.member_details, matching={'mch': self.matching},
                                                 company={'co': self.co_repos,
-                                                         'corepo': self.co_repos[0],
+                                                         'corepo': self.co_repos[2],
                                                          'costorage': self.co_storage},
                                                 curriculumvitae={'cv': self.cv_repos,
                                                                  'cvrepo': self.cv_repos[2],

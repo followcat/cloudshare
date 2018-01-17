@@ -157,15 +157,11 @@ class LSIbaseAPI(Resource):
             cur_page = 1
         datas = list()
         iduses = list()
-        index = set([member.es_config['CV_MEM']])
-        doctype = [member.id]
         for use in uses:
             if use == member.name:
                 iduses.append(member.id)
             else:
                 iduses.append(use)
-                index.add(member.es_config['CV_STO'])
-                doctype.append(member.es_config['CV_STO'])
         totals, searchs = member.cv_search(filterdict=filterdict, size=5000, source=False)
         ids = [item['_id'] for item in searchs]
         results = member.mch_probability_by_ids(doc, ids, uses=iduses, **project)
@@ -182,13 +178,12 @@ class LSIbaseAPI(Resource):
                       "order" : "asc"
                   }
                 }
-        totals, searchs = member.cv_search(index=list(index), doctype=doctype,
-                                               filterdict=filterdict,
-                                               ids=ids,
-                                               kwargs={'sort': sort,
-                                                       '_source_exclude': ['content']},
-                                               start=(cur_page-1)*size, size=size,
-                                               source=True)
+        totals, searchs = member.cv_search(filterdict=filterdict,
+                                           ids=ids,
+                                           kwargs={'sort': sort,
+                                                   '_source_exclude': ['content']},
+                                           start=(cur_page-1)*size, size=size,
+                                           source=True)
         """
         pages = int(math.ceil(float(len(searchs))/size))
         datas = list()
@@ -283,8 +278,6 @@ class LSIbyAllJDAPI(LSIbaseAPI):
 
     def findbest(self, member, project, filterdict, threshold, numbers, svc_project):
         results = dict()
-        index = [member.es_config['CV_MEM'], member.es_config['CV_STO']]
-        doctype = [member.id, 'cvstorage']
         searchids = member.cv_search(filterdict=filterdict, onlyid=True)
         for jd_id, jd in svc_project.jobdescription.datas():
             try:
@@ -392,7 +385,6 @@ class SimilarAPI(Resource):
         project = member.getproject(projectname)
         doc = member.cv_getmd(id)
         datas = []
-        index = [member.es_config['CV_MEM']]
         doctype = [member.id]
         totals, searchs = member.cv_search(
             filterdict={'date': [time.strftime('%Y%m%d', time.localtime(time.time()-

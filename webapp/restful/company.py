@@ -1,4 +1,3 @@
-import json
 import math
 
 import flask
@@ -8,7 +7,6 @@ from flask.ext.restful import Resource, reqparse
 
 import core.basedata
 import extractor.information_explorer
-import utils.builtin
 
 
 class CompanyAPI(Resource):

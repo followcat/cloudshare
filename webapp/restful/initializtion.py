@@ -1,5 +1,6 @@
 import flask.ext.restful
 
+from webapp.restful.firm import *
 from webapp.restful.match import *
 from webapp.restful.people import *
 from webapp.restful.mining import *
@@ -142,3 +143,6 @@ def initialize(app):
 
     api.add_resource(CaptchaAPI, '/api/captcha', endpoint = 'captcha')
     api.add_resource(SMSAPI, '/api/sms/<string:code>', endpoint = 'sms')
+
+    api.add_resource(FirmAPI, '/api/1.0/firm/<string:id>', endpoint='firm')
+    api.add_resource(FirmSearchAPI, '/api/1.0/firms/search', endpoint='firmsearch')

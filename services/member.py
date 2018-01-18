@@ -130,7 +130,7 @@ class Member(services.base.service.Service):
     def load_projects(self):
         self.projects = dict()
         for path in glob.glob(os.path.join(self.projects_path, '*')):
-            if os.path.isdir(path):
+            if os.path.isdir(path) and os.path.exists(os.path.join(path, 'config.yaml')):
                 str_name = os.path.split(path)[1]
                 name = unicode(str_name, 'utf-8')
                 tmp_project = services.project.Project(unicode(path, 'utf-8'), [self.companies],

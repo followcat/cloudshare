@@ -17,7 +17,7 @@ class ResumeJobRecommend extends Component {
     super(props);
     this.state = {
       visible: false,
-      jdId: null
+      jdId: ''
     }
     this.handleClickMore = this.handleClickMore.bind(this);
     this.getDomRader = this.getDomRader.bind(this);

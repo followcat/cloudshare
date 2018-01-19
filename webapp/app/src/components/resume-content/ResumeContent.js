@@ -17,10 +17,9 @@ class ResumeContent extends Component {
   render() {
     const { highlight, html } = this.props;
     return (
-       <div className={`${this.props.prefixCls}-wrapper`}>
+       <div className={`${this.props.prefixCls}-html`}>
         <HighLight highlight={highlight} html={html}>
          <div
-           className={`${this.props.prefixCls}`}
            ref="cv"
            dangerouslySetInnerHTML={{ __html: this.props.html }}
          />

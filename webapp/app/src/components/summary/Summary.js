@@ -69,12 +69,12 @@ class Summary extends Component {
                       span={colValue}
                     >
                       <Col
-                        span={10}
+                        span={8}
                         className={`${props.prefixCls}-label`}
                       >
                         {`${replaceName(v.name)}: `}
-                      </Col>  
-                      <Col span={14}>
+                      </Col>
+                      <Col span={16}>
                         {v.value}
                       </Col>
                     </Col>
@@ -86,12 +86,13 @@ class Summary extends Component {
             return (
               <Row key={index}>
                 <Col
-                  span={5}
+                  span={4}
                   className={`${props.prefixCls}-label`}
                 >
                   {`${replaceName(dataItem.name)}: `}
                 </Col>
-                <Col span={19}>
+                <br />
+                <Col span={19} offset={4}>
                   {dataItem.value.reverse().map((valueItem, index) => {
                     return (
                       <p key={index}>{valueItem.join(' | ')}</p>

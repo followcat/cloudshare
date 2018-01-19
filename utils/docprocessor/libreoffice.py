@@ -34,12 +34,8 @@ class LibreOfficeProcessor(utils.docprocessor.base.Processor):
 
     def convert_docfile(self, input, filename, output, outputname):
         result = True
-        try:
-            self.converter.convert(os.path.join(input, filename),
-                                   os.path.join(output, outputname))
-        except Exception as e:
-            logger.info(e)
-            result = False
+        self.converter.convert(os.path.join(input, filename),
+                               os.path.join(output, outputname))
         return result
 
     def remove_note(self):

@@ -8,6 +8,8 @@ from com.sun.star.task import ErrorCodeIOException
 from com.sun.star.connection import NoConnectException
 
 import utils.builtin
+import utils.timeout.thread
+import utils.timeout.exception
 from utils.docprocessor.base import logger
 
 DEFAULT_OPENOFFICE_PORT = 8100
@@ -52,6 +54,7 @@ class DocumentConversionException(Exception):
 class DocumentConverter:
 
     def __init__(self, host='localhost', port=DEFAULT_OPENOFFICE_PORT, invisible=True):
+        self.p = None
         self.host = host
         self.port = port
         self.invisible = invisible
@@ -60,56 +63,84 @@ class DocumentConverter:
         self.resolver = self.localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver",
                         self.localContext)
 
-
     def startservice(self):
+
+        def close_soffice():
+            command = ['pkill', '-9', 'soffice.bin']
+            subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+
         def wait_until_port_open(timeout=10):
             count = 0
             while(not utils.builtin.is_port_open(self.host, self.port)):
                 time.sleep(0.01)
                 count += 0.01
                 if count > timeout:
+                    print "Can not connect unoconverter server."
                     logger.info("Can not connect unoconverter server.")
                     break
 
+        close_soffice()
         if not utils.builtin.is_port_open(self.host, self.port):
             command = ['libreoffice',
                        '--accept=socket,host=%s,port=%s;urp;'%(self.host, self.port)]
             if self.invisible is True:
                 command.append('--invisible')
+            if self.p:
+                self.p.kill()
             self.p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
             wait_until_port_open()
 
+    def restartservice(self):
+        if self.p:
+            self.p.terminate()
+        self.startservice()
 
-    def convert(self, inputFile, outputFile):
-        try:
-            context = self.resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % self.port)
-        except NoConnectException:
-            self.startservice()
+    def makedesktop(self):
+        while(True):
+            try:
+                context = self.resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % self.port)
+                self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)
+                break
+            except Exception as e:
+                self.restartservice()
+                logger.info("%s. Restart service and rebuild desktop." % e)
             if not utils.builtin.is_port_open(self.host, self.port):
                 raise DocumentConversionException, "failed to connect to OpenOffice.org on port %s" % self.port
-            context = self.resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % self.port)
-        self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)
 
+    def convert(self, inputFile, outputFile):
+        retry = 0
         inputUrl = self._toFileUrl(inputFile)
         outputUrl = self._toFileUrl(outputFile)
-
         loadProperties = {"Hidden": True}
-
-        document = self.desktop.loadComponentFromURL(inputUrl, "_blank", 0, self._toProperties(loadProperties))
-        try:
-            document.refresh()
-        except AttributeError:
-            pass
-
-        family = self._detectFamily(document)
-
-        outputExt = self._getFileExt(outputFile)
-        storeProperties = self._getStoreProperties(document, outputExt)
-
-        try:
-            document.storeToURL(outputUrl, self._toProperties(storeProperties))
-        finally:
-            document.close(True)
+        self.makedesktop()
+        while(True and retry<3):
+            try:
+                document = utils.timeout.thread.timeout_call(self.desktop.loadComponentFromURL, 30,
+                                                             kill_wait=1,
+                                                             args=(inputUrl, "_blank", 0,
+                                                                   self._toProperties(loadProperties)))
+                document.refresh()
+                family = self._detectFamily(document)
+                outputExt = self._getFileExt(outputFile)
+                storeProperties = self._getStoreProperties(document, outputExt)
+                try:
+                    document.storeToURL(outputUrl, self._toProperties(storeProperties))
+                finally:
+                    document.close(True)
+                break
+            except utils.timeout.exception.ExecTimeout as e:
+                logger.info("DocumentConverter timeout.")
+                logger.info("Restart service and rebuild desktop.")
+                self.restartservice()
+                self.makedesktop()
+            except Exception as e:
+                # com.sun.star.uno.RuntimeException:
+                # Binary URP bridge already disposed
+                logger.info(e)
+                logger.info("Restart service and rebuild desktop.")
+                self.restartservice()
+                self.makedesktop()
+            retry += 1
 
     def _getStoreProperties(self, document, outputExt):
         family = self._detectFamily(document)

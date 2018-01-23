@@ -19,7 +19,7 @@ class Members(object):
         self.mult_peo = mult_peo
         self.members = dict()
         for member_path in glob.glob(os.path.join(self.path, '*')):
-            if os.path.isdir(member_path):
+            if os.path.isdir(member_path) and os.path.exists(os.path.join(member_path, 'config.yaml')):
                 str_name = os.path.split(member_path)[1]
                 name = unicode(str_name, 'utf-8')
                 member = services.member.Member(acc_repos, co_repos, cv_repos, jd_repos,

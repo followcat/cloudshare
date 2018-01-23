@@ -2,38 +2,39 @@
 import re
 
 
-def convert_key(filter_list):
+def convert_filterdict(keywords):
     result = dict()
     convert_dict = {
-        u'简历ID': 'id',
-        u'上传人': 'committer',
-        u'姓名': 'name',
-        u'邮箱': 'email',
-        u'性别': 'gender',
-        u'手机': 'phone',
-        u'年龄': 'age',
-        u'学历': 'education',
-        u'职位': 'position',
-        u'公司': 'company',
-        u'行业': 'classify',
-        u'来源': 'origin',
-        u'婚姻状况': 'marital_status'
+        u'简历ID':    'id',
+        u'上传人':     'committer',
+        u'姓名':      'name',
+        u'邮箱':      'email',
+        u'性别':      'gender',
+        u'手机':      'phone',
+        u'年龄':      'age',
+        u'学历':      'education',
+        u'职位':      'position',
+        u'公司':      'experience.company.name',
+        u'任职公司':    'company',
+        u'行业':      'classify',
+        u'来源':      'origin',
+        u'婚姻状况':    'marital_status'
     }
+    filter_list = re.findall(u'([\u4E00-\u9FA5A-Za-z0-9_]+)[:：]([\u4E00-\u9FA5A-Za-z0-9_]+)',
+                             keywords)
+    keywords = re.sub(u'([\u4E00-\u9FA5A-Za-z0-9_]+)[:：]([\u4E00-\u9FA5A-Za-z0-9_]+)',
+                      '', keywords)
     for each in filter_list:
         key, value = each
         if key in convert_dict:
             result[convert_dict[key]] = value
-    return result
+    return keywords, result
 
 
 def match_gen(key, keywords, must=True, slop=0):
     result = {'must': [], 'should': [], 'filter': []}
     match_str = re.sub('"(.*?)"', '', keywords)
     match_phrase_list = re.findall(u'[“"](.*?)["”]', keywords)
-    filter_list = re.findall(u'([\u4E00-\u9FA5A-Za-z0-9_]+)[:：]([\u4E00-\u9FA5A-Za-z0-9_]+)',
-                             keywords)
-    keywords = re.sub(u'([\u4E00-\u9FA5A-Za-z0-9_]+)[:：]([\u4E00-\u9FA5A-Za-z0-9_]+)',
-                      '', keywords)
     if len(match_str.replace(' ', '')) > 0:
         result["should"] = [{
                 "match_phrase": {
@@ -47,7 +48,7 @@ def match_gen(key, keywords, must=True, slop=0):
                                                    "minimum_should_match": "30%"}}})
     for keyword in match_phrase_list:
         result['must'].append({"match_phrase": {key: {"query": keyword}}})
-    return result, convert_key(filter_list)
+    return result
 
 
 def filter_gen(filterdict):
@@ -119,17 +120,25 @@ def request_gen(esconn, index=None, doctype=None, filterdict=None, ids=None, slo
             must = True
             if mappings[key] != 'text':
                 continue
+            keywords, str_filter = convert_filterdict(filterdict[key])
+            filterdict[key] = keywords
+            filterdict.update(str_filter)
+        mappings = getmappings(esconn, fields=filterdict.keys(),
+                               index=index, doctype=doctype)
+        for key in mappings:
+            must = True
+            if mappings[key] != 'text':
+                continue
             if key not in filterdict:
                 must = False
                 filterdict[key] = allshould
-            match_query, filter_query = match_gen(key, filterdict[key], must=must, slop=slop)
+            match_query = match_gen(key, filterdict[key], must=must, slop=slop)
             for each in match_query:
                 if match_query[each]:
                     if each not in querydict['query']['bool']:
                         querydict['query']['bool'][each] = list()
                     querydict['query']['bool'][each].extend(match_query[each])
             filterdict.pop(key)
-            filterdict.update(filter_query)
         filter_query = filter_gen(filterdict)
         for each in filter_query:
             if filter_query[each]:

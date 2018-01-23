@@ -2,58 +2,13 @@
 
 import os
 import time
-import shutil
 
 import utils.builtin
-import utils.chsname
-import core.exception
 import core.outputstorage
 import extractor.information_explorer
 
-
-def move_file(path, origin_path, filename):
-    base = "/tmp/Classify"
-    des_path = os.path.join(base, path)
-    if not os.path.exists(des_path):
-        os.makedirs(des_path)
-    shutil.copy(os.path.join(origin_path, filename),
-                os.path.join(des_path, filename))
-
-
-def filter(processer, yamlinfo, origin_path, filename):
-    def mustjudge(d):
-        return (d['email'] or d['phone'])
-
-    if processer.result is False:
-        path = "NotConvert"
-        move_file(path, origin_path, filename)
-        return
-    info = yamlinfo
-    if mustjudge(info):
-        if info['name']:
-            path = "OK"
-            move_file(path, origin_path, filename)
-        else:
-            name = utils.chsname.name_from_51job(processer.markdown_stream)
-            if name:
-                path = "51jobname"
-                move_file(path, origin_path, filename)
-            else:
-                name = utils.chsname.name_from_filename(filename)
-                if name:
-                    path = "name_in_filename"
-                    move_file(path, origin_path, filename)
-                else:
-                    path = "needaddname"
-                    move_file(path, origin_path, filename)
-    else:
-        path = "NoneConnection"
-        move_file(path, origin_path, filename)
-
-
 import yaml
 import utils._yaml
-import utils.builtin
 
 yaml.SafeDumper = utils._yaml.SafeDumper
 
@@ -268,17 +223,6 @@ def company_knowledge(SVC_CV, SVC_CO):
                 SVC_CO.add(coinfo)
 
 
-def initclassify(SVC_CV, SVC_CO=None):
-    import collections
-    import utils.builtin
-
-    for y in SVC_CV.yamls():
-        info = SVC_CV.getyaml(y)
-        info['classify'] = extractor.information_explorer.get_classify(info['experience'], SVC_CO)
-        if info['classify']:
-            utils.builtin.save_yaml(info, SVC_CV.path , y)
-
-
 def inituniqueid(SVC_CV, with_report=False, with_diff=False):
     import difflib
     import utils.builtin
@@ -305,49 +249,6 @@ def inituniqueid(SVC_CV, with_report=False, with_diff=False):
                         print(l.rstrip())
                     print('\n++++\n')
         utils.builtin.save_yaml(info, SVC_CV.path , y)
-
-
-
-def initproject(SVC_CV_REPO, SVC_PRJ):
-    import utils.builtin
-    for y in SVC_CV_REPO.yamls():
-        info = SVC_CV_REPO.getyaml(y)
-        convert_info = dict()
-        convert_info['tag'] = info.pop('tag')
-        convert_info['comment'] = info.pop('comment')
-        convert_info['tracking'] = info.pop('tracking')
-        convert_info['committer'] = info['committer']
-        SVC_PRJ._add(y)
-        utils.builtin.save_yaml(info, SVC_CV_REPO.path , y)
-        utils.builtin.save_yaml(convert_info, SVC_PRJ.cvpath , y)
-        SVC_PRJ.save()
-
-
-def convert_oldcompany(SVC_CO_REPO, filepath, filename):
-    import core.basedata
-    yamls = utils.builtin.load_yaml(filepath, filename)
-    for y in yamls:
-        args = y
-        metadata = extractor.information_explorer.catch_coinfo(stream=args)
-        coobj = core.basedata.DataObject(metadata, data=args['introduction'].encode('utf-8'))
-        SVC_CO_REPO.add(coobj)
-
-
-def update_jd_co_id(SVC_JD, SVC_CO):
-    import yaml
-    co_dict = {}
-    for id in SVC_CO.ids:
-        co_info = SVC_CO.getyaml(id)
-        co_dict[co_info['name']] = co_info
-
-    for jd_id, jd in SVC_JD.datas():
-        jd_company = jd['company']
-        if jd_company in co_dict:
-            jd['company'] = co_dict[jd_company]['id']
-            dump_data = yaml.safe_dump(jd, allow_unicode=True)
-            filename = SVC_JD.filename(jd_id)
-            with open(os.path.join(SVC_JD.path, filename), 'w') as f:
-                f.write(dump_data)
 
 
 def update_jd_commentary(SVC_JD, comments_dict):

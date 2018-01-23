@@ -271,54 +271,39 @@ class LSIbyAllJDAPI(LSIbaseAPI):
     def __init__(self):
         super(LSIbyAllJDAPI, self).__init__()
         self.reqparse.add_argument('fromcache', type=bool, location = 'json')
-        self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
 
-    def findbest(self, member, project, filterdict, threshold, numbers, svc_project):
-        results = dict()
-        searchids = member.cv_search(filterdict=filterdict, onlyid=True)
-        for jd_id, jd in svc_project.jobdescription.datas():
-            try:
-                if jd['status'] == 'Closed':
-                    continue
-            except KeyError:
-                continue
-            doc = jd['description']
-            doc += jd['commentary']
-            project = dict(filter(lambda x: x[0] in ('project',), kwargs.items()))
-            result = member.mch_probability_by_ids(doc, searchids, top=numbers, **project)
-            output = { 'CV': list() }
-            for each in result:
-                if each[1] > threshold:
-                    cvinfo = member.cv_getyaml(each[0])
-                    cvinfo['CVvalue'] = each[1]
-                    output['CV'].append(cvinfo)
-            if output['CV']:
-                output['id'] = jd_id
-                output['name'] = jd['name']
-                output['description'] = jd['description']
-                output['company'] = member.bd_getyaml(jd['company'], **project)['name']
-                results[jd_id] = output
-        return results
-
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         threshold = args['threshold']
         filterdict = args['filterdict']
         numbers = args['numbers']
         results = list()
         member = user.getmember()
-        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-        alls = self.findbest(member, project, filterdict, threshold, numbers, svc_project=member.getproject(projectname))
-        for jdid in alls:
-            results.append({'ID': jdid, 'name': alls[jdid]['name'],
-                            'company': alls[jdid]['company'],
-                            'description': alls[jdid]['description'],
-                            'CV': alls[jdid]['CV'][0:numbers]})
+        searchids = member.cv_search(filterdict=filterdict, onlyid=True)
+        for item in member.projects.keys():
+            project = dict({'project': item})
+            for item in member.jd_search(filterdict={'status': 'Opening'},
+                                         source=True, **project)[1]:
+                jd = item['_source']
+                doc = jd['description']
+                doc += jd['commentary']
+                result = member.mch_probability_by_ids(doc, searchids, top=numbers, **project)
+                CVs = list()
+                for each in result:
+                    if each[1] > threshold:
+                        cvinfo = member.cv_getyaml(each[0])
+                        cvinfo['CVvalue'] = each[1]
+                        CVs.append(cvinfo)
+                if CVs:
+                    results.append({'ID': jd['id'], 'name': jd['name'],
+                                    'company': member.bd_getyaml(jd['company'],
+                                                                 **project)['name'],
+                                    'description': jd['description'],
+                                    'CV': CVs})
         return { 'code': 200, 'data': results }
 
 

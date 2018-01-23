@@ -23,12 +23,11 @@ import { getJobDescriptionSearch } from 'request/jobdescription';
 
 import { getRadarOption } from 'utils/chart_option';
 
-
 class DrawChart extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      jdId: null,
+      jdId: '',
       jdDoc: '',
       type: 'id',
       dataSource: [],
@@ -43,6 +42,7 @@ class DrawChart extends Component {
     this.handleCollapseChange = this.handleCollapseChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDocSubmit = this.handleDocSubmit.bind(this);
     this.handleAnonymousChange = this.handleAnonymousChange.bind(this);
     this.handleOk = this.handleOk.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
@@ -90,15 +90,20 @@ class DrawChart extends Component {
     });
   }
 
+  handleDocSubmit() {
+    const { jdDoc } = this.state;
+      if (jdDoc === '') {
+      message.error('请更改职位描述.');
+      return;
+    }
+    this.setState({ type: 'doc' },this.handleSubmit())
+  }
+
   handleSubmit() {
     const { type, jdId, jdDoc, anonymized } = this.state,
           { resumeId } = this.props;
-    if (jdId === '' && jdDoc === '') {
-      message.error('请选择一个职位描述.');
-      return;
-    }
 
-    let requestParams = type === 'id' ? { id: jdId } : { doc: jdDoc };
+    let requestParams = type == 'id' ? { id: jdId } : { doc: jdDoc };
 
     this.setState({
       chartVisible: true,
@@ -112,7 +117,8 @@ class DrawChart extends Component {
         const option = getRadarOption(json.data.max, json.data.result, anonymized);
         this.setState({
           spinning: false,
-          radarOption: option
+          radarOption: option,
+          type: ''
         });
       }
     });
@@ -158,9 +164,19 @@ class DrawChart extends Component {
   getExpandedRowRender(record) {
     return (
       <div>
-        <div>
-          {record.description.split('\n').map((item, index) => { return (<p key={index}>{item}</p>); })}
-        </div>
+          <Input
+            type='textarea'
+            autosize={{minRows: 5}}
+            defaultValue={record.description}
+            onChange={this.handleInputChange}
+          />
+          <Button
+            type="primary"
+            style={{ marginTop: 4 }}
+            onClick={this.handleDocSubmit}
+          >
+            {language.SUBMIT}
+          </Button>
       </div>
     );
   }
@@ -200,8 +216,9 @@ class DrawChart extends Component {
       width: '15%',
       render: (record) => (
         <a onClick={() => {
-          this.setState({jdId:record.id,type: 'id'},() => this.handleSubmit());
-          }}>{language.MATCH_ACTION}</a>
+          this.setState({jdId:record.id,type: 'id'},() => this.handleSubmit());}}>
+          {language.MATCH_ACTION}
+        </a>
       )
     }
     ];
@@ -255,16 +272,6 @@ class DrawChart extends Component {
                 size="small"
                 rowKey={record => record.id}
                 expandedRowRender={record => this.getExpandedRowRender(record)}
-              />
-            </Collapse.Panel>
-            <Collapse.Panel
-              header={'职位描述内容'}
-              key="doc"
-            >
-              <Input
-                type="textarea"
-                rows="4"
-                onChange={this.handleInputChange}
               />
             </Collapse.Panel>
           </Collapse>

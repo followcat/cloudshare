@@ -20,7 +20,7 @@ class FirmAPI(Resource):
         user = flask.ext.login.current_user
         member = user.getmember()
         result = member.co_getyaml(id)
-        code = 400
+        code = 200
         if not result:
             code = 404
         return {'data': result}, code
@@ -55,6 +55,6 @@ class FirmSearchAPI(Resource):
                 datas.append(info)
             else:
                 total -= 1
-        code = 400
+        code = 200
         return {'data': datas, 'total': total}, code
 

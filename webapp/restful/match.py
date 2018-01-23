@@ -98,26 +98,3 @@ class PRJmatchAPI(MatchbaseAPI):
         total, result = self.miner.project_correlation(
                     [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
         return { 'code': 200, 'data': result, 'lenght': total }
-
-
-class CompanyProjectAPI(MatchbaseAPI):
-
-    def __init__(self):
-        super(CompanyProjectAPI, self).__init__()
-        self.cv_repo = flask.current_app.config['SVC_CV_REPO']
-
-    def post(self):
-        super(CompanyProjectAPI, self).post()
-        user = flask.ext.login.current_user
-        member = user.getmember()
-        result = list()
-        total, search = member.cv_search(filterdict={'experience.project.company': self.doc},
-                                         start=(self.page-1)*self.numbers,
-                                         size=self.numbers, source=True)
-        for each in search:
-            for project in each['_source']['experience']['project']:
-                if 'company' in project and project['company'] == self.doc:
-                    result.append( {'id': each['_source']['id'],
-                                    'value': 1,
-                                    'data': project} )
-        return { 'code': 200, 'data': result }

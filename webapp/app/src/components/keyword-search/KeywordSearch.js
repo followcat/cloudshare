@@ -114,7 +114,7 @@ class KeywordSearch extends Component {
 
 KeywordSearch.defaultProps = {
   prefixCls: 'cs-keyword-search',
-  defaultText: "在关键字前后添加双引号,可进行精确搜索",
+  defaultText: '在关键字前后添加双引号,可进行精确搜索; 添加冒号自定义过滤; 如 "会计" 性别：男',
   btnText: 'Search',
   horizontal: false,
   inline: false,

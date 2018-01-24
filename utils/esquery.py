@@ -15,7 +15,7 @@ def convert_filterdict(keywords):
         u'学历':      'education',
         u'职位':      'position',
         u'公司':      'experience.company.name',
-        u'任职公司':    'company',
+        u'最近公司':    'company',
         u'行业':      'classify',
         u'来源':      'origin',
         u'婚姻状况':    'marital_status'

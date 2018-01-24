@@ -47,7 +47,7 @@ class Resume extends Component {
     <div className="details">
        <h3>职位</h3>
        <p>{props.position}</p>
-       <h3>公司</h3>
+       <h3>最近公司</h3>
        <p>{props.company}</p>
        <h3>毕业院校</h3>
        <p>{props.school}</p>
@@ -57,7 +57,7 @@ class Resume extends Component {
        <p>{props.age}</p>
        <h3>性别</h3>
        <p>{props.gender}</p>
-       <h3>婚姻状态</h3>
+       <h3>婚姻状况</h3>
        <p>{props.marital_status}</p>
     </div>
     <div className="clearfix"></div>

@@ -18,7 +18,7 @@ class SearchResultHeader extends Component {
       title: '年龄',
       span: 1
     }, {
-      title: '婚姻状态',
+      title: '婚姻状况',
       span: 2
     }, {
       title: '学历',
@@ -27,10 +27,10 @@ class SearchResultHeader extends Component {
       title: '院校',
       span: 3
     }, {
-      title: '职位名称',
+      title: '职位',
       span: 3
     }, {
-      title: '任职公司',
+      title: '最近公司',
       span: 4
     }, {
       title: '上传人',
@@ -46,7 +46,7 @@ class SearchResultHeader extends Component {
       title: '年龄',
       span: 1
     }, {
-      title: '婚姻状态',
+      title: '婚姻状况',
       span: 2
     }, {
       title: '学历',
@@ -55,10 +55,10 @@ class SearchResultHeader extends Component {
       title: '院校',
       span: 3
     }, {
-      title: '职位名称',
+      title: '职位',
       span: 3
     }, {
-      title: '任职公司',
+      title: '最近公司',
       span: 4
     }, {
       title: '上传人',

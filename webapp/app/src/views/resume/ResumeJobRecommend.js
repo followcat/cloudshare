@@ -54,6 +54,7 @@ class ResumeJobRecommend extends Component {
             return (
               <div key={index} className="recommend-item">
                 <a onClick= {() =>{this.handleClickMore(item.id)}}>
+                  {item.match? parseInt(item.match*100)+'%| ' : ''}
                   {item.yaml_info.name ? item.yaml_info.name : item.id}
                   {item.yaml_info.company_name ? ' | ' + item.yaml_info.company_name: ''}
                 </a>

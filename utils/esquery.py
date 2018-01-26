@@ -116,6 +116,9 @@ def request_gen(esconn, index=None, doctype=None, filterdict=None, ids=None, slo
         if '*' in filterdict:
             allshould = filterdict['*']
             filterdict.pop('*')
+        if 'script' in filterdict:
+            querydict['query']['bool']['must'] = [{'script': filterdict['script']}]
+            filterdict.pop('script')
         for key in mappings:
             must = True
             if mappings[key] != 'text':

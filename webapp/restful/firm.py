@@ -44,9 +44,14 @@ class FirmSearchAPI(Resource):
         size = args['size']
         user = flask.ext.login.current_user
         member = user.getmember()
-        total, searches = member.co_search(filterdict={'name': query},
-                                           start=(page-1)*size,
-                                           size=size)
+        total, searches = member.co_search(filterdict=
+            {'name': query,
+             'script' : {
+                "script": {
+                    "inline": "doc['project.name'].size() > 0"}
+                }
+            },
+            start=(page-1)*size, size=size)
         pages = int(math.ceil(float(total)/size))
         datas = list()
         for item in searches:

@@ -68,7 +68,8 @@ class SearchIndex(services.operator.search.SearchIndex):
                             "match":              "project.name",
                             "mapping": {
                                 "type":           "text",
-                                "analyzer":       "ik_smart"
+                                "analyzer":       "ik_smart",
+                                "fielddata":       True,
                             }
                     }},
                     {

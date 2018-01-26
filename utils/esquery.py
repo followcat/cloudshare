@@ -1,10 +1,40 @@
+# -*- coding: utf-8 -*-
 import re
+
+
+def convert_filterdict(keywords):
+    result = dict()
+    convert_dict = {
+        u'简历ID':    'id',
+        u'上传人':     'committer',
+        u'姓名':      'name',
+        u'邮箱':      'email',
+        u'性别':      'gender',
+        u'手机':      'phone',
+        u'年龄':      'age',
+        u'学历':      'education',
+        u'职位':      'position',
+        u'公司':      'experience.company.name',
+        u'最近公司':    'company',
+        u'行业':      'classify',
+        u'来源':      'origin',
+        u'婚姻状况':    'marital_status'
+    }
+    filter_list = re.findall(u'([\u4E00-\u9FA5A-Za-z0-9_]+)[:：]([\u4E00-\u9FA5A-Za-z0-9_]+)',
+                             keywords)
+    keywords = re.sub(u'([\u4E00-\u9FA5A-Za-z0-9_]+)[:：]([\u4E00-\u9FA5A-Za-z0-9_]+)',
+                      '', keywords)
+    for each in filter_list:
+        key, value = each
+        if key in convert_dict:
+            result[convert_dict[key]] = value
+    return keywords, result
 
 
 def match_gen(key, keywords, must=True, slop=0):
     result = {'must': [], 'should': [], 'filter': []}
     match_str = re.sub('"(.*?)"', '', keywords)
-    match_phrase_list = re.findall('"(.*?)"', keywords)
+    match_phrase_list = re.findall(u'[“"](.*?)["”]', keywords)
     if len(match_str.replace(' ', '')) > 0:
         result["should"] = [{
                 "match_phrase": {
@@ -86,6 +116,18 @@ def request_gen(esconn, index=None, doctype=None, filterdict=None, ids=None, slo
         if '*' in filterdict:
             allshould = filterdict['*']
             filterdict.pop('*')
+        if 'script' in filterdict:
+            querydict['query']['bool']['must'] = [{'script': filterdict['script']}]
+            filterdict.pop('script')
+        for key in mappings:
+            must = True
+            if mappings[key] != 'text':
+                continue
+            keywords, str_filter = convert_filterdict(filterdict[key])
+            filterdict[key] = keywords
+            filterdict.update(str_filter)
+        mappings = getmappings(esconn, fields=filterdict.keys(),
+                               index=index, doctype=doctype)
         for key in mappings:
             must = True
             if mappings[key] != 'text':

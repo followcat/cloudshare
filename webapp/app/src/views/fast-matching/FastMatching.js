@@ -26,7 +26,8 @@ class FastMatching extends Component {
     super(props);
     this.state = {
       current: 1,
-      id: '',
+      jdid: '',
+      cvid: '',
       postAPI: '',
       startColor: '#00ff0a',
       bgStartColor: '#ffeb00',
@@ -82,7 +83,7 @@ class FastMatching extends Component {
       postAPI = API.LSI_BY_JD_ID_API;
 
       this.setState({
-        id: location.query.jd_id,
+        jdid: location.query.jd_id,
         postAPI: postAPI,
         siderbarVisible: true
       });
@@ -99,7 +100,7 @@ class FastMatching extends Component {
       postAPI = API.LSI_BY_CV_ID_API;
 
       this.setState({
-        id: location.query.cv_id,
+        cvid: location.query.cv_id,
         postAPI: postAPI,
         siderbarClosable: true
       });
@@ -174,7 +175,7 @@ class FastMatching extends Component {
    * @memberOf FastMatching
    */
   handleSearch(fieldValue) {
-    const { id, postAPI } = this.state;
+    const { jdid, cvid, postAPI } = this.state;
     let filterData = {},
         postData = {};
 
@@ -196,7 +197,7 @@ class FastMatching extends Component {
       };
     } else {
       postData = {
-        id: id,
+        id: jdid || cvid,
         uses: fieldValue.uses,
         filterdict: filterData
       };
@@ -311,7 +312,7 @@ class FastMatching extends Component {
 
   render() {
     const {
-      id,
+      jdid,
       textarea,
       classify,
       projects,
@@ -358,7 +359,7 @@ class FastMatching extends Component {
           startColor={startColor}
           endColor={endColor}
           bgEndColor={bgEndColor}
-          jdid={id}
+          jdid={jdid}
           searchText={searchText}
           matchDoc={matchDoc}
           dataSource={dataSource}

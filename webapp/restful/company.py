@@ -168,7 +168,7 @@ class CompanyCustomerAPI(Resource):
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         coobj = core.basedata.DataObject({'id': id}, data='')
-        result = member.addcustomer(coobj, user.name, **project)
+        result = member.bd_addcustomer(coobj, user.name, **project)
         if result:
             response = { 'code': 200, 'message': 'Add customer success.' }
         else:
@@ -181,7 +181,7 @@ class CompanyCustomerAPI(Resource):
         id = args['id']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-        result = project.deletecustomer(id, user.name, **project)
+        result = member.bd_deletecustomer(id, user.name, **project)
         if result:
             response = { 'code': 200, 'message': 'Delete customer success.' }
         else:

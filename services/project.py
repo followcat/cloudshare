@@ -196,10 +196,10 @@ class Project(services.operator.combine.Combine):
     def bd_customers(self):
         return self.customer.ids
 
-    def addcustomer(self, coobj, user=None, do_commit=True):
+    def bd_addcustomer(self, coobj, user=None, do_commit=True):
         return self.customer.add(coobj, committer=user, do_commit=do_commit)
 
-    def deletecustomer(self, id, user=None, do_commit=True):
+    def bd_deletecustomer(self, id, user=None, do_commit=True):
         return self.customer.remove(id, committer=user, do_commit=do_commit)
 
     def jd_get(self, id):

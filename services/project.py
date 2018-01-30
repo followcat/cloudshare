@@ -24,8 +24,6 @@ class SimulationProject(services.base.kv_storage.KeyValueStorage):
         ('model',               functools.partial(str, object='default')),
         ('autosetup',           bool),
         ('autoupdate',          bool),
-        ('storageCO',           str),
-        ('storageJD',           str),
     )
 
     def add(self, bsobj, *args, **kwargs):
@@ -64,20 +62,8 @@ class Project(services.operator.combine.Combine):
         self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
 
     @property
-    def storageCO(self):
-        result = None
-        servicename = self.config['storageCO']
-        for repo in self.bd_blocks:
-            if isinstance(repo, services.simulationbd.SimulationBD):
-                for each in repo.storages:
-                    if each.name == servicename:
-                        result = each
-                        break
-            elif repo.name == servicename:
-                result = repo
-            if result is not None:
-                break
-        return result
+    def storageBD(self):
+        return self.bidding.data_service.data_service.data_service
 
     @property
     def modelname(self):
@@ -136,15 +122,15 @@ class Project(services.operator.combine.Combine):
         if self.bidding.exists(id):
             info['id'] = id
             bsobj = core.basedata.DataObject(metadata=info, data=None)
-            repo_result = self.storageCO.modify(bsobj, "Update %s information."%id,
-                                                  committer)
+            repo_result = self.storageBD.modify(bsobj, "Update %s information."%id,
+                                                committer)
             project_result = self.bidding.modify(bsobj, committer)
             result = repo_result or project_result
         return result
 
     def bd_compare_excel(self, stream, committer):
         outputs = list()
-        outputs.extend(self.storageCO.compare_excel(stream, committer))
+        outputs.extend(self.storageBD.compare_excel(stream, committer))
         outputs.extend(self.bidding.compare_excel(stream, committer))
         return outputs
 
@@ -159,7 +145,7 @@ class Project(services.operator.combine.Combine):
             if item[0] == 'companyadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 try:
-                    result = self.storageCO.add(baseobj, committer=item[2][-1], do_commit=False)
+                    result = self.storageBD.add(baseobj, committer=item[2][-1], do_commit=False)
                     success = True
                 except Exception:
                     success = False
@@ -186,7 +172,7 @@ class Project(services.operator.combine.Combine):
             else:
                 success = False
             results[item[1]] = {'data': item, 'success': success, 'result': result}
-        self.storageCO.interface.do_commit(list(repo_result), committer=committer)
+        self.storageBD.interface.do_commit(list(repo_result), committer=committer)
         self.bidding.interface.do_commit(list(project_result), committer=committer)
         return results
 

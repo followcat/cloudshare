@@ -29,11 +29,6 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
         ('id',                  str),
         ('name',                str),
         ('administrator',       list),
-        ('storageCV',           str),
-        ('storagePEO',          str),
-        ('limitPEO',            str),
-        ('storageCO',           str),
-        ('storageJD',           str),
     )
 
     def add(self, bsobj, *args, **kwargs):
@@ -121,26 +116,6 @@ class CommonMember(services.operator.combine.Combine):
             self.config['administrator'] = set()
             self.config_service.modify(core.basedata.DataObject(metadata=self.config, data=None))
         return self.config['administrator']
-
-    @property
-    def storagePEO(self):
-        result = None
-        servicename = self.config['storagePEO']
-        for each in self.mult_peo[0].peoples:
-            if each.name == servicename:
-                result = each
-                break
-        return result
-
-    @property
-    def limitPEO(self):
-        result = None
-        servicename = self.config['limitPEO']
-        for each in self.mult_peo[0].peoples:
-            if each.name == servicename:
-                result = each
-                break
-        return result
 
     def peo_getyaml(self, id):
         yaml = self.people.getyaml(id)
@@ -412,11 +387,9 @@ class Member(DefaultMember):
                                                 search_engine={'idx': self.search_engine,
                                                                'config': self.es_config})
                 tmp_project.setup(info={'id':      project_id,
-                                     'name':       project_info['name'],
-                                     'autosetup':  False,
-                                     'autoupdate': False,
-                                     'storageCO':  self.config['storageCO'],
-                                     'storageJD':  self.config['storageJD']})
+                                        'name':       project_info['name'],
+                                        'autosetup':  False,
+                                        'autoupdate': False})
                 if not tmp_project.config['autosetup'] and not tmp_project.config['autoupdate']:
                     tmp_project._modelname = self.default_model
                 self.projects[name] = tmp_project
@@ -448,9 +421,7 @@ class Member(DefaultMember):
                                                                   'config': self.es_config})
             tmp_project.setup(info={'name':         name,
                                     'autosetup':    autosetup,
-                                    'autoupdate':   autoupdate,
-                                    'storageCO':    self.config['storageCO'],
-                                    'storageJD':    self.config['storageJD']})
+                                    'autoupdate':   autoupdate})
             self.active_projects.add(core.basedata.DataObject(metadata=tmp_project.config, data=''))
             self.projects[name] = tmp_project
             result = True

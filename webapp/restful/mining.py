@@ -164,7 +164,7 @@ class LSIbaseAPI(Resource):
                 iduses.append(use)
         totals, searchs = member.cv_search(filterdict=filterdict, size=5000, source=False)
         ids = [item['_id'] for item in searchs]
-        results = member.mch_probability_by_ids(doc, ids, uses=iduses, **project)
+        results = member.cv_probability_by_ids(doc, ids, uses=iduses, **project)
         """
         sort = {
                 "_script" : {
@@ -204,7 +204,6 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
 
     def __init__(self):
         super(LSIJDbyCVidAPI, self).__init__()
-        self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse.add_argument('project', location = 'json')
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('page', type = int, location = 'json')
@@ -222,7 +221,7 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         totals, searchs = member.jd_search(filterdict=filterdict,
                                                 size=5000, source=False, **project)
         ids = [item['_id'] for item in searchs]
-        results = self.miner.probability_by_ids('jdmatch', doc, ids)
+        results = member.jd_probability_by_ids(doc, ids, basemodel='jdmatch', **project)
         pages = int(math.ceil(float(len(searchs))/totals))
         datas = list()
         for result in results[(cur_page-1)*size: cur_page*size]:
@@ -291,7 +290,7 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 jd = item['_source']
                 doc = jd['description']
                 doc += jd['commentary']
-                result = member.mch_probability_by_ids(doc, searchids, top=numbers, **project)
+                result = member.cv_probability_by_ids(doc, searchids, top=numbers, **project)
                 CVs = list()
                 for each in result:
                     if each[1] > threshold:
@@ -378,7 +377,7 @@ class SimilarAPI(Resource):
             source=False)
         ids = [item['_id'] for item in searchs]
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-        for name, score in member.mch_probability_by_ids(doc, ids,
+        for name, score in member.cv_probability_by_ids(doc, ids,
                                                          uses=doctype, top=6, **project):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
@@ -404,7 +403,7 @@ class ValuablebaseAPI(Resource):
         uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
         project = dict(filter(lambda x: x[0] in ('project',), kwargs.items()))
-        result = member.mch_valuable_rate(name_list, member, doc, self.top, **project)
+        result = member.cv_valuable_rate(name_list, member, doc, self.top, **project)
         response = dict()
         datas = []
         for index in result:

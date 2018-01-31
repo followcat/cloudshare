@@ -5,6 +5,7 @@ import utils.builtin
 import core.outputstorage
 import sources.industry_id
 import services.bidding
+import services.matching
 import services.jobdescription
 import services.base.service
 import services.base.kv_storage
@@ -55,11 +56,11 @@ class Project(services.operator.combine.Combine):
 
     def idx_setup(self):
         self.bidding.setup(self.search_engine, self.es_config['BD_MEM'])
-        self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
+        self.jobdescription.data_service.setup(self.search_engine, self.es_config['JD_MEM'])
 
     def idx_updatesvc(self):
         self.bidding.updatesvc(self.es_config['BD_MEM'], self.id, numbers=1000)
-        self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
+        self.jobdescription.data_service.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
 
     @property
     def modelname(self):
@@ -90,28 +91,17 @@ class Project(services.operator.combine.Combine):
         self.customer = services.operator.checker.Selector(
                 data_service=self.bidding,
                 operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
-        self.jobdescription = services.jobdescription.SearchIndex(services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(self.jd_blocks),
-                operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
+        self.jobdescription = services.matching.Similarity(
+                data_service=services.jobdescription.SearchIndex(services.operator.checker.Filter(
+                    data_service=services.operator.multiple.Multiple(self.jd_blocks),
+                    operator_service=services.base.name_storage.NameStorage(jdpath, self.name))),
+                operator_service=self.matching)
         self.idx_setup()
+        self.mch_setup()
         return result
 
-    def mch_probability_by_id(self, doc, ids, uses=None, top=10000, **kwargs):
-        return self.matching.probability_by_id(self.modelname, doc, ids, uses=uses, top=top)
-
-    def mch_probability_by_ids(self, doc, ids, uses=None, top=10000, **kwargs):
-        return self.matching.probability_by_ids(self.modelname, doc, ids, uses=uses, top=top)
-
-    def mch_valuable_rate(self, name_list, member, doc, top, **kwargs):
-        return self.matching.valuable_rate(name_list, self.modelname, member, doc, top)
-
-    def mch_add_documents(self, names, documents, **kwargs):
-        # FIXME: Does not work for member without project (User upload)
-        if self.id not in self.matching.sim[self.modelname]:
-            self.matching.init_sim(self.modelname, self.id)
-        else:
-            self.matching.sim[self.modelname][self.id].add_documents(names, documents)
-            self.matching.sim[self.modelname][self.id].save()
+    def mch_setup(self):
+        self.jobdescription.setup('jdmatch', ['jdrepo'])
 
     def bd_update_info(self, id, info, committer):
         result = False

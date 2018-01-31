@@ -59,6 +59,7 @@ class DrawChart extends Component {
     },json => {
       if (json.code === 200) {
         this.setState({
+          spinning: false,
           dataSource: typeof(this.state.jdId) == 'string'? 
             json.data.filter(item => item.id === this.props.jdId) : json.data
         });

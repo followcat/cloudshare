@@ -89,10 +89,8 @@ class SearchCVbyTextAPI(Resource):
         cur_page = args['page'] if args['page'] else 1
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember()
-        index = member.es_config['CV_MEM']
         filterdict['content'] = text
-        total, searchs = member.cv_search(index=index, doctype=[member.id],
-                                        filterdict=filterdict, source=False,
+        total, searchs = member.cv_search(filterdict=filterdict, source=False,
                                         kwargs={'_source_exclude': ['content']},
                                         start=(cur_page-1)*count, size=count)
         pages = int(math.ceil(float(total)/count))

@@ -9,7 +9,6 @@ from flask.ext.restful import Resource
 
 import utils.builtin
 import core.mining.info
-import core.mining.valuable
 import core.outputstorage
 
 
@@ -45,9 +44,7 @@ class PositionAPI(BaseAPI):
         if args['md_ids'] and len(text) > 0:
             searches = args['md_ids']
         else:
-            index = member.es_config['CV_MEM']
-            searches = member.cv_search(index=index, doctype=[member.id],
-                                     filterdict={'name': text},
+            searches = member.cv_search(filterdict={'name': text},
                                      size=self.numbers, onlyid=True)
         result = []
         for id in searches[:self.numbers]:
@@ -150,7 +147,6 @@ class LSIbaseAPI(Resource):
 
     def __init__(self):
         super(LSIbaseAPI, self).__init__()
-        self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('page', type = int, location = 'json')
         self.reqparse.add_argument('filterdict', type=dict, location = 'json')
@@ -170,10 +166,9 @@ class LSIbaseAPI(Resource):
                 iduses.append(use)
                 index.add(member.es_config['CV_STO'])
                 doctype.append(member.es_config['CV_STO'])
-        totals, searchs = member.cv_search(index=list(index), doctype=doctype,
-                                                filterdict=filterdict, size=5000, source=False)
+        totals, searchs = member.cv_search(filterdict=filterdict, size=5000, source=False)
         ids = [item['_id'] for item in searchs]
-        results = self.miner.probability_by_ids(project.modelname, doc, ids, uses=iduses)
+        results = member.cv_probability_by_ids(doc, ids, uses=iduses, **project)
         """
         sort = {
                 "_script" : {
@@ -224,7 +219,6 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         id = args['id']
         size = args['size']
         cur_page = args['page']
-        projectname = args['project']
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
@@ -232,14 +226,13 @@ class LSIJDbyCVidAPI(LSIbaseAPI):
         totals, searchs = member.jd_search(filterdict=filterdict,
                                                 size=5000, source=False, **project)
         ids = [item['_id'] for item in searchs]
-        results = self.miner.probability_by_ids('jdmatch', doc, ids)
+        results = member.jd_probability_by_ids(doc, ids, basemodel='jdmatch', **project)
         pages = int(math.ceil(float(len(searchs))/totals))
         datas = list()
-        project = member.getproject(projectname)
         for result in results[(cur_page-1)*size: cur_page*size]:
-            yaml_info = project.jd_get(result[0])
+            yaml_info = member.jd_getyaml(result[0], **project)
             co_id = yaml_info['company']
-            co_name = project.bd_getyaml(co_id)['name']
+            co_name = member.bd_getyaml(co_id, **project)['name']
             yaml_info['company_name'] = co_name
             datas.append({ 'id': yaml_info['id'],
                            'yaml_info': yaml_info,
@@ -266,8 +259,8 @@ class LSIbyJDidAPI(LSIbaseAPI):
         filterdict = args['filterdict'] if args['filterdict'] else {}
         append_comment = args['appendcomment'] if args['appendcomment'] else False
         member = user.getmember()
-        project = member.getproject(projectname)
-        jd_yaml = project.jd_get(id)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        jd_yaml = member.jd_getyaml(id, **project)
         doc = jd_yaml['description']
         if append_comment:
             doc += jd_yaml['commentary']
@@ -287,13 +280,12 @@ class LSIbyAllJDAPI(LSIbaseAPI):
         self.reqparse.add_argument('threshold', type=float, location = 'json')
         self.reqparse.add_argument('numbers', type=int, location = 'json')
 
-    def findbest(self, member, project, filterdict, threshold, numbers):
+    def findbest(self, member, project, filterdict, threshold, numbers, svc_project):
         results = dict()
         index = [member.es_config['CV_MEM'], member.es_config['CV_STO']]
         doctype = [member.id, 'cvstorage']
-        searchids = member.cv_search(index=index, doctype=doctype,
-                                     filterdict=filterdict, onlyid=True)
-        for jd_id, jd in project.jobdescription.datas():
+        searchids = member.cv_search(filterdict=filterdict, onlyid=True)
+        for jd_id, jd in svc_project.jobdescription.datas():
             try:
                 if jd['status'] == 'Closed':
                     continue
@@ -301,7 +293,8 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 continue
             doc = jd['description']
             doc += jd['commentary']
-            result = self.miner.probability_by_ids(project.modelname, doc, searchids, top=numbers)
+            project = dict(filter(lambda x: x[0] in ('project',), kwargs.items()))
+            result = member.cv_probability_by_ids(doc, searchids, top=numbers, **project)
             output = { 'CV': list() }
             for each in result:
                 if each[1] > threshold:
@@ -312,21 +305,21 @@ class LSIbyAllJDAPI(LSIbaseAPI):
                 output['id'] = jd_id
                 output['name'] = jd['name']
                 output['description'] = jd['description']
-                output['company'] = project.bd_getyaml(jd['company'])['name']
+                output['company'] = member.bd_getyaml(jd['company'], **project)['name']
                 results[jd_id] = output
         return results
 
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        threshold = args['threshold']
         projectname = args['project']
+        threshold = args['threshold']
         filterdict = args['filterdict']
         numbers = args['numbers']
         results = list()
         member = user.getmember()
-        project = member.getproject(projectname)
-        alls = self.findbest(member, project, filterdict, threshold, numbers)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        alls = self.findbest(member, project, filterdict, threshold, numbers, svc_project=member.getproject(projectname))
         for jdid in alls:
             results.append({'ID': jdid, 'name': alls[jdid]['name'],
                             'company': alls[jdid]['company'],
@@ -348,12 +341,11 @@ class LSIbyCVidAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         cur_page = args['page']
-        projectname = args['project']
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember()
-        project = member.getproject(projectname)
         doc = member.cv_getmd(id)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -371,11 +363,10 @@ class LSIbydocAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         doc = args['doc']
         cur_page = args['page']
-        projectname = args['project']
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         member = user.getmember()
-        project = member.getproject(projectname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         result = self.process(member, project, doc, uses, filterdict, cur_page)
         return { 'code': 200, 'data': result }
 
@@ -387,7 +378,6 @@ class SimilarAPI(Resource):
 
     def __init__(self):
         super(SimilarAPI, self).__init__()
-        self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('id', type = str, location = 'json')
         self.reqparse.add_argument('project', location = 'json')
@@ -403,14 +393,15 @@ class SimilarAPI(Resource):
         datas = []
         index = [member.es_config['CV_MEM']]
         doctype = [member.id]
-        totals, searchs = member.cv_search(index=index, doctype=doctype,
+        totals, searchs = member.cv_search(
             filterdict={'date': [time.strftime('%Y%m%d', time.localtime(time.time()-
                                                          self.HALF_YEAR_SECOENDS)),
                                  time.strftime('%Y%m%d', time.localtime(time.time()))]},
             source=False)
         ids = [item['_id'] for item in searchs]
-        for name, score in self.miner.probability_by_ids(project.modelname, doc, ids,
-                                                         uses=doctype, top=6):
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        for name, score in member.cv_probability_by_ids(doc, ids,
+                                                         uses=doctype, top=6, **project):
             if id == core.outputstorage.ConvertName(name).base:
                 continue
             yaml_info = member.cv_getyaml(name)
@@ -425,17 +416,17 @@ class ValuablebaseAPI(Resource):
 
     def __init__(self):
         super(ValuablebaseAPI, self).__init__()
-        self.miner = flask.current_app.config['SVC_MIN']
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name_list', type = list, location = 'json')
         self.reqparse.add_argument('uses', type = list, location = 'json')
 
-    def _get(self, doc, member, modelname):
+    def _get(self, doc, member, **kwargs):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         uses = args['uses'] if args['uses'] else []
         name_list = args['name_list']
-        result = core.mining.valuable.rate(name_list, self.miner, modelname, member, doc, self.top)
+        project = dict(filter(lambda x: x[0] in ('project',), kwargs.items()))
+        result = member.cv_valuable_rate(name_list, member, doc, self.top, **project)
         response = dict()
         datas = []
         for index in result:
@@ -473,12 +464,11 @@ class ValuablebyJDidAPI(ValuablebaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        jd_yaml = project.jd_get(id)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        jd_yaml = member.jd_getyaml(id, **project)
         doc = jd_yaml['description']
-        result = self._get(doc, member, project.modelname)
+        result = self._get(doc, member, **project)
         return { 'code': 200, 'data': result }
 
 class ValuablebydocAPI(ValuablebaseAPI):
@@ -492,10 +482,9 @@ class ValuablebydocAPI(ValuablebaseAPI):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         doc = args['doc']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
-        result = self._get(doc, member, project.modelname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
+        result = self._get(doc, member, **project)
         return { 'result': result }
 
 
@@ -510,14 +499,13 @@ class ValuableAPI(ValuablebaseAPI):
     def post(self):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
+        project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         doc = ''
         if args['id']:
-            jd_yaml = project.jd_get(args['id'])
+            jd_yaml = member.jd_getyaml(args['id'], **project)
             doc = jd_yaml['description']
         elif args['doc']:
             doc = args['doc']
-        result = self._get(doc, member, project.modelname)
+        result = self._get(doc, member, **project)
         return { 'code': 200, 'data': result }

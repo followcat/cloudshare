@@ -76,7 +76,7 @@ class BaseStorage(services.base.service.Service):
         """
         return super(BaseStorage, self).unique(bsobj)
 
-    def add(self, bsobj, message=None, committer=None, do_commit=True):
+    def add(self, bsobj, message=None, committer=None, do_commit=True, **kwargs):
         name = core.outputstorage.ConvertName(bsobj.name)
         if not message:
             message = "Add %s: %s metadata." % (self.commitinfo, name)
@@ -90,7 +90,7 @@ class BaseStorage(services.base.service.Service):
         self.interface.delete(filename, message, committer, do_commit=do_commit)
         return True
 
-    def modify(self, bsobj, message=None, committer=None, do_commit=True):
+    def modify(self, bsobj, message=None, committer=None, do_commit=True, **kwargs):
         name = core.outputstorage.ConvertName(bsobj.name)
         if not message:
             message = "Add %s: %s metadata." % (self.commitinfo, name)

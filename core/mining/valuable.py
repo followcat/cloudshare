@@ -96,7 +96,7 @@ def mine_education(member, text, name_list):
     assert name_list
     datas = []
     for name in name_list:
-        education = education_rate(member.curriculumvitaes.getyaml(name)['education'])
+        education = education_rate(member.cv_getyaml(name)['education'])
         req = education_rate(text)
         if education and req:
             datas.append((name, str((5 + education - req)*0.1)))

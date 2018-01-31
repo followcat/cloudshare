@@ -29,7 +29,7 @@ class NameStorage(services.base.storage.BaseStorage):
         self.interface.modify(self.ids_file, ujson.dumps(sorted(self.ids), indent=4))
 
     def add(self, bsobj, committer=None, unique=True,
-            kv_file=False, text_file=True, do_commit=True):
+            kv_file=False, text_file=True, do_commit=True, **kwargs):
         result = False
         if (unique and self.unique(bsobj)) or not unique:
             id = bsobj.ID
@@ -41,7 +41,7 @@ class NameStorage(services.base.storage.BaseStorage):
         return result
 
     def modify(self, bsobj, committer=None, unique=True,
-            kv_file=False, text_file=True, do_commit=True):
+            kv_file=False, text_file=True, do_commit=True, **kwargs):
         """"""
         return self.exists(bsobj.ID)
 

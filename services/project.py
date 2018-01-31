@@ -5,6 +5,7 @@ import utils.builtin
 import core.outputstorage
 import sources.industry_id
 import services.bidding
+import services.matching
 import services.jobdescription
 import services.base.service
 import services.base.kv_storage
@@ -44,6 +45,7 @@ class Project(services.operator.combine.Combine):
     def __init__(self, data_service, **kwargs):
         super(Project, self).__init__(data_service, **kwargs)
         assert 'bidding' in kwargs
+        assert 'matching' in kwargs
         assert 'search_engine' in kwargs
         assert 'jobdescription' in kwargs
         self.bd_repos = kwargs['bidding']['bd']
@@ -56,11 +58,11 @@ class Project(services.operator.combine.Combine):
 
     def idx_setup(self):
         self.bidding.setup(self.search_engine, self.es_config['CO_MEM'])
-        self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
+        self.jobdescription.data_service.setup(self.search_engine, self.es_config['JD_MEM'])
 
     def idx_updatesvc(self):
         self.bidding.updatesvc(self.es_config['CO_MEM'], self.id, numbers=1000)
-        self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
+        self.jobdescription.data_service.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
 
     @property
     def storageCO(self):
@@ -107,11 +109,17 @@ class Project(services.operator.combine.Combine):
         self.customer = services.operator.checker.Selector(
                 data_service=self.bidding,
                 operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
-        self.jobdescription = services.jobdescription.SearchIndex(services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(self.jd_repos),
-                operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
+        self.jobdescription = services.matching.Similarity(
+                data_service=services.jobdescription.SearchIndex(services.operator.checker.Filter(
+                    data_service=services.operator.multiple.Multiple(self.jd_repos),
+                    operator_service=services.base.name_storage.NameStorage(jdpath, self.name))),
+                operator_service=self.matching)
         self.idx_setup()
+        self.mch_setup()
         return result
+
+    def mch_setup(self):
+        self.jobdescription.setup('jdmatch', ['jdrepo'])
 
     def bd_update_info(self, id, info, committer):
         result = False
@@ -187,18 +195,18 @@ class Project(services.operator.combine.Combine):
     def jd_get(self, id):
         return self.jobdescription.getyaml(id)
 
-    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True):
+    def jd_add(self, jdobj, committer=None, unique=True, do_commit=True, **kwargs):
         result = False
         if jdobj.metadata['company'] in self.bidding.customers:
             result = self.jobdescription.add(jdobj, committer,
-                                                       unique=unique, do_commit=do_commit)
+                                             unique=unique, do_commit=do_commit, **kwargs)
         return result
 
-    def jd_modify(self, id, description, status, commentary, followup, committer):
+    def jd_modify(self, id, description, status, commentary, followup, committer, **kwargs):
         result = False
         if self.jobdescription.exists(id):
             result = self.jobdescription.modify(id, description, status,
-                                           commentary, followup, committer)
+                                           commentary, followup, committer, **kwargs)
         return result
 
     def jd_datas(self):

@@ -62,10 +62,6 @@ class Project(services.operator.combine.Combine):
         self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
 
     @property
-    def storageBD(self):
-        return self.bidding.data_service.data_service.data_service
-
-    @property
     def modelname(self):
         return self.config['model']
 
@@ -122,58 +118,37 @@ class Project(services.operator.combine.Combine):
         if self.bidding.exists(id):
             info['id'] = id
             bsobj = core.basedata.DataObject(metadata=info, data=None)
-            repo_result = self.storageBD.modify(bsobj, "Update %s information."%id,
-                                                committer)
-            project_result = self.bidding.modify(bsobj, committer)
-            result = repo_result or project_result
+            result = self.bidding.modify(bsobj, committer)
         return result
 
     def bd_compare_excel(self, stream, committer):
         outputs = list()
-        outputs.extend(self.storageBD.compare_excel(stream, committer))
-        outputs.extend(self.bidding.compare_excel(stream, committer))
+        bd = self.bidding.compare_excel(stream, committer)
+        for each in bd:
+            print each[0]
+        outputs.extend(bd)
         return outputs
 
     def bd_add_excel(self, items, committer):
         results = dict()
-        repo_result = set()
-        project_result = set()
         for item in items:
             yamlname = core.outputstorage.ConvertName(item[1]).yaml
             result = None
             success = False
-            if item[0] == 'companyadd':
+            if item[0] in ['companyadd', 'projectadd']:
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 try:
-                    result = self.storageBD.add(baseobj, committer=item[2][-1], do_commit=False)
+                    result = self.bidding.add(baseobj, committer=item[2][-1])
                     success = True
                 except Exception:
-                    success = False
-                if success is True:
-                    repo_result.add(yamlname)
-            elif item[0] == 'projectadd':
-                baseobj = core.basedata.DataObject(*item[2][:2])
-                try:
-                    result = self.bidding.add(baseobj, committer=item[2][-1], do_commit=False)
-                    success = True
-                except Exception:
-                    success = False
-                if success is True:
-                    project_result.add(self.bidding.ids_file)
-                    project_result.add(os.path.join(self.bidding.YAML_DIR, yamlname))
+                    pass
             elif item[0] == 'listadd':
                 try:
-                    result = self.bidding.updateinfo(*item[2], do_commit=False)
+                    result = self.bidding.updateinfo(*item[2])
                     success = True
                 except Exception:
-                    success = False
-                if success is True:
-                    project_result.add(os.path.join(self.bidding.YAML_DIR, yamlname))
-            else:
-                success = False
+                    pass
             results[item[1]] = {'data': item, 'success': success, 'result': result}
-        self.storageBD.interface.do_commit(list(repo_result), committer=committer)
-        self.bidding.interface.do_commit(list(project_result), committer=committer)
         return results
 
     def bd_names(self):

@@ -1,3 +1,4 @@
+import core.basedata
 import utils.companyexcel
 import services.base.frame_storage
 import services.base.name_storage
@@ -6,6 +7,16 @@ import extractor.information_explorer
 
 class SelectionBD(services.base.name_storage.NameStorage):
     """"""
+
+    def compare_excel(self, stream, committer):
+        output = list()
+        excels = utils.companyexcel.convert(stream)
+        for excel in excels:
+            metadata = extractor.information_explorer.catch_biddinginfo(excel)
+            data = core.basedata.DataObject(metadata, excel)
+            if not self.exists(data.name):
+                output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
+        return output
 
 
 class SimulationBD(services.base.frame_storage.ListFrameStorage):
@@ -37,12 +48,8 @@ class SimulationBD(services.base.frame_storage.ListFrameStorage):
             data = core.basedata.DataObject(metadata, excel)
             id = data.name
             responsible = excel['responsible'] if excel['responsible'] else committer
-            if not self.exists(id):
-                for item in self.list_item:
-                    if item in metadata:
-                        metadata.pop(item)
-                output.append(('projectadd', metadata['id'], (metadata, excel, committer)))
-            else:
+            info = dict()
+            if self.exists(id):
                 info = self.getyaml(id)
             for key in dict(self.YAML_TEMPLATE):
                 if dict(self.YAML_TEMPLATE)[key] == list:

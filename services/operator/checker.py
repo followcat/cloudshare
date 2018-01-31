@@ -29,6 +29,11 @@ class Filter(services.operator.facade.Application):
             res = self.operator_service.add(*args, **kwargs)
         return res
 
+    def compare_excel(self, *args, **kwargs):
+        res = list(self.data_service.compare_excel(*args, **kwargs)) + list(
+                   self.operator_service.compare_excel(*args, **kwargs))
+        return res
+
 
 class Selector(Filter):
     """"""

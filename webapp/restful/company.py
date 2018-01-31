@@ -288,8 +288,7 @@ class CompanyUploadExcelAPI(Resource):
     def __init__(self):
         super(CompanyUploadExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('files', type = str, location = 'json')
-        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('project', type=str, location='form')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -298,7 +297,7 @@ class CompanyUploadExcelAPI(Resource):
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         network_file = flask.request.files['files']
         compare_result = member.bd_compare_excel(network_file.read(),
-                                                       committer=user.name, **project)
+                                                 committer=user.name, **project)
         infos = dict()
         for item in compare_result:
             coid = item[1]

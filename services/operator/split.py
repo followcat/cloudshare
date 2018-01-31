@@ -34,3 +34,8 @@ class SplitData(services.operator.facade.Application):
     def datas(self):
         for name, text in self.operator_service.datas():
             yield name, text
+
+    def compare_excel(self, *args, **kwargs):
+        res = list(self.data_service.compare_excel(*args, **kwargs)) + list(
+                   self.operator_service.compare_excel(*args, **kwargs))
+        return res

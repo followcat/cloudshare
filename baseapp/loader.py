@@ -207,7 +207,7 @@ def load_cv_mining(SVC_MIN, SVC_MEMBERS):
         try:
             for project in member.projects.values():
                 modelname = project.modelname
-                result = SVC_MIN.setup(modelname, [member.id])
+                result = SVC_MIN.setup(modelname)
         except AttributeError:
             continue
 

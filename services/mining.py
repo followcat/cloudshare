@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import re
-import math
 
 import core.basedata
 import core.mining.lsimodel
-import core.mining.valuable
 import core.mining.correlation
-import core.mining.lsisimilarity
 
-from utils.builtin import jieba_cut, pos_extract, industrytopath
+import services.base.service
+
+from utils.builtin import jieba_cut, pos_extract
 
 
 REJECT = re.compile('(('+')|('.join([
@@ -178,12 +177,9 @@ def silencer(document, cutservice=None, id=None):
     return result
 
 
-class Mining(object):
-
-    SIMS_PATH = 'all'
+class Mining(services.base.service.Service):
 
     def __init__(self, path, slicer=None):
-        self.sim = dict()
         self.path = path
         self.lsi_model = dict()
         if not os.path.exists(self.path):
@@ -193,51 +189,14 @@ class Mining(object):
         else:
             self.slicer = slicer
 
-    def setup(self, modelname, simnames):
+    def setup(self, modelname):
         result = True
         if modelname not in self.lsi_model:
             result = self.init_lsi(modelname)
-        if result is True:
-            model = self.lsi_model[modelname]
-            if model.names:
-                if modelname not in self.sim:
-                    self.sim[modelname] = dict()
-                for simname in simnames:
-                    if simname in self.sim[modelname]:
-                        continue
-                    self.init_sim(modelname, simname)
         return result
 
-    def init_sim(self, modelname, svc_name, gen=None):
-        model = self.lsi_model[modelname]
-        save_path = os.path.join(self.path, modelname, self.SIMS_PATH)
-        industrypath = industrytopath(svc_name)
-        index = core.mining.lsisimilarity.LSIsimilarity(svc_name,
-                                                        os.path.join(save_path,
-                                                        industrypath), model)
-        try:
-            index.load()
-        except IOError:
-            if gen is None:
-                gen = list()
-            index.build(gen)
-            index.save()
-        self.sim[modelname][svc_name] = index
-
-    def getsims(self, basemodel, uses=None):
-        sims = []
-        if uses is None:
-            try:
-                uses = self.sim[basemodel].keys()
-            except KeyError:
-                return sims
-        for each in uses:
-            try:
-                sim = self.sim[basemodel][each]
-            except KeyError:
-                continue
-            sims.append(sim)
-        return sims
+    def add(self, *args, **kwargs):
+        return True
 
     def init_lsi(self, modelname, gen=None, config=None):
         result = False
@@ -258,56 +217,6 @@ class Mining(object):
             self.lsi_model[modelname] = lsi
         return result
 
-    def probability(self, basemodel, doc, uses=None, top=None, minimum=None):
-        result = []
-        sims = self.getsims(basemodel, uses=uses)
-        for sim in sims:
-            result.extend(sim.probability(doc, top=top, minimum=minimum))
-        results_set = set(result)
-        return sorted(results_set, key=lambda x:float(x[1]), reverse=True)
-
-    def probability_by_id(self, basemodel, doc, id, uses=None):
-        result = tuple()
-        sims = self.getsims(basemodel, uses=uses)
-        for sim in sims:
-            probability = sim.probability_by_id(doc, id)
-            if probability is not None:
-                result = probability
-                break
-        return result
-
-    def probability_by_ids(self, basemodel, doc, ids, uses=None, top=10000):
-        result = []
-        sims = self.getsims(basemodel, uses=uses)
-        for sim in sims:
-            result.extend(sim.probability_by_ids(doc, ids, top=top))
-        return sorted(result, key=lambda x: x[1], reverse=True)
-
-    def idsims(self, modelname, ids):
-        results = list()
-        for id in ids:
-            for sim in self.sim[modelname].values():
-                if id in sim.names:
-                    results.append(sim.name)
-                    break
-        return results
-
-    def minelist(self, doc, ids, basemodel, uses=None):
-        return self.probability_by_ids(basemodel, doc, ids, uses=uses)
-
-    def minelistrank(self, doc, lists, basemodel, uses=None, top=None, minimum=None):
-        if uses is None:
-            uses = list()
-            for name, value in lists:
-                for sim in self.sim[basemodel].values():
-                    if sim.exists(name):
-                        uses.append(sim.name)
-        probalist = set(self.probability(basemodel, doc, uses=uses,
-                                         top=top, minimum=minimum))
-        probalist.update(set(lists))
-        ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
-        return len(ranklist), map(lambda x: (x[0], ranklist.index(x)), lists)
-
     def jobdescription_correlation(self, repos, doc, page, numbers):
         return core.mining.correlation.jobdescription_correlation(self,
                     repos, doc=doc, page=page, numbers=numbers)
@@ -323,6 +232,3 @@ class Mining(object):
     def project_correlation(self, repos, doc, page, numbers):
         return core.mining.correlation.project_correlation(self,
                     repos, doc=doc, page=page, numbers=numbers)
-
-    def valuable_rate(self, name_list, modelname, member, doc, top):
-        return core.mining.valuable.rate(name_list, self, modelname, member, doc, top)

@@ -25,6 +25,6 @@ SVC_MEMBERS = services.members.Members(config.storage_config['MEMBERS'],
 
 MIN_ADDITIONALS = { u'综合': SVC_CV_STO }
 baseapp.loader.load_cv_mining(SVC_MIN, SVC_MEMBERS)
-baseapp.loader.load_addedcv_mining(SVC_MIN, SVC_MEMBERS, {'*': MIN_ADDITIONALS.keys()})
-baseapp.loader.load_jd_mining(SVC_MIN, [SVC_JD_REPO])
-baseapp.loader.load_co_mining(SVC_MIN, [SVC_CV_REPO])
+#baseapp.loader.load_addedcv_mining(SVC_MIN, SVC_MEMBERS, {'*': MIN_ADDITIONALS.keys()})
+#baseapp.loader.load_jd_mining(SVC_MIN, [SVC_JD_REPO])
+#baseapp.loader.load_co_mining(SVC_MIN, [SVC_CV_REPO])

@@ -60,13 +60,12 @@ class UploadCVAPI(Resource):
         self.modelname = self.project.modelname
 
     def put(self):
+        user = flask.ext.login.current_user
         self.putparam()
-        names = []
         results = []
-        documents = []
         for item in self.updates:
             status = 'failed'
-            self.uploaddata = upload[self.user.name].pop(item['filename'])
+            self.uploaddata = upload[user.name].pop(item['filename'])
             self.cvobj = self.uploaddata['CV']
             cvobj=self.cvobj
             if cvobj is not None:
@@ -75,13 +74,11 @@ class UploadCVAPI(Resource):
                     if key is not u'id':
                         cvobj.metadata[key] = value
                 try:
-                    result = self.member.cv_add(cvobj, committer=self.user.name, unique=True)
+                    result = self.member.cv_add(cvobj, committer=user.name, unique=True)
                     if result:
                         status = 'success'
                         # Add to CV database and project
                         message = '200'
-                        names.append(id)
-                        documents.append(cvobj.data)
                     else:
                         status = 'success'
                         # Resume existed in database and project
@@ -93,8 +90,6 @@ class UploadCVAPI(Resource):
                                  'status': status,
                                  'message': message,
                                  'filename': item['filename'] })
-        project = dict(filter(lambda x: x[0] in ('project',), self.args.items()))
-        member.mch_add_documents(names, documents, **project)
         return { 'code': 200, 'data': results }
 
     def post(self):
@@ -144,7 +139,7 @@ class UserUploadCVAPI(UploadCVAPI):
         setpeople = args['setpeople']
         result = super(UserUploadCVAPI, self).put()
         if result['data'][0]['status'] == 'success' and setpeople:
-            self.user.peopleID = self.uploaddata['unique_id']
+            user.peopleID = self.uploaddata['unique_id']
         return result
 
     def post(self):
@@ -166,7 +161,6 @@ class MemberUploadCVAPI(UploadCVAPI):
     def putparam(self):
         super(MemberUploadCVAPI, self).putparam()
         projectname = self.args['project']
-        self.member = self.user.getmember()
         self.project = self.member.getproject(projectname)
         self.projectid = self.project.id
         self.modelname = self.project.modelname

@@ -221,11 +221,11 @@ class DefaultMember(CommonMember):
         return method(*args, **kwargs)
 
     def idx_setup(self):
-        self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
+        self.jobdescription.data_service.setup(self.search_engine, self.es_config['JD_MEM'])
         self.curriculumvitae.services[0].data_service.setup(self.search_engine, self.es_config['CV_MEM'])
 
     def idx_updatesvc(self):
-        self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
+        self.jobdescription.data_service.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
         self.curriculumvitae.services[0].updatesvc(self.es_config['CV_MEM'], self.id, numbers=1000)
 
     def use(self, id):
@@ -249,14 +249,17 @@ class DefaultMember(CommonMember):
                                 operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
                             operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
-        self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
-                services.operator.multiple.Multiple(self.jd_repos)))
+        self.jobdescription = services.matching.Similarity(
+                data_service=services.jobdescription.SearchIndex(services.secret.Secret(
+                    services.operator.multiple.Multiple(self.jd_repos))),
+                operator_service=self.matching)
         self.idx_setup()
         self.mch_setup()
         return result
 
     def mch_setup(self):
         self.curriculumvitae.services[0].setup(self.modelname, [self.id])
+        self.jobdescription.setup('jdmatch', ['jdrepo'])
 
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True, **kwargs):
         kwargs['doctype'] = self.id

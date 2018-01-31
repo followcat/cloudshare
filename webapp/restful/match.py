@@ -32,13 +32,14 @@ class JDmatchAPI(MatchbaseAPI):
 
     def post(self):
         super(JDmatchAPI, self).post()
-        total, result = self.miner.jobdescription_correlation(
-                    [self.jd_repo], doc=self.doc, page=self.page, numbers=self.numbers)
-        for each in result:
-            jdinfo = each['data']
-            jdinfo['companyID'] = jdinfo['company']
-            jdinfo['company'] = self.co_repo.getyaml(jdinfo['company'])['name']
-        return { 'code': 200, 'data': result, 'lenght': total }
+        user = flask.ext.login.current_user
+        member = user.getmember()
+        total, result = member.jd_correlation(doc=self.doc, basemodel='jdmatch',
+                    uses=[self.jd_repo.name], page=self.page, numbers=self.numbers)
+        res = list()
+        for id, value in result:
+            res.append( {'id': id, 'value': value, 'data': member.jd_getyaml(id)} )
+        return { 'code': 200, 'data': res, 'lenght': total }
 
     def get(self):
         args = request.args
@@ -47,18 +48,16 @@ class JDmatchAPI(MatchbaseAPI):
         user = flask.ext.login.current_user
         member = user.getmember()
         total = 0
-        result = list()
+        res = list()
         code = 204
         if user.peopleID:
             code = 200
             doc = member.peo_getmd(user.peopleID).next()
-            total, result = self.miner.jobdescription_correlation(
-                        [self.jd_repo], doc=doc, page=self.page, numbers=self.numbers)
-            for each in result:
-                jdinfo = each['data']
-                jdinfo['companyID'] = jdinfo['company']
-                jdinfo['company'] = self.co_repo.getyaml(jdinfo['company'])['name']
-        return { 'code': code, 'data': result, 'lenght': total }
+            total, result = member.jd_correlation(doc=doc, basemodel='jdmatch',
+                        uses=[self.jd_repo.name], page=self.page, numbers=self.numbers)
+            for id, value in result:
+                res.append( {'id': id, 'value': value, 'data': member.jd_getyaml(id)} )
+        return { 'code': code, 'data': res, 'lenght': total }
 
 
 class COmatchAPI(MatchbaseAPI):
@@ -69,9 +68,21 @@ class COmatchAPI(MatchbaseAPI):
 
     def post(self):
         super(COmatchAPI, self).post()
-        total, result = self.miner.company_correlation(
-                    [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
-        return { 'code': 200, 'data': result, 'lenght': total }
+        user = flask.ext.login.current_user
+        member = user.getmember()
+        total, result = member.jd_correlation(doc=self.doc, basemodel='comatch',
+                    uses=[self.cv_repo.name], page=self.page, numbers=self.numbers)
+        res = list()
+        for longname, value in result:
+            id, name = longname.split('.', 1)
+            info = member.jd_getyaml(id)
+            for company in info['experience']['company']:
+                if company['name'] == name:
+                    res.append({ 'id': id, 'value': value, 'data': company })
+                    break
+            else:
+                raise Exception('Not found description')
+        return { 'code': 200, 'data': res, 'lenght': total }
 
 
 class POSmatchAPI(MatchbaseAPI):
@@ -82,9 +93,27 @@ class POSmatchAPI(MatchbaseAPI):
 
     def post(self):
         super(POSmatchAPI, self).post()
-        total, result = self.miner.position_correlation(
-                    [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
-        return { 'code': 200, 'data': result, 'lenght': total }
+        user = flask.ext.login.current_user
+        member = user.getmember()
+        total, result = member.jd_correlation(doc=self.doc, basemodel='posmatch',
+                    uses=[self.cv_repo.name], page=self.page, numbers=self.numbers)
+        res = list()
+        for longname, value in result:
+            try:
+                id, longname = longname.split('.', 1)
+                company, name = longname.rsplit('.', 1)
+            except ValueError:
+                continue
+            info = member.jd_getyaml(id)
+            for position in info['experience']['position']:
+                at_company = position['at_company']
+                pos_company = info['experience']['company'][at_company]['name']
+                if pos_company == company and position['name'] == name:
+                    res.append({ 'id': id, 'value': value, 'data': position })
+                    break
+            else:
+                continue
+        return { 'code': 200, 'data': res, 'lenght': total }
 
 
 class PRJmatchAPI(MatchbaseAPI):
@@ -95,9 +124,25 @@ class PRJmatchAPI(MatchbaseAPI):
 
     def post(self):
         super(PRJmatchAPI, self).post()
-        total, result = self.miner.project_correlation(
-                    [self.cv_repo], doc=self.doc, page=self.page, numbers=self.numbers)
-        return { 'code': 200, 'data': result, 'lenght': total }
+        user = flask.ext.login.current_user
+        member = user.getmember()
+        total, result = member.jd_correlation(doc=self.doc, basemodel='prjmatch',
+                    uses=[self.cv_repo.name], page=self.page, numbers=self.numbers)
+        res = list()
+        for longname, value in result:
+            try:
+                id, longname = longname.split('.', 1)
+                company, name = longname.rsplit('.', 1)
+            except ValueError:
+                continue
+            info = member.jd_getyaml(id)
+            for project in info['experience']['project']:
+                if project['name'] == name:
+                    res.append({ 'id': id, 'value': value, 'data': project })
+                    break
+            else:
+                raise Exception('Not found description')
+        return { 'code': 200, 'data': res, 'lenght': total }
 
 
 class CompanyProjectAPI(MatchbaseAPI):

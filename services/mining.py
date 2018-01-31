@@ -4,7 +4,6 @@ import re
 
 import core.basedata
 import core.mining.lsimodel
-import core.mining.correlation
 
 import services.base.service
 
@@ -216,19 +215,3 @@ class Mining(services.base.service.Service):
                         lsi.save()
             self.lsi_model[modelname] = lsi
         return result
-
-    def jobdescription_correlation(self, repos, doc, page, numbers):
-        return core.mining.correlation.jobdescription_correlation(self,
-                    repos, doc=doc, page=page, numbers=numbers)
-
-    def company_correlation(self, repos, doc, page, numbers):
-        return core.mining.correlation.company_correlation(self,
-                    repos, doc=doc, page=page, numbers=numbers)
-
-    def position_correlation(self, repos, doc, page, numbers):
-        return core.mining.correlation.position_correlation(self,
-                    repos, doc=doc, page=page, numbers=numbers)
-
-    def project_correlation(self, repos, doc, page, numbers):
-        return core.mining.correlation.project_correlation(self,
-                    repos, doc=doc, page=page, numbers=numbers)

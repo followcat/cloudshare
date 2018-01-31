@@ -4,9 +4,10 @@ import functools
 
 import core.basedata
 import utils.builtin
+import services.secret
 import services.company
 import services.project
-import services.secret
+import services.matching
 import services.curriculumvitae
 import services.simulationcv
 import services.simulationco
@@ -28,6 +29,7 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
     YAML_TEMPLATE = (
         ('id',                  str),
         ('name',                str),
+        ('model',               functools.partial(str, object='default')),
         ('administrator',       list),
         ('storageCV',           str),
         ('storagePEO',          str),
@@ -116,6 +118,10 @@ class CommonMember(services.operator.combine.Combine):
     @property
     def id(self):
         return self.config['id']
+
+    @property
+    def modelname(self):
+        return self.config['model']
 
     @property
     def administrator(self):
@@ -216,7 +222,7 @@ class DefaultMember(CommonMember):
 
     def idx_setup(self):
         self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
-        self.curriculumvitae.services[0].setup(self.search_engine, self.es_config['CV_MEM'])
+        self.curriculumvitae.services[0].data_service.setup(self.search_engine, self.es_config['CV_MEM'])
 
     def idx_updatesvc(self):
         self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
@@ -230,23 +236,31 @@ class DefaultMember(CommonMember):
         self.cv_path = os.path.join(self.path, self.CV_PATH)
         self.jd_path = os.path.join(self.path, self.JD_PATH)
         self.curriculumvitae = services.operator.multiple.Multiple(
-                [services.curriculumvitae.SearchIndex(services.operator.checker.Filter(
-                    data_service=services.operator.split.SplitData(
-                        data_service=self.repo,
-                        operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
-                    operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
+                [services.matching.Similarity(
+                    data_service=services.curriculumvitae.SearchIndex(services.operator.checker.Filter(
+                            data_service=services.operator.split.SplitData(
+                                data_service=self.repo,
+                                operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
+                            operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
+                    operator_service=self.matching),
                 services.operator.split.SplitData(
-                    data_service=services.secret.Private(
-                        data_service=services.operator.multiple.Multiple(self.storage),
-                        operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
-                    operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
+                            data_service=services.secret.Private(
+                                data_service=services.operator.multiple.Multiple(self.storage),
+                                operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
+                            operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
         self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
                 services.operator.multiple.Multiple(self.jd_repos)))
         self.idx_setup()
+        self.mch_setup()
         return result
 
+    def mch_setup(self):
+        self.curriculumvitae.services[0].setup(self.modelname, [self.id])
+
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True, **kwargs):
+        kwargs['doctype'] = self.id
+        kwargs['simname'] = self.id
         result = self.curriculumvitae.add(cvobj, committer, unique=unique,
                                           do_commit=do_commit, **kwargs)
         if result:
@@ -345,7 +359,7 @@ class Member(DefaultMember):
         self.bd_repos = kwargs['bidding']['bd']
 
     def __getattr__(self, attr):
-        for key in ['bd', 'jd', 'mch']:
+        for key in ['bd', 'jd']:
             if attr.startswith(key+'_'):
                 return functools.partial(self.call_project, attr=attr)
         return super(Member, self).__getattr__(attr)

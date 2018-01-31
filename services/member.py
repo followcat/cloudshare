@@ -127,14 +127,6 @@ class CommonMember(services.operator.combine.Combine):
         yaml = self.people.getyaml(id)
         return yaml
 
-    def peo_updateyaml(self, id, key, value, username):
-        result = None
-        try:
-            result = self.people.updateinfo(id, key, value, username)
-        except AssertionError:
-            pass
-        return result
-
     def peo_deleteyaml(self, id, key, value, username, date):
         return self.people.deleteinfo(id, key, value, username, date)
 
@@ -282,15 +274,6 @@ class DefaultMember(CommonMember):
 
     def cv_numbers(self):
         return self.curriculumvitae.NUMS
-
-    def cv_updateyaml(self, id, key, value, username):
-        result = None
-        if key in dict(self.curriculumvitae.YAML_TEMPLATE):
-            try:
-                result = self.curriculumvitae.updateinfo(id, key, value, username)
-            except AssertionError:
-                pass
-        return result
 
     def peo_getyaml(self, id):
         yaml = super(DefaultMember, self).peo_getyaml(id)

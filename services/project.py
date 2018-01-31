@@ -133,8 +133,11 @@ class Project(services.operator.combine.Combine):
                 except Exception:
                     pass
             elif item[0] == 'listadd':
+                baseobj = core.basedata.DataObject(metadata={
+                                                    'id': item[2][0],
+                                                    item[2][1]: item[2][2]}, data=None)
                 try:
-                    result = self.bidding.updateinfo(*item[2])
+                    result = self.bidding.modify(baseobj, committer=item[2][3])
                     success = True
                 except Exception:
                     pass

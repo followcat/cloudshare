@@ -99,7 +99,9 @@ class CVStorageSync(object):
         raw_info = yaml.load(raw_yaml, Loader=utils._yaml.Loader)
         des_info = self.cv_storage.getyaml(id)
         if not raw_info['date'] == des_info['date']:
-            result = self.cv_storage.updateinfo(id, 'date', raw_info['date'], 'DEV')
+            dataobj = core.basedata.DataObject(metadata={'date': raw_info['date']},
+                                               data=None)
+            result = self.cv_storage.modify(dataobj, committer='DEV')
             logidname = os.path.join(rawdb.path, id)
             self.logger.info((' ').join(["Update", logidname, "date",
                                          "from", str(des_info['date']),

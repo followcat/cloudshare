@@ -32,6 +32,7 @@ class ResumeSimilar extends Component {
             return (
               <div key={index} className="similar-item">
                 <a href={`/resume/${item.id}`}>
+                  {item.match? parseInt(item.match*100)+'%| ' : ''}
                   {item.yaml_info.name ? item.yaml_info.name : item.id}
                   {item.yaml_info.position ? ' | ' + item.yaml_info.position : ''}
                   {item.yaml_info.age ? ' | ' + item.yaml_info.age : ''}

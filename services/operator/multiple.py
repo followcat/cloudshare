@@ -10,6 +10,7 @@ class Multiple(services.base.service.Service):
                  'getuniqueid', 'private_keys',
                  'add', 'modify', 'remove', 'kick',
                  'search', 'setup', 'indexadd', 'updatesvc', 'upgradesvc',
+                 'probability', 'probability_by_id', 'probability_by_ids', 'valuable_rate', 'init_sim',
                  'compare_excel',
                 )
 

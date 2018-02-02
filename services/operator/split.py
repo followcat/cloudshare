@@ -5,31 +5,21 @@ class SplitData(services.operator.facade.Application):
     """"""
     def getyaml(self, id):
         """Simulation done by merging service and template data"""
-        basetime = None
-        templatetime = None
-        try:
-            baseinfo = self.operator_service.getyaml(id)
-            if baseinfo:
-                basetime = baseinfo['modifytime'] if 'modifytime' in baseinfo else 0
-            else:
-                baseinfo = {}
-        except IOError:
-            baseinfo = {}
+        result = dict()
+        templateinfo = self.operator_service.getinfo(id)
         try:
             # No call to __getattr__ on ancestor class because getyaml() declaration is found here
-            #templateinfo = super(SplitData, self).getyaml(id)
-            templateinfo = super(SplitData, self).__getattr__('getyaml')(id)
-            if templateinfo:
-                templatetime = templateinfo['modifytime'] if 'modifytime' in templateinfo else 0
-            else:
-                templateinfo = {}
+            #baseinfo = super(SplitData, self).getyaml(id)
+            baseinfo = super(SplitData, self).__getattr__('getyaml')(id)
         except AttributeError:
             # assert type(self.operator_service) == services.base.text_storage.PlainTextStorage
-            templateinfo = {}
-        templateinfo.update(baseinfo)
-        if templateinfo:
-            templateinfo['modifytime'] = max(basetime, templatetime, 0)
-        return templateinfo
+            baseinfo = templateinfo
+        if baseinfo:
+            result.update(baseinfo)
+            for key in templateinfo:
+                if templateinfo[key]:
+                    result[key] = templateinfo[key]
+        return result
 
     def datas(self):
         for name, text in self.operator_service.datas():

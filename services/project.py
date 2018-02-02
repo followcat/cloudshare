@@ -171,7 +171,7 @@ class Project(services.base.service.Service):
                                                       do_commit=do_commit)
         result['project_cv_result'] = self.curriculumvitae.add(cvobj, committer, unique=unique,
                                                                do_commit=do_commit)
-        if result['repo_cv_result']:
+        if result['repo_cv_result'] or result['project_cv_result']:
             peoresult = self.peo_add(peopobj, committer, unique=unique, do_commit=do_commit)
             result.update(peoresult)
         return result

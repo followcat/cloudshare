@@ -10,7 +10,7 @@ class PlainTextStorage(services.base.storage.BaseStorage):
         result = False
         if unique is True and self.unique(bsobj) is False:
             self.info = "Exists File"
-            return result
+            return True
         name = core.outputstorage.ConvertName(bsobj.name)
         if text_file is True:
             message = "Add %s: %s data." % (self.commitinfo, name)

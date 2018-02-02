@@ -36,12 +36,11 @@ class Service(object):
         return not self.exists(id)
 
     def _add(self, name):
-        result = False
+        result = True
         if not self.exists(name):
             id = self.get_id(name)
             self.ids.add(id)
             self._nums += 1
-            result = True
         return result
 
     def _remove(self, name):

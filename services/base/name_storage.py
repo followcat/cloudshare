@@ -30,7 +30,7 @@ class NameStorage(services.base.storage.BaseStorage):
 
     def add(self, bsobj, committer=None, unique=True,
             kv_file=False, text_file=True, do_commit=True, **kwargs):
-        result = False
+        result = True
         if (unique and self.unique(bsobj)) or not unique:
             id = bsobj.ID
             result = self._add(id)

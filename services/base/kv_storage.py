@@ -137,7 +137,7 @@ class KeyValueStorage(services.base.storage.BaseStorage):
         result = False
         if unique is True and self.unique(bsobj) is False:
             self.info = "Exists File"
-            return False
+            return True
         if kv_file is True:
             if committer is not None:
                 bsobj.metadata['committer'] = committer

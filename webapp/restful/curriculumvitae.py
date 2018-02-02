@@ -33,13 +33,12 @@ class CurrivulumvitaeAPI(Resource):
         except KeyError:
             return { 'code': 400, 'message': 'Currivulumvitae information error.'}
         yaml['date'] = utils.builtin.strftime(yaml['date'])
-        cv_projects = member.cv_projects(id)
         en_html = ''
         html = member.cv_gethtml(id)
         if 'enversion' in yaml:
             en_html = member.cv_getmd_en(id)
         return { 'code': 200, 'data': { 'html': html, 'en_html': en_html,
-                                        'yaml_info': yaml, 'projects': cv_projects } }
+                                        'yaml_info': yaml, 'projects': [] } }
 
 
 class UpdateCurrivulumvitaeInformation(Resource):

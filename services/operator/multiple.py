@@ -6,9 +6,12 @@ import services.base.service
 class Multiple(services.base.service.Service):
     """"""
     combine_all = ('names', 'yamls')
-    match_any = ('exists', 'unique', 'getmd', 'getmd_en', 'gethtml', 'getyaml', 'getuniqueid', 'private_keys',
-                 'add', 'modify', 'remove', 'updateinfo', 'kick',
+    match_any = ('exists', 'unique', 'getmd', 'getmd_en', 'gethtml', 'getyaml',
+                 'getuniqueid', 'private_keys',
+                 'add', 'modify', 'remove', 'kick',
                  'search', 'setup', 'indexadd', 'updatesvc', 'upgradesvc',
+                 'probability', 'probability_by_id', 'probability_by_ids', 'valuable_rate', 'init_sim',
+                 'compare_excel',
                 )
 
     def __init__(self, services):
@@ -51,7 +54,7 @@ class Multiple(services.base.service.Service):
         for service in self.services:
             try:
                 res = getattr(service, attr)(*args, **kwargs)
-                if res:
+                if res or isinstance(res, list):
                     break
             except IOError:
                 continue

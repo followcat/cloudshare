@@ -55,12 +55,7 @@ class Members(object):
                                                 jobdescription={'jd': jd_repos},
                                                 people={'peo': mult_peo})
                 member.setup({'id':         member_id,
-                              'name':       name,
-                              'storageCV':  'cloudshare',
-                              'storagePEO': 'peostorage',
-                              'limitPEO':   'peolimit',
-                              'storageCO':  'corepo',
-                              'storageJD':  'jdrepo'})
+                              'name':       name})
                 self.members[name] = member
         self.idx_setup()
 
@@ -79,12 +74,7 @@ class Members(object):
                                                 jobdescription={'jd': self.jd_repos},
                                                 people={'peo': self.mult_peo})
         member.setup({'name':       self.default_member_name,
-                      'id':         member_id,
-                      'storageCV':  'cvindividual',
-                      'storagePEO': 'peoindividual',
-                      'limitPEO':   'peolimit',
-                      'storageCO':  'corepo',
-                      'storageJD':  'jdrepo'})
+                      'id':         member_id})
         self.members[self.default_member_name] = member
 
     def exists(self, name):
@@ -105,12 +95,7 @@ class Members(object):
                                                                'config': self.es_config},
                                                 jobdescription={'jd': self.jd_repos},
                                                 people={'peo': self.mult_peo})
-        member.setup({'name':       name,
-                      'storageCV':  'cloudshare',
-                      'storagePEO': 'peostorage',
-                      'limitPEO':   'peolimit',
-                      'storageCO':  'corepo',
-                      'storageJD':  'jdrepo'})
+        member.setup({'name':       name})
         self.active_members.add(core.basedata.DataObject(metadata=member.config, data=''))
         self.members[name] = member
 

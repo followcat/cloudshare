@@ -4,9 +4,10 @@ import functools
 
 import core.basedata
 import utils.builtin
+import services.secret
 import services.company
 import services.project
-import services.secret
+import services.matching
 import services.curriculumvitae
 import services.simulationcv
 import services.simulationco
@@ -28,12 +29,8 @@ class SimulationMember(services.base.kv_storage.KeyValueStorage):
     YAML_TEMPLATE = (
         ('id',                  str),
         ('name',                str),
+        ('model',               functools.partial(str, object='default')),
         ('administrator',       list),
-        ('storageCV',           str),
-        ('storagePEO',          str),
-        ('limitPEO',            str),
-        ('storageCO',           str),
-        ('storageJD',           str),
     )
 
     def add(self, bsobj, *args, **kwargs):
@@ -116,43 +113,19 @@ class CommonMember(services.operator.combine.Combine):
         return self.config['id']
 
     @property
+    def modelname(self):
+        return self.config['model']
+
+    @property
     def administrator(self):
         if 'administrator' not in self.config:
             self.config['administrator'] = set()
             self.config_service.modify(core.basedata.DataObject(metadata=self.config, data=None))
         return self.config['administrator']
 
-    @property
-    def storagePEO(self):
-        result = None
-        servicename = self.config['storagePEO']
-        for each in self.mult_peo[0].peoples:
-            if each.name == servicename:
-                result = each
-                break
-        return result
-
-    @property
-    def limitPEO(self):
-        result = None
-        servicename = self.config['limitPEO']
-        for each in self.mult_peo[0].peoples:
-            if each.name == servicename:
-                result = each
-                break
-        return result
-
     def peo_getyaml(self, id):
         yaml = self.people.getyaml(id)
         return yaml
-
-    def peo_updateyaml(self, id, key, value, username):
-        result = None
-        try:
-            result = self.people.updateinfo(id, key, value, username)
-        except AssertionError:
-            pass
-        return result
 
     def peo_deleteyaml(self, id, key, value, username, date):
         return self.people.deleteinfo(id, key, value, username, date)
@@ -213,18 +186,18 @@ class DefaultMember(CommonMember):
             else:
                 kwargs['doctype'] = [doctype]
         else:
-            for key in ('_indexadd', '_add', '_modify', '_kick'):
+            for key in ('_indexadd', '_add', '_modify', '_kick', '_add_excel'):
                 if attr.endswith(key):
                     kwargs['doctype'] = doctype
                     break
         return method(*args, **kwargs)
 
     def idx_setup(self):
-        self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
-        self.curriculumvitae.services[0].setup(self.search_engine, self.es_config['CV_MEM'])
+        self.jobdescription.data_service.setup(self.search_engine, self.es_config['JD_MEM'])
+        self.curriculumvitae.services[0].data_service.setup(self.search_engine, self.es_config['CV_MEM'])
 
     def idx_updatesvc(self):
-        self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
+        self.jobdescription.data_service.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
         self.curriculumvitae.services[0].updatesvc(self.es_config['CV_MEM'], self.id, numbers=1000)
 
     def use(self, id):
@@ -235,16 +208,18 @@ class DefaultMember(CommonMember):
         self.cv_path = os.path.join(self.path, self.CV_PATH)
         self.jd_path = os.path.join(self.path, self.JD_PATH)
         self.curriculumvitae = services.operator.multiple.Multiple(
-                [services.curriculumvitae.SearchIndex(services.operator.checker.Filter(
-                    data_service=services.operator.split.SplitData(
-                        data_service=self.cv_repo,
-                        operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
-                    operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
+                [services.matching.Similarity(
+                    data_service=services.curriculumvitae.SearchIndex(services.operator.checker.Filter(
+                            data_service=services.operator.split.SplitData(
+                                data_service=self.cv_repo,
+                                operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
+                            operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name))),
+                    operator_service=self.matching),
                 services.operator.split.SplitData(
-                    data_service=services.secret.Private(
-                        data_service=services.operator.multiple.Multiple(self.cv_storage),
-                        operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
-                    operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
+                            data_service=services.secret.Private(
+                                data_service=services.operator.multiple.Multiple(self.cv_storage),
+                                operator_service=services.simulationcv.SelectionCV(self.cv_path, self.name)),
+                            operator_service=services.simulationcv.SimulationCV(self.cv_path, self.name)),
                 ])
         self.company = services.operator.multiple.Multiple(
                 [services.company.SearchIndex(services.operator.checker.Filter(
@@ -256,12 +231,21 @@ class DefaultMember(CommonMember):
                     data_service=self.co_storage,
                     operator_service=services.simulationco.SimulationCO(self.firm_path, self.name)),
                 ])
-        self.jobdescription = services.jobdescription.SearchIndex(services.secret.Secret(
-                services.operator.multiple.Multiple(self.jd_blocks)))
+        self.jobdescription = services.matching.Similarity(
+                data_service=services.jobdescription.SearchIndex(services.secret.Secret(
+                    services.operator.multiple.Multiple(self.jd_blocks))),
+                operator_service=self.matching)
         self.idx_setup()
+        self.mch_setup()
         return result
 
+    def mch_setup(self):
+        self.curriculumvitae.services[0].setup(self.modelname, [self.id])
+        self.jobdescription.setup('jdmatch', ['jdrepo'])
+
     def cv_add(self, cvobj, committer=None, unique=True, do_commit=True, **kwargs):
+        kwargs['doctype'] = self.id
+        kwargs['simname'] = self.id
         result = self.curriculumvitae.add(cvobj, committer, unique=unique,
                                           do_commit=do_commit, **kwargs)
         if result:
@@ -293,15 +277,6 @@ class DefaultMember(CommonMember):
 
     def cv_numbers(self):
         return self.curriculumvitae.NUMS
-
-    def cv_updateyaml(self, id, key, value, username):
-        result = None
-        if key in dict(self.curriculumvitae.YAML_TEMPLATE):
-            try:
-                result = self.curriculumvitae.updateinfo(id, key, value, username)
-            except AssertionError:
-                pass
-        return result
 
     def peo_getyaml(self, id):
         yaml = super(DefaultMember, self).peo_getyaml(id)
@@ -360,7 +335,7 @@ class Member(DefaultMember):
         self.bd_blocks = kwargs['bidding']['bd']
 
     def __getattr__(self, attr):
-        for key in ['bd', 'jd', 'mch']:
+        for key in ['bd', 'jd']:
             if attr.startswith(key+'_'):
                 return functools.partial(self.call_project, attr=attr)
         return super(Member, self).__getattr__(attr)
@@ -412,11 +387,9 @@ class Member(DefaultMember):
                                                 search_engine={'idx': self.search_engine,
                                                                'config': self.es_config})
                 tmp_project.setup(info={'id':      project_id,
-                                     'name':       project_info['name'],
-                                     'autosetup':  False,
-                                     'autoupdate': False,
-                                     'storageCO':  self.config['storageCO'],
-                                     'storageJD':  self.config['storageJD']})
+                                        'name':       project_info['name'],
+                                        'autosetup':  False,
+                                        'autoupdate': False})
                 if not tmp_project.config['autosetup'] and not tmp_project.config['autoupdate']:
                     tmp_project._modelname = self.default_model
                 self.projects[name] = tmp_project
@@ -448,9 +421,7 @@ class Member(DefaultMember):
                                                                   'config': self.es_config})
             tmp_project.setup(info={'name':         name,
                                     'autosetup':    autosetup,
-                                    'autoupdate':   autoupdate,
-                                    'storageCO':    self.config['storageCO'],
-                                    'storageJD':    self.config['storageJD']})
+                                    'autoupdate':   autoupdate})
             self.active_projects.add(core.basedata.DataObject(metadata=tmp_project.config, data=''))
             self.projects[name] = tmp_project
             result = True

@@ -5,6 +5,7 @@ import utils.builtin
 import core.outputstorage
 import sources.industry_id
 import services.bidding
+import services.matching
 import services.jobdescription
 import services.base.service
 import services.base.kv_storage
@@ -24,8 +25,6 @@ class SimulationProject(services.base.kv_storage.KeyValueStorage):
         ('model',               functools.partial(str, object='default')),
         ('autosetup',           bool),
         ('autoupdate',          bool),
-        ('storageCO',           str),
-        ('storageJD',           str),
     )
 
     def add(self, bsobj, *args, **kwargs):
@@ -57,27 +56,11 @@ class Project(services.operator.combine.Combine):
 
     def idx_setup(self):
         self.bidding.setup(self.search_engine, self.es_config['BD_MEM'])
-        self.jobdescription.setup(self.search_engine, self.es_config['JD_MEM'])
+        self.jobdescription.data_service.setup(self.search_engine, self.es_config['JD_MEM'])
 
     def idx_updatesvc(self):
         self.bidding.updatesvc(self.es_config['BD_MEM'], self.id, numbers=1000)
-        self.jobdescription.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
-
-    @property
-    def storageCO(self):
-        result = None
-        servicename = self.config['storageCO']
-        for repo in self.bd_blocks:
-            if isinstance(repo, services.simulationbd.SimulationBD):
-                for each in repo.storages:
-                    if each.name == servicename:
-                        result = each
-                        break
-            elif repo.name == servicename:
-                result = repo
-            if result is not None:
-                break
-        return result
+        self.jobdescription.data_service.updatesvc(self.es_config['JD_MEM'], self.id, numbers=1000)
 
     @property
     def modelname(self):
@@ -108,86 +91,49 @@ class Project(services.operator.combine.Combine):
         self.customer = services.operator.checker.Selector(
                 data_service=self.bidding,
                 operator_service=services.simulationcustomer.SelectionCustomer(copath, self.name))
-        self.jobdescription = services.jobdescription.SearchIndex(services.operator.checker.Filter(
-                data_service=services.operator.multiple.Multiple(self.jd_blocks),
-                operator_service=services.base.name_storage.NameStorage(jdpath, self.name)))
+        self.jobdescription = services.matching.Similarity(
+                data_service=services.jobdescription.SearchIndex(services.operator.checker.Filter(
+                    data_service=services.operator.multiple.Multiple(self.jd_blocks),
+                    operator_service=services.base.name_storage.NameStorage(jdpath, self.name))),
+                operator_service=self.matching)
         self.idx_setup()
+        self.mch_setup()
         return result
 
-    def mch_probability_by_id(self, doc, ids, uses=None, top=10000, **kwargs):
-        return self.matching.probability_by_id(self.modelname, doc, ids, uses=uses, top=top)
-
-    def mch_probability_by_ids(self, doc, ids, uses=None, top=10000, **kwargs):
-        return self.matching.probability_by_ids(self.modelname, doc, ids, uses=uses, top=top)
-
-    def mch_valuable_rate(self, name_list, member, doc, top, **kwargs):
-        return self.matching.valuable_rate(name_list, self.modelname, member, doc, top)
-
-    def mch_add_documents(self, names, documents, **kwargs):
-        # FIXME: Does not work for member without project (User upload)
-        if self.id not in self.matching.sim[self.modelname]:
-            self.matching.init_sim(self.modelname, self.id)
-        else:
-            self.matching.sim[self.modelname][self.id].add_documents(names, documents)
-            self.matching.sim[self.modelname][self.id].save()
-
-    def bd_update_info(self, id, info, committer):
-        result = False
-        if self.bidding.exists(id):
-            info['id'] = id
-            bsobj = core.basedata.DataObject(metadata=info, data=None)
-            repo_result = self.storageCO.modify(bsobj, "Update %s information."%id,
-                                                  committer)
-            project_result = self.bidding.modify(bsobj, committer)
-            result = repo_result or project_result
-        return result
+    def mch_setup(self):
+        self.jobdescription.setup('jdmatch', ['jdrepo'])
 
     def bd_compare_excel(self, stream, committer):
         outputs = list()
-        outputs.extend(self.storageCO.compare_excel(stream, committer))
-        outputs.extend(self.bidding.compare_excel(stream, committer))
-        return outputs
+        return self.bidding.compare_excel(stream, committer)
 
-    def bd_add_excel(self, items, committer):
+    def bd_add_excel(self, items, **kwargs):
         results = dict()
-        repo_result = set()
-        project_result = set()
         for item in items:
-            yamlname = core.outputstorage.ConvertName(item[1]).yaml
-            result = None
-            success = False
-            if item[0] == 'companyadd':
+            result = False
+            if item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 try:
-                    result = self.storageCO.add(baseobj, committer=item[2][-1], do_commit=False)
-                    success = True
+                    result = self.bidding.add(baseobj, committer=item[2][-1],
+                                              do_commit=False, **kwargs)
                 except Exception:
-                    success = False
-                if success is True:
-                    repo_result.add(yamlname)
-            elif item[0] == 'projectadd':
-                baseobj = core.basedata.DataObject(*item[2][:2])
+                    pass
+            results[item[1]] = {'data': item, 'result': result}
+        for item in items:
+            if item[0] == 'listadd':
+                if item[2][1] in ['priority', 'responsible']:
+                    update_info = {'id': item[2][0], item[2][1]: item[2][2]}
+                else:
+                    update_info = {'id': item[2][0],
+                                   item[2][1]: { 'content': item[2][2],
+                                                 'author': item[2][3]}}
+                obj = core.basedata.DataObject(update_info, data='')
                 try:
-                    result = self.bidding.add(baseobj, committer=item[2][-1], do_commit=False)
-                    success = True
+                    result = self.bidding.modify(obj, committer=item[2][3],
+                                                 do_commit=False, **kwargs)
                 except Exception:
-                    success = False
-                if success is True:
-                    project_result.add(self.bidding.ids_file)
-                    project_result.add(os.path.join(self.bidding.YAML_DIR, yamlname))
-            elif item[0] == 'listadd':
-                try:
-                    result = self.bidding.updateinfo(*item[2], do_commit=False)
-                    success = True
-                except Exception:
-                    success = False
-                if success is True:
-                    project_result.add(os.path.join(self.bidding.YAML_DIR, yamlname))
-            else:
-                success = False
-            results[item[1]] = {'data': item, 'success': success, 'result': result}
-        self.storageCO.interface.do_commit(list(repo_result), committer=committer)
-        self.bidding.interface.do_commit(list(project_result), committer=committer)
+                    pass
+            results[item[1]] = {'data': item, 'result': result}
         return results
 
     def bd_names(self):

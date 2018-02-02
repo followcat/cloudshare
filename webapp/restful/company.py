@@ -226,10 +226,6 @@ class CompanyInfoUpdateAPI(Resource):
         bsobj = core.basedata.DataObject(metadata, data='')
         result = member.bd_kick(bsobj, committer=user.name, **project)
         if result:
-            id = bsobj.ID
-            co_info = member.bd_getyaml(id, **project)
-            member.bd_indexadd(id=id, data=None, info=co_info, **project)
-        if result:
             response = { 'code': 200, 'message': 'Update information success.' }
         else:
             response = { 'code': 400, 'message': 'Update information error.' }
@@ -288,8 +284,7 @@ class CompanyUploadExcelAPI(Resource):
     def __init__(self):
         super(CompanyUploadExcelAPI, self).__init__()
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('files', type = str, location = 'json')
-        self.reqparse.add_argument('project', location = 'json')
+        self.reqparse.add_argument('project', type=str, location='form')
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -298,14 +293,14 @@ class CompanyUploadExcelAPI(Resource):
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
         network_file = flask.request.files['files']
         compare_result = member.bd_compare_excel(network_file.read(),
-                                                       committer=user.name, **project)
+                                                 committer=user.name, **project)
         infos = dict()
         for item in compare_result:
             coid = item[1]
             if coid not in infos:
                 if member.bd_exists(coid, **project):
                     infos[coid] = member.bd_getyaml(coid, **project)
-                else:
+                elif item[0] == 'projectadd':
                     infos[coid] = item[2][0]
         return {
             'code': 200,
@@ -331,20 +326,16 @@ class CompanyConfirmExcelAPI(Resource):
         projectname = args['project']
         member = user.getmember()
         project = dict(filter(lambda x: x[0] in ('project',), args.items()))
-        prj_results = member.bd_add_excel(datas, committer=user.name, **project)
+        prj_results = member.bd_add_excel(datas, **project)
         infos = dict()
         results = { 'success': dict(), 'failed': dict() }
-        for coid in prj_results:
-            if member.bd_exists(coid, **project):
-                result_info = member.bd_get(coid, **project)
-            else:
-                result_info = prj_results[coid][data][0]
-            infos[coid] = result_info
-            result_key = 'success' if prj_results[coid]['success'] is True else 'failed'
-            results[result_key][coid] = prj_results[coid]
-            if prj_results[coid]['success'] is True:
-                co_info = member.bd_get(coid, **project)
-                member.bd_indexadd(id=coid, data=None, info=co_info, **project)
+        for bdid in prj_results:
+            result_info = member.bd_getyaml(bdid, **project)
+            infos[bdid] = result_info
+            result_key = 'success' if prj_results[bdid]['result'] is True else 'failed'
+            results[result_key][bdid] = prj_results[bdid]
+            if prj_results[bdid]['result'] is True:
+                member.bd_indexadd(id=bdid, data=None, info=result_info, **project)
         return {
             'code': 200,
             'data': results,

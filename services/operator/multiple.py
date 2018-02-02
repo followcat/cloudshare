@@ -53,7 +53,7 @@ class Multiple(services.base.service.Service):
         for service in self.services:
             try:
                 res = getattr(service, attr)(*args, **kwargs)
-                if res:
+                if res or isinstance(res, list):
                     break
             except IOError:
                 continue

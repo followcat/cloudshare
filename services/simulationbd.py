@@ -53,8 +53,9 @@ class SimulationBD(services.base.frame_storage.ListFrameStorage):
                 info = self.getyaml(id)
             for key in dict(self.YAML_TEMPLATE):
                 if dict(self.YAML_TEMPLATE)[key] == list:
-                    existvalues = [v['content'] for v in info[key]]\
-                                    if self.exists(id) else list()
+                    existvalues = list()
+                    if key in info:
+                        existvalues = [v['content'] for v in info[key]]
                     if key in excel:
                         for value in excel[key]:
                             if value in existvalues:

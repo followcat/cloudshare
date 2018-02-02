@@ -103,45 +103,37 @@ class Project(services.operator.combine.Combine):
     def mch_setup(self):
         self.jobdescription.setup('jdmatch', ['jdrepo'])
 
-    def bd_update_info(self, id, info, committer):
-        result = False
-        if self.bidding.exists(id):
-            info['id'] = id
-            bsobj = core.basedata.DataObject(metadata=info, data=None)
-            result = self.bidding.modify(bsobj, committer)
-        return result
-
     def bd_compare_excel(self, stream, committer):
         outputs = list()
-        bd = self.bidding.compare_excel(stream, committer)
-        for each in bd:
-            print each[0]
-        outputs.extend(bd)
-        return outputs
+        return self.bidding.compare_excel(stream, committer)
 
-    def bd_add_excel(self, items, committer):
+    def bd_add_excel(self, items, **kwargs):
         results = dict()
         for item in items:
-            yamlname = core.outputstorage.ConvertName(item[1]).yaml
-            result = None
-            success = False
-            if item[0] in ['companyadd', 'projectadd']:
+            result = False
+            if item[0] == 'projectadd':
                 baseobj = core.basedata.DataObject(*item[2][:2])
                 try:
-                    result = self.bidding.add(baseobj, committer=item[2][-1])
-                    success = True
+                    result = self.bidding.add(baseobj, committer=item[2][-1],
+                                              do_commit=False, **kwargs)
                 except Exception:
                     pass
-            elif item[0] == 'listadd':
-                baseobj = core.basedata.DataObject(metadata={
-                                                    'id': item[2][0],
-                                                    item[2][1]: item[2][2]}, data=None)
+            results[item[1]] = {'data': item, 'result': result}
+        for item in items:
+            if item[0] == 'listadd':
+                if item[2][1] in ['priority', 'responsible']:
+                    update_info = {'id': item[2][0], item[2][1]: item[2][2]}
+                else:
+                    update_info = {'id': item[2][0],
+                                   item[2][1]: { 'content': item[2][2],
+                                                 'author': item[2][3]}}
+                obj = core.basedata.DataObject(update_info, data='')
                 try:
-                    result = self.bidding.modify(baseobj, committer=item[2][3])
-                    success = True
+                    result = self.bidding.modify(obj, committer=item[2][3],
+                                                 do_commit=False, **kwargs)
                 except Exception:
                     pass
-            results[item[1]] = {'data': item, 'success': success, 'result': result}
+            results[item[1]] = {'data': item, 'result': result}
         return results
 
     def bd_names(self):

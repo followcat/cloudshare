@@ -40,12 +40,6 @@ class Bidding(services.base.kv_storage.KeyValueStorage):
 
     def compare_excel(self, stream, committer):
         output = list()
-        excels = utils.companyexcel.convert(stream)
-        for excel in excels:
-            metadata = extractor.information_explorer.catch_biddinginfo(excel)
-            data = core.basedata.DataObject(metadata, excel)
-            if not self.exists(data.name):
-                output.append(('companyadd', metadata['id'], (metadata, excel, committer)))
         return output
 
 

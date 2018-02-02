@@ -25,7 +25,7 @@ class Filter(services.operator.facade.Application):
 
     def add(self, *args, **kwargs):
         res = self.data_service.add(*args, **kwargs)
-        if res or not self.data_service.unique(args[0]):
+        if res:
             res = self.operator_service.add(*args, **kwargs)
         return res
 

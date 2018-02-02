@@ -254,7 +254,6 @@ class LSIbyJDidAPI(LSIbaseAPI):
         args = self.reqparse.parse_args()
         id = args['id']
         cur_page = args['page']
-        projectname = args['project']
         uses = args['uses'] if args['uses'] else []
         filterdict = args['filterdict'] if args['filterdict'] else {}
         append_comment = args['appendcomment'] if args['appendcomment'] else False
@@ -386,9 +385,7 @@ class SimilarAPI(Resource):
         user = flask.ext.login.current_user
         args = self.reqparse.parse_args()
         id = args['id']
-        projectname = args['project']
         member = user.getmember()
-        project = member.getproject(projectname)
         doc = member.cv_getmd(id)
         datas = []
         index = [member.es_config['CV_MEM']]

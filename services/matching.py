@@ -142,3 +142,15 @@ class Similarity(services.operator.facade.Application):
         ranklist = sorted(probalist, key=lambda x:float(x[1]), reverse=True)
         return len(ranklist), map(lambda x: (x[0], ranklist.index(x)), lists)
 
+    def correlation(self, doc, basemodel, uses=None, top=None, minimum=0, page=0, numbers=0):
+        begin = page*numbers
+        end = (page+1)*numbers
+        total = 0
+        results = list()
+        for sim in self.getsims(basemodel, uses):
+            result = sim.base_probability(doc, top=top, minimum=minimum)
+            total += len(result)
+            for index, value in result[begin:end]:
+                results.append((sim.names[index], value))
+        return total, results
+

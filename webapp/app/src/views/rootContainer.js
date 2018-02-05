@@ -69,10 +69,12 @@ const rootRoute = {
     require('routes/notice'),
     require('routes/management'),
     require('routes/resume'),
+    require('routes/company'),
     require('routes/upload-preview'),
     require('routes/go-to-signin'),
     require('routes/agreement'),
     require('routes/job-search'),
+    require('routes/company-search'),
     require('routes/best-excellent'),
     require('routes/add-position'),
   ]

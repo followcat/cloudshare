@@ -37,6 +37,7 @@ class EnhancedInput extends Component {
       if (props.dataIndex) {
         let obj = {};
         obj[props.dataIndex] = this.state.value;
+        obj = Object.assign({id: props.id},obj)
         props.onClick(obj);
       } else {
         props.onClick(this.state.value);

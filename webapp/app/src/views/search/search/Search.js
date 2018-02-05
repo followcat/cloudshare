@@ -26,6 +26,7 @@ class Search extends Component {
     }
     this.handleSearch = this.handleSearch.bind(this);
     this.handleJDSearch = this.handleJDSearch.bind(this);
+    this.handleCOSearch = this.handleCOSearch.bind(this);
   }
 
   handleSearch(value) {
@@ -42,10 +43,10 @@ class Search extends Component {
     });
   }
 
-  UploadClick(){
+  handleCOSearch(value) {
     browserHistory.push({
-      pathname: 'uploader?guide=true',
-      query: { search_text: true }
+      pathname: '/cosearch/result',
+      query: { search_text: value }
     });
   }
 
@@ -57,7 +58,7 @@ class Search extends Component {
           <div className="cs-search">
             <Tabs type="card">
             {this.state.ismember &&
-            <TabPane tab={language.JD_SEARCH} key="1">
+              <TabPane tab={language.JD_SEARCH} key="1">
                 <KeywordSearch
                   btnText={language.JD_SEARCH}
                   horizontal
@@ -71,6 +72,14 @@ class Search extends Component {
                   defaultText={'输入职位职责进行匹配'}
                   horizontal
                   onSearch={this.handleJDSearch}
+                />
+              </TabPane>
+              <TabPane tab={language.COMPANY_SEARCH} key="3">
+                <KeywordSearch
+                  btnText={language.COMPANY_SEARCH}
+                  defaultText={'输入公司名进行搜索'}
+                  horizontal
+                  onSearch={this.handleCOSearch}
                 />
               </TabPane>
               </Tabs>

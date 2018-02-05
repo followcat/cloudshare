@@ -2,6 +2,7 @@
 import StorageUtil from 'utils/storage';
 import Generator from 'utils/generator';
 import { API } from 'API';
+import { newFetch } from './newfetch';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
@@ -22,7 +23,7 @@ export const getDatabaseInfo = (callback) => {
 };
 
 export const getResultData = (params, callback) => {
-  return fetch(API.SEARCH_BY_TEXT_API, {
+  return newFetch(API.SEARCH_BY_TEXT_API, {
     method: 'POST',
     credentials: 'include',
     headers: {

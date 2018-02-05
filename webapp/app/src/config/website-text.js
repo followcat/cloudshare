@@ -16,8 +16,8 @@ const websiteText = {
     PHONE: '手机',
     AGE: '年龄',
     EDUCATION: '学历',
-    MARITAL_STATUS: '婚姻状况',
-    SCHOOL: '院校',
+    MARITAL_STATUS: '婚否',
+    SCHOOL: '学校',
     POSITION: '职位',
     COMPANY:  '最近公司',
     FROM_COMPANY: '所属公司',
@@ -40,6 +40,7 @@ const websiteText = {
     MANGEMENT: '管理',
     SEARCH: '查询',
     JD_SEARCH: '简历搜索',
+    COMPANY_SEARCH: '公司搜索',
     JOBSEARCH: '职位匹配',
     MATCH: '匹配',
     PROJECT_SEARCH: '项目查询',
@@ -92,7 +93,7 @@ const websiteText = {
     VISITOR: '陌拜人',
 
     
-    VIEW_DETAILS: '查看详情',
+    VIEW_DETAILS: '编辑详情',
     DETAILS_INFORMATION: '详细信息',
     EXTENDED_INFORMATION: '扩展信息',
     BASIC_INFORMATION: '基本信息',

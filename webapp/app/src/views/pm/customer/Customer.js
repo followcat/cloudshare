@@ -22,10 +22,14 @@ import {
 import {
   getCustomerList,
   updateCustomer,
-  getAddedCompanyList
+  getAddedCompanyList,
+  updateCompanyInfo,
+  updateCompanyInfoList,
+  deleteCompanyInfoList
 } from 'request/company';
 
 import find from 'lodash/find';
+import Storage from 'utils/storage';
 
 import websiteText from 'config/website-text';
 
@@ -46,6 +50,7 @@ class Customer extends Component {
   constructor() {
     super();
     this.state = {
+      user: Storage.get('user'),
       current: 1,
       totals: 0,
       pageSize: 10,
@@ -66,6 +71,9 @@ class Customer extends Component {
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
     this.handleOkClick = this.handleOkClick.bind(this);
+    this.handleExtractInfoCreate = this.handleExtractInfoCreate.bind(this);
+    this.handleExtractInfoRemove = this.handleExtractInfoRemove.bind(this);
+    this.handleBasicInfoSave = this.handleBasicInfoSave.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.getDataSource = this.getDataSource.bind(this);
     this.getCompanyDataSource = this.getCompanyDataSource.bind(this);
@@ -124,6 +132,58 @@ class Customer extends Component {
   handleCancelClick() {
     this.setState({
       visible: false
+    });
+  }
+
+  handleExtractInfoCreate(data) {
+    let key = Object.keys(data).filter((item) => {return item != 'id' && item != 'project'});
+    key = key[0];
+    let params = {};
+        params['project'] = data.project;
+        params['metadata'] = {[key]: {content: data[key], author: this.state.user},id: data.id};
+    updateCompanyInfoList(params, (json) => {
+      if (json.code === 200) {
+        message.success('更新成功!');
+        this.setState({
+          siderPanelVisible: false,
+          editStatus: false
+        })
+        this.getDataSource();
+      } else {
+        message.error('更新失败!');
+      }
+    });
+  }
+
+  handleExtractInfoRemove(key, value, date, id) {
+    let params = {};
+        params['metadata'] = {
+          [key]: {content: value, author: this.state.user, date: date},
+          id: id};
+    deleteCompanyInfoList(params, (json) => {
+      if (json.code === 200) {
+        message.success('更新成功!');
+          this.getDataSource();
+        } else {
+          message.error('更新失败!');
+        }
+    });
+  }
+
+  handleBasicInfoSave(data) {
+    let params = {};
+        params['metadata'] = data;
+    updateCompanyInfo(params, (json) => {
+        if (json.code === 200) {
+          message.success('更新成功!');
+          this.setState({
+            siderPanelVisible: false,
+            editStatus: false
+          });
+          this.getDataSource();
+        } else {
+          message.error('更新失败!');
+        }
     });
   }
 
@@ -346,6 +406,14 @@ class Customer extends Component {
         return (
           <ul>
             <li>
+              <a
+                href="javascript: void(0);"
+                onClick={() => this.handleViewDetailsClick(record)}
+              >
+                {language.VIEW_DETAILS}
+              </a>
+            </li>
+            <li>
               <Popconfirm
                 title={language.DELETE_CONFIRM_MSG}
                 onConfirm={() => this.handleDeleteCustomerConfirm(record.id)}
@@ -354,14 +422,6 @@ class Customer extends Component {
                   {language.DELETE}
                 </a>
               </Popconfirm>
-            </li>
-            <li>
-              <a
-                href="javascript: void(0);"
-                onClick={() => this.handleViewDetailsClick(record)}
-              >
-                {language.VIEW_DETAILS}
-              </a>
             </li>
           </ul>
         );
@@ -435,7 +495,7 @@ class Customer extends Component {
           onClose={this.handleSiderPanelClose}
         >
           <ExtractInfo 
-            editable={false}
+            editable={true}
             title={language.EXTENDED_INFORMATION}
             dataSource={this.state.detailData}
             onCreate={this.handleExtractInfoCreate}
@@ -445,7 +505,7 @@ class Customer extends Component {
             title={language.BASIC_INFORMATION}
             rows={rows}
             dataSource={this.state.detailData}
-            editable={false}
+            editable={true}
             saveText={language.SAVE}
             cancelText={language.CANCEL}
             editText={language.EDIT}

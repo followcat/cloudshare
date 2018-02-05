@@ -17,7 +17,7 @@ class SplitData(services.operator.facade.Application):
         if baseinfo:
             result.update(baseinfo)
             for key in templateinfo:
-                if templateinfo[key]:
+                if templateinfo[key] or key not in result:
                     result[key] = templateinfo[key]
         return result
 

@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { DatePicker, Input, Button } from 'antd';
+import { DatePicker, Input, Button, Icon } from 'antd';
 
 import cloneDeep from 'lodash/cloneDeep';
 import remove from 'lodash/remove';
@@ -99,6 +99,10 @@ class ReminderInfoItem extends Component {
             disabledDate={this.disabledDate}
             onChange={this.handleDateChange}
           />
+          <Icon type="plus" 
+            style={{ fontSize: 18, color: '#8BC34A' }}
+            onClick={this.props.handleSaveClick}
+          />
         </div>
       );
     }
@@ -136,10 +140,9 @@ class ReminderInfoItem extends Component {
                 <p key={index} className="visiting-list">
                   {item.content && `${item.author} | ${item.content.date} | ${item.content.text}`}
                   {editStatus ?
-                    <a
+                    <Icon type="close"
                       className="visiting-list-del"
-                      href="javascript: void(0);"
-                      onClick={() => this.handleDeleteClick(item)}>{language.DELETE}</a> :
+                      onClick={() => this.handleDeleteClick(item)}/> :
                     null}
                 </p>
               );

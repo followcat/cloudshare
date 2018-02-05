@@ -38,6 +38,7 @@ class CompanyInfo extends Component {
     this.handleUpdateFieldValues = this.handleUpdateFieldValues.bind(this);
     this.handleUpdateDeleteList = this.handleUpdateDeleteList.bind(this);
     this.handleSaveClick = this.handleSaveClick.bind(this);
+    this.handleSaveListClick = this.handleSaveListClick.bind(this);
     this.handleCancelClick = this.handleCancelClick.bind(this);
     this.getAdditionalInfoRender = this.getAdditionalInfoRender.bind(this);
     this.getBasicInfoOnExtra = this.getBasicInfoOnExtra.bind(this);
@@ -61,9 +62,8 @@ class CompanyInfo extends Component {
     const { formValues } = this.state;
     formValues[fieldProp] = fieldValue;
     this.setState({ formValues });
-    console.log(formValues);
   }
-
+  
   handleUpdateDeleteList(dataIndex, value) {
     const { deleteList } = this.state;
 
@@ -96,8 +96,7 @@ class CompanyInfo extends Component {
     }
 
     let params = {metadata:Object.assign({id: dataSource.id},args)};
-    console.log(args);
-    !args && updateCompanyInfo(params, (json) => {
+    updateCompanyInfo(params, (json) => {
         if (json.code === 200) {
           message.success('更新成功!');
           this.setState({
@@ -135,6 +134,61 @@ class CompanyInfo extends Component {
             formValues: [],
             deleteList: [],
             editStatus: false
+          });
+          this.props.updateDataSource();
+        } else {
+          message.error('更新失败!');
+        }
+      });
+    })
+  }
+
+  handleSaveListClick() {
+    const { dataSource } = this.props,
+          { formValues, deleteList, user } = this.state;
+    const listItemKeys = ['position', 'updatednumber', 'relatedcompany', 'clientcontact', 'reminder', 'progress'];
+
+    let args = {},argslist = [],argslistdelete = [];
+    for (let key in formValues) {
+      let obj = {}, lbj = {};
+      if (listItemKeys.indexOf(key) > -1) {
+        obj[key] = Object.assign(formValues[key],{author: user});
+        argslist.push(obj);
+      } else {
+        args[key] = formValues[key].content;
+      }
+    }
+    for (let i = 0; i < deleteList.length; i++) {
+      let key = deleteList[i].dataIndex,
+          dlj = {[key]: deleteList[i].value};
+      argslistdelete.push(dlj);
+    }
+
+    argslist.map( item => {
+      let params = {metadata: Object.assign({id: dataSource.id},item)}
+      updateCompanyInfoList(params, (json) => {
+        if (json.code === 200) {
+          message.success('更新成功!');
+          this.setState({
+            formValues: [],
+            deleteList: [],
+            editStatus: true
+          });
+          this.props.updateDataSource();
+        } else {
+          message.error('更新失败!');
+        }
+      });
+    })
+    argslistdelete.map( item => {
+      let params = {metadata: Object.assign({id: dataSource.id},item)}
+      deleteCompanyInfoList(params, (json) => {
+        if (json.code === 200) {
+          message.success('更新成功!');
+          this.setState({
+            formValues: [],
+            deleteList: [],
+            editStatus: true
           });
           this.props.updateDataSource();
         } else {
@@ -254,6 +308,7 @@ class CompanyInfo extends Component {
         dataSource={dataSource.progress}
         dataIndex="progress"
         editStatus={editStatus}
+        handleSaveListClick={this.handleSaveListClick}
         onUpdateFieldValues={this.handleUpdateFieldValues}
         onUpdateDeleteList={this.handleUpdateDeleteList}
       />
@@ -272,6 +327,7 @@ class CompanyInfo extends Component {
         editStatus={editStatus}
         onUpdateFieldValues={this.handleUpdateFieldValues}
         onUpdateDeleteList={this.handleUpdateDeleteList}
+        handleSaveClick={this.handleSaveClick}
       />
     );
   }
@@ -279,17 +335,12 @@ class CompanyInfo extends Component {
   render() {
     const { dataSource } = this.props,
           { visible, editStatus } = this.state;
-
     const items = [{
       key: 'name',
       dataIndex: 'name',
       width: '28.61888888%',
       editable: false
-    }, {
-      key: 'clientcontact',
-      dataIndex: 'clientcontact',
-      width: '21.45999999%'
-    }, {
+    },{
       key: 'conumber',
       dataIndex: 'conumber',
       width: '21.45999999%'
@@ -301,7 +352,11 @@ class CompanyInfo extends Component {
       key: 'priority',
       dataIndex: 'priority',
       width: '14.15622222%'
-    }];
+    },{
+      key: 'clientcontact',
+      dataIndex: 'clientcontact',
+      width: '21.45999999%'
+    },];
 
     const expandCls = visible ? 'cs-row-expand-icon cs-row-expanded' : 'cs-row-expand-icon cs-row-collapsed';
 
@@ -312,7 +367,7 @@ class CompanyInfo extends Component {
             <span className={expandCls} onClick={this.handleClick}></span>
             <span className="cs-row-expand-icon" onClick={this.handleEditIconClick}><Icon type="edit" /></span>
           </Col>
-          <Col span="14">                                                                                                                                                                             
+          <Col span="17">
             <Row>
               {items.map(item => {
                 return (
@@ -337,9 +392,11 @@ class CompanyInfo extends Component {
               </div> :
               null}
           </Col>
+          { false &&
           <Col span="3" className="cell-item">
             {this.getReminderInfoRender()}
           </Col>
+          }
           <Col span="6" className="cell-item">
             {this.getVisitingInfoRender()}
           </Col>

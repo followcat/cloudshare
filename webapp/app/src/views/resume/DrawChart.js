@@ -115,7 +115,10 @@ class DrawChart extends Component {
       name_list: [`${resumeId}`]
     }), (json) => {
       if (json.code === 200) {
-        const option = getRadarOption(json.data.max, json.data.result, anonymized);
+        let option = {};
+        if(json.data.result.length > 0) {
+          option = getRadarOption(json.data.max, json.data.result, anonymized);
+        }
         this.setState({
           spinning: false,
           radarOption: option,

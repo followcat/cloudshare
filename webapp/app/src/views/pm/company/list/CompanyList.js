@@ -289,28 +289,31 @@ class CompanyList extends Component {
     },{
       key: 'name',
       text: language.COMPANY_NAME,
-      span: 4,
-    }, {
-      key: 'clientcontact',
-      text: language.CONTACT,
-      span: 3
-    }, {
+      span: 5,
+    },{
       key: 'conumber',
       text: language.TELLPHONE,
       span: 3
     }, {
       key: 'responsible',
       text: language.RESPONSIBLE,
-      span: 2
+      span: 3
     }, {
       key: 'priority',
       text: language.PRIORITY,
-      span: 2
-    }, {
-      key: 'reminder',
-      text: language.REMINDER,
       span: 3
-    }, {
+    },
+    {
+      key: 'clientcontact',
+      text: language.CONTACT,
+      span: 3
+    },
+    // {
+    //   key: 'reminder',
+    //   text: language.REMINDER,
+    //   span: 3
+    // },
+    {
       key: 'visiting',
       text: language.VISITING_SITUATION,
       span: 6

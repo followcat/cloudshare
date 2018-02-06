@@ -66,6 +66,10 @@ export const API = {
 
   COMPANY_API: `${HOST}/api/company`,
 
+  RESUME_COMPANY_API: `${HOST}/api/1.0/firm`,
+
+  SEARCH_COMPANY_API: `${HOST}/api/1.0/firms/search`,
+
   ADDED_COMPANY_LIST_API: `${HOST}/api/addedcompanylist`,
 
   ALL_COMPANY_API: `${HOST}/api/companyall`,

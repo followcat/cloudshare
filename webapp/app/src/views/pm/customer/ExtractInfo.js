@@ -58,8 +58,8 @@ class ExtractInfo extends Component {
     }
   }
 
-  handleAfterClose(key, value, date) {
-    this.props.onRemove(key, value, date);
+  handleAfterClose(key, value, date, id) {
+    this.props.onRemove(key, value, date, id);
   }
 
   getExtractElement() {
@@ -86,14 +86,14 @@ class ExtractInfo extends Component {
     return null;
   }
 
-  getEditingRender(dataIndex, prop) {
+  getEditingRender(dataIndex, prop, id) {
     if (Array.isArray(prop)) {
       return prop.map((v, i) => {
         return (
           <Tag
             key={i}
             closable={this.state.editing}
-            afterClose={() => this.handleAfterClose(dataIndex, v.content, v.date)}
+            afterClose={() => this.handleAfterClose(dataIndex, v.content, v.date, id)}
           >
             {v.content}
           </Tag>
@@ -119,7 +119,6 @@ class ExtractInfo extends Component {
       title: language.RELATED_COMPANY,
       dataIndex: 'relatedcompany'
     }];
-
     return (
       <Card
         title={this.props.title}
@@ -132,7 +131,7 @@ class ExtractInfo extends Component {
               <Col span={4}>{item.title}</Col>
               <Col span={16}>
                 {this.state.editing ?
-                    this.getEditingRender(item.dataIndex, dataSource[item.dataIndex]) :
+                    this.getEditingRender(item.dataIndex, dataSource[item.dataIndex],dataSource['id']) :
                     this.getNormalRender(dataSource[item.dataIndex])
                 }
               </Col>
@@ -141,6 +140,7 @@ class ExtractInfo extends Component {
                     <Col span={4}>
                       <EnhancedInput
                         type="plus"
+                        id={dataSource['id']}
                         placeholder=""
                         dataIndex={item.dataIndex}
                         onClick={this.handleEnhancedInputClick}

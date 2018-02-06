@@ -35,7 +35,7 @@ class DetailInformation extends Component {
       editing: false,
     });
     const value = this.props.form.getFieldsValue();
-    this.props.onSave(value);
+    this.props.onSave(Object.assign({id: this.props.dataSource['id']},value));
   }
 
   handleCancelClick(e) {
@@ -111,7 +111,7 @@ class DetailInformation extends Component {
             <Row key={v.key} className="cs-item-row">
               <Col span={4}>{v.title}</Col>
               <Col span={18}>
-                {editing && v.editable ? this.renderForm(v) : this.renderValue(v)}
+                {editing ? this.renderForm(v) : this.renderValue(v)}
               </Col>
             </Row>
           );

@@ -2,12 +2,43 @@
 import StorageUtil from 'utils/storage';
 import Generator from 'utils/generator';
 import { API } from 'config/api';
+import { newFetch } from './newfetch';
 import { callbackFunction } from './callback';
 import 'whatwg-fetch';
 
 // 获取公司信息
 export const getCompanyInfo = (params, callback) => {
-  return fetch(`${API.COMPANY_API}/${params.id}`, {
+  return newFetch(`${API.COMPANY_API}/${params.id}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+// 获取简历中公司信息
+export const getResumeCompanyInfo = (params, callback) => {
+  return newFetch(`${API.RESUME_COMPANY_API}/${params.id}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Authorization': `Basic ${StorageUtil.get('token')}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => response.json())
+  .then(json => callbackFunction(callback, json));
+};
+
+// 搜索公司
+export const searchCompany = (params, callback) => {
+  return fetch(`${API.SEARCH_COMPANY_API}?${params.param}`, {
     method: 'GET',
     credentials: 'include',
     headers: {
@@ -26,7 +57,7 @@ export const getCompanyInfo = (params, callback) => {
  * @return {fucntion}            [description]
  */
 export const getCompanys = (callback) => {
-  return fetch(API.COMPANYLIST_API, {
+  return newFetch(API.COMPANYLIST_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -47,7 +78,7 @@ export const getCompanys = (callback) => {
  * @return {function} fetch    异步请求方法
  */
 export const createCompany = (params, callback) => {
-  return fetch(API.COMPANY_API, {
+  return newFetch(API.COMPANY_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -68,7 +99,7 @@ export const createCompany = (params, callback) => {
  * @return {function} fetch    异步请求方法
  */
 export const getAllCompany = (params, callback) => {
-  return fetch(API.ALL_COMPANY_API, {
+  return newFetch(API.ALL_COMPANY_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -89,7 +120,7 @@ export const getAllCompany = (params, callback) => {
  * @return {function} fetch    异步请求方法
  */
 export const getAddedCompanyList = (params, callback) => {
-  return fetch(API.ADDED_COMPANY_LIST_API, {
+  return newFetch(API.ADDED_COMPANY_LIST_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -110,7 +141,7 @@ export const getAddedCompanyList = (params, callback) => {
  * @return {function} fetch    异步请求方法
  */
 export const getAllCompanyBySearch = (params, callback) => {
-  return fetch(API.COMPANY_BY_SEARCH_KEY_API, {
+  return newFetch(API.COMPANY_BY_SEARCH_KEY_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -131,7 +162,7 @@ export const getAllCompanyBySearch = (params, callback) => {
  * @return {function} fetch    异步请求方法
  */
 export const updateCompanyInfo = (params, callback) => {
-  return fetch(API.UPDATE_COMPANY_INFO_API, {
+  return newFetch(API.UPDATE_COMPANY_INFO_API, {
     method: 'PUT',
     credentials: 'include',
     headers: {
@@ -152,7 +183,7 @@ export const updateCompanyInfo = (params, callback) => {
  * @return {function} fetch    异步请求方法
  */
 export const updateCompanyInfoList = (params, callback) => {
-  return fetch(API.UPDATE_COMPANY_INFO_API, {
+  return newFetch(API.UPDATE_COMPANY_INFO_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -167,13 +198,13 @@ export const updateCompanyInfoList = (params, callback) => {
 };
 
 /**
- * 更新公司信息List
+ * 删除公司信息List
  * @param  {object}   params   需要更新的字段参数
  * @param  {function} callback 回调函数
  * @return {function} fetch    异步请求方法
  */
 export const deleteCompanyInfoList = (params, callback) => {
-  return fetch(API.UPDATE_COMPANY_INFO_API, {
+  return newFetch(API.UPDATE_COMPANY_INFO_API, {
     method: 'DELETE',
     credentials: 'include',
     headers: {
@@ -192,7 +223,7 @@ export const deleteCompanyInfoList = (params, callback) => {
  * @param {function} callback  回调函数
  */
 export const getCustomerList = (params,callback) => {
-  return fetch(API.COMPANY_CUSTOMER_LIST_API, {
+  return newFetch(API.COMPANY_CUSTOMER_LIST_API, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -213,7 +244,7 @@ export const getCustomerList = (params,callback) => {
  * @param {function} callback 回调函数
  */
 export const updateCustomer = (method, params, callback) => {
-  return fetch(API.COMPANY_CUSTOMER_API, {
+  return newFetch(API.COMPANY_CUSTOMER_API, {
     method: method,
     credentials: 'include',
     headers: {
@@ -233,7 +264,7 @@ export const updateCustomer = (method, params, callback) => {
  * @param {function} callback 回调函数
  */
 export const confirmExcelUpload = (params, callback) => {
-  return fetch(API.CONFIRM_UPLOAD_EXCEL_API, {
+  return newFetch(API.CONFIRM_UPLOAD_EXCEL_API, {
     method: 'POST',
     credentials: 'include',
     headers: {

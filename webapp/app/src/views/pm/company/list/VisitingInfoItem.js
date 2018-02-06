@@ -1,7 +1,7 @@
 'use strict';
 import React, { Component, PropTypes } from 'react';
 
-import { Input } from 'antd';
+import { Input, Icon } from 'antd';
 
 import cloneDeep from 'lodash/cloneDeep';
 import remove from 'lodash/remove';
@@ -74,6 +74,9 @@ class VisitingInfoItem extends Component {
       return (
         <div className="visiting-form">
           <Input value={fieldValue} size="small" onChange={this.handleChange} />
+          <Icon type="check" 
+            onClick={this.props.handleSaveListClick}
+          />
         </div>
       );
     }
@@ -82,7 +85,7 @@ class VisitingInfoItem extends Component {
   }
 
   getRender() {
-    const { visible, editStatus } = this.props,
+    const { visible, editStatus, dataSource } = this.props,
           { datas, opening } = this.state;
 
     if (!visible) {
@@ -95,12 +98,6 @@ class VisitingInfoItem extends Component {
           {datas && datas.length > 0 ?
             `${datas[0].author} | ${datas[0].date.split(' ')[0]} | ${datas[0].content}` :
             `暂无数据`}
-          {editStatus && datas.length > 0 ?
-            <a
-              className="visiting-list-del"
-              href="javascript: void(0);"
-              onClick={() => this.handleDeleteClick(datas[0])}>{language.DELETE}</a> :
-            null}
         </div>
       );
     } else {
@@ -109,16 +106,10 @@ class VisitingInfoItem extends Component {
           onDoubleClick={this.handleDoubleClick}
         >
           {datas && datas.length > 0 ? 
-            datas.map((item, index) => {
+            dataSource.map((item, index) => {
               return (
                 <p key={index} className="visiting-list">
                   {`${item.author} | ${item.date.split(' ')[0]} | ${item.content}`}
-                  {editStatus ?
-                    <a
-                      className="visiting-list-del"
-                      href="javascript: void(0);"
-                      onClick={() => this.handleDeleteClick(item)}>{language.DELETE}</a> :
-                    null}
                 </p>
               );
             }) :

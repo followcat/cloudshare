@@ -68,8 +68,7 @@ class SearchIndex(services.operator.search.SearchIndex):
                             "match":              "project.name",
                             "mapping": {
                                 "type":           "text",
-                                "analyzer":       "ik_smart",
-                                "fielddata":       True,
+                                "analyzer":       "ik_smart"
                             }
                     }},
                     {
@@ -93,7 +92,18 @@ class SearchIndex(services.operator.search.SearchIndex):
                                 "type":           "keyword"
                             }
                     }}
-                ]
+                ],
+                "properties": {
+                    "project": {
+                        "properties": {
+                            "name": {
+                                "type": "text",
+                                "analyzer": "ik_smart",
+                                "fielddata": True
+                            }
+                        }
+                    }
+                }
             }
         }
     }

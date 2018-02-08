@@ -1,0 +1,34 @@
+
+    #Code redundancy:
+    -view/pm company and customers Code similarity is very high
+    -webap/src/view/pm/company/list/CompanyList line146 The page has not been deleted
+
+    #Defect:
+    -List data only use hook button can save in company management page
+    -URL does not distinguish between roles:
+        Router definition blur
+    -No use of Redux to Managing state and props causing data flow confusion
+    -Signed customers phone is string no list
+    -he method of encapsulating newfetch is not fully used because lack of test,a part of request is in /view.
+    -Less uses messy
+    -Message system hints are incomplete,There is no view of the message, can not distinguish the type
+
+    #Tool class description:
+    -lodashi:
+        1.lodash 的操作（例如 forEach）都是对对象/数组都可用的，
+        2.lodash 的操作都是 null-safe 的，
+    -intro.js:
+        js引导插件,用于指引用户完成流程操作
+    -enzyme:
+        enzyme是一种用于反应的JavaScript测试工具，它可以更容易地断言、操作和遍历响应组件的输出
+    -marked:
+        高效的Markdown解析器
+    -Moment:
+        Moment.js 是一个 JavaScript 日期处理类库,用于解析、检验、操作、以及显示日期
+    webapp/app/src/utils:
+        color-grad: hex颜色和RGB颜色转换
+        storage: localStorage,sessionStorage get/set/remove 方法
+        summary-generator: 简历概要信息生成
+
+
+
